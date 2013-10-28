@@ -27,5 +27,4 @@ test/testharness/*/*.sh_init.stdout
 test/testharness/*/*.out
 core*
 test/valgrind/*.out
-contextBroker.*
 src/lib/common/version.h
