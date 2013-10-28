@@ -1,0 +1,895 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# fermin at tid dot es
+
+--NAME--
+Query SEQ
+--SHELL-INIT--
+# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
+running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
+if [ $running_broker -ne 0 ]; then
+  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
+  # Wait some time so the broker can finish properly
+  sleep 1
+  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
+  if [ $running_broker -ne 0 ]; then
+    # If the broker refuses to stop politely, kill the process by brute force
+    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
+    sleep 1
+    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
+    if [ $running_broker -ne 0 ]; then
+      echo "Existing contextBroker is inmortal, can not be killed!"
+      exit 1
+    fi
+  fi
+fi
+
+echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
+CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
+if [ "$VALGRIND" == "" ]; then
+  $CB_START_CMD
+  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
+  sleep 1
+else
+  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
+  # Waiting for valgrind to start (sleep 10)
+  sleep 10s
+fi
+
+# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
+running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
+if [ $running_broker -ne 1 ]; then
+  echo "Unable to start contextBroker"
+  exit 1
+fi
+
+--SHELL--
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+        <attribute>pressure</attribute>
+        <attribute>lightstatus</attribute>
+  </attributeList>
+</queryContextRequest>
+EOF
+echo "1: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+        <attribute>temperature</attribute>
+  </attributeList>
+</queryContextRequest>
+EOF
+echo "2: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+  <registerContextRequest>
+    <contextRegistrationList>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="Room" isPattern="false">
+            <id>ConferenceRoom</id>
+          </entityId>
+          <entityId type="Room" isPattern="false">
+            <id>OfficeRoom</id>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
+          <contextRegistrationAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <isDomain>false</isDomain>
+          </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://localhost:1028/application</providingApplication>
+      </contextRegistration>
+    </contextRegistrationList>
+    <duration>PT1H</duration>
+    <registrationId></registrationId>
+  </registerContextRequest>
+EOF
+echo "3: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+        <attribute>pressure</attribute>
+        <attribute>lightstatus</attribute>
+  </attributeList>
+</queryContextRequest>
+EOF
+echo "4: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+        <attribute>temperature</attribute>
+  </attributeList>
+</queryContextRequest>
+EOF
+echo "5: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+        <attribute>pressure</attribute>
+        <attribute>lightstatus</attribute>
+  </attributeList>
+</queryContextRequest>
+EOF
+echo "6: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+        <attribute>temperature</attribute>
+  </attributeList>
+</queryContextRequest>
+EOF
+echo "7: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+        <attribute>temperature</attribute>
+  </attributeList>
+</queryContextRequest>
+EOF
+echo "8: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+        <attribute>pressure</attribute>
+        <attribute>lightstatus</attribute>
+  </attributeList>
+</queryContextRequest>
+EOF
+echo "9: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>kOfficeRoom</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+        <attribute>pressure</attribute>
+        <attribute>lightstatus</attribute>
+        <attribute>temperature</attribute>
+  </attributeList>
+</queryContextRequest>
+EOF
+echo "10: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="kRoom" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+        <attribute>pressure</attribute>
+        <attribute>lightstatus</attribute>
+        <attribute>temperature</attribute>
+  </attributeList>
+</queryContextRequest>
+EOF
+echo "11: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+  </attributeList>
+</queryContextRequest>
+EOF
+echo "12: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+        <contextElement>
+          <entityId type="Room" isPattern="false">
+                <id>OfficeRoom</id>
+          </entityId>
+          <contextAttributeList>
+            <contextAttribute>
+          <name>pressure</name>
+                  <type>clima</type>
+                  <contextValue>p2300</contextValue>
+                </contextAttribute>
+            <contextAttribute>
+          <name>lightstatus</name>
+                  <type>light</type>
+                  <contextValue>L23</contextValue>
+                </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>
+EOF
+echo "13: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+  </attributeList>  
+</queryContextRequest>
+EOF
+echo "14: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+        <contextElement>
+          <entityId type="Room" isPattern="false">
+                <id>ConferenceRoom</id>
+          </entityId>
+          <contextAttributeList>
+            <contextAttribute>
+          <name>pressure</name>
+                  <type>clima</type>
+                  <contextValue>p23</contextValue>
+                </contextAttribute>
+            <contextAttribute>
+          <name>lightstatus</name>
+                  <type>light</type>
+                  <contextValue>L23</contextValue>
+                </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>
+EOF
+echo "15: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+  </attributeList>
+</queryContextRequest>
+EOF
+echo "16: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <entityId type="Room" isPattern="false">
+          <id>BadRoom</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+        <attribute>temperature</attribute>
+  </attributeList>
+</queryContextRequest>
+EOF
+echo "17: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+  <registerContextRequest>
+    <contextRegistrationList>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="Room" isPattern="false">
+            <id>ConferenceRoom2</id>
+          </entityId>
+          <entityId type="Room" isPattern="false">
+            <id>OfficeRoom2</id>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
+          <contextRegistrationAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <isDomain>false</isDomain>
+          </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://localhost:1028/application</providingApplication>
+      </contextRegistration>
+    </contextRegistrationList>
+    <duration>PT1H</duration>
+    <registrationId></registrationId>
+  </registerContextRequest>
+EOF
+echo "18: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="Room" isPattern="true">
+          <id>ConferenceRoom.*</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+        <attribute>temperature</attribute>
+  </attributeList>
+</queryContextRequest>
+EOF
+echo "19: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="Room" isPattern="true">
+          <id>ConferenceRoom.*</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+        <attribute>temperature</attribute>
+        <attribute>pressure</attribute>
+        <attribute>lightstatus</attribute>
+  </attributeList>
+</queryContextRequest>
+EOF
+--REGEXPECT--
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context elements found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+1: ++++++++++++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context elements found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+2: ++++++++++++++++++++
+<?xml version="1.0"?>
+<registerContextResponse>
+  <registrationId>REGEX([0-9a-f]{24})</registrationId>
+  <duration>PT1H</duration>
+</registerContextResponse>
+3: ++++++++++++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context elements found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+4: ++++++++++++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+5: ++++++++++++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context elements found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+6: ++++++++++++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+7: ++++++++++++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+8: ++++++++++++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context elements found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+9: ++++++++++++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context elements found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+10: ++++++++++++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context elements found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+11: ++++++++++++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+12: ++++++++++++++++++++
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue/>
+          </contextAttribute>
+          <contextAttribute>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+13: ++++++++++++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue>p2300</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue>L23</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+14: ++++++++++++++++++++
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue/>
+          </contextAttribute>
+          <contextAttribute>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+15: ++++++++++++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue>p23</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue>L23</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue>p2300</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue>L23</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+16: ++++++++++++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+17: ++++++++++++++++++++
+<?xml version="1.0"?>
+<registerContextResponse>   
+  <registrationId>REGEX([0-9a-f]{24})</registrationId>
+  <duration>PT1H</duration>
+</registerContextResponse>
+18: ++++++++++++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom2</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+19: ++++++++++++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue>p23</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue>L23</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom2</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+--TEARDOWN--
+if [ "$VALGRIND" == "" ]; then
+  kill $(cat ${BROKER_PID_FILE})
+  rm /tmp/orion_${BROKER_PORT}.pid
+else
+  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
+  # Waiting for valgrind to terminate (sleep 10)
+  sleep 10
+fi

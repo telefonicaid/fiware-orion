@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <discoverContextAvailabilityRequest>
+    <entityIdList>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+    </entityIdList>
+  </discoverContextAvailabilityRequest>

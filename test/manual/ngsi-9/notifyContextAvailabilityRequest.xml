@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notifyContextAvailabilityRequest>
+	<subscriptionId>124588689asdf6</subscriptionId>
+	<contextRegistrationResponseList>
+		<contextRegistrationResponse>
+			<contextRegistration>
+				<entityIdList>
+					<entityId type="Room" isPattern="false">
+						<id>ConferenceRoom</id>						
+					</entityId>
+					<entityId type="Room" isPattern="false">
+						<id>OfficeRoom</id>						
+					</entityId>
+				</entityIdList>
+				<contextRegistrationAttributeList>
+					<contextRegistrationAttribute>
+						<name>temperature</name>
+						<type>degree</type>
+						<isDomain>false</isDomain>
+						<metadata>
+							<contextMetadata>
+								<name>ID</name>
+								<type>string</type>
+								<value>1110</value>
+							</contextMetadata>							
+						</metadata>
+					</contextRegistrationAttribute>
+				</contextRegistrationAttributeList>
+				<registrationMetadata>
+					<contextMetadata>
+						<name>ID</name>
+						<type>string</type>
+						<value>2212</value>
+					</contextMetadata>					
+				</registrationMetadata>
+				<providingApplication>http://192.168.100.1:70/application
+				</providingApplication>
+			</contextRegistration>
+		</contextRegistrationResponse>
+	</contextRegistrationResponseList>
+</notifyContextAvailabilityRequest>

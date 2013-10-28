@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updateContextSubscriptionRequest>
+  <duration>P50Y</duration>
+  <restriction>
+	<attributeExpression>AttriTest</attributeExpression>
+	<scope>
+	  <operationScope>
+		<scopeType>st1</scopeType>
+		<scopeValue>sv1</scopeValue>
+	  </operationScope>
+	  <operationScope>
+		<scopeType>st2</scopeType>
+		<scopeValue>sv2</scopeValue>
+	  </operationScope>
+	</scope>
+  </restriction>
+  <subscriptionId>012345678901234567891234</subscriptionId>
+  <notifyConditions>
+	<notifyCondition>
+	  <type>ONCHANGE</type>
+	  <condValueList>
+		<condValue>CondValue3</condValue>
+		<condValue>CondValue4</condValue>
+	  </condValueList>
+	</notifyCondition>
+  </notifyConditions>
+  <throttling>P5Y</throttling>
+</updateContextSubscriptionRequest>

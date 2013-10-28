@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updateContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>temperature</name>
+      <type>Room</type>
+      <contextValue>10</contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>1110</value>
+        </contextMetadata>
+        <contextMetadata>
+          <name></name>
+          <type></type>
+          <value></value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+    <contextAttribute>
+      <name>temperature</name>
+      <type>Room</type>
+      <contextValue>10</contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>1110</value>
+        </contextMetadata>
+        <contextMetadata>
+          <name></name>
+          <type></type>
+          <value></value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
+</updateContextElementRequest>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+	<contextElement>
+	  <entityId type="Room" isPattern="false">
+		<id>OfficeRoom</id>
+	  </entityId>
+	  <contextAttributeList>
+	    <contextAttribute>
+          <name>temperature</name>
+		  <type>degree</type>
+		  <contextValue>21</contextValue>
+		  <metadata>
+			<contextMetadata>
+			  <name>attributeValueIdentifier1</name>
+			  <type>long</type>
+			  <value>1</value>
+			</contextMetadata>
+			<contextMetadata>
+			  <name>attributeValueIdentifier2</name>
+			  <type>long</type>
+			  <value>2</value>
+			</contextMetadata>
+			<contextMetadata>
+			  <name>attributeValueIdentifier3</name>
+			  <type>long</type>
+			  <value>3</value>
+			</contextMetadata>
+		  </metadata>
+		</contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>DELETE</updateAction>
+</updateContextRequest>

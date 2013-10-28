@@ -1,0 +1,21 @@
+{
+	"entities": [],
+	"attributes": [
+		"temperature",
+		"occupancy",
+		"lightstatus"
+	],
+	"restriction": {
+		"attributeExpression" : "Attribute Expression",
+		"scopes": [
+			{
+				"type" : "st1",
+				"value" : "sv1"
+			},
+			{
+				"type" : "st2",
+				"value" : "sv2"
+			}
+		]
+	}
+}

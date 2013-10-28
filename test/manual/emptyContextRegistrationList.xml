@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <registerContextRequest>
+    <contextRegistrationList>
+    </contextRegistrationList>
+    <duration>PT1H</duration>
+    <registrationId></registrationId>
+  </registerContextRequest>
+

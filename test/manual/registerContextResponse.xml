@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<registerContextResponse>
+  <duration>PT1M</duration>
+  <registrationId>1579964ss5t</registrationId>
+  <errorCode>
+    <code>200</code>
+    <reasonPhrase>REASON</reasonPhrase>
+    <details>DETAILS</details>
+  </errorCode>
+</registerContextResponse>

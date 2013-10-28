@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unsubscribeContextAvailabilityResponse>
+	<subscriptionId>124588689asdf6</subscriptionId>
+	<statusCode>
+		<code>200</code>
+		<reasonPhrase>Ok</reasonPhrase>
+		<details>a</details>
+	</statusCode>
+</unsubscribeContextAvailabilityResponse>

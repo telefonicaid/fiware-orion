@@ -1,0 +1,26 @@
+Open Source Contribution Policy between Contributor and Telefónica Investigación y Desarrollo, S.A.U.
+
+With the aim of establish a Contribution Policy between the contributors and Telefónica I+D, contributors must send this policy signed in order to express the acceptance of all its sections.
+Contributor Contact Information
+Name (Contributor):__________________________________________________
+E-mail:_____________________________________________________________
+Phone:_____________________________________________________________
+Mailing Address:_____________________________________________________
+
+1.-  Contributor declare to own all the rights necessary to contribute with any material intended to be compiled or integrated with Source Code offered by Telefónica I+D after the acceptance of this policy by Telefónica I+D.
+
+2. By the acceptance of this policy, the Contributor assigns to Telefónica I+D the  ownership of the Contribution in all worldwide common law and statutory rights associated with the copyrights, copyright application, copyright registration and moral rights in the Contribution to the extent allowable under applicable local laws and copyright conventions.
+
+3. The Contributor will keep the moral rights and the authorship of the Contribution,
+
+4. The contributor agrees that the contribution given by this joint copyright assignment can be used by Telefónica I+D to establish and create privative versions of the contribution or to include it in privative products. The contributor will be mandatory mentioned as the author of the contribution, but all the rights and revenues of this privative version, will be owned by Telefónica I+D.
+
+5. This policy supersedes and replaces all prior copyrights assignments or agreements made by the contributor to Telefónica I+D under this project.
+
+6. This policy will apply to all contributions of the contributor, until one of the parties cancel or modify it by a written declaration or if a new one is signed.
+
+7. Contributor is legally entitled to grant the above policy and agrees not to provide any Contribution that violates any law or breaches any contract.
+
+Signed: ____________________________________________Date:________________
+
+Please send a signed original to fermin at tid dot es

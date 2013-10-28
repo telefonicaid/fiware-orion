@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<subscribeContextAvailabilityResponse>
+	<subscriptionId>12458896</subscriptionId>
+	<duration>PT1M</duration>
+	<errorCode>
+		<code>200</code>
+		<reasonPhrase>Ok</reasonPhrase>
+		<details>a</details>
+	</errorCode>
+</subscribeContextAvailabilityResponse>

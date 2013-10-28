@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+	<contextElement>
+	  <entityId type="Room" isPattern="false">
+		<id>ConferenceRoom</id>
+	  </entityId>
+	  <contextAttributeList>
+	    <contextAttribute>
+          <name>temperature</name>
+		  <type>degree</type>
+		  <contextValue>c23</contextValue>
+		  <metadata>
+			<contextMetadata>
+			  <name>attributeValueIdentifier1</name>
+			  <type>long</type>
+			  <value>1</value>
+			</contextMetadata>
+			<contextMetadata>
+			  <name>attributeValueIdentifier2</name>
+			  <type>long</type>
+			  <value>2</value>
+			</contextMetadata>
+			<contextMetadata>
+			  <name>attributeValueIdentifier3</name>
+			  <type>long</type>
+			  <value>3</value>
+			</contextMetadata>
+		  </metadata>
+		</contextAttribute>
+	    <contextAttribute>
+          <name>lightstatus</name>
+		  <type>light</type>
+		  <contextValue>d23</contextValue>
+		  <metadata>
+			<contextMetadata>
+			  <name>attributeValueIdentifier1</name>
+			  <type>long</type>
+			  <value>1</value>
+			</contextMetadata>
+			<contextMetadata>
+			  <name>attributeValueIdentifier2</name>
+			  <type>long</type>
+			  <value>2</value>
+			</contextMetadata>
+			<contextMetadata>
+			  <name>attributeValueIdentifier3</name>
+			  <type>long</type>
+			  <value>3</value>
+			</contextMetadata>
+		  </metadata>
+		</contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>

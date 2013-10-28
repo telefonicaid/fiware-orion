@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<appendContextAttributeResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>Room</type>
+          <contextValue>10</contextValue>
+          <metadata>
+            <contextMetadata>
+              <name>ID</name>
+              <type>string</type>
+              <value>1110</value>
+            </contextMetadata>
+            <contextMetadata>
+              <name></name>
+              <type></type>
+              <value></value>
+            </contextMetadata>
+          </metadata>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>Ok</reasonPhrase>
+        <details>a</details>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+  <errorCode>
+    <code>200</code>
+    <reasonPhrase>Ok</reasonPhrase>
+    <details>a</details>
+  </errorCode>
+</appendContextAttributeResponse>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<subscribeContextRequest>
+	<entityIdList>
+		<entityId type="Room" isPattern="false">
+			<id>ConferenceRoom</id>			
+		</entityId>
+		<entityId type="Room" isPattern="false">
+			<id>ConferenceRoom</id>			
+		</entityId>
+	</entityIdList>
+	<attributeList>
+		<attribute>temperature</attribute>
+		<attribute>temperature</attribute>
+	</attributeList>
+	<reference>127.0.0.1</reference>
+	<duration>P5Y</duration>
+	<restriction>
+		<attributeExpression>testRestriction</attributeExpression>
+		<scope>
+			<operationScope>
+				<scopeType>st1</scopeType>
+				<scopeValue>sv1</scopeValue>
+			</operationScope>
+			<operationScope>
+				<scopeType>st2</scopeType>
+				<scopeValue>sv2</scopeValue>
+			</operationScope>
+		</scope>
+	</restriction>
+	<notifyConditions>
+		<notifyCondition>
+			<type>ONCHANGE</type>
+			<condValueList>
+				<condValue>CondValue1</condValue>
+				<condValue>CondValue2</condValue>
+			</condValueList>
+			<restriction>restriction</restriction>
+		</notifyCondition>
+	</notifyConditions>
+	<throttling>P5Y</throttling>
+</subscribeContextRequest>
+

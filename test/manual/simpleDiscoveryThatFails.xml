@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <discoverContextAvailabilityRequest>
+    <entityIdList>
+      <entityId type="xRoom" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <entityId type="xRoom" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+    </entityIdList>
+    <attributeList>
+      <attribute>temperature</attribute>
+      <attribute>pressure</attribute>
+    </attributeList>
+    <restriction>
+      <attributeExpression>AttExpr</attributeExpression>
+      <scope>
+        <operationScope>
+          <scopeType>st1</scopeType>
+          <scopeValue>sv1</scopeValue>
+        </operationScope>
+        <operationScope>
+          <scopeType>st2</scopeType>
+          <scopeValue>sv2</scopeValue>
+        </operationScope>
+      </scope>
+    </restriction>
+  </discoverContextAvailabilityRequest>

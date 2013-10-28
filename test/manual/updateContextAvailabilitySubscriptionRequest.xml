@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updateContextAvailabilitySubscriptionRequest>
+	<entityIdList>
+		<entityId type="Room" isPattern="false">
+			<id>ConferenceRoom</id>
+		</entityId>
+		<entityId type="Room" isPattern="false">
+			<id>OfficeRoom</id>
+		</entityId>
+	</entityIdList>
+	<attributeList>
+		<attribute>temperature</attribute>
+		<attribute>occupancy</attribute>
+		<attribute>lightstatus</attribute>
+	</attributeList>
+	<duration>PT1M</duration>
+	<restriction>
+		<attributeExpression></attributeExpression>
+		<scope>
+			<operationScope>
+				<scopeType>st1</scopeType>
+				<scopeValue>1</scopeValue>
+			</operationScope>
+			<operationScope>
+				<scopeType>st2</scopeType>
+				<scopeValue>2</scopeValue>
+			</operationScope>
+		</scope>
+	</restriction>
+	<subscriptionId>SUBSCRIPTIONID</subscriptionId>
+</updateContextAvailabilitySubscriptionRequest>

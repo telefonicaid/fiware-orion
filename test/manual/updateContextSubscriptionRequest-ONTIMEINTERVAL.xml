@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updateContextSubscriptionRequest>
+  <duration>P5Y</duration>
+  <restriction>
+	<attributeExpression>testRestriction</attributeExpression>
+	<scope>
+	  <operationScope>
+		<scopeType>scope1</scopeType>
+		<scopeValue>sval1</scopeValue>
+	  </operationScope>
+	  <operationScope>
+		<scopeType>scope2</scopeType>
+		<scopeValue>sval2</scopeValue>
+	  </operationScope>
+	</scope>
+  </restriction>
+  <subscriptionId>SUBSCRIPTIONID</subscriptionId>
+  <notifyConditions>
+	<notifyCondition>
+	  <type>ONTIMEINTERVAL</type>
+	  <condValueList>
+		<condValue>PT3S</condValue>
+	  </condValueList>
+	  <restriction>restriction</restriction>
+	</notifyCondition>
+  </notifyConditions>
+  <throttling>P5Y</throttling>
+</updateContextSubscriptionRequest>

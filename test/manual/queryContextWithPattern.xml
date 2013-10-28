@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+	<entityId type="Room" isPattern="true">
+	  <id>ConferenceRoom.*</id>
+	</entityId>
+	<entityId type="Room" isPattern="false">
+	  <id>OfficeRoom</id>   
+	</entityId>
+  </entityIdList>
+  <attributeList>
+	<attribute>temperature</attribute>
+	<attribute>occupancy</attribute>
+	<attribute>lightstatus</attribute>
+  </attributeList>
+  <restriction>
+	<attributeExpression>Attribute Expression</attributeExpression>
+	<scope>
+	  <operationScope>
+		<scopeType>st1</scopeType>
+		<scopeValue>sv1</scopeValue>
+	  </operationScope>
+	  <operationScope>
+		<scopeType>st2</scopeType>
+		<scopeValue>sv2</scopeValue>
+	  </operationScope>
+	</scope>
+  </restriction>
+</queryContextRequest>

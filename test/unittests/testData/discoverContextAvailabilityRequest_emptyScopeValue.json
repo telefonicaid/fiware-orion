@@ -1,0 +1,31 @@
+{
+	"entities": [
+		{
+			"type": "Room",
+			"isPattern": "false",
+			"id": "ConferenceRoom"
+		},
+		{
+			"type": "Room",
+			"isPattern": "false",
+			"id": "OfficeRoom"
+		}
+	],
+	"attributes": [
+		"temperature",
+		"pressure"
+	],
+	"restriction": {
+		"attributeExpression" : "Attribute Expression",
+		"scopes": [
+			{
+				"type" : "st1",
+				"value" : ""
+			},
+			{
+				"type" : "st2",
+				"value" : "sv2"
+			}
+		]
+	}
+}

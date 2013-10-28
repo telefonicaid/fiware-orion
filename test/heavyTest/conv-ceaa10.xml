@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updateContextAttributeRequest>
+  <type>Room</type>
+  <contextValue>10</contextValue>
+  <metadata>
+    <contextMetadata>
+      <name>ID</name>
+      <type>string</type>
+      <value>1110</value>       
+    </contextMetadata>
+    <contextMetadata>
+      <name>M2</name>
+      <type>T2</type>
+      <value>V2</value> 
+    </contextMetadata>
+  </metadata>
+</updateContextAttributeRequest>

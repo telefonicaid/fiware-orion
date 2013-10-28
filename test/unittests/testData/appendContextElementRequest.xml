@@ -1,0 +1,10 @@
+<appendContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>pressure</name>
+      <type>clima</type>
+      <contextValue>p23</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>
