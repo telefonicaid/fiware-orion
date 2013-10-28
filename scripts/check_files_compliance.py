@@ -108,7 +108,7 @@ def ignore(root, file):
 
     # Particular cases of files that are also ignored
     if file == '.gitignore' or file == '.valgrindrc' or file == '.valgrindSuppressions' \
-        or file == 'README.md' or file == 'LICENSE.txt' or file == 'ContributionPolicy.txt' \
+        or file == 'README.md' or file == 'LICENSE' or file == 'ContributionPolicy.txt' \
         or file == 'version.h':
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
@@ -122,7 +122,7 @@ def supported_extension(root, file):
     if file.endswith('.py') or file.endswith('.cpp') or file.endswith('.h') or file.endswith('.xml')\
         or file.endswith('.json') or file.endswith('.test') or file.endswith('.vtest') or file.endswith('.txt')\
         or file.endswith('.sh') or file == 'makefile' or file == 'Makefile' or file.endswith('.spec') \
-        or file.endswith('.cfg') or file.endswith('.DISABLED'):
+        or file.endswith('.cfg') or file.endswith('.DISABLED') or file.endswith('.xtest'):
         return True
 
     if 'config' in root and file == 'contextBroker':
