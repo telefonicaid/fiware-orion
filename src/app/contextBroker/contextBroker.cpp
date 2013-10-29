@@ -100,6 +100,8 @@
 #include "serviceRoutines/badNgsi9Request.h"
 #include "serviceRoutines/badNgsi10Request.h"
 #include "serviceRoutines/badRequest.h"
+#include "contextBroker/version.h"
+
 
 /* ****************************************************************************
 *
@@ -467,6 +469,7 @@ int main(int argC, char* argV[])
   paConfig("man description",      (void*) description);
   paConfig("man author",           (void*) "Telefonica I+D");
   paConfig("man exitstatus",       (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
+  paConfig("man version",          (void*) ORION_VERSION);
 
   paConfig("builtin prefix",                    (void*) "ORION_");
   paConfig("usage and exit on any warning",     (void*) true);

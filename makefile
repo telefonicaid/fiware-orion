@@ -33,9 +33,9 @@ ifndef CPU_COUNT
 	CPU_COUNT:=$(shell cat /proc/cpuinfo | grep processor | wc -l)
 endif
 
-# Version for the contextBroker-* packages (execept contextBroker-fiware)
+# Version for the contextBroker-* packages (except contextBroker-fiware)
 ifndef BROKER_VERSION
-	BROKER_VERSION:=$(shell grep "\#define DEFAULT_VERSION" src/lib/parseArgs/paConfig.h | sed -e 's/^.* "//' -e 's/"//')
+	BROKER_VERSION:=$(shell grep "\#define ORION_VERSION" src/app/contextBroker/version.h | sed -e 's/^.* "//' -e 's/"//')
 endif
 
 # Release ID for the contextBroker-* packages (execept contextBroker-fiware)
