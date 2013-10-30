@@ -43,7 +43,7 @@ HttpStatusCode mapPutIndividualContextEntity(std::string entityId, UpdateContext
 {
   HttpStatusCode          ms;
   UpdateContextRequest    ucRequest;
-  UpdateContextResponse*  ucResponseP = new UpdateContextResponse();
+  UpdateContextResponse   ucResponse;
   ContextElement          ce;
 
   ce.entityId.fill(entityId, "", "false");
@@ -53,25 +53,31 @@ HttpStatusCode mapPutIndividualContextEntity(std::string entityId, UpdateContext
   ucRequest.contextElementVector.push_back(&ce);
   ucRequest.updateActionType.set("Update");
 
-  ms = mongoUpdateContext(&ucRequest, ucResponseP);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse);
 
-  if (ucResponseP->contextElementResponseVector.size() > 1)
+  if (ucResponse.contextElementResponseVector.size() > 1)
   {
      response->errorCode.fill(SccReceiverInternalError, "Internal error", "Bad size of contextElementResponseVector from mongoUpdateContext");
      return ms;
   }
 
-  if (ucResponseP->contextElementResponseVector.size() == 0)
+  if (ucResponse.contextElementResponseVector.size() == 0)
   {
-     response->errorCode = ucResponseP->errorCode;
+     response->errorCode = ucResponse.errorCode;
      return ms;
   }
 
   ContextAttributeResponse* carP = new ContextAttributeResponse();
+  ContextElement*           ceP  = &ucResponse.contextElementResponseVector.get(0)->contextElement;
 
-  carP->contextAttributeVector = ucResponseP->contextElementResponseVector.get(0)->contextElement.contextAttributeVector;
+  for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+  {
+    ContextAttribute* caP = new ContextAttribute(ceP->contextAttributeVector.get(ix));
+    carP->contextAttributeVector.push_back(caP);
+  }
+
   response->contextResponseVector.push_back(carP);
-  response->errorCode.fill(&ucResponseP->contextElementResponseVector.get(0)->statusCode);
+  response->errorCode.fill(&ucResponse.contextElementResponseVector.get(0)->statusCode);
 
   return ms;
 }

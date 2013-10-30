@@ -42,9 +42,8 @@
 HttpStatusCode mapPutIndividualContextEntityAttributes(std::string entityId, UpdateContextElementRequest* ucerP, UpdateContextElementResponse* response)
 {
   HttpStatusCode          ms;
-
   UpdateContextRequest    ucRequest;
-  UpdateContextResponse*  ucResponseP = new UpdateContextResponse();
+  UpdateContextResponse   ucResponse;
   ContextElement          ce;
 
   ce.entityId.fill(entityId, "", "false");
@@ -54,26 +53,32 @@ HttpStatusCode mapPutIndividualContextEntityAttributes(std::string entityId, Upd
   ucRequest.contextElementVector.push_back(&ce);
   ucRequest.updateActionType.set("Update");
 
-  ms = mongoUpdateContext(&ucRequest, ucResponseP);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse);
 
-  if (ucResponseP->contextElementResponseVector.size() > 1)
+  if (ucResponse.contextElementResponseVector.size() > 1)
   {
      response->errorCode.fill(SccReceiverInternalError, "Internal error", "Bad size of contextElementResponseVector from mongoUpdateContext");
      return ms;
   }
 
-  if (ucResponseP->contextElementResponseVector.size() == 0)
+  if (ucResponse.contextElementResponseVector.size() == 0)
   {
-     response->errorCode = ucResponseP->errorCode;
+     response->errorCode.fill(&ucResponse.errorCode);
      return ms;
   }
 
   ContextAttributeResponse* carP = new ContextAttributeResponse();
+  ContextElement*           ceP  = &ucResponse.contextElementResponseVector.get(0)->contextElement;
 
-  carP->contextAttributeVector = ucResponseP->contextElementResponseVector.get(0)->contextElement.contextAttributeVector;
-  carP->statusCode.fill(&ucResponseP->contextElementResponseVector.get(0)->statusCode);
+  for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+  {
+    ContextAttribute* caP = new ContextAttribute(ceP->contextAttributeVector.get(ix));
+    carP->contextAttributeVector.push_back(caP);
+  }
+
   response->contextResponseVector.push_back(carP);  
-  response->errorCode.fill(&ucResponseP->errorCode);
+  response->errorCode.fill(&ucResponse.errorCode);
+  carP->statusCode.fill(&ucResponse.contextElementResponseVector.get(0)->statusCode);
 
   return ms;
 }
