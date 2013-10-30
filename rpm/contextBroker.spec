@@ -147,6 +147,19 @@ Using these interfaces, clients can do several operations:
 %files -n %{name}-fiware
 
 %changelog
+* Wed Oct 30 2013 Fermin Galan <fermin@tid.es> 0.8.1-1 (FIWARE-3.2.1-1)
+- First version released as open source
+- ADD lastest-updates.py script 
+- ADD statistics as a REST service 
+- ADD compilation inforamtion in REST version message
+- REMOVE -reset from contextBroker invocation (too dangerous!)
+- FIX licence text on --version, to use AGPLv3
+- FIX problems with discoverContextAvailability when "type" and "id" is swapped in DB (spotted in Santander hackathon)
+- FIX memory leaks
+- FIX libmricohttp-devel dependency not needed for runtime
+- FIX crash with ONTIMEINTERVAL subscriptions (issue #9)
+- Starting the work in JSON rendering, not yet finished
+
 * Wed Oct 09 2013 Fermin Galan <fermin@tid.es> 0.8.0-1 (FIWARE-3.2.1-1)
 - ADD libmicrohttpd-devel to RPM dependencies
 - ADD entity creation timestamp in entities collection documents
