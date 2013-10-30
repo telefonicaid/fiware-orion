@@ -196,6 +196,8 @@ SET (SOURCES
     mongoBackend/mongoUpdateContext_withOnchangeSubscriptions_test.cpp
     mongoBackend/mongoNotifyContext_test.cpp
     mongoBackend/mongoNotifyContextAvailability_test.cpp
+
+    jsonParse/jsonRequest_test.cpp
 )
 
 SET (HEADERS
