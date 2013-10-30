@@ -59,9 +59,16 @@ fi
 %pre
 getent group %{owner} >/dev/null || groupadd -r %{owner}
 getent passwd %{owner} >/dev/null || useradd -r -g %{owner} -m -d /opt/orion -s /bin/bash -c 'Orion account' %{owner}
+# Backup previous sysconfig file (if any)
+DATE=$(date "+%Y-%m-%d")
+if [ -f "/etc/sysconfig/%{name}" ]; then
+   cp /etc/sysconfig/%{name} /etc/sysconfig/%{name}.orig-$DATE
+   chown %{owner}:%{owner} /etc/sysconfig/%{name}.orig-$DATE
+fi
 exit 0
 
 %post
+DATE=$(date "+%Y-%m-%d")
 /sbin/chkconfig --add %{name}
 mkdir -p /var/log/%{name}
 chown -R %{owner}:%{owner} /var/log/%{name}
@@ -72,6 +79,9 @@ cat <<EOMSG
 contextBroker requires additional configuration before the service can be
 started. Edit '/etc/sysconfig/%{name}' to provide the needed database
 configuration.
+
+Note that if you have a previously existing '/etc/sysconfig/%{name}' it
+has been renamed to /etc/sysconfig/%{name}.orig-$DATE.
 
 After configuring /etc/sysconfig/%{name} execute 'chkconfig %{name} on' to
 enable %{name} after a reboot.
@@ -151,12 +161,12 @@ Using these interfaces, clients can do several operations:
 - First version released as open source
 - ADD lastest-updates.py script 
 - ADD statistics as a REST service 
-- ADD compilation inforamtion in REST version message
+- ADD compilation information in REST version message
 - REMOVE -reset from contextBroker invocation (too dangerous!)
 - FIX licence text on --version, to use AGPLv3
 - FIX problems with discoverContextAvailability when "type" and "id" is swapped in DB (spotted in Santander hackathon)
 - FIX memory leaks
-- FIX libmricohttp-devel dependency not needed for runtime
+- FIX libmicrohttp-devel dependency not needed for runtime
 - FIX crash with ONTIMEINTERVAL subscriptions (issue #9)
 - Starting the work in JSON rendering, not yet finished
 
