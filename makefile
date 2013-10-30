@@ -65,22 +65,22 @@ all: prepare_release release
 
 di: install_debug
 
-git_version:
-	./scripts/gitVersion.sh
+compile_info:
+	./scripts/compileInfo.sh
 
-prepare_release: git_version
+prepare_release: compile_info
 	mkdir -p  BUILD_RELEASE || true
 	cd BUILD_RELEASE && cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_ARCH=$(BUILD_ARCH) -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
-prepare_debug: git_version
+prepare_debug: compile_info
 	mkdir -p  BUILD_DEBUG || true
 	cd BUILD_DEBUG && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DDEBUG=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
-prepare_coverage: git_version
+prepare_coverage: compile_info
 	mkdir -p  BUILD_COVERAGE || true
 	cd BUILD_COVERAGE && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
-prepare_unit_test: git_version
+prepare_unit_test: compile_info
 	@echo '------------------------------- prepare_unit_test starts ---------------------------------'
 	mkdir -p  BUILD_UNITTEST || true
 	cd BUILD_UNITTEST && cmake .. -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_ARCH=$(BUILD_ARCH) -DUNIT_TEST=True -DCOVERAGE=True -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)

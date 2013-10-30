@@ -27,4 +27,4 @@ test/testharness/*/*.sh_init.stdout
 test/testharness/*/*.out
 core*
 test/valgrind/*.out
-src/lib/common/version.h
+src/lib/common/compileInfo.h

@@ -18,17 +18,17 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
-date=$(date)
+date=$(LANG=C date)
 hash=$(git log | grep commit | head -1 | awk '{ print $2 }')
 user=$(whoami)
 host=$(hostname)
 
-echo '#ifndef CB_VERSION_H'                   >  src/lib/common/version.h
-echo '#define CB_VERSION_H'                  >> src/lib/common/version.h
-echo                                         >> src/lib/common/version.h
-echo '#define GIT_HASH         "'${hash}'"'  >> src/lib/common/version.h
-echo '#define COMPILE_TIME     "'${date}'"'  >> src/lib/common/version.h
-echo '#define COMPILED_BY      "'${user}'"'  >> src/lib/common/version.h
-echo '#define COMPILED_IN      "'${host}'"'  >> src/lib/common/version.h
-echo                                         >> src/lib/common/version.h
-echo '#endif'                                >> src/lib/common/version.h
+echo '#ifndef CB_VERSION_H'                   >  src/lib/common/compileInfo.h
+echo '#define CB_VERSION_H'                  >> src/lib/common/compileInfo.h
+echo                                         >> src/lib/common/compileInfo.h
+echo '#define GIT_HASH         "'${hash}'"'  >> src/lib/common/compileInfo.h
+echo '#define COMPILE_TIME     "'${date}'"'  >> src/lib/common/compileInfo.h
+echo '#define COMPILED_BY      "'${user}'"'  >> src/lib/common/compileInfo.h
+echo '#define COMPILED_IN      "'${host}'"'  >> src/lib/common/compileInfo.h
+echo                                         >> src/lib/common/compileInfo.h
+echo '#endif'                                >> src/lib/common/compileInfo.h

@@ -50,7 +50,7 @@
 #include "common/sem.h"
 #include "common/globals.h"
 #include "common/Timer.h"
-#include "common/version.h"
+#include "common/compileInfo.h"
 
 #include "serviceRoutines/logVerboseTreat.h"
 #include "serviceRoutines/logTraceTreat.h"
