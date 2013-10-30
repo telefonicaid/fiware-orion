@@ -24,8 +24,6 @@
 */
 #include "gtest/gtest.h"
 
-#include "parseArgs/paConfig.h"    // DEFAULT_VERSION
-
 #include "serviceRoutines/logVerboseTreat.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"

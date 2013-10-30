@@ -445,7 +445,7 @@ void exitFunc(void)
 const char* description =
    "\n"
    "Orion context broker version details:\n"
-   "  version:            " DEFAULT_VERSION "\n"
+   "  version:            " ORION_VERSION   "\n"
    "  git hash:           " GIT_HASH        "\n"
    "  compile time:       " COMPILE_TIME    "\n"
    "  compiled by:        " COMPILED_BY     "\n"
@@ -534,6 +534,9 @@ int main(int argC, char* argV[])
   int r;
   if ((r = restStart()) != 0)
      LM_X(1, ("restStart: error %d", r));
+
+  // Give the rest library the correct version string of this executable
+  versionSet(ORION_VERSION);
 
   while (1)
      sleep(10);

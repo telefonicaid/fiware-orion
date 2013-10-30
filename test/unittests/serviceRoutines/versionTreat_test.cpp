@@ -24,8 +24,6 @@
 */
 #include "gtest/gtest.h"
 
-#include "parseArgs/paConfig.h"    // DEFAULT_VERSION
-
 #include "serviceRoutines/versionTreat.h"
 #include "rest/RestService.h"
 
@@ -56,7 +54,7 @@ TEST(versionTreat, ok)
   //
   // char*    expected =
   //   "<orion>\n"
-  //   "  <version>" DEFAULT_VERSION "</version>\n"
+  //   "  <version>" ORION_VERSION "</version>\n"
   //   "  <uptime>*</uptime>"
   //   "  <git_hash>*</git_hash>\n"
   //   "  <compile_time>*</compile_time>\n"
@@ -69,7 +67,6 @@ TEST(versionTreat, ok)
   EXPECT_TRUE(strstr(out.c_str(), "<orion>") != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "<version>") != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "</version>") != NULL);
-  EXPECT_TRUE(strstr(out.c_str(), DEFAULT_VERSION) != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "<uptime>") != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "</uptime>") != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "<git_hash>") != NULL);
