@@ -316,7 +316,7 @@ function failedTest()
 nc -z localhost ${CB_TEST_PORT} > /dev/null 
 if [ "$?" == "0" ]
 then
-   # Sucessful nc means that port CB_TEST_PORT is used, thus exit
+   # Successful nc means that port CB_TEST_PORT is used, thus exit
    echo "Port $CB_TEST_PORT is in use. Aborting"
    exit 1
 fi
