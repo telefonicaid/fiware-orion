@@ -30,7 +30,7 @@
 #include "parseArgs/parseArgs.h"          /* Where we have the ext decl of paConfig    */
 
 #ifndef DEFAULT_VERSION
-    #define DEFAULT_VERSION "0.8.0-next"
+    #define DEFAULT_VERSION "alpha"
 #endif
 
 #ifndef DEFAULT_AUTHOR

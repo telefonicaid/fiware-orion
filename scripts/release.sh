@@ -131,9 +131,9 @@ fi
 
 
 #
-# Get the current version (currently maintained in parseArgs/paConfig.h)
+# Get the current version (maintained in src/app/contextBroker/version.h)
 #
-currentVersion=$(grep "define DEFAULT_VERSION" src/lib/parseArgs/paConfig.h  | awk -F\" '{ print $2 }')
+currentVersion=$(grep "define ORION_VERSION" src/app/contextBroker/version.h  | awk -F\" '{ print $2 }')
 
 echo "current version: $currentVersion"
 echo "new version:     $NEW_VERSION"
@@ -144,11 +144,11 @@ echo "new version:     $NEW_VERSION"
 #
 sed "s/$currentVersion/$NEW_VERSION/" test/testharness/version_via_rest.test > /tmp/version_via_rest.test
 sed "s/$currentVersion/$NEW_VERSION/" test/testharness/version.test          > /tmp/version.test
-sed "s/$currentVersion/$NEW_VERSION/" src/lib/parseArgs/paConfig.h           > /tmp/paConfig.h
+sed "s/$currentVersion/$NEW_VERSION/" src/app/contextBroker/version.h        > /tmp/version.h
 
 mv /tmp/version_via_rest.test  test/testharness/version_via_rest.test
 mv /tmp/version.test           test/testharness/version.test
-mv /tmp/paConfig.h             src/lib/parseArgs/paConfig.h
+mv /tmp/version.h              src/app/contextBroker/version.h
 
 
 #
@@ -158,7 +158,7 @@ CURRENT_BRANCH=$(git branch | grep '^*' | cut -c 3-10)
 if [ "$CURRENT_BRANCH" == "develop" ]
 then
     git add rpm/contextBroker.spec
-    git add src/lib/parseArgs/paConfig.h
+    git add src/app/contextBroker/version.h
     git add test/testharness/version.test
     git add test/testharness/version_via_rest.test
     git commit -m "Step: $currentVersion -> $NEW_VERSION"

@@ -30,7 +30,6 @@
 
 #include "parseArgs/parseArgs.h"
 #include "parseArgs/paBuiltin.h"        // paLsHost, paLsPort
-#include "parseArgs/paConfig.h"         // paConfig()
 #include "parseArgs/paIsSet.h"
 
 #include "logMsg/logMsg.h"

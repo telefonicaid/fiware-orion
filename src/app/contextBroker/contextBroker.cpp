@@ -50,7 +50,7 @@
 #include "common/sem.h"
 #include "common/globals.h"
 #include "common/Timer.h"
-#include "common/version.h"
+#include "common/compileInfo.h"
 
 #include "serviceRoutines/logVerboseTreat.h"
 #include "serviceRoutines/logTraceTreat.h"
@@ -100,6 +100,8 @@
 #include "serviceRoutines/badNgsi9Request.h"
 #include "serviceRoutines/badNgsi10Request.h"
 #include "serviceRoutines/badRequest.h"
+#include "contextBroker/version.h"
+
 
 /* ****************************************************************************
 *
@@ -443,7 +445,7 @@ void exitFunc(void)
 const char* description =
    "\n"
    "Orion context broker version details:\n"
-   "  version:            " DEFAULT_VERSION "\n"
+   "  version:            " ORION_VERSION   "\n"
    "  git hash:           " GIT_HASH        "\n"
    "  compile time:       " COMPILE_TIME    "\n"
    "  compiled by:        " COMPILED_BY     "\n"
@@ -467,6 +469,7 @@ int main(int argC, char* argV[])
   paConfig("man description",      (void*) description);
   paConfig("man author",           (void*) "Telefonica I+D");
   paConfig("man exitstatus",       (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
+  paConfig("man version",          (void*) ORION_VERSION);
 
   paConfig("builtin prefix",                    (void*) "ORION_");
   paConfig("usage and exit on any warning",     (void*) true);
@@ -531,6 +534,9 @@ int main(int argC, char* argV[])
   int r;
   if ((r = restStart()) != 0)
      LM_X(1, ("restStart: error %d", r));
+
+  // Give the rest library the correct version string of this executable
+  versionSet(ORION_VERSION);
 
   while (1)
      sleep(10);
