@@ -99,7 +99,7 @@ mkdir -p $RPM_BUILD_ROOT/etc/profile.d
 mkdir -p $RPM_BUILD_ROOT/usr/share/contextBroker/tests
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/contextBroker
 cp -r test/testharness/*.test $RPM_BUILD_ROOT/usr/share/contextBroker/tests
-cp LICENSE.txt $RPM_BUILD_ROOT/usr/share/doc/contextBroker
+cp LICENSE $RPM_BUILD_ROOT/usr/share/doc/contextBroker
 cp scripts/testEnv.sh scripts/testHarness.sh scripts/testDiff.py $RPM_BUILD_ROOT/usr/share/contextBroker/tests 
 cp scripts/accumulator-server.py $RPM_BUILD_ROOT/usr/share/contextBroker/tests 
 cp scripts/managedb/garbage-collector.py $RPM_BUILD_ROOT/usr/share/contextBroker
