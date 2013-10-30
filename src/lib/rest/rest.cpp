@@ -223,7 +223,6 @@ static Format wantedOutputSupported(std::string acceptList, std::string* charset
         *charsetP = "";
   }
 
-  
   LM_RE(NOFORMAT, ("No valid 'Accept-format' found"));
 }
 
@@ -298,6 +297,9 @@ static int connectionTreat
     if (ciP == NULL)
       LM_RE(MHD_NO, ("Error allocating ConnectionInfo"));
     
+    // Saving the pointer to the newly allocated ConnectionInfo
+    *con_cls         = (void*) ciP;
+
     ciP->callNo                    = 1;
     ciP->httpHeaders.contentLength = 0;
     ciP->requestEntityTooLarge     = false;
@@ -349,7 +351,6 @@ static int connectionTreat
        LM_W(("PUT/POST and contentLength == 0"));
     }
 
-    *con_cls         = (void*) ciP;
     ciP->payload     = (char*) calloc(1, PAYLOAD_SIZE);
     ciP->payloadSize = 0;
 
