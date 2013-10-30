@@ -157,17 +157,9 @@ extern void recoverOntimeIntervalThreads() {
         for (unsigned int ix = 0; ix < condV.size(); ++ix) {
             BSONObj condition = condV[ix].embeddedObject();
             if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0) {
-               Duration interval;
-
-               /* We are assuming (as NGSI mandates) that the cond values in this have only one element, the
-                * one corresponding to notification interval */
-               std::vector<BSONElement> condValuesV = condition.getField(CSUB_CONDITIONS_VALUE).Array();
-               interval.set(condValuesV[0].String());
-               interval.parse();
-
-               /* Create thread */
-               LM_T(LmtNotifier, ("creating ONTIMEINTERVAL for subscription %s with interval %d", subId.c_str(), interval.seconds));
-               processOntimeIntervalCondition(subId, interval.seconds);
+               int interval = condition.getIntField(CSUB_CONDITIONS_VALUE);
+               LM_T(LmtNotifier, ("creating ONTIMEINTERVAL for subscription %s with interval %d", subId.c_str(), interval));
+               processOntimeIntervalCondition(subId, interval);
 
             }
         }

@@ -92,9 +92,7 @@ db.csubs.insert({
         "conditions" : [
                 {
                         "type" : "ONTIMEINTERVAL",
-                        "value" : [
-                                "PT5S"
-                        ]
+                        "value" : 5
                 }
         ]
 })
@@ -112,9 +110,7 @@ db.csubs.insert({
         "conditions" : [
                 {
                         "type" : "ONTIMEINTERVAL",
-                        "value" : [
-                                "PT4S"
-                        ]
+                        "value" : 4
                 }
         ]
 })
