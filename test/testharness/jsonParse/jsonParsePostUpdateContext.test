@@ -188,10 +188,10 @@ echo "4: ***********************************"
   "contextResponses" : [
     {
       "contextElement" : {
-        "entityId" : {
-          "id" : "ConferenceRoom",
+        {
           "type" : "Room",
-          "isPattern" : "false"
+          "isPattern" : "false",
+          "id" : "ConferenceRoom"
         }
       },
       "statusCode" : {
@@ -219,10 +219,10 @@ echo "4: ***********************************"
             "contextValue" : ""
           }
         ],
-        "entityId" : {
-          "id" : "ConferenceRoom",
+        {
           "type" : "Room",
-          "isPattern" : "false"
+          "isPattern" : "false",
+          "id" : "ConferenceRoom"
         }
       },
       "statusCode" : {

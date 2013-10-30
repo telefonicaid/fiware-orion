@@ -128,7 +128,7 @@ TEST(QueryContextRequest, ok_json)
   qcrP->present(""); // No output
 
   std::string rendered;
-  std::string expected ="\"queryContextRequest\" : {\n  \"entityIdList\" : {\n    \"entityId\" : {\n      \"id\" : \"ConferenceRoom\",\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\"\n    },\n    \"entityId\" : {\n      \"id\" : \"OfficeRoom\",\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\"\n    }\n  }\n  \"attributeList\" : {\n    \"attribute\" : \"temperature\",\n    \"attribute\" : \"occupancy\",\n    \"attribute\" : \"lightstatus\"\n  }\n  \"restriction\" : {\n    \"attributeExpression\" : \"Attribute Expression\"\n    \"scope\" : {\n      \"operationScope\" : {\n        \"type\" : \"st1\"\n        \"value\" : \"sv1\"\n      }\n      \"operationScope\" : {\n        \"type\" : \"st2\"\n        \"value\" : \"sv2\"\n      }\n    }\n  }\n}\n";
+  std::string expected = "\"queryContextRequest\" : {\n  \"entities\" : [\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"ConferenceRoom\"\n    },\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"OfficeRoom\"\n    }\n  ]\n  \"attributeList\" : {\n    \"attribute\" : \"temperature\",\n    \"attribute\" : \"occupancy\",\n    \"attribute\" : \"lightstatus\"\n  }\n  \"restriction\" : {\n    \"attributeExpression\" : \"Attribute Expression\"\n    \"scope\" : {\n      \"operationScope\" : {\n        \"type\" : \"st1\"\n        \"value\" : \"sv1\"\n      }\n      \"operationScope\" : {\n        \"type\" : \"st2\"\n        \"value\" : \"sv2\"\n      }\n    }\n  }\n}\n";
 
   rendered = qcrP->render(QueryContext, JSON, "");
   LM_M(("Rendered: %s", rendered.c_str()));

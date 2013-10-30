@@ -200,10 +200,10 @@ echo "4: ***********************************"
             "contextValue" : ""
           }
         ],
-        "entityId" : {
-          "id" : "ConferenceRoom",
+        {
           "type" : "Room",
-          "isPattern" : "false"
+          "isPattern" : "false",
+          "id" : "ConferenceRoom"
         }
       },
       "statusCode" : {
@@ -220,10 +220,10 @@ echo "4: ***********************************"
             "contextValue" : ""
           }
         ],
-        "entityId" : {
-          "id" : "OfficeRoom",
+        {
           "type" : "Room",
-          "isPattern" : "false"
+          "isPattern" : "false",
+          "id" : "OfficeRoom"
         }
       },
       "statusCode" : {

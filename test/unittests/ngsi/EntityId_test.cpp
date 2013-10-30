@@ -37,7 +37,7 @@ TEST(EntityId, render)
   EntityId     eId;
   std::string  json;
   std::string  xml;
-  std::string  jsonExpected = "\"eId\" : {\n  \"id\" : \"\",\n  \"type\" : \"\",\n  \"isPattern\" : \"\"\n}\n";
+  std::string  jsonExpected = "{\n  \"type\" : \"\",\n  \"isPattern\" : \"\",\n  \"id\" : \"\"\n}\n";
   std::string  xmlExpected  = "<eId type=\"\" isPattern=\"\">\n  <id></id>\n</eId>\n";
 
   eId.tagSet("eId");

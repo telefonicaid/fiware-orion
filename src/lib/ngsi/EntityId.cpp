@@ -81,7 +81,7 @@ void EntityId::tagSet(std::string tagName)
 */
 std::string EntityId::render(Format format, std::string indent, bool comma)
 {
-  std::string out = "";
+  std::string out     = "";
 
   if (format == XML)
   {
@@ -91,10 +91,10 @@ std::string EntityId::render(Format format, std::string indent, bool comma)
   }
   else
   {
-    out += indent + "\"" + tag + "\" : {"                     + "\n";
-    out += indent + "  " + "\"id\" : \""        + id        + "\","  + "\n";
+    out += indent + "{"                                     + "\n";
     out += indent + "  " + "\"type\" : \""      + type      + "\","  + "\n";
-    out += indent + "  " + "\"isPattern\" : \"" + isPattern + "\""   + "\n";
+    out += indent + "  " + "\"isPattern\" : \"" + isPattern + "\","  + "\n";
+    out += indent + "  " + "\"id\" : \""        + id        + "\""   + "\n";
     out += indent + "}";
     out += (comma == true)? ",\n" : "\n";
   }
