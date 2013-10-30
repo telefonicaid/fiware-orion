@@ -290,11 +290,11 @@ void paConfigCleanup(void)
     }
 
 	PA_M(("freeing paManVersion"));
-	if (paManVersion)
-    {
-		free(paManVersion);
-        paManVersion = NULL;
-    }
+  if (paManVersion)
+  {
+    free(paManVersion);
+    paManVersion = NULL;
+  }
 
 	PA_M(("freeing paiList"));
 	if (paiList != NULL)
@@ -372,10 +372,10 @@ static void paConfigInit(void)
     else
         paManCopyright        = strdup(DEFAULT_COPYRIGHT);
 
-	if (paManVersion)
-		paManVersion          = strdup(paManVersion);
-    else
-        paManVersion          = strdup(DEFAULT_VERSION);
+  if (paManVersion)
+    paManVersion          = strdup(paManVersion);
+  else
+    paManVersion          = strdup(DEFAULT_VERSION);
 	
 
 	if (paTraceInfoAtEol)
@@ -452,8 +452,11 @@ int paConfig(const char* item, const void* value, const void* value2)
 	   paManReportingBugs = strdup((char*) val);
 	else if (strcmp(item, "man copyright") == 0)
 	   paManCopyright = strdup((char*) val);
-	else if (strcmp(item, "man version") == 0)
-	   paManVersion = strdup((char*) val);
+  else if (strcmp(item, "man version") == 0)
+  {
+    free(paManVersion);
+    paManVersion = strdup((char*) val);
+  }
 
 	else if (strcmp(item, "msgs to stdout") == 0)
 		paMsgsToStdout = (bool) val;

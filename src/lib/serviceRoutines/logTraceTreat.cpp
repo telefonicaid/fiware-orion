@@ -28,8 +28,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "parseArgs/paConfig.h"    // To be moved somewhere else ... please ...
-
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/orionReply.h"

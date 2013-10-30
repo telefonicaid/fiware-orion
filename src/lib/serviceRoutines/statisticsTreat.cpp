@@ -28,8 +28,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "parseArgs/paConfig.h"    // To be moved somewhere else ... please ...
-
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/tag.h"

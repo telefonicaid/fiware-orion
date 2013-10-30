@@ -24,8 +24,6 @@
 */
 #include "gtest/gtest.h"
 
-#include "parseArgs/paConfig.h"    // DEFAULT_VERSION
-
 #include "serviceRoutines/exitTreat.h"
 #include "rest/RestService.h"
 
@@ -65,7 +63,7 @@ TEST(exitTreat, error)
 
 #if 0
   // I CANT RUN THIS TEST AS IT KILLS THE BROKER
-  // Taken care of by harness tests
+  // The test is taken care of by harness tests
   std::string    expected3  = "<orion>\n  <exit>Exit requested so I obey and exit</exit>\n</orion>\n";
   std::string    out3       = restService(&ci3, rs);
   EXPECT_STREQ(expected3.c_str(), out3.c_str());

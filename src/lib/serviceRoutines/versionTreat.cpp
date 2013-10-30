@@ -28,16 +28,33 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "parseArgs/paConfig.h"    // To be moved somewhere else ... please ...
-
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/tag.h"
-#include "common/version.h"
+#include "common/compileInfo.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutines/versionTreat.h"
+
+
+
+/* ****************************************************************************
+*
+* version - 
+*/
+static char versionString[30] = { 'a', 'l', 'p', 'h', 'a', 0 };
+
+
+
+/* ****************************************************************************
+*
+* versionSet - 
+*/
+void versionSet(const char* version)
+{
+   strncpy(versionString, version, sizeof(versionString));
+}
 
 
 
@@ -58,7 +75,7 @@ std::string versionTreat(ConnectionInfo* ciP, int components, std::vector<std::s
 #endif
 
   out += startTag(indent, tag, ciP->outFormat);
-  out += valueTag(indent + "  ", "version",       DEFAULT_VERSION, ciP->outFormat, true);
+  out += valueTag(indent + "  ", "version",       versionString,   ciP->outFormat, true);
   out += valueTag(indent + "  ", "uptime",        uptime,          ciP->outFormat, true);
   out += valueTag(indent + "  ", "git_hash",      GIT_HASH,        ciP->outFormat, true);
   out += valueTag(indent + "  ", "compile_time",  COMPILE_TIME,    ciP->outFormat, true);

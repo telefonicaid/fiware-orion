@@ -1,5 +1,5 @@
-#ifndef VERSION_TREAT_H
-#define VERSION_TREAT_H
+#ifndef CONTEXT_BROKER_VERSION_H
+#define CONTEXT_BROKER_VERSION_H
 
 /*
 *
@@ -25,26 +25,9 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-#include <vector>
-
-#include "rest/ConnectionInfo.h"
-#include "ngsi/ParseData.h"
 
 
 
-/* ****************************************************************************
-*
-* versionSet -
-*/
-extern void versionSet(const char* version);
-
-
-
-/* ****************************************************************************
-*
-* versionTreat - 
-*/
-extern std::string versionTreat(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+#define ORION_VERSION "0.8.0-next"
 
 #endif
