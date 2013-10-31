@@ -1,0 +1,46 @@
+{
+	"entities": [
+		{
+			"type": "Room",
+			"isPattern": "false",
+			"id": "ConferenceRoom"
+		},
+		{
+			"type": "Room",
+			"isPattern": "false",
+			"id": "OfficeRoom"
+		}
+	],
+	"attributes": [
+		"temperature",
+		"occupancy",
+		"lightstatus"
+	],
+	"reference": "127.0.0.1",
+	"duration": "P5Y",
+	"restriction": {
+		"attributeExpression": "testRestriction",
+		"scopes" : [
+			{
+				"type" : "",
+				"value" : ""
+			},
+			{
+				"type" : "",
+				"value" : ""
+			}
+		]
+	},
+	"notifyConditions": [
+		{
+			"type": "ONCHANGE",
+			"condValues": [
+				"CondValue1",
+				"CondValue2"
+			]
+			,
+			"restriction": "restriction"
+		}
+	],
+	"throttling": "P5Y"
+}
