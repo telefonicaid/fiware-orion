@@ -110,8 +110,6 @@ std::string EntityId::render(Format format, std::string indent, bool comma)
 */
 std::string EntityId::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
-   LM_M(("Checking an entity: isPattern == '%s' (this: %p)", isPattern.c_str(), this));
-
   if ((id == "") || (id == "not in use"))
     return "empty entityId:id";
 

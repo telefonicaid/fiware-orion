@@ -70,7 +70,6 @@ std::string SubscribeContextRequest::check(RequestType requestType, Format forma
   /* First, check optional fields only in the case they are present */
   /* Second, check the other (mandatory) fields */
 
-  LM_M(("Checking"));
   if (((res = entityIdVector.check(SubscribeContext, format, indent, predetectedError, counter))        != "OK") ||
       ((res = attributeList.check(SubscribeContext, format, indent, predetectedError, counter))         != "OK") ||      
       ((res = duration.check(SubscribeContext, format, indent, predetectedError, counter))              != "OK") ||

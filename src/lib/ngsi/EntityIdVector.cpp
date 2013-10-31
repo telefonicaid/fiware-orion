@@ -71,7 +71,6 @@ std::string EntityIdVector::check(RequestType requestType, Format format, std::s
   {
     std::string res;
 
-    LM_M(("Checking entity %d", ix));
     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
       return res;
   }
