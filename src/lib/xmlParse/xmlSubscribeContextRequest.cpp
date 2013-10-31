@@ -56,8 +56,11 @@ static int entityId(xml_node<>* node, ParseData* reqData)
   std::string es = entityIdParse(SubscribeContext, node, reqData->scr.entityIdP);
 
   if (es != "OK")
+  {
     reqData->errorString = es;
-  
+    return 1;
+  }
+
   return 0;
 }
 
@@ -70,45 +73,7 @@ static int entityId(xml_node<>* node, ParseData* reqData)
 static int entityIdId(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got an entityId:id: '%s'", node->value()));
-
-  if ((reqData->scr.entityIdP->id != "") && (reqData->scr.entityIdP->id != node->value()))
-    LM_W(("Overwriting entityId:id (was '%s') for '%s'", reqData->scr.entityIdP->id.c_str(), node->value()));
   reqData->scr.entityIdP->id = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* entityIdType - 
-*/
-static int entityIdType(xml_node<>* node, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got an entityId:type: '%s'", node->value()));
-
-  if ((reqData->scr.entityIdP->type != "") && (reqData->scr.entityIdP->type != node->value()))
-    LM_W(("Overwriting entityId:type (was '%s') for '%s'", reqData->scr.entityIdP->type.c_str(), node->value()));
-  reqData->scr.entityIdP->type = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* entityIdIsPattern - 
-*/
-static int entityIdIsPattern(xml_node<>* node, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", node->value()));
-
-  if ((reqData->scr.entityIdP->isPattern != "") && (reqData->scr.entityIdP->isPattern != node->value()))
-    LM_W(("Overwriting entityId:isPattern (was '%s') for '%s'", reqData->scr.entityIdP->isPattern.c_str(), node->value()));
-  reqData->scr.entityIdP->isPattern = node->value();
-
   return 0;
 }
 
@@ -354,8 +319,6 @@ XmlNode scrParseVector[] =
   { "/subscribeContextRequest/entityIdList",                     nullTreat         },
   { "/subscribeContextRequest/entityIdList/entityId",            entityId          },
   { "/subscribeContextRequest/entityIdList/entityId/id",         entityIdId        },
-  { "/subscribeContextRequest/entityIdList/entityId/type",       entityIdType      },
-  { "/subscribeContextRequest/entityIdList/entityId/isPattern",  entityIdIsPattern },
 
   { "/subscribeContextRequest/attributeList",            nullTreat },
   { "/subscribeContextRequest/attributeList/attribute",  attribute },

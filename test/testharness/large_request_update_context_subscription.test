@@ -76,6 +76,7 @@ rm $BIGFILE
 <?xml version="1.0"?>
 <updateContextSubscriptionResponse>
   <subscribeError>
+    <subscriptionId>0</subscriptionId>
     <errorCode>
       <code>413</code>
       <reasonPhrase>Payload Too Large</reasonPhrase>

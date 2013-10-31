@@ -54,7 +54,7 @@ TEST(UpdateContextSubscriptionRequest, badLength_xml)
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     fileName = "updateContextSubscription_ok.xml";
-  const char*     expected = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>bad length (24 chars expected)</reasonPhrase>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
+  const char*     expected1 = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <subscriptionId>SUBSCRIPTIONID</subscriptionId>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>bad length (24 chars expected)</reasonPhrase>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -62,7 +62,7 @@ TEST(UpdateContextSubscriptionRequest, badLength_xml)
   std::string result = xmlTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
   lmTraceLevelSet(LmtDump, false);
 
-  EXPECT_STREQ(expected, result.c_str());
+  EXPECT_STREQ(expected1, result.c_str());
 
   //
   // With the data obtained, render, present and release methods are exercised
@@ -73,19 +73,19 @@ TEST(UpdateContextSubscriptionRequest, badLength_xml)
 
   std::string rendered;
   std::string checked;
-  std::string expected1 = "<updateContextSubscriptionRequest>\n  <duration>P50Y</duration>\n  <restriction>\n    <attributeExpression>AttriTest</attributeExpression>\n    <scope>\n      <operationScope>\n        <type>st1</type>\n        <value>sv1</value>\n      </operationScope>\n      <operationScope>\n        <type>st2</type>\n        <value>sv2</value>\n      </operationScope>\n    </scope>\n  </restriction>\n  <subscriptionId>SUBSCRIPTIONID</subscriptionId>\n  <contextAttributeList>\n    <notifyCondition>\n      <type>ONCHANGE</type>\n      <attributeList>\n        <attribute>CondValue3</attribute>\n        <attribute>CondValue4</attribute>\n      </attributeList>\n    </notifyCondition>\n  </contextAttributeList>\n  <throttling>P5Y</throttling>\n</updateContextSubscriptionRequest>\n";
-  std::string expected2 = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>FORCED ERROR</reasonPhrase>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
-  std::string expected3 = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>syntax error in duration string</reasonPhrase>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
+  std::string expected2 = "<updateContextSubscriptionRequest>\n  <duration>P50Y</duration>\n  <restriction>\n    <attributeExpression>AttriTest</attributeExpression>\n    <scope>\n      <operationScope>\n        <type>st1</type>\n        <value>sv1</value>\n      </operationScope>\n      <operationScope>\n        <type>st2</type>\n        <value>sv2</value>\n      </operationScope>\n    </scope>\n  </restriction>\n  <subscriptionId>SUBSCRIPTIONID</subscriptionId>\n  <contextAttributeList>\n    <notifyCondition>\n      <type>ONCHANGE</type>\n      <attributeList>\n        <attribute>CondValue3</attribute>\n        <attribute>CondValue4</attribute>\n      </attributeList>\n    </notifyCondition>\n  </contextAttributeList>\n  <throttling>P5Y</throttling>\n</updateContextSubscriptionRequest>\n";
+  std::string expected3 = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <subscriptionId>SUBSCRIPTIONID</subscriptionId>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>FORCED ERROR</reasonPhrase>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
+  std::string expected4 = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <subscriptionId>SUBSCRIPTIONID</subscriptionId>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>syntax error in duration string</reasonPhrase>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
 
   rendered = ucsrP->render(UpdateContextSubscription, XML, "");
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
 
   checked  = ucsrP->check(UpdateContextSubscription, XML, "", "FORCED ERROR", 0);
-  EXPECT_STREQ(expected2.c_str(), checked.c_str());
+  EXPECT_STREQ(expected3.c_str(), checked.c_str());
 
   ucsrP->duration.set("XXXYYYZZZ");
   checked  = ucsrP->check(UpdateContextSubscription, XML, "", "", 0);
-  EXPECT_STREQ(expected3.c_str(), checked.c_str());
+  EXPECT_STREQ(expected4.c_str(), checked.c_str());
 
   ucsrP->present("");
   ucsrP->release();

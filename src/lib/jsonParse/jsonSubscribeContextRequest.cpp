@@ -96,9 +96,6 @@ static std::string entityIdIsPattern(std::string path, std::string value, ParseD
 {
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
-  if (!isTrue(value) && !isFalse(value))
-    return "bad 'isPattern' value: '" + value + "'";
-
   parseDataP->scr.entityIdP->isPattern = value;
 
   return "OK";
@@ -334,6 +331,8 @@ JsonNode jsonScrParseVector[] =
 */
 void jsonScrInit(ParseData* parseDataP)
 {
+  jsonScrRelease(parseDataP);
+
   parseDataP->scr.entityIdP              = NULL;
   parseDataP->scr.notifyConditionP       = NULL;
   parseDataP->scr.scopeP                 = NULL;  

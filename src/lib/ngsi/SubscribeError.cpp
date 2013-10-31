@@ -51,11 +51,16 @@ std::string SubscribeError::render(RequestType requestType, Format format, std::
   std::string out = "";
   std::string tag = "subscribeError";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, format, true);
 
-  if ((requestType == SubscribeContext) && (subscriptionId.get() != "0") && (subscriptionId.get() != ""))
-    out += subscriptionId.render(format, indent + "  ");
+  // subscriptionId is Mandatory if part of updateContextSubscriptionResponse
+  if (requestType == UpdateContextSubscription)
+     out += subscriptionId.render(format, indent + "  ", true);
+  else if ((requestType == SubscribeContext) && (subscriptionId.get() != "0") && (subscriptionId.get() != ""))
+     out += subscriptionId.render(format, indent + "  ", true);
+
   out += errorCode.render(format, indent + "  ");
+
   out += endTag(indent, tag, format);
 
   return out;

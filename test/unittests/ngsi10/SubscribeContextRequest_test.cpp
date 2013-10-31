@@ -30,19 +30,11 @@
 #include "common/globals.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "jsonParse/jsonRequest.h"
 #include "xmlParse/xmlRequest.h"
 #include "xmlParse/xmlParse.h"
 
 #include "testDataFromFile.h"
-
-
-
-/* ****************************************************************************
-*
-* Tests
-* - ok
-*
-*/
 
 
 
@@ -81,6 +73,46 @@ TEST(SubscribeContextRequest, ok_xml)
 }
 
 
+
+/* ****************************************************************************
+*
+* ok_json - 
+*/
+TEST(SubscribeContextRequest, ok_json)
+{
+  ParseData       parseData;
+  ConnectionInfo  ci("", "POST", "1.1");
+  const char*     fileName = "subscribeContextRequest_ok.json";
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  lmTraceLevelSet(LmtDump, true);
+  std::string result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_EQ("OK", result);
+  lmTraceLevelSet(LmtDump, false);
+
+
+  //
+  // With the data obtained, render, present and release methods are exercised
+  //
+  SubscribeContextRequest*  scrP = &parseData.scr.res;
+  
+  scrP->present(""); // No output
+
+  std::string rendered;
+  std::string expected = "\"subscribeContextRequest\" : {\n  \"entities\" : [\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"ConferenceRoom\"\n    },\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"OfficeRoom\"\n    }\n  ]\n  \"attributeList\" : {\n    \"attribute\" : \"temperature\",\n    \"attribute\" : \"occupancy\",\n    \"attribute\" : \"lightstatus\"\n  }\n  \"reference\" : \"127.0.0.1\"\n  \"duration\" : \"P5Y\",\n  \"restriction\" : {\n    \"attributeExpression\" : \"testRestriction\"\n    \"scope\" : {\n      \"operationScope\" : {\n        \"type\" : \"t1\"\n        \"value\" : \"v1\"\n      }\n      \"operationScope\" : {\n        \"type\" : \"t2\"\n        \"value\" : \"v2\"\n      }\n    }\n  }\n  \"contextAttributeList\" : {\n    \"notifyCondition\" : {\n      \"type\" : \"ONTIMEINTERVAL\"\n      \"attributeList\" : {\n        \"attribute\" : \"temperature\",\n        \"attribute\" : \"lightstatus\"\n      }\n      \"restriction\" : \"restriction\"\n    }\n  }\n  \"throttling\" : \"P5Y\"\n}\n";
+
+  rendered = scrP->render(SubscribeContext, JSON, "");
+  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+
+  scrP->release();
+}
+
+
+
 /* ****************************************************************************
 *
 * invalidDuration_xml - 
@@ -90,6 +122,7 @@ TEST(SubscribeContextRequest, invalidDuration_xml)
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     fileName = "subscribeContextRequest_invalidDuration.xml";
+  const char*     expected = "<subscribeContextResponse>\n  <subscribeError>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>invalid payload</reasonPhrase>\n      <details>syntax error in duration string</details>\n    </errorCode>\n  </subscribeError>\n</subscribeContextResponse>\n";
   XmlRequest*     reqP;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -99,5 +132,73 @@ TEST(SubscribeContextRequest, invalidDuration_xml)
   lmTraceLevelSet(LmtDump, false);
 
   reqP->release(&parseData);
-  EXPECT_STREQ("syntax error in duration string", result.c_str());
+  EXPECT_STREQ(expected, result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* badIsPattern_json - 
+*/
+TEST(SubscribeContextRequest, badIsPattern_json)
+{
+  ParseData       parseData;
+  ConnectionInfo  ci("", "POST", "1.1");
+  const char*     fileName = "subscribeContextRequest_badIsPattern.json";
+  const char*     expected = "{\n  \"subscribeError\" : {\n    \"errorCode\" : {\n      \"code\" : \"400\",\n      \"reasonPhrase\" : \"invalid payload\",\n      \"details\" : \"bad value for 'isPattern'\"\n    }\n  }\n}\n";
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  std::string result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_EQ(expected, result);
+}
+
+
+
+/* ****************************************************************************
+*
+* invalidDuration_json - 
+*/
+TEST(SubscribeContextRequest, invalidDuration_json)
+{
+  ParseData       parseData;
+  ConnectionInfo  ci("", "POST", "1.1");
+  const char*     fileName = "subscribeContextRequest_invalidDuration.json";
+  const char*     expected = "{\n  \"subscribeError\" : {\n    \"errorCode\" : {\n      \"code\" : \"400\",\n      \"reasonPhrase\" : \"invalid payload\",\n      \"details\" : \"syntax error in duration string\"\n    }\n  }\n}\n";
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  std::string result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_EQ(expected, result);
+}
+
+
+
+/* ****************************************************************************
+*
+* invalidEntityIdAttribute_xml - 
+*
+* FIXME P5: invalid attributes in EntityId are found but not reported
+*/
+TEST(SubscribeContextRequest, invalidEntityIdAttribute_xml)
+{
+  ParseData       parseData;
+  ConnectionInfo  ci("", "POST", "1.1");
+  const char*     fileName = "subscribeContextRequest_invalidEntityIdAttribute.xml";
+  const char*     expected = "OK";
+  XmlRequest*     reqP;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+
+  std::string result = xmlTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", &reqP);
+
+  reqP->release(&parseData);
+  EXPECT_STREQ(expected, result.c_str());
 }
