@@ -108,35 +108,35 @@ echo "+++++ Registration Done +++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
 {
-	"entities": [
-		{
-			"type": "Room",
-			"isPattern": "false",
-			"id": "ConferenceRoom"
-		},
-		{
-			"type": "Room",
-			"isPattern": "false",
-			"id": "OfficeRoom"
-		}
-	],
-	"attributes": [
-		"temperature",
-		"pressure"
-	],
-	"restriction": {
-		"attributeExpression" : "Attribute Expression",
-		"scopes": [
-			{
-				"type" : "st1",
-				"value" : "sv1"
-			},
-			{
-				"type" : "st2",
-				"value" : "sv2"
-			}
-		]
-	}
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "pressure"
+  ],
+  "restriction": {
+    "attributeExpression" : "Attribute Expression",
+    "scopes": [
+      {
+        "type" : "st1",
+        "value" : "sv1"
+      },
+      {
+        "type" : "st2",
+        "value" : "sv2"
+      }
+    ]
+  }
 }
 EOF
 echo "+++++ Discovery Done +++++++++++++++"
@@ -148,32 +148,32 @@ echo "+++++ Discovery Done +++++++++++++++"
 }
 +++++ Registration Done +++++++++++++++
 {
-  "contextRegistrationResponseList" : {
-    "contextRegistrationResponse" : {
+  "contextRegistrationResponses" : [
+    {
       "contextRegistration" : {
-        "entityIdList" : {
-          "entityId" : {
-            "id" : "ConferenceRoom",
+        "entities" : [
+          {
             "type" : "Room",
-            "isPattern" : "false"
+            "isPattern" : "false",
+            "id" : "ConferenceRoom"
           },
-          "entityId" : {
-            "id" : "OfficeRoom",
+          {
             "type" : "Room",
-            "isPattern" : "false"
+            "isPattern" : "false",
+            "id" : "OfficeRoom"
           }
-        },
-        "contextRegistrationAttributeList" : {
-          "contextRegistrationAttribute" : {
+        ],
+        "attributes" : [
+          {
             "name" : "temperature",
             "type" : "degree",
             "isDomain" : "false"
           }
-        },
+        ],
         "providingApplication" : "http://192.168.100.1:70/application"
       }
     }
-  }
+  ]
 }
 +++++ Discovery Done +++++++++++++++
 --TEARDOWN--

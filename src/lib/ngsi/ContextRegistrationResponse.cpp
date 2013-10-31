@@ -49,16 +49,17 @@ ContextRegistrationResponse::ContextRegistrationResponse()
 */
 std::string ContextRegistrationResponse::render(Format format, std::string indent, bool comma)
 {
-  std::string out = "";
-  std::string tag = "contextRegistrationResponse";
+  std::string xmlTag   = "contextRegistrationResponse";
+  std::string jsonTag  = "contextRegistration";
+  std::string out      = "";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, xmlTag, jsonTag, format, false, false);
   out += contextRegistration.render(format, indent + "  ");
 
   if (errorCode.code != NO_ERROR_CODE)
     out += errorCode.render(format, indent + "  ");
 
-  out += endTag(indent, tag, format, comma);
+  out += endTag(indent, xmlTag, format, comma);
 
   return out;
 }

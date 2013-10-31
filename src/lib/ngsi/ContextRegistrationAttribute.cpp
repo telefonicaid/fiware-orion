@@ -57,15 +57,16 @@ ContextRegistrationAttribute::ContextRegistrationAttribute(std::string _name, st
 */
 std::string ContextRegistrationAttribute::render(Format format, std::string indent)
 {
-  std::string out = "";
-  std::string tag = "contextRegistrationAttribute";
+  std::string xmlTag   = "contextRegistrationAttribute";
+  std::string jsonTag  = "registrationAttribute";
+  std::string out      = "";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, xmlTag, jsonTag, format, false, false);
   out += valueTag(indent + "  ", "name",     name, format, true);
   out += valueTag(indent + "  ", "type",     type, format, true);
   out += valueTag(indent + "  ", "isDomain", isDomain, format, metadataVector.size() != 0);
   out += metadataVector.render(format, indent + "  ");
-  out += endTag(indent, tag, format);
+  out += endTag(indent, xmlTag, format);
 
   return out;
 }

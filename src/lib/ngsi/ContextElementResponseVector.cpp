@@ -38,9 +38,9 @@
 */
 std::string ContextElementResponseVector::render(Format format, std::string indent)
 {
-  std::string out     = "";
-  std::string xmlTag  = "contextResponseList";
-  std::string jsonTag = "contextResponses";
+  std::string xmlTag   = "contextResponseList";
+  std::string jsonTag  = "contextResponses";
+  std::string out      = "";
 
   if (vec.size() == 0)
     return "";

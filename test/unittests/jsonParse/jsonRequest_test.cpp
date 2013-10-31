@@ -24,43 +24,33 @@
 */
 #include "gtest/gtest.h"
 
-#include "ngsi/EntityId.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
+#include "jsonParse/jsonRequest.h"
+#include "ngsi/ParseData.h"
+#include "ngsi/Request.h"
 
 
 
 /* ****************************************************************************
 *
-* render - 
+* - 
 */
-TEST(EntityId, render)
+TEST(jsonRequest, jsonTreat)
 {
-  EntityId     eId;
-  std::string  json;
-  std::string  xml;
-  std::string  jsonExpected = "{\n  \"type\" : \"\",\n  \"isPattern\" : \"\",\n  \"id\" : \"\"\n}\n";
-  std::string  xmlExpected  = "<eId type=\"\" isPattern=\"\">\n  <id></id>\n</eId>\n";
+   ConnectionInfo  ci("/ngsi9/registerContext", "POST", "1.1");
+   ParseData       parseData;
+   
+   ci.outFormat = JSON;
 
-  eId.tagSet("eId");
-  EXPECT_STREQ("eId", eId.tag.c_str());
-  
-  json = eId.render(JSON, "");
-  EXPECT_STREQ(jsonExpected.c_str(), json.c_str());
+   std::string  out;
+   std::string  expected1 = "\"errorCode\" : {\n  \"code\" : \"400\",\n  \"reasonPhrase\" : \"no request treating object found\",\n  \"details\" : \"Sorry, no request treating object found for RequestType 'InvalidRequest'\"\n}\n";
+   std::string  expected2 = "\"errorCode\" : {\n  \"code\" : \"400\",\n  \"reasonPhrase\" : \"Sorry, not implemented\"\n}\n";
 
-  xml = eId.render(XML, "");
-  EXPECT_STREQ(xmlExpected.c_str(), xml.c_str());
-}
+   out  = jsonTreat("", &ci, &parseData, InvalidRequest, "no_payload", NULL);
+   EXPECT_EQ(expected1, out);
 
-
-
-/* ****************************************************************************
-*
-* present - no output expected, just exercising the code
-*/
-TEST(EntityId, present)
-{
-  EntityId     eId;
-
-  eId.tagSet("entityId");
-  eId.present("", -1);
-  eId.present("", 0);
+   out = jsonTreat("", &ci, &parseData, UnsubscribeContext, "no_payload", NULL);
+   EXPECT_EQ(expected2, out);
 }
