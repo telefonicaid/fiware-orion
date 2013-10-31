@@ -51,7 +51,7 @@ std::string SubscribeResponse::render(Format format, std::string indent)
   std::string tag  = "subscribeResponse";
 
   out += startTag(indent, tag, format);
-  out += subscriptionId.render(format, indent + "  ");
+  out += subscriptionId.render(format, indent + "  ", true);
   out += duration.render(format, indent + "  ");
   out += throttling.render(format, indent + "  ");
   out += endTag(indent, tag, format);

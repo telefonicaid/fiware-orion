@@ -19,7 +19,7 @@
 # fermin at tid dot es
 
 --NAME--
-Large request error for /NGSI10/updateContextSubscription
+Check subscriptionId in error for /NGSI10/updateContextSubscription
 --SHELL-INIT--
 # Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
 running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
@@ -61,26 +61,40 @@ fi
 
 
 --SHELL--
-# Prepare the big file to use for the test
-BIGFILE=$(mktemp)
-tr -dc A-Za-z0-9 </dev/urandom |  head -c 1500000 > $BIGFILE
+(curl localhost:${BROKER_PORT}/NGSI10/updateContextSubscription -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
+<updateContextSubscriptionRequest>
+  <duration>P50Y</duration>
+  <restriction>
+    <attributeExpression>AttriTest</attributeExpression>
+    <scope>
+      <operationScope>
+        <scopeType>st1</scopeType>
+        <scopeValue>sv1</scopeValue>
+      </operationScope>
+    </scope>
+  </restriction>
+  <subscriptionId>012345678901234567890123</subscriptionId>
+  <notifyConditions>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>CondValue3</condValue>
+        <condValue>CondValue4</condValue>
+      </condValueList>
+    </notifyCondition>
+  </notifyConditions>
+  <throttling>xxxP5Y</throttling>
+</updateContextSubscriptionRequest>
 
-# Note that we are not including an actual XML payload, but in this test what matters
-# is the size, not the format of the data
-(curl localhost:${BROKER_PORT}/NGSI10/updateContextSubscription -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-$(cat $BIGFILE)
 EOF
-
-rm $BIGFILE
 --REGEXPECT--
 <?xml version="1.0"?>
 <updateContextSubscriptionResponse>
   <subscribeError>
-    <subscriptionId>0</subscriptionId>
+    <subscriptionId>012345678901234567890123</subscriptionId>
     <errorCode>
-      <code>413</code>
-      <reasonPhrase>Payload Too Large</reasonPhrase>
-      <details>payload size: 1500000</details>
+      <code>404</code>
+      <reasonPhrase>Subscription Not Found</reasonPhrase>
     </errorCode>
   </subscribeError>
 </updateContextSubscriptionResponse>

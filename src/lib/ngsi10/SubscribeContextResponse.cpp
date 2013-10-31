@@ -66,7 +66,7 @@ std::string SubscribeContextResponse::render(RequestType requestType, Format for
   std::string out     = "";
   std::string tag     = "subscribeContextResponse";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, format, false);
 
   if (subscribeError.errorCode.code == NO_ERROR_CODE)
     out += subscribeResponse.render(format, indent + "  ");
