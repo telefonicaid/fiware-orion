@@ -24,6 +24,8 @@
 */
 #include <string>
 
+#include "logMsg/logMsg.h"
+
 #include "common/Format.h"
 #include "common/tag.h"
 #include "ngsi/ContextElementResponse.h"
@@ -34,16 +36,18 @@
 *
 * ContextElementResponse::render - 
 */
-std::string ContextElementResponse::render(Format format, std::string indent)
+std::string ContextElementResponse::render(Format format, std::string indent, bool comma)
 {
   std::string xmlTag   = "contextElementResponse";
   std::string jsonTag  = "contextElement";
   std::string out      = "";
 
+  LM_M(("rendering ContextElementResponse %s comma", comma? "with" : "without"));
+
   out += startTag(indent, xmlTag, jsonTag, format, false, false);
   out += contextElement.render(format, indent + "  ");
   out += statusCode.render(format, indent + "  ");
-  out += endTag(indent, xmlTag, format);
+  out += endTag(indent, xmlTag, format, comma, false);
 
   return out;
 }

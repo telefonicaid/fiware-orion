@@ -44,7 +44,7 @@ std::string NotifyContextRequest::render(RequestType requestType, Format format,
   out += startTag(indent, tag, format);
   out += subscriptionId.render(format, indent + "  ");
   out += originator.render(format, indent  + "  ");
-  out += contextElementResponseVector.render(format, indent  + "  ");
+  out += contextElementResponseVector.render(format, indent  + "  ", false);
   out += endTag(indent, tag, format);
 
   return out;
@@ -60,6 +60,7 @@ std::string NotifyContextRequest::check(RequestType requestType, Format format, 
   std::string            res;
   NotifyContextResponse  response;
    
+  LM_M(("Checking NotifyContextRequest"));
   if (predetectedError != "")
   {
     response.responseCode.code         = SccBadRequest;
@@ -71,9 +72,13 @@ std::string NotifyContextRequest::check(RequestType requestType, Format format, 
   {
     response.responseCode.code         = SccBadRequest;
     response.responseCode.reasonPhrase = res;
+    LM_M(("Bad payload in NotifyContextRequest: %s", res.c_str()));
   }
   else
+  {
+    LM_M(("NotifyContextRequest is OK"));
     return "OK";
+  }
 
   return response.render(NotifyContext, format, indent);
 }

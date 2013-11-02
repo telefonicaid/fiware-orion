@@ -55,8 +55,8 @@ std::string treat(int type, std::string path, std::string value, JsonNode* parse
     if (path == parseVector[ix].path)
     {
       LM_T(LmtTreat, ("calling treat %d function for '%s': '%s'", type, path.c_str(), value.c_str()));
-
       std::string res = parseVector[ix].treat(path, value, reqDataP);
+      LM_T(LmtTreat, ("called treat %d function for '%s'. result: '%s'", type, path.c_str(), res.c_str()));
       return res;
     }
   }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <notifyContextRequest>
-	<subscriptionId>123ed5d</subscriptionId>
+	<subscriptionId>012345678901234567890123</subscriptionId>
 	<originator>http://localhost/test</originator>
 	<contextResponseList>
 		<contextElementResponse>

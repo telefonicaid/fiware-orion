@@ -44,6 +44,12 @@
 */
 void ncrInit(ParseData* parseDataP)
 {
+   ncrRelease(parseDataP);
+
+   parseDataP->ncr.cerP                 = NULL;
+   parseDataP->ncr.attributeP           = NULL;
+   parseDataP->ncr.attributeMetadataP   = NULL;
+   parseDataP->ncr.domainMetadataP      = NULL;
 }
 
 
@@ -69,7 +75,7 @@ std::string ncrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 }
 
 
-#define PRINTF printf
+
 /* ****************************************************************************
 *
 * ncrPresent - 
@@ -105,7 +111,7 @@ static int subscriptionId(xml_node<>* node, ParseData* parseDataP)
 */
 static int originator(xml_node<>* node, ParseData* parseDataP)
 {
-  LM_T(LmtParse, ("Got a originator: '%s'", node->value()));
+  LM_T(LmtParse, ("Got an originator: '%s'", node->value()));
 
   parseDataP->ncr.res.originator.set(node->value());
   return 0;
@@ -139,8 +145,6 @@ static int entityIdId(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId:id: '%s'", node->value()));
 
-  if ((parseDataP->ncr.cerP->contextElement.entityId.id != "") && (parseDataP->ncr.cerP->contextElement.entityId.id != node->value()))
-    LM_W(("Overwriting entityId:id (was '%s') for '%s'", parseDataP->ncr.cerP->contextElement.entityId.id.c_str(), node->value()));
   parseDataP->ncr.cerP->contextElement.entityId.id = node->value();
 
   return 0;

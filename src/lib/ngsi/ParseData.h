@@ -170,6 +170,8 @@ typedef struct NotifyContextData
   NotifyContextRequest     res;
   ContextElementResponse*  cerP;
   ContextAttribute*        attributeP;
+  Metadata*                attributeMetadataP;
+  Metadata*                domainMetadataP;
 } NotifyContextData;
 
 

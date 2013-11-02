@@ -65,7 +65,7 @@ Format formatParse(std::string formatString, std::string* charsetP)
   if ((s = strstr(cP, ";")) != NULL)
   {
     *s = 0;
-    
+    ++s;
     s = wsStrip(s);
     if (strncmp(s, "charset=", 8) == 0)
     {

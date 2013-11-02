@@ -1,5 +1,5 @@
-#ifndef CONTEXT_ELEMENT_RESPONSE_VECTOR_H
-#define CONTEXT_ELEMENT_RESPONSE_VECTOR_H
+#ifndef JSON_NOTIFY_CONTEXT_REQUEST_H
+#define JSON_NOTIFY_CONTEXT_REQUEST_H
 
 /*
 *
@@ -26,27 +26,48 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <vector>
 
-#include "ngsi/ContextElementResponse.h"
+#include "jsonParse/JsonNode.h"
+#include "rest/ConnectionInfo.h"
 
 
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector - 
+* ncrParseVector - 
 */
-typedef struct ContextElementResponseVector
-{
-  std::vector<ContextElementResponse*>  vec;
+extern JsonNode jsonNcrParseVector[];
 
-  std::string              render(Format format, std::string indent, bool comma = false);
-  std::string              check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void                     present(std::string indent);
-  void                     push_back(ContextElementResponse* item);
-  unsigned int             size(void);
-  ContextElementResponse*  get(int ix);
-  void                     release();
-} ContextElementResponseVector;
+
+
+/* ****************************************************************************
+*
+* jsonNcrInit - 
+*/
+extern void jsonNcrInit(ParseData* reqDataP);
+
+
+
+/* ****************************************************************************
+*
+* jsonNcrRelease - 
+*/
+extern void jsonNcrRelease(ParseData* reqDataP);
+
+
+
+/* ****************************************************************************
+*
+* jsonNcrCheck - 
+*/
+extern std::string jsonNcrCheck(ParseData* reqDataP, ConnectionInfo* ciP);
+
+
+
+/* ****************************************************************************
+*
+* jsonNcrPresent - 
+*/
+extern void jsonNcrPresent(ParseData* reqDataP);
 
 #endif
