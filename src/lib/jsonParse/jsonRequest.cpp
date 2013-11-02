@@ -39,6 +39,7 @@
 #include "jsonParse/jsonQueryContextRequest.h"
 #include "jsonParse/jsonUpdateContextRequest.h"
 #include "jsonParse/jsonSubscribeContextRequest.h"
+#include "jsonParse/jsonUnsubscribeContextRequest.h"
 #include "jsonParse/jsonNotifyContextRequest.h"
 #include "rest/restReply.h"
 
@@ -64,7 +65,7 @@ static JsonRequest jsonRequest[] =
   { NotifyContext,                         "POST", "notifyContextRequest",                          jsonNcrParseVector,  jsonNcrInit,  jsonNcrCheck,   jsonNcrPresent,  jsonNcrRelease  },
   
   { UpdateContextSubscription,             "POST", "updateContextSubscriptionRequest",              NULL, NULL, NULL, NULL, NULL },
-  { UnsubscribeContext,                    "POST", "unsubscribeContextRequest",                     NULL, NULL, NULL, NULL, NULL }
+  { UnsubscribeContext,                    "POST", "unsubscribeContextRequest",                     jsonUncrParseVector, jsonUncrInit, jsonUncrCheck,  jsonUncrPresent, jsonUncrRelease }
 };
 
 
@@ -100,13 +101,6 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
   {
     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", requestType(request), SccBadRequest, "no request treating object found", std::string("Sorry, no request treating object found for RequestType '") + requestType(request) + "'");
     LM_RE(errorReply, ("Sorry, no request treating object found for RequestType %d (%s)", request, requestType(request)));
-  }
-
-  LM_T(LmtParse, ("Found '%s' request", reqP->keyword.c_str()));
-  if (reqP->parseVector == NULL)
-  {
-    std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", requestType(request), SccBadRequest, "Sorry, not implemented", "");
-    LM_RE(errorReply, ("Sorry, the '%s' object is not implemented", reqP->keyword.c_str()));
   }
 
   LM_T(LmtParse, ("Treating '%s' request", reqP->keyword.c_str()));
