@@ -1,6 +1,3 @@
-#ifndef NOTIFY_CONTEXT_AVAILABILITY_REQUEST_H
-#define NOTIFY_CONTEXT_AVAILABILITY_REQUEST_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -23,31 +20,37 @@
 * For those usages not covered by this license please contact with
 * fermin at tid dot es
 *
-* Author: Fermin Galan
+* Author: Ken Zangelin
 */
-#include <string>
+#include "gtest/gtest.h"
 
-#include "ngsi/Request.h"
-#include "ngsi/SubscriptionId.h"
-#include "ngsi/ContextRegistrationResponseVector.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
+#include "ngsi/StatusCode.h"
+#include "ngsi/ErrorCode.h"
+#include "ngsi9/NotifyContextAvailabilityResponse.h"
+
 
 
 /* ****************************************************************************
 *
-* NotifyContextAvailabilityRequest -
+* all - 
 */
-typedef struct NotifyContextAvailabilityRequest
+TEST(NotifyContextAvailabilityResponse, all)
 {
-  SubscriptionId                     subscriptionId;                     // Mandatory
-  ContextRegistrationResponseVector  contextRegistrationResponseVector;  // Mandatory
-  ErrorCode                          errorCode;                          // Optional
+  StatusCode                         sc(SccBadRequest, "status", "status details");
+  ErrorCode                          ec(SccForbidden,  "error",  "error details");
+  NotifyContextAvailabilityResponse  ncr1;
+  NotifyContextAvailabilityResponse  ncr2(sc);
+  NotifyContextAvailabilityResponse  ncr3(ec);
+  
+  EXPECT_EQ(ncr1.responseCode.code, SccOk);
+  EXPECT_EQ(ncr2.responseCode.code, SccBadRequest);
+  EXPECT_EQ(ncr3.responseCode.code, SccForbidden);
 
-  NotifyContextAvailabilityRequest();
+  ncr1.render(NotifyContextAvailability, XML, "");
+  ncr1.present("");
+  ncr1.release();
+}
 
-  std::string   render(RequestType requestType, Format format, std::string indent);
-  std::string   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void          present(std::string indent);
-  void          release(void);
-} NotifyContextAvailabilityRequest;
-
-#endif

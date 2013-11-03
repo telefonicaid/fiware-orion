@@ -307,7 +307,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 </unsubscribeContextAvailabilityResponse>
 7: ++++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 1472
+Content-Length: 1558
 User-Agent: NGSI Rest Library
 Host: localhost:REGEX(\d+)
 Accept: */*
@@ -351,11 +351,15 @@ Content-Type: application/xml
       </contextRegistration>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
+  <errorCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </errorCode>
 </notifyContextAvailabilityRequest>
 
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 839
+Content-Length: 925
 User-Agent: NGSI Rest Library
 Host: localhost:REGEX(\d+)
 Accept: */*
@@ -382,11 +386,15 @@ Content-Type: application/xml
       </contextRegistration>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
+  <errorCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </errorCode>
 </notifyContextAvailabilityRequest>
 
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 1464
+Content-Length: 1550
 User-Agent: NGSI Rest Library
 Host: localhost:REGEX(\d+)
 Accept: */*
@@ -430,11 +438,15 @@ Content-Type: application/xml
       </contextRegistration>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
+  <errorCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </errorCode>
 </notifyContextAvailabilityRequest>
 
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 835
+Content-Length: 921
 User-Agent: NGSI Rest Library
 Host: localhost:REGEX(\d+)
 Accept: */*
@@ -461,6 +473,10 @@ Content-Type: application/xml
       </contextRegistration>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
+  <errorCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </errorCode>
 </notifyContextAvailabilityRequest>
 
 =======================================
