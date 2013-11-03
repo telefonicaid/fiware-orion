@@ -60,14 +60,14 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextRequest>
   <subscriptionId>012345678901234567890123</subscriptionId>
 </unsubscribeContextRequest>
 EOF
 echo "2: ***********************************"
-OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -112,7 +112,7 @@ EOF)
 echo "$OUT"
 subscriptionId=$(echo "$OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "3: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextRequest>
   <subscriptionId>$subscriptionId</subscriptionId>
@@ -120,6 +120,30 @@ echo "3: ***********************************"
 EOF
 echo "4: ***********************************"
 --REGEXPECT--
+<unsubscribeContextResponse>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <statusCode>
+    <code>404</code>
+    <reasonPhrase>Subscription Not Found</reasonPhrase>
+  </statusCode>
+</unsubscribeContextResponse>
+2: ***********************************
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+    <duration>P5Y</duration>
+    <throttling>P5Y</throttling>
+  </subscribeResponse>
+</subscribeContextResponse>
+3: ***********************************
+<unsubscribeContextResponse>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</unsubscribeContextResponse>
+4: ***********************************
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})
