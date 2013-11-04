@@ -66,7 +66,7 @@ JsonNode jsonUncrParseVector[] =
 void jsonUncrInit(ParseData* parseDataP)
 {
   jsonUncrRelease(parseDataP);
-  parseDataP->errorString                = "";
+  parseDataP->errorString  = "";
 }
 
 
