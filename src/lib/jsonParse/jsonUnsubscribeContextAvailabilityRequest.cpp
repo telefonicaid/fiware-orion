@@ -53,9 +53,8 @@ static std::string subscriptionId(std::string path, std::string value, ParseData
 */
 JsonNode jsonUcarParseVector[] =
 {
-  { "/subscriptionId",                                                                       subscriptionId    },
-
-  { "LAST", NULL }
+  { "/subscriptionId",  subscriptionId },
+  { "LAST",             NULL }
 };
 
 
@@ -67,7 +66,7 @@ JsonNode jsonUcarParseVector[] =
 void jsonUcarInit(ParseData* parseDataP)
 {
   jsonUcarRelease(parseDataP);
-  parseDataP->errorString                = "";
+  parseDataP->errorString = "";
 }
 
 
