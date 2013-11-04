@@ -307,48 +307,6 @@ static std::string providingApplication(std::string path, std::string value, Par
 
 /* ****************************************************************************
 *
-* errorCodeCode - 
-*/
-static std::string errorCodeCode(std::string path, std::string value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got an errorCode.code: '%s'", value.c_str()));
-
-  parseDataP->ncar.res.errorCode.code = atoi(value.c_str());
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* errorCodeReasonPhrase - 
-*/
-static std::string errorCodeReasonPhrase(std::string path, std::string value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got an errorCode.reasonPhrase: '%s'", value.c_str()));
-
-  parseDataP->ncar.res.errorCode.reasonPhrase = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* errorCodeDetails - 
-*/
-static std::string errorCodeDetails(std::string path, std::string value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got an errorCode.details: '%s'", value.c_str()));
-
-  parseDataP->ncar.res.errorCode.details = value;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * jsonNcarParseVector -
 */
 JsonNode jsonNcarParseVector[] =
@@ -383,10 +341,6 @@ JsonNode jsonNcarParseVector[] =
    { "/contextRegistrationResponses/contextRegistrationResponse/contextRegistration/metadatas/metadata/value",  registrationMetadataValue   },
 
    { "/contextRegistrationResponses/contextRegistrationResponse/contextRegistration/providingApplication",      providingApplication        },
-
-   { "/errorCode/code",                  errorCodeCode         },
-   { "/errorCode/reasonPhrase",          errorCodeReasonPhrase },
-   { "/errorCode/details",               errorCodeDetails      },
 
    { "LAST", NULL }
 };

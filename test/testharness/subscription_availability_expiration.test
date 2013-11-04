@@ -194,7 +194,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 </registerContextResponse>
 3: ++++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 926
+Content-Length: 840
 User-Agent: NGSI Rest Library
 Host: localhost:REGEX(\d+)
 Accept: */*
@@ -221,10 +221,6 @@ Content-Type: application/xml
       </contextRegistration>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
-  <errorCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-  </errorCode>
 </notifyContextAvailabilityRequest>
 
 =======================================

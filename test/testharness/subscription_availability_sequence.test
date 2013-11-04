@@ -412,7 +412,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 </registerContextResponse>
 10: ++++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 924
+Content-Length: 838
 User-Agent: NGSI Rest Library
 Host: localhost:REGEX(\d+)
 Accept: */*
@@ -439,15 +439,11 @@ Content-Type: application/xml
       </contextRegistration>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
-  <errorCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-  </errorCode>
 </notifyContextAvailabilityRequest>
 
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 918
+Content-Length: 832
 User-Agent: NGSI Rest Library
 Host: localhost:REGEX(\d+)
 Accept: */*
@@ -474,15 +470,11 @@ Content-Type: application/xml
       </contextRegistration>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
-  <errorCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-  </errorCode>
 </notifyContextAvailabilityRequest>
 
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 924
+Content-Length: 838
 User-Agent: NGSI Rest Library
 Host: localhost:REGEX(\d+)
 Accept: */*
@@ -509,15 +501,11 @@ Content-Type: application/xml
       </contextRegistration>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
-  <errorCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-  </errorCode>
 </notifyContextAvailabilityRequest>
 
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 920
+Content-Length: 834
 User-Agent: NGSI Rest Library
 Host: localhost:REGEX(\d+)
 Accept: */*
@@ -544,10 +532,6 @@ Content-Type: application/xml
       </contextRegistration>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
-  <errorCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-  </errorCode>
 </notifyContextAvailabilityRequest>
 
 =======================================
