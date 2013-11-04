@@ -90,6 +90,7 @@ TEST(SubscribeContextRequest, invalidDuration_xml)
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     fileName = "subscribeContextRequest_invalidDuration.xml";
+  const char*     expected = "<subscribeContextResponse>\n  <subscribeError>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>bad input format</reasonPhrase>\n      <details>syntax error in duration string</details>\n    </errorCode>\n  </subscribeError>\n</subscribeContextResponse>\n";
   XmlRequest*     reqP;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -99,5 +100,5 @@ TEST(SubscribeContextRequest, invalidDuration_xml)
   lmTraceLevelSet(LmtDump, false);
 
   reqP->release(&parseData);
-  EXPECT_STREQ("syntax error in duration string", result.c_str());
+  EXPECT_STREQ(expected, result.c_str());
 }

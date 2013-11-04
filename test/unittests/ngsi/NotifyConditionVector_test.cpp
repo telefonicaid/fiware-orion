@@ -70,7 +70,7 @@ TEST(NotifyConditionVector, check)
   NotifyConditionVector  ncV;
   std::string            checked;
   std::string            expected1 = "OK";
-  std::string            expected2 = "OK";
+  std::string            expected2 = "invalid notify condition type: 'Type'";
   std::string            expected3 = "empty type for NotifyCondition";
   
   checked = ncV.check(RegisterContext, XML, "", "", 0);

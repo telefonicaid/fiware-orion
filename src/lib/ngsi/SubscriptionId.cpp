@@ -102,14 +102,14 @@ void SubscriptionId::present(std::string indent)
 *
 * SubscriptionId::render - 
 */
-std::string SubscriptionId::render(Format format, std::string indent)
+std::string SubscriptionId::render(Format format, std::string indent, bool comma)
 {
   std::string xString = string;
   
   if (xString == "")
     xString = std::string("No Subscription ID");
 
-  return valueTag(indent, "subscriptionId", xString, format);
+  return valueTag(indent, "subscriptionId", xString, format, comma);
 }
 
 

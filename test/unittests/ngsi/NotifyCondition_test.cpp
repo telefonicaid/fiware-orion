@@ -84,7 +84,7 @@ TEST(NotifyCondition, check)
 {
   NotifyCondition  nc;
   std::string      expected1 = "empty type for NotifyCondition";
-  std::string      expected2 = "OK";
+  std::string      expected2 = "invalid notify condition type: 'XXX'";
   std::string      checked;
 
   checked = nc.check(RegisterContext, XML, "", "", 0);
