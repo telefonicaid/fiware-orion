@@ -107,7 +107,7 @@ echo "++++++++++++++++++++"
 {
   "registrationId" : "0",
   "errorCode" : {
-    "code" : "500",
+    "code" : "400",
     "reasonPhrase" : "Parse Error",
     "details" : "JSON parse error: <unspecified file>(1): expected object name"
   }

@@ -120,7 +120,7 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
   catch (std::exception &e)
   {
     res = std::string("JSON parse error: ") + e.what();
-    std::string errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccReceiverInternalError, "Parse Error", res);
+    std::string errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, "Parse Error", res);
     LM_E(("JSON Parse Error: '%s'", e.what()));
     LM_RE(errorReply, (res.c_str()));
   }
