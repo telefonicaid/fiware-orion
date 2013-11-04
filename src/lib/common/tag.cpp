@@ -38,14 +38,34 @@
 */
 std::string startTag(std::string indent, std::string tagName, Format format, bool showTag)
 {
+  char* xP = (char*) malloc(12);
+  if (xP)
+  {
+     LM_M(("malloc OK"));
+     free(xP);
+  }
+
   if (format == XML)
-    return indent + "<" + tagName + ">\n";
+  {
+    LM_M(("HERE. indent == '%s'", indent.c_str()));
+    LM_M(("HERE. tagName == '%s'", tagName.c_str()));
+
+    std::string out = "";
+
+    out += indent;
+    out += "<";
+    out += std::string(tagName);
+    LM_M(("HERE. out == '%s'", out.c_str()));
+    out += std::string(">\n");
+    LM_M(("HERE. out == '%s'", out.c_str()));
+    return out;
+  }
   else if (format == JSON)
   {
     if (showTag == false)
       return indent + "{\n";
     else
-       return indent + "\"" + tagName + "\" : {\n";
+      return indent + "\"" + tagName + "\" : {\n";
   }
 
   return "Format not supported";
