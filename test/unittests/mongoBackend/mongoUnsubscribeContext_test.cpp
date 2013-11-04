@@ -322,6 +322,9 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
 
     /* Check database (untouched) */
     mongoDisconnect();
+
+    // Sleeping a little to "give mongod time to process its input".
+    usleep(1000);
     mongoConnect("localhost");
     DBClientConnection* connection = getMongoConnection();
     ASSERT_EQ(2, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
