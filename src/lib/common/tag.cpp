@@ -87,9 +87,6 @@ std::string endTag(std::string indent, std::string tagName, Format format, bool 
   if (format == XML)
     return indent + "</" + tagName + ">\n";
 
-  if (comma)
-    LM_M(("rendering endTag for '%s' %s comma", tagName.c_str(), comma? "with" : "without"));
-
   if (isVector && comma)
      return indent + "],\n";
   else if (isVector && !comma)

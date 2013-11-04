@@ -50,12 +50,8 @@ std::string ContextElementResponseVector::render(Format format, std::string inde
   out += startTag(indent, xmlTag, jsonTag, format, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    LM_M(("ix == %d, size == %d, comma == %d", ix, vec.size(), ix < (vec.size() - 1)));
     out += vec[ix]->render(format, indent + "  ", ix < (vec.size() - 1));
-  }
 
-  LM_M(("Calling endTag for ContextElementResponseVector '%s' comma", comma? "with" : "without"));
   out += endTag(indent, xmlTag, format, comma, true);
 
   return out;
