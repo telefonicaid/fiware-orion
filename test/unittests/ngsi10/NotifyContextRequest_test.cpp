@@ -43,9 +43,9 @@
 
 /* ****************************************************************************
 *
-* xml_ok - 
+* handmade_ncr_xml_ok - 
 */
-TEST(NotifyContextRequest, old_xml_ok)
+TEST(NotifyContextRequest, handmade_ncr_xml_ok)
 {
   NotifyContextRequest     ncr;
   ContextElementResponse*  cerP = new ContextElementResponse();
