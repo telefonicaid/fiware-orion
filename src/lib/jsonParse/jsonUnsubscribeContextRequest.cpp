@@ -53,9 +53,8 @@ static std::string subscriptionId(std::string path, std::string value, ParseData
 */
 JsonNode jsonUncrParseVector[] =
 {
-  { "/subscriptionId",                                                                       subscriptionId    },
-
-  { "LAST", NULL }
+  { "/subscriptionId", subscriptionId },
+  { "LAST",            NULL           }
 };
 
 
