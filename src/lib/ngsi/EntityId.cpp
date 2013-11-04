@@ -114,7 +114,10 @@ std::string EntityId::check(RequestType requestType, Format format, std::string 
     return "empty entityId:id";
 
   if (!isTrue(isPattern) && !isFalse(isPattern) && isPattern != "")
+  {
+    LM_E(("bad value for 'isPattern' : '%s'", isPattern.c_str()));
     return "bad value for 'isPattern'";
+  }
 
   if ((requestType == RegisterContext) && (isTrue(isPattern)))
     return "'isPattern' set to true for a registration";

@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/ContextElementResponseVector.h"
@@ -36,7 +38,7 @@
 *
 * ContextElementResponseVector::render - 
 */
-std::string ContextElementResponseVector::render(Format format, std::string indent)
+std::string ContextElementResponseVector::render(Format format, std::string indent, bool comma)
 {
   std::string xmlTag   = "contextResponseList";
   std::string jsonTag  = "contextResponses";
@@ -46,9 +48,11 @@ std::string ContextElementResponseVector::render(Format format, std::string inde
     return "";
 
   out += startTag(indent, xmlTag, jsonTag, format, true, true);
+
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ");
-  out += endTag(indent, xmlTag, format, false, true);
+    out += vec[ix]->render(format, indent + "  ", ix < (vec.size() - 1));
+
+  out += endTag(indent, xmlTag, format, comma, true);
 
   return out;
 }

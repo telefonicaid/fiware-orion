@@ -39,6 +39,7 @@
 #include "jsonParse/jsonQueryContextRequest.h"
 #include "jsonParse/jsonUpdateContextRequest.h"
 #include "jsonParse/jsonSubscribeContextRequest.h"
+#include "jsonParse/jsonNotifyContextRequest.h"
 #include "rest/restReply.h"
 
 
@@ -50,16 +51,18 @@
 static JsonRequest jsonRequest[] = 
 {
   // NGSI9
-  { RegisterContext,                       "POST", "registerContextRequest",                        jsonRcrParseVector,  jsonRcrInit,  jsonRcrCheck,  jsonRcrPresent,  jsonRcrRelease  },
-  { DiscoverContextAvailability,           "POST", "discoverContextAvailabilityRequest",            jsonDcarParseVector, jsonDcarInit, jsonDcarCheck, jsonDcarPresent, jsonDcarRelease },
-  { SubscribeContextAvailability,          "POST", "subscribeContextAvailabilityRequest",           jsonScarParseVector, jsonScarInit, jsonScarCheck, jsonScarPresent, jsonScarRelease },
+  { RegisterContext,                       "POST", "registerContextRequest",                        jsonRcrParseVector,  jsonRcrInit,  jsonRcrCheck,   jsonRcrPresent,  jsonRcrRelease  },
+  { DiscoverContextAvailability,           "POST", "discoverContextAvailabilityRequest",            jsonDcarParseVector, jsonDcarInit, jsonDcarCheck,  jsonDcarPresent, jsonDcarRelease },
+  { SubscribeContextAvailability,          "POST", "subscribeContextAvailabilityRequest",           jsonScarParseVector, jsonScarInit, jsonScarCheck,  jsonScarPresent, jsonScarRelease },
   { UnsubscribeContextAvailability,        "POST", "unsubscribeContextAvailabilityRequest",         NULL, NULL, NULL, NULL, NULL },
   { UpdateContextAvailabilitySubscription, "POST", "updateContextAvailabilitySubscriptionRequest",  NULL, NULL, NULL, NULL, NULL },
 
   // NGSI10
-  { QueryContext,                          "POST", "queryContextRequest",                           jsonQcrParseVector,  jsonQcrInit,  jsonQcrCheck,  jsonQcrPresent,  jsonQcrRelease  },
-  { UpdateContext,                         "POST", "updateContextRequest",                          jsonUpcrParseVector, jsonUpcrInit, jsonUpcrCheck, jsonUpcrPresent, jsonUpcrRelease },
-  { SubscribeContext,                      "POST", "subscribeContextRequest",                       jsonScrParseVector,  jsonScrInit,  jsonScrCheck,  jsonScrPresent,  jsonScrRelease  },
+  { QueryContext,                          "POST", "queryContextRequest",                           jsonQcrParseVector,  jsonQcrInit,  jsonQcrCheck,   jsonQcrPresent,  jsonQcrRelease  },
+  { UpdateContext,                         "POST", "updateContextRequest",                          jsonUpcrParseVector, jsonUpcrInit, jsonUpcrCheck,  jsonUpcrPresent, jsonUpcrRelease },
+  { SubscribeContext,                      "POST", "subscribeContextRequest",                       jsonScrParseVector,  jsonScrInit,  jsonScrCheck,   jsonScrPresent,  jsonScrRelease  },
+  { NotifyContext,                         "POST", "notifyContextRequest",                          jsonNcrParseVector,  jsonNcrInit,  jsonNcrCheck,   jsonNcrPresent,  jsonNcrRelease  },
+  
   { UpdateContextSubscription,             "POST", "updateContextSubscriptionRequest",              NULL, NULL, NULL, NULL, NULL },
   { UnsubscribeContext,                    "POST", "unsubscribeContextRequest",                     NULL, NULL, NULL, NULL, NULL }
 };
@@ -118,6 +121,7 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
   {
     res = std::string("JSON parse error: ") + e.what();
     std::string errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccReceiverInternalError, "Parse Error", res);
+    LM_E(("JSON Parse Error: '%s'", e.what()));
     LM_RE(errorReply, (res.c_str()));
   }
 

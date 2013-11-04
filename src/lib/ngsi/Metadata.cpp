@@ -93,11 +93,7 @@ std::string Metadata::render(Format format, std::string indent)
   if (type == "Association")
      xValue = std::string("\n") + association.render(format, indent + "  ");
 
-  LM_M(("xValue == '%s'", xValue.c_str()));
-
   out += valueTag(indent + "  ", "value", xValue, format, false, (type == "Association"));
-  LM_M(("out == '%s'", out.c_str()));
-
   out += endTag(indent, tag, format);
 
   return out;

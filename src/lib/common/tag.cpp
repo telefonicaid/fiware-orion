@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <string>
 
+#include "logMsg/logMsg.h"
+
 #include "common/Format.h"
 #include "common/tag.h"
 
