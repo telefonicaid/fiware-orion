@@ -18,9 +18,6 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
-#
-# FIXME P8 - an extra comma after an entityId must be taken away!
-#
 --NAME--
 JSON Parse Post UnsubscribeContextAvailability
 --SHELL-INIT--
