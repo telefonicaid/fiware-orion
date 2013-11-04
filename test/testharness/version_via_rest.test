@@ -63,8 +63,13 @@ fi
 # Note that we are assuming a fixed value of 0 for days, hours and minutes, assuming that this test
 # is executed in less than one minute
 
+echo "1: +++++++++++++++++++++++++++++"
 curl localhost:${BROKER_PORT}/version
+echo "2: +++++++++++++++++++++++++++++"
+curl localhost:${BROKER_PORT}/version --header "Accept: application/json"
+echo "3: +++++++++++++++++++++++++++++"
 --REGEXPECT--
+1: +++++++++++++++++++++++++++++
 <orion>
   <version>REGEX(.*)</version>
   <uptime>REGEX(.*)</uptime>
@@ -73,6 +78,16 @@ curl localhost:${BROKER_PORT}/version
   <compiled_by>REGEX(.*)</compiled_by>
   <compiled_in>REGEX(.*)</compiled_in>
 </orion>
+2: +++++++++++++++++++++++++++++
+"orion" : {
+  "version" : "REGEX(.*)",
+  "uptime" : "REGEX(.*)",
+  "git_hash" : "REGEX([0-9a-f]{40})",
+  "compile_time" : "REGEX(.*)",
+  "compiled_by" : "REGEX(.*)",
+  "compiled_in" : "REGEX(.*)"
+}
+3: +++++++++++++++++++++++++++++
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})
