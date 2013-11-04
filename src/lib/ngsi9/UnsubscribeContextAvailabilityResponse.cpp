@@ -80,9 +80,9 @@ std::string UnsubscribeContextAvailabilityResponse::render(RequestType requestTy
   std::string out     = "";
   std::string tag = "unsubscribeContextAvailabilityResponse";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, format, false);
 
-  out += subscriptionId.render(format, indent + "  ");
+  out += subscriptionId.render(format, indent + "  ", true);
   out += statusCode.render(format, indent + "  ");
 
   out += endTag(indent, tag, format);

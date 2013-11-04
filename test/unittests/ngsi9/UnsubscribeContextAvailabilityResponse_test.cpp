@@ -24,7 +24,7 @@
 */
 #include "gtest/gtest.h"
 
-#include "ngsi10/UnsubscribeContextResponse.h"
+#include "ngsi9/UnsubscribeContextAvailabilityResponse.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/ErrorCode.h"
 
@@ -34,22 +34,24 @@
 *
 * constructorsAndRender - 
 */
-TEST(UnsubscribeContextResponse, constructorsAndRender)
+TEST(UnsubscribeContextAvailabilityResponse, constructorsAndRender)
 {
-  UnsubscribeContextResponse  uncr1;
-  StatusCode                  sc(SccOk, "RP", "D");
-  UnsubscribeContextResponse  uncr2(sc);
-  ErrorCode                   ec(SccBadRequest, "RP", "D");
-  UnsubscribeContextResponse  uncr3(ec);
-  std::string                 rendered;
-  std::string                 expected = "<unsubscribeContextResponse>\n  <subscriptionId>0</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>RP</reasonPhrase>\n    <details>D</details>\n  </statusCode>\n</unsubscribeContextResponse>\n";
+  UnsubscribeContextAvailabilityResponse  ucar1;
+  SubscriptionId                          subscriptionId;
 
-  EXPECT_EQ(0,             uncr1.statusCode.code);
-  EXPECT_EQ(SccOk,         uncr2.statusCode.code);
-  EXPECT_EQ(SccBadRequest, uncr3.statusCode.code);
+  subscriptionId.set("111122223333444455556666");
 
-  rendered = uncr3.render(UnsubscribeContext, XML, "");
+  UnsubscribeContextAvailabilityResponse  ucar2(subscriptionId);
+  ErrorCode                               ec(SccBadRequest, "RP", "D");
+  UnsubscribeContextAvailabilityResponse  ucar3(ec);
+  std::string                             rendered;
+  std::string                             expected = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>RP</reasonPhrase>\n    <details>D</details>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
+;
+
+  EXPECT_EQ(0,                    ucar1.statusCode.code);
+  EXPECT_EQ(subscriptionId.get(), ucar2.subscriptionId.get());
+  EXPECT_EQ(SccBadRequest,        ucar3.statusCode.code);
+
+  rendered = ucar3.render(UnsubscribeContext, XML, "");
   EXPECT_STREQ(expected.c_str(), rendered.c_str());
-
-  uncr1.release();
 }

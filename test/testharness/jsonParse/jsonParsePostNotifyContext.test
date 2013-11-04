@@ -133,7 +133,7 @@ EOF
 echo "2: ***********************************"
 --REGEXPECT--
 1: ***********************************
-"notifyContextResponse" : {
+{
   "statusCode" : {
     "code" : "200",
     "reasonPhrase" : "OK"
