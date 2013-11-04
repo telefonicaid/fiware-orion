@@ -40,7 +40,6 @@ typedef struct NotifyContextAvailabilityRequest
 {
   SubscriptionId                     subscriptionId;                     // Mandatory
   ContextRegistrationResponseVector  contextRegistrationResponseVector;  // Mandatory
-  ErrorCode                          errorCode;                          // Optional
 
   NotifyContextAvailabilityRequest();
 

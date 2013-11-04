@@ -38,7 +38,6 @@
 */
 NotifyContextAvailabilityRequest::NotifyContextAvailabilityRequest()
 {
-  errorCode.fill(200, "OK");
 }
 
 
@@ -55,7 +54,6 @@ std::string NotifyContextAvailabilityRequest::render(RequestType requestType, Fo
   out += startTag(indent, tag, format);
   out += subscriptionId.render(format, indent + "  ");
   out += contextRegistrationResponseVector.render(format, indent  + "  ");
-  out += errorCode.render(format, indent  + "  ");
   out += endTag(indent, tag, format);
 
   return out;
@@ -98,7 +96,6 @@ void NotifyContextAvailabilityRequest::present(std::string indent)
 {
   subscriptionId.present(indent);
   contextRegistrationResponseVector.present(indent);
-  errorCode.present(indent);
 }
 
 
@@ -110,5 +107,4 @@ void NotifyContextAvailabilityRequest::present(std::string indent)
 void NotifyContextAvailabilityRequest::release(void)
 {
   contextRegistrationResponseVector.release();
-  errorCode.release();
 }
