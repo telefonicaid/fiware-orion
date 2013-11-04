@@ -645,6 +645,9 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
 
     /* Check that database is as expected (untouched) */
     mongoDisconnect();
+
+    // Sleeping a little to "give mongod time to process its input".
+    usleep(1000);
     mongoConnect("localhost");
     DBClientConnection* connection = getMongoConnection();
     BSONObj sub1 = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
