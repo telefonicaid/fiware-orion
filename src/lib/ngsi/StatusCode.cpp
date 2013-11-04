@@ -66,7 +66,7 @@ StatusCode::StatusCode(HttpStatusCode _code, std::string _reasonPhrase, std::str
 *
 * StatusCode::render - 
 */
-std::string StatusCode::render(Format format, std::string indent)
+std::string StatusCode::render(Format format, std::string indent, bool comma)
 {
   std::string out  = "";
   std::string tag  = "statusCode";
@@ -78,7 +78,7 @@ std::string StatusCode::render(Format format, std::string indent)
   if (details != "")
      out += valueTag(indent + "  ", "details", details, format, false);
 
-  out += endTag(indent, tag, format);
+  out += endTag(indent, tag, format, comma, false);
 
   return out;
 }

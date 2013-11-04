@@ -33,6 +33,7 @@
 #include "rest/ConnectionInfo.h"
 #include "xmlParse/xmlRequest.h"
 #include "xmlParse/xmlParse.h"
+#include "jsonParse/jsonRequest.h"
 
 
 /* ****************************************************************************
@@ -67,4 +68,35 @@ TEST(UnsubscribeContextRequest, badSubscriptionId_xml)
   EXPECT_STREQ(expected.c_str(), rendered.c_str());
 
   ucrP->release();
+}
+
+
+
+/* ****************************************************************************
+*
+* badSubscriptionId_json - 
+*/
+TEST(UnsubscribeContextRequest, badSubscriptionId_json)
+{
+  ParseData       reqData;
+  ConnectionInfo  ci("", "POST", "1.1");
+  const char*     fileName = "unsubscribeContextRequest_badSubscriptionId.json";
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+  lmTraceLevelSet(LmtDump, true);
+  std::string result = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContext, "unsubscribeContextRequest", NULL);
+  lmTraceLevelSet(LmtDump, false);
+
+  UnsubscribeContextRequest*  ucrP = &reqData.uncr.res;
+
+  ucrP->present("");
+  std::string expected = "\"unsubscribeContextRequest\" : {\n  \"subscriptionId\" : \"012345678901234567890123\"\n}\n";
+  std::string rendered = ucrP->render(UnsubscribeContext, JSON, "");
+  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+
+  ucrP->release();
+
 }

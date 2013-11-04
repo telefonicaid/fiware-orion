@@ -121,8 +121,7 @@ static void requestCompleted
 
   if (savedResponse[0] != 0)
   {
-     // LM_T(LmtSavedResponse, ("Saved response found - responding ..."));
-     LM_M(("Saved response found - responding ..."));
+     LM_T(LmtSavedResponse, ("Saved response found - responding ..."));
      restReply(ciP, savedResponse);
      savedResponse[0] = 0;
   }

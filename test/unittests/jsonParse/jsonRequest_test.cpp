@@ -50,7 +50,4 @@ TEST(jsonRequest, jsonTreat)
 
    out  = jsonTreat("", &ci, &parseData, InvalidRequest, "no_payload", NULL);
    EXPECT_EQ(expected1, out);
-
-   out = jsonTreat("", &ci, &parseData, UnsubscribeContext, "no_payload", NULL);
-   EXPECT_EQ(expected2, out);
 }

@@ -131,7 +131,6 @@ int restReply(ConnectionInfo* ciP, std::string answer)
        std::string errorAnswer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, 500, "response too large", "Maximum size of responses has been set to 2Mb");
        LM_W(("answer too large: %d bytes (max allowed is %d bytes", strlen(answer.c_str()), sizeof(savedResponse)));
        savedResponse[0] = 0;
-       LM_M(("New reply: %s", errorAnswer.c_str()));
        restReply(ciP, errorAnswer);
        return MHD_NO;
     }

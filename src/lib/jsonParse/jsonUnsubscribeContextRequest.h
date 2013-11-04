@@ -1,3 +1,6 @@
+#ifndef JSON_UNSUBSCRIBE_CONTEXT_REQUEST_H
+#define JSON_UNSUBSCRIBE_CONTEXT_REQUEST_H
+
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -22,31 +25,50 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
+#include <string>
+#include <vector>
 
-#include "ngsi10/QueryContextResponse.h"
+#include "rest/ConnectionInfo.h"
+#include "jsonParse/JsonNode.h"
 
 
 
 /* ****************************************************************************
 *
-* ok_xml - 
+* jsonUncrParseVector -
 */
-TEST(QueryContextResponse, ok_xml)
-{
-  ErrorCode*            ecP = new ErrorCode(SccOk, "Reason", "Detail");
-  ErrorCode             ec(SccOk, "Reason2", "Detail2");
-  QueryContextResponse  qcr1;
-  QueryContextResponse  qcr2(ec);
-  std::string           rendered;
-  std::string           expected1 = "<queryContextResponse>\n</queryContextResponse>\n";
-  std::string           expected2 = "<queryContextResponse>\n  <errorCode>\n    <code>200</code>\n    <reasonPhrase>Reason2</reasonPhrase>\n    <details>Detail2</details>\n  </errorCode>\n</queryContextResponse>\n";
+extern JsonNode jsonUncrParseVector[];
 
-  rendered = qcr1.render(QueryContext, XML, "");
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
 
-  rendered = qcr2.render(QueryContext, XML, "");
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
 
-  delete ecP;
-}
+/* ****************************************************************************
+*
+* jsonUncrInit - 
+*/
+extern void jsonUncrInit(ParseData* reqDataP);
+
+
+
+/* ****************************************************************************
+*
+* jsonUncrRelease - 
+*/
+extern void jsonUncrRelease(ParseData* reqDataP);
+
+
+
+/* ****************************************************************************
+*
+* jsonUncrCheck - 
+*/
+extern std::string jsonUncrCheck(ParseData* reqDataP, ConnectionInfo* ciP);
+
+
+
+/* ****************************************************************************
+*
+* jsonUncrPresent - 
+*/
+extern void jsonUncrPresent(ParseData* reqDataP);
+
+#endif

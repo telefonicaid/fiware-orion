@@ -48,7 +48,7 @@ typedef struct StatusCode
   StatusCode();
   StatusCode(HttpStatusCode _code, std::string _reasonPhrase, std::string _details);
 
-  std::string  render(Format format, std::string indent);
+  std::string  render(Format format, std::string indent, bool comma = false);
   std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void         fill(HttpStatusCode _code, std::string _reasonPhrase, std::string _details = "");
   void         fill(StatusCode* scP);    // FIXME P3: having StatusCode and ErrorCode actually being the same type lead to this dirty duplication
