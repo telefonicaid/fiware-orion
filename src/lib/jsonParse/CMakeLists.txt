@@ -28,6 +28,7 @@ SET (SOURCES
     jsonRegisterContextRequest.cpp
     jsonDiscoverContextAvailabilityRequest.cpp
     jsonSubscribeContextAvailabilityRequest.cpp
+    jsonNotifyContextAvailabilityRequest.cpp
 
     jsonQueryContextRequest.cpp
     jsonUpdateContextRequest.cpp

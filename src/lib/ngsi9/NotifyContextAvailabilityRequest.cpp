@@ -34,6 +34,16 @@
 
 /* ****************************************************************************
 *
+* NotifyContextAvailabilityRequest::NotifyContextAvailabilityRequest - 
+*/
+NotifyContextAvailabilityRequest::NotifyContextAvailabilityRequest()
+{
+}
+
+
+
+/* ****************************************************************************
+*
 * NotifyContextAvailabilityRequest::render -
 */
 std::string NotifyContextAvailabilityRequest::render(RequestType requestType, Format format, std::string indent)

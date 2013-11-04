@@ -1,5 +1,5 @@
-#ifndef NOTIFY_CONTEXT_AVAILABILITY_REQUEST_H
-#define NOTIFY_CONTEXT_AVAILABILITY_REQUEST_H
+#ifndef JSON_NOTIFY_CONTEXT_AVAILABILITY_REQUEST_H
+#define JSON_NOTIFY_CONTEXT_AVAILABILITY_REQUEST_H
 
 /*
 *
@@ -23,30 +23,51 @@
 * For those usages not covered by this license please contact with
 * fermin at tid dot es
 *
-* Author: Fermin Galan
+* Author: Ken Zangelin
 */
 #include <string>
 
-#include "ngsi/Request.h"
-#include "ngsi/SubscriptionId.h"
-#include "ngsi/ContextRegistrationResponseVector.h"
+#include "jsonParse/JsonNode.h"
+#include "rest/ConnectionInfo.h"
+
 
 
 /* ****************************************************************************
 *
-* NotifyContextAvailabilityRequest -
+* ncarParseVector - 
 */
-typedef struct NotifyContextAvailabilityRequest
-{
-  SubscriptionId                     subscriptionId;                     // Mandatory
-  ContextRegistrationResponseVector  contextRegistrationResponseVector;  // Mandatory
+extern JsonNode jsonNcarParseVector[];
 
-  NotifyContextAvailabilityRequest();
 
-  std::string   render(RequestType requestType, Format format, std::string indent);
-  std::string   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void          present(std::string indent);
-  void          release(void);
-} NotifyContextAvailabilityRequest;
+
+/* ****************************************************************************
+*
+* jsonNcarInit - 
+*/
+extern void jsonNcarInit(ParseData* reqDataP);
+
+
+
+/* ****************************************************************************
+*
+* jsonNcarRelease - 
+*/
+extern void jsonNcarRelease(ParseData* reqDataP);
+
+
+
+/* ****************************************************************************
+*
+* jsonNcarCheck - 
+*/
+extern std::string jsonNcarCheck(ParseData* reqDataP, ConnectionInfo* ciP);
+
+
+
+/* ****************************************************************************
+*
+* jsonNcarPresent - 
+*/
+extern void jsonNcarPresent(ParseData* reqDataP);
 
 #endif
