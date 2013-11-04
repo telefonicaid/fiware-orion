@@ -35,9 +35,10 @@
 #include "jsonParse/jsonRequest.h"
 #include "jsonParse/jsonRegisterContextRequest.h"
 #include "jsonParse/jsonDiscoverContextAvailabilityRequest.h"
-#include "jsonParse/jsonQueryContextRequest.h"
 #include "jsonParse/jsonSubscribeContextAvailabilityRequest.h"
+#include "jsonParse/jsonQueryContextRequest.h"
 #include "jsonParse/jsonUpdateContextRequest.h"
+#include "jsonParse/jsonSubscribeContextRequest.h"
 #include "rest/restReply.h"
 
 
@@ -58,7 +59,7 @@ static JsonRequest jsonRequest[] =
   // NGSI10
   { QueryContext,                          "POST", "queryContextRequest",                           jsonQcrParseVector,  jsonQcrInit,  jsonQcrCheck,  jsonQcrPresent,  jsonQcrRelease  },
   { UpdateContext,                         "POST", "updateContextRequest",                          jsonUpcrParseVector, jsonUpcrInit, jsonUpcrCheck, jsonUpcrPresent, jsonUpcrRelease },
-  { SubscribeContext,                      "POST", "subscribeContextRequest",                       NULL, NULL, NULL, NULL, NULL },
+  { SubscribeContext,                      "POST", "subscribeContextRequest",                       jsonScrParseVector,  jsonScrInit,  jsonScrCheck,  jsonScrPresent,  jsonScrRelease  },
   { UpdateContextSubscription,             "POST", "updateContextSubscriptionRequest",              NULL, NULL, NULL, NULL, NULL },
   { UnsubscribeContext,                    "POST", "unsubscribeContextRequest",                     NULL, NULL, NULL, NULL, NULL }
 };

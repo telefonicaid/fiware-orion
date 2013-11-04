@@ -26,9 +26,11 @@ SET (SOURCES
     jsonNullTreat.cpp
     jsonRegisterContextRequest.cpp
     jsonDiscoverContextAvailabilityRequest.cpp
-    jsonQueryContextRequest.cpp
     jsonSubscribeContextAvailabilityRequest.cpp
+
+    jsonQueryContextRequest.cpp
     jsonUpdateContextRequest.cpp
+    jsonSubscribeContextRequest.cpp
 )
 
 SET (HEADERS
@@ -38,9 +40,11 @@ SET (HEADERS
     jsonNullTreat.h
     jsonRegisterContextRequest.h
     jsonDiscoverContextAvailabilityRequest.h
-    jsonQueryContextRequest.h
     jsonSubscribeContextAvailabilityRequest.h
+
+    jsonQueryContextRequest.h
     jsonUpdateContextRequest.h
+    jsonSubscribeContextRequest.h
 )
 
 

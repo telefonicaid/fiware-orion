@@ -277,6 +277,8 @@ JsonNode jsonScarParseVector[] =
 */
 void jsonScarInit(ParseData* reqDataP)
 {
+  jsonScarRelease(reqDataP);
+
   reqDataP->errorString                = "";
 
   reqDataP->scar.entityIdP             = NULL;
