@@ -43,30 +43,6 @@
 
 /* ****************************************************************************
 *
-* handmade_ncr_xml_ok - 
-*/
-TEST(NotifyContextRequest, handmade_ncr_xml_ok)
-{
-  NotifyContextRequest     ncr;
-  ContextElementResponse*  cerP = new ContextElementResponse();
-  std::string              rendered;
-  std::string              expected = "<notifyContextRequest>\n  <subscriptionId>SUB_1</subscriptionId>\n  <originator>originator</originator>\n  <contextResponseList>\n    <contextElementResponse>\n      <contextElement>\n        <entityId type=\"\" isPattern=\"\">\n          <id></id>\n        </entityId>\n      </contextElement>\n      <statusCode>\n        <code>0</code>\n        <reasonPhrase></reasonPhrase>\n      </statusCode>\n    </contextElementResponse>\n  </contextResponseList>\n</notifyContextRequest>\n";
-
-  ncr.subscriptionId.set("SUB_1");
-  ncr.originator.set("originator");
-  ncr.contextElementResponseVector.push_back(cerP);
-
-  rendered = ncr.render(NotifyContext, XML, "");
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
-
-  ncr.present("");
-  ncr.release();
-}
-
-
-
-/* ****************************************************************************
-*
 * xml_ok - 
 */
 TEST(NotifyContextRequest, xml_ok)
@@ -92,6 +68,7 @@ TEST(NotifyContextRequest, xml_ok)
   rendered = ncrP->render(NotifyContext, XML, "");
   EXPECT_STREQ(expected.c_str(), rendered.c_str());
 
+  ncrP->present("");
   ncrP->release();
 }
 
