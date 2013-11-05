@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * fermin at tid dot es
 *
-* Author: Fermín Galán & Ken Zangelin
+* Author: Ken Zangelin
 */
 #include <string>
 #include <vector>
@@ -28,85 +28,81 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/tag.h"
 #include "common/globals.h"
-#include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
-#include "ngsi9/NotifyContextAvailabilityResponse.h"
-#include "rest/HttpStatusCode.h"
+#include "jsonParse/JsonNode.h"
+#include "jsonParse/jsonUnsubscribeContextAvailabilityRequest.h"
 
 
 
 /* ****************************************************************************
 *
-* NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse - 
+* subscriptionId - 
 */
-NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse()
+static std::string subscriptionId(std::string path, std::string value, ParseData* parseDataP)
 {
-   responseCode.fill(SccOk, "", "");
+  LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
+  parseDataP->ucar.res.subscriptionId.set(value);
+  return "OK";
 }
 
 
 
 /* ****************************************************************************
 *
-* NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse - 
+* jsonUcarParseVector -
 */
-NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse(StatusCode& sc)
+JsonNode jsonUcarParseVector[] =
 {
-   responseCode = sc;
+  { "/subscriptionId",  subscriptionId },
+  { "LAST",             NULL }
+};
+
+
+
+/* ****************************************************************************
+*
+* jsonUcarInit - 
+*/
+void jsonUcarInit(ParseData* parseDataP)
+{
+  jsonUcarRelease(parseDataP);
+  parseDataP->errorString = "";
 }
 
 
 
 /* ****************************************************************************
 *
-* NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse -
+* jsonUcarRelease - 
 */
-NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse(ErrorCode& ec)
+void jsonUcarRelease(ParseData* parseDataP)
 {
-   responseCode.fill(&ec);
+  parseDataP->ucar.res.release();
 }
 
 
 
 /* ****************************************************************************
 *
-* NotifyContextAvailabilityResponse::render -
+* jsonUcarCheck - 
 */
-std::string NotifyContextAvailabilityResponse::render(RequestType requestType, Format format, std::string indent)
+std::string jsonUcarCheck(ParseData* parseData, ConnectionInfo* ciP)
 {
-  std::string out = "";
-  std::string tag = "notifyContextAvailabilityResponse";
-
-  out += startTag(indent, tag, format, false);
-  out += responseCode.render(format, indent + "  ");
-  out += endTag(indent, tag, format);
-
-  return out;
+  return parseData->ucar.res.check(UnsubscribeContext, ciP->outFormat, "", parseData->errorString, 0);
 }
 
 
 
 /* ****************************************************************************
 *
-* NotifyContextAvailabilityResponse::present -
+* jsonUcarPresent - 
 */
-void NotifyContextAvailabilityResponse::present(std::string indent)
+void jsonUcarPresent(ParseData* parseDataP)
 {
-  PRINTF("%sNotifyContextAvailabilityResponse:", indent.c_str());
-  responseCode.present(indent + "  ");
-  PRINTF("\n");
+  if (!lmTraceIsSet(LmtDump))
+    return;
+
+  PRINTF("\n\n");
+
+  parseDataP->ucar.res.subscriptionId.present("");
 }
-
-
-
-/* ****************************************************************************
-*
-* NotifyContextAvailabilityResponse::release -
-*/
-void NotifyContextAvailabilityResponse::release(void)
-{
-  responseCode.release();
-}
-

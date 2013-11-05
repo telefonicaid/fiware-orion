@@ -44,6 +44,13 @@
 */
 void ncarInit(ParseData* parseDataP)
 {
+   ncarRelease(parseDataP);
+
+   parseDataP->ncar.crrP                = NULL;
+   parseDataP->ncar.entityIdP           = NULL;
+   parseDataP->ncar.craP                = NULL;
+   parseDataP->ncar.attributeMetadataP  = NULL;
+   parseDataP->ncar.regMetadataP        = NULL;
 }
 
 

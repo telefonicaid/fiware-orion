@@ -50,7 +50,7 @@ function verboseMsg()
 #
 function usage()
 {
-  echo usage: $0 '[-host <host>] [-port <p>] [-v (verbose)] [-lint (use xmllint)] [-cop <convenience operation>] [-X <method>] [-en <entityId>] [-attr (attributeName)] [-id <reg/sub id>] [-informat (in-format)] [-outformat (out-format)] [-table <table to debug>] <operation> <data file>'
+  echo usage: $0 '[-host <host>] [-port <p>] [-v (verbose)] [-lint (use xmllint)] [-cop <convenience operation>] [-X <method>] [-en <entityId>] [-attr (attributeName)] [-id <reg/sub id>] [-json (in and out-format in JSON)] [-informat (in-format)] [-outformat (out-format)] [-table <table to debug>] <operation> <data file>'
 
   verbose=1
   verboseMsg "Operations:"
@@ -116,6 +116,7 @@ do
   elif [ "$1" == "-en" ];        then entityId=$2;                    shift;
   elif [ "$1" == "-attr" ];      then attributeName=$2;               shift;
   elif [ "$1" == "-id" ];        then id=$2;                          shift;
+  elif [ "$1" == "-json" ];      then IN_FORMAT="Content-Type: application/json"; OUT_FORMAT="Accept: application/json";  shift;
   elif [ "$1" == "-informat" ];  then IN_FORMAT="Content-Type: $2";   shift;
   elif [ "$1" == "-outformat" ]; then OUT_FORMAT="Accept: $2";        shift;
   elif [ "$1" == "-table" ];     then table=$2;                       shift;

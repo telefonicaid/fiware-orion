@@ -19,7 +19,7 @@
 # fermin at tid dot es
 
 --NAME--
-JSON Parse Post RegisterContext NoEntityId
+JSON Parse Post UnsubscribeContextAvailability
 --SHELL-INIT--
 # Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
 running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
@@ -60,59 +60,23 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+echo "1: ***********************************"
+(curl localhost:${BROKER_PORT}/NGSI9/unsubscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
 {
-  "contextRegistrations": [
-    {
-      "entities": [
-        {
-          "type": "Room",
-          "isPattern": "false",
-        },
-        {
-          "type": "Room",
-          "isPattern": "false",
-          "id": "OfficeRoom"
-        }
-      ],
-      "attributes": [
-        {
-          "name": "temperature",
-          "type": "degree",
-          "isDomain": "false",
-          "metadatas": [
-            {
-              "name": "ID",
-              "type": "string",
-              "value": "1110"
-            }
-          ]
-        }
-      ],
-      "metadatas": [
-        {
-          "name": "ID",
-          "type": "string",
-          "value": "2212"
-        }
-      ],
-      "providingApplication": "http://192.168.100.1:70/application"
-    }
-  ],
-  "duration": "PT1M"
+  "subscriptionId": "012345678901234567890123"
 }
 EOF
-echo "++++++++++++++++++++"
+echo "2: ***********************************"
 --REGEXPECT--
+1: ***********************************
 {
-  "registrationId" : "0",
-  "errorCode" : {
-    "code" : "400",
-    "reasonPhrase" : "Parse Error",
-    "details" : "JSON parse error: <unspecified file>(1): expected object name"
+  "subscriptionId" : "012345678901234567890123",
+  "statusCode" : {
+    "code" : "404",
+    "reasonPhrase" : "Subscription Not Found"
   }
 }
-++++++++++++++++++++
+2: ***********************************
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})

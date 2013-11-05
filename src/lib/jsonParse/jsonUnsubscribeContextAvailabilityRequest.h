@@ -1,5 +1,5 @@
-#ifndef NOTIFY_CONTEXT_AVAILABILITY_REQUEST_H
-#define NOTIFY_CONTEXT_AVAILABILITY_REQUEST_H
+#ifndef JSON_UNSUBSCRIBE_CONTEXT_AVAILABILITY_REQUEST_H
+#define JSON_UNSUBSCRIBE_CONTEXT_AVAILABILITY_REQUEST_H
 
 /*
 *
@@ -23,30 +23,52 @@
 * For those usages not covered by this license please contact with
 * fermin at tid dot es
 *
-* Author: Fermin Galan
+* Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "ngsi/Request.h"
-#include "ngsi/SubscriptionId.h"
-#include "ngsi/ContextRegistrationResponseVector.h"
+#include "rest/ConnectionInfo.h"
+#include "jsonParse/JsonNode.h"
+
 
 
 /* ****************************************************************************
 *
-* NotifyContextAvailabilityRequest -
+* jsonUcarParseVector -
 */
-typedef struct NotifyContextAvailabilityRequest
-{
-  SubscriptionId                     subscriptionId;                     // Mandatory
-  ContextRegistrationResponseVector  contextRegistrationResponseVector;  // Mandatory
+extern JsonNode jsonUcarParseVector[];
 
-  NotifyContextAvailabilityRequest();
 
-  std::string   render(RequestType requestType, Format format, std::string indent);
-  std::string   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void          present(std::string indent);
-  void          release(void);
-} NotifyContextAvailabilityRequest;
+
+/* ****************************************************************************
+*
+* jsonUcarInit - 
+*/
+extern void jsonUcarInit(ParseData* reqDataP);
+
+
+
+/* ****************************************************************************
+*
+* jsonUcarRelease - 
+*/
+extern void jsonUcarRelease(ParseData* reqDataP);
+
+
+
+/* ****************************************************************************
+*
+* jsonUcarCheck - 
+*/
+extern std::string jsonUcarCheck(ParseData* reqDataP, ConnectionInfo* ciP);
+
+
+
+/* ****************************************************************************
+*
+* jsonUcarPresent - 
+*/
+extern void jsonUcarPresent(ParseData* reqDataP);
 
 #endif
