@@ -1,0 +1,28 @@
+{
+	"duration": "P5Y",
+	"restriction": {
+		"attributeExpression" : "",
+		"scopes": [
+			{
+				"type" : "",
+				"value" : ""
+			},
+			{
+				"type" : "",
+				"value" : ""
+			}
+		]
+	},
+	"subscriptionId": "9212ce4b0c214479be429e2b",
+	"notifyConditions": [
+		{
+			"type": "ONCHANGE",
+			"condValues": [
+				"CondValue1",
+				"CondValue2"
+			],
+			"restriction": "restriction"
+		}
+	],
+	"throttling": "P5Y"
+}
