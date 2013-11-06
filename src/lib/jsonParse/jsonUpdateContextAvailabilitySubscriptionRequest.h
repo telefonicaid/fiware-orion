@@ -1,3 +1,6 @@
+#ifndef JSON_UPDATE_CONTEXT_AVAILABILITY_SUBSCRIPTION_REQUEST_H
+#define JSON_UPDATE_CONTEXT_AVAILABILITY_SUBSCRIPTION_REQUEST_H
+
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,26 +28,47 @@
 #include <string>
 #include <vector>
 
-#include "mongoBackend/mongoUpdateContextAvailabilitySubscription.h"
-#include "ngsi/ParseData.h"
-#include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "jsonParse/JsonNode.h"
 
 
 
 /* ****************************************************************************
 *
-* postUpdateContextAvailabilitySubscription - 
+* jsonUcasParseVector -
 */
-std::string postUpdateContextAvailabilitySubscription(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
-{
-  UpdateContextAvailabilitySubscriptionResponse  ucas;
-  std::string                                    answer;
+extern JsonNode jsonUcasParseVector[];
 
-  ucas.subscriptionId = parseDataP->ucas.res.subscriptionId;
 
-  mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res, &ucas);
-  answer = ucas.render(UpdateContextAvailabilitySubscription, ciP->outFormat, "", 0);
 
-  return answer;
-}
+/* ****************************************************************************
+*
+* jsonUcasInit - 
+*/
+extern void jsonUcasInit(ParseData* reqDataP);
+
+
+
+/* ****************************************************************************
+*
+* jsonUcasRelease - 
+*/
+extern void jsonUcasRelease(ParseData* reqDataP);
+
+
+
+/* ****************************************************************************
+*
+* jsonUcasCheck - 
+*/
+extern std::string jsonUcasCheck(ParseData* reqDataP, ConnectionInfo* ciP);
+
+
+
+/* ****************************************************************************
+*
+* jsonUcasPresent - 
+*/
+extern void jsonUcasPresent(ParseData* reqDataP);
+
+#endif

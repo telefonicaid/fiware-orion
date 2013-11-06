@@ -1,0 +1,34 @@
+{
+	"entities": [
+		{
+			"type": "Room",
+			"isPattern": "false",
+			"id": "ConferenceRoom"
+		},
+		{
+			"type": "Room",
+			"isPattern": "false",
+			"id": "OfficeRoom"
+		}
+	],
+	"attributes": [
+		"temperature",
+		"occupancy",
+		"lightstatus"
+	],
+	"duration": "PT1M",
+	"restriction": {
+		"attributeExpression" : "AE",
+		"scopes": [
+			{
+				"type" : "st1",
+				"value" : "1"
+			},
+			{
+				"type" : "st2",
+				"value" : "2"
+			}
+		]
+	},
+	"subscriptionId": "012345678901234567890123"
+}

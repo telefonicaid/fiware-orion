@@ -40,6 +40,7 @@
 #include "jsonParse/jsonSubscribeContextAvailabilityRequest.h"
 #include "jsonParse/jsonNotifyContextAvailabilityRequest.h"
 #include "jsonParse/jsonUnsubscribeContextAvailabilityRequest.h"
+#include "jsonParse/jsonUpdateContextAvailabilitySubscriptionRequest.h"
 
 #include "jsonParse/jsonQueryContextRequest.h"
 #include "jsonParse/jsonUpdateContextRequest.h"
@@ -63,7 +64,7 @@ static JsonRequest jsonRequest[] =
   { SubscribeContextAvailability,          "POST", "subscribeContextAvailabilityRequest",           jsonScarParseVector, jsonScarInit, jsonScarCheck,  jsonScarPresent, jsonScarRelease },
   { UnsubscribeContextAvailability,        "POST", "unsubscribeContextAvailabilityRequest",         jsonUcarParseVector, jsonUcarInit, jsonUcarCheck,  jsonUcarPresent, jsonUcarRelease },
   { NotifyContextAvailability,             "POST", "notifyContextRequestAvailability",              jsonNcarParseVector, jsonNcarInit, jsonNcarCheck,  jsonNcarPresent, jsonNcarRelease },
-  { UpdateContextAvailabilitySubscription, "POST", "updateContextAvailabilitySubscriptionRequest",  NULL, NULL, NULL, NULL, NULL },
+  { UpdateContextAvailabilitySubscription, "POST", "updateContextAvailabilitySubscriptionRequest",  jsonUcasParseVector, jsonUcasInit, jsonUcasCheck,  jsonUcasPresent, jsonUcasRelease },
 
   // NGSI10
   { QueryContext,                          "POST", "queryContextRequest",                           jsonQcrParseVector,  jsonQcrInit,  jsonQcrCheck,   jsonQcrPresent,  jsonQcrRelease  },
