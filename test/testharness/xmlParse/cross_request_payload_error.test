@@ -19,7 +19,7 @@
 # fermin at tid dot es
 
 --NAME--
-Cross request payload error
+Cross request payload error in XML
 --SHELL-INIT--
 # Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
 running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
@@ -60,13 +60,12 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI9/reguisterContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
 <discoverContextAvailabilityRequest/>
 EOF
 echo "1: ++++++++++++++++++++"
 
-# Updating non existing registration
 (curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
 <registerContextRequest/>
@@ -141,11 +140,14 @@ echo "13: ++++++++++++++++++++"
 
 --EXPECT--
 <?xml version="1.0"?>
-<errorCode>
-  <code>400</code>
-  <reasonPhrase>bad ngsi9 request</reasonPhrase>
-  <details>ngsi9 service '/NGSI9/reguisterContext' not found</details>
-</errorCode>
+<registerContextResponse>
+  <registrationId>0</registrationId>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Invalid payload</reasonPhrase>
+    <details>Expected 'registerContextRequest' payload, got 'discoverContextAvailabilityRequest'</details>
+  </errorCode>
+</registerContextResponse>
 1: ++++++++++++++++++++
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>

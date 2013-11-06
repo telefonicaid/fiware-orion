@@ -1,0 +1,230 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# fermin at tid dot es
+
+--NAME--
+Empty payloads errors in JSON
+--SHELL-INIT--
+# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
+running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
+if [ $running_broker -ne 0 ]; then
+  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
+  # Wait some time so the broker can finish properly
+  sleep 1
+  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
+  if [ $running_broker -ne 0 ]; then
+    # If the broker refuses to stop politely, kill the process by brute force
+    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
+    sleep 1
+    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
+    if [ $running_broker -ne 0 ]; then
+      echo "Existing contextBroker is inmortal, can not be killed!"
+      exit 1
+    fi
+  fi
+fi
+
+echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
+CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
+if [ "$VALGRIND" == "" ]; then
+  $CB_START_CMD
+  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
+  sleep 1
+else
+  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
+  # Waiting for valgrind to start (sleep 10)
+  sleep 10s
+fi
+
+# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
+running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
+if [ $running_broker -ne 1 ]; then
+  echo "Unable to start contextBroker"
+  exit 1
+fi
+
+--SHELL--
+(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
+{ }
+EOF
+echo "1: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
+{ }
+EOF
+echo "2: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI9/subscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
+{ }
+EOF
+echo "3: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI9/updateContextAvailabilitySubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
+{ }
+EOF
+echo "4: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI9/unsubscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
+{ }
+EOF
+echo "5: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
+{ }
+EOF
+echo "6: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
+{ }
+EOF
+echo "7: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
+{ }
+EOF
+echo "8: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/updateContextSubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
+{ }
+EOF
+echo "9: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
+{ }
+EOF
+echo "10: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI9/notSupportedRequest -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
+{ }
+EOF
+echo "11: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI10/notSupportedRequest -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
+{ }
+EOF
+echo "12: ++++++++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/notSupportedRequest -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
+{ } 
+EOF
+echo "13: ++++++++++++++++++++"
+
+--REGEXPECT--
+{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Empty Context Registration List"
+  }
+}
+1: ++++++++++++++++++++
+{
+  "errorCode" : {
+    "code" : "404",
+    "reasonPhrase" : "No context element found"
+  }
+}
+2: ++++++++++++++++++++
+"subscribeContextAvailabilityResponse" : {
+  "duration" : "PT24H",
+  "subscriptionId" : "REGEX([0-9a-f]{24})"
+}
+3: ++++++++++++++++++++
+"updateContextAvailabilitySubscriptionResponse" : {
+  "errorCode" : {
+    "code" : "404",
+    "reasonPhrase" : "Subscription Not Found"
+  },
+  "subscriptionId" : "No Subscription ID"
+}
+4: ++++++++++++++++++++
+{
+  "subscriptionId" : "No Subscription ID",
+  "statusCode" : {
+    "code" : "404",
+    "reasonPhrase" : "Subscription Not Found"
+  }
+}
+5: ++++++++++++++++++++
+{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "No entities"
+  }
+}
+6: ++++++++++++++++++++
+{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad request",
+    "details" : "bad update action type: ''"
+  }
+}
+7: ++++++++++++++++++++
+{
+  "subscribeResponse" : {
+    "subscriptionId" : "REGEX([0-9a-f]{24})",
+    "duration" : "PT24H",
+  }
+}
+8: ++++++++++++++++++++
+{
+  "subscribeError" : {
+    "subscriptionId" : "No Subscription ID",
+    "errorCode" : {
+      "code" : "404",
+      "reasonPhrase" : "Subscription Not Found"
+    }
+  }
+}
+9: ++++++++++++++++++++
+"unsubscribeContextResponse" : {
+  "subscriptionId" : "No Subscription ID",
+  "statusCode" : {
+    "code" : "404",
+    "reasonPhrase" : "Subscription Not Found"
+  }
+}
+10: ++++++++++++++++++++
+"errorCode" : {
+  "code" : "400",
+  "reasonPhrase" : "no request treating object found",
+  "details" : "Sorry, no request treating object found for RequestType 'InvalidRequest'"
+}
+11: ++++++++++++++++++++
+"errorCode" : {
+  "code" : "400",
+  "reasonPhrase" : "no request treating object found",
+  "details" : "Sorry, no request treating object found for RequestType 'InvalidRequest'"
+}
+12: ++++++++++++++++++++
+"errorCode" : {
+  "code" : "400",
+  "reasonPhrase" : "no request treating object found",
+  "details" : "Sorry, no request treating object found for RequestType 'InvalidRequest'"
+}
+13: ++++++++++++++++++++
+--TEARDOWN--
+if [ "$VALGRIND" == "" ]; then
+  kill $(cat ${BROKER_PID_FILE})
+  rm /tmp/orion_${BROKER_PORT}.pid
+else
+  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
+  # Waiting for valgrind to terminate (sleep 10)
+  sleep 10
+fi
