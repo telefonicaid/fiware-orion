@@ -67,7 +67,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, xml_invalidEntityAttribute)
   ParseData       reqData;
   const char*     fileName = "updateContextAvailabilitySubscriptionRequest_invalidEntityAttribute.xml";
   ConnectionInfo  ci("", "POST", "1.1");  
-  std::string     expected = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
+  std::string     expected = "<updateContextAvailabilitySubscriptionResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n</updateContextAvailabilitySubscriptionResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -128,7 +128,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_invalidIsPattern)
   ParseData       reqData;
   const char*     fileName = "updateContextAvailabilitySubscriptionRequest_invalidIsPattern.json";
   ConnectionInfo  ci("", "POST", "1.1");
-  std::string     expected = "\"updateContextAvailabilitySubscriptionResponse\" : {\n  \"subscriptionId\" : \"012345678901234567890123\",\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"bad value for 'isPattern'\"\n  }\n}\n";
+  std::string     expected = "\"updateContextAvailabilitySubscriptionResponse\" : {\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"bad value for 'isPattern'\"\n  },\n  \"subscriptionId\" : \"012345678901234567890123\"\n}\n";
 
   ci.inFormat      = JSON;
   ci.outFormat     = JSON;
@@ -153,9 +153,9 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, response)
   std::string                                    render;
   std::string                                    check;
   std::string                                    expected1 = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n</updateContextAvailabilitySubscriptionResponse>\n";
-  std::string                                    expected2 = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Reason</reasonPhrase>\n    <details>Detail</details>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
-  std::string                                    expected3 = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>syntax error in duration string</reasonPhrase>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
-  std::string                                    expected4 = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>predetected error</reasonPhrase>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
+  std::string                                    expected2 = "<updateContextAvailabilitySubscriptionResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Reason</reasonPhrase>\n    <details>Detail</details>\n  </errorCode>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n</updateContextAvailabilitySubscriptionResponse>\n";
+  std::string                                    expected3 = "<updateContextAvailabilitySubscriptionResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>syntax error in duration string</reasonPhrase>\n  </errorCode>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n</updateContextAvailabilitySubscriptionResponse>\n";
+  std::string                                    expected4 = "<updateContextAvailabilitySubscriptionResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>predetected error</reasonPhrase>\n  </errorCode>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n</updateContextAvailabilitySubscriptionResponse>\n";
   
   EXPECT_EQ(ucas2.errorCode.code, SccBadRequest);
 

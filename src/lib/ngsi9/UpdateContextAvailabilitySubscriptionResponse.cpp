@@ -77,12 +77,13 @@ std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType re
   std::string tag  = "updateContextAvailabilitySubscriptionResponse";
 
   out += startTag(indent, tag, format);
-  out += subscriptionId.render(format, indent + "  ", true);
 
   if (errorCode.code == NO_ERROR_CODE)
-     out += duration.render(format, indent + "  ");
+     out += duration.render(format, indent + "  ", true);
   else
-     out += errorCode.render(format, indent + "  ");
+     out += errorCode.render(format, indent + "  ", true);
+
+  out += subscriptionId.render(format, indent + "  ", false);
 
   out += endTag(indent, tag, format);
 
