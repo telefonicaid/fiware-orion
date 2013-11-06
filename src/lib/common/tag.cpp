@@ -38,13 +38,6 @@
 */
 std::string startTag(std::string indent, std::string tagName, Format format, bool showTag)
 {
-  char* xP = (char*) malloc(12);
-  if (xP)
-  {
-     LM_M(("malloc OK"));
-     free(xP);
-  }
-
   if (format == XML)
      return indent + "<" + tagName + ">\n";
   else if (format == JSON)
