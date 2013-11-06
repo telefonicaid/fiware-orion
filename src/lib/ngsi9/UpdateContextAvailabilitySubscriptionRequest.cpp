@@ -92,6 +92,8 @@ std::string UpdateContextAvailabilitySubscriptionRequest::check(RequestType requ
   std::string                                    res;
   UpdateContextAvailabilitySubscriptionResponse  response;
 
+  response.subscriptionId = subscriptionId;
+
   if (predetectedError != "")
   {
     response.errorCode.code         = SccBadRequest;

@@ -19,7 +19,7 @@
 # fermin at tid dot es
 
 --NAME--
-JSON Parse Post SubscribeContextAvailability
+JSON Parse Post UpdateContextAvailabilitySubscription
 --SHELL-INIT--
 # Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
 running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
@@ -60,7 +60,45 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI9/subscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+echo "1: ***********************************"
+(curl localhost:${BROKER_PORT}/NGSI9/updateContextAvailabilitySubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+{
+	"entities": [
+		{
+			"type": "Room",
+			"isPattern": "false",
+			"id": "ConferenceRoom"
+		},
+		{
+			"type": "Room",
+			"isPattern": "false",
+			"id": "OfficeRoom"
+		}
+	],
+	"attributes": [
+		"temperature",
+		"occupancy",
+		"lightstatus"
+	],
+	"duration": "PT1M",
+	"restriction": {
+		"attributeExpression" : "AE",
+		"scopes": [
+			{
+				"type" : "st1",
+				"value" : "1"
+			},
+			{
+				"type" : "st2",
+				"value" : "2"
+			}
+		]
+	},
+	"subscriptionId" : "012345678901234567890123"
+}
+EOF
+echo "2: ***********************************"
+OUT=$((curl localhost:${BROKER_PORT}/NGSI9/subscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
 {
   "entities": [
     {
@@ -96,13 +134,68 @@ fi
     ]
   }
 }
+EOF)
+SUB_ID=$(echo "$OUT" | grep subscriptionId | awk -F\" '{ print $4}')
+echo "$OUT"
 
+echo "3: ***********************************"
+(curl localhost:${BROKER_PORT}/NGSI9/updateContextAvailabilitySubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+{
+	"entities": [
+		{
+			"type": "Room",
+			"isPattern": "false",
+			"id": "ConferenceRoom"
+		},
+		{
+			"type": "Room",
+			"isPattern": "false",
+			"id": "OfficeRoom"
+		}
+	],
+	"attributes": [
+		"temperature",
+		"occupancy",
+		"lightstatus"
+	],
+	"duration": "PT1S",
+	"restriction": {
+		"attributeExpression" : "AE",
+		"scopes": [
+			{
+				"type" : "st1",
+				"value" : "1"
+			},
+			{
+				"type" : "st2",
+				"value" : "2"
+			}
+		]
+	},
+	"subscriptionId" : "${SUB_ID}"
+}
 EOF
+echo "4: ***********************************"
 --REGEXPECT--
+1: ***********************************
+"updateContextAvailabilitySubscriptionResponse" : {
+  "errorCode" : {
+    "code" : "404",
+    "reasonPhrase" : "Subscription Not Found"
+  },
+  "subscriptionId" : "012345678901234567890123"
+}
+2: ***********************************
 "subscribeContextAvailabilityResponse" : {
   "duration" : "PT1M",
   "subscriptionId" : "REGEX([0-9a-f]{24})"
 }
+3: ***********************************
+"updateContextAvailabilitySubscriptionResponse" : {
+  "duration" : "PT1S",
+  "subscriptionId" : "REGEX([0-9a-f]{24})"
+}
+4: ***********************************
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})

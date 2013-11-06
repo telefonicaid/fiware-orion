@@ -71,43 +71,7 @@ static int entityIdId(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got an entityId:id: '%s'", node->value()));
 
-  if ((reqData->ucas.entityIdP->id != "") && (reqData->ucas.entityIdP->id != node->value()))
-    LM_W(("Overwriting entityId:id (was '%s') for '%s'", reqData->ucas.entityIdP->id.c_str(), node->value()));
   reqData->ucas.entityIdP->id = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* entityIdType - 
-*/
-static int entityIdType(xml_node<>* node, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got an entityId:type: '%s'", node->value()));
-
-  if ((reqData->ucas.entityIdP->type != "") && (reqData->ucas.entityIdP->type != node->value()))
-    LM_W(("Overwriting entityId:type (was '%s') for '%s'", reqData->ucas.entityIdP->type.c_str(), node->value()));
-  reqData->ucas.entityIdP->type = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* entityIdIsPattern - 
-*/
-static int entityIdIsPattern(xml_node<>* node, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", node->value()));
-
-  if ((reqData->ucas.entityIdP->isPattern != "") && (reqData->ucas.entityIdP->isPattern != node->value()))
-    LM_W(("Overwriting entityId:isPattern (was '%s') for '%s'", reqData->ucas.entityIdP->isPattern.c_str(), node->value()));
-  reqData->ucas.entityIdP->isPattern = node->value();
 
   return 0;
 }
@@ -288,8 +252,6 @@ XmlNode ucasParseVector[] =
   { "/updateContextAvailabilitySubscriptionRequest/entityIdList",                                nullTreat             },
   { "/updateContextAvailabilitySubscriptionRequest/entityIdList/entityId",                       entityId              },
   { "/updateContextAvailabilitySubscriptionRequest/entityIdList/entityId/id",                    entityIdId            },
-  { "/updateContextAvailabilitySubscriptionRequest/entityIdList/entityId/type",                  entityIdType          },
-  { "/updateContextAvailabilitySubscriptionRequest/entityIdList/entityId/isPattern",             entityIdIsPattern     },
 
   { "/updateContextAvailabilitySubscriptionRequest/attributeList",                               nullTreat             },
   { "/updateContextAvailabilitySubscriptionRequest/attributeList/attribute",                     attribute             },
