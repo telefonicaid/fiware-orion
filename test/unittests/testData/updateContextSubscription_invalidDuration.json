@@ -1,5 +1,5 @@
 {
-	"duration": "P5Y",
+	"duration": "ddd",
 	"restriction": {
 		"attributeExpression" : "AE",
 		"scopes": [

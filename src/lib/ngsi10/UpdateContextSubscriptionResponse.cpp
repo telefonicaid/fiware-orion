@@ -63,15 +63,15 @@ UpdateContextSubscriptionResponse::~UpdateContextSubscriptionResponse() {
 */
 std::string UpdateContextSubscriptionResponse::render(RequestType requestType, Format format, std::string indent)
 {
-  std::string out     = "";
-  std::string tag = "updateContextSubscriptionResponse";
+  std::string out  = "";
+  std::string tag  = "updateContextSubscriptionResponse";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, format, false);
 
   if (subscribeError.errorCode.code == NO_ERROR_CODE)
     out += subscribeResponse.render(format, indent + "  ");
   else
-     out += subscribeError.render(UpdateContextSubscription, format, indent + "  ");
+    out += subscribeError.render(UpdateContextSubscription, format, indent + "  ");
 
   out += endTag(indent, tag, format);
 

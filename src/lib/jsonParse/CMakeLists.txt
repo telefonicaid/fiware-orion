@@ -37,6 +37,7 @@ SET (SOURCES
     jsonSubscribeContextRequest.cpp
     jsonNotifyContextRequest.cpp
     jsonUnsubscribeContextRequest.cpp
+    jsonUpdateContextSubscriptionRequest.cpp
 )
 
 SET (HEADERS
@@ -57,6 +58,7 @@ SET (HEADERS
     jsonSubscribeContextRequest.h
     jsonNotifyContextRequest.h
     jsonUnsubscribeContextRequest.h
+    jsonUpdateContextSubscriptionRequest.h
 )
 
 

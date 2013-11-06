@@ -22,12 +22,12 @@
 		"attributeExpression": "testRestriction",
 		"scopes" : [
 			{
-				"type" : "",
-				"value" : ""
+				"type" : "t1",
+				"value" : "1"
 			},
 			{
-				"type" : "",
-				"value" : ""
+				"type" : "t2",
+				"value" : "2"
 			}
 		]
 	},

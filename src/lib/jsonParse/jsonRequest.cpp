@@ -47,6 +47,7 @@
 #include "jsonParse/jsonSubscribeContextRequest.h"
 #include "jsonParse/jsonUnsubscribeContextRequest.h"
 #include "jsonParse/jsonNotifyContextRequest.h"
+#include "jsonParse/jsonUpdateContextSubscriptionRequest.h"
 
 #include "rest/restReply.h"
 
@@ -72,7 +73,7 @@ static JsonRequest jsonRequest[] =
   { SubscribeContext,                      "POST", "subscribeContextRequest",                       jsonScrParseVector,  jsonScrInit,  jsonScrCheck,   jsonScrPresent,  jsonScrRelease  },
   { NotifyContext,                         "POST", "notifyContextRequest",                          jsonNcrParseVector,  jsonNcrInit,  jsonNcrCheck,   jsonNcrPresent,  jsonNcrRelease  },
   { UnsubscribeContext,                    "POST", "unsubscribeContextRequest",                     jsonUncrParseVector, jsonUncrInit, jsonUncrCheck,  jsonUncrPresent, jsonUncrRelease },
-  { UpdateContextSubscription,             "POST", "updateContextSubscriptionRequest",              NULL, NULL, NULL, NULL, NULL }
+  { UpdateContextSubscription,             "POST", "updateContextSubscriptionRequest",              jsonUcsrParseVector, jsonUcsrInit, jsonUcsrCheck,  jsonUcsrPresent, jsonUcsrRelease }
 };
 
 
