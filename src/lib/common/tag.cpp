@@ -46,20 +46,7 @@ std::string startTag(std::string indent, std::string tagName, Format format, boo
   }
 
   if (format == XML)
-  {
-    LM_M(("HERE. indent == '%s'", indent.c_str()));
-    LM_M(("HERE. tagName == '%s'", tagName.c_str()));
-
-    std::string out = "";
-
-    out += indent;
-    out += "<";
-    out += std::string(tagName);
-    LM_M(("HERE. out == '%s'", out.c_str()));
-    out += std::string(">\n");
-    LM_M(("HERE. out == '%s'", out.c_str()));
-    return out;
-  }
+     return indent + "<" + tagName + ">\n";
   else if (format == JSON)
   {
     if (showTag == false)

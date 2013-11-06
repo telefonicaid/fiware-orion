@@ -186,9 +186,23 @@ echo "13: ++++++++++++++++++++"
   </statusCode>
 </unsubscribeContextAvailabilityResponse>
 5: ++++++++++++++++++++
-(TBD for queryContext)
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Invalid payload</reasonPhrase>
+    <details>Expected 'queryContextRequest' payload, got 'registerContextRequest'</details>
+  </errorCode>
+</queryContextResponse>
 6: ++++++++++++++++++++
-(TBD for updateContext)
+<?xml version="1.0"?>
+<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Invalid payload</reasonPhrase>
+    <details>Expected 'updateContextRequest' payload, got 'registerContextRequest'</details>
+  </errorCode>
+</updateContextResponse>
 7: ++++++++++++++++++++
 <?xml version="1.0"?>
 <subscribeContextResponse>
@@ -201,9 +215,27 @@ echo "13: ++++++++++++++++++++"
   </subscribeError>
 </subscribeContextResponse>
 8: ++++++++++++++++++++
-(TBD for updateContextSubscription)
+<?xml version="1.0"?>
+<updateContextSubscriptionResponse>
+  <subscribeError>
+    <subscriptionId>0</subscriptionId>
+    <errorCode>
+      <code>400</code>
+      <reasonPhrase>Invalid payload</reasonPhrase>
+      <details>Expected 'updateContextSubscriptionRequest' payload, got 'registerContextRequest'</details>
+    </errorCode>
+  </subscribeError>
+</updateContextSubscriptionResponse>
 9: ++++++++++++++++++++
-(TBD for unsubscribeContext)
+<?xml version="1.0"?>
+<unsubscribeContextResponse>
+  <subscriptionId>0</subscriptionId>
+  <statusCode>
+    <code>400</code>
+    <reasonPhrase>Invalid payload</reasonPhrase>
+    <details>Expected 'unsubscribeContextRequest' payload, got 'registerContextRequest'</details>
+  </statusCode>
+</unsubscribeContextResponse>
 10: ++++++++++++++++++++
 <?xml version="1.0"?>
 <errorCode>
