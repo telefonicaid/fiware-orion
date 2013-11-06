@@ -60,69 +60,43 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
-{ }
-EOF
+curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}" 
 echo "1: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
-{ }
-EOF
+curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "2: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/subscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
-{ }
-EOF
+curl localhost:${BROKER_PORT}/NGSI9/subscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "3: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/updateContextAvailabilitySubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
-{ }
-EOF
+curl localhost:${BROKER_PORT}/NGSI9/updateContextAvailabilitySubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}" 
 echo "4: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/unsubscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
-{ }
-EOF
+curl localhost:${BROKER_PORT}/NGSI9/unsubscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "5: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
-{ }
-EOF
+curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "6: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
-{ }
-EOF
+curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "7: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
-{ }
-EOF
+curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "8: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContextSubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
-{ }
-EOF
+curl localhost:${BROKER_PORT}/NGSI10/updateContextSubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "9: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
-{ }
-EOF
+curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "10: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/notSupportedRequest -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
-{ }
-EOF
+curl localhost:${BROKER_PORT}/NGSI9/notSupportedRequest -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "11: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/notSupportedRequest -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
-{ }
-EOF
+curl localhost:${BROKER_PORT}/NGSI10/notSupportedRequest -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "12: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/notSupportedRequest -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) <<EOF
-{ } 
-EOF
+curl localhost:${BROKER_PORT}/notSupportedRequest -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "13: ++++++++++++++++++++"
 
 --REGEXPECT--
