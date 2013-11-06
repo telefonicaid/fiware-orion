@@ -99,7 +99,7 @@ fi
 
 EOF
 --REGEXPECT--
-"subscribeContextAvailabilityResponse" : {
+{
   "subscriptionId" : "REGEX([0-9a-f]{24})"
   "duration" : "PT1M",
 }

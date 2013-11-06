@@ -178,7 +178,7 @@ EOF
 echo "4: ***********************************"
 --REGEXPECT--
 1: ***********************************
-"updateContextAvailabilitySubscriptionResponse" : {
+{
   "subscriptionId" : "012345678901234567890123",
   "errorCode" : {
     "code" : "404",
@@ -186,12 +186,12 @@ echo "4: ***********************************"
   }
 }
 2: ***********************************
-"subscribeContextAvailabilityResponse" : {
+{
   "subscriptionId" : "REGEX([0-9a-f]{24})"
   "duration" : "PT1M",
 }
 3: ***********************************
-"updateContextAvailabilitySubscriptionResponse" : {
+{
   "subscriptionId" : "REGEX([0-9a-f]{24})",
   "duration" : "PT1S",
 }

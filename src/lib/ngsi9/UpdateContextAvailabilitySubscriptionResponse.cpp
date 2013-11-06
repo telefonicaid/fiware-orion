@@ -76,7 +76,7 @@ std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType re
   std::string out  = "";
   std::string tag  = "updateContextAvailabilitySubscriptionResponse";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, format, false);
   out += subscriptionId.render(format, indent + "  ", true);
 
   if (errorCode.code == NO_ERROR_CODE)

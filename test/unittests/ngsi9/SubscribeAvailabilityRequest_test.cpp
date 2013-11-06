@@ -255,7 +255,7 @@ TEST(SubscribeContextAvailabilityRequest, json_badDuration)
   ParseData       reqData;
   const char*     fileName = "subscribeContextAvailabilityRequest_badDuration.json";
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     expected = "\"subscribeContextAvailabilityResponse\" : {\n  \"subscriptionId\" : \"No Subscription ID\"\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"syntax error in duration string\"\n  }\n}\n";
+  const char*     expected = "{\n  \"subscriptionId\" : \"No Subscription ID\"\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"syntax error in duration string\"\n  }\n}\n";
 
   ci.inFormat      = JSON;
   ci.outFormat     = JSON;

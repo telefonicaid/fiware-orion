@@ -126,7 +126,7 @@ EOF
 echo "4: ***********************************"
 --REGEXPECT--
 1: ***********************************
-"unsubscribeContextResponse" : {
+{
   "subscriptionId" : "012345678901234567890123",
   "statusCode" : {
     "code" : "404",
@@ -142,7 +142,7 @@ echo "4: ***********************************"
   }
 }
 3: ***********************************
-"unsubscribeContextResponse" : {
+{
   "subscriptionId" : "REGEX([0-9a-f]{24})",
   "statusCode" : {
     "code" : "200",
