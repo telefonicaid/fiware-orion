@@ -76,6 +76,13 @@ TEST(SubscribeContextAvailabilityRequest, xml_ok)
   std::string result = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
   lmTraceLevelSet(LmtDump, false);
   EXPECT_EQ("OK", result) << "this test should be OK";
+
+  SubscribeContextAvailabilityRequest*  scarP = &reqData.scar.res;
+  std::string                           out;
+  std::string                           expected = "<subscribeContextAvailabilityRequest>\n  <entityIdList>\n    <entityId type=\"Room\" isPattern=\"false\">\n      <id>ConferenceRoom</id>\n    </entityId>\n    <entityId type=\"Room\" isPattern=\"false\">\n      <id>OfficeRoom</id>\n    </entityId>\n  </entityIdList>\n  <attributeList>\n    <attribute>temperature</attribute>\n    <attribute>occupancy</attribute>\n    <attribute>lightstatus</attribute>\n  </attributeList>\n  <reference>http://10.1.1.1:80/test/interfaceNotification\n\t</reference>\n  <duration>PT1M</duration>\n  <restriction>\n    <attributeExpression>ATTR_EXPR</attributeExpression>\n    <scope>\n      <operationScope>\n        <type>st1</type>\n        <value>st1</value>\n      </operationScope>\n    </scope>\n  </restriction>\n  <subscriptionId>12458896</subscriptionId>\n</subscribeContextAvailabilityRequest>\n";
+
+  out = scarP->render(SubscribeContextAvailability, XML, "");
+  EXPECT_EQ(expected, out);
 }
 
 
