@@ -16,31 +16,19 @@
 		"occupancy",
 		"lightstatus"
 	],
-	"reference": "127.0.0.1",
-	"duration": "P5Y",
+	"duration": "PT1M",
 	"restriction": {
-		"attributeExpression": "testRestriction",
-		"scopes" : [
+		"attributeExpression" : "AE",
+		"scopes": [
 			{
-				"type" : "t1",
+				"type" : "st1",
 				"value" : "1"
 			},
 			{
-				"type" : "t2",
+				"type" : "st2",
 				"value" : "2"
 			}
 		]
 	},
-	"notifyConditions": [
-		{
-			"type": "ONCHANGE",
-			"condValues": [
-				"CondValue1",
-				"CondValue2"
-			]
-			,
-			"restriction": "restriction"
-		}
-	],
-	"throttling": "P5Y"
+	"subscriptionId": "012345678901234567890123"
 }

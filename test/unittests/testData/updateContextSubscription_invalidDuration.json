@@ -1,0 +1,28 @@
+{
+	"duration": "ddd",
+	"restriction": {
+		"attributeExpression" : "AE",
+		"scopes": [
+			{
+				"type" : "t1",
+				"value" : "1"
+			},
+			{
+				"type" : "t2",
+				"value" : "2"
+			}
+		]
+	},
+	"subscriptionId": "9212ce4b0c214479be429e2b",
+	"notifyConditions": [
+		{
+			"type": "ONCHANGE",
+			"condValues": [
+				"CondValue1",
+				"CondValue2"
+			],
+			"restriction": "restriction"
+		}
+	],
+	"throttling": "P5Y"
+}

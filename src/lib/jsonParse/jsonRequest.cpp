@@ -40,12 +40,14 @@
 #include "jsonParse/jsonSubscribeContextAvailabilityRequest.h"
 #include "jsonParse/jsonNotifyContextAvailabilityRequest.h"
 #include "jsonParse/jsonUnsubscribeContextAvailabilityRequest.h"
+#include "jsonParse/jsonUpdateContextAvailabilitySubscriptionRequest.h"
 
 #include "jsonParse/jsonQueryContextRequest.h"
 #include "jsonParse/jsonUpdateContextRequest.h"
 #include "jsonParse/jsonSubscribeContextRequest.h"
 #include "jsonParse/jsonUnsubscribeContextRequest.h"
 #include "jsonParse/jsonNotifyContextRequest.h"
+#include "jsonParse/jsonUpdateContextSubscriptionRequest.h"
 
 #include "rest/restReply.h"
 
@@ -63,7 +65,7 @@ static JsonRequest jsonRequest[] =
   { SubscribeContextAvailability,          "POST", "subscribeContextAvailabilityRequest",           jsonScarParseVector, jsonScarInit, jsonScarCheck,  jsonScarPresent, jsonScarRelease },
   { UnsubscribeContextAvailability,        "POST", "unsubscribeContextAvailabilityRequest",         jsonUcarParseVector, jsonUcarInit, jsonUcarCheck,  jsonUcarPresent, jsonUcarRelease },
   { NotifyContextAvailability,             "POST", "notifyContextRequestAvailability",              jsonNcarParseVector, jsonNcarInit, jsonNcarCheck,  jsonNcarPresent, jsonNcarRelease },
-  { UpdateContextAvailabilitySubscription, "POST", "updateContextAvailabilitySubscriptionRequest",  NULL, NULL, NULL, NULL, NULL },
+  { UpdateContextAvailabilitySubscription, "POST", "updateContextAvailabilitySubscriptionRequest",  jsonUcasParseVector, jsonUcasInit, jsonUcasCheck,  jsonUcasPresent, jsonUcasRelease },
 
   // NGSI10
   { QueryContext,                          "POST", "queryContextRequest",                           jsonQcrParseVector,  jsonQcrInit,  jsonQcrCheck,   jsonQcrPresent,  jsonQcrRelease  },
@@ -71,7 +73,7 @@ static JsonRequest jsonRequest[] =
   { SubscribeContext,                      "POST", "subscribeContextRequest",                       jsonScrParseVector,  jsonScrInit,  jsonScrCheck,   jsonScrPresent,  jsonScrRelease  },
   { NotifyContext,                         "POST", "notifyContextRequest",                          jsonNcrParseVector,  jsonNcrInit,  jsonNcrCheck,   jsonNcrPresent,  jsonNcrRelease  },
   { UnsubscribeContext,                    "POST", "unsubscribeContextRequest",                     jsonUncrParseVector, jsonUncrInit, jsonUncrCheck,  jsonUncrPresent, jsonUncrRelease },
-  { UpdateContextSubscription,             "POST", "updateContextSubscriptionRequest",              NULL, NULL, NULL, NULL, NULL }
+  { UpdateContextSubscription,             "POST", "updateContextSubscriptionRequest",              jsonUcsrParseVector, jsonUcsrInit, jsonUcsrCheck,  jsonUcsrPresent, jsonUcsrRelease }
 };
 
 

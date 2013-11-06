@@ -1,5 +1,5 @@
-#ifndef ERROR_CODE_H
-#define ERROR_CODE_H
+#ifndef JSON_UPDATE_CONTEXT_SUBSCRIPTION_REQUEST_H
+#define JSON_UPDATE_CONTEXT_SUBSCRIPTION_REQUEST_H
 
 /*
 *
@@ -26,43 +26,49 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <iostream>
-#include <sstream>
+#include <vector>
 
-#include "common/Format.h"
-#include "ngsi/Request.h"
-#include "ngsi/StatusCode.h"
+#include "rest/ConnectionInfo.h"
+#include "jsonParse/JsonNode.h"
 
 
 
 /* ****************************************************************************
 *
-* NO_ERROR_CODE - 
+* jsonUcsrParseVector -
 */
-#define NO_ERROR_CODE 0
+extern JsonNode jsonUcsrParseVector[];
 
 
 
 /* ****************************************************************************
 *
-* ErrorCode - 
+* jsonUcsrInit - 
 */
-typedef struct ErrorCode
-{
-  int          code;             // Mandatory
-  std::string  reasonPhrase;     // Mandatory
-  std::string  details;          // Optional
+extern void jsonUcsrInit(ParseData* reqDataP);
 
-  ErrorCode();
-  ErrorCode(int _code, std::string _reasonPhrase, std::string _details);
 
-  std::string  render(Format format, std::string indent, bool comma = false);
-  std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void         fill(int _code, std::string _reasonPhrase, std::string _details = "");
-  void         fill(StatusCode* scP);
-  void         fill(ErrorCode* scP);    // FIXME P3: having StatusCode and ErrorCode actually being the same type lead to this dirty duplication
-  void         present(std::string indent);
-  void         release(void);
-} ErrorCode;
+
+/* ****************************************************************************
+*
+* jsonUcsrRelease - 
+*/
+extern void jsonUcsrRelease(ParseData* reqDataP);
+
+
+
+/* ****************************************************************************
+*
+* jsonUcsrCheck - 
+*/
+extern std::string jsonUcsrCheck(ParseData* reqDataP, ConnectionInfo* ciP);
+
+
+
+/* ****************************************************************************
+*
+* jsonUcsrPresent - 
+*/
+extern void jsonUcsrPresent(ParseData* reqDataP);
 
 #endif

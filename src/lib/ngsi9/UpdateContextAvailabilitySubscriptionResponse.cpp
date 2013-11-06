@@ -77,12 +77,13 @@ std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType re
   std::string tag  = "updateContextAvailabilitySubscriptionResponse";
 
   out += startTag(indent, tag, format);
-  out += subscriptionId.render(format, indent + "  ");
 
   if (errorCode.code == NO_ERROR_CODE)
-     out += duration.render(format, indent + "  ");
+     out += duration.render(format, indent + "  ", true);
   else
-     out += errorCode.render(format, indent + "  ");
+     out += errorCode.render(format, indent + "  ", true);
+
+  out += subscriptionId.render(format, indent + "  ", false);
 
   out += endTag(indent, tag, format);
 
@@ -95,8 +96,21 @@ std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType re
 */
 std::string UpdateContextAvailabilitySubscriptionResponse::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
-  if ((predetectedError != "OK") && (predetectedError != ""))
-    return predetectedError;
+  std::string  res;
 
-  return "OK";
+  if (predetectedError != "")
+  {
+    errorCode.code         = SccBadRequest;
+    errorCode.reasonPhrase = predetectedError;
+  }
+  else if (((res = subscriptionId.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter)) != "OK") ||
+           ((res = duration.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))       != "OK"))
+  {
+    errorCode.code         = SccBadRequest;
+    errorCode.reasonPhrase = res;
+  }
+  else
+    return "OK";
+
+  return render(UpdateContextAvailabilitySubscription, format, indent, counter);
 }

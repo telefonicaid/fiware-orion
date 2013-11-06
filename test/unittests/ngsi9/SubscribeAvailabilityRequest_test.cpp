@@ -111,7 +111,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_badIsPattern)
 {
   ParseData       reqData;
   const char*     fileName = "subscribeContextAvailabilityRequest_badIsPattern.xml";
-  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </errorCode>\n</subscribeContextAvailabilityResponse>\n";
+  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </errorCode>\n  <subscriptionId>No Subscription ID</subscriptionId>\n</subscribeContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
   
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -151,7 +151,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_badEntityId)
 {
   ParseData       reqData;
   const char*     fileName = "subscribeContextAvailabilityRequest_badEntityId.xml";
-  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</subscribeContextAvailabilityResponse>\n";
+  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n  <subscriptionId>No Subscription ID</subscriptionId>\n</subscribeContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
   
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -255,7 +255,7 @@ TEST(SubscribeContextAvailabilityRequest, json_badDuration)
   ParseData       reqData;
   const char*     fileName = "subscribeContextAvailabilityRequest_badDuration.json";
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     expected = "\"subscribeContextAvailabilityResponse\" : {\n  \"subscriptionId\" : \"No Subscription ID\"\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"syntax error in duration string\"\n  }\n}\n";
+  const char*     expected = "\"subscribeContextAvailabilityResponse\" : {\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"syntax error in duration string\"\n  },\n  \"subscriptionId\" : \"No Subscription ID\"\n}\n";
 
   ci.inFormat      = JSON;
   ci.outFormat     = JSON;

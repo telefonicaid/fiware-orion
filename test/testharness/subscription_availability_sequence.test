@@ -349,8 +349,8 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 1: ++++++++++++++++++++
 <?xml version="1.0"?>
 <subscribeContextAvailabilityResponse>
-  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
   <duration>PT5H</duration>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
 </subscribeContextAvailabilityResponse>
 { "count" : 1 }
 2: ++++++++++++++++++++
@@ -369,8 +369,8 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 4: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextAvailabilitySubscriptionResponse>
-  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
   <duration>PT5H</duration>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
 </updateContextAvailabilitySubscriptionResponse>
 { "count" : 3 }
 5: ++++++++++++++++++++
