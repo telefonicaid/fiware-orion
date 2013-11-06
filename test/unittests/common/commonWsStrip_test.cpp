@@ -20,48 +20,29 @@
 * For those usages not covered by this license please contact with
 * fermin at tid dot es
 *
-* Author: Fermin Galan
+* Author: Ken Zangelin
 */
+#include "gtest/gtest.h"
 
-#include "sem.h"
-#include <semaphore.h>
-#include <errno.h>
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+#include "common/wsStrip.h"
+
 
 /* ****************************************************************************
 *
-* Globals -
+* all - 
 */
-static sem_t sem;
-
-/* ****************************************************************************
-*
-* semInit -
-*
-* parameter #2: 0 - the semaphore is to be shared between threads,
-* parameter #3: 1 - initially the semaphore is free
-*
-* Return Value
-*   0 on success,
-*  -1 on failure
-*
-*/
-int semInit(void) {
-  return sem_init(&sem, 0, 1);
-}
-
-/* ****************************************************************************
-*
-* semTake -
-*/
-int semTake(void) {
-    return sem_wait(&sem);
-}
-
-/* ****************************************************************************
-*
-* semGive -
-*/
-int semGive(void) {
-    return sem_post(&sem);
+TEST(commonWsStrip, all)
+{
+  char* s;
+  char* dirty = strdup(" \t\n  X\n\t  Y  \t\n   ");
+  s = wsStrip(dirty);
+  EXPECT_STREQ(s, "X\n\t  Y");
+  
+  free(dirty);
+  
+  dirty = strdup("                     ");
+  s = wsStrip(dirty);
+  EXPECT_STREQ(s, "");
 }

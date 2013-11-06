@@ -117,6 +117,8 @@ SET (SOURCES
     common/commonString_test.cpp
     common/commonTag_test.cpp
     common/commonSem_test.cpp
+    common/commonStatistics_test.cpp
+    common/commonWsStrip_test.cpp
 
     ngsi9/RegisterContextRequest_test.cpp
     ngsi9/DiscoverContextAvailabilityRequest_test.cpp
