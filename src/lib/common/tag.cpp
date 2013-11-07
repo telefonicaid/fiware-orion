@@ -39,13 +39,13 @@
 std::string startTag(std::string indent, std::string tagName, Format format, bool showTag)
 {
   if (format == XML)
-    return indent + "<" + tagName + ">\n";
+     return indent + "<" + tagName + ">\n";
   else if (format == JSON)
   {
     if (showTag == false)
       return indent + "{\n";
     else
-       return indent + "\"" + tagName + "\" : {\n";
+      return indent + "\"" + tagName + "\" : {\n";
   }
 
   return "Format not supported";
