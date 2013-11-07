@@ -111,7 +111,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_badIsPattern)
 {
   ParseData       reqData;
   const char*     fileName = "subscribeContextAvailabilityRequest_badIsPattern.xml";
-  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </errorCode>\n</subscribeContextAvailabilityResponse>\n";
+  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </errorCode>\n  <subscriptionId>No Subscription ID</subscriptionId>\n</subscribeContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
   
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -151,7 +151,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_badEntityId)
 {
   ParseData       reqData;
   const char*     fileName = "subscribeContextAvailabilityRequest_badEntityId.xml";
-  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</subscribeContextAvailabilityResponse>\n";
+  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n  <subscriptionId>No Subscription ID</subscriptionId>\n</subscribeContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
   
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -171,6 +171,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_noEntityId)
   ParseData       reqData;
   const char*     fileName = "subscribeContextAvailabilityRequest_noEntityId.xml";
   ConnectionInfo  ci("", "POST", "1.1");
+  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>No entities</reasonPhrase>\n  </errorCode>\n  <subscriptionId>No Subscription ID</subscriptionId>\n</subscribeContextAvailabilityResponse>\n";
 
   ci.inFormat      = XML;
   ci.outFormat     = XML;
@@ -178,7 +179,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_noEntityId)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
-  EXPECT_EQ("OK", result) << "this test should NOT be OK";
+  EXPECT_EQ(expected, result);
 }
 
 
@@ -192,6 +193,7 @@ TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
   ParseData       reqData;
   const char*     fileName = "subscribeContextAvailabilityRequest_noEntityId.json";
   ConnectionInfo  ci("", "POST", "1.1");
+  std::string     expected = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"No entities\"\n  },\n  \"subscriptionId\" : \"No Subscription ID\"\n}\n";
 
   ci.inFormat      = JSON;
   ci.outFormat     = JSON;
@@ -199,7 +201,7 @@ TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
-  EXPECT_EQ("OK", result) << "this test should NOT be OK";
+  EXPECT_EQ(expected, result);
 }
 
 
@@ -248,6 +250,28 @@ TEST(SubscribeContextAvailabilityRequest, xml_entityIdIsPatternAsBothFieldAndAtt
 
 /* ****************************************************************************
 *
+* xml_noReference - 
+*/
+TEST(SubscribeContextAvailabilityRequest, xml_noReference)
+{
+  ParseData       reqData;
+  const char*     fileName = "subscribeContextAvailabilityRequest_noReference.xml";
+  ConnectionInfo  ci("", "POST", "1.1");
+  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty Reference</reasonPhrase>\n  </errorCode>\n  <subscriptionId>No Subscription ID</subscriptionId>\n</subscribeContextAvailabilityResponse>\n";
+
+  ci.inFormat      = XML;
+  ci.outFormat     = XML;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+
+  std::string result = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
+  EXPECT_EQ(expected, result);
+}
+
+
+
+/* ****************************************************************************
+*
 * json_badDuration - 
 */
 TEST(SubscribeContextAvailabilityRequest, json_badDuration)
@@ -255,7 +279,7 @@ TEST(SubscribeContextAvailabilityRequest, json_badDuration)
   ParseData       reqData;
   const char*     fileName = "subscribeContextAvailabilityRequest_badDuration.json";
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     expected = "{\n  \"subscriptionId\" : \"No Subscription ID\"\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"syntax error in duration string\"\n  }\n}\n";
+  const char*     expected = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"syntax error in duration string\"\n  },\n  \"subscriptionId\" : \"No Subscription ID\"\n}\n";
 
   ci.inFormat      = JSON;
   ci.outFormat     = JSON;

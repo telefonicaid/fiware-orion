@@ -1136,7 +1136,7 @@ EOF
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad request</reasonPhrase>
-    <details>bad update action type: 'Delhete'</details>
+    <details>invalid update action type: 'Delhete'</details>
   </errorCode>
 </updateContextResponse>
 20: ++++++++++++++++++++

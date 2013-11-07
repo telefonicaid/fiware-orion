@@ -59,7 +59,8 @@ TEST(UpdateActionType, check)
   std::string        checked;
   std::string        expected1 = "OK";
   std::string        expected2 = "OK";
-  std::string        expected3 = "bad update action type: 'APPEND2'";
+  std::string        expected3 = "invalid update action type: 'APPEND2'";
+  std::string        expected4 = "empty update action type";
 
   uat.set("Append");
   checked = uat.check(UpdateContext, XML, "", "", 0);
@@ -80,6 +81,10 @@ TEST(UpdateActionType, check)
   uat.set("APPEND2");
   checked = uat.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ(expected3.c_str(), checked.c_str());
+
+  uat.set("");
+  checked = uat.check(RegisterContext, XML, "", "", 0);
+  EXPECT_STREQ(expected4.c_str(), checked.c_str());
 }
 
 

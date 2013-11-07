@@ -40,14 +40,17 @@
 */
 std::string UpdateActionType::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
-   if ((string == "update") || (string == "UPDATE") || (string == "Update") ||
-       (string == "append") || (string == "APPEND") || (string == "Append") ||
-       (string == "delete") || (string == "DELETE") || (string == "Delete"))
-   {
-      return "OK";
-   }
+  if ((string == "update") || (string == "UPDATE") || (string == "Update") ||
+      (string == "append") || (string == "APPEND") || (string == "Append") ||
+      (string == "delete") || (string == "DELETE") || (string == "Delete"))
+  {
+    return "OK";
+  }
 
-   return std::string("bad update action type: '") + string + "'";
+  if (string == "")
+    return "empty update action type";
+
+  return std::string("invalid update action type: '") + string + "'";
 }
 
 

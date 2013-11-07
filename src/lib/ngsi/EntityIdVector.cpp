@@ -29,7 +29,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/EntityIdVector.h"
-
+#include "ngsi/Request.h"
 
 
 /* ****************************************************************************
@@ -61,10 +61,18 @@ std::string EntityIdVector::render(Format format, std::string indent, bool comma
 */
 std::string EntityIdVector::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
-  if ((requestType == DiscoverContextAvailability) || (requestType == QueryContext))
+  // Only OK to be empty if part of a ContextRegistration
+  if ((requestType == DiscoverContextAvailability)           ||
+      (requestType == SubscribeContextAvailability)          ||
+      (requestType == UpdateContextAvailabilitySubscription) ||
+      (requestType == QueryContext)                          ||
+      (requestType == SubscribeContext))
   {
     if (vec.size() == 0)
+    {
+      LM_E(("No entity list when it is mandatory"));
       return "No entities";
+    }
   }
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)

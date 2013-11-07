@@ -64,7 +64,7 @@ ErrorCode::ErrorCode(int _code, std::string _reasonPhrase, std::string _details)
 *
 * ErrorCode::render - 
 */
-std::string ErrorCode::render(Format format, std::string indent)
+std::string ErrorCode::render(Format format, std::string indent, bool comma)
 {
   std::string out     = "";
   std::string tag     = "errorCode";
@@ -82,7 +82,7 @@ std::string ErrorCode::render(Format format, std::string indent)
   if (details != "")
      out += valueTag(indent + "  ", "details", details, format, false);
 
-  out += endTag(indent, tag, format);
+  out += endTag(indent, tag, format, comma);
 
   return out;
 }
