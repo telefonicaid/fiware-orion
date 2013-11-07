@@ -38,15 +38,15 @@ static sem_t sem;
 *
 * semInit -
 *
-* parameter #2: 0 - the semaphore is to be shared between threads,
-* parameter #3: 1 - initially the semaphore is free
-*
-* Return Value
+* Return Value (of sem_init)
 *   0 on success,
 *  -1 on failure
 *
 */
 int semInit(void) {
+  // sem_init: 
+  //   parameter #1: 0 - the semaphore is to be shared between threads,
+  //   parameter #2: 1 - initially the semaphore is free
   return sem_init(&sem, 0, 1);
 }
 
@@ -55,7 +55,7 @@ int semInit(void) {
 * semTake -
 */
 int semTake(void) {
-    return sem_wait(&sem);
+  return sem_wait(&sem);
 }
 
 /* ****************************************************************************
@@ -63,5 +63,5 @@ int semTake(void) {
 * semGive -
 */
 int semGive(void) {
-    return sem_post(&sem);
+  return sem_post(&sem);
 }
