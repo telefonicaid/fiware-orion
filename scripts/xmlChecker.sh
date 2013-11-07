@@ -19,8 +19,9 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
-#TEST_PATH="../test/unittests/testData"
-TEST_PATH="../test/manual"
+TEST_DATA_PATH="../test/unittests/testData"
+TEST_MANUAL_PATH="../test/manual"
+TEST_HARNESS_PATH="../test/testharness"
 VERBOSE=0
 
 function inc_n () {
@@ -53,6 +54,50 @@ function process_file() {
    inc_n
 }
 
+function do_check() {
+
+   # NGSI 9
+   for FILE in $(ls $1/registerContext*.xml); do
+      process_file $FILE Ngsi9_Operations_v07.xsd
+   done
+   for FILE in $(ls $1/discoverContextAvailability*.xml); do
+      process_file $FILE Ngsi9_Operations_v07.xsd
+   done
+   for FILE in $(ls $1/subscribeContextAvailabilityR*.xml); do
+      process_file $FILE Ngsi9_Operations_v07.xsd
+   done
+   for FILE in $(ls $1/updateContextAvailabilitySubscriptionR*.xml); do
+      process_file $FILE Ngsi9_Operations_v07.xsd
+   done
+   for FILE in $(ls $1/unsubscribeContextAvailabilityR*.xml); do
+      process_file $FILE Ngsi9_Operations_v07.xsd
+   done
+   for FILE in $(ls $1/notifyContextAvailabilityR*.xml); do
+      process_file $FILE Ngsi9_Operations_v07.xsd
+   done
+
+   # NGSI 10
+   for FILE in $(ls $1/queryContext*.xml); do
+      process_file $FILE Ngsi10_Operations_v07.xsd
+   done
+   for FILE in $(ls $1/updateContext*.xml); do
+      process_file $FILE Ngsi10_Operations_v07.xsd
+   done
+   for FILE in $(ls $1/subscribeContextR*.xml); do
+      process_file $FILE Ngsi10_Operations_v07.xsd
+   done
+   for FILE in $(ls $1/updateContextSubscriptionR*.xml); do
+      process_file $FILE Ngsi10_Operations_v07.xsd
+   done
+   for FILE in $(ls $1/unsubscribeContextR*.xml); do
+      process_file $FILE Ngsi10_Operations_v07.xsd
+   done
+   for FILE in $(ls $1/notifyContextR*.xml); do
+      process_file $FILE Ngsi10_Operations_v07.xsd
+   done
+
+}
+
 # Get the .xsd files
 echo "Enter username: "
 read USER
@@ -72,62 +117,47 @@ N=0
 OK=0
 ERR=0
 
-# NGSI 9
-for FILE in $(ls $TEST_PATH/registerContext*.xml); do
-   process_file $FILE Ngsi9_Operations_v07.xsd
-done
-for FILE in $(ls $TEST_PATH/discoverContextAvailability*.xml); do
-   process_file $FILE Ngsi9_Operations_v07.xsd
-done
-for FILE in $(ls $TEST_PATH/subscribeContextAvailabilityR*.xml); do
-   process_file $FILE Ngsi9_Operations_v07.xsd
-done
-for FILE in $(ls $TEST_PATH/updateContextAvailabilitySubscriptionR*.xml); do
-   process_file $FILE Ngsi9_Operations_v07.xsd
-done
-for FILE in $(ls $TEST_PATH/unsubscribeContextAvailabilityR*.xml); do
-   process_file $FILE Ngsi9_Operations_v07.xsd
-done
-for FILE in $(ls $TEST_PATH/notifyContextAvailabilityR*.xml); do
-   process_file $FILE Ngsi9_Operations_v07.xsd
+# Check "regular files"
+do_check $TEST_DATA_PATH
+do_check $TEST_MANUAL_PATH
+N_ONLY_FILES=$N
+
+# Check fragments in test harness
+TMP_DIR=$(mktemp -d /tmp/xmlCheck.XXXXX)
+for FILE in $(find $TEST_HARNESS_PATH -name *.test); do
+    PREFIX=$(basename ${FILE%.*})
+    ./xmlExtractor.py $FILE $TMP_DIR $PREFIX
 done
 
+for FILE in $(ls $TMP_DIR/*ngsi9*); do
+    process_file $FILE Ngsi9_Operations_v07.xsd
+done
 
-# NGSI 10
-for FILE in $(ls $TEST_PATH/queryContext*.xml); do
-   process_file $FILE Ngsi10_Operations_v07.xsd
-done
-for FILE in $(ls $TEST_PATH/updateContext*.xml); do
-   process_file $FILE Ngsi10_Operations_v07.xsd
-done
-for FILE in $(ls $TEST_PATH/subscribeContextR*.xml); do
-   process_file $FILE Ngsi10_Operations_v07.xsd
-done
-for FILE in $(ls $TEST_PATH/updateContextSubscriptionR*.xml); do
-   process_file $FILE Ngsi10_Operations_v07.xsd
-done
-for FILE in $(ls $TEST_PATH/unsubscribeContextR*.xml); do
-   process_file $FILE Ngsi9_Operations_v07.xsd
-done
-for FILE in $(ls $TEST_PATH/notifyContextR*.xml); do
-   process_file $FILE Ngsi9_Operations_v07.xsd
+for FILE in $(ls $TMP_DIR/*ngsi10*); do
+    process_file $FILE Ngsi10_Operations_v07.xsd
 done
 
 # Cleaning
 rm Ngsi10_Operations_v07.xsd
 rm Ngsi9_Operations_v07.xsd
 rm Ngsi9_10_dataStructure_v07.xsd
+rm -rf $TMP_DIR
 
 #Results
 echo "----------------"
-echo "Processed files: $N"
-echo "Ok files: $OK"
-echo "Err files: $ERR"
+echo "Processed files/fragments: $N"
+echo "Ok files/fragments: $OK"
+echo "Err files/fragments: $ERR"
 
-TOTAL_FILES=$(ls $TEST_PATH/*.xml | wc -l)
+N_DATA=$(ls $TEST_DATA_PATH/*.xml | wc -l)
+N_MANUAL=$(ls $TEST_MANUAL_PATH/*.xml | wc -l)
+TOTAL_FILES=`expr $N_DATA + $N_MANUAL`
+
 if [ "$TOTAL_FILES" -ne "$N" ]; then
    echo "----------------"
-   echo "There are $TOTAL_FILES XML files in the directory, so some of them were not processed"
+   echo "There are $TOTAL_FILES XML files in $TEST_DATA_PATH and $TEST_MANUAL_PATH directories, but only $N_ONLY_FILES"
+   echo "were processed. This typically happens when some .xml files are not following the name convention used by"
+   echo "the xmlChecker.sh script."
    exit 1
 fi
 
