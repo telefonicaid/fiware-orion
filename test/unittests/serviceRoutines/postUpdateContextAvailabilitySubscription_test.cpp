@@ -54,7 +54,7 @@ static RestService rs[] =
 TEST(postUpdateContextAvailabilitySubscription, notFound)
 {
   ConnectionInfo ci("/ngsi9/updateContextAvailabilitySubscription",  "POST", "1.1");
-  std::string    expected    = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>111122223333444455556666</subscriptionId>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Subscription Not Found</reasonPhrase>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
+  std::string    expected    = "<updateContextAvailabilitySubscriptionResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Subscription Not Found</reasonPhrase>\n  </errorCode>\n  <subscriptionId>111122223333444455556666</subscriptionId>\n</updateContextAvailabilitySubscriptionResponse>\n";
   const char*    fileName    = "updateContextAvailabilitySubscription_notFound.xml";
   std::string    out;
 

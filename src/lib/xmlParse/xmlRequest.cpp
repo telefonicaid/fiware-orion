@@ -241,14 +241,9 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
 
     if (strncasecmp(payloadWord.c_str(), payloadStart, payloadWord.length()) != 0)
     {
-      std::string errorReply;
-      std::string payloadBeginning = payloadStart;
-      char*       endPointer;
+      std::string  errorReply;
 
-      endPointer  = (char*) payloadBeginning.c_str();
-      endPointer[payloadWord.length()] = 0;
-      errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, "Invalid payload", std::string("Expected '") + payloadWord + "' payload, got '" + payloadBeginning + "'");
-
+      errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, "Invalid payload", std::string("Expected '") + payloadWord + "' payload, got '" + payloadStart + "'");
       LM_RE(errorReply, ("Invalid payload: wanted: '%s', got '%s'", payloadWord.c_str(), payloadStart));
     }
   }
