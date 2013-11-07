@@ -61,7 +61,7 @@ DiscoverContextAvailabilityResponse::~DiscoverContextAvailabilityResponse()
 *
 * DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse - 
 */
-DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(ErrorCode _errorCode)
+DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(ErrorCode& _errorCode)
 {
   errorCode = _errorCode;
 }

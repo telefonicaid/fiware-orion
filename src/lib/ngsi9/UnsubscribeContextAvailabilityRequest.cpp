@@ -68,7 +68,10 @@ std::string UnsubscribeContextAvailabilityRequest::check(RequestType requestType
     response.statusCode.reasonPhrase = predetectedError;
   }
   else if ((res = subscriptionId.check(UnsubscribeContextAvailability, format, indent, predetectedError, counter)) != "OK")
-    return res;
+  {
+    response.statusCode.code         = SccBadRequest;
+    response.statusCode.reasonPhrase = res;
+  }
   else
     return "OK";
 
@@ -83,4 +86,5 @@ std::string UnsubscribeContextAvailabilityRequest::check(RequestType requestType
 */
 void UnsubscribeContextAvailabilityRequest::release(void)
 {
+   subscriptionId.release();
 }

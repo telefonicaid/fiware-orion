@@ -40,6 +40,9 @@ typedef struct SubscriptionId
 {
   std::string   string;
 
+  SubscriptionId();
+  SubscriptionId(std::string subId);
+
   void          set(std::string value);
   std::string   get(void);
   bool          isEmpty(void);
