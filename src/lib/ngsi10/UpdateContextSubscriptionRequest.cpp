@@ -42,7 +42,7 @@ std::string UpdateContextSubscriptionRequest::render(RequestType requestType, Fo
   std::string out = "";
   std::string tag = "updateContextSubscriptionRequest";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, format, false);
   out += duration.render(format, indent + "  ");
   out += restriction.render(format, indent + "  ");
   out += subscriptionId.render(format, indent + "  ");

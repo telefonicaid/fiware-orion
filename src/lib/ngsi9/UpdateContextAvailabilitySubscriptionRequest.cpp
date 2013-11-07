@@ -55,7 +55,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::render(RequestType req
   std::string out = "";
   std::string tag = "updateContextAvailabilitySubscriptionRequest";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, format, false);
   out += entityIdVector.render(format, indent + "  ");
   out += attributeList.render(format, indent + "  ");
   out += duration.render(format, indent + "  ");

@@ -114,7 +114,7 @@ echo "13: ++++++++++++++++++++"
   }
 }
 2: ++++++++++++++++++++
-"subscribeContextAvailabilityResponse" : {
+{
   "errorCode" : {
     "code" : "400",
     "reasonPhrase" : "No entities"
@@ -122,7 +122,7 @@ echo "13: ++++++++++++++++++++"
   "subscriptionId" : "No Subscription ID"
 }
 3: ++++++++++++++++++++
-"updateContextAvailabilitySubscriptionResponse" : {
+{
   "errorCode" : {
     "code" : "400",
     "reasonPhrase" : "No entities"
@@ -173,7 +173,7 @@ echo "13: ++++++++++++++++++++"
   }
 }
 9: ++++++++++++++++++++
-"unsubscribeContextResponse" : {
+{
   "subscriptionId" : "No Subscription ID",
   "statusCode" : {
     "code" : "404",

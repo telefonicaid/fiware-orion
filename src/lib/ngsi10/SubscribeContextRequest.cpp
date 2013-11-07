@@ -43,7 +43,7 @@ std::string SubscribeContextRequest::render(RequestType requestType, Format form
   std::string tag      = "subscribeContextRequest";
   std::string indent2  = indent + "  ";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, format, false);
   out += entityIdVector.render(format, indent2);
   out += attributeList.render(format, indent2);
   out += reference.render(format, indent2);

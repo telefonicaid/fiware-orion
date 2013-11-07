@@ -44,7 +44,7 @@ std::string RegisterContextRequest::render(RequestType requestType, Format forma
   std::string out = "";
   std::string tag = "registerContextRequest";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, format, false);
   out += contextRegistrationVector.render(format, indent + "  ");
   out += duration.render(format, indent + "  ");
   out += registrationId.render(format, indent + "  ");

@@ -103,7 +103,7 @@ TEST(NotifyContextRequest, json_ok)
   ncrP->present("");
 
   std::string rendered;
-  std::string expected = "\"notifyContextRequest\" : {\n  \"subscriptionId\" : \"012345678901234567890123\"\n  \"originator\" : \"http://localhost/test\"\n  \"contextResponses\" : [\n    {\n      \"contextElement\" : {\n        \"attributeDomainName\" : \"ADN\",\n        \"attributes\" : [\n          \"contextAttribute\" : {\n            \"name\" : \"temperature\",\n            \"type\" : \"Room\",\n            \"contextValue\" : \"10\"\n          }\n          \"contextAttribute\" : {\n            \"name\" : \"temperature\",\n            \"type\" : \"Room\",\n            \"contextValue\" : \"10\"\n          }\n        ],\n        \"registrationMetadata\" : {\n          \"contextMetadata\" : {\n            \"name\" : \"m1\",\n            \"type\" : \"t1\",\n            \"value\" : \"v1\"\n          }\n          \"contextMetadata\" : {\n            \"name\" : \"m2\",\n            \"type\" : \"t2\",\n            \"value\" : \"v2\"\n          }\n        },\n        {\n          \"type\" : \"Room\",\n          \"isPattern\" : \"false\",\n          \"id\" : \"ConferenceRoom\"\n        }\n      },\n      \"statusCode\" : {\n        \"code\" : \"200\",\n        \"reasonPhrase\" : \"Ok\",\n        \"details\" : \"a\"\n      }\n    }\n  ]\n}\n";
+  std::string expected = "{\n  \"subscriptionId\" : \"012345678901234567890123\"\n  \"originator\" : \"http://localhost/test\"\n  \"contextResponses\" : [\n    {\n      \"contextElement\" : {\n        \"attributeDomainName\" : \"ADN\",\n        \"attributes\" : [\n          \"contextAttribute\" : {\n            \"name\" : \"temperature\",\n            \"type\" : \"Room\",\n            \"contextValue\" : \"10\"\n          }\n          \"contextAttribute\" : {\n            \"name\" : \"temperature\",\n            \"type\" : \"Room\",\n            \"contextValue\" : \"10\"\n          }\n        ],\n        \"registrationMetadata\" : {\n          \"contextMetadata\" : {\n            \"name\" : \"m1\",\n            \"type\" : \"t1\",\n            \"value\" : \"v1\"\n          }\n          \"contextMetadata\" : {\n            \"name\" : \"m2\",\n            \"type\" : \"t2\",\n            \"value\" : \"v2\"\n          }\n        },\n        {\n          \"type\" : \"Room\",\n          \"isPattern\" : \"false\",\n          \"id\" : \"ConferenceRoom\"\n        }\n      },\n      \"statusCode\" : {\n        \"code\" : \"200\",\n        \"reasonPhrase\" : \"Ok\",\n        \"details\" : \"a\"\n      }\n    }\n  ]\n}\n";
 
   rendered = ncrP->render(NotifyContext, JSON, "");
   EXPECT_STREQ(expected.c_str(), rendered.c_str());
@@ -149,7 +149,7 @@ TEST(NotifyContextRequest, json_badIsPattern)
   ci.outFormat = JSON;
 
   std::string result   = jsonTreat(testBuf, &ci, &reqData, NotifyContext, "notifyContextRequest", NULL);
-  std::string expected = "\"notifyContextResponse\" : {\n  \"statusCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"bad value for 'isPattern'\"\n  }\n}\n";
+  std::string expected = "{\n  \"statusCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"bad value for 'isPattern'\"\n  }\n}\n";
 
   EXPECT_EQ(expected, result);
 }

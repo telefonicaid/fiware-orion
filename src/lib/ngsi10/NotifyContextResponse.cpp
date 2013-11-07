@@ -79,7 +79,7 @@ std::string NotifyContextResponse::render(RequestType requestType, Format format
   std::string out = "";
   std::string tag = "notifyContextResponse";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, format, false);
   out += responseCode.render(format, indent + "  ");
   out += endTag(indent, tag, format);
 

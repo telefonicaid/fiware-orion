@@ -89,7 +89,7 @@ std::string SubscribeContextAvailabilityResponse::render(RequestType requestType
   std::string tag = "subscribeContextAvailabilityResponse";
   std::string out = "";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, format, false);
 
   if (!duration.isEmpty())
      out += duration.render(format, indent + "  ", true);
