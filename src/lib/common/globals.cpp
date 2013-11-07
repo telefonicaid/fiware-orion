@@ -103,7 +103,7 @@ int getCurrentTime(void)
 *
 * toSeconds -
 */
-static int toSeconds(int value, char what, bool dayPart)
+int toSeconds(int value, char what, bool dayPart)
 {
   if (dayPart == true)
   {

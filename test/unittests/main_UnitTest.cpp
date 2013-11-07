@@ -93,7 +93,8 @@ int main(int argC, char** argV)
   setupDatabase();
 
   /* Initialize the semaphore used by mongoBackend */
-  semInit();
+  if (semInit() != 0)
+    LM_X(1, ("Error initializing semaphore: %s\n", strerror(errno)));
 
   /* Set timer object (singleton) */
   setTimer(new Timer());

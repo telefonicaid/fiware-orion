@@ -75,6 +75,12 @@ extern void setTimer(Timer* t);
 */ 
 extern int getCurrentTime(void);
 
+/* ****************************************************************************
+*
+* toSeconds -
+*/
+extern int toSeconds(int value, char what, bool dayPart);
+
 /*****************************************************************************
 *
 * parse8601 -

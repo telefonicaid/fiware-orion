@@ -136,3 +136,50 @@ TEST(commonGlobals, parse8601)
    secs = parse8601("P3Y1M1DT1H1M11S");
    EXPECT_EQ(threeYearsOneMonthOneDayOneHourOneMinuteAndElevenSeconds, secs) << "parse error for 'P3Y1M1DT1H1M11S'";
 }
+
+
+
+/* ****************************************************************************
+*
+* toSeconds - 
+*/
+TEST(commonGlobals, toSeconds)
+{
+  int secs;
+
+  // 3 years
+  secs = toSeconds(3, 'Y', true);
+  EXPECT_EQ(3 * 365 * 24 * 3600, secs);
+
+  // error
+  secs = toSeconds(3, 'Y', false);
+  EXPECT_EQ(-1, secs);
+
+  // 3 months
+  secs = toSeconds(3, 'M', true);
+  EXPECT_EQ(3 * 30 * 24 * 3600, secs);
+
+  // 3 weeks
+  secs = toSeconds(3, 'W', true);
+  EXPECT_EQ(3 * 7 * 24 * 3600, secs);
+
+  // 3 days
+  secs = toSeconds(3, 'D', true);
+  EXPECT_EQ(3 * 24 * 3600, secs);
+
+  // 3 hours
+  secs = toSeconds(3, 'H', false);
+  EXPECT_EQ(3 * 3600, secs);
+
+  // 3 minutes
+  secs = toSeconds(3, 'M', false);
+  EXPECT_EQ(3 * 60, secs);
+
+  // 3 seconds
+  secs = toSeconds(3, 'S', false);
+  EXPECT_EQ(3, secs);
+
+  // error
+  secs = toSeconds(3, 'f', false);
+  EXPECT_EQ(-1, secs);
+}
