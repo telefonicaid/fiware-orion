@@ -56,7 +56,7 @@ typedef struct ErrorCode
   ErrorCode();
   ErrorCode(int _code, std::string _reasonPhrase, std::string _details);
 
-  std::string  render(Format format, std::string indent);
+  std::string  render(Format format, std::string indent, bool comma = false);
   std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void         fill(int _code, std::string _reasonPhrase, std::string _details = "");
   void         fill(StatusCode* scP);

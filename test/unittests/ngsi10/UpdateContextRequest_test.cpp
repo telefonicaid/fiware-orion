@@ -75,7 +75,7 @@ TEST(UpdateContextRequest, ok_xml)
   std::string checked;
   std::string expected = "<updateContextRequest>\n  <contextElementList>\n    <contextElement>\n      <entityId type=\"Room\" isPattern=\"false\">\n        <id>ConferenceRoom</id>\n      </entityId>\n      <contextAttributeList>\n        <contextAttribute>\n          <name>temperature</name>\n          <type>degree</type>\n          <contextValue>c23</contextValue>\n        </contextAttribute>\n        <contextAttribute>\n          <name>lightstatus</name>\n          <type>light</type>\n          <contextValue>d23</contextValue>\n        </contextAttribute>\n      </contextAttributeList>\n    </contextElement>\n  </contextElementList>\n  <updateAction>APPEND</updateAction>\n</updateContextRequest>\n";
   std::string expected2 = "<updateContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad request</reasonPhrase>\n    <details>FORCED ERROR</details>\n  </errorCode>\n</updateContextResponse>\n";
-  std::string expected3 = "<updateContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad request</reasonPhrase>\n    <details>bad update action type: 'invalid'</details>\n  </errorCode>\n</updateContextResponse>\n";
+  std::string expected3 = "<updateContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad request</reasonPhrase>\n    <details>invalid update action type: 'invalid'</details>\n  </errorCode>\n</updateContextResponse>\n";
 
   rendered = upcrP->render(UpdateContext, XML, "");
   EXPECT_STREQ(expected.c_str(), rendered.c_str());
