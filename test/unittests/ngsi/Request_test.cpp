@@ -69,7 +69,9 @@ TEST(Request, requestType)
     { UpdateContextAttribute,                    "UpdateContextAttribute"                                 },
     { LogRequest,                                "Log"                                                    },
     { VersionRequest,                            "Version"                                                },
+    { StatisticsRequest,                         "Statistics"                                             },
     { ExitRequest,                               "Exit"                                                   },
+    { LeakRequest,                               "Leak"                                                   },
     { InvalidRequest,                            "InvalidRequest"                                         },
     { RegisterResponse,                          "RegisterResponse"                                       }
   };
@@ -78,4 +80,7 @@ TEST(Request, requestType)
   {
     EXPECT_STREQ(req[ix].string, requestType(req[ix].rt));
   }
+
+  RequestType rt = (RequestType) (RegisterResponse + 1);
+  EXPECT_STREQ("", requestType(rt));
 }

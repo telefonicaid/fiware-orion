@@ -57,13 +57,18 @@ TEST(ErrorCode, check)
 {
   ErrorCode    e1(0, "REASON", "DETAILS");
   ErrorCode    e2(200, "", "DETAILS");
+  ErrorCode    e3(200, "REASON", "DETAILS");
   std::string  rendered;
   std::string  expected1 = "no code";
   std::string  expected2 = "no reason phrase";
+  std::string  expected3 = "OK";
 
   rendered = e1.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());
 
   rendered = e2.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+
+  rendered = e3.check(RegisterContext, XML, "", "", 0);
+  EXPECT_STREQ(expected3.c_str(), rendered.c_str());
 }

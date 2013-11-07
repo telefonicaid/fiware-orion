@@ -61,5 +61,31 @@ TEST(AttributeAssociationList, ok)
 
   // Just to exercise the code ...
   aal.present("");
+}
 
+
+
+/* ****************************************************************************
+*
+* invalidAttributeAssociation - 
+*/
+TEST(AttributeAssociationList, invalidAttributeAssociation)
+{
+  AttributeAssociationList aal;
+  AttributeAssociation     aa;
+  std::string              out;
+  std::string              expected1 = "empty target";
+  std::string              expected2 = "empty source";
+
+  aa.source = "S";
+  aa.target = "";
+
+  aal.push_back(&aa);
+  out = aal.check(RegisterContext, XML, "", "", 0);
+  EXPECT_EQ(expected1, out);
+
+  aa.source = "";
+  aa.target = "T";
+  out = aal.check(RegisterContext, XML, "", "", 0);
+  EXPECT_EQ(expected2, out);
 }
