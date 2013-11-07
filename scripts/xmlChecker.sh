@@ -24,18 +24,6 @@ TEST_MANUAL_PATH="../test/manual"
 TEST_HARNESS_PATH="../test/testharness"
 VERBOSE=0
 
-function inc_n () {
-   N=`expr $N + 1`
-}
-
-function inc_ok () {
-   OK=`expr $OK + 1`
-}
-
-function inc_err () {
-   ERR=`expr $ERR + 1`
-}
-
 function process_file() {
    if [ "$VERBOSE" -eq "1" ]; then
       xmllint $1 --schema $2
@@ -46,12 +34,12 @@ function process_file() {
    fi
    if [ "$RESULT" -eq "0" ]; then
       echo "$1: ok"
-      inc_ok
+      OK=$OK+1
    else
       echo "$1: FAILS (xmllint error: $RESULT)"
-      inc_err
+      ERR=$ERR+1
    fi
-   inc_n
+   N=$N+1
 }
 
 function do_check() {
@@ -113,6 +101,9 @@ wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-wa
 wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-ware.eu/scmrepos/svn/iot/trunk/schemes/Ngsi9_10_dataStructure_v07.xsd
 
 # Check each "family" of XML (per operation)
+typeset -i N
+typeset -i OK
+typeset -i ERR
 N=0
 OK=0
 ERR=0
@@ -149,9 +140,13 @@ echo "Processed files/fragments: $N"
 echo "Ok files/fragments: $OK"
 echo "Err files/fragments: $ERR"
 
+typeset -i N_DATA
+typeset -i N_MANUAL
+typeset -i TOTAL_FILES
 N_DATA=$(ls $TEST_DATA_PATH/*.xml | wc -l)
 N_MANUAL=$(ls $TEST_MANUAL_PATH/*.xml | wc -l)
-TOTAL_FILES=`expr $N_DATA + $N_MANUAL`
+TOTAL_FILES=$N_DATA+$N_MANUAL
+#TOTAL_FILES=`expr $N_DATA + $N_MANUAL`
 
 if [ "$TOTAL_FILES" -ne "$N" ]; then
    echo "----------------"
