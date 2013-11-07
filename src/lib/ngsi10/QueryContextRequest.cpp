@@ -44,7 +44,7 @@ std::string QueryContextRequest::render(RequestType requestType, Format format, 
   std::string out = "";
   std::string tag = "queryContextRequest";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, format, false);
   out += entityIdVector.render(format, indent + "  ");
   out += attributeList.render(format, indent + "  ");
   out += restriction.render(format, indent + "  ");

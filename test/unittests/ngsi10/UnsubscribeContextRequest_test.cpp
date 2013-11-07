@@ -93,7 +93,7 @@ TEST(UnsubscribeContextRequest, badSubscriptionId_json)
   UnsubscribeContextRequest*  ucrP = &reqData.uncr.res;
 
   ucrP->present("");
-  std::string expected = "\"unsubscribeContextRequest\" : {\n  \"subscriptionId\" : \"012345678901234567890123\"\n}\n";
+  std::string expected = "{\n  \"subscriptionId\" : \"012345678901234567890123\"\n}\n";
   std::string rendered = ucrP->render(UnsubscribeContext, JSON, "");
   EXPECT_STREQ(expected.c_str(), rendered.c_str());
 

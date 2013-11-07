@@ -193,7 +193,7 @@ TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
   ParseData       reqData;
   const char*     fileName = "subscribeContextAvailabilityRequest_noEntityId.json";
   ConnectionInfo  ci("", "POST", "1.1");
-  std::string     expected = "\"subscribeContextAvailabilityResponse\" : {\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"No entities\"\n  },\n  \"subscriptionId\" : \"No Subscription ID\"\n}\n";
+  std::string     expected = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"No entities\"\n  },\n  \"subscriptionId\" : \"No Subscription ID\"\n}\n";
 
   ci.inFormat      = JSON;
   ci.outFormat     = JSON;
@@ -279,7 +279,7 @@ TEST(SubscribeContextAvailabilityRequest, json_badDuration)
   ParseData       reqData;
   const char*     fileName = "subscribeContextAvailabilityRequest_badDuration.json";
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     expected = "\"subscribeContextAvailabilityResponse\" : {\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"syntax error in duration string\"\n  },\n  \"subscriptionId\" : \"No Subscription ID\"\n}\n";
+  const char*     expected = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"syntax error in duration string\"\n  },\n  \"subscriptionId\" : \"No Subscription ID\"\n}\n";
 
   ci.inFormat      = JSON;
   ci.outFormat     = JSON;
