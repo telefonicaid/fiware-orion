@@ -115,14 +115,17 @@ echo "13: ++++++++++++++++++++"
 }
 2: ++++++++++++++++++++
 "subscribeContextAvailabilityResponse" : {
-  "duration" : "PT24H",
-  "subscriptionId" : "REGEX([0-9a-f]{24})"
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "No entities"
+  },
+  "subscriptionId" : "No Subscription ID"
 }
 3: ++++++++++++++++++++
 "updateContextAvailabilitySubscriptionResponse" : {
   "errorCode" : {
-    "code" : "404",
-    "reasonPhrase" : "Subscription Not Found"
+    "code" : "400",
+    "reasonPhrase" : "No entities"
   },
   "subscriptionId" : "No Subscription ID"
 }
@@ -146,14 +149,17 @@ echo "13: ++++++++++++++++++++"
   "errorCode" : {
     "code" : "400",
     "reasonPhrase" : "Bad request",
-    "details" : "bad update action type: ''"
+    "details" : "empty update action type"
   }
 }
 7: ++++++++++++++++++++
 {
-  "subscribeResponse" : {
-    "subscriptionId" : "REGEX([0-9a-f]{24})",
-    "duration" : "PT24H",
+  "subscribeError" : {
+    "errorCode" : {
+      "code" : "400",
+      "reasonPhrase" : "invalid payload",
+      "details" : "No entities"
+    }
   }
 }
 8: ++++++++++++++++++++

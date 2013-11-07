@@ -40,6 +40,12 @@
 */
 std::string Reference::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
+  if (string == "")
+  {
+    if ((requestType == SubscribeContextAvailability) || (requestType == SubscribeContext))
+       return "Empty Reference";
+  }
+
   return "OK";
 }
 
