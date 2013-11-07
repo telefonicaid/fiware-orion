@@ -111,12 +111,6 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
     LM_RE(errorReply, ("Sorry, no request treating object found for RequestType %d (%s)", request, requestType(request)));
   }
 
-  if (reqP->parseVector == NULL)
-  {
-     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", requestType(request), SccReceiverInternalError, "not implemented", "not implemented");
-     LM_RE(errorReply, ("Sorry, not implemented"));
-  }
-
   LM_T(LmtParse, ("Treating '%s' request", reqP->keyword.c_str()));
 
   reqP->init(parseDataP);
