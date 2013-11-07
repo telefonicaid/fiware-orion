@@ -100,8 +100,8 @@ fi
 EOF
 --REGEXPECT--
 {
-  "subscriptionId" : "REGEX([0-9a-f]{24})"
   "duration" : "PT1M",
+  "subscriptionId" : "REGEX([0-9a-f]{24})"
 }
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then

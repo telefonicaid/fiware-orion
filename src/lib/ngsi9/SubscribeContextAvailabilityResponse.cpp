@@ -90,13 +90,14 @@ std::string SubscribeContextAvailabilityResponse::render(RequestType requestType
   std::string out = "";
 
   out += startTag(indent, tag, format, false);
-  out += subscriptionId.render(format, indent + "  ");
 
   if (!duration.isEmpty())
-    out += duration.render(format, indent + "  ");
+     out += duration.render(format, indent + "  ", true);
 
   if (errorCode.code != NO_ERROR_CODE)
-    out += errorCode.render(format, indent + "  ");
+     out += errorCode.render(format, indent + "  ", true);
+
+  out += subscriptionId.render(format, indent + "  ", false);
 
   out += endTag(indent, tag, format);
   
