@@ -91,7 +91,7 @@ TEST(ContextAttribute, render)
   ContextAttribute  ca("NAME", "TYPE", "VALUE");
   std::string       out;
   std::string       xml  = "<contextAttribute>\n  <name>NAME</name>\n  <type>TYPE</type>\n  <contextValue>VALUE</contextValue>\n</contextAttribute>\n";
-  std::string       json = "\"contextAttribute\" : {\n  \"name\" : \"NAME\",\n  \"type\" : \"TYPE\",\n  \"contextValue\" : \"VALUE\"\n}\n";
+  std::string       json = "{\n  \"name\" : \"NAME\",\n  \"type\" : \"TYPE\",\n  \"contextValue\" : \"VALUE\"\n}\n";
 
   out = ca.render(XML, "");
   EXPECT_STREQ(xml.c_str(), out.c_str());
