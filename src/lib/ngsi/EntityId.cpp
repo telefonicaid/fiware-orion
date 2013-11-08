@@ -91,12 +91,12 @@ std::string EntityId::render(Format format, std::string indent, bool comma, bool
   }
   else
   {
-    out += indent + (isInVector? "{" : "") + "\n";
+    out += (isInVector? indent + "{\n": "");
     out += indent + (isInVector? "  " : "") + "\"type\" : \""      + type      + "\","  + "\n";
     out += indent + (isInVector? "  " : "") + "\"isPattern\" : \"" + isPattern + "\","  + "\n";
     out += indent + (isInVector? "  " : "") + "\"id\" : \""        + id        + "\""   + "\n";
-    out += indent + (isInVector? "}" : "");
-    out += (comma == true)? ",\n" : "\n";
+    out += (isInVector? indent + "}" : "");
+    out += (comma == true)? ",\n" : "";
   }
 
   return out;
