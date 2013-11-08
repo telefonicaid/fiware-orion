@@ -96,12 +96,12 @@ void Originator::present(std::string indent)
 *
 * Originator::render -
 */
-std::string Originator::render(Format format, std::string indent)
+std::string Originator::render(Format format, std::string indent, bool comma)
 {
   if (string == "")
     return "";
 
-  return valueTag(indent, "originator", string, format);
+  return valueTag(indent, "originator", string, format, comma);
 }
 
 

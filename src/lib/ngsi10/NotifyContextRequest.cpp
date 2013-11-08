@@ -42,8 +42,8 @@ std::string NotifyContextRequest::render(RequestType requestType, Format format,
   std::string tag = "notifyContextRequest";
 
   out += startTag(indent, tag, format, false);
-  out += subscriptionId.render(format, indent + "  ");
-  out += originator.render(format, indent  + "  ");
+  out += subscriptionId.render(format, indent + "  ", true);
+  out += originator.render(format, indent  + "  ", true);
   out += contextElementResponseVector.render(format, indent  + "  ", false);
   out += endTag(indent, tag, format);
 

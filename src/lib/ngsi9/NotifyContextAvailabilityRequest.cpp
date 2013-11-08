@@ -52,7 +52,7 @@ std::string NotifyContextAvailabilityRequest::render(RequestType requestType, Fo
   std::string tag = "notifyContextAvailabilityRequest";
 
   out += startTag(indent, tag, format, false);
-  out += subscriptionId.render(format, indent + "  ");
+  out += subscriptionId.render(format, indent + "  ", true);
   out += contextRegistrationResponseVector.render(format, indent  + "  ");
   out += endTag(indent, tag, format);
 
