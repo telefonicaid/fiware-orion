@@ -1,6 +1,3 @@
-#ifndef DISCOVER_CONTEXT_AVAILABILITY_RESPONSE_H
-#define DISCOVER_CONTEXT_AVAILABILITY_RESPONSE_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,30 +22,30 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-#include <iostream>
-#include <sstream>
+#include "gtest/gtest.h"
 
-#include "ngsi/ContextRegistrationResponseVector.h"
-#include "ngsi/ErrorCode.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
+#include "ngsi9/SubscribeContextAvailabilityResponse.h"
 
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityResponse - 
+* constructors - 
 */
-typedef struct DiscoverContextAvailabilityResponse
+TEST(SubscribeContextAvailabilityResponse, constructors)
 {
-  ContextRegistrationResponseVector   responseVector;     // Optional
-  ErrorCode                           errorCode;          // Optional
+  SubscribeContextAvailabilityResponse* scar1 = new SubscribeContextAvailabilityResponse();
+  SubscribeContextAvailabilityResponse  scar2("012345678901234567890123", "PT1S");
+  ErrorCode                             ec(SccBadRequest, "Reason", "Detail");
+  SubscribeContextAvailabilityResponse  scar3("012345678901234567890124", ec);
 
-  DiscoverContextAvailabilityResponse();
-  ~DiscoverContextAvailabilityResponse();
-  DiscoverContextAvailabilityResponse(ErrorCode& _errorCode);
+  EXPECT_EQ("", scar1->subscriptionId.get());
+  delete(scar1);
 
-  std::string  render(RequestType requestType, Format format, std::string indent);  
-  void         release();
-} DiscoverContextAvailabilityResponse;
+  EXPECT_EQ("012345678901234567890123", scar2.subscriptionId.get());
 
-#endif
+  EXPECT_EQ("012345678901234567890124", scar3.subscriptionId.get());
+  EXPECT_EQ(SccBadRequest, scar3.errorCode.code);
+}

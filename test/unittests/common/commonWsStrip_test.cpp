@@ -1,6 +1,3 @@
-#ifndef DISCOVER_CONTEXT_AVAILABILITY_RESPONSE_H
-#define DISCOVER_CONTEXT_AVAILABILITY_RESPONSE_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,30 +22,27 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-#include <iostream>
-#include <sstream>
+#include "gtest/gtest.h"
 
-#include "ngsi/ContextRegistrationResponseVector.h"
-#include "ngsi/ErrorCode.h"
-
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+#include "common/wsStrip.h"
 
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityResponse - 
+* all - 
 */
-typedef struct DiscoverContextAvailabilityResponse
+TEST(commonWsStrip, all)
 {
-  ContextRegistrationResponseVector   responseVector;     // Optional
-  ErrorCode                           errorCode;          // Optional
-
-  DiscoverContextAvailabilityResponse();
-  ~DiscoverContextAvailabilityResponse();
-  DiscoverContextAvailabilityResponse(ErrorCode& _errorCode);
-
-  std::string  render(RequestType requestType, Format format, std::string indent);  
-  void         release();
-} DiscoverContextAvailabilityResponse;
-
-#endif
+  char* s;
+  char* dirty = strdup(" \t\n  X\n\t  Y  \t\n   ");
+  s = wsStrip(dirty);
+  EXPECT_STREQ(s, "X\n\t  Y");
+  
+  free(dirty);
+  
+  dirty = strdup("                     ");
+  s = wsStrip(dirty);
+  EXPECT_STREQ(s, "");
+}

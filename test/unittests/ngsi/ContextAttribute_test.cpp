@@ -113,3 +113,22 @@ TEST(ContextAttribute, present)
 
   ca.present("", 0);
 }
+
+
+
+/* ****************************************************************************
+*
+* copyMetadatas - 
+*/
+TEST(ContextAttribute, copyMetadatas)
+{
+  ContextAttribute  ca;
+  Metadata          m1("m1", "int", "2");
+  Metadata          m2("m2", "string", "sss");
+
+  ca.metadataVector.push_back(&m1);
+  ca.metadataVector.push_back(&m2);
+
+  ContextAttribute ca2(&ca);
+  EXPECT_EQ(2, ca2.metadataVector.size());
+}

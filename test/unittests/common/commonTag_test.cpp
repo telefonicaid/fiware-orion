@@ -39,7 +39,7 @@ TEST(commonTag, startTag)
    std::string      indent = "  ";
    std::string      xml    = "  <TAG>\n";
    std::string      json   = "  {\n";
-   std::string      json2   = "  \"TAG\" : {\n";
+   std::string      json2  = "  \"TAG\" : {\n";
    std::string      out;
 
    out = startTag(indent, tag, XML);
@@ -50,6 +50,24 @@ TEST(commonTag, startTag)
 
    out = startTag(indent, tag, JSON, true);
    EXPECT_EQ(json2, out);
+
+   out = startTag(indent, tag, HTML, true);
+   EXPECT_EQ("Format not supported", out);
+
+   out = startTag(indent, tag, tag, JSON, false, true);
+   EXPECT_EQ("  \"TAG\" : {\n", out);
+
+   out = startTag(indent, tag, tag, JSON, true, true);
+   EXPECT_EQ("  \"TAG\" : [\n", out);
+
+   out = startTag(indent, tag, tag, JSON, false, false);
+   EXPECT_EQ("  {\n", out);
+
+   out = startTag(indent, tag, tag, JSON, true, false);
+   EXPECT_EQ("  [\n", out);
+
+   out = startTag(indent, tag, tag, HTML, true, false);
+   EXPECT_EQ("Format not supported", out);
 }
 
 
@@ -81,12 +99,14 @@ TEST(commonTag, endTag)
 */
 TEST(commonTag, valueTag)
 {
-   std::string      tag         = "TAG";
-   std::string      indent      = "  ";
-   std::string      value       = "tag";
-   std::string      xml         = "  <TAG>tag</TAG>\n";
-   std::string      jsonComma   = "  \"TAG\" : \"tag\",\n";
-   std::string      jsonNoComma = "  \"TAG\" : \"tag\"\n";
+   std::string      tag                     = "TAG";
+   std::string      indent                  = "  ";
+   std::string      value                   = "tag";
+   std::string      xml                     = "  <TAG>tag</TAG>\n";
+   std::string      jsonComma               = "  \"TAG\" : \"tag\",\n";
+   std::string      jsonNoComma             = "  \"TAG\" : \"tag\"\n";
+   std::string      jsonCommaAndAssociation = "  \"TAG\" : tag,\n";
+   std::string      integerJsonNoComma      = "  \"TAG\" : \"8\"\n";
    std::string      out;
 
    out = valueTag(indent, tag, value, XML);
@@ -97,4 +117,10 @@ TEST(commonTag, valueTag)
 
    out = valueTag(indent, tag, value, JSON);
    EXPECT_EQ(jsonNoComma, out);   
+
+   out = valueTag(indent, tag, value, JSON, true, true);
+   EXPECT_EQ(jsonCommaAndAssociation, out);
+
+   out = valueTag(indent, tag, 8, JSON, false);
+   EXPECT_EQ(integerJsonNoComma, out);
 }

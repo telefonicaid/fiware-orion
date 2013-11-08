@@ -35,6 +35,41 @@
 #include "xmlParse/xmlParse.h"
 #include "jsonParse/jsonRequest.h"
 
+#include "ngsi/SubscriptionId.h"
+#include "ngsi9/UnsubscribeContextAvailabilityRequest.h"
+
+
+
+/* ****************************************************************************
+*
+* constructorsAndCheck -
+*/
+TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
+{
+  UnsubscribeContextAvailabilityRequest ucar1;
+  SubscriptionId                        subId("012345678901234567890123");
+  UnsubscribeContextAvailabilityRequest ucar2(subId);
+
+  EXPECT_EQ("", ucar1.subscriptionId.get());
+  EXPECT_EQ("012345678901234567890123", ucar2.subscriptionId.get());
+
+  std::string   out;
+  std::string   expected1 = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>Forced Error</reasonPhrase>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
+  std::string   expected2 = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>1</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>bad length (24 chars expected)</reasonPhrase>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
+  std::string   expected3 = "OK";
+
+  out = ucar1.check(UnsubscribeContextAvailability, XML, "", "Forced Error", 0);
+  EXPECT_EQ(expected1, out);
+
+  ucar1.subscriptionId.set("1");
+  out = ucar1.check(UnsubscribeContextAvailability, XML, "", "", 0);
+  EXPECT_EQ(expected2, out);
+
+  out = ucar2.check(UnsubscribeContextAvailability, XML, "", "", 0);
+  EXPECT_EQ(expected3, out);
+}
+
+
 
 /* ****************************************************************************
 *
@@ -46,7 +81,7 @@ TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_xml)
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     fileName = "unsubscribeContextAvailabilityRequest_badSubscriptionId.xml";
   std::string     rendered;
-  std::string     expected = "bad length (24 chars expected)";
+  std::string     expected = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>12345</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>bad length (24 chars expected)</reasonPhrase>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -72,7 +107,7 @@ TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_json)
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     fileName = "unsubscribeContextAvailabilityRequest_badSubscriptionId.json";
-  std::string     expected = "bad length (24 chars expected)";
+  std::string     expected = "{\n  \"subscriptionId\" : \"12345\",\n  \"statusCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"bad length (24 chars expected)\"\n  }\n}\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
   

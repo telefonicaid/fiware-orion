@@ -932,3 +932,6 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeName)
   std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
   EXPECT_EQ(expected, result);
 }
+
+
+

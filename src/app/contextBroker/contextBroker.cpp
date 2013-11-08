@@ -529,7 +529,8 @@ int main(int argC, char* argV[])
   statisticsTime = startTime;
 
   /* Initialize the semaphore used by mongoBackend */
-  semInit();
+  if (semInit() != 0)
+    LM_X(1, ("Error initializing semaphore: %s\n", strerror(errno)));
 
   int r;
   if ((r = restStart()) != 0)

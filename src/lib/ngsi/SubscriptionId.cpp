@@ -37,6 +37,28 @@
 
 /* ****************************************************************************
 *
+* SubscriptionId::SubscriptionId - 
+*/
+SubscriptionId::SubscriptionId()
+{
+   string = "";
+}
+
+
+
+/* ****************************************************************************
+*
+* SubscriptionId::SubscriptionId - 
+*/
+SubscriptionId::SubscriptionId(std::string subId)
+{
+   string = subId;
+}
+
+
+
+/* ****************************************************************************
+*
 * SubscriptionId::check - 
 */
 std::string SubscriptionId::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)

@@ -88,6 +88,13 @@ TEST(RegisterContextRequest, xml_ok)
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ("OK", result) << "this test should be OK";
+
+  RegisterContextRequest*  rcrP = &reqData.rcr.res;
+  std::string              out;
+  std::string              expected = "<registerContextRequest>\n  <contextRegistrationList>\n    <contextRegistration>\n      <entityIdList>\n        <entityId type=\"Room\" isPattern=\"false\">\n          <id>ConferenceRoom</id>\n        </entityId>\n        <entityId type=\"Room\" isPattern=\"false\">\n          <id>OfficeRoom</id>\n        </entityId>\n      </entityIdList>\n      <contextRegistrationAttributeList>\n        <contextRegistrationAttribute>\n          <name>temperature</name>\n          <type>degree</type>\n          <isDomain>false</isDomain>\n          <registrationMetadata>\n            <contextMetadata>\n              <name>ID</name>\n              <type>string</type>\n              <value>1110</value>\n            </contextMetadata>\n            <contextMetadata>\n              <name>cm2</name>\n              <type>string</type>\n              <value>XXX</value>\n            </contextMetadata>\n          </registrationMetadata>\n        </contextRegistrationAttribute>\n      </contextRegistrationAttributeList>\n      <registrationMetadata>\n        <contextMetadata>\n          <name>ID</name>\n          <type>string</type>\n          <value>2212</value>\n        </contextMetadata>\n        <contextMetadata>\n          <name>ID2</name>\n          <type>string</type>\n          <value>212</value>\n        </contextMetadata>\n      </registrationMetadata>\n      <providingApplication>http://localhost:1028/application</providingApplication>\n    </contextRegistration>\n  </contextRegistrationList>\n  <duration>PT1H</duration>\n</registerContextRequest>\n";
+
+  out = rcrP->render(RegisterContext, XML, "");
+  EXPECT_EQ(expected, out);
 }
 
 

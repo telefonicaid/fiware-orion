@@ -33,6 +33,21 @@
 
 /* ****************************************************************************
 *
+* constructors - 
+*/
+TEST(SubscriptionId, constructors)
+{
+  SubscriptionId s1;
+  SubscriptionId s2("subId");
+
+  EXPECT_EQ("", s1.string);
+  EXPECT_EQ("subId", s2.string);
+}
+
+
+
+/* ****************************************************************************
+*
 * check - 
 */
 TEST(SubscriptionId, check)

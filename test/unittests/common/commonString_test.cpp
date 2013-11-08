@@ -268,3 +268,16 @@ TEST(string, parseEmptyUrl)
 
     EXPECT_FALSE(result) << "wrong result (shall be false)";
 }
+
+/* ****************************************************************************
+*
+* parsedUptime -
+*/
+TEST(string, parsedUptime)
+{
+  std::string uptime;
+
+  // 3 days, 4 hours, 5 min and 6 seconds
+  uptime = parsedUptime(3 * (24 * 3600) + 4 * 3600 + 5 * 60 + 6);
+  EXPECT_EQ(uptime, "3 d, 4 h, 5 m, 6 s");
+}

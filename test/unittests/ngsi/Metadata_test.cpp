@@ -30,6 +30,23 @@
 
 /* ****************************************************************************
 *
+* constructor - 
+*/
+TEST(Metadata, constructor)
+{
+   Metadata m1;
+   Metadata m2("n2", "t2", "v2");
+   Metadata m3(&m2);
+
+   EXPECT_EQ("", m1.name);
+   EXPECT_EQ("n2", m2.name);
+   EXPECT_EQ("n2", m3.name);
+}
+
+
+
+/* ****************************************************************************
+*
 * render - 
 */
 TEST(Metadata, render)
