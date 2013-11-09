@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
-      <entityId type="Room" isPattern="false">
+      <entityId type="Room" isPattern="fahlse">
         <id>ConferenceRoom</id>
       </entityId>
       <entityId type="Room" isPattern="false">

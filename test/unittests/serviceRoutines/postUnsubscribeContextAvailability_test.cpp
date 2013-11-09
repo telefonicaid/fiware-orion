@@ -55,7 +55,7 @@ TEST(postUnsubscribeContextAvailability, badSubscriptionId)
 {
   ConnectionInfo ci("/ngsi9/unsubscribeContextAvailability",  "POST", "1.1");
   std::string    expected    = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>112233445566778899001234</subscriptionId>\n  <statusCode>\n    <code>404</code>\n    <reasonPhrase>Subscription Not Found</reasonPhrase>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
-  const char*    fileName    = "unsubscribeContextAvailabilityRequest_subscriptionNotFound.xml";
+  const char*    fileName    = "ngsi9.unsubscribeContextAvailabilityRequest.subscriptionIdNotFound.valid.xml";
   std::string    out;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";

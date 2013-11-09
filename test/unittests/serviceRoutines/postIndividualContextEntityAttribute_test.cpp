@@ -55,7 +55,7 @@ TEST(postIndividualContextEntityAttribute, notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity11/attributes/temperature",  "POST", "1.1");
   std::string    expected      = "<statusCode>\n  <code>200</code>\n  <reasonPhrase>OK</reasonPhrase>\n</statusCode>\n";
-  const char*    fileName      = "updateContextAttributeRequest.xml";
+  const char*    fileName      = "ngsi10.updateContextAttributeRequest.ok.valid.xml";
   std::string    out;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";

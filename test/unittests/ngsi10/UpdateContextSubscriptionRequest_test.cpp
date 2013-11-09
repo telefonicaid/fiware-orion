@@ -56,7 +56,7 @@ TEST(UpdateContextSubscriptionRequest, badLength_xml)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "updateContextSubscription_badLength.xml";
+  const char*     fileName = "ngsi10.updateContextSubscription.subscriptionIdLength.invalid.xml";
   const char*     expected1 = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <subscriptionId>12345</subscriptionId>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>bad length (24 chars expected)</reasonPhrase>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
