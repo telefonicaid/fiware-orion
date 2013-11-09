@@ -185,11 +185,9 @@ echo "4: ***********************************"
   "contextResponses" : [
     {
       "contextElement" : {
-        {
-          "type" : "Room",
-          "isPattern" : "false",
-          "id" : "ConferenceRoom"
-        }
+        "type" : "Room",
+        "isPattern" : "false",
+        "id" : "ConferenceRoom"
       },
       "statusCode" : {
         "code" : "404",
@@ -210,17 +208,15 @@ echo "4: ***********************************"
     {
       "contextElement" : {
         "attributes" : [
-          "contextAttribute" : {
+          {
             "name" : "temperature",
             "type" : "degree",
             "contextValue" : ""
           }
         ],
-        {
-          "type" : "Room",
-          "isPattern" : "false",
-          "id" : "ConferenceRoom"
-        }
+        "type" : "Room",
+        "isPattern" : "false",
+        "id" : "ConferenceRoom"
       },
       "statusCode" : {
         "code" : "200",
