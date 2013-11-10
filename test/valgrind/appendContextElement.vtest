@@ -22,10 +22,10 @@
 # Make a registration and modify it 
 #
 echo Make a registration
-../manual/cbTest.sh rcr ../manual/firstReg.xml > /dev/null 2>&1
+../manual/cbTest.sh rcr ../manual/ngsi9.registerContextRequest.ok.xml > /dev/null 2>&1
 
 echo Add an attribute to ConferenceRoom
-../manual/cbTest.sh conv ../manual/appendContextElementRequest.xml -en ConferenceRoom -cop ce > /dev/null 2>&1
+../manual/cbTest.sh conv ../manual/ngsi10.appendContextElementRequest.ok.valid.xml -en ConferenceRoom -cop ce > /dev/null 2>&1
 
 echo Discover and see if it worked!
-../manual/cbTest.sh dcar ../manual/simpleDiscovery.xml > /dev/null 2>&1
+../manual/cbTest.sh dcar ../manual/ngsi9.discoverContextAvailabilityRequest.ok.valid.xml > /dev/null 2>&1

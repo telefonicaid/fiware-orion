@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<notifyContextAvailabilitytResponse>
-	<responseCode>
-		<code>200</code>
-		<reasonPhrase>Ok</reasonPhrase>
-		<details>a</details>
-	</responseCode>
-</notifyContextAvailabilitytResponse>

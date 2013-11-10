@@ -22,4 +22,4 @@
 # Make a ceaa registerProviderRequest (/ngsi9/contextEntities/*/attributes/*)
 #
 echo "Make a registration and then make the broker exit"
-../manual/cbTest.sh conv/ceaa ../manual/registerProviderRequest.xml > /dev/null 2>&1
+../manual/cbTest.sh conv/ceaa ../manual/ngsi9.registerProviderRequest.ok.valid.xml > /dev/null 2>&1

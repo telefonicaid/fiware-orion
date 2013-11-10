@@ -22,7 +22,7 @@
 # Make a registration and a subscription
 #
 echo Make a registration
-../manual/cbTest.sh rcr ../manual/firstReg.xml > /dev/null 2>&1
+../manual/cbTest.sh rcr ../manual/ngsi9.registerContextRequest.ok.xml > /dev/null 2>&1
 
 echo Create an availability subscription
 ../manual/cbTest.sh dcar ../manual/subscribeContextAvailability.xml > ${NAME}.cbTest.out 2>&1
@@ -31,7 +31,7 @@ subIdLine=$(grep '</subscriptionId>' ${NAME}.cbTest.out)
 subId=$(echo $subIdLine | awk -F '>' '{ print $2}' | awk -F '<' '{ print $1}')
 
 echo Update the subscription
-../manual/cbTest.sh ucsr ../manual/updateContextSubscriptionRequest.xml -id $subId >> ${NAME}.cbTest.out 2>&1
+../manual/cbTest.sh ucsr ../manual/ngsi10.updateContextSubscriptionRequest.onchange-SUBSCRIPTIONID.invalid.xml -id $subId >> ${NAME}.cbTest.out 2>&1
 
 
 
