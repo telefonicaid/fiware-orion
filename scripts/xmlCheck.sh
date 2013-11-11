@@ -186,6 +186,10 @@ done
 #
 dir=$(dirname $0)
 SRC_TOP=${PWD}/${dir}/../
+
+cd $SRC_TOP
+SRC_TOP=$(pwd)
+cd -
 vMsg Git repo home: $SRC_TOP
 
 
