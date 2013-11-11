@@ -194,17 +194,15 @@ echo "4: ***********************************"
     {
       "contextElement" : {
         "attributes" : [
-          "contextAttribute" : {
+          {
             "name" : "temperature",
             "type" : "degree",
             "contextValue" : ""
           }
         ],
-        {
-          "type" : "Room",
-          "isPattern" : "false",
-          "id" : "ConferenceRoom"
-        }
+        "type" : "Room",
+        "isPattern" : "false",
+        "id" : "ConferenceRoom"
       },
       "statusCode" : {
         "code" : "200",
@@ -214,17 +212,15 @@ echo "4: ***********************************"
     {
       "contextElement" : {
         "attributes" : [
-          "contextAttribute" : {
+          {
             "name" : "temperature",
             "type" : "degree",
             "contextValue" : ""
           }
         ],
-        {
-          "type" : "Room",
-          "isPattern" : "false",
-          "id" : "OfficeRoom"
-        }
+        "type" : "Room",
+        "isPattern" : "false",
+        "id" : "OfficeRoom"
       },
       "statusCode" : {
         "code" : "200",
