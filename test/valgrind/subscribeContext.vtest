@@ -22,11 +22,11 @@
 # Make a registration and a subscription
 #
 echo Make a registration
-../manual/cbTest.sh rcr ../manual/firstReg.xml > /dev/null 2>&1
+../manual/cbTest.sh rcr ../manual/ngsi9.registerContextRequest.ok.xml > /dev/null 2>&1
 
 #FIXME P10: recover this
 #echo Make a subscription
-#../manual/cbTest.sh scr ../manual/subscribeContextRequest-ONTIMEINTERVAL.xml > /dev/null 2>&1
+#../manual/cbTest.sh scr ../manual/ngsi10.subscribeContextRequest.ontimeinterval.valid.xml > /dev/null 2>&1
 
 echo Wait some time for ONTIMEINTERVAL ...
 sleep 11

@@ -15,7 +15,7 @@
 	</attributeList>
 	<duration>PT1M</duration>
 	<restriction>
-		<attributeExpression></attributeExpression>
+		<attributeExpression>AE</attributeExpression>
 		<scope>
 			<operationScope>
 				<scopeType>st1</scopeType>

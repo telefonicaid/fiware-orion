@@ -60,7 +60,7 @@ TEST(postSubscribeContextAvailability, ok)
 {
   ConnectionInfo ci("/ngsi9/subscribeContextAvailability",  "POST", "1.1");
   std::string    expectedStart  = "<subscribeContextAvailabilityResponse>\n  <duration>PT1M</duration>";
-  const char*    fileName       = "subscribeContextAvailabilityRequest_ok.xml";
+  const char*    fileName       = "ngsi9.subscribeContextAvailabilityRequest.subscriptionIdNot24Chars.invalid.xml";
   std::string    out;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";

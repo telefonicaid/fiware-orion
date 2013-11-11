@@ -49,7 +49,7 @@ TEST(NotifyContextRequest, xml_ok)
 {
    ParseData       reqData;
    ConnectionInfo  ci("", "POST", "1.1");
-   const char*     fileName = "notifyContextRequest_ok.xml";
+   const char*     fileName = "ngsi10.notifyContextRequest.ok.valid.xml";
 
    EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -121,7 +121,7 @@ TEST(NotifyContextRequest, xml_badIsPattern)
 {
    ParseData       reqData;
    ConnectionInfo  ci("", "POST", "1.1");
-   const char*     fileName = "notifyContextRequest_badIsPattern.xml";
+   const char*     fileName = "ngsi10.notifyContextRequest.isPattern.invalid.xml";
    std::string     expected = "<notifyContextResponse>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </statusCode>\n</notifyContextResponse>\n";
 
    EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -164,7 +164,7 @@ TEST(NotifyContextRequest, xml_invalidEntityIdAttribute)
 {
    ParseData       reqData;
    ConnectionInfo  ci("", "POST", "1.1");
-   const char*     fileName = "notifyContextRequest_invalidEntityIdAttribute.xml";
+   const char*     fileName = "ngsi10.notifyContextRequest.entityIdAttribute.invalid.xml";
    std::string     expected = "<notifyContextResponse>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </statusCode>\n</notifyContextResponse>\n";
 
    EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";

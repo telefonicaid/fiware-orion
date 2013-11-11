@@ -55,7 +55,7 @@ TEST(putIndividualContextEntity, ok)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity011",  "PUT", "1.1");
   std::string    expected    = "<updateContextElementResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Entity not found</reasonPhrase>\n    <details>entity: (entity011, , false)</details>\n  </errorCode>\n</updateContextElementResponse>\n";
-  const char*    fileName    = "updateContextElementRequest_ok.xml";
+  const char*    fileName    = "ngsi10.updateContextElementRequest.valid.xml";
   std::string    out;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";

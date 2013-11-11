@@ -22,7 +22,7 @@
 # Make a registration and a query
 #
 echo Make a registration
-../manual/cbTest.sh rcr ../manual/firstReg.xml > /dev/null 2>&1
+../manual/cbTest.sh rcr ../manual/ngsi9.registerContextRequest.ok.xml > /dev/null 2>&1
 
 echo Make a query
-../manual/cbTest.sh qcr ../manual/queryContext.xml > /dev/null 2>&1
+../manual/cbTest.sh qcr ../manual/ngsi10.queryContextRequest.ok.valid.xml > /dev/null 2>&1

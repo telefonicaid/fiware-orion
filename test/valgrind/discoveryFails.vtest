@@ -22,4 +22,4 @@
 # Make a discovery
 #
 echo Make a discovery that fails
-../manual/cbTest.sh dcar ../manual/simpleDiscoveryThatFails.xml > /dev/null 2>&1
+../manual/cbTest.sh dcar ../manual/ngsi9.discoverContextAvailabilityRequest.nothingFound.valid.xml > /dev/null 2>&1

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <registerContextResponse>
   <duration>PT1M</duration>
-  <registrationId>1579964ss5t</registrationId>
+  <registrationId>123456789012345678901234</registrationId>
   <errorCode>
     <code>200</code>
     <reasonPhrase>REASON</reasonPhrase>

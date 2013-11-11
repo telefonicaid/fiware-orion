@@ -44,7 +44,7 @@
 TEST(NotifyContextAvailabilityRequest, ok_xml)
 {
   ParseData       parseData;
-  const char*     fileName = "notifyContextAvailabilityRequest_ok.xml";
+  const char*     fileName = "ngsi9.notifyContextAvailabilityRequest.ok.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -105,7 +105,7 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
 TEST(NotifyContextAvailabilityRequest, badEntityAttribute_xml)
 {
   ParseData       parseData;
-  const char*     fileName = "notifyContextAvailabilityRequest_badEntityAttribute.xml";
+  const char*     fileName = "ngsi9.notifyContextAvailabilityRequest.entityAttribute.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
   std::string     expected = "<notifyContextAvailabilityResponse>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </statusCode>\n</notifyContextAvailabilityResponse>\n";
 

@@ -72,7 +72,7 @@ TEST(QueryContextRequest, ok_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_ok.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.ok.valid.xml";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -148,7 +148,7 @@ TEST(QueryContextRequest, entityIdIdAsAttribute_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_entityIdIdAsAttribute.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.entityIdIdAsAttribute.invalid.xml";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -166,7 +166,7 @@ TEST(QueryContextRequest, badIsPattern_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_badIsPattern.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.isPattern.invalid.xml";
   const char*     expected = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -248,7 +248,7 @@ TEST(QueryContextRequest, unsupportedEntityIdAttribute_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_unsupportedEntityIdAttribute.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.attributeUnknown.invalid.xml";
   const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -267,7 +267,7 @@ TEST(QueryContextRequest, entityIdType_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_entityIdType.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.entityIdTypeAsField.invalid.xml";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -285,7 +285,7 @@ TEST(QueryContextRequest, entityIdIsPattern_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_entityIdIsPattern.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.entityIdIsPatternAsField.invalid.xml";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -303,7 +303,7 @@ TEST(QueryContextRequest, overwriteEntityIdType_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_overwriteEntityIdType.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.typeAsField.invalid.xml";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -321,7 +321,7 @@ TEST(QueryContextRequest, overwriteEntityIdIsPattern_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_overwriteEntityIdIsPattern.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.isPatternAsField.invalid.xml";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -339,7 +339,7 @@ TEST(QueryContextRequest, overwriteEntityIdId_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_overwriteEntityIdId.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.entityIdIdAsAttribute.invalid.xml";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -357,7 +357,7 @@ TEST(QueryContextRequest, noEntityList_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_noEntityList.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.noEntityList.invalid.xml";
   const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>No entities</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -376,7 +376,7 @@ TEST(QueryContextRequest, emptyEntityList_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_emptyEntityList.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.emptyEntityList.invalid.xml";
   const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>No entities</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -395,7 +395,7 @@ TEST(QueryContextRequest, emptyEntityIdId_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_emptyEntityIdId.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.emptyEntityIdId.invalid.xml";
   const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>empty entityId:id</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -414,7 +414,7 @@ TEST(QueryContextRequest, noAttributeExpression_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_noAttributeExpression.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.noAttributeExpression.valid.xml";
   const char*     expect   = "OK";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -433,7 +433,7 @@ TEST(QueryContextRequest, emptyAttributeExpression_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_emptyAttributeExpression.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.emptyAttributeExpression.invalid.xml";
   const char*     expect   = "OK";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -452,7 +452,7 @@ TEST(QueryContextRequest, emptyScopeType_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_emptyScopeType.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.emptyScopeType.invalid.xml";
   const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty type in restriction scope</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -471,7 +471,7 @@ TEST(QueryContextRequest, emptyScopeValue_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_emptyScopeValue.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.emptyScopeValue.invalid.xml";
   const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty value in restriction scope</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -490,7 +490,7 @@ TEST(QueryContextRequest, noScopeType_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_noScopeType.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.noScopeType.invalid.xml";
   const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty type in restriction scope</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -509,7 +509,7 @@ TEST(QueryContextRequest, noScopeValue_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_noScopeValue.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.noScopeValue.invalid.xml";
   const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty value in restriction scope</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -528,7 +528,7 @@ TEST(QueryContextRequest, noRestriction_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_noRestriction.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.noRestriction.valid.xml";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 

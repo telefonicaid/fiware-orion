@@ -60,7 +60,7 @@ TEST(postSubscribeContext, ok)
 {
   ConnectionInfo ci("/ngsi10/subscribeContext",  "POST", "1.1");
   std::string    expectedStart  = "<subscribeContextResponse>\n  <subscribeResponse>\n    <subscriptionId>";
-  const char*    fileName       = "subscribeContextRequest_ok.xml";
+  const char*    fileName       = "ngsi10.subscribeContextRequest.ok.valid.xml";
   std::string    out;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";

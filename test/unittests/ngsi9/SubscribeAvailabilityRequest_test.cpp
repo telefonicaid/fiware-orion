@@ -66,7 +66,7 @@
 TEST(SubscribeContextAvailabilityRequest, xml_ok)
 {
   ParseData       reqData;
-  const char*     fileName = "subscribeContextAvailabilityRequest_ok.xml";
+  const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.subscriptionIdNot24Chars.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
   
   
@@ -117,7 +117,7 @@ TEST(SubscribeContextAvailabilityRequest, json_ok)
 TEST(SubscribeContextAvailabilityRequest, xml_badIsPattern)
 {
   ParseData       reqData;
-  const char*     fileName = "subscribeContextAvailabilityRequest_badIsPattern.xml";
+  const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.isPattern.invalid.xml";
   std::string     expected = "<subscribeContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </errorCode>\n  <subscriptionId>No Subscription ID</subscriptionId>\n</subscribeContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
   
@@ -157,7 +157,7 @@ TEST(SubscribeContextAvailabilityRequest, json_badIsPattern)
 TEST(SubscribeContextAvailabilityRequest, xml_badEntityId)
 {
   ParseData       reqData;
-  const char*     fileName = "subscribeContextAvailabilityRequest_badEntityId.xml";
+  const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.entityId.invalid.xml";
   std::string     expected = "<subscribeContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n  <subscriptionId>No Subscription ID</subscriptionId>\n</subscribeContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
   
@@ -176,7 +176,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_badEntityId)
 TEST(SubscribeContextAvailabilityRequest, xml_noEntityId)
 {
   ParseData       reqData;
-  const char*     fileName = "subscribeContextAvailabilityRequest_noEntityId.xml";
+  const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.noEntity.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
   std::string     expected = "<subscribeContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>No entities</reasonPhrase>\n  </errorCode>\n  <subscriptionId>No Subscription ID</subscriptionId>\n</subscribeContextAvailabilityResponse>\n";
 
@@ -220,7 +220,7 @@ TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
 TEST(SubscribeContextAvailabilityRequest, xml_entityIdTypeAsBothFieldAndAttribute)
 {
   ParseData       reqData;
-  const char*     fileName = "subscribeContextAvailabilityRequest_entityIdTypeAsBothFieldAndAttribute.xml";
+  const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.entityIdTypeAsBothFieldAndAttribute.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat      = XML;
@@ -241,7 +241,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_entityIdTypeAsBothFieldAndAttribut
 TEST(SubscribeContextAvailabilityRequest, xml_entityIdIsPatternAsBothFieldAndAttribute)
 {
   ParseData       reqData;
-  const char*     fileName = "subscribeContextAvailabilityRequest_entityIdIsPatternAsBothFieldAndAttribute.xml";
+  const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.entityIdIsPatternAsBothFieldAndAttribute.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat      = XML;
@@ -262,7 +262,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_entityIdIsPatternAsBothFieldAndAtt
 TEST(SubscribeContextAvailabilityRequest, xml_noReference)
 {
   ParseData       reqData;
-  const char*     fileName = "subscribeContextAvailabilityRequest_noReference.xml";
+  const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.noReference.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
   std::string     expected = "<subscribeContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty Reference</reasonPhrase>\n  </errorCode>\n  <subscriptionId>No Subscription ID</subscriptionId>\n</subscribeContextAvailabilityResponse>\n";
 

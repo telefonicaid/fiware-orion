@@ -55,7 +55,7 @@ TEST(postUpdateContextAvailabilitySubscription, notFound)
 {
   ConnectionInfo ci("/ngsi9/updateContextAvailabilitySubscription",  "POST", "1.1");
   std::string    expected    = "<updateContextAvailabilitySubscriptionResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Subscription Not Found</reasonPhrase>\n  </errorCode>\n  <subscriptionId>111122223333444455556666</subscriptionId>\n</updateContextAvailabilitySubscriptionResponse>\n";
-  const char*    fileName    = "updateContextAvailabilitySubscription_notFound.xml";
+  const char*    fileName    = "ngsi9.updateContextAvailabilitySubscriptionRequest.subscriptionIdNotFound.valid.xml";
   std::string    out;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";

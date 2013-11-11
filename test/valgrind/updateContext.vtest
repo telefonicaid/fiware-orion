@@ -22,14 +22,14 @@
 # Make a registration and modify it 
 #
 echo Make a registration
-../manual/cbTest.sh rcr ../manual/firstReg.xml > /dev/null 2>&1
+../manual/cbTest.sh rcr ../manual/ngsi9.registerContextRequest.ok.xml > /dev/null 2>&1
 
 echo Append to an entity
-../manual/cbTest.sh upcr ../manual/updateContext01.append.xml
+../manual/cbTest.sh upcr ../manual/ngsi10.updateContextRequest.append.valid.xml
 
 echo Update an entity
-../manual/cbTest.sh upcr ../manual/updateContext01.update.xml
+../manual/cbTest.sh upcr ../manual/ngsi10.updateContextRequest.update.valid.xml
 
 echo Delete from an entity
-../manual/cbTest.sh upcr ../manual/updateContext01.delete.xml
+../manual/cbTest.sh upcr ../manual/ngsi10.updateContextRequest.delete.valid.xml
 

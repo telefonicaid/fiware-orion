@@ -60,7 +60,7 @@ TEST(postUpdateContext, notFound)
 {
   ConnectionInfo ci("/ngsi10/updateContext",  "POST", "1.1");
   std::string    expected    = "<updateContextResponse>\n  <contextResponseList>\n    <contextElementResponse>\n      <contextElement>\n        <entityId type=\"Room\" isPattern=\"false\">\n          <id>ConferensRoom</id>\n        </entityId>\n      </contextElement>\n      <statusCode>\n        <code>404</code>\n        <reasonPhrase>Entity not found</reasonPhrase>\n        <details>entity: (ConferensRoom, Room, false)</details>\n      </statusCode>\n    </contextElementResponse>\n  </contextResponseList>\n</updateContextResponse>\n";
-  const char*    fileName    = "updateContext_notFound.xml";
+  const char*    fileName    = "ngsi10.updateContextRequest.idNotFound.valid.xml";
   std::string    out;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";

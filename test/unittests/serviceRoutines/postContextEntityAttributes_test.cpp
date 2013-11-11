@@ -60,7 +60,7 @@ TEST(postContextEntityAttributes, ok)
 {
   ConnectionInfo ci("/ngsi9/contextEntities/entity03/attributes",  "POST", "1.1");
   std::string    expectedStart = "<registerContextResponse>\n  <registrationId>";
-  const char*    fileName      = "registerProviderRequest_ok2.xml";
+  const char*    fileName      = "ngsi9.registerProviderRequest.noRegistrationId.valid.xml";
   std::string    out;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";

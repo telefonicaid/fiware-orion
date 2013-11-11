@@ -50,7 +50,7 @@ sudo yum install make cmake gcc-c++ scons
 * Install the required libraries (except the mongo driver and gmock, described in following steps).
 
 ```
-sudo yum install libmicrohttpd-devel boost-devel gtest
+sudo yum install libmicrohttpd-devel boost-devel
 ```
 
 * Install the Mongo Driver from source (reference procedure http://docs.mongodb.org/ecosystem/tutorial/getting-started-with-cpp-driver/):
@@ -122,7 +122,7 @@ following the following procedure (optional):
 * Install the required tools:
 
 ```
-sudo yum install python python-flask curl libxml2 nc mongodb valgrind
+sudo yum install python python-flask curl libxml2 nc mongodb valgrind libxslt
 ```
 
 * Run valgrind tests (it takes some time, please be patient):
