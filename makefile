@@ -159,6 +159,11 @@ post_install_libs:
 	cp src/lib/logMsg/*.h /usr/local/include/contextBroker/logMsg         
 	cp $(CMAKE_BUILD_TYPE)/src/lib/logMsg/liblm.a  /usr/local/lib 
 
+	cd /usr/local/include/contextBroker  && rm -rf serviceRoutines && mkdir -p serviceRoutines
+	cp src/lib/serviceRoutines/*.h /usr/local/include/contextBroker/serviceRoutines
+	cp $(CMAKE_BUILD_TYPE)/src/lib/serviceRoutines/libserviceRoutines.a  /usr/local/lib
+
+
 
 # Requires root access, i.e. use 'sudo make install_libs' to install
 install_libs: release

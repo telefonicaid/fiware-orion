@@ -46,7 +46,7 @@ TEST(SubscribeContextRequest, ok_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "subscribeContextRequest_ok.xml";
+  const char*     fileName = "ngsi10.subscribeContextRequest.ok.valid.xml";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -121,7 +121,7 @@ TEST(SubscribeContextRequest, invalidDuration_xml)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "subscribeContextRequest_invalidDuration.xml";
+  const char*     fileName = "ngsi10.subscribeContextRequest.duration.invalid.xml";
   const char*     expected = "<subscribeContextResponse>\n  <subscribeError>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>invalid payload</reasonPhrase>\n      <details>syntax error in duration string</details>\n    </errorCode>\n  </subscribeError>\n</subscribeContextResponse>\n";
   XmlRequest*     reqP;
 
@@ -191,7 +191,7 @@ TEST(SubscribeContextRequest, invalidEntityIdAttribute_xml)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "subscribeContextRequest_invalidEntityIdAttribute.xml";
+  const char*     fileName = "ngsi10.subscribeContextRequest.entityIdAttribute.invalid.xml";
   const char*     expected = "OK";
   XmlRequest*     reqP;
 

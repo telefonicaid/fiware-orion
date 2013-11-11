@@ -45,7 +45,7 @@
 TEST(UpdateContextAvailabilitySubscriptionRequest, xml_ok)
 {
   ParseData       reqData;
-  const char*     fileName = "updateContextAvailabilitySubscriptionRequest_ok.xml";
+  const char*     fileName = "ngsi9.updateContextAvailabilitySubscriptionRequest.ok2.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");  
   
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -65,7 +65,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, xml_ok)
 TEST(UpdateContextAvailabilitySubscriptionRequest, xml_invalidEntityAttribute)
 {
   ParseData       reqData;
-  const char*     fileName = "updateContextAvailabilitySubscriptionRequest_invalidEntityAttribute.xml";
+  const char*     fileName = "ngsi9.updateContextAvailabilitySubscriptionRequest.entityIdAttribute.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");  
   std::string     expected = "<updateContextAvailabilitySubscriptionResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n</updateContextAvailabilitySubscriptionResponse>\n";
 

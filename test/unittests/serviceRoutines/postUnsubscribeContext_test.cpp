@@ -54,9 +54,8 @@ static RestService rs[] =
 TEST(postUnsubscribeContext, badSubscriptionId)
 {
   ConnectionInfo ci("/ngsi10/unsubscribeContext",  "POST", "1.1");
+  const char*    fileName    = "ngsi10.unsubscribeContextRequest.subscriptionId.invalid.xml";
   std::string    expected    = "<unsubscribeContextResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>Invalid Subscription Id</reasonPhrase>\n    <details>12345D</details>\n  </statusCode>\n</unsubscribeContextResponse>\n";
-
-  const char*    fileName    = "unsubscribeContextRequest_badSubscriptionId.xml";
   std::string    out;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";

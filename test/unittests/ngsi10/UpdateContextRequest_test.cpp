@@ -54,7 +54,7 @@ TEST(UpdateContextRequest, ok_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "updateContext_ok.xml";
+  const char*     fileName = "ngsi10.updateContext.valid.xml";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 

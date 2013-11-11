@@ -71,7 +71,7 @@
 TEST(DiscoverContextAvailabilityRequest, ok_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_ok.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.ok.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -114,7 +114,7 @@ TEST(DiscoverContextAvailabilityRequest, ok_json)
 TEST(DiscoverContextAvailabilityRequest, okNoRestrictions_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_okNoRestrictions.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.noRestriction.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -153,7 +153,7 @@ TEST(DiscoverContextAvailabilityRequest, okNoRestrictions_json)
 TEST(DiscoverContextAvailabilityRequest, noEntityIdList_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_noEntityIdList.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.noEntityIdList.invalid.xml";
   const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -195,7 +195,7 @@ TEST(DiscoverContextAvailabilityRequest, noEntityIdList_json)
 TEST(DiscoverContextAvailabilityRequest, emptyEntityIdList_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_emptyEntityIdList.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.emptyEntityIdList.invalid.xml";
   const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -237,7 +237,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyEntityIdList_json)
 TEST(DiscoverContextAvailabilityRequest, invalidIsPatternValue_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_invalidIsPatternValue.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.isPattern.invalid.xml";
   const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -280,7 +280,7 @@ TEST(DiscoverContextAvailabilityRequest, invalidIsPatternValue_json)
 TEST(DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_unsupportedAttributeForEntityId.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.unsupportedAttributeForEntityId.invalid.xml";
   const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -321,7 +321,7 @@ TEST(DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_json)
 TEST(DiscoverContextAvailabilityRequest, entityIdIdAsAttribute_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_entityIdIdAsAttribute.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.entityIdIdAsAttribute.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -361,7 +361,7 @@ TEST(DiscoverContextAvailabilityRequest, entityIdIdAsAttribute_json)
 TEST(DiscoverContextAvailabilityRequest, entityIdType_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_entityIdType.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.entityIdTypeAsField.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -401,7 +401,7 @@ TEST(DiscoverContextAvailabilityRequest, entityIdType_json)
 TEST(DiscoverContextAvailabilityRequest, entityIdIsPattern_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_entityIdIsPattern.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.entityIdIsPatternAsField.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -441,7 +441,7 @@ TEST(DiscoverContextAvailabilityRequest, entityIdIsPattern_json)
 TEST(DiscoverContextAvailabilityRequest, overrideEntityIdId_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_overrideEntityIdId.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.EntityIdIdAsAttribute.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -481,7 +481,7 @@ TEST(DiscoverContextAvailabilityRequest, overrideEntityIdId_json)
 TEST(DiscoverContextAvailabilityRequest, overrideEntityIdType_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_overrideEntityIdType.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.EntityIdTypeAsField.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -521,7 +521,7 @@ TEST(DiscoverContextAvailabilityRequest, overrideEntityIdType_json)
 TEST(DiscoverContextAvailabilityRequest, overrideEntityIdIsPattern_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_overrideEntityIdIsPattern.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.EntityIdIsPattern.invalid.xml";
   const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -563,7 +563,7 @@ TEST(DiscoverContextAvailabilityRequest, overrideEntityIdIsPattern_json)
 TEST(DiscoverContextAvailabilityRequest, emptyEntityIdId_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_emptyEntityIdId.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.emptyEntityIdId.invalid.xml";
   const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>empty entityId:id</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -605,7 +605,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyEntityIdId_json)
 TEST(DiscoverContextAvailabilityRequest, noEntityIdId_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_noEntityIdId.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.noEntityIdId.invalid.xml";
   const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>empty entityId:id</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -647,7 +647,7 @@ TEST(DiscoverContextAvailabilityRequest, noEntityIdId_json)
 TEST(DiscoverContextAvailabilityRequest, noAttributeExpression_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_noAttributeExpression.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.noAttributeExpression.valid.xml";
   const char*     expect   = "OK";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -689,7 +689,7 @@ TEST(DiscoverContextAvailabilityRequest, noAttributeExpression_json)
 TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_emptyAttributeExpression.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.emptyAttributeExpression.invalid.xml";
   const char*     expect   = "OK";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -731,7 +731,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_json)
 TEST(DiscoverContextAvailabilityRequest, noScopeType_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_noScopeType.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.noScopeType.invalid.xml";
   const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty type in restriction scope</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -773,7 +773,7 @@ TEST(DiscoverContextAvailabilityRequest, noScopeType_json)
 TEST(DiscoverContextAvailabilityRequest, noScopeValue_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_noScopeValue.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.noScopeValue.invalid.xml";
   const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty value in restriction scope</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -815,7 +815,7 @@ TEST(DiscoverContextAvailabilityRequest, noScopeValue_json)
 TEST(DiscoverContextAvailabilityRequest, emptyScopeType_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_emptyScopeType.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.emptyScopeType.invalid.xml";
   const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty type in restriction scope</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -857,7 +857,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyScopeType_json)
 TEST(DiscoverContextAvailabilityRequest, emptyScopeValue_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_emptyScopeValue.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.emptyScopeValue.invalid.xml";
   const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty value in restriction scope</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
