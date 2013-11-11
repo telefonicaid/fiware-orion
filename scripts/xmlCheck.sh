@@ -27,18 +27,20 @@
 #
 function usage()
 {
+  exitCode=$1
+
   spaces=$(echo $0 | tr '0-9a-zA-Z /_.\-' ' ')
 
   echo $0 "[-u (usage)]"
   echo "${spaces} [-v (verbose)]"
-  echo "${spaces} [-v2 (verbose XML checker)]"
-  echo "${spaces} [-filter (test filter)]"
   echo "${spaces} [-f (file to check)]"
-  echo "${spaces} [-harness (no harness files)]"
-  echo "${spaces} [-dryrun (don't actually execute anything)]"
-  echo "${spaces} [-xsdDownload (download XSD files for FIWARE subversion)]"
-  echo "${spaces} [-cleanup (do NOT remove harness files at end of processing)]"
-  exit $1
+  echo "${spaces} [--filter (test filter)]"
+  echo "${spaces} [--noharness (no harness files)]"
+  echo "${spaces} [--dryrun (don't actually execute anything)]"
+  echo "${spaces} [--xsdDownload (download XSD files for FIWARE subversion)]"
+  echo "${spaces} [--cleanup (do NOT remove harness files at end of processing)]"
+
+  exit $exitCode
 }
 
 
@@ -72,16 +74,16 @@ cleanup="on"
 
 while [ "$#" != 0 ]
 do
-  if   [ "$1" == "-u" ];           then usage 0;
-  elif [ "$1" == "-v" ];           then verbose=on;
-  elif [ "$1" == "-filter" ];      then filter=$2; shift;
-  elif [ "$1" == "-f" ];           then file=$2; shift;
-  elif [ "$1" == "-harness" ];     then harness="off";
-  elif [ "$1" == "-dryrun" ];      then dryrun="on";
-  elif [ "$1" == "-cleanup" ];     then cleanup="off";
-  elif [ "$1" == "-xsdDownload" ]; then xsdDownload="on";
+  if   [ "$1" == "-u" ];            then usage 0;
+  elif [ "$1" == "-v" ];            then verbose=on;
+  elif [ "$1" == "--filter" ];      then filter=$2; shift;
+  elif [ "$1" == "-f" ];            then file=$2; shift;
+  elif [ "$1" == "--noharness" ];   then harness="off";
+  elif [ "$1" == "--dryrun" ];      then dryrun="on";
+  elif [ "$1" == "--cleanup" ];     then cleanup="off";
+  elif [ "$1" == "--xsdDownload" ]; then xsdDownload="on";
   else
-    echo $0: bad parameter/option: "'"${1}"'";
+    echo $0: bad parameter/option: "'"${1}"'"
     usage 1
   fi
   shift
@@ -91,12 +93,12 @@ done
 
 # -----------------------------------------------------------------------------
 #
-# CLONE_HOME
+# SRC_TOP
 #
 dir=$(dirname $0)
-CLONE_HOME=${PWD}/${dir}/../
-XSD_DIR=$CLONE_HOME/scripts/XSD
-vMsg Git repo home: $CLONE_HOME
+SRC_TOP=${PWD}/${dir}/../
+XSD_DIR=$SRC_TOP/scripts/XSD
+vMsg Git repo home: $SRC_TOP
 
 
 
@@ -107,17 +109,16 @@ vMsg Git repo home: $CLONE_HOME
 function xsdGet()
 {
   prefix="$1"
+  file="$2"
+
   if [ "$prefix" = "ngsi9" ]
   then
     echo $XSD_DIR/Ngsi9_Operations_v07.xsd
   elif [ "$prefix" == "ngsi10" ]
   then
     echo $XSD_DIR/Ngsi10_Operations_v07.xsd
-  elif [ "$prefix" == "ngsi" ]
-  then
-    echo $XSD_DIR/Ngsi9_10_dataStructure_v07.xsd
   else
-    echo "unknown prefix: '"${prefix}"'"
+    echo "unknown file prefix: '"${prefix}"' for $file"
     exit 1
   fi
 }
@@ -171,9 +172,12 @@ ERR=0
 #
 function processFile()
 {
-  if [ "$1" == "" ] || [ "$2" == "" ]
+  xmlFile=$1
+  xsdFile=$2
+
+  if [ "$xmlFile" == "" ] || [ "$xsdFile" == "" ]
   then
-    echo "bad parameters for file processing '"${1}"', '"${2}"'" 
+    echo "bad parameters for file processing '"${xmlFile}"', '"${xsdFile}"'" 
     return;
   fi
 
@@ -181,28 +185,28 @@ function processFile()
 
   if [ "$dryrun" == "on" ]
   then
-    echo dryrun: xmllint "$1" --schema "$2"
+    echo dryrun: xmllint "$xmlFile" --schema "$xsdFile"
     return
   fi
 
-  vMsg XSD: $2
+  vMsg XSD: $xsdFile
   if [ "$verbose2" == "on" ]
   then
-    xmllint $1 --schema $2
+    xmllint $xmlFile --schema $xsdFile
     RESULT=$?
   else
-    xmllint $1 --schema $2 > /dev/null 2>&1
+    xmllint $xmlFile --schema $xsdFile > /dev/null 2>&1
     RESULT=$?
   fi
 
   if [ "$RESULT" == "0" ]
   then
-    echo "$1: ok"
+    echo "$xmlFile: ok"
     OK=$OK+1
   else
-    echo "$1: FAILS (xmllint error: $RESULT)"
+    echo "$xmlFile: FAILS (xmllint error: $RESULT)"
     ERR=$ERR+1
-    failingList=${failingList}" "$1
+    failingList=${failingList}" "$xmlFile
   fi
 }
 
@@ -212,13 +216,13 @@ function processFile()
 #
 # harnessFiles - 
 #
-function harnessFiles
+function harnessFiles()
 {
   TMP_DIR=$(mktemp -d /tmp/xmlCheck.XXXXX)
-  for FILE in $(find $CLONE_HOME/test/testharness -name *.test)
+  for FILE in $(find $SRC_TOP/test/testharness -name *.test)
   do
     PREFIX=$(basename ${FILE%.*})
-    $CLONE_HOME/scripts/xmlExtractor2.py $FILE $TMP_DIR $PREFIX
+    $SRC_TOP/scripts/xmlExtractor2.py $FILE $TMP_DIR $PREFIX
   done
 
   harnessList=$(ls $TMP_DIR/*ngsi9* $TMP_DIR/*ngsi10*)
@@ -235,26 +239,18 @@ then
   fileList=$file
   verbose2=on
 else
-  if [ "$ngsi9" == "on" ]
-  then
-    fileList=$(find . -name "ngsi9.*.valid.xml")
-  elif [ "$ngsi10" == "on" ]
-  then
-    fileList=$(find . -name "ngsi10.*.valid.xml")
-  elif [ "$ngsi" == "on" ]
-  then
-    fileList=$(find . -name "ngsi.*.valid.xml")
-  else
-    harnessList=""
-    if [ "$harness" == "on" ]
-    then
-      harnessFiles
-    fi
+  fileList=$(find . -name "ngsi9.*.valid.xml")
+  fileList=$(find . -name "ngsi10.*.valid.xml")
 
-    ngsi9List=$(find . -name "ngsi9.*.valid.xml")
-    ngsi10List=$(find . -name "ngsi10.*.valid.xml")
-    fileList=${ngsi9List}" "${ngsi10List}" "${harnessList}
+  harnessList=""
+  if [ "$harness" == "on" ]
+  then
+    harnessFiles
   fi
+
+  ngsi9List=$(find . -name "ngsi9.*.valid.xml")
+  ngsi10List=$(find . -name "ngsi10.*.valid.xml")
+  fileList=${ngsi9List}" "${ngsi10List}" "${harnessList}
 fi
 
 
@@ -286,7 +282,7 @@ done
 
 # ------------------------------------------------------------------------------
 #
-# Applying filter
+# Applying filter to the file list
 #
 if [ "$filter" != "" ]
 then
@@ -341,7 +337,7 @@ for file in $fileList
 do
   fileName=$(basename $file)
   prefix=$(echo $fileName | cut -d . -f 1)
-  xsd=$(xsdGet $prefix)
+  xsd=$(xsdGet "$prefix" "$file")
   processFile "$file" "$xsd" 
 done
 
