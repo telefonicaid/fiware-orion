@@ -80,13 +80,13 @@ Metadata::Metadata(std::string _name, std::string _type, std::string _value)
 *
 * Metadata::render - 
 */
-std::string Metadata::render(Format format, std::string indent)
+std::string Metadata::render(Format format, std::string indent, bool comma)
 {
   std::string out     = "";
-  std::string tag     = "contextMetadata";
+  std::string tag  = "contextMetadata";
   std::string xValue  = value;
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, tag, format, false, false);
   out += valueTag(indent + "  ", "name", name, format, true);
   out += valueTag(indent + "  ", "type", type, format, true);
 
@@ -94,7 +94,7 @@ std::string Metadata::render(Format format, std::string indent)
      xValue = std::string("\n") + association.render(format, indent + "  ");
 
   out += valueTag(indent + "  ", "value", xValue, format, false, (type == "Association"));
-  out += endTag(indent, tag, format);
+  out += endTag(indent, tag, format, comma);
 
   return out;
 }

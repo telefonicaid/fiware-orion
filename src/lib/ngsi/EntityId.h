@@ -49,7 +49,7 @@ typedef struct EntityId
   EntityId(std::string _id, std::string _type, std::string _isPattern = "", std::string _tag = "entityId");
 
   void         tagSet(std::string tagName);
-  std::string  render(Format format, std::string indent, bool comma = false);
+  std::string  render(Format format, std::string indent, bool comma = false, bool isInVector = false, std::string assocTag = "");
   std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void         fill(std::string _id, std::string _type, std::string _isPattern);
   void         present(std::string indent, int ix);
