@@ -139,7 +139,7 @@ function harnessFiles()
   for FILE in $(find $SRC_TOP/test/testharness -name *.test)
   do
     PREFIX=$(basename ${FILE%.*})
-    $SRC_TOP/scripts/xmlExtractor2.py $FILE $TMP_DIR $PREFIX
+    $SRC_TOP/scripts/xmlExtractor.py $FILE $TMP_DIR $PREFIX
   done
 
   harnessList=$(ls $TMP_DIR/*ngsi9* $TMP_DIR/*ngsi10*)
@@ -341,21 +341,23 @@ fi
 #
 # Counting XMLs
 #
-xmlFilesInClone=$(find $SRC_TOP/test -name "*.xml" | wc -l)
+xmlFilesInTest=$(find $SRC_TOP/test -name "*.xml" | wc -l)
 harnessNgsi9=$(find $TMP_DIR -name "ngsi9.*" | wc -l)
 harnessNgsi10=$(find $TMP_DIR -name "ngsi10.*" | wc -l)
-all=$xmlFilesInClone+$harnessNgsi9+$harnessNgsi10
+all=$xmlFilesInTest+$harnessNgsi9+$harnessNgsi10
 
 if [ "$all" != "$filesInListBeforeFilter" ]
 then
   diff=$(expr $all - $filesInListBeforeFilter)
   echo
   echo ' ----------------------------------------------------------------------------------------'
-  echo "   Warning - there seem to be $diff XML files not recognized as such for this checker"
+  echo "   Warning - there seems to be $diff XML files not recognized as such for this checker"
   echo "   Please, check their file names ..."
   echo ' ----------------------------------------------------------------------------------------'
   echo
 fi
+
+invalidXmls=$(find $SRC_TOP/test -name "ngsi*.invalid.xml" | wc -l)
 
 vMsg "Total number of files in test before filter: $filesInListBeforeFilter"
 vMsg "Files included in test run: $filesInTestRun"
@@ -376,19 +378,26 @@ do
 done
 
 
-echo $N files processed
-echo $ERR errors
-echo $OK files are OK
-echo
-
+echo "====================================================================="
 if [ "$ERR" != "0" ]
 then
+  echo
   echo "List of files with problems:"
   for file in $failingList
   do
     echo "  o " $file
   done
+
+  echo
+  echo "====================================================================="
 fi
+
+
+echo $N files processed
+echo $ERR errors
+echo $OK files are OK
+echo "$invalidXmls files are not checked on purpose ('invalid' for xml checker)"
+echo
 
 if [ "$cleanup" == "on" ]
 then
