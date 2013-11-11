@@ -22,7 +22,7 @@
 # Make an availability subscription
 #
 echo Make a registration to prepare for a subscription
-../manual/cbTest.sh rcr ../manual/firstReg.xml
+../manual/cbTest.sh rcr ../manual/ngsi9.registerContextRequest.ok.xml
 
 echo Make an availability subscription and then make the broker exit
 ../manual/cbTest.sh scar ../manual/subscribeContextAvailability.xml > /dev/null 2>&1

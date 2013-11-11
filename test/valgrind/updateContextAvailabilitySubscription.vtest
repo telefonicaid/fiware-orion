@@ -22,14 +22,14 @@
 # Create a subscription
 #
 echo Register an entity
-../manual/cbTest.sh rcr ../manual/firstReg.xml > /dev/null 2>&1
+../manual/cbTest.sh rcr ../manual/ngsi9.registerContextRequest.ok.xml > /dev/null 2>&1
 
 echo Create an availability subscription
-../manual/cbTest.sh scar ../manual/subscribeContextAvailabilityRequest.xml > ${NAME}.cbTest.out 2>&1
+../manual/cbTest.sh scar ../manual/ngsi9.subscribeContextAvailabilityRequest.ok.valid.xml > ${NAME}.cbTest.out 2>&1
 
 subIdLine=$(grep '</subscriptionId>' ${NAME}.cbTest.out)
 subId=$(echo $subIdLine | awk -F '>' '{ print $2}' | awk -F '<' '{ print $1}')
 
 echo Update subscription $subId and then make the broker exit
-../manual/cbTest.sh ucas ../manual/updateContextAvailabilitySubscriptionRequest.xml -id $subId >> ${NAME}.cbTest.out 2>&1
+../manual/cbTest.sh ucas ../manual/ngsi9.updateContextAvailabilitySubscriptionRequest.SUBSCRIPTIONID.invalid.xml -id $subId >> ${NAME}.cbTest.out 2>&1
 

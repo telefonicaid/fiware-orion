@@ -22,5 +22,5 @@
 # Just make a registration
 #
 echo "Make a registration and then make the broker exit"
-../manual/cbTest.sh rcr ../manual/firstReg.xml > /dev/null 2>&1
+../manual/cbTest.sh rcr ../manual/ngsi9.registerContextRequest.ok.valid.xml > /dev/null 2>&1
 
