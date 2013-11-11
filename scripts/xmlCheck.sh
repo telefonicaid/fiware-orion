@@ -35,10 +35,11 @@ function usage()
   echo "${spaces} [-v (verbose)]"
   echo "${spaces} [-f (file to check)]"
   echo "${spaces} [--filter (test filter)]"
-  echo "${spaces} [--noharness (no harness files)]"
+  echo "${spaces} [--no-harness (no harness files)]"
   echo "${spaces} [--dryrun (don't actually execute anything)]"
-  echo "${spaces} [--xsdDownload (download XSD files for FIWARE subversion)]"
-  echo "${spaces} [--cleanup (do NOT remove harness files at end of processing)]"
+  echo "${spaces} [--no-cleanup (do NOT remove harness files at end of processing)]"
+  echo "${spaces} [--xsd-download (download XSD files for FIWARE subversion)]"
+  echo "${spaces} [--xsd-dir (directory for XSD files)]"
 
   exit $exitCode
 }
@@ -61,49 +62,6 @@ function vMsg()
 
 # ------------------------------------------------------------------------------
 #
-# command line options
-#
-verbose="off"
-filter=""
-file=""
-xsd=""
-harness="on"
-dryrun="off"
-xsdDownload="off"
-cleanup="on"
-
-while [ "$#" != 0 ]
-do
-  if   [ "$1" == "-u" ];            then usage 0;
-  elif [ "$1" == "-v" ];            then verbose=on;
-  elif [ "$1" == "--filter" ];      then filter=$2; shift;
-  elif [ "$1" == "-f" ];            then file=$2; shift;
-  elif [ "$1" == "--noharness" ];   then harness="off";
-  elif [ "$1" == "--dryrun" ];      then dryrun="on";
-  elif [ "$1" == "--cleanup" ];     then cleanup="off";
-  elif [ "$1" == "--xsdDownload" ]; then xsdDownload="on";
-  else
-    echo $0: bad parameter/option: "'"${1}"'"
-    usage 1
-  fi
-  shift
-done
-
-
-
-# -----------------------------------------------------------------------------
-#
-# SRC_TOP
-#
-dir=$(dirname $0)
-SRC_TOP=${PWD}/${dir}/../
-XSD_DIR=$SRC_TOP/scripts/XSD
-vMsg Git repo home: $SRC_TOP
-
-
-
-# ------------------------------------------------------------------------------
-#
 # xsdGet - 
 #
 function xsdGet()
@@ -113,56 +71,15 @@ function xsdGet()
 
   if [ "$prefix" = "ngsi9" ]
   then
-    echo $XSD_DIR/Ngsi9_Operations_v07.xsd
+    echo $xsdDir/Ngsi9_Operations_v07.xsd
   elif [ "$prefix" == "ngsi10" ]
   then
-    echo $XSD_DIR/Ngsi10_Operations_v07.xsd
+    echo $xsdDir/Ngsi10_Operations_v07.xsd
   else
     echo "unknown file prefix: '"${prefix}"' for $file"
     exit 1
   fi
 }
-
-
-
-# ------------------------------------------------------------------------------
-#
-# Download XSD files from FIWARE repo?
-#
-if [ "$xsdDownload" == "on" ]
-then
-  # Get the .xsd files
-  echo  -n "Enter username: "
-  read USER
-
-  echo -n "Enter password: "
-  STTY_ORIG=`stty -g` 
-  stty -echo
-  read PASS
-  stty $STTY_ORIG
-  echo
-
-  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-ware.eu/scmrepos/svn/iot/trunk/schemes/Ngsi10_Operations_v07.xsd
-  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-ware.eu/scmrepos/svn/iot/trunk/schemes/Ngsi9_Operations_v07.xsd
-  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-ware.eu/scmrepos/svn/iot/trunk/schemes/Ngsi9_10_dataStructure_v07.xsd
-
-  mv Ngsi10_Operations_v07.xsd Ngsi9_Operations_v07.xsd Ngsi9_10_dataStructure_v07.xsd $XSD_DIR
-
-  echo "got XSD files"
-fi
-
-
-
-# ------------------------------------------------------------------------------
-#
-# variables
-#
-typeset -i N
-typeset -i OK
-typeset -i ERR
-N=0
-OK=0
-ERR=0
 
 
 
@@ -185,7 +102,7 @@ function processFile()
 
   if [ "$dryrun" == "on" ]
   then
-    echo dryrun: xmllint "$xmlFile" --schema "$xsdFile"
+    vMsg dryrun: xmllint "$xmlFile" --schema "$xsdFile"
     return
   fi
 
@@ -230,6 +147,122 @@ function harnessFiles()
 
 
 
+# ------------------------------------------------------------------------------
+#
+# command line options
+#
+verbose="off"
+filter=""
+file=""
+xsdDir="/tmp/xsd"
+harness="on"
+dryrun="off"
+xsdDownload="off"
+cleanup="on"
+
+while [ "$#" != 0 ]
+do
+  if   [ "$1" == "-u" ];             then usage 0;
+  elif [ "$1" == "-v" ];             then verbose=on;
+  elif [ "$1" == "-f" ];             then file=$2; shift;
+  elif [ "$1" == "--filter" ];       then filter=$2; shift;
+  elif [ "$1" == "--no-harness" ];   then harness="off";
+  elif [ "$1" == "--dryrun" ];       then dryrun="on";
+  elif [ "$1" == "--no-cleanup" ];   then cleanup="off";
+  elif [ "$1" == "--xsd-download" ]; then xsdDownload="on";
+  elif [ "$1" == "--xsd-dir" ];      then xsdDir=$2; shift;
+  else
+    echo $0: bad parameter/option: "'"${1}"'"
+    usage 1
+  fi
+  shift
+done
+
+
+
+# -----------------------------------------------------------------------------
+#
+# SRC_TOP
+#
+dir=$(dirname $0)
+SRC_TOP=${PWD}/${dir}/../
+vMsg Git repo home: $SRC_TOP
+
+
+
+# -----------------------------------------------------------------------------
+#
+# XSD directory
+#
+if [ ! -d "$xsdDir" ]
+then
+  echo "$0: error: '"${xsdDir}"': no such directory"
+  exit 2
+fi
+
+
+
+
+# ------------------------------------------------------------------------------
+#
+# Download XSD files from FIWARE repo?
+#
+if [ "$xsdDownload" == "on" ]
+then
+  # Get the .xsd files
+  echo  -n "Enter username: "
+  read USER
+
+  echo -n "Enter password: "
+  STTY_ORIG=`stty -g` 
+  stty -echo
+  read PASS
+  stty $STTY_ORIG
+  echo
+
+  \rm Ngsi10_Operations_v07.xsd Ngsi9_Operations_v07.xsd Ngsi9_10_dataStructure_v07.xsd 2> /dev/null
+  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-ware.eu/scmrepos/svn/iot/trunk/schemes/Ngsi10_Operations_v07.xsd
+  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-ware.eu/scmrepos/svn/iot/trunk/schemes/Ngsi9_Operations_v07.xsd
+  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-ware.eu/scmrepos/svn/iot/trunk/schemes/Ngsi9_10_dataStructure_v07.xsd
+
+  if [ ! -f Ngsi10_Operations_v07.xsd ] || [ ! -f Ngsi9_Operations_v07.xsd ] || [ ! -f Ngsi9_10_dataStructure_v07.xsd ]
+  then
+    echo $0: error: wget failed to download latest XSD files
+    exit 5
+  fi
+
+  mv Ngsi10_Operations_v07.xsd Ngsi9_Operations_v07.xsd Ngsi9_10_dataStructure_v07.xsd $xsdDir
+
+  echo "got XSD files"
+fi
+
+
+
+# ------------------------------------------------------------------------------
+#
+# XSD files there?
+#
+if [ ! -f $xsdDir/Ngsi10_Operations_v07.xsd ] || [ ! -f $xsdDir/Ngsi9_Operations_v07.xsd ] || [ ! -f $xsdDir/Ngsi9_10_dataStructure_v07.xsd ]
+then
+  echo "$0: error: XSD files missing in $xsdDir"
+  exit 3
+fi
+
+
+
+# ------------------------------------------------------------------------------
+#
+# variables
+#
+typeset -i N
+typeset -i OK
+typeset -i ERR
+N=0
+OK=0
+ERR=0
+
+
+
 # -----------------------------------------------------------------------------
 #
 # Setting up the file list
@@ -239,8 +272,8 @@ then
   fileList=$file
   verbose2=on
 else
-  fileList=$(find . -name "ngsi9.*.valid.xml")
-  fileList=$(find . -name "ngsi10.*.valid.xml")
+  fileList=$(find $SRC_TOP/test -name "ngsi9.*.valid.xml")
+  fileList=$(find $SRC_TOP/test -name "ngsi10.*.valid.xml")
 
   harnessList=""
   if [ "$harness" == "on" ]
@@ -248,8 +281,8 @@ else
     harnessFiles
   fi
 
-  ngsi9List=$(find . -name "ngsi9.*.valid.xml")
-  ngsi10List=$(find . -name "ngsi10.*.valid.xml")
+  ngsi9List=$(find $SRC_TOP/test -name "ngsi9.*.valid.xml")
+  ngsi10List=$(find $SRC_TOP/test -name "ngsi10.*.valid.xml")
   fileList=${ngsi9List}" "${ngsi10List}" "${harnessList}
 fi
 
@@ -261,11 +294,13 @@ fi
 #
 typeset -i all
 typeset -i total
-typeset -i included
+typeset -i filesInTestRun
+typeset -i filesInListBeforeFilter
 
 all=0
 files=0
-included=0
+filesInTestRun=0
+filesInListBeforeFilter=0
 
 
 
@@ -275,7 +310,7 @@ included=0
 #
 for file in $fileList
 do
-  total=$total+1
+  filesInListBeforeFilter=$filesInListBeforeFilter+1
 done
 
 
@@ -294,7 +329,7 @@ then
     if [ "$?" == 0 ]
     then
       newFileList=${newFileList}" "${file}
-      included=$included+1
+      filesInTestRun=$filesInTestRun+1
     fi
   done
   fileList=$newFileList
@@ -306,15 +341,14 @@ fi
 #
 # Counting XMLs
 #
-here=$(find . -name "*.xml" | wc -l)
-harness9=$(find $TMP_DIR -name "ngsi9.*" | wc -l)
-harness10=$(find $TMP_DIR -name "ngsi10.*" | wc -l)
-all=$here+$harness9+$harness10
+xmlFilesInClone=$(find $SRC_TOP/test -name "*.xml" | wc -l)
+harnessNgsi9=$(find $TMP_DIR -name "ngsi9.*" | wc -l)
+harnessNgsi10=$(find $TMP_DIR -name "ngsi10.*" | wc -l)
+all=$xmlFilesInClone+$harnessNgsi9+$harnessNgsi10
 
-if [ "$all" != "$total" ]
+if [ "$all" != "$filesInListBeforeFilter" ]
 then
-  typeset -i diff
-  diff=$(expr $all - $total)
+  diff=$(expr $all - $filesInListBeforeFilter)
   echo
   echo ' ----------------------------------------------------------------------------------------'
   echo "   Warning - there seem to be $diff XML files not recognized as such for this checker"
@@ -323,8 +357,8 @@ then
   echo
 fi
 
-vMsg "Total number of files in test before filter: $total"
-vMsg "Files included in test run: $included"
+vMsg "Total number of files in test before filter: $filesInListBeforeFilter"
+vMsg "Files included in test run: $filesInTestRun"
 vMsg "Total number of XML files found: $all"
 
 
