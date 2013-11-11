@@ -135,6 +135,7 @@ function processFile()
 #
 function harnessFiles()
 {
+  harnessList=""
   TMP_DIR=$(mktemp -d /tmp/xmlCheck.XXXXX)
   for FILE in $(find $SRC_TOP/test/testharness -name *.test)
   do
@@ -143,6 +144,7 @@ function harnessFiles()
   done
 
   harnessList=$(ls $TMP_DIR/*ngsi9* $TMP_DIR/*ngsi10*)
+  xmlPartsFound=$(ls $TMP_DIR/*ngsi9* $TMP_DIR/*ngsi10* | wc -l)
 }
 
 
@@ -196,7 +198,7 @@ vMsg Git repo home: $SRC_TOP
 
 # -----------------------------------------------------------------------------
 #
-# XSD directory
+# Checking the XSD directory
 #
 if [ ! -d "$xsdDir" ]
 then
@@ -237,7 +239,7 @@ then
 
   mv Ngsi10_Operations_v07.xsd Ngsi9_Operations_v07.xsd Ngsi9_10_dataStructure_v07.xsd $xsdDir
 
-  echo "got XSD files"
+  vMsg "got XSD files"
 fi
 
 
@@ -276,10 +278,6 @@ then
   fileList=$file
   verbose2=on
 else
-  fileList=$(find $SRC_TOP/test -name "ngsi9.*.valid.xml")
-  fileList=$(find $SRC_TOP/test -name "ngsi10.*.valid.xml")
-
-  harnessList=""
   if [ "$harness" == "on" ]
   then
     harnessFiles
@@ -287,41 +285,95 @@ else
 
   ngsi9List=$(find $SRC_TOP/test -name "ngsi9.*.valid.xml")
   ngsi10List=$(find $SRC_TOP/test -name "ngsi10.*.valid.xml")
-  fileList=${ngsi9List}" "${ngsi10List}" "${harnessList}
+  fileList=${ngsi9List}" "${ngsi10List}
+  partList=$harnessList
 fi
 
 
 
 # ------------------------------------------------------------------------------
 #
-# file counters
+# Counters
 #
-typeset -i all
-typeset -i total
-typeset -i filesInTestRun
-typeset -i filesInListBeforeFilter
+# A. xmlFilesFound        - Total number of XML files under test/
+# a. xmlFilesProcessed    - Total number of XML files that were tested
+# B. xmlFilesValid        - Number of XML files that are valid
+# C. xmlFilesInvalid      - Number of XML files that are invalid
+# D. xmlFilesPostponed    - Number of XML files that are postponed
+# X. xmlFilesBadName      - Number of XML files whose names don't follow the naming convention - should be zero
+#
+# Y. harnessFilesFound    - Number of files in the harness directory - to part in many XML files
+# E. xmlPartsFound        - Number of XML docs created from harness directory
+# e. xmlPartsProcessed    - Number of XML docs that were tested 
+# F. xmlPartsOK           - Number of XML docs that passed the test
+# G. xmlPartsError        - Number of XML docs that did not pass the test
+#
+# H. xmlFilesOK           - Number of XML files that passed the test
+# I. xmlFilesError        - Number of XML files that did not pass the test
+#
+# J. xmlDocsFound         - xmlFilesFound + xmlPartsFound
+# K. xmlDocsProcessed     - xmlFilesProcessed + xmlPartsProcessed
+# L. xmlDocsOk            - xmlFilesOK + xmlPartsOK
+# M. xmlError             - xmlFilesError + xmlPartsError
+#
+# STATISTICS:
+#
+# XML docs that did not pass the XML Validity test:
+#  o 
+#  o 
+#  o ...
+#
+# Tested ${xmlDocsProcessed} (${xmlFilesProcessed} + ${xmlPartsProcessed}) out of ${xmlDocsFound} (${xmlFilesFound} + ${xmlPartsFound}) XML documents:
+#   ${xmlDocsOk} documents passed the XML validity test
+#   ${xmlError} documents did not pass
+#
+# ${xmlFilesInvalid} documents were not tested as they on purpose don't follow the XSD
+# ${xmlFilesPostponed} documents were not tested as they still have no XSD
+#
+# if ($xmlFilesBadName != 0) WARNING: $xmlFilesBadName ...
+#
 
-all=0
-files=0
-filesInTestRun=0
-filesInListBeforeFilter=0
+typeset -i xmlFilesFound        # Total number of XML files under test/
+typeset -i xmlFilesValid        # Number of XML files that are valid
+typeset -i xmlFilesInvalid      # Number of XML files that are invalid
+typeset -i xmlFilesPostponed    # Number of XML files that are postponed
+typeset -i xmlFilesBadName      # Number of XML files whose names don't follow the naming convention - should be zero
+typeset -i xmlFilesProcessed    # Total number of XML files that were tested
+typeset -i xmlFilesOK           # Number of XML files that passed the test
+typeset -i xmlFilesErrors       # Number of XML files that did not pass the test
+typeset -i harnessFilesFound    # Number of files in the harness directory - to part in many XML files
+typeset -i xmlPartsFound        # Number of XML docs created from harness directory
+typeset -i xmlPartsProcessed    # Number of XML docs that were tested 
+typeset -i xmlPartsOK           # Number of XML docs that passed the test
+typeset -i xmlPartsErrors       # Number of XML docs that did not pass the test
+typeset -i xmlDocsFound         # xmlFilesFound + xmlPartsFound
+typeset -i xmlDocsProcessed     # xmlFilesProcessed + xmlPartsProcessed
+typeset -i xmlDocsOk            # xmlFilesOK + xmlPartsOK
+typeset -i xmlDocsErrors        # xmlFilesErrors + xmlPartsErrors
+
+xmlFilesFound=$(find $SRC_TOP/test -name "*.xml" | wc -l)
+xmlFilesValid=$(find $SRC_TOP/test -name "ngsi*.valid.xml" | wc -l)
+xmlFilesInvalid=$(find $SRC_TOP/test -name "ngsi*.invalid.xml" | wc -l)
+xmlFilesPostponed=$(find $SRC_TOP/test -name "ngsi*.postponed.xml" | wc -l)
+xmlFilesBadName=$(expr $xmlFilesFound - $xmlFilesValid - $xmlFilesInvalid - $xmlFilesPostponed)
+xmlFilesProcessed=0
+xmlFilesOK=0
+xmlFilesErrors=0
+harnessFilesFound=$(find $SRC_TOP/test/harness -name "*.test" | wc -l)
+xmlPartsFound=$xmlPartsFound     # already taken care of by function 'harnessFiles'
+xmlPartsProcessed=0
+xmlPartsOK=0
+xmlPartsErrors=0
+xmlDocsFound=$(expr $xmlFilesFound + $xmlPartsFound)
+xmlDocsProcessed=0
+xmlDocsOk=0
+xmlDocsErrors=0
 
 
 
 # ------------------------------------------------------------------------------
 #
-# Counting the total number of files
-#
-for file in $fileList
-do
-  filesInListBeforeFilter=$filesInListBeforeFilter+1
-done
-
-
-
-# ------------------------------------------------------------------------------
-#
-# Applying filter to the file list
+# Applying filter to the file lists
 #
 if [ "$filter" != "" ]
 then
@@ -333,39 +385,23 @@ then
     if [ "$?" == 0 ]
     then
       newFileList=${newFileList}" "${file}
-      filesInTestRun=$filesInTestRun+1
+      xmlFilesProcessed=$xmlFilesProcessed+1
     fi
   done
   fileList=$newFileList
+
+  newPartList=""
+  for part in $partList
+  do
+    echo $part | grep "$filter" > /dev/null 2>&1
+    if [ "$?" == 0 ]
+    then
+      newPartList=${newPartList}" "${part}
+      xmlPartsProcessed=$xmlPartsProcessed+1
+    fi
+  done
+  partList=$newPartList    
 fi
-
-
-
-# ------------------------------------------------------------------------------
-#
-# Counting XMLs
-#
-xmlFilesInTest=$(find $SRC_TOP/test -name "*.xml" | wc -l)
-ngsiXmlFilesInTest=$(find $SRC_TOP/test -name "ngsi*.xml" | wc -l)
-harnessNgsi9=$(find $TMP_DIR -name "ngsi9.*" | wc -l)
-harnessNgsi10=$(find $TMP_DIR -name "ngsi10.*" | wc -l)
-all=$xmlFilesInTest+$harnessNgsi9+$harnessNgsi10
-unrecognized=$(expr $all - $filesInListBeforeFilter)
-
-if [ "$all" != "$filesInListBeforeFilter" ]
-then
-  diff=$(expr $all - $filesInListBeforeFilter)
-  echo
-  echo ' ----------------------------------------------------------------------------------------'
-  echo "   Warning - there seems to be $diff XML files not recognized as such for this checker"
-  echo "   Please, check their file names ..."
-  echo ' ----------------------------------------------------------------------------------------'
-  echo
-fi
-
-invalidXmls=$(find $SRC_TOP/test -name "ngsi*.invalid.xml" | wc -l)
-postponedXmls=$(find $SRC_TOP/test -name "ngsi*.postponed.xml" | wc -l)
-uncaughtXmlFilesInTestDir=$(expr $xmlFilesInTest - $ngsiXmlFilesInTest)
 
 
 
@@ -373,6 +409,9 @@ uncaughtXmlFilesInTestDir=$(expr $xmlFilesInTest - $ngsiXmlFilesInTest)
 #
 # process the list of files to check
 #
+OK=0
+ERR=0
+N=0
 for file in $fileList
 do
   fileName=$(basename $file)
@@ -381,15 +420,47 @@ do
   processFile "$file" "$xsd" 
 done
 
+xmlFilesProcessed=$N
+xmlFilesOK=$OK;
+xmlFilesErrors=$ERR
+
+
+
+# ------------------------------------------------------------------------------
+#
+# process the list of parts to check
+#
+OK=0
+ERR=0
+N=0
+for part in $partList
+do
+  partName=$(basename $part)
+  prefix=$(echo $partName | cut -d . -f 1)
+  xsd=$(xsdGet "$prefix" "$part")
+  processFile "$part" "$xsd" 
+done
+
+xmlPartsProcessed=$N
+xmlPartsOK=$OK;
+xmlPartsErrors=$ERR
+
+
+xmlDocsProcessed=$(expr $xmlFilesProcessed + $xmlPartsProcessed)
+xmlDocsOk=$(expr $xmlFilesOK + $xmlPartsOK)
+xmlDocsErrors=$(expr $xmlFilesErrors + $xmlPartsErrors)
+
+
 
 echo "====================================================================="
-if [ "$ERR" != "0" ]
+if [ "$xmlDocsErrors" != "0" ]
 then
   echo
-  echo "List of files with problems:"
-  for file in $failingList
+  echo "XML docs that did not pass the XML Validity test:"
+
+  for item in $failingList
   do
-    echo "  o " $file
+    echo "  o " $item
   done
 
   echo
@@ -397,18 +468,22 @@ then
 fi
 
 
-echo "Total number of files in test before filter: $filesInListBeforeFilter"
-echo "Files included in test run: $filesInTestRun"
-echo "Total number of XML files found: $all"
-echo "XML files not recognized as such for this checker: $unrecognized"
+echo "Tested ${xmlDocsProcessed} (${xmlFilesProcessed} files + ${xmlPartsProcessed} parts) out of ${xmlDocsFound} (${xmlFilesFound} files + ${xmlPartsFound} parts) XML documents:"
+echo "  ${xmlDocsOk} documents passed the XML validity test"
+echo "  ${xmlDocsErrors} documents did not pass"
 echo
-echo $N files processed
-echo $ERR errors
-echo $OK files are OK
-echo "$invalidXmls files are not checked on purpose ('invalid' for xml checker)"
-echo "$postponedXmls files are postponed (no XSD file to compare with)"
-echo "$uncaughtXmlFilesInTestDir XML files under the test/ directory don't follow the naming convention"
-echo
+echo "${xmlFilesInvalid} documents were not tested as they on purpose don't follow the XSD"
+echo "${xmlFilesPostponed} documents were not tested as they still have no XSD"
+
+if [ "$xmlFilesBadName" != 0 ]
+then
+  echo
+  echo "WARNING: $xmlFilesBadName XML files do not conform to the naming convention"  
+  for file in $(find test -name "*.xml" | grep -v "ngsi9.*.valid.xml" | grep -v "ngsi9.*.invalid.xml" | grep -v "ngsi9.*.postponed.xml" | grep -v "ngsi10.*.valid.xml" | grep -v "ngsi10.*.invalid.xml" | grep -v "ngsi10.*.postponed.xml")
+  do
+    echo "  o $file"
+  done
+fi
 
 if [ "$cleanup" == "on" ]
 then
