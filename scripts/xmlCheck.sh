@@ -362,6 +362,7 @@ then
 fi
 
 invalidXmls=$(find $SRC_TOP/test -name "ngsi*.invalid.xml" | wc -l)
+postponedXmls=$(find $SRC_TOP/test -name "ngsi*.postponed.xml" | wc -l)
 
 vMsg "Total number of files in test before filter: $filesInListBeforeFilter"
 vMsg "Files included in test run: $filesInTestRun"
@@ -401,6 +402,7 @@ echo $N files processed
 echo $ERR errors
 echo $OK files are OK
 echo "$invalidXmls files are not checked on purpose ('invalid' for xml checker)"
+echo "$postponedXmls files are postponed (no XSD file to compare with)"
 echo
 
 if [ "$cleanup" == "on" ]
