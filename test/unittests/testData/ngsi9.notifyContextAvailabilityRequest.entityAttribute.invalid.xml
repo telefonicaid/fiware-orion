@@ -6,10 +6,10 @@
 			<contextRegistration>
 				<entityIdList>
 					<entityId type="Room" isPattern="false" ide="12">
-						<id>ConferenceRoom</id>						
+						<id>ConferenceRoom</id>
 					</entityId>
 					<entityId type="Room" isPattern="false">
-						<id>OfficeRoom</id>						
+						<id>OfficeRoom</id>
 					</entityId>
 				</entityIdList>
 				<contextRegistrationAttributeList>
@@ -22,7 +22,7 @@
 								<name>ID</name>
 								<type>string</type>
 								<value>1110</value>
-							</contextMetadata>							
+							</contextMetadata>
 						</metadata>
 					</contextRegistrationAttribute>
 				</contextRegistrationAttributeList>
@@ -31,7 +31,7 @@
 						<name>ID</name>
 						<type>string</type>
 						<value>2212</value>
-					</contextMetadata>					
+					</contextMetadata>
 				</registrationMetadata>
 				<providingApplication>http://192.168.100.1:70/application
 				</providingApplication>

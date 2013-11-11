@@ -81,7 +81,7 @@
 TEST(RegisterContextRequest, xml_ok)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_ok.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.ok.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
   
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -129,7 +129,7 @@ TEST(RegisterContextRequest, json_ok)
 TEST(RegisterContextRequest, noContextRegistrationList)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_noContextRegistration.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.noContextRegistration.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty Context Registration List</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -171,7 +171,7 @@ TEST(RegisterContextRequest, json_noContextRegistration)
 TEST(RegisterContextRequest, emptyContextRegistration)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_emptyContextRegistration.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.emptyContextRegistration.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty Context Registration List</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -190,7 +190,7 @@ TEST(RegisterContextRequest, emptyContextRegistration)
 TEST(RegisterContextRequest, noProvidingApplication)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_noProvidingApplication.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.noProvidingApplication.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>no providing application</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -231,7 +231,7 @@ TEST(RegisterContextRequest, json_noProvidingApplication)
 TEST(RegisterContextRequest, emptyProvidingApplication)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_emptyProvidingApplication.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.emptyProvidingApplication.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>no providing application</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -272,7 +272,7 @@ TEST(RegisterContextRequest, json_emptyProvidingApplication)
 TEST(RegisterContextRequest, noEntityIdList)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_noEntityIdList.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.noEntityIdList.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -290,7 +290,7 @@ TEST(RegisterContextRequest, noEntityIdList)
 TEST(RegisterContextRequest, emptyEntityIdList)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_emptyEntityIdList.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.emptyEntityIdList.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -308,7 +308,7 @@ TEST(RegisterContextRequest, emptyEntityIdList)
 TEST(RegisterContextRequest, entityIdWithEmptyId)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_entityIdWithEmptyId.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.entityIdWithEmptyId.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>empty entityId:id</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -327,7 +327,7 @@ TEST(RegisterContextRequest, entityIdWithEmptyId)
 TEST(RegisterContextRequest, entityIdWithNoId)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_entityIdWithNoId.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.entityIdWithNoId.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>empty entityId:id</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -346,7 +346,7 @@ TEST(RegisterContextRequest, entityIdWithNoId)
 TEST(RegisterContextRequest, entityIdWithIsPatternTrue)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_entityIdWithIsPatternTrue.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.entityIdWithIsPatternTrue.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>'isPattern' set to true for a registration</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -387,7 +387,7 @@ TEST(RegisterContextRequest, json_entityIdWithIsPatternTrue)
 TEST(RegisterContextRequest, present)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_ok.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.ok.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -407,7 +407,7 @@ TEST(RegisterContextRequest, present)
 TEST(RegisterContextRequest, invalidIsPatternString)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_invalidIsPatternString.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.isPattern.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -448,7 +448,7 @@ TEST(RegisterContextRequest, json_invalidIsPatternString)
 TEST(RegisterContextRequest, invalidAttributeName)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_invalidAttributeName.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.entityIdAttribute.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -467,7 +467,7 @@ TEST(RegisterContextRequest, invalidAttributeName)
 TEST(RegisterContextRequest, overwriteEntityIdType)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_overwriteEntityIdType.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.idAsEntityIdAttribute.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -506,7 +506,7 @@ TEST(RegisterContextRequest, json_overwriteEntityIdType)
 TEST(RegisterContextRequest, durationError)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_durationError.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.duration.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>invalid duration</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>syntax error in duration string</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -525,7 +525,7 @@ TEST(RegisterContextRequest, durationError)
 TEST(RegisterContextRequest, emptyContextRegistrationAttributeName)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_emptyContextRegistrationAttributeName.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.emptyContextRegistrationAttributeName.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing name for registration attribute</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -544,7 +544,7 @@ TEST(RegisterContextRequest, emptyContextRegistrationAttributeName)
 TEST(RegisterContextRequest, emptyContextRegistrationAttributeIsDomain)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_emptyContextRegistrationAttributeIsDomain.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.emptyContextRegistrationAttributeIsDomain.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing isDomain value for registration attribute</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -563,7 +563,7 @@ TEST(RegisterContextRequest, emptyContextRegistrationAttributeIsDomain)
 TEST(RegisterContextRequest, badContextRegistrationAttributeIsDomain)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_badContextRegistrationAttributeIsDomain.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.contextRegistrationAttributeIsDomain.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad isDomain value for registration attribute</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -604,7 +604,7 @@ TEST(RegisterContextRequest, json_badContextRegistrationAttributeIsDomain)
 TEST(RegisterContextRequest, emptyContextMetadataName)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_emptyContextMetadataName.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.emptyContextMetadataName.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing metadata name</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -623,7 +623,7 @@ TEST(RegisterContextRequest, emptyContextMetadataName)
 TEST(RegisterContextRequest, emptyContextMetadataValue)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_emptyContextMetadataValue.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.emptyContextMetadataValue.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing metadata value</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -642,7 +642,7 @@ TEST(RegisterContextRequest, emptyContextMetadataValue)
 TEST(RegisterContextRequest, emptyRegistrationMetadataValue)
 {
   ParseData       reqData;
-  const char*     fileName = "registerContextRequest_emptyRegistrationMetadataValue.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.emptyRegistrationMetadataValue.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing metadata value</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 

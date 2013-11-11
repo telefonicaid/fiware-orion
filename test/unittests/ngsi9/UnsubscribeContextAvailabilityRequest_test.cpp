@@ -79,7 +79,7 @@ TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "unsubscribeContextAvailabilityRequest_badSubscriptionId.xml";
+  const char*     fileName = "ngsi9.unsubscribeContextAvailabilityRequest.subscriptionId.invalid.xml";
   std::string     rendered;
   std::string     expected = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>12345</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>bad length (24 chars expected)</reasonPhrase>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
 

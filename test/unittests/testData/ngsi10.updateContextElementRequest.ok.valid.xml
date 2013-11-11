@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
-  <attributeDomainName></attributeDomainName>
+  <attributeDomainName>ADN</attributeDomainName>
   <contextAttributeList>
     <contextAttribute>
       <name>temperature</name>
@@ -13,9 +13,9 @@
           <value>1110</value>
         </contextMetadata>
         <contextMetadata>
-          <name></name>
-          <type></type>
-          <value></value>
+          <name>n</name>
+          <type>t</type>
+          <value>v</value>
         </contextMetadata>
       </metadata>
     </contextAttribute>
@@ -30,9 +30,9 @@
           <value>1110</value>
         </contextMetadata>
         <contextMetadata>
-          <name></name>
-          <type></type>
-          <value></value>
+          <name>n</name>
+          <type>t</type>
+          <value>v</value>
         </contextMetadata>
       </metadata>
     </contextAttribute>

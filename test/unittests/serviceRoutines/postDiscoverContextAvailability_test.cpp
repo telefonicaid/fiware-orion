@@ -60,7 +60,7 @@ TEST(postDiscoverContextAvailability, notFound)
 {
   ConnectionInfo ci("/ngsi9/discoverContextAvailability",  "POST", "1.1");
   std::string    expected    = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element registrations found</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
-  const char*    fileName    = "discoverContextAvailabilityRequest_notFound.xml";
+  const char*    fileName    = "ngsi9.discoverContextAvailabilityRequest.entityIdIdNotFound.valid.xml";
   std::string    out;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
