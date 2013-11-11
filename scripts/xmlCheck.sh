@@ -346,9 +346,11 @@ fi
 # Counting XMLs
 #
 xmlFilesInTest=$(find $SRC_TOP/test -name "*.xml" | wc -l)
+ngsiXmlFilesInTest=$(find $SRC_TOP/test -name "ngsi*.xml" | wc -l)
 harnessNgsi9=$(find $TMP_DIR -name "ngsi9.*" | wc -l)
 harnessNgsi10=$(find $TMP_DIR -name "ngsi10.*" | wc -l)
 all=$xmlFilesInTest+$harnessNgsi9+$harnessNgsi10
+unrecognized=$(expr $all - $filesInListBeforeFilter)
 
 if [ "$all" != "$filesInListBeforeFilter" ]
 then
@@ -363,10 +365,7 @@ fi
 
 invalidXmls=$(find $SRC_TOP/test -name "ngsi*.invalid.xml" | wc -l)
 postponedXmls=$(find $SRC_TOP/test -name "ngsi*.postponed.xml" | wc -l)
-
-vMsg "Total number of files in test before filter: $filesInListBeforeFilter"
-vMsg "Files included in test run: $filesInTestRun"
-vMsg "Total number of XML files found: $all"
+uncaughtXmlFilesInTestDir=$(expr $xmlFilesInTest - $ngsiXmlFilesInTest)
 
 
 
@@ -398,11 +397,17 @@ then
 fi
 
 
+echo "Total number of files in test before filter: $filesInListBeforeFilter"
+echo "Files included in test run: $filesInTestRun"
+echo "Total number of XML files found: $all"
+echo "XML files not recognized as such for this checker: $unrecognized"
+echo
 echo $N files processed
 echo $ERR errors
 echo $OK files are OK
 echo "$invalidXmls files are not checked on purpose ('invalid' for xml checker)"
 echo "$postponedXmls files are postponed (no XSD file to compare with)"
+echo "$uncaughtXmlFilesInTestDir XML files under the test/ directory don't follow the naming convention"
 echo
 
 if [ "$cleanup" == "on" ]
