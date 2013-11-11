@@ -22,14 +22,14 @@
 # Make a registration and a subscription
 #
 echo Make a registration
-../manual/cbTest.sh rcr ../manual/firstReg.xml > /dev/null 2>&1
+../manual/cbTest.sh rcr ../manual/ngsi9.registerContextRequest.ok.xml > /dev/null 2>&1
 
 echo Make a subscription
-../manual/cbTest.sh scr ../manual/subscribeContextRequest-ONTIMEINTERVAL.xml > ${NAME}.cbTest.out 2>&1
+../manual/cbTest.sh scr ../manual/ngsi10.subscribeContextRequest.ontimeinterval.valid.xml > ${NAME}.cbTest.out 2>&1
 subIdLine=$(grep '</subscriptionId>' ${NAME}.cbTest.out)
 subId=$(echo $subIdLine | awk -F '>' '{ print $2}' | awk -F '<' '{ print $1}')
 
 echo Cancel subscription $subId
-../manual/cbTest.sh uncr ../manual/unsubscribeContextRequest.xml -id $subId >> ${NAME}.cbTest.out 2>&1
+../manual/cbTest.sh uncr ../manual/ngsi9.unsubscribeContextRequest.SUBSCRIPTION_ID.invalid.xml -id $subId >> ${NAME}.cbTest.out 2>&1
 
 

@@ -22,8 +22,8 @@
 # Make a registration and modify it 
 #
 echo Make a registration
-../manual/cbTest.sh rcr ../manual/firstReg.xml > /dev/null 2>&1
+../manual/cbTest.sh rcr ../manual/ngsi9.registerContextRequest.ok.xml > /dev/null 2>&1
 
 echo Add a provider to ConferenceRoom
-../manual/cbTest.sh conv ../manual/registerProviderRequest.xml -en ConferenceRoom -cop ce > /dev/null 2>&1
+../manual/cbTest.sh conv ../manual/ngsi9.registerProviderRequest.ok.valid.xml -en ConferenceRoom -cop ce > /dev/null 2>&1
 

@@ -21,6 +21,6 @@
 #
 # Make a query, it will fail
 #
-echo Make a query that fails
-../manual/cbTest.sh qcr ../manual/queryContext.xml > /dev/null 2>&1
+echo Make a query that fails - nothing found
+../manual/cbTest.sh qcr ../manual/ngsi10.queryContextRequest.ok.valid.xml > /dev/null 2>&1
 

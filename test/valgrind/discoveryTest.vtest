@@ -22,7 +22,7 @@
 # Make a registration, a discovery and exit
 #
 echo Make a registration
-../manual/cbTest.sh rcr ../manual/firstReg.xml > /dev/null 2>&1
+../manual/cbTest.sh rcr ../manual/ngsi9.registerContextRequest.ok.xml > /dev/null 2>&1
 
 echo Make a discovery
-../manual/cbTest.sh dcar ../manual/simpleDiscovery.xml > /dev/null 2>&1
+../manual/cbTest.sh dcar ../manual/ngsi9.discoverContextAvailabilityRequest.ok.valid.xml > /dev/null 2>&1
