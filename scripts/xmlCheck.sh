@@ -67,7 +67,7 @@ function vMsg()
 function xsdGet()
 {
   prefix="$1"
-  file="$2"
+  xfile="$2"
 
   if [ "$prefix" = "ngsi9" ]
   then
@@ -76,7 +76,7 @@ function xsdGet()
   then
     echo $xsdDir/Ngsi10_Operations_v07.xsd
   else
-    echo "unknown file prefix: '"${prefix}"' for $file"
+    echo "unknown file prefix: '"${prefix}"' for $xfile"
     exit 1
   fi
 }
@@ -295,44 +295,6 @@ fi
 #
 # Counters
 #
-# A. xmlFilesFound        - Total number of XML files under test/
-# a. xmlFilesProcessed    - Total number of XML files that were tested
-# B. xmlFilesValid        - Number of XML files that are valid
-# C. xmlFilesInvalid      - Number of XML files that are invalid
-# D. xmlFilesPostponed    - Number of XML files that are postponed
-# X. xmlFilesBadName      - Number of XML files whose names don't follow the naming convention - should be zero
-#
-# Y. harnessFilesFound    - Number of files in the harness directory - to part in many XML files
-# E. xmlPartsFound        - Number of XML docs created from harness directory
-# e. xmlPartsProcessed    - Number of XML docs that were tested 
-# F. xmlPartsOK           - Number of XML docs that passed the test
-# G. xmlPartsError        - Number of XML docs that did not pass the test
-#
-# H. xmlFilesOK           - Number of XML files that passed the test
-# I. xmlFilesError        - Number of XML files that did not pass the test
-#
-# J. xmlDocsFound         - xmlFilesFound + xmlPartsFound
-# K. xmlDocsProcessed     - xmlFilesProcessed + xmlPartsProcessed
-# L. xmlDocsOk            - xmlFilesOK + xmlPartsOK
-# M. xmlError             - xmlFilesError + xmlPartsError
-#
-# STATISTICS:
-#
-# XML docs that did not pass the XML Validity test:
-#  o 
-#  o 
-#  o ...
-#
-# Tested ${xmlDocsProcessed} (${xmlFilesProcessed} + ${xmlPartsProcessed}) out of ${xmlDocsFound} (${xmlFilesFound} + ${xmlPartsFound}) XML documents:
-#   ${xmlDocsOk} documents passed the XML validity test
-#   ${xmlError} documents did not pass
-#
-# ${xmlFilesInvalid} documents were not tested as they on purpose don't follow the XSD
-# ${xmlFilesPostponed} documents were not tested as they still have no XSD
-#
-# if ($xmlFilesBadName != 0) WARNING: $xmlFilesBadName ...
-#
-
 typeset -i xmlFilesFound        # Total number of XML files under test/
 typeset -i xmlFilesValid        # Number of XML files that are valid
 typeset -i xmlFilesInvalid      # Number of XML files that are invalid
@@ -359,7 +321,7 @@ xmlFilesBadName=$(expr $xmlFilesFound - $xmlFilesValid - $xmlFilesInvalid - $xml
 xmlFilesProcessed=0
 xmlFilesOK=0
 xmlFilesErrors=0
-harnessFilesFound=$(find $SRC_TOP/test/harness -name "*.test" | wc -l)
+harnessFilesFound=$(find $SRC_TOP/test/testharness -name "*.test" | wc -l)
 xmlPartsFound=$xmlPartsFound     # already taken care of by function 'harnessFiles'
 xmlPartsProcessed=0
 xmlPartsOK=0
@@ -379,12 +341,12 @@ if [ "$filter" != "" ]
 then
   vMsg appying filter "'"${filter}"'"
   newFileList=""
-  for file in $fileList
+  for xfile in $fileList
   do
-    echo $file | grep "$filter" > /dev/null 2>&1
+    echo $xfile | grep "$filter" > /dev/null 2>&1
     if [ "$?" == 0 ]
     then
-      newFileList=${newFileList}" "${file}
+      newFileList=${newFileList}" "${xfile}
       xmlFilesProcessed=$xmlFilesProcessed+1
     fi
   done
@@ -412,12 +374,12 @@ fi
 OK=0
 ERR=0
 N=0
-for file in $fileList
+for xfile in $fileList
 do
-  fileName=$(basename $file)
+  fileName=$(basename $xfile)
   prefix=$(echo $fileName | cut -d . -f 1)
-  xsd=$(xsdGet "$prefix" "$file")
-  processFile "$file" "$xsd" 
+  xsd=$(xsdGet "$prefix" "$xfile")
+  processFile "$xfile" "$xsd" 
 done
 
 xmlFilesProcessed=$N
@@ -452,6 +414,32 @@ xmlDocsErrors=$(expr $xmlFilesErrors + $xmlPartsErrors)
 
 
 
+# ------------------------------------------------------------------------------
+#
+# Cleanup?
+#
+if [ "$cleanup" == "on" ]
+then
+  rm -rf $TMP_DIR
+fi
+
+
+
+# ------------------------------------------------------------------------------
+#
+# Statistics not shown if the option '-f' is set
+#
+if [ "$file" != "" ]
+then
+  exit 0
+fi
+
+
+
+# ------------------------------------------------------------------------------
+#
+# Statistics
+#
 echo "====================================================================="
 if [ "$xmlDocsErrors" != "0" ]
 then
@@ -479,13 +467,8 @@ if [ "$xmlFilesBadName" != 0 ]
 then
   echo
   echo "WARNING: $xmlFilesBadName XML files do not conform to the naming convention"  
-  for file in $(find test -name "*.xml" | grep -v "ngsi9.*.valid.xml" | grep -v "ngsi9.*.invalid.xml" | grep -v "ngsi9.*.postponed.xml" | grep -v "ngsi10.*.valid.xml" | grep -v "ngsi10.*.invalid.xml" | grep -v "ngsi10.*.postponed.xml")
+  for xfile in $(find test -name "*.xml" | grep -v "ngsi9.*.valid.xml" | grep -v "ngsi9.*.invalid.xml" | grep -v "ngsi9.*.postponed.xml" | grep -v "ngsi10.*.valid.xml" | grep -v "ngsi10.*.invalid.xml" | grep -v "ngsi10.*.postponed.xml")
   do
-    echo "  o $file"
+    echo "  o $xfile"
   done
-fi
-
-if [ "$cleanup" == "on" ]
-then
-  rm -rf $TMP_DIR
 fi
