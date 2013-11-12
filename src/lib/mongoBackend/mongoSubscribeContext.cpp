@@ -94,7 +94,8 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
                                              requestP->entityIdVector,
                                              requestP->attributeList, oid.str(),
                                              requestP->reference.get(),
-                                             &notificationDone);
+                                             &notificationDone,
+                                             inFormat);
     sub.append(CSUB_CONDITIONS, conds);
     if (notificationDone) {
         sub.append(CSUB_LASTNOTIFICATION, getCurrentTime());

@@ -100,7 +100,7 @@ TEST(mongoUnsubscribeContextAvailability, subscriptionNotFound)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -143,7 +143,7 @@ TEST(mongoUnsubscribeContextAvailability, unsubscribe)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -195,7 +195,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbFindOneFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -260,7 +260,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbRemoveFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 

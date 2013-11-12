@@ -144,7 +144,8 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
                                                 attrL,
                                                 requestP->subscriptionId.get(),
                                                 C_STR_FIELD(sub, CSUB_REFERENCE),
-                                                &notificationDone);
+                                                &notificationDone,
+                                                inFormat);
        newSub.appendArray(CSUB_CONDITIONS, conds);
 
        /* Remove EntityIdVector and AttributeList dynamic memory */

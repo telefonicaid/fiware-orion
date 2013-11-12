@@ -59,13 +59,10 @@ Notifier::~Notifier (void) {
 *
 * Notifier::sendNotifyContextRequest -
 */
-void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, std::string url)
+void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, std::string url, Format format)
 {
     /* Render NotifyContextRequest */
-    // FIXME: currently, XML is hardwired as rendering format, but the subscriber
-    // may want to receive JSON. How can we specify this? Maybe using metadata on
-    // the subscribeContext?
-    std::string payload = ncr->render(NotifyContext, XML, "");
+    std::string payload = ncr->render(NotifyContext, format, "");
 
     /* Parse URL */
     std::string  host;
@@ -76,9 +73,11 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, std::string u
         LM_RVE(("Sending NotifyContextRequest: malformed URL: '%s'", url.c_str()));
     }
 
+    /* Set Content-Type depending on the format */
+    std::string content_type = (format == XML ? "application/xml" : "application/json");
 
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, "POST", path, "application/xml", payload, false);
+    sendHttpSocket(host, port, "POST", path, content_type, payload, false);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
@@ -89,8 +88,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, std::string u
     params->port = port;
     params->verb = "POST";
     params->resource = path;
-    //FIXME: unhardwire content type
-    params->content_type = std::string ("application/xml");
+    params->content_type = content_type;
     params->content = payload;
 
     int ret = pthread_create(&tid, NULL, startSenderThread, params);
@@ -110,14 +108,10 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, std::string u
 * they could be refactored in the future to have a common part using a parent
 * class for both types of notifications and using it as first argument
 */
-void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, std::string url) {
+void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, std::string url, Format format) {
 
     /* Render NotifyContextAvailabilityRequest */
-    // FIXME: currently, XML is hardwired as rendering format, but the subscriber
-    // may want to receive JSON. How can we specify this? Maybe using metadata on
-    // the subscribeContext?
-    // With the new classes, the input and output format is a part of the NgsiBase class.
-    std::string payload = ncar->render(NotifyContextAvailability, XML, "");
+    std::string payload = ncar->render(NotifyContextAvailability, format, "");
 
     /* Parse URL */
     std::string host;
@@ -127,9 +121,12 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
         LM_RVE(("Sending NotifyContextAvailabilityRequest: malformed URL: '%s'", url.c_str()));
     }
 
+    /* Set Content-Type depending on the format */
+    std::string content_type = (format == XML ? "application/xml" : "application/json");
+
     /* Send the message (no wait for response, in a separated thread to avoid blocking response)*/
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, "POST", path, "application/xml", payload, false);
+    sendHttpSocket(host, port, "POST", path, content_type, payload, false);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
@@ -139,9 +136,8 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     params->ip       = host;
     params->port     = port;
     params->verb     = "POST";
-    params->resource = path;
-    //FIXME: unhardwire content type
-    params->content_type = "application/xml";
+    params->resource = path;   
+    params->content_type = content_type;
     params->content      = payload;
 
     int ret = pthread_create(&tid, NULL, startSenderThread, params);

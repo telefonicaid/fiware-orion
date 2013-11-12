@@ -93,6 +93,9 @@ HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscri
 
     csiP->throttling = sub.hasField(CSUB_THROTTLING) ? sub.getIntField(CSUB_THROTTLING) : -1;
 
+    /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
+    csiP->format = sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML;
+
     LM_SR(SccOk);
 }
 

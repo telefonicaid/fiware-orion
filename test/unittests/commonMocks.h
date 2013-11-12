@@ -153,17 +153,17 @@ public:
          * actually created/sent */
     }
 
-    MOCK_METHOD2(sendNotifyContextRequest, void(NotifyContextRequest* ncr, std::string url));
-    MOCK_METHOD2(sendNotifyContextAvailabilityRequest, void(NotifyContextAvailabilityRequest* ncar, std::string url));
+    MOCK_METHOD3(sendNotifyContextRequest, void(NotifyContextRequest* ncr, std::string url, Format f));
+    MOCK_METHOD3(sendNotifyContextAvailabilityRequest, void(NotifyContextAvailabilityRequest* ncar, std::string url, Format f));
     MOCK_METHOD2(createIntervalThread, void(std::string subId, int interval));
     MOCK_METHOD1(destroyOntimeIntervalThreads, void(std::string subId));
 
     /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
-    void parent_sendNotifyContextRequest(NotifyContextRequest* ncr, std::string url) {
-        return Notifier::sendNotifyContextRequest(ncr, url);
+    void parent_sendNotifyContextRequest(NotifyContextRequest* ncr, std::string url, Format format) {
+        return Notifier::sendNotifyContextRequest(ncr, url, format);
     }
-    void parent_sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, std::string url) {
-        return Notifier::sendNotifyContextAvailabilityRequest(ncar, url);
+    void parent_sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, std::string url, Format format) {
+        return Notifier::sendNotifyContextAvailabilityRequest(ncar, url, format);
     }
     void parent_createIntervalThread(std::string subId, int interval) {
         return Notifier::createIntervalThread(subId, interval);

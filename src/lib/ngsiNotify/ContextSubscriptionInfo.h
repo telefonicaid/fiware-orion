@@ -26,6 +26,7 @@
 * Author: Fermin Galan
 */
 
+#include "common/Format.h"
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/AttributeList.h"
 
@@ -33,6 +34,7 @@ typedef struct ContextSubscriptionInfo {
     EntityIdVector         entityIdVector;
     AttributeList          attributeList;
     std::string            url;
+    Format                 format;
     int                    lastNotification;
     int                    expiration;
     int                    throttling;

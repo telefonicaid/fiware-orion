@@ -155,7 +155,8 @@ static void prepareDatabase(void) {
                                                        "type" << "ONCHANGE" <<
                                                        "value" << BSON_ARRAY("A1" << "A2" << "A4" << "A5")
                                                        )) <<
-                        "count" << 20
+                        "count" << 20 <<
+                        "format" << "XML"
                         );
 
     BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
@@ -229,6 +230,7 @@ TEST(mongoOntimeintervalOperations, mongoGetContextSubscriptionInfo_ok)
     EXPECT_EQ(20000000, csi.lastNotification);
     EXPECT_EQ("http://notify1.me", csi.url);
     EXPECT_EQ(10, csi.throttling);
+    EXPECT_EQ(XML, csi.format);
     EXPECT_EQ(0, err.length());
 
 }

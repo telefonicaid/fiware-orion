@@ -372,7 +372,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_Attr0_noPattern)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -444,7 +444,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_AttrN_noPattern)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -520,7 +520,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, EntN_Attr0_noPattern)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -598,7 +598,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, EntN_AttrN_noPattern)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -683,7 +683,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_Attr0_pattern)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -772,7 +772,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrsAll)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -857,7 +857,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrOneSingle)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -953,7 +953,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrOneMulti)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1043,7 +1043,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrsSubset)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1142,7 +1142,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternSeveralCREs)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1236,7 +1236,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternSeveralRegistrations)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1339,7 +1339,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiEntity)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1435,7 +1435,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiAttr)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1538,7 +1538,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiEntityAttrs)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1656,7 +1656,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternNoType)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1759,7 +1759,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern0Attr)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1842,7 +1842,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern1AttrSingle)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1934,7 +1934,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern1AttrMulti)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2033,7 +2033,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, patternNAttr)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2143,7 +2143,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, patternNoType)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2250,7 +2250,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, mixPatternAndNotPattern)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2327,7 +2327,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, updateDurationAndEntN_AttrN_noP
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2423,7 +2423,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, updateDurationAndNoPatternAttrs
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2495,7 +2495,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, subscriptionNotFound)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2544,7 +2544,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbFindOneFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2600,7 +2600,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbUpdateFail)
     ON_CALL(*connectionMock, findOne("unittest.casubs",_,_,_))
             .WillByDefault(Return(fakeSub));
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
