@@ -131,11 +131,11 @@ with open (file, 'r') as f:
 
             if re.search('<\/'+ root_element + '>', line):
                 # We add a 'ngsi9' or 'ngsi10' token in the filename to help xmlChecker.sh script
-                filename = dir + '/' + prefix + '.' + ngsi_token(root_element) + '.' + str(xml_fragments_counter)
+                filename = dir + '/' + ngsi_token(root_element) + '.' + prefix + '.' + str(xml_fragments_counter)
                 write_fragment(buffer, filename)
                 buffer = []
                 search_mode = True
 
 if xml_headers_counter != xml_fragments_counter:
-    print 'Waring: XML headers (' + str(xml_headers_counter) + ') and ' \
+    print 'Warning: XML headers (' + str(xml_headers_counter) + ') and ' \
           'generated fragments (' + str(xml_fragments_counter) + ') differ'
