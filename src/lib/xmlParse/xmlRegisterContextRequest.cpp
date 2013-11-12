@@ -94,40 +94,6 @@ static int entityIdId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* entityIdType - 
-*/
-static int entityIdType(xml_node<>* node, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got an entityId:type: '%s'", node->value()));
-
-  if ((parseDataP->rcr.entityIdP->type != "") && (parseDataP->rcr.entityIdP->type != node->value()))
-    LM_W(("Overwriting entityId:type (was '%s') for '%s'", parseDataP->rcr.entityIdP->type.c_str(), node->value()));
-  parseDataP->rcr.entityIdP->type = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* entityIdIsPattern - 
-*/
-static int entityIdIsPattern(xml_node<>* node, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", node->value()));
-
-  if ((parseDataP->rcr.entityIdP->isPattern != "") && (parseDataP->rcr.entityIdP->isPattern != node->value()))
-    LM_W(("Overwriting entityId:isPattern (was '%s') for '%s'", parseDataP->rcr.entityIdP->isPattern.c_str(), node->value()));
-  parseDataP->rcr.entityIdP->isPattern = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
 * crAttribute - 
 */
 static int crAttribute(xml_node<>* node, ParseData* parseDataP)
@@ -519,8 +485,6 @@ XmlNode rcrParseVector[] =
   { "/registerContextRequest/contextRegistrationList/contextRegistration/entityIdList",                      entityIdList        },
   { "/registerContextRequest/contextRegistrationList/contextRegistration/entityIdList/entityId",             entityId            },
   { "/registerContextRequest/contextRegistrationList/contextRegistration/entityIdList/entityId/id",          entityIdId          },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/entityIdList/entityId/type",        entityIdType        },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/entityIdList/entityId/isPattern",   entityIdIsPattern   },
 
   { "/registerContextRequest/contextRegistrationList/contextRegistration/contextRegistrationAttributeList",  nullTreat           },
 

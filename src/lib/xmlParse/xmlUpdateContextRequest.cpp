@@ -98,40 +98,6 @@ static int entityIdId(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* entityIdType - 
-*/
-static int entityIdType(xml_node<>* node, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got an entityId:type: '%s'", node->value()));
-
-  if ((reqData->upcr.entityIdP->type != "") && (reqData->upcr.entityIdP->type != node->value()))
-    LM_W(("Overwriting entityId:type (was '%s') for '%s'", reqData->upcr.entityIdP->type.c_str(), node->value()));
-  reqData->upcr.entityIdP->type = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* entityIdIsPattern - 
-*/
-static int entityIdIsPattern(xml_node<>* node, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", node->value()));
-
-  if ((reqData->upcr.entityIdP->isPattern != "") && (reqData->upcr.entityIdP->isPattern != node->value()))
-    LM_W(("Overwriting entityId:isPattern (was '%s') for '%s'", reqData->upcr.entityIdP->isPattern.c_str(), node->value()));
-  reqData->upcr.entityIdP->isPattern = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
 * contextAttribute - 
 */
 static int contextAttribute(xml_node<>* node, ParseData* reqData)
@@ -367,8 +333,6 @@ XmlNode upcrParseVector[] =
 
   { "/updateContextRequest/contextElementList/contextElement/entityId",           entityId          },
   { "/updateContextRequest/contextElementList/contextElement/entityId/id",        entityIdId        },
-  { "/updateContextRequest/contextElementList/contextElement/entityId/type",      entityIdType      },
-  { "/updateContextRequest/contextElementList/contextElement/entityId/isPattern", entityIdIsPattern },
   
   { "/updateContextRequest/contextElementList/contextElement/contextAttributeList",                               nullTreat              },
   { "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute",              contextAttribute       },

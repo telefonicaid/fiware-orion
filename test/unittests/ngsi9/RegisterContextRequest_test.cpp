@@ -290,7 +290,7 @@ TEST(RegisterContextRequest, noEntityIdList)
 TEST(RegisterContextRequest, emptyEntityIdList)
 {
   ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.emptyEntityIdList.valid.xml";
+  const char*     fileName = "ngsi9.registerContextRequest.emptyEntityIdList.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
   std::string     expected = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty entityIdVector</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
 
@@ -457,24 +457,6 @@ TEST(RegisterContextRequest, invalidAttributeName)
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result) << "error in invalidAttributeName";
-}
-
-
-
-/* ****************************************************************************
-*
-* overwriteEntityIdType - 
-*/
-TEST(RegisterContextRequest, overwriteEntityIdType)
-{
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.idAsEntityIdAttribute.invalid.xml";
-  ConnectionInfo  ci("", "POST", "1.1");
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
-
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_EQ("OK", result) << "error at overwriting EntityIdType";
 }
 
 

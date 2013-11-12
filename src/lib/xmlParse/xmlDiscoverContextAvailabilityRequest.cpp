@@ -80,40 +80,6 @@ static int entityIdId(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* entityIdType - 
-*/
-static int entityIdType(xml_node<>* node, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got an entityId:type: '%s'", node->value()));
-
-  if ((reqDataP->dcar.entityIdP->type != "") && (reqDataP->dcar.entityIdP->type != node->value()))
-    LM_W(("Overwriting entityId:type (was '%s') for '%s'", reqDataP->dcar.entityIdP->type.c_str(), node->value()));
-  reqDataP->dcar.entityIdP->type = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* entityIdIsPattern - 
-*/
-static int entityIdIsPattern(xml_node<>* node, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", node->value()));
-
-  if ((reqDataP->dcar.entityIdP->isPattern != "") && (reqDataP->dcar.entityIdP->isPattern != node->value()))
-    LM_W(("Overwriting entityId:isPattern (was '%s') for '%s'", reqDataP->dcar.entityIdP->isPattern.c_str(), node->value()));
-  reqDataP->dcar.entityIdP->isPattern = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
 * attribute - 
 */
 static int attribute(xml_node<>* node, ParseData* reqDataP)
@@ -264,8 +230,6 @@ XmlNode dcarParseVector[] =
   { "/discoverContextAvailabilityRequest/entityIdList",                                nullTreat            },
   { "/discoverContextAvailabilityRequest/entityIdList/entityId",                       entityId             },
   { "/discoverContextAvailabilityRequest/entityIdList/entityId/id",                    entityIdId           },
-  { "/discoverContextAvailabilityRequest/entityIdList/entityId/type",                  entityIdType         },
-  { "/discoverContextAvailabilityRequest/entityIdList/entityId/isPattern",             entityIdIsPattern    },
 
   { "/discoverContextAvailabilityRequest/attributeList",                               nullTreat            },
   { "/discoverContextAvailabilityRequest/attributeList/attribute",                     attribute            },

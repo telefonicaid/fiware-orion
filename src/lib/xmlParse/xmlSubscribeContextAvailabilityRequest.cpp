@@ -82,40 +82,6 @@ static int entityIdId(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* entityIdType - 
-*/
-static int entityIdType(xml_node<>* node, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got an entityId:type: '%s'", node->value()));
-
-  if ((reqData->scar.entityIdP->type != "") && (reqData->scar.entityIdP->type != node->value()))
-    LM_W(("Overwriting entityId:type (was '%s') for '%s'", reqData->scar.entityIdP->type.c_str(), node->value()));
-  reqData->scar.entityIdP->type = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* entityIdIsPattern - 
-*/
-static int entityIdIsPattern(xml_node<>* node, ParseData* reqData)
-{
-  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", node->value()));
-
-  if ((reqData->scar.entityIdP->isPattern != "") && (reqData->scar.entityIdP->isPattern != node->value()))
-    LM_W(("Overwriting entityId:isPattern (was '%s') for '%s'", reqData->scar.entityIdP->isPattern.c_str(), node->value()));
-  reqData->scar.entityIdP->isPattern = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
 * reference - 
 */
 static int reference(xml_node<>* node, ParseData* reqData)
@@ -304,8 +270,6 @@ XmlNode scarParseVector[] =
   { "/subscribeContextAvailabilityRequest/entityIdList",                                nullTreat            },
   { "/subscribeContextAvailabilityRequest/entityIdList/entityId",                       entityId             },
   { "/subscribeContextAvailabilityRequest/entityIdList/entityId/id",                    entityIdId           },
-  { "/subscribeContextAvailabilityRequest/entityIdList/entityId/type",                  entityIdType         },
-  { "/subscribeContextAvailabilityRequest/entityIdList/entityId/isPattern",             entityIdIsPattern    },
 
   { "/subscribeContextAvailabilityRequest/attributeList",                               nullTreat            },
   { "/subscribeContextAvailabilityRequest/attributeList/attribute",                     attribute            },
