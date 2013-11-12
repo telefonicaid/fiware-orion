@@ -37,6 +37,6 @@
 *
 * mongoSubscribeContext - 
 */
-extern HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, SubscribeContextResponse* responseP, Format inFormat);
+extern HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, SubscribeContextResponse* responseP, Format inFormat = NOFORMAT);
 
 #endif
