@@ -133,7 +133,7 @@ echo "2: ++++++++++++++++++++"
                 <attribute>measurement</attribute>
 	</attributeList>
 	<restriction>
-    <attributeExpression>AE</attributeExpression>
+    <attributeExpression></attributeExpression>
 			<scope>
 				<operationScope>
 					<scopeType>Include Associations</scopeType>
