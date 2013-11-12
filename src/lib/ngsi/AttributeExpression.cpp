@@ -35,6 +35,20 @@
 
 /* ****************************************************************************
 *
+* AttributeExpression::check - 
+*/
+std::string AttributeExpression::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+{
+  if ((string == "") || (string == "not in use"))
+    return "no attribute expression";
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
 * AttributeExpression::isEmpty - 
 */
 bool AttributeExpression::isEmpty(void)

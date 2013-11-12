@@ -47,6 +47,8 @@ typedef struct ContextRegistration
   MetadataVector                      registrationMetadataVector;            // Optional
   ProvidingApplication                providingApplication;                  // Mandatory
 
+  bool                                entityIdVectorPresent;                 // entityIdList present during parsing
+
   std::string  render(Format format, std::string indent);
   std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void         present(std::string indent, int ix);

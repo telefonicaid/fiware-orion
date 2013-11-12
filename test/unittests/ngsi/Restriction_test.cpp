@@ -42,7 +42,7 @@ TEST(Restriction, check)
   std::string  checked;
   std::string  expected1 = "OK";
   std::string  expected2 = "Empty type in restriction scope";
-  std::string  expected3 = "OK";
+  std::string  expected3 = "no attribute expression";
   Scope*       scopeP    = new Scope("", "Value");
 
   checked = restriction.check(RegisterContext, XML, "", "", 0);

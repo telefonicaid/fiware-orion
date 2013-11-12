@@ -647,8 +647,8 @@ TEST(DiscoverContextAvailabilityRequest, noEntityIdId_json)
 TEST(DiscoverContextAvailabilityRequest, noAttributeExpression_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.noAttributeExpression.valid.xml";
-  const char*     expect   = "OK";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.noAttributeExpression.invalid.xml";
+  const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>no attribute expression</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -666,8 +666,8 @@ TEST(DiscoverContextAvailabilityRequest, noAttributeExpression_xml)
 TEST(DiscoverContextAvailabilityRequest, noAttributeExpression_json)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_noAttributeExpression.json";
-  const char*     expect   = "OK";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.noAttributeExpression.invalid.json";
+  const char*     expect   = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"no attribute expression\"\n  }\n}\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
@@ -690,7 +690,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_xml)
 {
   ParseData       reqData;
   const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.emptyAttributeExpression.invalid.xml";
-  const char*     expect   = "OK";
+  const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>no attribute expression</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -708,8 +708,8 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_xml)
 TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_json)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_emptyAttributeExpression.json";
-  const char*     expect   = "OK";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.emptyAttributeExpression.invalid.json";
+  const char*     expect   = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"no attribute expression\"\n  }\n}\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;

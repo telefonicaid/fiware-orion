@@ -49,7 +49,8 @@ std::string Restriction::check(RequestType requestType, Format format, std::stri
     return "OK";
   }
 
-  if ((res = scopeVector.check(requestType, format, indent, predetectedError,  counter)) != "OK")
+  if (((res = scopeVector.check(requestType, format, indent, predetectedError,  counter)) != "OK") ||
+      ((res = attributeExpression.check(requestType, format, indent, predetectedError,  counter)) != "OK"))
   {
     LM_T(LmtRestriction, ("Restriction::check returns '%s'", res.c_str()));
     return res;

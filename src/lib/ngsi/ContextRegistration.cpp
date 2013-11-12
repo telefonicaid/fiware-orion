@@ -68,6 +68,9 @@ std::string ContextRegistration::check(RequestType requestType, Format format, s
   if ((res = registrationMetadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")          return res;
   if ((res = providingApplication.check(requestType, format, indent, predetectedError, counter)) != "OK")                return res;
 
+  if ((entityIdVectorPresent == true) && (entityIdVector.size() == 0))
+    return "Empty entityIdVector";
+
   return "OK";
 }
 

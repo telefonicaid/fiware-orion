@@ -40,6 +40,7 @@ typedef struct AttributeExpression
 {
   std::string   string;
 
+  std::string   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void          set(std::string value);
   std::string   get(void);
   bool          isEmpty(void);

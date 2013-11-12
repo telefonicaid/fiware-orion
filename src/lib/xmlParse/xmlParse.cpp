@@ -124,7 +124,7 @@ std::string entityIdParse(RequestType requestType, xml_node<>* node, EntityId* e
       LM_T(LmtEntityId, ("Got an id for an entity: '%s'", entityIdP->id.c_str()));
     }
     else
-       LM_RE("unsupported attribute for EntityId", ("Warning: unsupported attribute '%s' for EntityId", attr->name()));
+      LM_RE("unsupported attribute for EntityId", ("Warning: unsupported attribute '%s' for EntityId", attr->name()));
   }
 
   return "OK";
