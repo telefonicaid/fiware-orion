@@ -26,7 +26,9 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
+#include "common/Format.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContextAvailabilitySubscription.h"
@@ -39,7 +41,7 @@
 *
 * mongoUpdateContextAvailabilitySubscription - 
 */
-HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabilitySubscriptionRequest* requestP, UpdateContextAvailabilitySubscriptionResponse* responseP)
+HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabilitySubscriptionRequest* requestP, UpdateContextAvailabilitySubscriptionResponse* responseP, Format inFormat)
 {
   /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
   semTake();

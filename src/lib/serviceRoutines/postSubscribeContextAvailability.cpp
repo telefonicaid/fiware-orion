@@ -42,7 +42,7 @@ std::string postSubscribeContextAvailability(ConnectionInfo* ciP, int components
   SubscribeContextAvailabilityResponse  scar;
   std::string                           answer;
 
-  mongoSubscribeContextAvailability(&parseDataP->scar.res, &scar);
+  mongoSubscribeContextAvailability(&parseDataP->scar.res, &scar, ciP->inFormat);
   answer = scar.render(SubscribeContextAvailability, ciP->outFormat, "");
 
   return answer;

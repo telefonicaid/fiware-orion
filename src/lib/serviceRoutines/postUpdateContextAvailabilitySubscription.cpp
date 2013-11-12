@@ -43,7 +43,7 @@ std::string postUpdateContextAvailabilitySubscription(ConnectionInfo* ciP, int c
 
   ucas.subscriptionId = parseDataP->ucas.res.subscriptionId;
 
-  mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res, &ucas);
+  mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res, &ucas, ciP->inFormat);
   answer = ucas.render(UpdateContextAvailabilitySubscription, ciP->outFormat, "", 0);
 
   return answer;

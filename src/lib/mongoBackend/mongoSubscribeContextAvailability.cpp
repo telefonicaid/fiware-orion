@@ -34,13 +34,14 @@
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
 
+#include "common/Format.h"
 #include "common/sem.h"
 
 /* ****************************************************************************
 *
 * mongoSubscribeContextAvailability - 
 */
-HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityRequest* requestP, SubscribeContextAvailabilityResponse* responseP)
+HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityRequest* requestP, SubscribeContextAvailabilityResponse* responseP, Format inFormat)
 {
     /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
     semTake();

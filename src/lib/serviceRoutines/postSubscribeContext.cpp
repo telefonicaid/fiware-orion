@@ -42,7 +42,7 @@ std::string postSubscribeContext(ConnectionInfo* ciP, int components, std::vecto
   SubscribeContextResponse  scr;
   std::string               answer;
 
-  mongoSubscribeContext(&parseDataP->scr.res, &scr);
+  mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->inFormat);
   answer = scr.render(SubscribeContext, ciP->outFormat, "");
 
   return answer;

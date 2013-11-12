@@ -33,13 +33,14 @@
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 
+#include "common/Format.h"
 #include "common/sem.h"
 
 /* ****************************************************************************
 *
 * mongoUpdateContextSubscription - 
 */
-HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* requestP, UpdateContextSubscriptionResponse* responseP)
+HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* requestP, UpdateContextSubscriptionResponse* responseP, Format inFormat)
 {
 
   /* Take semaphore. The LM_S* family of macros combines semaphore release with return */

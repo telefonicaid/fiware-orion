@@ -27,6 +27,7 @@
 */
 #include <string>
 
+#include "common/Format.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 
@@ -36,6 +37,6 @@
 *
 * mongoUpdateContextSubscription - 
 */
-extern HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* requestP, UpdateContextSubscriptionResponse* responseP);
+extern HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* requestP, UpdateContextSubscriptionResponse* responseP, Format inFormat);
 
 #endif

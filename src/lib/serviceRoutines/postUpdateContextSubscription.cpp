@@ -43,7 +43,7 @@ std::string postUpdateContextSubscription(ConnectionInfo* ciP, int components, s
   std::string                        answer;
 
   ucsr.subscribeError.subscriptionId = parseDataP->ucsr.res.subscriptionId;
-  mongoUpdateContextSubscription(&parseDataP->ucsr.res, &ucsr);
+  mongoUpdateContextSubscription(&parseDataP->ucsr.res, &ucsr, ciP->inFormat);
   answer = ucsr.render(UpdateContextSubscription, ciP->outFormat, "");
   return answer;
 }
