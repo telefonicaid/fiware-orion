@@ -7408,7 +7408,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     std::string s2 = res.subscribeError.errorCode.details.substr(56+24, res.subscribeError.errorCode.details.size()-56-24);
     EXPECT_EQ("collection: unittest.csubs "
               "- insert(): { _id: ObjectId('", s1);
-    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: {}, conditions: [ { type: \"ONTIMEINTERVAL\", value: 60 } ] } "
+    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: {}, conditions: [ { type: \"ONTIMEINTERVAL\", value: 60 } ], format: \"XML\" } "
               "- exception: boom!!", s2);
 
     /* Release mocks */

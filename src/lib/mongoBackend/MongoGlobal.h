@@ -85,6 +85,7 @@ using namespace mongo;
 #define CSUB_ENTITY_TYPE        "type"
 #define CSUB_ENTITY_ISPATTERN   "isPattern"
 #define CSUB_COUNT              "count"
+#define CSUB_FORMAT             "format"
 
 #define CASUB_EXPIRATION        "expiration"
 #define CASUB_REFERENCE         "reference"
@@ -95,6 +96,7 @@ using namespace mongo;
 #define CASUB_ENTITY_ISPATTERN  "isPattern"
 #define CASUB_LASTNOTIFICATION  "lastNotification"
 #define CASUB_COUNT             "count"
+#define CASUB_FORMAT            "format"
 
 #define ASSOC_SOURCE_ENT        "srcEnt"
 #define ASSOC_TARGET_ENT        "tgtEnt"

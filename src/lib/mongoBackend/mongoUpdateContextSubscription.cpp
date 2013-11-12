@@ -169,6 +169,9 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
       }
   }
 
+  /* Adding format to use in notifications */
+  newSub.append(CSUB_FORMAT, std::string(formatToString(inFormat)));
+
   /* Update document in MongoDB */
   BSONObj update = newSub.obj();
   try {

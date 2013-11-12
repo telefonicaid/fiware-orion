@@ -91,6 +91,9 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
     }
     sub.append(CASUB_ATTRS, attrs.arr());
 
+    /* Adding format to use in notifications */
+    sub.append(CASUB_FORMAT, std::string(formatToString(inFormat)));
+
     /* Insert document in database */
     BSONObj subDoc = sub.obj();
     try {

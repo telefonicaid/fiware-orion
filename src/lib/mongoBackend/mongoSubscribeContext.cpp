@@ -101,6 +101,9 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
         sub.append(CSUB_COUNT, 1);
     }
 
+    /* Adding format to use in notifications */
+    sub.append(CSUB_FORMAT, std::string(formatToString(inFormat)));
+
     /* Insert document in database */
     BSONObj subDoc = sub.obj();
     try {

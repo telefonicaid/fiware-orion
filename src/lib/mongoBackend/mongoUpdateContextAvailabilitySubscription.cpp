@@ -131,11 +131,14 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
 
   /* The hasField check is needed due to lastNotification/count could not be present in the original doc */
   if (sub.hasField(CASUB_LASTNOTIFICATION)) {
-      newSub.append(CASUB_LASTNOTIFICATION, sub.getIntField(CSUB_LASTNOTIFICATION));
+      newSub.append(CASUB_LASTNOTIFICATION, sub.getIntField(CASUB_LASTNOTIFICATION));
   }
   if (sub.hasField(CASUB_COUNT)) {
       newSub.append(CASUB_COUNT, count);
   }
+
+  /* Adding format to use in notifications */
+  newSub.append(CASUB_FORMAT, std::string(formatToString(inFormat)));
 
   /* Update document in MongoDB */
   BSONObj update = newSub.obj();
