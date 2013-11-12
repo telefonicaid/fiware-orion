@@ -37,6 +37,6 @@
 *
 * mongoUpdateContextAvailabilitySubscription - 
 */
-extern HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabilitySubscriptionRequest* requestP, UpdateContextAvailabilitySubscriptionResponse* responseP, Format inFormat = NOFORMAT);
+extern HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabilitySubscriptionRequest* requestP, UpdateContextAvailabilitySubscriptionResponse* responseP, Format inFormat = XML);
 
 #endif

@@ -37,6 +37,6 @@
 *
 * mongoUpdateContextSubscription - 
 */
-extern HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* requestP, UpdateContextSubscriptionResponse* responseP, Format inFormat = NOFORMAT);
+extern HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* requestP, UpdateContextSubscriptionResponse* responseP, Format inFormat = XML);
 
 #endif
