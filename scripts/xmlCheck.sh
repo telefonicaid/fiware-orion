@@ -467,7 +467,7 @@ if [ "$xmlFilesBadName" != 0 ]
 then
   echo
   echo "WARNING: $xmlFilesBadName XML files do not conform to the naming convention"  
-  for xfile in $(find test -name "*.xml" | grep -v "ngsi9.*.valid.xml" | grep -v "ngsi9.*.invalid.xml" | grep -v "ngsi9.*.postponed.xml" | grep -v "ngsi10.*.valid.xml" | grep -v "ngsi10.*.invalid.xml" | grep -v "ngsi10.*.postponed.xml")
+  for xfile in $(find $SRC_TOP/test -name "*.xml" | grep -v "ngsi9.*.valid.xml" | grep -v "ngsi9.*.invalid.xml" | grep -v "ngsi9.*.postponed.xml" | grep -v "ngsi10.*.valid.xml" | grep -v "ngsi10.*.invalid.xml" | grep -v "ngsi10.*.postponed.xml")
   do
     echo "  o $xfile"
   done
