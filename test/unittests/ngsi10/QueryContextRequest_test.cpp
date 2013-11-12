@@ -415,12 +415,12 @@ TEST(QueryContextRequest, noAttributeExpression_xml)
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     fileName = "ngsi10.queryContextRequest.noAttributeExpression.valid.xml";
-  const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>no attribute expression</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  const char*     expect   = "OK";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "noAttributeExpression";
+  EXPECT_EQ(expect, result);
 }
 
 
@@ -434,12 +434,12 @@ TEST(QueryContextRequest, emptyAttributeExpression_xml)
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     fileName = "ngsi10.queryContextRequest.emptyAttributeExpression.invalid.xml";
-  const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>no attribute expression</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  const char*     expect   = "OK";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "emptyAttributeExpression";
+  EXPECT_EQ(expect, result);
 }
 
 

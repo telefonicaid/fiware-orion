@@ -648,7 +648,7 @@ TEST(DiscoverContextAvailabilityRequest, noAttributeExpression_xml)
 {
   ParseData       reqData;
   const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.noAttributeExpression.invalid.xml";
-  const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>no attribute expression</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
+  const char*     expect   = "OK";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -667,7 +667,7 @@ TEST(DiscoverContextAvailabilityRequest, noAttributeExpression_json)
 {
   ParseData       reqData;
   const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.noAttributeExpression.invalid.json";
-  const char*     expect   = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"no attribute expression\"\n  }\n}\n";
+  const char*     expect   = "OK";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
@@ -690,7 +690,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_xml)
 {
   ParseData       reqData;
   const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.emptyAttributeExpression.invalid.xml";
-  const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>no attribute expression</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
+  const char*     expect   = "OK";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -709,7 +709,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_json)
 {
   ParseData       reqData;
   const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.emptyAttributeExpression.invalid.json";
-  const char*     expect   = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"no attribute expression\"\n  }\n}\n";
+  const char*     expect   = "OK";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;

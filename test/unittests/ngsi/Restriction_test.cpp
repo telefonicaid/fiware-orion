@@ -42,21 +42,19 @@ TEST(Restriction, check)
   std::string  checked;
   std::string  expected1 = "OK";
   std::string  expected2 = "Empty type in restriction scope";
-  std::string  expected3 = "no attribute expression";
+  std::string  expected3 = "OK";
   Scope*       scopeP    = new Scope("", "Value");
 
   checked = restriction.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(checked.c_str(), expected1.c_str());
+  EXPECT_EQ(expected1, checked);
 
   restriction.scopeVector.push_back(scopeP);
   checked = restriction.check(RegisterContext, XML, "", "", 1);
-  EXPECT_STREQ(checked.c_str(), expected2.c_str());
+  EXPECT_EQ(expected2, checked);
 
   scopeP->type = "Type";
   checked = restriction.check(RegisterContext, XML, "", "", 1);
-  EXPECT_STREQ(checked.c_str(), expected3.c_str());
-
-                                     
+  EXPECT_EQ(expected3, checked);
 }
 
 
