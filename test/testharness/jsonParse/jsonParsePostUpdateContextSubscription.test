@@ -65,7 +65,7 @@ echo "1: ***********************************"
 {
 	"duration": "P5Y",
 	"restriction": {
-		"attributeExpression" : "",
+		"attributeExpression" : "AE",
 		"scopes": [
 			{
 				"type" : "t1",
@@ -148,7 +148,7 @@ echo "3: ***********************************"
 {
 	"duration": "P4Y",
 	"restriction": {
-		"attributeExpression" : "",
+		"attributeExpression" : "AE",
 		"scopes": [
 			{
 				"type" : "t1",

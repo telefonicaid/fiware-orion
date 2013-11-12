@@ -292,11 +292,12 @@ TEST(RegisterContextRequest, emptyEntityIdList)
   ParseData       reqData;
   const char*     fileName = "ngsi9.registerContextRequest.emptyEntityIdList.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
+  std::string     expected = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty entityIdVector</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_EQ("OK", result) << "No EntityId List error";
+  EXPECT_EQ(expected, result);
 }
 
 

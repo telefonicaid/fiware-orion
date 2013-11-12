@@ -35,6 +35,17 @@
 
 /* ****************************************************************************
 *
+* AttributeExpression::check - 
+*/
+std::string AttributeExpression::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+{
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
 * AttributeExpression::isEmpty - 
 */
 bool AttributeExpression::isEmpty(void)

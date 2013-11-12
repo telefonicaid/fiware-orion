@@ -438,6 +438,19 @@ static int targetAttribute(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
+* entityIdList - 
+*/
+static int entityIdList(xml_node<>* node, ParseData* parseDataP)
+{
+   LM_T(LmtParse, ("got an entityIdList"));
+   parseDataP->rcr.crP->entityIdVectorPresent = true;
+   return 0;
+}
+
+
+
+/* ****************************************************************************
+*
 * rcrInit - 
 */
 void rcrInit(ParseData* parseDataP)
@@ -503,7 +516,7 @@ XmlNode rcrParseVector[] =
 
   { "/registerContextRequest/contextRegistrationList/contextRegistration",                                   contextRegistration },
 
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/entityIdList",                      nullTreat           },
+  { "/registerContextRequest/contextRegistrationList/contextRegistration/entityIdList",                      entityIdList        },
   { "/registerContextRequest/contextRegistrationList/contextRegistration/entityIdList/entityId",             entityId            },
   { "/registerContextRequest/contextRegistrationList/contextRegistration/entityIdList/entityId/id",          entityIdId          },
   { "/registerContextRequest/contextRegistrationList/contextRegistration/entityIdList/entityId/type",        entityIdType        },

@@ -647,7 +647,7 @@ TEST(DiscoverContextAvailabilityRequest, noEntityIdId_json)
 TEST(DiscoverContextAvailabilityRequest, noAttributeExpression_xml)
 {
   ParseData       reqData;
-  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.noAttributeExpression.valid.xml";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.noAttributeExpression.invalid.xml";
   const char*     expect   = "OK";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -666,7 +666,7 @@ TEST(DiscoverContextAvailabilityRequest, noAttributeExpression_xml)
 TEST(DiscoverContextAvailabilityRequest, noAttributeExpression_json)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_noAttributeExpression.json";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.noAttributeExpression.invalid.json";
   const char*     expect   = "OK";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -708,7 +708,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_xml)
 TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_json)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_emptyAttributeExpression.json";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.emptyAttributeExpression.invalid.json";
   const char*     expect   = "OK";
   ConnectionInfo  ci("", "POST", "1.1");
 

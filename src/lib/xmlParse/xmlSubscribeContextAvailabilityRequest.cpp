@@ -149,7 +149,7 @@ static int attribute(xml_node<>* node, ParseData* reqData)
 static int restriction(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a restriction"));
-  ++reqData->scar.restrictions;
+  ++reqData->scar.res.restrictions;
 
   return 0;
 }
@@ -250,6 +250,9 @@ void scarInit(ParseData* reqData)
   reqData->scar.entityIdP              = NULL;
   reqData->scar.scopeP                 = NULL;
   reqData->scar.restrictions           = 0;
+  reqData->scar.res.restrictions       = 0;
+
+  reqData->scar.res.restriction.attributeExpression.set("");
 }
 
 

@@ -420,7 +420,7 @@ TEST(QueryContextRequest, noAttributeExpression_xml)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "noAttributeExpression";
+  EXPECT_EQ(expect, result);
 }
 
 
@@ -439,7 +439,7 @@ TEST(QueryContextRequest, emptyAttributeExpression_xml)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "emptyAttributeExpression";
+  EXPECT_EQ(expect, result);
 }
 
 

@@ -40,6 +40,7 @@ TEST(ContextRegistrationResponseVector, all)
   ContextRegistrationResponse        crr;
   ContextRegistrationResponseVector  crrV;
   std::string                        rendered;
+  std::string                        expected = "Empty entityIdVector";
 
   crr.contextRegistration.providingApplication.set("10.1.1.1://nada");
 
@@ -54,12 +55,12 @@ TEST(ContextRegistrationResponseVector, all)
 
   // check OK
   rendered = crrV.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ("OK", rendered.c_str());
+  EXPECT_EQ(expected, rendered.c_str());
 
   EntityId             eId;   // Empty ID
-  std::string          expected = "empty entityId:id";
+  std::string          expected2 = "empty entityId:id";
 
   crr.contextRegistration.entityIdVector.push_back(&eId);
   rendered = crrV.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+  EXPECT_EQ(expected2, rendered);
 }
