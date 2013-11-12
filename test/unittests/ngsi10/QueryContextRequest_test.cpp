@@ -397,7 +397,7 @@ TEST(QueryContextRequest, noAttributeExpression_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.noAttributeExpression.valid.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.noAttributeExpression.invalid.xml";
   const char*     expect   = "OK";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";

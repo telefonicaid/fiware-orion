@@ -346,11 +346,11 @@ XmlNode upcrParseVector[] =
   { "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/type",  contextMetadataType       },
   { "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/value", contextMetadataValue      },
   
-  { "/updateContextRequest/contextElementList/contextElement/domainMetadataList/",                     nullTreat            },
-  { "/updateContextRequest/contextElementList/contextElement/domainMetadataList/domainMetadata",       domainMetadata       },
-  { "/updateContextRequest/contextElementList/contextElement/domainMetadataList/domainMetadata/name",  domainMetadataName   },
-  { "/updateContextRequest/contextElementList/contextElement/domainMetadataList/domainMetadata/type",  domainMetadataType   },
-  { "/updateContextRequest/contextElementList/contextElement/domainMetadataList/domainMetadata/value", domainMetadataValue  },
+  { "/updateContextRequest/contextElementList/contextElement/domainMetadata/",                      nullTreat            },
+  { "/updateContextRequest/contextElementList/contextElement/domainMetadata/contextMetadata",       domainMetadata       },
+  { "/updateContextRequest/contextElementList/contextElement/domainMetadata/contextMetadata/name",  domainMetadataName   },
+  { "/updateContextRequest/contextElementList/contextElement/domainMetadata/contextMetadata/type",  domainMetadataType   },
+  { "/updateContextRequest/contextElementList/contextElement/domainMetadata/contextMetadata/value", domainMetadataValue  },
   
   { "/updateContextRequest/updateAction", updateAction },
 

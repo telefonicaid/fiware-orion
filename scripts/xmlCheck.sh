@@ -458,7 +458,16 @@ fi
 
 echo "Tested ${xmlDocsProcessed} (${xmlFilesProcessed} files + ${xmlPartsProcessed} parts) out of ${xmlDocsFound} (${xmlFilesFound} files + ${xmlPartsFound} parts) XML documents:"
 echo "  ${xmlDocsOk} documents passed the XML validity test"
-echo "  ${xmlDocsErrors} documents did not pass"
+
+if [ "$xmlDocsErrors" != 0 ]
+then
+  echo "  ${xmlDocsErrors} documents did not pass"
+else
+  echo "  -----------------------"
+  echo "  ALL documents passed!!!"
+  echo "  -----------------------"
+fi
+
 echo
 echo "${xmlFilesInvalid} documents were not tested as they on purpose don't follow the XSD"
 echo "${xmlFilesPostponed} documents were not tested as they still have no XSD"

@@ -64,6 +64,8 @@ std::string QueryContextRequest::check(RequestType requestType, Format format, s
   std::string           res;
   QueryContextResponse  response;
 
+  LM_M(("In QueryContextRequest::check: restrictions == %d", restrictions));
+
   if (predetectedError != "")
   {
     response.errorCode.code         = SccBadRequest;
