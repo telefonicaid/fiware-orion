@@ -58,15 +58,16 @@ void MetadataVector::tagSet(std::string tagName)
 */
 std::string MetadataVector::render(Format format, std::string indent, bool comma)
 {
-  std::string out = "";
+  std::string out     = "";
+  std::string jsonTag = "metadatas";
 
   if (vec.size() == 0)
     return "";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, jsonTag, format, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ");
-  out += endTag(indent, tag, format, comma);
+    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
+  out += endTag(indent, tag, format, comma, true);
 
 
   return out;

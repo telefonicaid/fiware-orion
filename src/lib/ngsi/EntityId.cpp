@@ -79,7 +79,7 @@ void EntityId::tagSet(std::string tagName)
 * FIXME P1: startTag() is not enough for the XML case of entityId - XML attributes ...
 *           Perhaps add a vector of attributes to startTag() ?
 */
-std::string EntityId::render(Format format, std::string indent, bool comma)
+std::string EntityId::render(Format format, std::string indent, bool comma, bool isInVector, std::string assocTag)
 {
   std::string out     = "";
 
@@ -91,12 +91,13 @@ std::string EntityId::render(Format format, std::string indent, bool comma)
   }
   else
   {
-    out += indent + "{"                                     + "\n";
-    out += indent + "  " + "\"type\" : \""      + type      + "\","  + "\n";
-    out += indent + "  " + "\"isPattern\" : \"" + isPattern + "\","  + "\n";
-    out += indent + "  " + "\"id\" : \""        + id        + "\""   + "\n";
-    out += indent + "}";
-    out += (comma == true)? ",\n" : "\n";
+    bool isAssoc = !assocTag.empty();
+    out += (isInVector? indent + (isAssoc? "\"" + assocTag + "\" : ": "") + "{\n": "");
+    out += indent + (isInVector? "  " : "") + "\"type\" : \""      + type      + "\","  + "\n";
+    out += indent + (isInVector? "  " : "") + "\"isPattern\" : \"" + isPattern + "\","  + "\n";
+    out += indent + (isInVector? "  " : "") + "\"id\" : \""        + id        + "\""   + "\n";
+    out += (isInVector? indent + "}" : "");
+    out += (comma == true)? ",\n" : (isInVector? "\n" : "");
   }
 
   return out;

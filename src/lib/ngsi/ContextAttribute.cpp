@@ -86,16 +86,16 @@ ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::st
 *
 * render - 
 */
-std::string ContextAttribute::render(Format format, std::string indent)
+std::string ContextAttribute::render(Format format, std::string indent, bool isInVector)
 {
   std::string out = "";
   std::string tag = "contextAttribute";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, format, false);
   out += valueTag(indent + "  ", "name",         name,  format, true);
   out += valueTag(indent + "  ", "type",         type,  format, true);
   out += valueTag(indent + "  ", "contextValue", value, format, false);
-  out += endTag(indent, tag, format);
+  out += endTag(indent, tag, format, isInVector);
 
   return out;
 }
