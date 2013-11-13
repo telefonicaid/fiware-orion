@@ -42,7 +42,7 @@ std::string postSubscribeContextAvailability(ConnectionInfo* ciP, int components
   SubscribeContextAvailabilityResponse  scar;
   std::string                           answer;
 
-  // FIXME: by the moment, we are assuming that notification will be sent in the same format than the one
+  // FIXME P6: by the moment, we are assuming that notification will be sent in the same format than the one
   // used to do the subscription, so we are passing ciP->inFomat. This is just an heuristic, the client could want
   // for example to use XML in the subscription message but wants notifications in JSON. We need a more
   // flexible approach, to be implemented
