@@ -343,8 +343,8 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 --REGEXPECT--
 <?xml version="1.0"?>
 <registerContextResponse>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
   <duration>PT1H</duration>
+  <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 1: ++++++++++++++++++++
 <?xml version="1.0"?>
@@ -356,15 +356,15 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 2: ++++++++++++++++++++
 <?xml version="1.0"?>
 <registerContextResponse>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
   <duration>PT1H</duration>
+  <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 { "count" : 2 }
 3: ++++++++++++++++++++
 <?xml version="1.0"?>
 <registerContextResponse>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
   <duration>PT1H</duration>
+  <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 4: ++++++++++++++++++++
 <?xml version="1.0"?>
@@ -376,14 +376,14 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 5: ++++++++++++++++++++
 <?xml version="1.0"?>
 <registerContextResponse>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
   <duration>PT1H</duration>
+  <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 6: ++++++++++++++++++++
 <?xml version="1.0"?>
 <registerContextResponse>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
   <duration>PT1H</duration>
+  <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 { "count" : 4 }
 7: ++++++++++++++++++++
@@ -407,8 +407,8 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 9: ++++++++++++++++++++
 <?xml version="1.0"?>
 <registerContextResponse>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
   <duration>PT1H</duration>
+  <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 10: ++++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify

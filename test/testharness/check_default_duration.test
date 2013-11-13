@@ -110,8 +110,8 @@ EOF
 --REGEXPECT--
 <?xml version="1.0"?>
 <registerContextResponse>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
   <duration>PT24H</duration>
+  <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 ++++++++++++++++++++
 <?xml version="1.0"?>

@@ -108,8 +108,8 @@ echo "2: ***********************************"
 --REGEXPECT--
 1: ***********************************
 {
-  "registrationId" : "REGEX([0-9a-f]{24})",
-  "duration" : "PT1M"
+  "duration" : "PT1M",
+  "registrationId" : "REGEX([0-9a-f]{24})"
 }
 2: ***********************************
 --TEARDOWN--

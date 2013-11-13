@@ -143,8 +143,8 @@ echo "+++++ Discovery Done +++++++++++++++"
 --REGEXPECT--
 +++++ Starting +++++++++++++++
 {
-  "registrationId" : "REGEX([0-9a-f]{24})",
-  "duration" : "PT1M"
+  "duration" : "PT1M",
+  "registrationId" : "REGEX([0-9a-f]{24})"
 }
 +++++ Registration Done +++++++++++++++
 {

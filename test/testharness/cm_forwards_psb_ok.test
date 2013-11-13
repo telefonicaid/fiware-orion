@@ -272,8 +272,8 @@ fi
 1: ++++++++++++++++++++
 <?xml version="1.0"?>
 <registerContextResponse>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
   <duration>PT1H</duration>
+  <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 2: ++++++++++++++++++++
 <?xml version="1.0"?>
@@ -330,8 +330,8 @@ fi
 4: ++++++++++++++++++++
 <?xml version="1.0"?>
 <registerContextResponse>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
   <duration>PT5H</duration>
+  <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 5: ++++++++++++++++++++
 <?xml version="1.0"?>
