@@ -115,8 +115,8 @@ echo "++++++++++++++++++++"
 --REGEXPECT--
 <?xml version="1.0"?>
 <registerContextResponse>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
   <duration>PT1H</duration>
+  <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 ++++++++++++++++++++
 --TEARDOWN--
