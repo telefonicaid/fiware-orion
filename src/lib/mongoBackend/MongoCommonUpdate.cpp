@@ -354,10 +354,14 @@ static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::
         /* Build attribute list vector */
         AttributeList attrL = subToAttributeList(sub);
 
+        /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
+        Format format = sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML;
+
         /* Send notification */
         if (processOnChangeCondition(enV, attrL, NULL,
                                      subId.str(),
-                                     STR_FIELD(sub, CSUB_REFERENCE))) {
+                                     STR_FIELD(sub, CSUB_REFERENCE),
+                                     format)) {
 
             BSONObj query = BSON("_id" << subId);
             BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CSUB_COUNT << 1));

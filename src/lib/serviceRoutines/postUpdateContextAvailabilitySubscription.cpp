@@ -43,7 +43,11 @@ std::string postUpdateContextAvailabilitySubscription(ConnectionInfo* ciP, int c
 
   ucas.subscriptionId = parseDataP->ucas.res.subscriptionId;
 
-  mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res, &ucas);
+  // FIXME P6: by the moment, we are assuming that notification will be sent in the same format than the one
+  // used to do the subscription, so we are passing ciP->inFomat. This is just an heuristic, the client could want
+  // for example to use XML in the subscription message but wants notifications in JSON. We need a more
+  // flexible approach, to be implemented
+  mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res, &ucas, ciP->inFormat);
   answer = ucas.render(UpdateContextAvailabilitySubscription, ciP->outFormat, "", 0);
 
   return answer;

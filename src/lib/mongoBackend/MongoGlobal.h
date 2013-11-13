@@ -85,6 +85,7 @@ using namespace mongo;
 #define CSUB_ENTITY_TYPE        "type"
 #define CSUB_ENTITY_ISPATTERN   "isPattern"
 #define CSUB_COUNT              "count"
+#define CSUB_FORMAT             "format"
 
 #define CASUB_EXPIRATION        "expiration"
 #define CASUB_REFERENCE         "reference"
@@ -95,6 +96,7 @@ using namespace mongo;
 #define CASUB_ENTITY_ISPATTERN  "isPattern"
 #define CASUB_LASTNOTIFICATION  "lastNotification"
 #define CASUB_COUNT             "count"
+#define CASUB_FORMAT            "format"
 
 #define ASSOC_SOURCE_ENT        "srcEnt"
 #define ASSOC_TARGET_ENT        "tgtEnt"
@@ -309,20 +311,20 @@ extern void processOntimeIntervalCondition(std::string subId, int interval);
 * processOnChangeCondition -
 *
 */
-extern bool processOnChangeCondition(EntityIdVector enV, AttributeList attrV, ConditionValueList* condValues, std::string subId, std::string notifyUrl);
+extern bool processOnChangeCondition(EntityIdVector enV, AttributeList attrV, ConditionValueList* condValues, std::string subId, std::string notifyUrl, Format format);
 
 /* ****************************************************************************
 *
 * processConditionVector -
 *
 */
-extern BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone);
+extern BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format);
 
 /* ****************************************************************************
 *
 * processAvailabilitySubscriptions -
 *
 */
-extern bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl);
+extern bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl, Format format);
 
 #endif

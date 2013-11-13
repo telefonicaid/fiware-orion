@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
 #include "common/sem.h"
+#include "common/Format.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubscribeContext.h"
 #include "ngsi10/SubscribeContextRequest.h"
@@ -38,7 +39,7 @@
 *
 * mongoSubscribeContext - 
 */
-HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, SubscribeContextResponse* responseP)
+HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, SubscribeContextResponse* responseP, Format inFormat)
 {
 
     /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
@@ -93,12 +94,16 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
                                              requestP->entityIdVector,
                                              requestP->attributeList, oid.str(),
                                              requestP->reference.get(),
-                                             &notificationDone);
+                                             &notificationDone,
+                                             inFormat);
     sub.append(CSUB_CONDITIONS, conds);
     if (notificationDone) {
         sub.append(CSUB_LASTNOTIFICATION, getCurrentTime());
         sub.append(CSUB_COUNT, 1);
     }
+
+    /* Adding format to use in notifications */
+    sub.append(CSUB_FORMAT, std::string(formatToString(inFormat)));
 
     /* Insert document in database */
     BSONObj subDoc = sub.obj();

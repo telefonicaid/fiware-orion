@@ -300,8 +300,11 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
         /* Build attribute list vector */
         AttributeList attrL = subToAttributeList(sub);
 
+        /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
+        Format format = sub.hasField(CASUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CASUB_FORMAT)) : XML;
+
         /* Send notification */
-        if (!processAvailabilitySubscription(triggerEntitiesV, attrL, subId.str(), STR_FIELD(sub, CSUB_REFERENCE))) {
+        if (!processAvailabilitySubscription(triggerEntitiesV, attrL, subId.str(), STR_FIELD(sub, CSUB_REFERENCE), format)) {
             ret = false;
         }
 

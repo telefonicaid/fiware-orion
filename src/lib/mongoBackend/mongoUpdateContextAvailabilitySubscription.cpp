@@ -26,7 +26,9 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
+#include "common/Format.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContextAvailabilitySubscription.h"
@@ -39,7 +41,7 @@
 *
 * mongoUpdateContextAvailabilitySubscription - 
 */
-HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabilitySubscriptionRequest* requestP, UpdateContextAvailabilitySubscriptionResponse* responseP)
+HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabilitySubscriptionRequest* requestP, UpdateContextAvailabilitySubscriptionResponse* responseP, Format inFormat)
 {
   /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
   semTake();
@@ -129,11 +131,14 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
 
   /* The hasField check is needed due to lastNotification/count could not be present in the original doc */
   if (sub.hasField(CASUB_LASTNOTIFICATION)) {
-      newSub.append(CASUB_LASTNOTIFICATION, sub.getIntField(CSUB_LASTNOTIFICATION));
+      newSub.append(CASUB_LASTNOTIFICATION, sub.getIntField(CASUB_LASTNOTIFICATION));
   }
   if (sub.hasField(CASUB_COUNT)) {
       newSub.append(CASUB_COUNT, count);
   }
+
+  /* Adding format to use in notifications */
+  newSub.append(CASUB_FORMAT, std::string(formatToString(inFormat)));
 
   /* Update document in MongoDB */
   BSONObj update = newSub.obj();
@@ -157,7 +162,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
   }
 
   /* Send notifications for matching context registrations */
-  processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, requestP->subscriptionId.get(), STR_FIELD(sub, CASUB_REFERENCE));
+  processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, requestP->subscriptionId.get(), STR_FIELD(sub, CASUB_REFERENCE), inFormat);
 
   /* Duration is an optional parameter, it is only added in the case they
    * was used for update */
