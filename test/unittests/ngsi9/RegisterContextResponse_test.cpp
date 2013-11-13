@@ -46,7 +46,7 @@ TEST(RegisterContextResponse, constructors)
   RegisterContextResponse  rcr5("012345678901234567890123", "PT1M");
 
   std::string              out;
-  std::string              expected1 = "<registerContextResponse>\n  <registrationId>REG_ID2</registrationId>\n  <duration>PT1S</duration>\n</registerContextResponse>\n";
+  std::string              expected1 = "<registerContextResponse>\n  <duration>PT1S</duration>\n  <registrationId>REG_ID2</registrationId>\n</registerContextResponse>\n";
   std::string              expected2 = "<registerContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad length (24 chars expected)</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   std::string              expected3 = "<registerContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Forced Error</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   std::string              expected4 = "<registerContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>syntax error in duration string</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";

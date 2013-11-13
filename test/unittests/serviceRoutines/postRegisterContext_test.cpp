@@ -68,7 +68,7 @@ TEST(postRegisterContext, ok)
   fwdPort = 0;
 
   ConnectionInfo ci("/ngsi9/registerContext",  "POST", "1.1");
-  std::string    expectedStart  = "<registerContextResponse>\n  <registrationId>";
+  std::string    expectedStart  = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <registrationId>";
   const char*    fileName       = "ngsi9.registerContextRequest.ok.valid.xml";
   std::string    out;
 

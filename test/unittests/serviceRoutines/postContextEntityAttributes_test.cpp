@@ -59,7 +59,7 @@ static RestService rs[] =
 TEST(postContextEntityAttributes, ok)
 {
   ConnectionInfo ci("/ngsi9/contextEntities/entity03/attributes",  "POST", "1.1");
-  std::string    expectedStart = "<registerContextResponse>\n  <registrationId>";
+  std::string    expectedStart = "<registerContextResponse>\n  <duration>PT1S</duration>\n  <registrationId>";
   const char*    fileName      = "ngsi9.registerProviderRequest.noRegistrationId.postponed.xml";
   std::string    out;
 
