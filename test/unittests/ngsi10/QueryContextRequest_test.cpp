@@ -149,11 +149,12 @@ TEST(QueryContextRequest, entityIdIdAsAttribute_xml)
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     fileName = "ngsi10.queryContextRequest.entityIdIdAsAttribute.invalid.xml";
+  std::string     expected = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ("OK", result) << "entityIdIdAsAttribute";
+  EXPECT_EQ(expected, result);
 }
 
 
@@ -333,24 +334,6 @@ TEST(QueryContextRequest, overwriteEntityIdIsPattern_xml)
 
 /* ****************************************************************************
 *
-* overwriteEntityIdId_xml - 
-*/
-TEST(QueryContextRequest, overwriteEntityIdId_xml)
-{
-  ParseData       reqData;
-  ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.entityIdIdAsAttribute.invalid.xml";
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
-
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ("OK", result) << "overwriteEntityIdId";
-}
-
-
-
-/* ****************************************************************************
-*
 * noEntityList_xml - 
 */
 TEST(QueryContextRequest, noEntityList_xml)
@@ -414,7 +397,7 @@ TEST(QueryContextRequest, noAttributeExpression_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.noAttributeExpression.valid.xml";
+  const char*     fileName = "ngsi10.queryContextRequest.noAttributeExpression.invalid.xml";
   const char*     expect   = "OK";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";

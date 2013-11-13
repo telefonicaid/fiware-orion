@@ -3,10 +3,8 @@
     <contextRegistrationList>
       <contextRegistration>
         <entityIdList>
-          <entityId type="Room" isPattern="false" id="ID">
+          <entityId type="Room" isPattern="false">
             <id>ConferenceRoom</id>
-            <type>Room</type>
-            <isPattern>false</isPattern>
           </entityId>
           <entityId type="Room" isPattern="false">
             <id>OfficeRoom</id>

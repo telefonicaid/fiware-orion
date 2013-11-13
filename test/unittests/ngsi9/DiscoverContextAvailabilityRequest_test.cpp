@@ -323,11 +323,12 @@ TEST(DiscoverContextAvailabilityRequest, entityIdIdAsAttribute_xml)
   ParseData       reqData;
   const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.entityIdIdAsAttribute.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
+  std::string     expected = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-  EXPECT_EQ("OK", result) << "invalid 'isPattern' value";
+  EXPECT_EQ(expected, result);
 }
 
 
@@ -429,24 +430,6 @@ TEST(DiscoverContextAvailabilityRequest, entityIdIsPattern_json)
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
 
-  EXPECT_EQ("OK", result) << "invalid 'isPattern' value";
-}
-
-
-
-/* ****************************************************************************
-*
-* overrideEntityIdId_xml - 
-*/
-TEST(DiscoverContextAvailabilityRequest, overrideEntityIdId_xml)
-{
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.EntityIdIdAsAttribute.invalid.xml";
-  ConnectionInfo  ci("", "POST", "1.1");
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
-
-  std::string result = xmlTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
   EXPECT_EQ("OK", result) << "invalid 'isPattern' value";
 }
 

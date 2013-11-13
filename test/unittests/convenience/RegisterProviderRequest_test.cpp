@@ -46,7 +46,7 @@
 TEST(RegisterProviderRequest, xml_ok)
 {
   ParseData       reqData;
-  const char*     fileName = "ngsi9.registerProviderRequest.ok.valid.xml";
+  const char*     fileName = "ngsi9.registerProviderRequest.ok.postponed.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat = XML;

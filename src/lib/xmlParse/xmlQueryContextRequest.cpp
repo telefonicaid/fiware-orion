@@ -81,40 +81,6 @@ static int entityIdId(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* entityIdType - 
-*/
-static int entityIdType(xml_node<>* node, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got an entityId:type: '%s'", node->value()));
-
-  if ((reqDataP->qcr.entityIdP->type != "") && (reqDataP->qcr.entityIdP->type != node->value()))
-    LM_W(("Overwriting entityId:type (was '%s') for '%s'", reqDataP->qcr.entityIdP->type.c_str(), node->value()));
-  reqDataP->qcr.entityIdP->type = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* entityIdIsPattern - 
-*/
-static int entityIdIsPattern(xml_node<>* node, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", node->value()));
-
-  if ((reqDataP->qcr.entityIdP->isPattern != "") && (reqDataP->qcr.entityIdP->isPattern != node->value()))
-    LM_W(("Overwriting entityId:isPattern (was '%s') for '%s'", reqDataP->qcr.entityIdP->isPattern.c_str(), node->value()));
-  reqDataP->qcr.entityIdP->isPattern = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
 * attribute - 
 */
 static int attribute(xml_node<>* node, ParseData* reqDataP)
@@ -269,8 +235,6 @@ XmlNode qcrParseVector[] =
   { "/queryContextRequest/entityIdList",                                nullTreat            },
   { "/queryContextRequest/entityIdList/entityId",                       entityId             },
   { "/queryContextRequest/entityIdList/entityId/id",                    entityIdId           },
-  { "/queryContextRequest/entityIdList/entityId/type",                  entityIdType         },
-  { "/queryContextRequest/entityIdList/entityId/isPattern",             entityIdIsPattern    },
   { "/queryContextRequest/attributeList",                               nullTreat            },
   { "/queryContextRequest/attributeList/attribute",                     attribute            },
   { "/queryContextRequest/restriction",                                 restriction          },
