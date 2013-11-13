@@ -344,12 +344,14 @@ static void prepareDatabasePatternTrue(void) {
   BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860010") <<
                       "expiration" << 1879048191 <<
                       "reference" << "http://notify1.me" <<
+                      "format" << "XML" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E7" << "type" << "T7" << "isPattern" << "false")) <<
                       "attrs" << BSONArray());
 
   BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860020") <<
                       "expiration" << 1879048191 <<
                       "reference" << "http://notify2.me" <<
+                      "format" << "XML" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E8" << "type" << "T8" << "isPattern" << "false")) <<
                       "attrs" << BSON_ARRAY("A4"));
 
