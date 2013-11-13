@@ -107,7 +107,7 @@ TEST(NotifyContextAvailabilityRequest, badEntityAttribute_xml)
   ParseData       parseData;
   const char*     fileName = "ngsi9.notifyContextAvailabilityRequest.entityAttribute.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
-  std::string     expected = "<notifyContextAvailabilityResponse>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </statusCode>\n</notifyContextAvailabilityResponse>\n";
+  std::string     expected = "<notifyContextAvailabilityResponse>\n  <responseCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </responseCode>\n</notifyContextAvailabilityResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -126,8 +126,8 @@ TEST(NotifyContextAvailabilityRequest, check)
   NotifyContextAvailabilityRequest  ncr;
   std::string                       check;
   std::string                       expected1 = "OK";
-  std::string                       expected2 = "<notifyContextAvailabilityResponse>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>predetected error</reasonPhrase>\n  </statusCode>\n</notifyContextAvailabilityResponse>\n";
-  std::string                       expected3 = "<notifyContextAvailabilityResponse>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>bad length (24 chars expected)</reasonPhrase>\n  </statusCode>\n</notifyContextAvailabilityResponse>\n";
+  std::string                       expected2 = "<notifyContextAvailabilityResponse>\n  <responseCode>\n    <code>400</code>\n    <reasonPhrase>predetected error</reasonPhrase>\n  </responseCode>\n</notifyContextAvailabilityResponse>\n";
+  std::string                       expected3 = "<notifyContextAvailabilityResponse>\n  <responseCode>\n    <code>400</code>\n    <reasonPhrase>bad length (24 chars expected)</reasonPhrase>\n  </responseCode>\n</notifyContextAvailabilityResponse>\n";
 
   // check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
   check = ncr.check(NotifyContextAvailability, XML, "", "", 0);

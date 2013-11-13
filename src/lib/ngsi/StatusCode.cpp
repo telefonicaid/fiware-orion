@@ -45,6 +45,7 @@ StatusCode::StatusCode()
   code         = SccNone;
   reasonPhrase = "";
   details      = "";
+  tag          = "statusCode";
 }
 
 
@@ -58,6 +59,7 @@ StatusCode::StatusCode(HttpStatusCode _code, std::string _reasonPhrase, std::str
   code          = _code;
   reasonPhrase  = _reasonPhrase;
   details       = _details;
+  tag           = "statusCode";
 }
 
 
@@ -69,7 +71,6 @@ StatusCode::StatusCode(HttpStatusCode _code, std::string _reasonPhrase, std::str
 std::string StatusCode::render(Format format, std::string indent, bool comma)
 {
   std::string out  = "";
-  std::string tag  = "statusCode";
 
   out += startTag(indent, tag, format);
   out += valueTag(indent + "  ", "code", code, format, true);
@@ -161,4 +162,15 @@ void StatusCode::present(std::string indent)
 void StatusCode::release(void)
 {
    /* This method is included for the sake of homogeneity */
+}
+
+
+
+/* ****************************************************************************
+*
+* tagSet - 
+*/
+void StatusCode::tagSet(std::string _tag)
+{
+  tag = _tag;
 }

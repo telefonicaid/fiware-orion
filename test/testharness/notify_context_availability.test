@@ -108,10 +108,10 @@ echo "2: ++++++++++++++++++++"
 --REGEXPECT--
 <?xml version="1.0"?>
 <notifyContextAvailabilityResponse>
-  <statusCode>
+  <responseCode>
     <code>200</code>
     <reasonPhrase>OK</reasonPhrase>
-  </statusCode>
+  </responseCode>
 </notifyContextAvailabilityResponse>
 1: ++++++++++++++++++++
 <?xml version="1.0"?>
