@@ -45,6 +45,8 @@ typedef struct StatusCode
   std::string     reasonPhrase;     // Mandatory
   std::string     details;          // Optional
 
+  std::string     tag;              // tag to be rendered
+
   StatusCode();
   StatusCode(HttpStatusCode _code, std::string _reasonPhrase, std::string _details);
 
@@ -55,6 +57,7 @@ typedef struct StatusCode
   void         fill(ErrorCode* ecP);
   void         present(std::string indent);
   void         release(void);
+  void         tagSet(std::string _tag);
 } StatusCode;
 
 #endif

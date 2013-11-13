@@ -152,17 +152,17 @@ echo "3: ***********************************"
 --REGEXPECT--
 1: ***********************************
 <notifyContextAvailabilityResponse>
-  <statusCode>
+  <responseCode>
     <code>200</code>
     <reasonPhrase>OK</reasonPhrase>
-  </statusCode>
+  </responseCode>
 </notifyContextAvailabilityResponse>
 2: ***********************************
 <notifyContextAvailabilityResponse>
-  <statusCode>
+  <responseCode>
     <code>400</code>
     <reasonPhrase>bad length (24 chars expected)</reasonPhrase>
-  </statusCode>
+  </responseCode>
 </notifyContextAvailabilityResponse>
 3: ***********************************
 --TEARDOWN--
