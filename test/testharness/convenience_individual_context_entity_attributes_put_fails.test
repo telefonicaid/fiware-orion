@@ -61,7 +61,7 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-echo "---------- 1. put an entity ----------"
+echo "+++++ 1. put an entity +++++"
 (curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes -s -S --header 'Content-Type: application/xml' -X PUT -d @- | xmllint --format - ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
@@ -83,20 +83,19 @@ EOF
 
 
 --REGEXPECT--
----------- 1. put an entity ----------
++++++ 1. put an entity +++++
 <?xml version="1.0"?>
-<contextElementResponse>
-  <contextElement>
-    <entityId type="" isPattern="false">
-      <id>entity01</id>
-    </entityId>
-  </contextElement>
-  <statusCode>
-    <code>404</code>
-    <reasonPhrase>Entity Not Found</reasonPhrase>
-    <details>entity01</details>
-  </statusCode>
-</contextElementResponse>
+<updateContextElementResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <statusCode>
+        <code>404</code>
+        <reasonPhrase>Entity not found</reasonPhrase>
+        <details>entity: (entity01, , false)</details>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</updateContextElementResponse>
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})

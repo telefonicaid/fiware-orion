@@ -61,12 +61,16 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-echo "---------- 1. put an entity ----------"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes/attr01 -s -S --header 'Content-Type: application/xml' -X PUT -d "<nothing></nothing>" | xmllint --format)
+echo "+++++ 1. put an entity +++++"
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes/attr01 -s -S --header 'Content-Type: application/xml' -X PUT -d "<nothing></nothing>")
 
 --REGEXPECT--
----------- 1. put an entity ----------
-no request treating object found
++++++ 1. put an entity +++++
+<errorCode>
+  <code>400</code>
+  <reasonPhrase>no request treating object found</reasonPhrase>
+  <details>Sorry, no request treating object found for RequestType 'IndividualContextEntityAttribute'</details>
+</errorCode>
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})
