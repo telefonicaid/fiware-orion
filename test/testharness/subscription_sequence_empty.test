@@ -246,7 +246,7 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
           <restriction>restriction</restriction>
         </notifyCondition>
   </notifyConditions>
-  <throttling></throttling>
+  <throttling>PT1S</throttling>
 </subscribeContextRequest>
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
@@ -270,7 +270,7 @@ echo "7: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Append</updateAction>
+  <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
 echo "8: ++++++++++++++++++++"
@@ -292,7 +292,7 @@ echo "8: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Delete</updateAction>
+  <updateAction>DELETE</updateAction>
 </updateContextRequest>
 EOF
 echo "9: ++++++++++++++++++++"
@@ -382,6 +382,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   <subscribeResponse>
     <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
     <duration>PT1H</duration>
+    <throttling>PT1S</throttling>
   </subscribeResponse>
 </subscribeContextResponse>
 7: ++++++++++++++++++++
@@ -631,44 +632,6 @@ Content-Type: application/xml
           <id>OfficeRoom</id>
         </entityId>
         <contextAttributeList>
-          <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue>L23</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</notifyContextRequest>
-
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Content-Length: 911
-User-Agent: NGSI Rest Library
-Host: localhost:REGEX(\d+)
-Accept: */*
-Content-Type: application/xml
-
-<notifyContextRequest>
-  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-  <originator>localhost</originator>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>t39</contextValue>
-          </contextAttribute>
           <contextAttribute>
             <name>lightstatus</name>
             <type>light</type>

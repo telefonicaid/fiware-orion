@@ -77,7 +77,7 @@ fi
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Update</updateAction>
+  <updateAction>UPDATE</updateAction>
 </updateContextRequest>
 EOF
 echo "1: ++++++++++++++++++++"
@@ -111,7 +111,7 @@ echo "1: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Update</updateAction>
+  <updateAction>UPDATE</updateAction>
 </updateContextRequest>
 EOF
 echo "2: ++++++++++++++++++++"
@@ -162,7 +162,7 @@ echo "3: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Update</updateAction>
+  <updateAction>UPDATE</updateAction>
 </updateContextRequest>
 EOF
 echo "4: ++++++++++++++++++++"
@@ -196,7 +196,7 @@ echo "4: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Update</updateAction>
+  <updateAction>UPDATE</updateAction>
 </updateContextRequest>
 EOF
 echo "5: ++++++++++++++++++++"
@@ -218,7 +218,7 @@ echo "5: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Append</updateAction>
+  <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
 echo "6: ++++++++++++++++++++"
@@ -240,7 +240,7 @@ echo "6: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Update</updateAction>
+  <updateAction>UPDATE</updateAction>
 </updateContextRequest>
 EOF
 echo "7: ++++++++++++++++++++"
@@ -274,7 +274,7 @@ echo "7: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Update</updateAction>
+  <updateAction>UPDATE</updateAction>
 </updateContextRequest>
 EOF
 echo "8: ++++++++++++++++++++"
@@ -296,7 +296,7 @@ echo "8: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Append</updateAction>
+  <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
 echo "9: ++++++++++++++++++++"
@@ -318,7 +318,7 @@ echo "9: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Update</updateAction>
+  <updateAction>UPDATE</updateAction>
 </updateContextRequest>
 EOF
 echo "10: ++++++++++++++++++++"
@@ -340,7 +340,7 @@ echo "10: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Delete</updateAction>
+  <updateAction>DELETE</updateAction>
 </updateContextRequest>
 EOF
 echo "11: ++++++++++++++++++++"
@@ -362,7 +362,7 @@ echo "11: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Delete</updateAction>
+  <updateAction>DELETE</updateAction>
 </updateContextRequest>
 EOF
 echo "12: ++++++++++++++++++++"
@@ -384,7 +384,7 @@ echo "12: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Delete</updateAction>
+  <updateAction>DELETE</updateAction>
 </updateContextRequest>
 EOF
 echo "13: ++++++++++++++++++++"
@@ -406,7 +406,7 @@ echo "13: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Update</updateAction>
+  <updateAction>UPDATE</updateAction>
 </updateContextRequest>
 EOF
 echo "14: ++++++++++++++++++++"
@@ -440,7 +440,7 @@ echo "14: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Update</updateAction>
+  <updateAction>UPDATE</updateAction>
 </updateContextRequest>
 EOF
 echo "15: ++++++++++++++++++++"
@@ -462,7 +462,7 @@ echo "15: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Append</updateAction>
+  <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
 echo "16: ++++++++++++++++++++"
@@ -489,7 +489,7 @@ echo "16: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Update</updateAction>
+  <updateAction>UPDATE</updateAction>
 </updateContextRequest>
 EOF
 echo "17: ++++++++++++++++++++"
@@ -550,32 +550,10 @@ echo "18: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Update</updateAction>
+  <updateAction>UPDATE</updateAction>
 </updateContextRequest>
 EOF
 echo "19: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
-          <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue></contextValue>
-                </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>Delhete</updateAction>
-</updateContextRequest>
-EOF
-echo "20: ++++++++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
@@ -594,7 +572,7 @@ echo "20: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Update</updateAction>
+  <updateAction>UPDATE</updateAction>
 </updateContextRequest>
 EOF
 --REGEXPECT--
@@ -831,7 +809,7 @@ EOF
       <statusCode>
         <code>472</code>
         <reasonPhrase>Empty Attribute in UPDATE or APPEND</reasonPhrase>
-        <details>action: Append - entity: (OfficeRoom, Room, false) - offending attribute: pressure</details>
+        <details>action: APPEND - entity: (OfficeRoom, Room, false) - offending attribute: pressure</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -856,7 +834,7 @@ EOF
       <statusCode>
         <code>472</code>
         <reasonPhrase>Empty Attribute in UPDATE or APPEND</reasonPhrase>
-        <details>action: Update - entity: (OfficeRoom, Room, false) - offending attribute: pressure</details>
+        <details>action: UPDATE - entity: (OfficeRoom, Room, false) - offending attribute: pressure</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -1131,15 +1109,6 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 19: ++++++++++++++++++++
-<?xml version="1.0"?>
-<updateContextResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad request</reasonPhrase>
-    <details>invalid update action type: 'Delhete'</details>
-  </errorCode>
-</updateContextResponse>
-20: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>

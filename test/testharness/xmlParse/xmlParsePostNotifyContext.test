@@ -134,10 +134,10 @@ echo "++++++++++++++++++++"
 --REGEXPECT--
 <?xml version="1.0"?>
 <notifyContextResponse>
-  <statusCode>
+  <responseCode>
     <code>200</code>
     <reasonPhrase>OK</reasonPhrase>
-  </statusCode>
+  </responseCode>
 </notifyContextResponse>
 ++++++++++++++++++++
 --TEARDOWN--

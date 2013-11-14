@@ -122,7 +122,7 @@ TEST(NotifyContextRequest, xml_badIsPattern)
    ParseData       reqData;
    ConnectionInfo  ci("", "POST", "1.1");
    const char*     fileName = "ngsi10.notifyContextRequest.isPattern.invalid.xml";
-   std::string     expected = "<notifyContextResponse>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </statusCode>\n</notifyContextResponse>\n";
+   std::string     expected = "<notifyContextResponse>\n  <responseCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </responseCode>\n</notifyContextResponse>\n";
 
    EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -149,7 +149,7 @@ TEST(NotifyContextRequest, json_badIsPattern)
   ci.outFormat = JSON;
 
   std::string result   = jsonTreat(testBuf, &ci, &reqData, NotifyContext, "notifyContextRequest", NULL);
-  std::string expected = "{\n  \"statusCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"bad value for 'isPattern'\"\n  }\n}\n";
+  std::string expected = "{\n  \"responseCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"bad value for 'isPattern'\"\n  }\n}\n";
 
   EXPECT_EQ(expected, result);
 }
@@ -165,7 +165,7 @@ TEST(NotifyContextRequest, xml_invalidEntityIdAttribute)
    ParseData       reqData;
    ConnectionInfo  ci("", "POST", "1.1");
    const char*     fileName = "ngsi10.notifyContextRequest.entityIdAttribute.invalid.xml";
-   std::string     expected = "<notifyContextResponse>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </statusCode>\n</notifyContextResponse>\n";
+   std::string     expected = "<notifyContextResponse>\n  <responseCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </responseCode>\n</notifyContextResponse>\n";
 
    EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -182,7 +182,7 @@ TEST(NotifyContextRequest, xml_invalidEntityIdAttribute)
 TEST(NotifyContextRequest, predetectedError)
 {
    NotifyContextRequest ncr;
-   std::string          expected = "<notifyContextResponse>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>predetected error</reasonPhrase>\n  </statusCode>\n</notifyContextResponse>\n";
+   std::string          expected = "<notifyContextResponse>\n  <responseCode>\n    <code>400</code>\n    <reasonPhrase>predetected error</reasonPhrase>\n  </responseCode>\n</notifyContextResponse>\n";
    std::string          out      = ncr.check(NotifyContext, XML, "", "predetected error", 0);
 
    EXPECT_EQ(expected, out);
