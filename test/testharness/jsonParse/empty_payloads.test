@@ -115,19 +115,19 @@ echo "13: ++++++++++++++++++++"
 }
 2: ++++++++++++++++++++
 {
+  "subscriptionId" : "No Subscription ID",
   "errorCode" : {
     "code" : "400",
     "reasonPhrase" : "No entities"
-  },
-  "subscriptionId" : "No Subscription ID"
+  }
 }
 3: ++++++++++++++++++++
 {
+  "subscriptionId" : "No Subscription ID",
   "errorCode" : {
     "code" : "400",
     "reasonPhrase" : "No entities"
-  },
-  "subscriptionId" : "No Subscription ID"
+  }
 }
 4: ++++++++++++++++++++
 {

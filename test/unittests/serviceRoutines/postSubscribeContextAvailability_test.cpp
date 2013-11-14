@@ -59,7 +59,7 @@ static RestService rs[] =
 TEST(postSubscribeContextAvailability, ok)
 {
   ConnectionInfo ci("/ngsi9/subscribeContextAvailability",  "POST", "1.1");
-  std::string    expectedStart  = "<subscribeContextAvailabilityResponse>\n  <duration>PT1M</duration>";
+  std::string    expectedStart  = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>";
   const char*    fileName       = "ngsi9.subscribeContextAvailabilityRequest.subscriptionIdNot24Chars.invalid.xml";
   std::string    out;
 

@@ -38,6 +38,7 @@ function usage()
   echo "${spaces} [--no-harness (no harness files)]"
   echo "${spaces} [--dryrun (don't actually execute anything)]"
   echo "${spaces} [--no-cleanup (do NOT remove harness files at end of processing)]"
+  echo "${spaces} [--keep (do NOT remove harness files at end of processing)]"
   echo "${spaces} [--xsd-download (download XSD files for FIWARE subversion)]"
   echo "${spaces} [--xsd-dir (directory for XSD files)]"
 
@@ -143,6 +144,17 @@ function harnessFiles()
     $SRC_TOP/scripts/xmlExtractor.py $FILE $TMP_DIR $PREFIX
   done
 
+  for FILE in $(ls $TMP_DIR)
+  do
+    grep '\$' $TMP_DIR/$FILE
+    if [ "$?" != "0" ]
+    then
+      continue
+    fi
+
+    $SRC_TOP/scripts/envVarSubstitute.sh -f "$TMP_DIR/$FILE"
+  done
+
   harnessList=$(ls $TMP_DIR/*ngsi9* $TMP_DIR/*ngsi10*)
   xmlPartsFound=$(ls $TMP_DIR/*ngsi9* $TMP_DIR/*ngsi10* | wc -l)
 }
@@ -171,6 +183,7 @@ do
   elif [ "$1" == "--no-harness" ];   then harness="off";
   elif [ "$1" == "--dryrun" ];       then dryrun="on";
   elif [ "$1" == "--no-cleanup" ];   then cleanup="off";
+  elif [ "$1" == "--keep" ];         then cleanup="off";
   elif [ "$1" == "--xsd-download" ]; then xsdDownload="on";
   elif [ "$1" == "--xsd-dir" ];      then xsdDir=$2; shift;
   else
@@ -187,7 +200,14 @@ done
 # SRC_TOP
 #
 dir=$(dirname $0)
-SRC_TOP=${PWD}/${dir}/../
+SRC_TOP1=${PWD}/${dir}/../
+SRC_TOP2=${dir}/..
+if [ -d ${SRC_TOP1} ]
+then
+  SRC_TOP=${SRC_TOP1}
+else
+  SRC_TOP=${SRC_TOP2}
+fi
 
 cd $SRC_TOP
 SRC_TOP=$(pwd)

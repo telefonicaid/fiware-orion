@@ -86,18 +86,18 @@ SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(std::
 */
 std::string SubscribeContextAvailabilityResponse::render(RequestType requestType, Format format, std::string indent)
 {
-  std::string tag = "subscribeContextAvailabilityResponse";
-  std::string out = "";
+  std::string  tag                = "subscribeContextAvailabilityResponse";
+  std::string  out                = "";
+  bool         durationRendered   = !duration.isEmpty();
+  bool         errorCodeRendered  = (errorCode.code != NO_ERROR_CODE);
 
   out += startTag(indent, tag, format, false);
 
-  if (!duration.isEmpty())
-     out += duration.render(format, indent + "  ", true);
+  out += subscriptionId.render(format, indent + "  ", durationRendered || errorCodeRendered);
+  out += duration.render(format, indent + "  ", errorCodeRendered);
 
-  if (errorCode.code != NO_ERROR_CODE)
-     out += errorCode.render(format, indent + "  ", true);
-
-  out += subscriptionId.render(format, indent + "  ", false);
+  if (errorCodeRendered)
+     out += errorCode.render(format, indent + "  ", false);
 
   out += endTag(indent, tag, format);
   
