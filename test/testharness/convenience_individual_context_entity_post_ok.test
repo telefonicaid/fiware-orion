@@ -108,7 +108,7 @@ EOF
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
-  <registrationHId>REGEX([0-9a-f]{24})</registrationId>
+  <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 ---------- 2. add to the entity ----------
 <?xml version="1.0"?>
