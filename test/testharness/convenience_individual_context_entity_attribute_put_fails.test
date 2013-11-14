@@ -62,10 +62,11 @@ fi
 
 --SHELL--
 echo "+++++ 1. put an entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes/attr01 -s -S --header 'Content-Type: application/xml' -X PUT -d "<nothing></nothing>")
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes/attr01 -s -S --header 'Content-Type: application/xml' -X PUT -d "<nothing></nothing>" | xmllint --format -)
 
 --REGEXPECT--
 +++++ 1. put an entity +++++
+<?xml version="1.0"?>
 <errorCode>
   <code>400</code>
   <reasonPhrase>no request treating object found</reasonPhrase>
