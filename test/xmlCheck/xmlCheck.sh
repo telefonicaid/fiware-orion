@@ -140,7 +140,7 @@ function harnessFiles()
   for FILE in $(find $SRC_TOP/test/testharness -name *.test)
   do
     PREFIX=$(basename ${FILE%.*})
-    $SRC_TOP/scripts/xmlExtractor.py $FILE $TMP_DIR $PREFIX
+    $SRC_TOP/test/xmlCheck/xmlExtractor.py $FILE $TMP_DIR $PREFIX
   done
 
   for FILE in $(ls $TMP_DIR)
@@ -151,7 +151,7 @@ function harnessFiles()
       continue
     fi
 
-    $SRC_TOP/scripts/envVarSubstitute.sh -f "$TMP_DIR/$FILE"
+    $SRC_TOP/test/xmlCheck/envVarSubstitute.sh -f "$TMP_DIR/$FILE"
   done
 
   harnessList=$(ls $TMP_DIR/*ngsi9* $TMP_DIR/*ngsi10*)
@@ -195,11 +195,12 @@ done
 
 # -----------------------------------------------------------------------------
 #
-# SRC_TOP
+# SRC_TOP - getting the TOP directory
 #
 dir=$(dirname $0)
-SRC_TOP1=${PWD}/${dir}/../
-SRC_TOP2=${dir}/..
+echo dir: $dir
+SRC_TOP1=${PWD}/${dir}/../..   # if called with a relative path
+SRC_TOP2=${dir}/../..          # if called via $PATH or with an absolute path
 if [ -d ${SRC_TOP1} ]
 then
   SRC_TOP=${SRC_TOP1}
