@@ -37,7 +37,7 @@ function usage()
   echo "${spaces} [--filter (test filter)]"
   echo "${spaces} [--no-harness (no harness files)]"
   echo "${spaces} [--dryrun (don't actually execute anything)]"
-  echo "${spaces} [--no-cleanup (do NOT remove harness files at end of processing)]"
+  echo "${spaces} [--keep (do NOT remove harness files at end of processing)]"
   echo "${spaces} [--xsd-download (download XSD files for FIWARE subversion)]"
   echo "${spaces} [--xsd-dir (directory for XSD files)]"
 
@@ -140,7 +140,18 @@ function harnessFiles()
   for FILE in $(find $SRC_TOP/test/testharness -name *.test)
   do
     PREFIX=$(basename ${FILE%.*})
-    $SRC_TOP/scripts/xmlExtractor.py $FILE $TMP_DIR $PREFIX
+    $SRC_TOP/test/xmlCheck/xmlExtractor.py $FILE $TMP_DIR $PREFIX
+  done
+
+  for FILE in $(ls $TMP_DIR)
+  do
+    grep '\$' $TMP_DIR/$FILE
+    if [ "$?" != "0" ]
+    then
+      continue
+    fi
+
+    $SRC_TOP/test/xmlCheck/envVarSubstitute.sh -f "$TMP_DIR/$FILE"
   done
 
   harnessList=$(ls $TMP_DIR/*ngsi9* $TMP_DIR/*ngsi10*)
@@ -160,7 +171,7 @@ xsdDir="/tmp/xsd"
 harness="on"
 dryrun="off"
 xsdDownload="off"
-cleanup="on"
+keep="off"
 
 while [ "$#" != 0 ]
 do
@@ -170,7 +181,7 @@ do
   elif [ "$1" == "--filter" ];       then filter=$2; shift;
   elif [ "$1" == "--no-harness" ];   then harness="off";
   elif [ "$1" == "--dryrun" ];       then dryrun="on";
-  elif [ "$1" == "--no-cleanup" ];   then cleanup="off";
+  elif [ "$1" == "--keep" ];         then keep="on";
   elif [ "$1" == "--xsd-download" ]; then xsdDownload="on";
   elif [ "$1" == "--xsd-dir" ];      then xsdDir=$2; shift;
   else
@@ -184,10 +195,18 @@ done
 
 # -----------------------------------------------------------------------------
 #
-# SRC_TOP
+# SRC_TOP - getting the TOP directory
 #
 dir=$(dirname $0)
-SRC_TOP=${PWD}/${dir}/../
+echo dir: $dir
+SRC_TOP1=${PWD}/${dir}/../..   # if called with a relative path
+SRC_TOP2=${dir}/../..          # if called via $PATH or with an absolute path
+if [ -d ${SRC_TOP1} ]
+then
+  SRC_TOP=${SRC_TOP1}
+else
+  SRC_TOP=${SRC_TOP2}
+fi
 
 cd $SRC_TOP
 SRC_TOP=$(pwd)
@@ -416,9 +435,9 @@ xmlDocsErrors=$(expr $xmlFilesErrors + $xmlPartsErrors)
 
 # ------------------------------------------------------------------------------
 #
-# Cleanup?
+# Keep?
 #
-if [ "$cleanup" == "on" ]
+if [ "$keep" == "off" ]
 then
   rm -rf $TMP_DIR
 fi

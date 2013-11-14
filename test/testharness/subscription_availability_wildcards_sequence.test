@@ -104,8 +104,6 @@ done
           <entityId type="Room" isPattern="false">
             <id>ConferenceRoom</id>
           </entityId>
-        </entityIdList>
-        <entityIdList>
           <entityId type="Room" isPattern="false">
             <id>OfficeRoom</id>
           </entityId>
@@ -135,8 +133,6 @@ echo "1: ++++++++++++++++++++"
           <entityId type="Room" isPattern="false">
             <id>ConferenceRoom2</id>
           </entityId>
-        </entityIdList>
-        <entityIdList>
           <entityId type="Room" isPattern="false">
             <id>OfficeRoom2</id>
           </entityId>
@@ -275,8 +271,8 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 2: ++++++++++++++++++++
 <?xml version="1.0"?>
 <subscribeContextAvailabilityResponse>
-  <duration>PT5H</duration>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <duration>PT5H</duration>
 </subscribeContextAvailabilityResponse>
 3: ++++++++++++++++++++
 <?xml version="1.0"?>
@@ -287,8 +283,8 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 4: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextAvailabilitySubscriptionResponse>
-  <duration>PT5H</duration>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <duration>PT5H</duration>
 </updateContextAvailabilitySubscriptionResponse>
 5: ++++++++++++++++++++
 <?xml version="1.0"?>

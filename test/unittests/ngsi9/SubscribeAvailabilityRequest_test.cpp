@@ -118,7 +118,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_badIsPattern)
 {
   ParseData       reqData;
   const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.isPattern.invalid.xml";
-  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </errorCode>\n  <subscriptionId>No Subscription ID</subscriptionId>\n</subscribeContextAvailabilityResponse>\n";
+  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </errorCode>\n</subscribeContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
   
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -158,7 +158,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_badEntityId)
 {
   ParseData       reqData;
   const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.entityId.invalid.xml";
-  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n  <subscriptionId>No Subscription ID</subscriptionId>\n</subscribeContextAvailabilityResponse>\n";
+  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</subscribeContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
   
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
@@ -178,7 +178,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_noEntityId)
   ParseData       reqData;
   const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.noEntity.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
-  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>No entities</reasonPhrase>\n  </errorCode>\n  <subscriptionId>No Subscription ID</subscriptionId>\n</subscribeContextAvailabilityResponse>\n";
+  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>No entities</reasonPhrase>\n  </errorCode>\n</subscribeContextAvailabilityResponse>\n";
 
   ci.inFormat      = XML;
   ci.outFormat     = XML;
@@ -200,7 +200,7 @@ TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
   ParseData       reqData;
   const char*     fileName = "subscribeContextAvailabilityRequest_noEntityId.json";
   ConnectionInfo  ci("", "POST", "1.1");
-  std::string     expected = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"No entities\"\n  },\n  \"subscriptionId\" : \"No Subscription ID\"\n}\n";
+  std::string     expected = "{\n  \"subscriptionId\" : \"No Subscription ID\",\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"No entities\"\n  }\n}\n";
 
   ci.inFormat      = JSON;
   ci.outFormat     = JSON;
@@ -264,7 +264,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_noReference)
   ParseData       reqData;
   const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.noReference.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
-  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty Reference</reasonPhrase>\n  </errorCode>\n  <subscriptionId>No Subscription ID</subscriptionId>\n</subscribeContextAvailabilityResponse>\n";
+  std::string     expected = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty Reference</reasonPhrase>\n  </errorCode>\n</subscribeContextAvailabilityResponse>\n";
 
   ci.inFormat      = XML;
   ci.outFormat     = XML;
@@ -286,7 +286,7 @@ TEST(SubscribeContextAvailabilityRequest, json_badDuration)
   ParseData       reqData;
   const char*     fileName = "subscribeContextAvailabilityRequest_badDuration.json";
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     expected = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"syntax error in duration string\"\n  },\n  \"subscriptionId\" : \"No Subscription ID\"\n}\n";
+  const char*     expected = "{\n  \"subscriptionId\" : \"No Subscription ID\",\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"syntax error in duration string\"\n  }\n}\n";
 
   ci.inFormat      = JSON;
   ci.outFormat     = JSON;

@@ -409,6 +409,12 @@ static int targetAttribute(xml_node<>* node, ParseData* parseDataP)
 static int entityIdList(xml_node<>* node, ParseData* parseDataP)
 {
    LM_T(LmtParse, ("got an entityIdList"));
+   if (parseDataP->rcr.crP->entityIdVectorPresent == true)
+   {
+     parseDataP->errorString = "Got an entityIdList when one was present already";
+     LM_RE(1, ("Got an entityIdList when one was present already!!!"));
+   }
+
    parseDataP->rcr.crP->entityIdVectorPresent = true;
    return 0;
 }

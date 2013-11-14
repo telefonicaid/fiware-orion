@@ -160,22 +160,22 @@ echo "13: ++++++++++++++++++++"
 2: ++++++++++++++++++++
 <?xml version="1.0"?>
 <subscribeContextAvailabilityResponse>
+  <subscriptionId>0</subscriptionId>
   <errorCode>
     <code>400</code>
     <reasonPhrase>Invalid payload</reasonPhrase>
     <details>Expected 'subscribeContextAvailabilityRequest' payload, got 'registerContextRequest'</details>
   </errorCode>
-  <subscriptionId>0</subscriptionId>
 </subscribeContextAvailabilityResponse>
 3: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextAvailabilitySubscriptionResponse>
+  <subscriptionId>No Subscription ID</subscriptionId>
   <errorCode>
     <code>400</code>
     <reasonPhrase>Invalid payload</reasonPhrase>
     <details>Expected 'updateContextAvailabilitySubscriptionRequest' payload, got 'registerContextRequest'</details>
   </errorCode>
-  <subscriptionId>No Subscription ID</subscriptionId>
 </updateContextAvailabilitySubscriptionResponse>
 4: ++++++++++++++++++++
 <?xml version="1.0"?>

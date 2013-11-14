@@ -75,12 +75,12 @@ rm $BIGFILE
 --REGEXPECT--
 <?xml version="1.0"?>
 <updateContextAvailabilitySubscriptionResponse>
+  <subscriptionId>No Subscription ID</subscriptionId>
   <errorCode>
     <code>413</code>
     <reasonPhrase>Payload Too Large</reasonPhrase>
     <details>payload size: 1500000</details>
   </errorCode>
-  <subscriptionId>No Subscription ID</subscriptionId>
 </updateContextAvailabilitySubscriptionResponse>
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
