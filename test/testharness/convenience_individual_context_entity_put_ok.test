@@ -19,7 +19,7 @@
 # fermin at tid dot es
 
 --NAME--
-Convenience Individual Context Entity - PUT OK2
+Convenience Individual Context Entity - PUT OK
 
 --SHELL-INIT--
 # Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
