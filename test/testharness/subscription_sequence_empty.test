@@ -645,6 +645,7 @@ Content-Type: application/xml
   </contextResponseList>
 </notifyContextRequest>
 
+=======================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 911
 User-Agent: NGSI Rest Library
@@ -652,7 +653,6 @@ Host: localhost:REGEX(\d+)
 Accept: */*
 Content-Type: application/xml
 
-=======================================
 <notifyContextRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
   <originator>localhost</originator>
