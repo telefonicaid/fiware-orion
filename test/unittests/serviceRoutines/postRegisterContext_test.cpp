@@ -76,7 +76,7 @@ TEST(postRegisterContext, ok)
 
   /* Prepare mock */
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
           .Times(0);
   setNotifier(notifierMock);
 

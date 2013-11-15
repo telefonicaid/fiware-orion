@@ -27,6 +27,7 @@
 */
 #include <string>
 
+#include "common/Format.h"
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
 
@@ -36,6 +37,6 @@
 *
 * mongoSubscribeContextAvailability - 
 */
-extern HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityRequest* requestP, SubscribeContextAvailabilityResponse* responseP);
+extern HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityRequest* requestP, SubscribeContextAvailabilityResponse* responseP, Format inFormat = XML);
 
 #endif

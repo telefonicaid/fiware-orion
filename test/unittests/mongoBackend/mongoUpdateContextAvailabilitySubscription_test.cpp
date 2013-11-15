@@ -52,6 +52,7 @@ using ::testing::Return;
 * Updates in entity/attrributeList (*) not matching existing registrations:
 *
 * - Ent1_Attr0_noPattern
+* - Ent1_Attr0_noPattern_JSON
 * - Ent1_AttrN_noPattern
 * - EntN_Attr0_noPattern
 * - EntN_AttrN_noPattern
@@ -61,6 +62,7 @@ using ::testing::Return;
 * (very close to the same tests for discoverContextAvailability):
 *
 * - noPatternAttrsAll
+* - noPatternAttrsAll_JSON
 * - noPatternAttrOneSingle
 * - noPatternAttrOneMulti
 * - noPatternAttrsSubset
@@ -211,12 +213,14 @@ static void prepareDatabase(void) {
     BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860010") <<
                         "expiration" << 1879048191 <<
                         "reference" << "http://notify1.me" <<
+                        "format" << "XML" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E7" << "type" << "T7" << "isPattern" << "false")) <<
                         "attrs" << BSONArray());
 
     BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860020") <<
                         "expiration" << 1879048191 <<
                         "reference" << "http://notify2.me" <<
+                        "format" << "XML" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E8" << "type" << "T8" << "isPattern" << "false")) <<
                         "attrs" << BSON_ARRAY("A4"));
 
@@ -340,12 +344,14 @@ static void prepareDatabasePatternTrue(void) {
   BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860010") <<
                       "expiration" << 1879048191 <<
                       "reference" << "http://notify1.me" <<
+                      "format" << "XML" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E7" << "type" << "T7" << "isPattern" << "false")) <<
                       "attrs" << BSONArray());
 
   BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860020") <<
                       "expiration" << 1879048191 <<
                       "reference" << "http://notify2.me" <<
+                      "format" << "XML" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E8" << "type" << "T8" << "isPattern" << "false")) <<
                       "attrs" << BSON_ARRAY("A4"));
 
@@ -372,7 +378,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_Attr0_noPattern)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -412,8 +418,83 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_Attr0_noPattern)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
+    ASSERT_EQ(1, entities.size());
+    BSONObj ent0 = entities[0].embeddedObject();
+    EXPECT_STREQ("E5", C_STR_FIELD(ent0, "id"));
+    EXPECT_STREQ("T5", C_STR_FIELD(ent0, "type"));
+    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
+
+    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
+    EXPECT_EQ(0, attrs.size());
+
+    /* Release connection */
+    mongoDisconnect();
+
+    /* Release mock */
+    delete notifierMock;
+    delete timerMock;
+
+}
+
+/* ****************************************************************************
+*
+* Ent1_Attr0_noPattern_JSON -
+*/
+TEST(mongoUpdateContextAvailabilitySubscription, Ent1_Attr0_noPattern_JSON)
+{
+
+    HttpStatusCode                                ms;
+    UpdateContextAvailabilitySubscriptionRequest  req;
+    UpdateContextAvailabilitySubscriptionResponse res;
+
+    /* Prepare mock */
+    NotifierMock* notifierMock = new NotifierMock();
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+            .Times(0);
+    setNotifier(notifierMock);
+
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
+
+    /* Forge the request (from "inside" to "outside") */
+    EntityId en("E5", "T5", "false");
+    req.entityIdVector.push_back(&en);
+    req.subscriptionId.set("51307b66f481db11bf860010");
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoUpdateContextAvailabilitySubscription(&req, &res, JSON);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+    EXPECT_TRUE(res.duration.isEmpty());
+    EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
+    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    /* Check database is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientConnection* connection = getMongoConnection();
+
+    ASSERT_EQ(2, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
+    BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSON("_id" << OID("51307b66f481db11bf860010")));
+
+    EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
+    EXPECT_EQ(1879048191, sub.getIntField("expiration"));
+    EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
+
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
     BSONObj ent0 = entities[0].embeddedObject();
     EXPECT_STREQ("E5", C_STR_FIELD(ent0, "id"));
@@ -444,7 +525,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_AttrN_noPattern)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -486,6 +567,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_AttrN_noPattern)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();    
     ASSERT_EQ(1, entities.size());
@@ -520,7 +602,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, EntN_Attr0_noPattern)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -562,6 +644,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, EntN_Attr0_noPattern)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -598,7 +681,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, EntN_AttrN_noPattern)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -642,6 +725,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, EntN_AttrN_noPattern)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -683,7 +767,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_Attr0_pattern)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -723,6 +807,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_Attr0_pattern)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -772,7 +857,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrsAll)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -812,6 +897,97 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrsAll)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
+
+    std::vector<BSONElement> entities = sub.getField("entities").Array();
+    ASSERT_EQ(1, entities.size());
+    BSONObj ent0 = entities[0].embeddedObject();
+    EXPECT_STREQ("E3", C_STR_FIELD(ent0, "id"));
+    EXPECT_STREQ("T3", C_STR_FIELD(ent0, "type"));
+    EXPECT_STREQ("false", C_STR_FIELD(ent0, "isPattern"));
+
+    std::vector<BSONElement> attrs = sub.getField("attrs").Array();
+    EXPECT_EQ(0, attrs.size());
+
+    /* Release connection */
+    mongoDisconnect();
+
+    /* Release mock */
+    delete notifierMock;
+    delete timerMock;
+
+}
+
+/* ****************************************************************************
+*
+* noPatternAttrsAll_JSON -
+*
+* Discover:  E3 -no attrs
+* Result:    E3 - (A1, A2, A3) - http://cr1.com
+*/
+TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrsAll_JSON)
+{
+    HttpStatusCode                                ms;
+    UpdateContextAvailabilitySubscriptionRequest  req;
+    UpdateContextAvailabilitySubscriptionResponse res;
+
+    /* Prepare mock */
+    NotifyContextAvailabilityRequest expectedNcar;
+    EntityId mockEn("E3", "T3", "false");
+    ContextRegistrationAttribute cra1("A1", "TA1", "true");
+    ContextRegistrationAttribute cra2("A2", "TA2", "false");
+    ContextRegistrationAttribute cra3("A3", "TA3", "true");
+    ContextRegistrationResponse crr;
+    crr.contextRegistration.entityIdVector.push_back(&mockEn);
+    crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
+    crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra2);
+    crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra3);
+    crr.contextRegistration.providingApplication.set("http://cr1.com");
+    expectedNcar.contextRegistrationResponseVector.push_back(&crr);
+    expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
+
+    NotifierMock* notifierMock = new NotifierMock();
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", JSON))
+            .Times(1);
+    setNotifier(notifierMock);
+
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
+
+    /* Forge the request (from "inside" to "outside") */
+    EntityId en("E3", "T3", "false");
+    req.entityIdVector.push_back(&en);
+    req.subscriptionId.set("51307b66f481db11bf860010");
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoUpdateContextAvailabilitySubscription(&req, &res, JSON);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+    EXPECT_TRUE(res.duration.isEmpty());
+    EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
+    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    /* Check database is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientConnection* connection = getMongoConnection();
+
+    ASSERT_EQ(2, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
+    BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSON("_id" << OID("51307b66f481db11bf860010")));
+
+    EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
+    EXPECT_EQ(1879048191, sub.getIntField("expiration"));
+    EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -857,7 +1033,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrOneSingle)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -898,6 +1074,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrOneSingle)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -953,7 +1130,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrOneMulti)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -994,6 +1171,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrOneMulti)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1043,7 +1221,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrsSubset)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1085,6 +1263,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrsSubset)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1142,7 +1321,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternSeveralCREs)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1182,6 +1361,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternSeveralCREs)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1236,7 +1416,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternSeveralRegistrations)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1276,6 +1456,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternSeveralRegistrations)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1339,7 +1520,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiEntity)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1381,6 +1562,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiEntity)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1435,7 +1617,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiAttr)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1478,6 +1660,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiAttr)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1538,7 +1721,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiEntityAttrs)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1583,6 +1766,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiEntityAttrs)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -1656,7 +1840,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternNoType)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1697,6 +1881,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternNoType)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1759,7 +1944,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern0Attr)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1798,6 +1983,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern0Attr)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1842,7 +2028,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern1AttrSingle)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1882,6 +2068,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern1AttrSingle)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -1934,7 +2121,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern1AttrMulti)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1974,6 +2161,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern1AttrMulti)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2033,7 +2221,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, patternNAttr)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2074,6 +2262,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, patternNAttr)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2143,7 +2332,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, patternNoType)
     expectedNcar.contextRegistrationResponseVector.push_back(&crr4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2184,6 +2373,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, patternNoType)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2250,7 +2440,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, mixPatternAndNotPattern)
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2291,6 +2481,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, mixPatternAndNotPattern)
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1879048191, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -2327,7 +2518,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, updateDurationAndEntN_AttrN_noP
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2372,6 +2563,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, updateDurationAndEntN_AttrN_noP
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1360250700, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(2, entities.size());
@@ -2423,7 +2615,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, updateDurationAndNoPatternAttrs
     expectedNcar.subscriptionId.set("51307b66f481db11bf860010");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me"))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2464,6 +2656,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, updateDurationAndNoPatternAttrs
     EXPECT_EQ("51307b66f481db11bf860010", sub.getField("_id").OID().str());
     EXPECT_EQ(1360250700, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify1.me", C_STR_FIELD(sub, "reference"));
+    EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
 
     std::vector<BSONElement> entities = sub.getField("entities").Array();
     ASSERT_EQ(1, entities.size());
@@ -2495,7 +2688,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, subscriptionNotFound)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2544,7 +2737,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbFindOneFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2600,7 +2793,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbUpdateFail)
     ON_CALL(*connectionMock, findOne("unittest.casubs",_,_,_))
             .WillByDefault(Return(fakeSub));
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2629,7 +2822,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbUpdateFail)
     EXPECT_EQ("Database Error", res.errorCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.casubs "
               "- update() _id: 51307b66f481db11bf860010 "
-              "- update() doc: { entities: [ { id: \"E5\", type: \"T5\", isPattern: \"false\" } ], attrs: {}, expiration: 1360250700, reference: \"http://notify1.me\" } "
+              "- update() doc: { entities: [ { id: \"E5\", type: \"T5\", isPattern: \"false\" } ], attrs: {}, expiration: 1360250700, reference: \"http://notify1.me\", format: \"XML\" } "
               "- exception: boom!!", res.errorCode.details);
 
     /* Release mocks */

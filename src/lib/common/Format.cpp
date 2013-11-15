@@ -51,7 +51,19 @@ const char* formatToString(Format format)
    return "Unknown format";
 }
 
-
+/* ****************************************************************************
+*
+* stringToFormat
+*/
+Format stringToFormat(std::string s)
+{
+    if (s == "XML")
+        return XML;
+    else if (s == "JSON")
+        return JSON;
+    else
+        return NOFORMAT;
+}
 
 /* ****************************************************************************
 *

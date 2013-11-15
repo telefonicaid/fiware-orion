@@ -34,13 +34,14 @@
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
 
+#include "common/Format.h"
 #include "common/sem.h"
 
 /* ****************************************************************************
 *
 * mongoSubscribeContextAvailability - 
 */
-HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityRequest* requestP, SubscribeContextAvailabilityResponse* responseP)
+HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityRequest* requestP, SubscribeContextAvailabilityResponse* responseP, Format inFormat)
 {
     /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
     semTake();
@@ -90,6 +91,9 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
     }
     sub.append(CASUB_ATTRS, attrs.arr());
 
+    /* Adding format to use in notifications */
+    sub.append(CASUB_FORMAT, std::string(formatToString(inFormat)));
+
     /* Insert document in database */
     BSONObj subDoc = sub.obj();
     try {
@@ -109,7 +113,7 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
     }
 
     /* Send notifications for matching context registrations */
-    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.str(), requestP->reference.get());
+    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.str(), requestP->reference.get(), inFormat);
 
     /* Fill the response element */
     responseP->duration = requestP->duration;

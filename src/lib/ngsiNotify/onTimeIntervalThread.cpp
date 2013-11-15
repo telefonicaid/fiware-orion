@@ -78,7 +78,7 @@ static void doNotification(OnIntervalThreadParams* params) {
             ncr.originator.set("localhost");
             ncr.subscriptionId.set(params->subId);
 
-            params->notifier->sendNotifyContextRequest(&ncr, csi.url);
+            params->notifier->sendNotifyContextRequest(&ncr, csi.url, csi.format);
 
             ncr.contextElementResponseVector.release();
 
