@@ -497,6 +497,7 @@ Content-Type: application/xml
   </contextResponseList>
 </notifyContextRequest>
 
+=======================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 735
 User-Agent: NGSI Rest Library

@@ -809,7 +809,7 @@ EOF
       <statusCode>
         <code>472</code>
         <reasonPhrase>Empty Attribute in UPDATE or APPEND</reasonPhrase>
-        <details>action: Append - entity: (OfficeRoom, Room, false) - offending attribute: pressure</details>
+        <details>action: APPEND - entity: (OfficeRoom, Room, false) - offending attribute: pressure</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -834,7 +834,7 @@ EOF
       <statusCode>
         <code>472</code>
         <reasonPhrase>Empty Attribute in UPDATE or APPEND</reasonPhrase>
-        <details>action: Update - entity: (OfficeRoom, Room, false) - offending attribute: pressure</details>
+        <details>action: UPDATE - entity: (OfficeRoom, Room, false) - offending attribute: pressure</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
