@@ -175,7 +175,6 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
           </condValueList>          
         </notifyCondition>
   </notifyConditions>
-  <throttling>PT1S</throttling>
 </subscribeContextRequest>
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
@@ -322,7 +321,6 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   <subscribeResponse>
     <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
     <duration>PT1H</duration>
-    <throttling>PT1S</throttling>
   </subscribeResponse>
 </subscribeContextResponse>
 3: ++++++++++++++++++++
@@ -488,6 +486,109 @@ Content-Type: application/xml
             <name>pressure</name>
             <type>clima</type>
             <contextValue>p23</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</notifyContextRequest>
+
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 735
+User-Agent: NGSI Rest Library
+Host: localhost:REGEX(\d+)
+Accept: */*
+Content-Type: application/xml
+
+<notifyContextRequest>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <originator>localhost</originator>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue>p83</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</notifyContextRequest>
+
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 736
+User-Agent: NGSI Rest Library
+Host: localhost:REGEX(\d+)
+Accept: */*
+Content-Type: application/xml
+
+<notifyContextRequest>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <originator>localhost</originator>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom2</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue>p23</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</notifyContextRequest>
+
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 908
+User-Agent: NGSI Rest Library
+Host: localhost:REGEX(\d+)
+Accept: */*
+Content-Type: application/xml
+
+<notifyContextRequest>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <originator>localhost</originator>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>t39</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue>p83</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>

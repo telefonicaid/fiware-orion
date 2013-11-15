@@ -143,7 +143,6 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
           </condValueList>          
         </notifyCondition>
   </notifyConditions>
-  <throttling>PT1S</throttling>
 </subscribeContextRequest>
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
@@ -213,7 +212,6 @@ echo "5: ++++++++++++++++++++"
   <subscribeResponse>
     <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
     <duration>PT5S</duration>
-    <throttling>PT1S</throttling>
   </subscribeResponse>
 </subscribeContextResponse>
 2: ++++++++++++++++++++
