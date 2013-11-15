@@ -73,7 +73,7 @@ echo "3: +++++++++++++++++++++++++++++"
 <orion>
   <version>REGEX(.*)</version>
   <uptime>REGEX(.*)</uptime>
-  <git_hash>REGEX([0-9a-f]{40})</git_hash>
+  <git_hash>REGEX(([0-9a-f]{40}|nogitversion))</git_hash>
   <compile_time>REGEX(.*)</compile_time>
   <compiled_by>REGEX(.*)</compiled_by>
   <compiled_in>REGEX(.*)</compiled_in>
@@ -82,7 +82,7 @@ echo "3: +++++++++++++++++++++++++++++"
 "orion" : {
   "version" : "REGEX(.*)",
   "uptime" : "REGEX(.*)",
-  "git_hash" : "REGEX([0-9a-f]{40})",
+  "git_hash" : "REGEX(([0-9a-f]{40}|nogitversion))",
   "compile_time" : "REGEX(.*)",
   "compiled_by" : "REGEX(.*)",
   "compiled_in" : "REGEX(.*)"

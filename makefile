@@ -68,7 +68,10 @@ di: install_debug
 compile_info:
 	./scripts/compileInfo.sh
 
-prepare_release: compile_info
+compile_info_release:
+	./scripts/compileInfo.sh --release
+
+prepare_release: compile_info_release
 	mkdir -p  BUILD_RELEASE || true
 	cd BUILD_RELEASE && cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_ARCH=$(BUILD_ARCH) -DCMAKE_INSTALL_PREFIX=$(INSTALL_DIR)
 
