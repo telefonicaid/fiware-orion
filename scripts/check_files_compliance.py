@@ -99,7 +99,8 @@ def ignore(root, file):
         return True
 
     # Files used by the Qt IDE (they start with contextBroker.*) are not processed
-    if 'contextBroker.' in file:
+    if file.endswith('.creator') or file.endswith('.creator.user') or file.endswith('.config') \
+       or file.endswith('.files') or file.endswith('.includes'):
         return True
 
     # Files used by the PyCharm IDE (in the .idea/ directory) are not processed
@@ -109,7 +110,7 @@ def ignore(root, file):
     # Particular cases of files that are also ignored
     if file == '.gitignore' or file == '.valgrindrc' or file == '.valgrindSuppressions' \
         or file == 'README.md' or file == 'LICENSE' or file == 'ContributionPolicy.txt' \
-        or file == 'version.h':
+        or file == 'compileInfo.h':
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
         or file == 'cmake2junit.xsl'):
@@ -122,7 +123,7 @@ def supported_extension(root, file):
     if file.endswith('.py') or file.endswith('.cpp') or file.endswith('.h') or file.endswith('.xml')\
         or file.endswith('.json') or file.endswith('.test') or file.endswith('.vtest') or file.endswith('.txt')\
         or file.endswith('.sh') or file == 'makefile' or file == 'Makefile' or file.endswith('.spec') \
-        or file.endswith('.cfg') or file.endswith('.DISABLED') or file.endswith('.xtest'):
+        or file.endswith('.cfg') or file.endswith('.DISABLED') or file.endswith('.xtest') or file.endswith('.centos'):
         return True
 
     if 'config' in root and file == 'contextBroker':
