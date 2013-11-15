@@ -61,7 +61,7 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-echo "---------- 1. put an entity ----------"
+echo "+++++ 1. put an entity +++++"
 (curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X PUT -d @- | xmllint --format - ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
@@ -83,7 +83,7 @@ EOF
 
 
 --REGEXPECT--
----------- 1. put an entity ----------
++++++ 1. put an entity +++++
 <?xml version="1.0"?>
 <updateContextElementResponse>
   <errorCode>

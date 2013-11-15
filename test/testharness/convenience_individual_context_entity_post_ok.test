@@ -61,7 +61,7 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-echo "---------- 1. register an entity ----------"
+echo "+++++++++++++ 1. register an entity"
 (curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
 <?xml version="1.0"?>
   <registerContextRequest>
@@ -86,8 +86,8 @@ echo "---------- 1. register an entity ----------"
     <registrationId></registrationId>
   </registerContextRequest>
 EOF
-
-echo "---------- 2. add to the entity ----------"
+echo
+echo "+++++++++++++ 2. add to the entity"
 (curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
@@ -104,28 +104,31 @@ EOF
 
 
 --REGEXPECT--
----------- 1. register an entity ----------
++++++++++++++ 1. register an entity
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
----------- 2. add to the entity ----------
+
++++++++++++++ 2. add to the entity
 <?xml version="1.0"?>
 <appendContextAttributeResponse>
-<contextResponse>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>pressure</name>
-      <type>clima</type>
-      <contextValue/>
-    </contextAttribute>
-  </contextAttributeList>
-  <statusCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
-  </statusCode>
-</contextResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>pressure</name>
+          <type>clima</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>0</code>
+        <reasonPhrase/>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
 </appendContextAttributeResponse>
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then

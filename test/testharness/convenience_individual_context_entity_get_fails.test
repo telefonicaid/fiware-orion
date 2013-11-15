@@ -61,12 +61,12 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-echo "---------- 1. get an entity ----------"
+echo "+++++ 1. get an entity +++++"
 (curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X GET | xmllint --format - )
 
 
 --REGEXPECT--
----------- 1. get an entity ----------
++++++ 1. get an entity +++++
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>

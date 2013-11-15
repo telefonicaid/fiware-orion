@@ -61,11 +61,11 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-echo "---------- 1. delete an entity ----------"
+echo "+++++ 1. delete an entity +++++"
 (curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes -s -S --header 'Content-Type: application/xml' -X DELETE | xmllint --format - )
 
 --REGEXPECT--
----------- 1. delete an entity ----------
++++++ 1. delete an entity +++++
 <?xml version="1.0"?>
 <statusCode>
   <code>404</code>

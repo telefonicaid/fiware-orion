@@ -61,7 +61,7 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-echo "---------- 1. post an entity ----------"
+echo "+++++ 1. post an entity +++++"
 (curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes/attr01 -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <updateContextAttributeRequest>
@@ -83,7 +83,7 @@ echo "---------- 1. post an entity ----------"
 EOF
 
 --REGEXPECT--
----------- 1. post an entity ----------
++++++ 1. post an entity +++++
 <?xml version="1.0"?>
 <statusCode>
   <code>200</code>

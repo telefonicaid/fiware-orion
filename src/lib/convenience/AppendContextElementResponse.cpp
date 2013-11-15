@@ -46,10 +46,10 @@ std::string AppendContextElementResponse::render(Format format, std::string inde
 
   out += startTag(indent, tag, format);
 
-   if (errorCode.code != NO_ERROR_CODE)
-     out += errorCode.render(format, indent + "  ");
-   else
-     out += contextResponseVector.render(format, indent + "  ");
+  if ((errorCode.code != NO_ERROR_CODE) && (errorCode.code != SccOk))
+    out += errorCode.render(format, indent + "  ");
+  else
+    out += contextResponseVector.render(format, indent + "  ");
 
   out += endTag(indent, tag, format);
 
