@@ -54,7 +54,6 @@ std::string Throttling::check(RequestType requestType, Format format, std::strin
 
   if (string == "")
     return "OK";
-
   
   if (parse() == -1)
      return "syntax error in throttling string";
