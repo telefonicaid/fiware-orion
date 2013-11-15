@@ -103,6 +103,7 @@ buffer = []
 xml_headers_counter = 0
 xml_fragments_counter = 0
 search_mode = True
+next_xml_invalid = False
 buffer = []
 
 with open (file, 'r') as f:
@@ -110,9 +111,11 @@ with open (file, 'r') as f:
         line = l
 
         if search_mode:
-            # Search mode is on: looking for a root element
+            # Search mode is on: looking for a root element or for an 'invalid' mark
             if re.search('<\?xml', line):
                 xml_headers_counter += 1
+            elif re.search('#INVALID_XML', line):
+                next_xml_invalid = True                
             else:
                 m = re.match('\s*<(.*)>', line)
                 if m != None:
@@ -131,10 +134,15 @@ with open (file, 'r') as f:
 
             if re.search('<\/'+ root_element + '>', line):
                 # We add a 'ngsi9' or 'ngsi10' token in the filename to help xmlChecker.sh script
-                filename = dir + '/' + ngsi_token(root_element) + '.' + prefix + '.' + str(xml_fragments_counter)
+                filename_base = dir + '/' + ngsi_token(root_element) + '.' + prefix + '.'
+                if next_xml_invalid:
+                    filename = filename_base + 'invalid.' + str(xml_fragments_counter)
+                else:
+                    filename = filename_base + str(xml_fragments_counter)
                 write_fragment(buffer, filename)
                 buffer = []
                 search_mode = True
+                next_xml_invalid = False
 
 if xml_headers_counter != xml_fragments_counter:
     print 'Warning: XML headers (' + str(xml_headers_counter) + ') and ' \
