@@ -396,6 +396,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   <subscribeResponse>
     <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
     <duration>PT1H</duration>
+    <throttling>PT1S</throttling>
   </subscribeResponse>
 </subscribeContextResponse>
 2: ++++++++++++++++++++
@@ -457,7 +458,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-{ "count" : 2 }
+{ "count" : 1 }
 4: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextSubscriptionResponse>
@@ -467,7 +468,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     <throttling>PT6S</throttling>
   </subscribeResponse>
 </updateContextSubscriptionResponse>
-{ "count" : 2 }
+{ "count" : 1 }
 5: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextResponse>
@@ -497,7 +498,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-{ "count" : 3 }
+{ "count" : 2 }
 6: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextResponse>
@@ -551,7 +552,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-{ "count" : 4 }
+{ "count" : 3 }
 8: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextResponse>
@@ -627,44 +628,6 @@ Content-Type: application/xml
           <id>OfficeRoom</id>
         </entityId>
         <contextAttributeList>
-          <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue>L23</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</notifyContextRequest>
-
-=======================================
-POST http://localhost:REGEX(\d+)/notify
-Content-Length: 912
-User-Agent: NGSI Rest Library
-Host: localhost:REGEX(\d+)
-Accept: */*
-Content-Type: application/xml
-
-<notifyContextRequest>
-  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-  <originator>localhost</originator>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>t100</contextValue>
-          </contextAttribute>
           <contextAttribute>
             <name>lightstatus</name>
             <type>light</type>

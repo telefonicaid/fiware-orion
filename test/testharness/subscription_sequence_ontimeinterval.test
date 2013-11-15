@@ -292,6 +292,7 @@ echo "TIMES: $TIMES"
   <subscribeResponse>
     <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
     <duration>PT10M</duration>
+    <throttling>PT1S</throttling>
   </subscribeResponse>
 </updateContextSubscriptionResponse>
 3: ++++++++++++++++++++
@@ -300,6 +301,7 @@ echo "TIMES: $TIMES"
   <subscribeResponse>
     <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
     <duration>PT10M</duration>
+    <throttling>PT1S</throttling>
   </subscribeResponse>
 </updateContextSubscriptionResponse>
 4: ++++++++++++++++++++
@@ -308,6 +310,7 @@ echo "TIMES: $TIMES"
   <subscribeResponse>
     <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
     <duration>PT10M</duration>
+    <throttling>PT1S</throttling>
   </subscribeResponse>
 </updateContextSubscriptionResponse>
 5: ++++++++++++++++++++
@@ -329,7 +332,7 @@ echo "TIMES: $TIMES"
   </subscribeResponse>
 </updateContextSubscriptionResponse>
 7: ++++++++++++++++++++
-{ "count" : 16 }
+{ "count" : 13 }
 <?xml version="1.0"?>
 <unsubscribeContextResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -371,8 +374,8 @@ Content-Type: application/xml
   </contextResponseList>
 </notifyContextRequest>
 
-NUMBER: 16
-TIMES: REGEX((0, 2, 4, 5, 9, 13, 14, 24, 34, 35, 37, 39, 53, 65, 67, 69|0, 2, 4, 5, 9, 13, 14, 24, 34, 35, 37, 39, 51, 63, 67, 69))
+NUMBER: 13
+TIMES: REGEX(0, 2, 4, 9, 13, 24, 34, 37, 39, 51, 63, 67, 69)
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})

@@ -214,6 +214,7 @@ echo "4: ++++++++++++++++++++"
   <subscribeResponse>
     <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
     <duration>PT5S</duration>
+    <throttling>PT1S</throttling>
   </subscribeResponse>
 </subscribeContextResponse>
 3: ++++++++++++++++++++
