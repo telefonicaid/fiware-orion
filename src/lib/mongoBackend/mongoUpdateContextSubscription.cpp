@@ -33,13 +33,14 @@
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 
+#include "common/Format.h"
 #include "common/sem.h"
 
 /* ****************************************************************************
 *
 * mongoUpdateContextSubscription - 
 */
-HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* requestP, UpdateContextSubscriptionResponse* responseP)
+HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* requestP, UpdateContextSubscriptionResponse* responseP, Format inFormat)
 {
 
   /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
@@ -143,7 +144,8 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
                                                 attrL,
                                                 requestP->subscriptionId.get(),
                                                 C_STR_FIELD(sub, CSUB_REFERENCE),
-                                                &notificationDone);
+                                                &notificationDone,
+                                                inFormat);
        newSub.appendArray(CSUB_CONDITIONS, conds);
 
        /* Remove EntityIdVector and AttributeList dynamic memory */
@@ -167,6 +169,9 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
           newSub.append(CSUB_COUNT, count);
       }
   }
+
+  /* Adding format to use in notifications */
+  newSub.append(CSUB_FORMAT, std::string(formatToString(inFormat)));
 
   /* Update document in MongoDB */
   BSONObj update = newSub.obj();

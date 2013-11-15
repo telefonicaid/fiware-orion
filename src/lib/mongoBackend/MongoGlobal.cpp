@@ -838,7 +838,7 @@ AttributeList subToAttributeList(BSONObj sub) {
 * is returned. This is used in the caller to know if lastNotification field in the
 * subscription document in csubs collection has to be modified or not.
 */
-bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, ConditionValueList* condValues, std::string subId, std::string notifyUrl) {
+bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, ConditionValueList* condValues, std::string subId, std::string notifyUrl, Format format) {
 
     std::string err;
     NotifyContextRequest ncr;
@@ -868,7 +868,7 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
 
             if (isCondValueInContextElementResponse(condValues, &allCerV)) {
                 /* Send notification */
-                getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl);
+                getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, format);
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
                 return true;
@@ -877,7 +877,7 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
             allCerV.release();
         }
         else {
-            getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl);
+            getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, format);
             ncr.contextElementResponseVector.release();
             return true;
         }
@@ -902,7 +902,7 @@ void processOntimeIntervalCondition(std::string subId, int interval) {
 * processConditionVector -
 *
 */
-BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone) {
+BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format) {
 
     BSONArrayBuilder conds;
     *notificationDone = false;
@@ -935,7 +935,8 @@ BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV
                                      attrL,
                                      &(nc->condValueList),
                                      subId,
-                                     url)) {
+                                     url,
+                                     format)) {
 
                 *notificationDone = true;
             }
@@ -996,7 +997,7 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
 * This method returns true if the notification was actually send. Otherwise, false
 * is returned.
 */
-bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl) {
+bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl, Format format) {
 
     std::string err;
     NotifyContextAvailabilityRequest ncar;
@@ -1011,7 +1012,7 @@ bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, st
         /* Complete the fields in NotifyContextRequest */
         ncar.subscriptionId.set(subId);
 
-        getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl);
+        getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, format);
         ncar.contextRegistrationResponseVector.release();
 
         /* Update database fields due to new notification */

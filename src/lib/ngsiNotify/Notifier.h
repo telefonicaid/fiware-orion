@@ -46,8 +46,8 @@ public:
    
     virtual ~Notifier(void);
 
-    virtual void sendNotifyContextRequest(NotifyContextRequest* ncr, std::string url);
-    virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr, std::string url);
+    virtual void sendNotifyContextRequest(NotifyContextRequest* ncr, std::string url, Format format = XML);
+    virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr, std::string url, Format format = XML);
     virtual void createIntervalThread(std::string subId, int interval);
     virtual void destroyOntimeIntervalThreads(std::string subId);
 

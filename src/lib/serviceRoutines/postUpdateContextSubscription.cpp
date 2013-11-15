@@ -43,7 +43,12 @@ std::string postUpdateContextSubscription(ConnectionInfo* ciP, int components, s
   std::string                        answer;
 
   ucsr.subscribeError.subscriptionId = parseDataP->ucsr.res.subscriptionId;
-  mongoUpdateContextSubscription(&parseDataP->ucsr.res, &ucsr);
+
+  // FIXME P6: by the moment, we are assuming that notification will be sent in the same format than the one
+  // used to do the subscription, so we are passing ciP->inFomat. This is just an heuristic, the client could want
+  // for example to use XML in the subscription message but wants notifications in JSON. We need a more
+  // flexible approach, to be implemented
+  mongoUpdateContextSubscription(&parseDataP->ucsr.res, &ucsr, ciP->inFormat);
   answer = ucsr.render(UpdateContextSubscription, ciP->outFormat, "");
   return answer;
 }
