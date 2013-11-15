@@ -246,7 +246,6 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
           <restriction>restriction</restriction>
         </notifyCondition>
   </notifyConditions>
-  <throttling></throttling>
 </subscribeContextRequest>
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
@@ -270,7 +269,7 @@ echo "7: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Append</updateAction>
+  <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
 echo "8: ++++++++++++++++++++"
@@ -292,7 +291,7 @@ echo "8: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Delete</updateAction>
+  <updateAction>DELETE</updateAction>
 </updateContextRequest>
 EOF
 echo "9: ++++++++++++++++++++"

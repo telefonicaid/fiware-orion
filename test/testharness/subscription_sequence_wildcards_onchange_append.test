@@ -175,7 +175,6 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
           </condValueList>          
         </notifyCondition>
   </notifyConditions>
-  <throttling></throttling>
 </subscribeContextRequest>
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
@@ -199,7 +198,7 @@ echo "3: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Append</updateAction>
+  <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
 echo "4: ++++++++++++++++++++"
@@ -233,7 +232,7 @@ echo "4: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Append</updateAction>
+  <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
 echo "5: ++++++++++++++++++++"
@@ -255,7 +254,7 @@ echo "5: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Append</updateAction>
+  <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
 echo "6: ++++++++++++++++++++"
@@ -296,7 +295,7 @@ echo "7: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>Append</updateAction>
+  <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
 echo "8: ++++++++++++++++++++"

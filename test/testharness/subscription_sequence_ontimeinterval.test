@@ -168,7 +168,6 @@ sleep 5
           </condValueList>
         </notifyCondition>
   </notifyConditions>
-  <throttling></throttling>
 </updateContextSubscriptionRequest>
 EOF
 echo "3: ++++++++++++++++++++"
@@ -189,7 +188,6 @@ sleep 9
           </condValueList>
         </notifyCondition>
   </notifyConditions>
-  <throttling></throttling>
 </updateContextSubscriptionRequest>
 EOF
 echo "4: ++++++++++++++++++++"
@@ -210,7 +208,6 @@ sleep 21
           </condValueList>
         </notifyCondition>
   </notifyConditions>
-  <throttling></throttling>
 </updateContextSubscriptionRequest>
 EOF
 echo "5: ++++++++++++++++++++"

@@ -83,7 +83,7 @@ fi
       </condValueList>
     </notifyCondition>
   </notifyConditions>
-  <throttling>xxxP5Y</throttling>
+  <throttling>P5Y</throttling>
 </updateContextSubscriptionRequest>
 
 EOF
