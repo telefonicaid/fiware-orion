@@ -45,8 +45,8 @@ echo '#define COMPILED_IN      "'${host}'"'  >> $TMP_FILE
 echo                                         >> $TMP_FILE
 echo '#endif'                                >> $TMP_FILE
 
-# We only update compileInfo.h if the file previously doesn't exist or is
-# different to avoid trigger make build in unneded cases
+# We only update the file compileInfo.h if the file previously doesn't exist 
+# or requires an update, to avoid triggering make build unnecessarily.
 diff $TMP_FILE src/lib/common/compileInfo.h
 if [ "$?" == "0" ]; then
    rm -f $TMP_FILE
