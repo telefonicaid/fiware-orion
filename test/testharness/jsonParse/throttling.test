@@ -61,59 +61,30 @@ fi
 
 --SHELL--
 echo "1: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/ngsi10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
-<subscribeContextRequest>
-  <entityIdList>
-    <entityId type="Room" isPattern="false">
-      <id>OfficeRoom</id>
-    </entityId>
-  </entityIdList>
-  <reference>http://localhost:${LISTENER_PORT}/notify</reference>
-  <throttling>PT5H</throttling>
-</subscribeContextRequest>
+(curl localhost:${BROKER_PORT}/ngsi10/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @-) <<EOF
+{
+  "entities" : [
+    {
+      "type" : "Room",
+      "isPattern" : "false",
+      "id" : "OfficeRoom"
+    }
+  ],
+  "reference" : "http://localhost:${LISTENER_PORT}/notify",
+  "throttling" : "PT5H"
+}
 EOF
 echo "2: +++++++++++++++++++++++++++++"
-
-# Bad throttling syntax
-# INVALID XML
-(curl localhost:${BROKER_PORT}/ngsi10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
-<subscribeContextRequest>
-  <entityIdList>
-    <entityId type="Room" isPattern="false">
-      <id>OfficeRoom</id>
-    </entityId>
-  </entityIdList>
-  <reference>http://localhost:${LISTENER_PORT}/notify</reference>
-  <throttling>PT5R</throttling>
-</subscribeContextRequest>
-EOF
-
-echo "3: +++++++++++++++++++++++++++++"
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
-<?xml version="1.0"?>
-<subscribeContextResponse>
-  <subscribeResponse>
-    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-    <duration>PT24H</duration>
-    <throttling>PT5H</throttling>
-  </subscribeResponse>
-</subscribeContextResponse>
+{
+  "subscribeResponse" : {
+    "subscriptionId" : "REGEX([0-9a-f]{24})",
+    "duration" : "PT24H",
+    "throttling" : "PT5H"
+  }
+}
 2: +++++++++++++++++++++++++++++
-# INVALID XML
-<?xml version="1.0"?>
-<subscribeContextResponse>
-  <subscribeError>
-    <errorCode>
-      <code>400</code>
-      <reasonPhrase>invalid payload</reasonPhrase>
-      <details>syntax error in throttling string</details>
-    </errorCode>
-  </subscribeError>
-</subscribeContextResponse>
-3: +++++++++++++++++++++++++++++
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})
