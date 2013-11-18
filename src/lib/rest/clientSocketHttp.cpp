@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 #include "ConnectionInfo.h"
 #include "clientSocketHttp.h"
+#include "serviceRoutines/versionTreat.h"
 #include <iostream>
 
 #include <sys/types.h>                          // system types ...
@@ -114,10 +115,10 @@ std::string sendHttpSocket( std::string ip,
 
   snprintf(msg, sizeof(msg),
            "%s %s HTTP/1.1\n"
-           "User-Agent: NGSI Rest Library\n"
+           "User-Agent: orion/%s\n"
            "Host: %s:%d\n"
            "Accept: */*\n",
-           verb.c_str(), resource.c_str(), ip.c_str(), port);
+           verb.c_str(), resource.c_str(), versionGet(), ip.c_str(), port);
 
   if ((!content_type.empty()) && (!content.empty()))
   {
