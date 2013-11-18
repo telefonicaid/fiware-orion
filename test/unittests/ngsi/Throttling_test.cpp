@@ -58,11 +58,21 @@ TEST(Throttling, check)
 {
   Throttling   t;
   std::string  checked;
-  std::string  expected = "OK";
+  std::string  expected1 = "OK";
+  std::string  expected2 = "OK";
+  std::string  expected3 = "syntax error in throttling string";
+
+  t.set("");
+  checked = t.check(RegisterContext, XML, "", "", 0);
+  EXPECT_EQ(expected1, checked);
 
   t.set("PT5S");
   checked = t.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected.c_str(), checked.c_str());
+  EXPECT_EQ(expected2, checked);
+
+  t.set("xxxPT5S");
+  checked = t.check(RegisterContext, XML, "", "", 0);
+  EXPECT_EQ(expected3, checked);
 }
 
 
