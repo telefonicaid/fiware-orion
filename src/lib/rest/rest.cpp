@@ -79,7 +79,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "content-type") == 0)    headerP->contentType    = value;
   else if (strcasecmp(key.c_str(), "content-length") == 0)  headerP->contentLength  = atoi(value);
   else
-    LM_W(("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
+    LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
 
 
   /* Note that the strategy to "fix" the Content-Type is to replace the ";" with 0
