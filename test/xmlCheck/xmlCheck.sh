@@ -201,7 +201,6 @@ done
 # SRC_TOP - getting the TOP directory
 #
 dir=$(dirname $0)
-echo dir: $dir
 SRC_TOP1=${PWD}/${dir}/../..   # if called with a relative path
 SRC_TOP2=${dir}/../..          # if called via $PATH or with an absolute path
 if [ -d ${SRC_TOP1} ]
@@ -213,7 +212,7 @@ fi
 
 cd $SRC_TOP
 SRC_TOP=$(pwd)
-cd -
+cd - > /dev/null
 vMsg Git repo home: $SRC_TOP
 
 

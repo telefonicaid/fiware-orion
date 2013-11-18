@@ -60,14 +60,14 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextRequest>
   <subscriptionId>012345678901234567890123</subscriptionId>
 </unsubscribeContextRequest>
 EOF
 echo "2: ***********************************"
-OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- ) << EOF
+OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -112,7 +112,7 @@ EOF)
 echo "$OUT"
 subscriptionId=$(echo "$OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "3: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextRequest>
   <subscriptionId>$subscriptionId</subscriptionId>
@@ -120,6 +120,7 @@ echo "3: ***********************************"
 EOF
 echo "4: ***********************************"
 --REGEXPECT--
+<?xml version="1.0"?>
 <unsubscribeContextResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
   <statusCode>
@@ -128,6 +129,7 @@ echo "4: ***********************************"
   </statusCode>
 </unsubscribeContextResponse>
 2: ***********************************
+<?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
     <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -136,6 +138,7 @@ echo "4: ***********************************"
   </subscribeResponse>
 </subscribeContextResponse>
 3: ***********************************
+<?xml version="1.0"?>
 <unsubscribeContextResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
   <statusCode>
