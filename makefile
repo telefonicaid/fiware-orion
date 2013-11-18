@@ -61,6 +61,10 @@ ifndef MOCK_CONFIG
     MOCK_CONFIG=epel-6-tid
 endif
 
+ifndef XSD_DIR
+    XSD_DIR=/tmp/xsd
+endif
+
 all: prepare_release release
 
 di: install_debug
@@ -373,6 +377,6 @@ files_compliance:
 	scripts/check_files_compliance.py .
 
 xml_check:
-	test/xmlCheck/xmlCheck.sh
+	test/xmlCheck/xmlCheck.sh --xsd-dir $(XSD_DIR)
 
 .PHONY: rpm mock mock32 mock64 valgrind
