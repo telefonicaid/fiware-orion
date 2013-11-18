@@ -373,6 +373,6 @@ files_compliance:
 	scripts/check_files_compliance.py .
 
 xml_check:
-	scripts/xmlCheck.sh
+	test/xmlCheck/xmlCheck.sh
 
 .PHONY: rpm mock mock32 mock64 valgrind
