@@ -64,6 +64,8 @@ echo "1: +++++++++++++++++++++++++++++"
 curl localhost:${BROKER_PORT}/exit | xmllint --format -
 echo "2: +++++++++++++++++++++++++++++"
 
+#FIXME P8: without this sleep, the second response is lost. We probably
+#have some concurrency problem here that need to be fixed...
 sleep 1
 
 curl localhost:${BROKER_PORT}/exit/123 | xmllint --format -
