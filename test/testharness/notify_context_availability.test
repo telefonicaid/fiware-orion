@@ -62,6 +62,7 @@ fi
 --SHELL--
 
 (curl localhost:${BROKER_PORT}/NGSI9/notifyContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+<?xml version="1.0"?>
 <notifyContextAvailabilityRequest>
   <subscriptionId>51307b66f481db11bf860001</subscriptionId>
   <contextRegistrationResponseList>

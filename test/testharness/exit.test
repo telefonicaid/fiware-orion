@@ -60,9 +60,10 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-curl localhost:${BROKER_PORT}/exit
+curl localhost:${BROKER_PORT}/exit | xmllint --format -
 curl localhost:${BROKER_PORT}/exit/123
 --REGEXPECT--
+<?xml version="1.0"?>
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad request</reasonPhrase>

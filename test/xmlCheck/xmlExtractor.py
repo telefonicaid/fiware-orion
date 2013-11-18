@@ -101,6 +101,7 @@ prefix = str(argv[3])
 
 buffer = []
 xml_headers_counter = 0
+xml_headers_correction = 0
 xml_fragments_counter = 0
 search_mode = True
 next_xml_invalid = False
@@ -115,10 +116,16 @@ with open (file, 'r') as f:
             # Search mode is on: looking for a root element or for an 'invalid' or 'postponed' mark
             if re.search('<\?xml', line):
                 xml_headers_counter += 1
+            elif re.search('User-Agent:', line):
+                # Heuristic: each time a User-Agent is detected, then a nofityContextRequest or notifyContextAvailabiltiyRequest
+                # if found in the .test file. These are fragments of code that comes from accumulator-script.py dumps, outside
+                # the usual "xmllint decoration" that adds the XML preamble in that case. Thus, we have to count then and apply as
+                # a correction factor in the warning generation
+                xml_headers_correction += 1
             elif re.search('#INVALID_XML', line):
                 next_xml_invalid = True
             elif re.search('#POSTPONED_XML', line):
-                next_xml_postponed = True
+                next_xml_postponed = True         
             else:
                 m = re.match('\s*<(.*)>', line)
                 if m != None:
@@ -152,6 +159,6 @@ with open (file, 'r') as f:
                 next_xml_invalid = False
                 next_xml_postponed = False
 
-if xml_headers_counter != xml_fragments_counter:
-    print 'Warning: XML headers (' + str(xml_headers_counter) + ') and ' \
+if xml_headers_counter != xml_fragments_counter - xml_headers_correction:
+    print 'Warning in ' + prefix + ': XML headers (' + str(xml_headers_counter) + ', correction: ' + str(xml_headers_correction) + ') and ' \
           'generated fragments (' + str(xml_fragments_counter) + ') differ'
