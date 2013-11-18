@@ -60,14 +60,28 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
+echo "1: +++++++++++++++++++++++++++++"
 curl localhost:${BROKER_PORT}/exit
+echo "2: +++++++++++++++++++++++++++++"
+
+sleep 1
+
 curl localhost:${BROKER_PORT}/exit/123
+echo "3: +++++++++++++++++++++++++++++"
 --REGEXPECT--
+1: +++++++++++++++++++++++++++++
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad request</reasonPhrase>
   <details>Password requested</details>
 </orionError>
+2: +++++++++++++++++++++++++++++
+<orionError>
+  <code>400</code>
+  <reasonPhrase>Bad request</reasonPhrase>
+  <details>Request denied - password erroneous</details>
+</orionError>
+3: +++++++++++++++++++++++++++++
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})
