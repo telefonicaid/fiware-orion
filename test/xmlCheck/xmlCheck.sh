@@ -143,19 +143,22 @@ function harnessFiles()
     $SRC_TOP/test/xmlCheck/xmlExtractor.py $FILE $TMP_DIR $PREFIX
   done
 
-  for FILE in $(ls $TMP_DIR)
+  for FILE in $(find $TMP_DIR - name ngsi*.valid.xml)
   do
-    grep '\$' $TMP_DIR/$FILE
+    grep '\$' $FILE
     if [ "$?" != "0" ]
     then
       continue
     fi
 
-    $SRC_TOP/test/xmlCheck/envVarSubstitute.sh -f "$TMP_DIR/$FILE"
+    $SRC_TOP/test/xmlCheck/envVarSubstitute.sh -f "$FILE"
   done
 
-  harnessList=$(ls $TMP_DIR/*ngsi9* $TMP_DIR/*ngsi10*)
-  xmlPartsFound=$(ls $TMP_DIR/*ngsi9* $TMP_DIR/*ngsi10* | wc -l)
+  harnessList=$(find $TMP_DIR -name "ngsi*.valid.xml")
+  xmlPartsFound=$(find $TMP_DIR -name "ngsi*.xml" | wc -l)
+  xmlPartsValid=$(find $TMP_DIR -name "ngsi*.valid.xml" | wc -l)
+  xmlPartsInvalid=$(find $TMP_DIR -name "ngsi*.invalid.xml" | wc -l)
+  xmlPartsPostponed=$(find $TMP_DIR -name "ngsi*.postponed.xml" | wc -l)
 }
 
 
@@ -322,11 +325,15 @@ typeset -i xmlFilesBadName      # Number of XML files whose names don't follow t
 typeset -i xmlFilesProcessed    # Total number of XML files that were tested
 typeset -i xmlFilesOK           # Number of XML files that passed the test
 typeset -i xmlFilesErrors       # Number of XML files that did not pass the test
+
 typeset -i harnessFilesFound    # Number of files in the harness directory - to part in many XML files
-typeset -i xmlPartsFound        # Number of XML docs created from harness directory
-typeset -i xmlPartsProcessed    # Number of XML docs that were tested 
-typeset -i xmlPartsOK           # Number of XML docs that passed the test
-typeset -i xmlPartsErrors       # Number of XML docs that did not pass the test
+typeset -i xmlPartsFound        # Number of XML parts created from harness directory
+typeset -i xmlPartsValid        # Number of XML parts that are valid
+typeset -i xmlPartsInvalid      # Number of XML parts that are invalid
+typeset -i xmlPartsPostponed    # Number of XML parts that are postponed
+typeset -i xmlPartsProcessed    # Number of XML parts that were tested 
+typeset -i xmlPartsOK           # Number of XML parts that passed the test
+typeset -i xmlPartsErrors       # Number of XML parts that did not pass the test
 typeset -i xmlDocsFound         # xmlFilesFound + xmlPartsFound
 typeset -i xmlDocsProcessed     # xmlFilesProcessed + xmlPartsProcessed
 typeset -i xmlDocsOk            # xmlFilesOK + xmlPartsOK
@@ -341,7 +348,10 @@ xmlFilesProcessed=0
 xmlFilesOK=0
 xmlFilesErrors=0
 harnessFilesFound=$(find $SRC_TOP/test/testharness -name "*.test" | wc -l)
-xmlPartsFound=$xmlPartsFound     # already taken care of by function 'harnessFiles'
+xmlPartsFound=$xmlPartsFound           # already taken care of by function 'harnessFiles'
+xmlPartsValid=$xmlPartsValid           # already taken care of by function 'harnessFiles'
+xmlPartsInvalid=$xmlPartsInvalid       # already taken care of by function 'harnessFiles'
+xmlPartsPostponed=$xmlPartsPostponed   # already taken care of by function 'harnessFiles'
 xmlPartsProcessed=0
 xmlPartsOK=0
 xmlPartsErrors=0

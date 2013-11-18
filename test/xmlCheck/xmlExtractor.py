@@ -138,12 +138,14 @@ with open (file, 'r') as f:
             if re.search('<\/'+ root_element + '>', line):
                 # We add a 'ngsi9' or 'ngsi10' token in the filename to help xmlChecker.sh script
                 filename_base = dir + '/' + ngsi_token(root_element) + '.' + prefix + '.'
+
                 if next_xml_invalid:
-                    filename = filename_base + 'invalid.' + str(xml_fragments_counter)
+                    filename = filename_base + 'part_' + str(xml_fragments_counter) + '.invalid.xml'
                 elif next_xml_postponed:
-                    filename = filename_base + 'postponed.' + str(xml_fragments_counter)
+                    filename = filename_base + 'part_' + str(xml_fragments_counter) + '.postponed.xml'
                 else:
-                    filename = filename_base + str(xml_fragments_counter)
+                    filename = filename_base + 'part_' + str(xml_fragments_counter) + '.valid.xml'
+
                 write_fragment(buffer, filename)
                 buffer = []
                 search_mode = True

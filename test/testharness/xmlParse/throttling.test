@@ -76,7 +76,7 @@ EOF
 echo "2: +++++++++++++++++++++++++++++"
 
 # Bad throttling syntax
-# INVALID XML
+#INVALID_XML
 (curl localhost:${BROKER_PORT}/ngsi10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
