@@ -46,6 +46,9 @@ n = 0
 #
 # [CEST Sep  5 12:28:50] error    : 'contextBroker' process is not running
 # [CEST Sep  5 12:32:03] info     : 'contextBroker' 'contextBroker' total mem amount check succeeded [current total mem amount=2464kB]
+#
+# Note that both 'CEST' and 'CET' are used as timestamp prefix (the S stands for 'Summer'), thus the regular expressions in use
+# match both alternatives
 
 with open(file) as f:
     for line in f:
@@ -55,9 +58,9 @@ with open(file) as f:
 
         # Filter out lines which doesn't include the process name (typically 'contextBroker') or
         # doesn't include the target date
-        if re.search('\'' + process_name + '\'', line) and re.search('CEST\s+' + target_month + '\s+' + target_day, line, flags=re.IGNORECASE):
+        if re.search('\'' + process_name + '\'', line) and re.search('CES?T\s+' + target_month + '\s+' + target_day, line, flags=re.IGNORECASE):
             # Grep line information we need using a regular expression
-            m = re.match('\[CEST (.*)\] (.*) : \'.*\' (.*)', line)
+            m = re.match('\[CES?T (.*)\] (.*) : \'.*\' (.*)', line)
             if m != None:
 
                 # If the line includes the "error" mark, we store it in last_error
