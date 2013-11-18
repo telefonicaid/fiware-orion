@@ -60,14 +60,32 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-curl localhost:${BROKER_PORT}/exit
-curl localhost:${BROKER_PORT}/exit/123
+echo "1: +++++++++++++++++++++++++++++"
+curl localhost:${BROKER_PORT}/exit | xmllint --format -
+echo "2: +++++++++++++++++++++++++++++"
+
+#FIXME P8: without this sleep, the second response is lost. We probably
+#have some concurrency problem here that need to be fixed...
+sleep 1
+
+curl localhost:${BROKER_PORT}/exit/123 | xmllint --format -
+echo "3: +++++++++++++++++++++++++++++"
 --REGEXPECT--
+1: +++++++++++++++++++++++++++++
+<?xml version="1.0"?>
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad request</reasonPhrase>
   <details>Password requested</details>
 </orionError>
+2: +++++++++++++++++++++++++++++
+<?xml version="1.0"?>
+<orionError>
+  <code>400</code>
+  <reasonPhrase>Bad request</reasonPhrase>
+  <details>Request denied - password erroneous</details>
+</orionError>
+3: +++++++++++++++++++++++++++++
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})

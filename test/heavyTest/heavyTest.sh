@@ -413,29 +413,29 @@ do
   #
   # NGSI-9
   #
-  partTest 1   rcr          rcr.xml         "NGSI9 Registration"                                "/NGSI9/registerContext"  "/NGSI9/registerContext OK (registrationId:"
-  partTest 99  rcr          rcr.xml         "NGSI9 Registrations"                               "/NGSI9/registerContext"  "/NGSI9/registerContext OK (registrationId:"
-  partTest 400 rcr          rcr.xml         "NGSI9 Registrations"                               "/NGSI9/registerContext"  "/NGSI9/registerContext OK (registrationId:"
+  partTest 1   rcr          ngsi9.registerContextRequest.ok.valid.xml                        "NGSI9 Registration"                                "/NGSI9/registerContext"  "/NGSI9/registerContext OK (registrationId:"
+  partTest 99  rcr          ngsi9.registerContextRequest.ok.valid.xml                        "NGSI9 Registrations"                               "/NGSI9/registerContext"  "/NGSI9/registerContext OK (registrationId:"
+  partTest 400 rcr          ngsi9.registerContextRequest.ok.valid.xml                        "NGSI9 Registrations"                               "/NGSI9/registerContext"  "/NGSI9/registerContext OK (registrationId:"
   
-  partTest 1   dcar         dcar.xml        "NGSI9 Discovery"                                   "/NGSI9/discoverContextAvailability" "NO PATTERN"
-  partTest 99  dcar         dcar.xml        "NGSI9 Discoveries"                                 "/NGSI9/discoverContextAvailability" "NO PATTERN"
-  partTest 400 dcar         dcar.xml        "NGSI9 Discoveries"                                 "/NGSI9/discoverContextAvailability" "NO PATTERN"
+  partTest 1   dcar         ngsi9.discoverContextAvailabilityRequest.ok.xml                  "NGSI9 Discovery"                                   "/NGSI9/discoverContextAvailability" "NO PATTERN"
+  partTest 99  dcar         ngsi9.discoverContextAvailabilityRequest.ok.xml                  "NGSI9 Discoveries"                                 "/NGSI9/discoverContextAvailability" "NO PATTERN"
+  partTest 400 dcar         ngsi9.discoverContextAvailabilityRequest.ok.xml                  "NGSI9 Discoveries"                                 "/NGSI9/discoverContextAvailability" "NO PATTERN"
   
-  partTest 1   scar         scar.xml        "NGSI9 AvailabilitySubscription"                    "/NGSI9/subscribeContextAvailability" "NO PATTERN"
-  partTest 99  scar         scar.xml        "NGSI9 AvailabilitySubscriptions"                   "/NGSI9/subscribeContextAvailability" "NO PATTERN"
-  partTest 200 scar         scar.xml        "NGSI9 AvailabilitySubscriptions"                   "/NGSI9/subscribeContextAvailability" "NO PATTERN"
+  partTest 1   scar         ngsi9.subscribeContextAvailabilityRequest.ok.valid.xml           "NGSI9 AvailabilitySubscription"                    "/NGSI9/subscribeContextAvailability" "NO PATTERN"
+  partTest 99  scar         ngsi9.subscribeContextAvailabilityRequest.ok.valid.xml           "NGSI9 AvailabilitySubscriptions"                   "/NGSI9/subscribeContextAvailability" "NO PATTERN"
+  partTest 200 scar         ngsi9.subscribeContextAvailabilityRequest.ok.valid.xml           "NGSI9 AvailabilitySubscriptions"                   "/NGSI9/subscribeContextAvailability" "NO PATTERN"
   
-  partTest 1   ucas         ucas.xml        "NGSI9 AvailabilitySubscriptionUpdate"              "/NGSI9/updateContextAvailabilitySubscription" "NO PATTERN"
-  partTest 99  ucas         ucas.xml        "NGSI9 AvailabilitySubscriptionUpdates"             "/NGSI9/updateContextAvailabilitySubscription" "NO PATTERN"
-  partTest 200 ucas         ucas.xml        "NGSI9 AvailabilitySubscriptionUpdates"             "/NGSI9/updateContextAvailabilitySubscription" "NO PATTERN"
+  partTest 1   ucas         ngsi9.updateContextAvailabilitySubscriptionRequest.ok.valid.xml  "NGSI9 AvailabilitySubscriptionUpdate"              "/NGSI9/updateContextAvailabilitySubscription" "NO PATTERN"
+  partTest 99  ucas         ngsi9.updateContextAvailabilitySubscriptionRequest.ok.valid.xml  "NGSI9 AvailabilitySubscriptionUpdates"             "/NGSI9/updateContextAvailabilitySubscription" "NO PATTERN"
+  partTest 200 ucas         ngsi9.updateContextAvailabilitySubscriptionRequest.ok.valid.xml  "NGSI9 AvailabilitySubscriptionUpdates"             "/NGSI9/updateContextAvailabilitySubscription" "NO PATTERN"
   
-  partTest 1   ucar         ucar.xml        "NGSI9 AvailabilityUnsubscribe"                     "/NGSI9/unsubscribeContextAvailability" "NO PATTERN"
-  partTest 99  ucar         ucar.xml        "NGSI9 AvailabilityUnsubscribe"                     "/NGSI9/unsubscribeContextAvailability" "NO PATTERN"
-  partTest 200 ucar         ucar.xml        "NGSI9 AvailabilityUnsubscribe"                     "/NGSI9/unsubscribeContextAvailability" "NO PATTERN"
+  partTest 1   ucar         ngsi9.unsubscribeContextAvailabilityRequest.ok.valid.xml         "NGSI9 AvailabilityUnsubscribe"                     "/NGSI9/unsubscribeContextAvailability" "NO PATTERN"
+  partTest 99  ucar         ngsi9.unsubscribeContextAvailabilityRequest.ok.valid.xml         "NGSI9 AvailabilityUnsubscribe"                     "/NGSI9/unsubscribeContextAvailability" "NO PATTERN"
+  partTest 200 ucar         ngsi9.unsubscribeContextAvailabilityRequest.ok.valid.xml         "NGSI9 AvailabilityUnsubscribe"                     "/NGSI9/unsubscribeContextAvailability" "NO PATTERN"
   
-  partTest 1   ncar         ncar.xml        "NGSI9 NotifyAvailability"                          "/NGSI9/notifyContextAvailability" "NO PATTERN"
-  partTest 99  ncar         ncar.xml        "NGSI9 NotifyAvailability"                          "/NGSI9/notifyContextAvailability" "NO PATTERN"
-  partTest 200 ncar         ncar.xml        "NGSI9 NotifyAvailability"                          "/NGSI9/notifyContextAvailability" "NO PATTERN"
+  partTest 1   ncar         ngsi9.notifyContextAvailabilityRequest.ok.valid.xml              "NGSI9 NotifyAvailability"                          "/NGSI9/notifyContextAvailability" "NO PATTERN"
+  partTest 99  ncar         ngsi9.notifyContextAvailabilityRequest.ok.valid.xml              "NGSI9 NotifyAvailability"                          "/NGSI9/notifyContextAvailability" "NO PATTERN"
+  partTest 200 ncar         ngsi9.notifyContextAvailabilityRequest.ok.valid.xml              "NGSI9 NotifyAvailability"                          "/NGSI9/notifyContextAvailability" "NO PATTERN"
   
   
   
@@ -443,29 +443,29 @@ do
   #
   # NGSI-10
   #
-  partTest 1   qcr          qcr.xml         "NGSI10 Query"                                       "/NGSI10/queryContext" "NO PATTERN"
-  partTest 99  qcr          qcr.xml         "NGSI10 Queries"                                     "/NGSI10/queryContext" "NO PATTERN"
-  partTest 400 qcr          qcr.xml         "NGSI10 Queries"                                     "/NGSI10/queryContext" "NO PATTERN"
+  partTest 1   qcr          ngsi10.queryContextRequest.ok.valid.xml                "NGSI10 Query"                                       "/NGSI10/queryContext" "NO PATTERN"
+  partTest 99  qcr          ngsi10.queryContextRequest.ok.valid.xml                "NGSI10 Queries"                                     "/NGSI10/queryContext" "NO PATTERN"
+  partTest 400 qcr          ngsi10.queryContextRequest.ok.valid.xml                "NGSI10 Queries"                                     "/NGSI10/queryContext" "NO PATTERN"
   
-  partTest 1   scr          scr.xml         "NGSI10 Subscription"                                "/NGSI10/subscribeContext" "NO PATTERN"
-  partTest 99  scr          scr.xml         "NGSI10 Subscriptions"                               "/NGSI10/subscribeContext" "NO PATTERN"
-  partTest 400 scr          scr.xml         "NGSI10 Subscriptions"                               "/NGSI10/subscribeContext" "NO PATTERN"
+  partTest 1   scr          ngsi10.subscribeContextRequest.ok.valid.xml            "NGSI10 Subscription"                                "/NGSI10/subscribeContext" "NO PATTERN"
+  partTest 99  scr          ngsi10.subscribeContextRequest.ok.valid.xml            "NGSI10 Subscriptions"                               "/NGSI10/subscribeContext" "NO PATTERN"
+  partTest 400 scr          ngsi10.subscribeContextRequest.ok.valid.xml            "NGSI10 Subscriptions"                               "/NGSI10/subscribeContext" "NO PATTERN"
   
-  partTest 1   ucsr         ucsr.xml        "NGSI10 UpdateSubscription"                          "/NGSI10/updateContextSubscription" "NO PATTERN"
-  partTest 99  ucsr         ucsr.xml        "NGSI10 UpdateSubscriptions"                         "/NGSI10/updateContextSubscription" "NO PATTERN"
-  partTest 400 ucsr         ucsr.xml        "NGSI10 UpdateSubscriptions"                         "/NGSI10/updateContextSubscription" "NO PATTERN"
+  partTest 1   ucsr         ngsi10.updateContextSubscriptionRequest.ok.valid.xml   "NGSI10 UpdateSubscription"                          "/NGSI10/updateContextSubscription" "NO PATTERN"
+  partTest 99  ucsr         ngsi10.updateContextSubscriptionRequest.ok.valid.xml   "NGSI10 UpdateSubscriptions"                         "/NGSI10/updateContextSubscription" "NO PATTERN"
+  partTest 400 ucsr         ngsi10.updateContextSubscriptionRequest.ok.valid.xml   "NGSI10 UpdateSubscriptions"                         "/NGSI10/updateContextSubscription" "NO PATTERN"
   
-  partTest 1   uncr         uncr.xml        "NGSI10 Unsubscribe"                                 "/NGSI10/unsubscribeContext" "NO PATTERN"
-  partTest 99  uncr         uncr.xml        "NGSI10 Unsubscribe"                                 "/NGSI10/unsubscribeContext" "NO PATTERN"
-  partTest 400 uncr         uncr.xml        "NGSI10 Unsubscribe"                                 "/NGSI10/unsubscribeContext" "NO PATTERN"
+  partTest 1   uncr         ngsi10.unsubscribeContextRequest.ok.valid.xml          "NGSI10 Unsubscribe"                                 "/NGSI10/unsubscribeContext" "NO PATTERN"
+  partTest 99  uncr         ngsi10.unsubscribeContextRequest.ok.valid.xml          "NGSI10 Unsubscribe"                                 "/NGSI10/unsubscribeContext" "NO PATTERN"
+  partTest 400 uncr         ngsi10.unsubscribeContextRequest.ok.valid.xml          "NGSI10 Unsubscribe"                                 "/NGSI10/unsubscribeContext" "NO PATTERN"
  
-  partTest 1   upcr         upcr.xml        "NGSI10 Update"                                      "/NGSI10/updateContext" "NO PATTERN"
-  partTest 99  upcr         upcr.xml        "NGSI10 Updates"                                     "/NGSI10/updateContext" "NO PATTERN"
-  partTest 400 upcr         upcr.xml        "NGSI10 Updates"                                     "/NGSI10/updateContext" "NO PATTERN"
+  partTest 1   upcr         ngsi10.updateContextRequest.ok.valid.xml               "NGSI10 Update"                                      "/NGSI10/updateContext" "NO PATTERN"
+  partTest 99  upcr         ngsi10.updateContextRequest.ok.valid.xml               "NGSI10 Updates"                                     "/NGSI10/updateContext" "NO PATTERN"
+  partTest 400 upcr         ngsi10.updateContextRequest.ok.valid.xml               "NGSI10 Updates"                                     "/NGSI10/updateContext" "NO PATTERN"
   
-  partTest 1   ncr          ncr.xml         "NGSI10 Notification"                                "/NGSI10/notifyContext" "NO PATTERN"
-  partTest 99  ncr          ncr.xml         "NGSI10 Notifications"                               "/NGSI10/notifyContext" "NO PATTERN"
-  partTest 400 ncr          ncr.xml         "NGSI10 Notifications"                               "/NGSI10/notifyContext" "NO PATTERN"
+  partTest 1   ncr          ngsi10.notifyContextRequest.ok.valid.xml               "NGSI10 Notification"                                "/NGSI10/notifyContext" "NO PATTERN"
+  partTest 99  ncr          ngsi10.notifyContextRequest.ok.valid.xml               "NGSI10 Notifications"                               "/NGSI10/notifyContext" "NO PATTERN"
+  partTest 400 ncr          ngsi10.notifyContextRequest.ok.valid.xml               "NGSI10 Notifications"                               "/NGSI10/notifyContext" "NO PATTERN"
   
   
   
@@ -473,17 +473,17 @@ do
   #
   # NGSI-9 Convenience operations
   #
-  partTest 1   conv/ce      conv-ce.xml     "NGSI9 ContextEntity Convenience"             "/NGSI9/contextEntities/ENTITY_ID" "NO PATTERN"
-  partTest 99  conv/ce      conv-ce.xml     "NGSI9 ContextEntity Convenience"             "/NGSI9/contextEntities/ENTITY_ID" "NO PATTERN"
-  partTest 200 conv/ce      conv-ce.xml     "NGSI9 ContextEntity Convenience"             "/NGSI9/contextEntities/ENTITY_ID" "NO PATTERN"
+  partTest 1   conv/ce      ngsi9.registerProviderRequest.ok.postponed.xml    "NGSI9 ContextEntity Convenience"             "/NGSI9/contextEntities/ENTITY_ID" "NO PATTERN"
+  partTest 99  conv/ce      ngsi9.registerProviderRequest.ok.postponed.xml    "NGSI9 ContextEntity Convenience"             "/NGSI9/contextEntities/ENTITY_ID" "NO PATTERN"
+  partTest 200 conv/ce      ngsi9.registerProviderRequest.ok.postponed.xml    "NGSI9 ContextEntity Convenience"             "/NGSI9/contextEntities/ENTITY_ID" "NO PATTERN"
   
-  partTest 1   conv/cea     conv-cea.xml    "NGSI9 ContextEntityAttributes Convenience"   "/NGSI9/contextEntities/ENTITY_ID/attributes" "NO PATTERN"
-  partTest 99  conv/cea     conv-cea.xml    "NGSI9 ContextEntityAttributes Convenience"   "/NGSI9/contextEntities/ENTITY_ID/attributes" "NO PATTERN"
-  partTest 200 conv/cea     conv-cea.xml    "NGSI9 ContextEntityAttributes Convenience"   "/NGSI9/contextEntities/ENTITY_ID/attributes" "NO PATTERN"
+  partTest 1   conv/cea     ngsi9.registerProviderRequest.ok.postponed.xml    "NGSI9 ContextEntityAttributes Convenience"   "/NGSI9/contextEntities/ENTITY_ID/attributes" "NO PATTERN"
+  partTest 99  conv/cea     ngsi9.registerProviderRequest.ok.postponed.xml    "NGSI9 ContextEntityAttributes Convenience"   "/NGSI9/contextEntities/ENTITY_ID/attributes" "NO PATTERN"
+  partTest 200 conv/cea     ngsi9.registerProviderRequest.ok.postponed.xml    "NGSI9 ContextEntityAttributes Convenience"   "/NGSI9/contextEntities/ENTITY_ID/attributes" "NO PATTERN"
   
-  partTest 1   conv/ceaa    conv-ceaa.xml   "NGSI9 ContextEntityAttribute Convenience"    "/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_NAME" "NO PATTERN"
-  partTest 99  conv/ceaa    conv-ceaa.xml   "NGSI9 ContextEntityAttribute Convenience"    "/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_NAME" "NO PATTERN"
-  partTest 200 conv/ceaa    conv-ceaa.xml   "NGSI9 ContextEntityAttribute Convenience"    "/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_NAME" "NO PATTERN"
+  partTest 1   conv/ceaa    ngsi9.registerProviderRequest.ok.postponed.xml    "NGSI9 ContextEntityAttribute Convenience"    "/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_NAME" "NO PATTERN"
+  partTest 99  conv/ceaa    ngsi9.registerProviderRequest.ok.postponed.xml    "NGSI9 ContextEntityAttribute Convenience"    "/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_NAME" "NO PATTERN"
+  partTest 200 conv/ceaa    ngsi9.registerProviderRequest.ok.postponed.xml    "NGSI9 ContextEntityAttribute Convenience"    "/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_NAME" "NO PATTERN"
   
   
   
@@ -491,17 +491,17 @@ do
   #
   # NGSI-10 Convenience operations
   #
-  partTest 1   conv/ce10    conv-ce10.xml   "NGSI10 ContextEntity Convenience"            "/NGSI10/contextEntities/ENTITY_ID" "NO PATTERN"
-  partTest 99  conv/ce10    conv-ce10.xml   "NGSI10 ContextEntity Convenience"            "/NGSI10/contextEntities/ENTITY_ID" "NO PATTERN"
-  partTest 200 conv/ce10    conv-ce10.xml   "NGSI10 ContextEntity Convenience"            "/NGSI10/contextEntities/ENTITY_ID" "NO PATTERN"
-  
-  partTest 1   conv/cea10   conv-cea10.xml  "NGSI10 ContextEntityAttributes Convenience"  "/NGSI10/contextEntities/ENTITY_ID/attributes" "NO PATTERN"
-  partTest 99  conv/cea10   conv-cea10.xml  "NGSI10 ContextEntityAttributes Convenience"  "/NGSI10/contextEntities/ENTITY_ID/attributes" "NO PATTERN"
-  partTest 200 conv/cea10   conv-cea10.xml  "NGSI10 ContextEntityAttributes Convenience"  "/NGSI10/contextEntities/ENTITY_ID/attributes" "NO PATTERN"
-  
-  partTest 1   conv/ceaa10  conv-ceaa10.xml "NGSI10 ContextEntityAttribute Convenience"   "/NGSI10/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_NAME" "NO PATTERN"
-  partTest 99  conv/ceaa10  conv-ceaa10.xml "NGSI10 ContextEntityAttribute Convenience"   "/NGSI10/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_NAME" "NO PATTERN"
-  partTest 200 conv/ceaa10  conv-ceaa10.xml "NGSI10 ContextEntityAttribute Convenience"   "/NGSI10/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_NAME" "NO PATTERN"
+  partTest 1   conv/ce10    ngsi10.appendContextElementRequest.ok.postponed.xml   "NGSI10 ContextEntity Convenience"            "/NGSI10/contextEntities/ENTITY_ID" "NO PATTERN"
+  partTest 99  conv/ce10    ngsi10.appendContextElementRequest.ok.postponed.xml   "NGSI10 ContextEntity Convenience"            "/NGSI10/contextEntities/ENTITY_ID" "NO PATTERN"
+  partTest 200 conv/ce10    ngsi10.appendContextElementRequest.ok.postponed.xml   "NGSI10 ContextEntity Convenience"            "/NGSI10/contextEntities/ENTITY_ID" "NO PATTERN"
+
+  partTest 1   conv/cea10   ngsi10.appendContextElementRequest.ok.postponed.xml   "NGSI10 ContextEntityAttributes Convenience"  "/NGSI10/contextEntities/ENTITY_ID/attributes" "NO PATTERN"
+  partTest 99  conv/cea10   ngsi10.appendContextElementRequest.ok.postponed.xml   "NGSI10 ContextEntityAttributes Convenience"  "/NGSI10/contextEntities/ENTITY_ID/attributes" "NO PATTERN"
+  partTest 200 conv/cea10   ngsi10.appendContextElementRequest.ok.postponed.xml   "NGSI10 ContextEntityAttributes Convenience"  "/NGSI10/contextEntities/ENTITY_ID/attributes" "NO PATTERN"
+
+  partTest 1   conv/ceaa10  ngsi10.updateContextAttributeRequest.ok.postponed.xml "NGSI10 ContextEntityAttribute Convenience"   "/NGSI10/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_NAME" "NO PATTERN"
+  partTest 99  conv/ceaa10  ngsi10.updateContextAttributeRequest.ok.postponed.xml "NGSI10 ContextEntityAttribute Convenience"   "/NGSI10/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_NAME" "NO PATTERN"
+  partTest 200 conv/ceaa10  ngsi10.updateContextAttributeRequest.ok.postponed.xml "NGSI10 ContextEntityAttribute Convenience"   "/NGSI10/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_NAME" "NO PATTERN"
   
   loop=$loop+1
 done

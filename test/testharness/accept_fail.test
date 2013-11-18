@@ -171,7 +171,8 @@ echo "7: ++++++++++++++++++++"
 # FIXME P10: enable this test once the tested functionality gets implemented (including REGEXPECT)
 # This test that Accept preference is correctly taken into account (XML preferred to JSON)
 #(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml, application/json' -d @- | xmllint --format -) <<EOF
-#<?xml version="1.0" encoding="UTF-8"?>
+# Note the "<-" in the following line, this is a way of "skipping" fragment generation by xmlExtractor.py while this step is activated
+#<-?xml version="1.0" encoding="UTF-8"?>
 #<queryContextRequest>
 #  <entityIdList>
 #        <entityId type="Room" isPattern="false">
@@ -202,7 +203,8 @@ echo "7: ++++++++++++++++++++"
 # FIXME P10: enable this test once the tested functionality gets implemented (including REGEXPECT)
 # Cross Accept/Content-Type JSON/XML test (only a weird client will do this, but it is theoretically possible)
 #(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/json' -d @- | xmllint --format -) <<EOF
-#<?xml version="1.0" encoding="UTF-8"?>
+# Note the "<-" in the following line, this is a way of "skipping" fragment generation by xmlExtractor.py while this step is activated
+#<-?xml version="1.0" encoding="UTF-8"?>
 #<queryContextRequest>
 #  <entityIdList>
 #        <entityId type="Room" isPattern="false">
