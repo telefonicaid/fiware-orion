@@ -38,6 +38,13 @@
 * versionSet -
 */
 extern void versionSet(const char* version);
+
+
+
+/* ****************************************************************************
+*
+* versionGet -
+*/
 extern char* versionGet();
 
 
