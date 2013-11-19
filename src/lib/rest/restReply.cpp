@@ -105,7 +105,11 @@ int restReply(ConnectionInfo* ciP, std::string answer)
 
   ++replyIx;
   LM_T(LmtRestReply, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answer.length(), ciP->httpStatusCode));
-  response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_YES, MHD_YES);
+
+  if (answer == "")
+    response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_NO, MHD_NO);
+  else
+    response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_YES, MHD_YES);
 
   if (!response)
     LM_RE(MHD_NO, ("MHD_create_response_from_buffer FAILED"));

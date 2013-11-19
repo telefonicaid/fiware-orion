@@ -144,10 +144,11 @@ curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID2 -s -S | xmllint -
 echo "7: ++++++++++++++++++++"
 
 # DELETE and PUT should give errors
-curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID -s -S -X DELETE | xmllint --format -
+curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID -s -S -X DELETE -D /tmp/headers | xmllint --format -
+cat /tmp/headers
+rm -f /tmp/headers < /dev/null 2>&1
 echo "8: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X PUT -d @- | xmllint --format -) << EOF
+(curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID -s -S -X PUT -D /tmp/headers --header 'Content-Type: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
@@ -164,9 +165,9 @@ echo "8: ++++++++++++++++++++"
   </metadata>
   <duration>PT2H</duration>
   <providingApplication>http://kz.tid.es/abc2</providingApplication>
-  <registrationId>$REG_ID</registrationId>
 </registerProviderRequest>
 EOF
+cat /tmp/headers
 echo "9: ++++++++++++++++++++"
 
 --REGEXPECT--
@@ -239,23 +240,19 @@ echo "9: ++++++++++++++++++++"
   </errorCode>
 </discoverContextAvailabilityResponse>
 7: ++++++++++++++++++++
-<?xml version="1.0"?>
-<discoverContextAvailabilityResponse>
-  <errorCode>
-    <code>405</code>
-    <reasonPhrase>Method not allowed</reasonPhrase>
-    <details>Allow: POST, GET</details>
-  </errorCode>
-</discoverContextAvailabilityResponse>
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Content-Type: application/xml
+Allow: POST, GET
+Date: REGEX(.*)
+
 8: ++++++++++++++++++++
-<?xml version="1.0"?>
-<discoverContextAvailabilityResponse>
-  <errorCode>
-    <code>405</code>
-    <reasonPhrase>Method not allowed</reasonPhrase>
-    <details>Allow: POST, GET</details>
-  </errorCode>
-</discoverContextAvailabilityResponse>
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Content-Type: application/xml
+Allow: POST, GET
+Date: REGEX(.*)
+
 9: ++++++++++++++++++++
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
