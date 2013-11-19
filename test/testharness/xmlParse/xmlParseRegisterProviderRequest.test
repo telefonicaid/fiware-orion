@@ -146,6 +146,7 @@ echo "7: ++++++++++++++++++++"
 # DELETE and PUT should give errors
 curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID -s -S -X DELETE --include
 echo "8: ++++++++++++++++++++"
+
 (curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID -s -S -X PUT --include --header 'Content-Type: application/xml' -d @-) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
