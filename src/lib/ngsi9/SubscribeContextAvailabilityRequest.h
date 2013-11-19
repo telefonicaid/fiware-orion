@@ -53,6 +53,7 @@ typedef struct SubscribeContextAvailabilityRequest
   /* The number of restrictions */
   int                    restrictions;
 
+  SubscribeContextAvailabilityRequest();
   std::string  render(RequestType requestType, Format format, std::string indent);
   std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void         release(void);

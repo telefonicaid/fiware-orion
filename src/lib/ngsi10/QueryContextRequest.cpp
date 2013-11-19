@@ -33,6 +33,17 @@
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/QueryContextRequest.h"
 
+/* ****************************************************************************
+*
+* QueryContextRequest::QueryContextRequest
+*
+* Explicit constructor needed to initialize primitive types so they don't get
+* random values from the stack
+*/
+QueryContextRequest::QueryContextRequest()
+{
+  restrictions = 0;
+}
 
 
 /* ****************************************************************************

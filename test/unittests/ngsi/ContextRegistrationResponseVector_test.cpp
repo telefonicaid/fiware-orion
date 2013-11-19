@@ -38,6 +38,7 @@
 TEST(ContextRegistrationResponseVector, all)
 {
   ContextRegistrationResponse        crr;
+  crr.contextRegistration.entityIdVectorPresent = true;
   ContextRegistrationResponseVector  crrV;
   std::string                        rendered;
   std::string                        expected = "Empty entityIdVector";

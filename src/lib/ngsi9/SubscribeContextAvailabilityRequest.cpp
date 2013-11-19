@@ -37,7 +37,17 @@
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
 
-
+/* ****************************************************************************
+*
+* SubscribeContextAvailabilityRequest::SubscribeContextAvailabilityRequest
+*
+* Explicit constructor needed to initialize primitive types so they don't get
+* random values from the stack
+*/
+SubscribeContextAvailabilityRequest::SubscribeContextAvailabilityRequest()
+{
+  restrictions = 0;
+}
 
 /* ****************************************************************************
 *

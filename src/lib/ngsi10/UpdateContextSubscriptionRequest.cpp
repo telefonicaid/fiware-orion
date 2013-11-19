@@ -31,6 +31,17 @@
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 
+/* ****************************************************************************
+*
+* UpdateContextSubscriptionRequest::UpdateContextSubscriptionRequest
+*
+* Explicit constructor needed to initialize primitive types so they don't get
+* random values from the stack
+*/
+UpdateContextSubscriptionRequest::UpdateContextSubscriptionRequest()
+{
+  restrictions = 0;
+}
 
 
 /* ****************************************************************************
