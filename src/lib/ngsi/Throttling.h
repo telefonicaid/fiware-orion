@@ -41,6 +41,7 @@ typedef struct Throttling
   std::string  string;
   unsigned int seconds;
 
+  Throttling();
   void         set(std::string value);
   std::string  get(void);
   bool         isEmpty(void);

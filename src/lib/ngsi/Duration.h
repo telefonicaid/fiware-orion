@@ -42,6 +42,7 @@ typedef struct Duration
   std::string   string;
   unsigned int  seconds; 
 
+  Duration();
   void          set(std::string value);
   std::string   get(void);
   bool          isEmpty(void);

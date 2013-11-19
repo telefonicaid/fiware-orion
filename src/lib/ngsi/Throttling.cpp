@@ -34,6 +34,18 @@
 
 /* ****************************************************************************
 *
+* Throttling::Throttling
+*
+* Explicit constructor needed to initialize primitive types so they don't get
+* random values from the stack
+*/
+Throttling::Throttling()
+{
+    seconds = 0;
+}
+
+/* ****************************************************************************
+*
 * Throttling::parse -
 */
 int Throttling::parse(void)
