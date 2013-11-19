@@ -349,7 +349,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 6: ++++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 739
-User-Agent: NGSI Rest Library
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: */*
 Content-Type: application/xml
@@ -382,7 +382,7 @@ Content-Type: application/xml
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 739
-User-Agent: NGSI Rest Library
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: */*
 Content-Type: application/xml
@@ -415,7 +415,7 @@ Content-Type: application/xml
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 740
-User-Agent: NGSI Rest Library
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: */*
 Content-Type: application/xml
