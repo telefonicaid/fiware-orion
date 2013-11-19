@@ -41,12 +41,11 @@
 */
 std::string badVerbGetPostOnly(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
-  std::string answer;
-
   ciP->httpHeader.push_back("Allow");
   ciP->httpHeaderValue.push_back("POST, GET");
   ciP->httpStatusCode = SccBadVerb;
 
-  answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadVerb, "Method not allowed", "Allow: POST, GET");
-  return answer;
+  LM_W(("IN badVerbGetPostOnly for url '%s', method '%s'", ciP->url.c_str(), ciP->method.c_str()));
+
+  return "";
 }
