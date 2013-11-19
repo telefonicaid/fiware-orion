@@ -65,7 +65,6 @@ badRequest.cpp
 postNotifyContext.cpp
 postNotifyContextAvailability.cpp
 statisticsTreat.cpp
-payloadWord.cpp
 )
 
 SET (HEADERS
@@ -112,7 +111,6 @@ badRequest.h
 postNotifyContext.h
 postNotifyContextAvailability.h
 statisticsTreat.h
-payloadWord.h
 )
 
 
