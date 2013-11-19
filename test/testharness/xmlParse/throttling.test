@@ -102,7 +102,6 @@ echo "3: +++++++++++++++++++++++++++++"
   </subscribeResponse>
 </subscribeContextResponse>
 2: +++++++++++++++++++++++++++++
-# INVALID XML
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeError>

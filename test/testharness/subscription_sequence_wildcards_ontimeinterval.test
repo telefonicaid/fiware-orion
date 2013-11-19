@@ -186,6 +186,7 @@ echo "3: ++++++++++++++++++++"
 sleep 11
 
 (curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+<?xml version="1.0"?>
 <unsubscribeContextRequest>
   <subscriptionId>$SUB_ID</subscriptionId>
 </unsubscribeContextRequest>
