@@ -61,7 +61,7 @@ fi
 
 --SHELL--
 echo "1: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI9/notifyContextAvailability -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI9/notifyContextAvailability -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <notifyContextAvailabilityRequest>
 	<subscriptionId>012345678901234567890123</subscriptionId>
@@ -105,7 +105,7 @@ echo "1: ***********************************"
 </notifyContextAvailabilityRequest>
 EOF
 echo "2: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI9/notifyContextAvailability -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI9/notifyContextAvailability -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <notifyContextAvailabilityRequest>
 	<subscriptionId>01234567890123456789012</subscriptionId>
@@ -151,6 +151,7 @@ EOF
 echo "3: ***********************************"
 --REGEXPECT--
 1: ***********************************
+<?xml version="1.0"?>
 <notifyContextAvailabilityResponse>
   <responseCode>
     <code>200</code>
@@ -158,6 +159,7 @@ echo "3: ***********************************"
   </responseCode>
 </notifyContextAvailabilityResponse>
 2: ***********************************
+<?xml version="1.0"?>
 <notifyContextAvailabilityResponse>
   <responseCode>
     <code>400</code>

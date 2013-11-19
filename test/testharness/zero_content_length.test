@@ -63,8 +63,9 @@ fi
 # Note that we are assuming a fixed value of 0 for days, hours and minutes, assuming that this test
 # is executed in less than one minute
 
-curl localhost:${BROKER_PORT}/ngsi9/registerContext --header "Content-Length: 0" -X POST 
+curl localhost:${BROKER_PORT}/ngsi9/registerContext --header "Content-Length: 0" -X POST | xmllint --format -
 --REGEXPECT--
+<?xml version="1.0"?>
 <registerContextResponse>
   <registrationId>0</registrationId>
   <errorCode>

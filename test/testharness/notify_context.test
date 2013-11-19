@@ -87,6 +87,7 @@ EOF
 echo "1: ++++++++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI10/notifyContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+<?xml version="1.0"?>
 <notifyContextRequest>
   <subscriptionId>51307b66f481db11bf860001</subscriptionId>
   <originator>localhost</originator>

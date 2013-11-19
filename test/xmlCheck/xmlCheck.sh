@@ -77,7 +77,7 @@ function xsdGet()
     echo $xsdDir/Ngsi10_Operations_v07.xsd
   else
     echo "unknown file prefix: '"${prefix}"' for $xfile"
-    exit 1
+    exit 2
   fi
 }
 
@@ -201,7 +201,6 @@ done
 # SRC_TOP - getting the TOP directory
 #
 dir=$(dirname $0)
-echo dir: $dir
 SRC_TOP1=${PWD}/${dir}/../..   # if called with a relative path
 SRC_TOP2=${dir}/../..          # if called via $PATH or with an absolute path
 if [ -d ${SRC_TOP1} ]
@@ -213,7 +212,7 @@ fi
 
 cd $SRC_TOP
 SRC_TOP=$(pwd)
-cd -
+cd - > /dev/null
 vMsg Git repo home: $SRC_TOP
 
 
@@ -225,7 +224,7 @@ vMsg Git repo home: $SRC_TOP
 if [ ! -d "$xsdDir" ]
 then
   echo "$0: error: '"${xsdDir}"': no such directory"
-  exit 2
+  exit 3
 fi
 
 
@@ -256,7 +255,7 @@ then
   if [ ! -f Ngsi10_Operations_v07.xsd ] || [ ! -f Ngsi9_Operations_v07.xsd ] || [ ! -f Ngsi9_10_dataStructure_v07.xsd ]
   then
     echo $0: error: wget failed to download latest XSD files
-    exit 5
+    exit 4
   fi
 
   mv Ngsi10_Operations_v07.xsd Ngsi9_Operations_v07.xsd Ngsi9_10_dataStructure_v07.xsd $xsdDir
@@ -273,7 +272,7 @@ fi
 if [ ! -f $xsdDir/Ngsi10_Operations_v07.xsd ] || [ ! -f $xsdDir/Ngsi9_Operations_v07.xsd ] || [ ! -f $xsdDir/Ngsi9_10_dataStructure_v07.xsd ]
 then
   echo "$0: error: XSD files missing in $xsdDir"
-  exit 3
+  exit 5
 fi
 
 
@@ -460,7 +459,12 @@ fi
 #
 if [ "$file" != "" ]
 then
-  exit 0
+  if [ "$ERR" != "0"
+  then
+    exit 6
+  else
+    exit 0
+  fi
 fi
 
 
@@ -488,6 +492,8 @@ fi
 echo "Tested ${xmlDocsProcessed} (${xmlFilesProcessed} files + ${xmlPartsProcessed} parts) out of ${xmlDocsFound} (${xmlFilesFound} files + ${xmlPartsFound} parts) XML documents:"
 echo "  ${xmlDocsOk} documents passed the XML validity test"
 
+exitCode=8
+
 if [ "$xmlDocsErrors" != 0 ]
 then
   echo "  ${xmlDocsErrors} documents did not pass"
@@ -495,6 +501,7 @@ else
   echo "  -----------------------"
   echo "  ALL documents passed!!!"
   echo "  -----------------------"
+  exitCode=0
 fi
 
 echo
@@ -509,4 +516,7 @@ then
   do
     echo "  o $xfile"
   done
+  exit 7
 fi
+
+exit $exitCode

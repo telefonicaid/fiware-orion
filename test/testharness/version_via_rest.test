@@ -64,12 +64,13 @@ fi
 # is executed in less than one minute
 
 echo "1: +++++++++++++++++++++++++++++"
-curl localhost:${BROKER_PORT}/version
+curl localhost:${BROKER_PORT}/version | xmllint --format -
 echo "2: +++++++++++++++++++++++++++++"
 curl localhost:${BROKER_PORT}/version --header "Accept: application/json"
 echo "3: +++++++++++++++++++++++++++++"
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
+<?xml version="1.0"?>
 <orion>
   <version>REGEX(.*)</version>
   <uptime>REGEX(.*)</uptime>
