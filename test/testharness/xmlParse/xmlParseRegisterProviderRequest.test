@@ -144,11 +144,9 @@ curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID2 -s -S | xmllint -
 echo "7: ++++++++++++++++++++"
 
 # DELETE and PUT should give errors
-curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID -s -S -X DELETE -D /tmp/headers | xmllint --format -
-cat /tmp/headers
-rm -f /tmp/headers < /dev/null 2>&1
+curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID -s -S -X DELETE -D - 
 echo "8: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID -s -S -X PUT -D /tmp/headers --header 'Content-Type: application/xml' -d @- | xmllint --format -) << EOF
+curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID -s -S -X PUT -D - --header 'Content-Type: application/xml' -d @- << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
@@ -167,7 +165,6 @@ echo "8: ++++++++++++++++++++"
   <providingApplication>http://kz.tid.es/abc2</providingApplication>
 </registerProviderRequest>
 EOF
-cat /tmp/headers
 echo "9: ++++++++++++++++++++"
 
 --REGEXPECT--
