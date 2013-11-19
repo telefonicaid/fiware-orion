@@ -46,7 +46,7 @@
 TEST(RegisterProviderRequest, xml_ok)
 {
   ParseData       reqData;
-  const char*     fileName = "ngsi9.registerProviderRequest.ok.postponed.xml";
+  const char*     fileName = "ngsi9.registerProviderRequest.noRegistrationId.postponed.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat = XML;
@@ -54,10 +54,10 @@ TEST(RegisterProviderRequest, xml_ok)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterProvider, "registerProviderRequest", NULL);
+  std::string result = xmlTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, "registerProviderRequest", NULL);
   EXPECT_EQ("OK", result) << "this test should be OK";
 
-  std::string expected = "<registerProviderRequest>\n  <registrationMetadata>\n    <contextMetadata>\n      <name>ID</name>\n      <type>string</type>\n      <value>1110</value>\n    </contextMetadata>\n    <contextMetadata>\n      <name>cm2</name>\n      <type>string</type>\n      <value>XXX</value>\n    </contextMetadata>\n  </registrationMetadata>\n  <duration>PT1S</duration>\n  <providingApplication>http://kz.tid.es/abc</providingApplication>\n  <registrationId>001122334455667788991234</registrationId>\n</registerProviderRequest>\n";
+  std::string expected = "<registerProviderRequest>\n  <registrationMetadata>\n    <contextMetadata>\n      <name>ID</name>\n      <type>string</type>\n      <value>1110</value>\n    </contextMetadata>\n    <contextMetadata>\n      <name>cm2</name>\n      <type>string</type>\n      <value>XXX</value>\n    </contextMetadata>\n  </registrationMetadata>\n  <duration>PT1S</duration>\n  <providingApplication>http://kz.tid.es/abc</providingApplication>\n</registerProviderRequest>\n";
 
   std::string rendered = reqData.rpr.res.render(XML, "");
   EXPECT_EQ(expected, rendered) << "bad string rendered";

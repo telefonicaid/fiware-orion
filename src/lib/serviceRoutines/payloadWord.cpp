@@ -25,31 +25,16 @@
 #include <string>
 #include <vector>
 
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-
-#include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/restReply.h"
-#include "serviceRoutines/badVerbGetPostOnly.h"
 #include "serviceRoutines/payloadWord.h"
-
 
 
 /* ****************************************************************************
 *
-* badVerbGetPostOnly - 
+* payloadWordGet -
 */
-std::string badVerbGetPostOnly(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+void payloadWordGet(ConnectionInfo* ciP, int components, std::vector<std::string> compV)
 {
-  std::string answer;
-
-  ciP->httpHeader.push_back("Allow");
-  ciP->httpHeaderValue.push_back("POST, GET");
-  ciP->httpStatusCode = SccBadVerb;
-
-  payloadWordGet(ciP, components, compV);
-
-  answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadVerb, "Method not allowed", "Allow: POST, GET");
-  return answer;
+  if ((components == 3) && (compV[0] == "NGSI9") && (compV[1] == "contextEntities")) 
+    strcpy(ciP->payloadWord, "discoverContextAvailability");
 }

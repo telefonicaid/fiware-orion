@@ -1,3 +1,6 @@
+#ifndef PAYLOAD_WORD_H
+#define PAYLOAD_WORD_H
+
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,31 +28,15 @@
 #include <string>
 #include <vector>
 
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-
-#include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/restReply.h"
-#include "serviceRoutines/badVerbGetPostOnly.h"
-#include "serviceRoutines/payloadWord.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* badVerbGetPostOnly - 
+* payloadWordGet - 
 */
-std::string badVerbGetPostOnly(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
-{
-  std::string answer;
+extern void payloadWordGet(ConnectionInfo* ciP, int components, std::vector<std::string> compV);
 
-  ciP->httpHeader.push_back("Allow");
-  ciP->httpHeaderValue.push_back("POST, GET");
-  ciP->httpStatusCode = SccBadVerb;
-
-  payloadWordGet(ciP, components, compV);
-
-  answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadVerb, "Method not allowed", "Allow: POST, GET");
-  return answer;
-}
+#endif
