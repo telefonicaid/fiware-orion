@@ -59,13 +59,11 @@ typedef enum RequestType
   IndividualContextEntityAttributes,
   IndividualContextEntityAttribute,
 
-  RegisterProvider = 18,
-
-  UpdateContextElement,
+  UpdateContextElement = 18,
   AppendContextElement,
   UpdateContextAttribute,
 
-  LogRequest = 22,
+  LogRequest = 21,
   VersionRequest,
   ExitRequest,
   LeakRequest,

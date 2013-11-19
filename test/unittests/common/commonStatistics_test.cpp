@@ -55,7 +55,6 @@ TEST(commonStatistics, statisticsUpdate)
   noOfIndividualContextEntity                = 0;
   noOfIndividualContextEntityAttributes      = 0;
   noOfIndividualContextEntityAttribute       = 0;
-  noOfRegisterProviders                      = 0;
   noOfUpdateContextElement                   = 0;
   noOfAppendContextElement                   = 0;
   noOfUpdateContextAttribute                 = 0;
@@ -87,7 +86,6 @@ TEST(commonStatistics, statisticsUpdate)
   statisticsUpdate(IndividualContextEntity, JSON);
   statisticsUpdate(IndividualContextEntityAttributes, XML);
   statisticsUpdate(IndividualContextEntityAttribute, JSON);
-  statisticsUpdate(RegisterProvider, XML);
   statisticsUpdate(UpdateContextElement, JSON);
   statisticsUpdate(AppendContextElement, XML);
   statisticsUpdate(UpdateContextAttribute, JSON);
@@ -117,7 +115,6 @@ TEST(commonStatistics, statisticsUpdate)
   EXPECT_EQ(1, noOfIndividualContextEntity);
   EXPECT_EQ(1, noOfIndividualContextEntityAttributes);
   EXPECT_EQ(1, noOfIndividualContextEntityAttribute);
-  EXPECT_EQ(1, noOfRegisterProviders);
   EXPECT_EQ(1, noOfUpdateContextElement);
   EXPECT_EQ(1, noOfAppendContextElement);
   EXPECT_EQ(1, noOfUpdateContextAttribute);
@@ -129,6 +126,6 @@ TEST(commonStatistics, statisticsUpdate)
   EXPECT_EQ(1, noOfInvalidRequests);
   EXPECT_EQ(1, noOfRegisterResponses);
 
-  EXPECT_EQ(15, noOfXmlRequests);
+  EXPECT_EQ(14, noOfXmlRequests);
   EXPECT_EQ(14, noOfJsonRequests);
 }
