@@ -67,7 +67,6 @@ int noOfEntityByIdAttributeByName            = -1;
 int noOfIndividualContextEntity              = -1;
 int noOfIndividualContextEntityAttributes    = -1;
 int noOfIndividualContextEntityAttribute     = -1;
-int noOfRegisterProviders                    = -1;
 int noOfUpdateContextElement                 = -1;
 int noOfAppendContextElement                 = -1;
 int noOfUpdateContextAttribute               = -1;
@@ -113,8 +112,6 @@ void statisticsUpdate(RequestType request, Format inFormat)
    case IndividualContextEntity:                ++noOfIndividualContextEntity; break;
    case IndividualContextEntityAttributes:      ++noOfIndividualContextEntityAttributes; break;
    case IndividualContextEntityAttribute:       ++noOfIndividualContextEntityAttribute; break;
-
-   case RegisterProvider:                       ++noOfRegisterProviders; break;
 
    case UpdateContextElement:                   ++noOfUpdateContextElement; break;
    case AppendContextElement:                   ++noOfAppendContextElement; break;

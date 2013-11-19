@@ -70,7 +70,6 @@ extern int noOfEntityByIdAttributeByName;
 extern int noOfIndividualContextEntity;
 extern int noOfIndividualContextEntityAttributes;
 extern int noOfIndividualContextEntityAttribute;
-extern int noOfRegisterProviders;
 extern int noOfUpdateContextElement;
 extern int noOfAppendContextElement;
 extern int noOfUpdateContextAttribute;

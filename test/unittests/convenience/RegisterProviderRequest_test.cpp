@@ -65,11 +65,11 @@ TEST(RegisterProviderRequest, xml_ok)
   // Destroying metadata to provoke an error
   reqData.rpr.res.metadataVector.get(0)->name = "";
   std::string error;
-  error = reqData.rpr.res.check(RegisterProvider, XML, "", "", 0);
+  error = reqData.rpr.res.check(DiscoverContextAvailability, XML, "", "", 0);
   EXPECT_EQ("<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing metadata name</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n", error);
 
   // sending a 'predetected error' to the check function
-  error    = reqData.rpr.res.check(RegisterProvider, XML, "", "forced predetectedError", 0);
+  error    = reqData.rpr.res.check(DiscoverContextAvailability, XML, "", "forced predetectedError", 0);
   expected = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>forced predetectedError</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
   EXPECT_EQ(expected, error);
 
