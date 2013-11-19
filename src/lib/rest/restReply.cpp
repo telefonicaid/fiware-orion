@@ -120,10 +120,13 @@ int restReply(ConnectionInfo* ciP, std::string answer)
         MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
   }
 
-  if (ciP->outFormat == XML)
-    MHD_add_response_header(response, "Content-Type", "application/xml");
-  else if (ciP->outFormat == JSON)
-    MHD_add_response_header(response, "Content-Type", "application/json");
+  if (answer != "")
+  {
+    if (ciP->outFormat == XML)
+      MHD_add_response_header(response, "Content-Type", "application/xml");
+    else if (ciP->outFormat == JSON)
+      MHD_add_response_header(response, "Content-Type", "application/json");
+  }
 
   ret = MHD_queue_response(ciP->connection, ciP->httpStatusCode, response);
   MHD_destroy_response(response);
