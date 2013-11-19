@@ -29,7 +29,6 @@
 #include <vector>
 
 #include "rest/ConnectionInfo.h"
-#include "ngsi/ParseData.h"
 
 
 
