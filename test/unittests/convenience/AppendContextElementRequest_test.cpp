@@ -96,6 +96,9 @@ TEST(AppendContextElementRequest, check)
    acer.domainMetadataVector.push_back(&md2);
    out = acer.check(AppendContextElement, XML, "", "", 0);
    EXPECT_STREQ(expected4.c_str(), out.c_str());
+
+   // 5. Bad attributeDomainName
+   // FIXME P3: AttributeDomainName::check always returns "OK"
 }
 
 
