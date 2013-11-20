@@ -40,6 +40,7 @@
 */
 std::string AttributeDomainName::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
+  // FIXME P3: AttributeDomainName::check always returns "OK"
   return "OK";
 }
 

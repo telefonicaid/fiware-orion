@@ -71,8 +71,8 @@ TEST(UpdateContextAttributeRequest, check)
 
   ucar.metadataVector.push_back(&mdata);
 
-  // 1. predetectedError
-  out = ucar.check(UpdateContextAttribute, XML, "", "PRE Error", 0);
+  // 1. predetectedError + Format ZERO => XML
+  out = ucar.check(UpdateContextAttribute, (Format) 0, "", "PRE Error", 0);
   EXPECT_STREQ(expected1.c_str(), out.c_str());
   
   // 2. empty contextValue
