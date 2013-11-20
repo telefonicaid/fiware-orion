@@ -264,11 +264,11 @@ fi
 
 --REGEXPECT--
 <?xml version="1.0"?>
-<errorCode>
+<orionError>
   <code>400</code>
   <reasonPhrase>bad request</reasonPhrase>
   <details>service '/NGSI10/queryContext' not found</details>
-</errorCode>
+</orionError>
 1: ++++++++++++++++++++
 <?xml version="1.0"?>
 <registerContextResponse>

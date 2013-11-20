@@ -70,18 +70,18 @@ echo "2: ++++++++++++++++++++"
 --REGEXPECT--
 0: ++++++++++++++++++++
 <?xml version="1.0"?>
-<errorCode>
+<orionError>
   <code>400</code>
   <reasonPhrase>bad request</reasonPhrase>
   <details>service '/NGSI8/contextEntities/entity01' not found</details>
-</errorCode>
+</orionError>
 1: ++++++++++++++++++++
 <?xml version="1.0"?>
-<errorCode>
+<orionError>
   <code>400</code>
   <reasonPhrase>bad ngsi9 request</reasonPhrase>
   <details>ngsi9 service '/NGSI9/nothingAtAll' not found</details>
-</errorCode>
+</orionError>
 2: ++++++++++++++++++++
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then

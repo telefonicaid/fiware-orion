@@ -67,11 +67,11 @@ echo "+++++ 1. put an entity +++++"
 --REGEXPECT--
 +++++ 1. put an entity +++++
 <?xml version="1.0"?>
-<errorCode>
+<orionError>
   <code>400</code>
   <reasonPhrase>no request treating object found</reasonPhrase>
   <details>Sorry, no request treating object found for RequestType 'IndividualContextEntityAttribute'</details>
-</errorCode>
+</orionError>
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})
