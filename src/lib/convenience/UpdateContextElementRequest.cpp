@@ -59,7 +59,7 @@ std::string UpdateContextElementRequest::render(Format format, std::string inden
 * check - 
 *
 *
-* FIXME P3: once (if ever) AttributeDomainName::check stops to always reutnr "OK", put back this piece of code 
+* FIXME P3: once (if ever) AttributeDomainName::check stops to always return "OK", put back this piece of code 
 *           in its place:
 -
 *   else if ((res = attributeDomainName.check(AppendContextElement, format, indent, predetectedError, counter)) != "OK")
