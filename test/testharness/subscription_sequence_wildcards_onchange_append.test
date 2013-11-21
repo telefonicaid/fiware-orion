@@ -470,7 +470,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 735
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: */*
+Accept: application/xml, application/json
 Content-Type: application/xml
 
 <notifyContextRequest>
@@ -503,7 +503,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 735
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: */*
+Accept: application/xml, application/json
 Content-Type: application/xml
 
 <notifyContextRequest>
@@ -536,7 +536,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 736
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: */*
+Accept: application/xml, application/json
 Content-Type: application/xml
 
 <notifyContextRequest>
@@ -569,7 +569,7 @@ POST http://localhost:REGEX(\d+)/notify
 Content-Length: 908
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: */*
+Accept: application/xml, application/json
 Content-Type: application/xml
 
 <notifyContextRequest>
