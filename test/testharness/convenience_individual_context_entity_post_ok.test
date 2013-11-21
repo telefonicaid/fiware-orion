@@ -113,7 +113,7 @@ EOF
 
 +++++++++++++ 2. add to the entity
 <?xml version="1.0"?>
-<appendContextAttributeResponse>
+<appendContextElementResponse>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>
@@ -129,7 +129,7 @@ EOF
       </statusCode>
     </contextAttributeResponse>
   </contextResponseList>
-</appendContextAttributeResponse>
+</appendContextElementResponse>
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})

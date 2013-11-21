@@ -100,6 +100,9 @@ SET (SOURCES
     convenienceMap/mapPostIndividualContextEntity_test.cpp
     convenienceMap/mapPutIndividualContextEntity_test.cpp
 
+    convenienceMap/mapGetIndividualContextEntityAttribute_test.cpp
+    convenienceMap/mapPostIndividualContextEntityAttribute_test.cpp
+
     convenienceMap/mapDeleteIndividualContextEntityAttributes_test.cpp
     convenienceMap/mapGetIndividualContextEntityAttributes_test.cpp
     convenienceMap/mapPostIndividualContextEntityAttributes_test.cpp

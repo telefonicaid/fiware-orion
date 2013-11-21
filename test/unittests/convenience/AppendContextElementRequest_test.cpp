@@ -66,9 +66,9 @@ TEST(AppendContextElementRequest, check)
    ContextAttribute             ca("caName", "caType", "121");
    Metadata                     md("mdName", "mdType", "122");
    std::string                  expected1 = "OK";
-   std::string                  expected2 = "<appendContextAttributeResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Error is predetected</reasonPhrase>\n  </errorCode>\n</appendContextAttributeResponse>\n";
-   std::string                  expected3 = "<appendContextAttributeResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing attribute name</reasonPhrase>\n  </errorCode>\n</appendContextAttributeResponse>\n";
-   std::string                  expected4 = "<appendContextAttributeResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing metadata name</reasonPhrase>\n  </errorCode>\n</appendContextAttributeResponse>\n";
+   std::string                  expected2 = "<appendContextElementResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Error is predetected</reasonPhrase>\n  </errorCode>\n</appendContextElementResponse>\n";
+   std::string                  expected3 = "<appendContextElementResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing attribute name</reasonPhrase>\n  </errorCode>\n</appendContextElementResponse>\n";
+   std::string                  expected4 = "<appendContextElementResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing metadata name</reasonPhrase>\n  </errorCode>\n</appendContextElementResponse>\n";
 
    acer.attributeDomainName.set("ADN");
    acer.contextAttributeVector.push_back(&ca);

@@ -54,9 +54,7 @@ HttpStatusCode mapDeleteIndividualContextEntityAttribute(std::string entityId, s
   ms = mongoUpdateContext(&ucRequest, &ucResponse);
 
   if (ms == SccOk)
-     *response = ucResponse.contextElementResponseVector.get(0)->statusCode;
-  else
-     response->fill(SccContextElementNotFound, "Entity/Attribute pair not found", entityId + ":" + attributeName);
+    *response = ucResponse.contextElementResponseVector.get(0)->statusCode;
 
   return ms;
 }
