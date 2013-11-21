@@ -72,7 +72,6 @@ tokens_map = {
     'appendContextElementRequest':      ['ngsi10', 'postponed'],
     'appendContextElementResponse':     ['ngsi10', 'postponed'],
     'updateContextAttributeRequest':    ['ngsi10', 'postponed'],
-    'appendContextAttributeResponse':   ['ngsi10', 'postponed'],
     'contextElementResponse':           ['ngsi10', 'postponed'],
     'contextAttributeResponse':         ['ngsi10', 'postponed'],
     'statusCode':                       ['ngsi', 'valid'],
