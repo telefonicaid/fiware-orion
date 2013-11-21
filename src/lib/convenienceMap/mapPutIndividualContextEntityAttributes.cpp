@@ -55,12 +55,6 @@ HttpStatusCode mapPutIndividualContextEntityAttributes(std::string entityId, Upd
 
   ms = mongoUpdateContext(&ucRequest, &ucResponse);
 
-  if (ucResponse.contextElementResponseVector.size() > 1)
-  {
-     response->errorCode.fill(SccReceiverInternalError, "Internal error", "Bad size of contextElementResponseVector from mongoUpdateContext");
-     return ms;
-  }
-
   if (ucResponse.contextElementResponseVector.size() == 0)
   {
      response->errorCode.fill(&ucResponse.errorCode);

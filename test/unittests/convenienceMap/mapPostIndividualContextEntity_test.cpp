@@ -71,16 +71,19 @@ static void prepareDatabase(std::string id, std::string type)
    *     A3: W
    */
 
-  BSONObj en1 = BSON("_id" << BSON("id" << id << "type" << type) <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                        BSON("name" << "A1" << "type" << "TA1bis" << "value" << "Y") <<
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
-                        BSON("name" << "A3" << "type" << "TA3" << "value" << "W")
-                        )
-     );
+  if (id != "")
+  {
+    BSONObj en1 = BSON("_id" << BSON("id" << id << "type" << type) <<
+                       "attrs" << BSON_ARRAY(
+                          BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
+                          BSON("name" << "A1" << "type" << "TA1bis" << "value" << "Y") <<
+                          BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
+                          BSON("name" << "A3" << "type" << "TA3" << "value" << "W")
+                          )
+       );
 
-  connection->insert(ENTITIES_COLL, en1);
+    connection->insert(ENTITIES_COLL, en1);
+  }
 }
 
 
@@ -99,6 +102,12 @@ TEST(mapPostIndividualContextEntity, notFoundThenFound)
   Timer* t = new Timer();
   setTimer(t);
 
+  // Empty database
+  prepareDatabase("", "");
+  ms = mapPostIndividualContextEntity("MPICE", &request, &response);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(404, response.errorCode.code);
+
   prepareDatabase("MPICE", "ttt");
   request.attributeDomainName.set("ad");
 
@@ -113,8 +122,8 @@ TEST(mapPostIndividualContextEntity, notFoundThenFound)
   prepareDatabase("MPICE", "ttt2");
   ms = mapPostIndividualContextEntity("MPICE", &request, &response);
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(500, response.errorCode.code);
-  EXPECT_STREQ("Bad size of contextElementResponseVector from mongoUpdateContext", response.errorCode.details.c_str());
+  EXPECT_EQ(200, response.errorCode.code);
+  EXPECT_STREQ("", response.errorCode.details.c_str());
 
   ms = mapPostIndividualContextEntity("NADA", &request, &response);
   EXPECT_EQ(SccOk, ms);

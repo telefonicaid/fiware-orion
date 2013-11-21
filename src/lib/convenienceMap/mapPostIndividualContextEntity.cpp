@@ -61,13 +61,6 @@ HttpStatusCode mapPostIndividualContextEntity(std::string entityId, AppendContex
   ms = mongoUpdateContext(&ucRequest, &ucResponse);
   LM_T(LmtMetadataDoubleFree, ("Back from mongoUpdateContext"));
 
-  if (ucResponse.contextElementResponseVector.size() > 1)
-  {
-     response->errorCode.fill(SccReceiverInternalError, "Internal error", "Bad size of contextElementResponseVector from mongoUpdateContext");
-     LM_E(("Bad size of contextElementResponseVector from mongoUpdateContext"));
-     return ms;
-  }
-
   if (ucResponse.contextElementResponseVector.size() == 0)
   {
      response->errorCode = ucResponse.errorCode;
