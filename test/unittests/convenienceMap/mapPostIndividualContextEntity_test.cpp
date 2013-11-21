@@ -107,6 +107,8 @@ TEST(mapPostIndividualContextEntity, emptyDb)
   ms = mapPostIndividualContextEntity("MPICE", &request, &response);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(404, response.errorCode.code);
+  EXPECT_EQ("Entity not found", response.errorCode.reasonPhrase);
+  EXPECT_EQ("entity: (MPICE, , false)", response.errorCode.details);
 }
 
 
