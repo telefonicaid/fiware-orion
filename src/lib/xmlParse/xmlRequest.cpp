@@ -98,10 +98,12 @@ static XmlRequest xmlRequest[] =
   { NotifyContext,                         "*",    "notifyContextRequest",                         ncrParseVector,   ncrInit,   ncrRelease,   ncrPresent,   ncrCheck   },
 
   // Convenience
-  { RegisterProvider,                      "POST", "registerProviderRequest",                      rprParseVector,   rprInit,   rprRelease,   rprPresent,   rprCheck   },
   { ContextEntitiesByEntityId,             "POST", "registerProviderRequest",                      rprParseVector,   rprInit,   rprRelease,   rprPresent,   rprCheck   },
+  { ContextEntitiesByEntityId,             "*",    "registerProviderRequest",                      rprParseVector,   rprInit,   rprRelease,   rprPresent,   rprCheck   },
   { EntityByIdAttributeByName,             "POST", "registerProviderRequest",                      rprParseVector,   rprInit,   rprRelease,   rprPresent,   rprCheck   },
+  { EntityByIdAttributeByName,             "*",    "registerProviderRequest",                      rprParseVector,   rprInit,   rprRelease,   rprPresent,   rprCheck   },
   { ContextEntityAttributes,               "POST", "registerProviderRequest",                      rprParseVector,   rprInit,   rprRelease,   rprPresent,   rprCheck   },
+  { ContextEntityAttributes,               "*",    "registerProviderRequest",                      rprParseVector,   rprInit,   rprRelease,   rprPresent,   rprCheck   },
   { UpdateContextElement,                  "POST", "updateContextElementRequest",                  ucerParseVector,  ucerInit,  ucerRelease,  ucerPresent,  ucerCheck  },
   { IndividualContextEntity,               "PUT",  "updateContextElementRequest",                  ucerParseVector,  ucerInit,  ucerRelease,  ucerPresent,  ucerCheck  },
   { IndividualContextEntity,               "POST", "appendContextElementRequest",                  acerParseVector,  acerInit,  acerRelease,  acerPresent,  acerCheck  },

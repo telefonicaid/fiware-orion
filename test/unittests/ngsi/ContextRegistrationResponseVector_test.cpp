@@ -40,13 +40,12 @@ TEST(ContextRegistrationResponseVector, all)
   ContextRegistrationResponse        crr;
   ContextRegistrationResponseVector  crrV;
   std::string                        rendered;
-  std::string                        expected = "Empty entityIdVector";
 
   crr.contextRegistration.providingApplication.set("10.1.1.1://nada");
 
   // Empty vector gives empty rendered result
   rendered = crrV.render(XML, "");
-  EXPECT_STREQ("", rendered.c_str());
+  EXPECT_EQ("", rendered);
 
   crrV.push_back(&crr);
 
@@ -55,12 +54,17 @@ TEST(ContextRegistrationResponseVector, all)
 
   // check OK
   rendered = crrV.check(RegisterContext, XML, "", "", 0);
-  EXPECT_EQ(expected, rendered.c_str());
+  EXPECT_EQ("OK", rendered);
+
+  // Now telling the crr that we've found an instance of '<entityIdList></entityIdList>
+  // but without any entities inside the vector
+  crr.contextRegistration.entityIdVectorPresent = true;
+  rendered = crrV.check(RegisterContext, XML, "", "", 0);
+  EXPECT_EQ("Empty entityIdVector", rendered);
 
   EntityId             eId;   // Empty ID
-  std::string          expected2 = "empty entityId:id";
 
   crr.contextRegistration.entityIdVector.push_back(&eId);
   rendered = crrV.check(RegisterContext, XML, "", "", 0);
-  EXPECT_EQ(expected2, rendered);
+  EXPECT_EQ("empty entityId:id", rendered);
 }

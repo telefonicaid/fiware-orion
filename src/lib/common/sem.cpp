@@ -47,7 +47,11 @@ int semInit(void) {
   // sem_init: 
   //   parameter #1: 0 - the semaphore is to be shared between threads,
   //   parameter #2: 1 - initially the semaphore is free
-  return sem_init(&sem, 0, 1);
+  if (sem_init(&sem, 0, 1) == -1) 
+  {
+    LM_RE(1, ("Error initializing semaphore: %s\n", strerror(errno)));
+  }  
+  return 0;
 }
 
 /* ****************************************************************************

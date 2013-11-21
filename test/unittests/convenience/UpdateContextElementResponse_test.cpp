@@ -53,3 +53,35 @@ TEST(UpdateContextElementResponse, render)
   out = ucer.render(XML, "");
   EXPECT_STREQ(expected.c_str(), out.c_str());
 }
+
+
+
+/* ****************************************************************************
+*
+* check - 
+*/
+TEST(UpdateContextElementResponse, check)
+{
+  UpdateContextElementResponse  ucer;
+  ContextAttributeResponse      car;
+  ContextAttribute              ca("", "TYPE", "VALUE"); // empty name, thus provoking error
+  std::string                   out;
+  std::string                   expected1 = "<updateContextElementResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>PRE ERR</reasonPhrase>\n  </errorCode>\n</updateContextElementResponse>\n";
+  std::string                   expected2 = "<updateContextElementResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase><contextAttributeResponse>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>missing attribute name</reasonPhrase>\n  </statusCode>\n</contextAttributeResponse>\n</reasonPhrase>\n  </errorCode>\n</updateContextElementResponse>\n";
+  std::string                   expected3 = "OK";
+
+  // 1. predetected error
+  out = ucer.check(IndividualContextEntity, XML, "", "PRE ERR", 0);
+  EXPECT_EQ(expected1, out);
+
+  // 2. bad contextResponseVector
+  car.contextAttributeVector.push_back(&ca);
+  ucer.contextResponseVector.push_back(&car);
+  out = ucer.check(IndividualContextEntity, XML, "", "", 0);
+  EXPECT_EQ(expected2, out);
+
+  // 3. OK
+  ca.name = "NAME";
+  out = ucer.check(IndividualContextEntity, XML, "", "", 0);
+  EXPECT_EQ(expected3, out);
+}

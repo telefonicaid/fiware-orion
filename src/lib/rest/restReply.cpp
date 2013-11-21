@@ -105,7 +105,11 @@ int restReply(ConnectionInfo* ciP, std::string answer)
 
   ++replyIx;
   LM_T(LmtRestReply, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answer.length(), ciP->httpStatusCode));
-  response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_YES, MHD_YES);
+
+  if (answer == "")
+    response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_NO, MHD_NO);
+  else
+    response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_YES, MHD_YES);
 
   if (!response)
     LM_RE(MHD_NO, ("MHD_create_response_from_buffer FAILED"));
@@ -116,10 +120,13 @@ int restReply(ConnectionInfo* ciP, std::string answer)
         MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
   }
 
-  if (ciP->outFormat == XML)
-    MHD_add_response_header(response, "Content-Type", "application/xml");
-  else if (ciP->outFormat == JSON)
-    MHD_add_response_header(response, "Content-Type", "application/json");
+  if (answer != "")
+  {
+    if (ciP->outFormat == XML)
+      MHD_add_response_header(response, "Content-Type", "application/xml");
+    else if (ciP->outFormat == JSON)
+      MHD_add_response_header(response, "Content-Type", "application/json");
+  }
 
   ret = MHD_queue_response(ciP->connection, ciP->httpStatusCode, response);
   MHD_destroy_response(response);

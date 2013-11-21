@@ -63,7 +63,6 @@ TEST(Request, requestType)
     { IndividualContextEntity,                   "IndividualContextEntity"                                },
     { IndividualContextEntityAttributes,         "IndividualContextEntityAttributes"                      },
     { IndividualContextEntityAttribute,          "IndividualContextEntityAttribute"                       },
-    { RegisterProvider,                          "RegisterProvider"                                       },
     { UpdateContextElement,                      "UpdateContextElement"                                   },
     { AppendContextElement,                      "AppendContextElement"                                   },
     { UpdateContextAttribute,                    "UpdateContextAttribute"                                 },

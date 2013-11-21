@@ -186,7 +186,7 @@ void rprRelease(ParseData* reqData)
 */
 std::string rprCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->rpr.res.check(RegisterProvider, ciP->outFormat, "", reqData->errorString, 0);
+  return reqData->rpr.res.check(ContextEntitiesByEntityId, ciP->outFormat, "", reqData->errorString, 0);
 }
 
 

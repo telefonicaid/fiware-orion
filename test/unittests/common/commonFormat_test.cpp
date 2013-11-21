@@ -60,6 +60,26 @@ TEST(commonFormat, formatToString)
 
 /* ****************************************************************************
 *
+* stringToformat - 
+*/
+TEST(commonFormat, stringToformat)
+{
+  Format format;
+
+  format = stringToFormat("XML");
+  EXPECT_EQ(XML, format);
+
+  format = stringToFormat("JSON");
+  EXPECT_EQ(JSON, format);
+
+  format = stringToFormat("noFormat");
+  EXPECT_EQ(NOFORMAT, format);
+}
+
+
+
+/* ****************************************************************************
+*
 * formatParse - 
 */
 TEST(commonFormat, formatParse)

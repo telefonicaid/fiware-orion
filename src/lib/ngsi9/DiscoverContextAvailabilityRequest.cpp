@@ -34,7 +34,17 @@
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 
-
+/* ****************************************************************************
+*
+* DiscoverContextAvailabilityRequest::DiscoverContextAvailabilityRequest
+*
+* Explicit constructor needed to initialize primitive types so they don't get
+* random values from the stack
+*/
+DiscoverContextAvailabilityRequest::DiscoverContextAvailabilityRequest()
+{
+  restrictions = 0;
+}
 
 /* ****************************************************************************
 *

@@ -32,7 +32,17 @@
 #include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/EntityId.h"
 
-
+/* ****************************************************************************
+*
+* ContextRegistration::ContextRegistration -
+*
+* Explicit constructor needed to initialize primitive types so they don't get
+* random values from the stack
+*/
+ContextRegistration::ContextRegistration()
+{
+  entityIdVectorPresent = false;
+}
 
 /* ****************************************************************************
 *

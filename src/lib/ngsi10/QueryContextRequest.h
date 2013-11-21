@@ -46,6 +46,7 @@ typedef struct QueryContextRequest
 
   int               restrictions;
 
+  QueryContextRequest();
   std::string   render(RequestType requestType, Format format, std::string indent);
   std::string   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void          present(std::string indent);

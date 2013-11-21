@@ -37,6 +37,11 @@
 /* ****************************************************************************
 *
 * AppendContextElementResponse - 
+*
+* FIXME P5: AppendContextElementResponse and UpdateContextElementResponse are
+*           identical. They should 'merge' into ONE struct.
+*           This problem origins from an ?error? in the ngsi10 binding doc by NEC
+*           See: https://github.com/telefonicaid/fiware-orion/issues/106
 */
 typedef struct AppendContextElementResponse
 {

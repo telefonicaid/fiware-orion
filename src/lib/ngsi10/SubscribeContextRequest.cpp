@@ -31,7 +31,17 @@
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi10/SubscribeContextRequest.h"
 
-
+/* ****************************************************************************
+*
+* SubscribeContextRequest::SubscribeContextRequest
+*
+* Explicit constructor needed to initialize primitive types so they don't get
+* random values from the stack
+*/
+SubscribeContextRequest::SubscribeContextRequest()
+{
+  restrictions = 0;
+}
 
 /* ****************************************************************************
 *

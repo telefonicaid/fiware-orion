@@ -87,7 +87,6 @@ std::string statisticsTreat(ConnectionInfo* ciP, int components, std::vector<std
      noOfIndividualContextEntity              = -1;
      noOfIndividualContextEntityAttributes    = -1;
      noOfIndividualContextEntityAttribute     = -1;
-     noOfRegisterProviders                    = -1;
      noOfUpdateContextElement                 = -1;
      noOfAppendContextElement                 = -1;
      noOfUpdateContextAttribute               = -1;
@@ -131,7 +130,6 @@ std::string statisticsTreat(ConnectionInfo* ciP, int components, std::vector<std
   if (noOfIndividualContextEntity != -1)            out += valueTag(indent + "  ", "individualContextEntity",               noOfIndividualContextEntity + 1,              ciP->outFormat);
   if (noOfIndividualContextEntityAttributes != -1)  out += valueTag(indent + "  ", "individualContextEntityAttributes",     noOfIndividualContextEntityAttributes + 1,    ciP->outFormat);
   if (noOfIndividualContextEntityAttribute != -1)   out += valueTag(indent + "  ", "individualContextEntityAttribute",      noOfIndividualContextEntityAttribute + 1,     ciP->outFormat);
-  if (noOfRegisterProviders != -1)                  out += valueTag(indent + "  ", "registerProviderRequests",              noOfRegisterProviders + 1,                    ciP->outFormat);
   if (noOfUpdateContextElement != -1)               out += valueTag(indent + "  ", "updateContextElement",                  noOfUpdateContextElement + 1,                 ciP->outFormat);
   if (noOfAppendContextElement != -1)               out += valueTag(indent + "  ", "appendContextElement",                  noOfAppendContextElement + 1,                 ciP->outFormat);
   if (noOfUpdateContextAttribute != -1)             out += valueTag(indent + "  ", "updateContextAttribute",                noOfUpdateContextAttribute + 1,               ciP->outFormat);

@@ -36,6 +36,18 @@
 
 /* ****************************************************************************
 *
+* Duration::Duration
+*
+* Explicit constructor needed to initialize primitive types so they don't get
+* random values from the stack
+*/
+Duration::Duration()
+{
+    seconds = 0;
+}
+
+/* ****************************************************************************
+*
 * Duration::check - 
 */
 std::string Duration::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)

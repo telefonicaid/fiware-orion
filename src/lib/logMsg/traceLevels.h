@@ -46,6 +46,7 @@ typedef enum TraceLevels
   LmtHttpHeaders,
   LmtHttpDaemon,
   LmtHttpPayload,
+  LmtHttpUnsupportedHeader,
   LmtMhd,
   LmtRestReply,
   LmtSavedResponse,
