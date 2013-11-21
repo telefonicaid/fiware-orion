@@ -340,6 +340,7 @@ typeset -i xmlPartsOK           # Number of XML parts that passed the test
 typeset -i xmlPartsErrors       # Number of XML parts that did not pass the test
 typeset -i xmlDocsFound         # xmlFilesFound + xmlPartsFound
 typeset -i xmlDocsProcessed     # xmlFilesProcessed + xmlPartsProcessed
+typeset -i xmlDocsPostponed     # xmlFilesPostponed + xmlPartsPostponed
 typeset -i xmlDocsOk            # xmlFilesOK + xmlPartsOK
 typeset -i xmlDocsErrors        # xmlFilesErrors + xmlPartsErrors
 
@@ -503,7 +504,8 @@ fi
 
 echo
 echo "${xmlFilesInvalid} documents were not tested as they on purpose don't follow the XSD"
-echo "${xmlFilesPostponed} documents were not tested as they still have no XSD"
+xmlDocsPostponed=$xmlFilesPostponed+$xmlPartsPostponed
+echo "${xmlDocsPostponed} documents were not tested as they still have no XSD"
 
 if [ "$xmlFilesBadName" != 0 ]
 then
