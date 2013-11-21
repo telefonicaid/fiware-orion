@@ -338,9 +338,9 @@ echo "TIMES: $TIMES"
 8: ++++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 736
-User-Agent: NGSI Rest Library
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: */*
+Accept: application/xml, application/json
 Content-Type: application/xml
 
 <notifyContextRequest>

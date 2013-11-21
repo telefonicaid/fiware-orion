@@ -43,6 +43,14 @@ extern void versionSet(const char* version);
 
 /* ****************************************************************************
 *
+* versionGet -
+*/
+extern char* versionGet();
+
+
+
+/* ****************************************************************************
+*
 * versionTreat - 
 */
 extern std::string versionTreat(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
