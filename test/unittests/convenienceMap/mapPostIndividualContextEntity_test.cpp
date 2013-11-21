@@ -90,9 +90,9 @@ static void prepareDatabase(std::string id, std::string type)
 
 /* ****************************************************************************
 *
-* notFoundThenFound - 
+* emptyDb - 
 */
-TEST(mapPostIndividualContextEntity, notFoundThenFound)
+TEST(mapPostIndividualContextEntity, emptyDb)
 {
   HttpStatusCode                ms;
   AppendContextElementRequest   request;
@@ -107,6 +107,23 @@ TEST(mapPostIndividualContextEntity, notFoundThenFound)
   ms = mapPostIndividualContextEntity("MPICE", &request, &response);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(404, response.errorCode.code);
+}
+
+
+
+/* ****************************************************************************
+*
+* found - 
+*/
+TEST(mapPostIndividualContextEntity, found)
+{
+  HttpStatusCode                ms;
+  AppendContextElementRequest   request;
+  AppendContextElementResponse  response;
+
+  /* Set timer */
+  Timer* t = new Timer();
+  setTimer(t);
 
   prepareDatabase("MPICE", "ttt");
   request.attributeDomainName.set("ad");
@@ -114,18 +131,28 @@ TEST(mapPostIndividualContextEntity, notFoundThenFound)
   ms = mapPostIndividualContextEntity("MPICE", &request, &response);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(200, response.errorCode.code);
+}
+
+
+
+/* ****************************************************************************
+*
+* notFound - 
+*/
+TEST(mapPostIndividualContextEntity, notFound)
+{
+  HttpStatusCode                ms;
+  AppendContextElementRequest   request;
+  AppendContextElementResponse  response;
+
+  /* Set timer */
+  Timer* t = new Timer();
+  setTimer(t);
+
+  prepareDatabase("MPICE", "ttt");
+  request.attributeDomainName.set("ad");
 
   ms = mapPostIndividualContextEntity("MPICE2", &request, &response);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(404, response.errorCode.code);
-
-  prepareDatabase("MPICE", "ttt2");
-  ms = mapPostIndividualContextEntity("MPICE", &request, &response);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(200, response.errorCode.code);
-  EXPECT_STREQ("", response.errorCode.details.c_str());
-
-  ms = mapPostIndividualContextEntity("NADA", &request, &response);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(404, response.errorCode.code);
   EXPECT_STREQ("Entity not found", response.errorCode.reasonPhrase.c_str());
