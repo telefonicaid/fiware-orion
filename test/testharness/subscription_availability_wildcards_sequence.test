@@ -304,9 +304,9 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 7: ++++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 1472
-User-Agent: NGSI Rest Library
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: */*
+Accept: application/xml, application/json
 Content-Type: application/xml
 
 <notifyContextAvailabilityRequest>
@@ -352,9 +352,9 @@ Content-Type: application/xml
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 839
-User-Agent: NGSI Rest Library
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: */*
+Accept: application/xml, application/json
 Content-Type: application/xml
 
 <notifyContextAvailabilityRequest>
@@ -383,9 +383,9 @@ Content-Type: application/xml
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 1464
-User-Agent: NGSI Rest Library
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: */*
+Accept: application/xml, application/json
 Content-Type: application/xml
 
 <notifyContextAvailabilityRequest>
@@ -431,9 +431,9 @@ Content-Type: application/xml
 =======================================
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 835
-User-Agent: NGSI Rest Library
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: */*
+Accept: application/xml, application/json
 Content-Type: application/xml
 
 <notifyContextAvailabilityRequest>

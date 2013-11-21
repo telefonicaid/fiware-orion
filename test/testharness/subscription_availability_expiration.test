@@ -195,9 +195,9 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 3: ++++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 840
-User-Agent: NGSI Rest Library
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: */*
+Accept: application/xml, application/json
 Content-Type: application/xml
 
 <notifyContextAvailabilityRequest>

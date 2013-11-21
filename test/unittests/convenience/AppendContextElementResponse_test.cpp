@@ -41,8 +41,8 @@ TEST(AppendContextElementResponse, render)
   AppendContextElementResponse  acer;
   ContextAttributeResponse      car;
   std::string                   out;
-  std::string                   expected1 = "<appendContextAttributeResponse>\n</appendContextAttributeResponse>\n";
-  std::string                   expected2 = "<appendContextAttributeResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad request</reasonPhrase>\n    <details>very bad request</details>\n  </errorCode>\n</appendContextAttributeResponse>\n";
+  std::string                   expected1 = "<appendContextElementResponse>\n</appendContextElementResponse>\n";
+  std::string                   expected2 = "<appendContextElementResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad request</reasonPhrase>\n    <details>very bad request</details>\n  </errorCode>\n</appendContextElementResponse>\n";
 
   // 1. empty acer
   out = acer.render(XML, "");
@@ -66,8 +66,8 @@ TEST(AppendContextElementResponse, check)
   ContextAttributeResponse      car;
   ContextAttribute              ca("", "TYPE", "VALUE"); // empty name, thus provoking error
   std::string                   out;
-  std::string                   expected1 = "<appendContextAttributeResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>PRE ERR</reasonPhrase>\n  </errorCode>\n</appendContextAttributeResponse>\n";
-  std::string                   expected2 = "<appendContextAttributeResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase><contextAttributeResponse>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>missing attribute name</reasonPhrase>\n  </statusCode>\n</contextAttributeResponse>\n</reasonPhrase>\n  </errorCode>\n</appendContextAttributeResponse>\n";
+  std::string                   expected1 = "<appendContextElementResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>PRE ERR</reasonPhrase>\n  </errorCode>\n</appendContextElementResponse>\n";
+  std::string                   expected2 = "<appendContextElementResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase><contextAttributeResponse>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>missing attribute name</reasonPhrase>\n  </statusCode>\n</contextAttributeResponse>\n</reasonPhrase>\n  </errorCode>\n</appendContextElementResponse>\n";
   std::string                   expected3 = "OK";
 
   // 1. predetected error

@@ -56,6 +56,13 @@ void versionSet(const char* version)
    strncpy(versionString, version, sizeof(versionString));
 }
 
+/* ****************************************************************************
+*
+* versionGet -
+*/
+char* versionGet() {
+    return versionString;
+}
 
 
 /* ****************************************************************************
