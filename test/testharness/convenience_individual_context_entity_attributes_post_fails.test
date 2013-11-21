@@ -85,13 +85,13 @@ EOF
 --REGEXPECT--
 +++++ 1. post an entity +++++
 <?xml version="1.0"?>
-<appendContextAttributeResponse>
+<appendContextElementResponse>
   <errorCode>
     <code>404</code>
     <reasonPhrase>Entity not found</reasonPhrase>
     <details>entity: (entity01, , false)</details>
   </errorCode>
-</appendContextAttributeResponse>
+</appendContextElementResponse>
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})

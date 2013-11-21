@@ -54,7 +54,7 @@ static RestService rs[] =
 TEST(postIndividualContextEntity, ok)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity11",  "POST", "1.1");
-  std::string    expected      = "<appendContextAttributeResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Entity not found</reasonPhrase>\n    <details>entity: (entity11, , false)</details>\n  </errorCode>\n</appendContextAttributeResponse>\n";
+  std::string    expected      = "<appendContextElementResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Entity not found</reasonPhrase>\n    <details>entity: (entity11, , false)</details>\n  </errorCode>\n</appendContextElementResponse>\n";
   const char*    fileName      = "ngsi10.appendContextElementRequest.ok.valid.xml";
   std::string    out;
 

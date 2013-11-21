@@ -41,7 +41,7 @@
 */
 std::string AppendContextElementResponse::render(Format format, std::string indent)
 {
-  std::string tag = "appendContextAttributeResponse";
+  std::string tag = "appendContextElementResponse";
   std::string out = "";
 
   out += startTag(indent, tag, format);
