@@ -67,10 +67,11 @@ tokens_map = {
     'notifyContextResponse':              ['ngsi10', 'valid'],
     # NGSI convenience operations exclusive types
     'registerProviderRequest':          ['ngsi9',  'postponed'],
-    'updateContextElementResponse':     ['ngsi10', 'postponed'],
     'updateContextElementRequest':      ['ngsi10', 'postponed'],
-    'updateContextAttributeRequest':    ['ngsi10', 'postponed'],
+    'updateContextElementResponse':     ['ngsi10', 'postponed'],
     'appendContextElementRequest':      ['ngsi10', 'postponed'],
+    'appendContextElementResponse':     ['ngsi10', 'postponed'],
+    'updateContextAttributeRequest':    ['ngsi10', 'postponed'],
     'appendContextAttributeResponse':   ['ngsi10', 'postponed'],
     'contextElementResponse':           ['ngsi10', 'postponed'],
     'contextAttributeResponse':         ['ngsi10', 'postponed'],
