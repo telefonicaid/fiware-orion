@@ -23,7 +23,7 @@
 # This script extract XML fragments of a given file (passed as first arguments),
 # each fragment put in a separate file in a given directory (passed as second argument).
 # This is mainly aimed at processing test harness files (.test files) to pass the
-# xmlChecker.sh on then afterwards. Note that the heuristic used by the script is not
+# xmlCheck.sh on then afterwards. Note that the heuristic used by the script is not
 # bullet-proof: it assumes that the starting and ending tag of the root element is
 # in its own line, without other child starting or ending tags (but it should suffice
 # for .test files)
@@ -38,66 +38,56 @@ def write_fragment(lines, filename):
     f.writelines(lines)
     f.close()
 
-def ngsi_token(s):
-    if s == 'registerContextRequest':
-        return 'ngsi9'
-    elif s == 'registerContextResponse':
-        return 'ngsi9'
-    elif s == 'discoverContextAvailabilityRequest':
-        return 'ngsi9'
-    elif s == 'discoverContextAvailabilityResponse':
-        return 'ngsi9'
-    elif s == 'subscribeContextAvailabilityRequest':
-        return 'ngsi9'
-    elif s == 'subscribeContextAvailabilityResponse':
-        return 'ngsi9'
-    elif s == 'updateContextAvailabilitySubscriptionRequest':
-        return 'ngsi9'
-    elif s == 'updateContextAvailabilitySubscriptionResponse':
-        return 'ngsi9'
-    elif s == 'unsubscribeContextAvailabilityRequest':
-        return 'ngsi9'
-    elif s == 'unsubscribeContextAvailabilityResponse':
-        return 'ngsi9'
-    elif s == 'notifyContextAvailabilityRequest':
-        return 'ngsi9'
-    elif s == 'notifyContextAvailabilityResponse':
-        return 'ngsi9'
-    elif s == 'queryContextRequest':
-        return 'ngsi10'
-    elif s == 'queryContextResponse':
-        return 'ngsi10'
-    elif s == 'updateContextRequest':
-        return 'ngsi10'
-    elif s == 'updateContextResponse':
-        return 'ngsi10'
-    elif s == 'subscribeContextRequest':
-        return 'ngsi10'
-    elif s == 'subscribeContextResponse':
-        return 'ngsi10'
-    elif s == 'updateContextSubscriptionRequest':
-        return 'ngsi10'
-    elif s == 'updateContextSubscriptionResponse':
-        return 'ngsi10'
-    elif s == 'unsubscribeContextRequest':
-        return 'ngsi10'
-    elif s == 'unsubscribeContextResponse':
-        return 'ngsi10'
-    elif s == 'notifyContextRequest':
-        return 'ngsi10'
-    elif s == 'notifyContextResponse':
-        return 'ngsi10'
-    else:
-        return 'unknown'
+tokens_map = {
+    # NGSI9 standard operations
+    'registerContextRequest':                        ['ngsi9', 'valid'],
+    'registerContextResponse':                       ['ngsi9', 'valid'],
+    'discoverContextAvailabilityRequest':            ['ngsi9', 'valid'],
+    'discoverContextAvailabilityResponse':           ['ngsi9', 'valid'],
+    'subscribeContextAvailabilityRequest':           ['ngsi9', 'valid'],
+    'subscribeContextAvailabilityResponse':          ['ngsi9', 'valid'],
+    'updateContextAvailabilitySubscriptionRequest':  ['ngsi9', 'valid'],
+    'updateContextAvailabilitySubscriptionResponse': ['ngsi9', 'valid'],
+    'unsubscribeContextAvailabilityRequest':         ['ngsi9', 'valid'],
+    'unsubscribeContextAvailabilityResponse':        ['ngsi9', 'valid'],
+    'notifyContextAvailabilityRequest':              ['ngsi9', 'valid'],
+    'notifyContextAvailabilityResponse':             ['ngsi9', 'valid'],
+    # NGSI10 standard operatoins
+    'queryContextRequest':                ['ngsi10', 'valid'],
+    'queryContextResponse':               ['ngsi10', 'valid'],
+    'updateContextRequest':               ['ngsi10', 'valid'],
+    'updateContextResponse':              ['ngsi10', 'valid'],
+    'subscribeContextRequest':            ['ngsi10', 'valid'],
+    'subscribeContextResponse':           ['ngsi10', 'valid'],
+    'updateContextSubscriptionRequest':   ['ngsi10', 'valid'],
+    'updateContextSubscriptionResponse':  ['ngsi10', 'valid'],
+    'unsubscribeContextRequest':          ['ngsi10', 'valid'],
+    'unsubscribeContextResponse':         ['ngsi10', 'valid'],
+    'notifyContextRequest':               ['ngsi10', 'valid'],
+    'notifyContextResponse':              ['ngsi10', 'valid'],
+    # NGSI convenience operations exclusive types
+    'registerProviderRequest':          ['ngsi9',  'postponed'],
+    'updateContextElementResponse':     ['ngsi10', 'postponed'],
+    'updateContextElementRequest':      ['ngsi10', 'postponed'],
+    'updateContextAttributeRequest':    ['ngsi10', 'postponed'],
+    'appendContextElementRequest':      ['ngsi10', 'postponed'],
+    'appendContextAttributeResponse':   ['ngsi10', 'postponed'],
+    'contextElementResponse':           ['ngsi10', 'postponed'],
+    'contextAttributeResponse':         ['ngsi10', 'postponed'],
+    'statusCode':                       ['ngsi', 'valid'],
+    # Orion own types
+    'orion':      ['orion', 'invalid'],
+    'orionError': ['orion', 'invalid']
+}
 
 if len (argv) != 4:
     print 'Wrong number of arguments'
-    print argv[0] + ' <file_to_parse> <directory_for_fragments> <prefix>'
+    print argv[0] + ' <file_to_parse> <directory_for_fragments> <base_name>'
     exit(1)
 
 file = str(argv[1])
 dir = str(argv[2])
-prefix = str(argv[3])
+base_name = str(argv[3])
 
 buffer = []
 xml_headers_counter = 0
@@ -105,7 +95,6 @@ xml_headers_correction = 0
 xml_fragments_counter = 0
 search_mode = True
 next_xml_invalid = False
-next_xml_postponed = False
 buffer = []
 
 with open (file, 'r') as f:
@@ -113,7 +102,7 @@ with open (file, 'r') as f:
         line = l
 
         if search_mode:
-            # Search mode is on: looking for a root element or for an 'invalid' or 'postponed' mark
+            # Search mode is on: looking for a root element or for an 'invalid'
             if re.search('<\?xml', line):
                 xml_headers_counter += 1
             elif re.search('User-Agent:', line):
@@ -124,8 +113,6 @@ with open (file, 'r') as f:
                 xml_headers_correction += 1
             elif re.search('#INVALID_XML', line):
                 next_xml_invalid = True
-            elif re.search('#POSTPONED_XML', line):
-                next_xml_postponed = True         
             else:
                 m = re.match('\s*<(.*)>', line)
                 if m != None:
@@ -142,23 +129,27 @@ with open (file, 'r') as f:
             # Search mode is off: accumulate each line until the ending tag is found
             buffer.append(line)
 
-            if re.search('<\/'+ root_element + '>', line):
-                # We add a 'ngsi9' or 'ngsi10' token in the filename to help xmlChecker.sh script
-                filename_base = dir + '/' + ngsi_token(root_element) + '.' + prefix + '.'
+            if re.search('<\/'+ root_element + '>', line):              
+                # We use some tokens in the filename to help xmlCheck.sh script
+                if tokens_map.has_key(root_element):
+                    family = tokens_map[root_element][0]
+                    vality = tokens_map[root_element][1]
+                else:                    
+                    family = 'unknown'
+                    vality = 'invalid'
 
+                # No matter the result of the map, if the invalid mark was used in the .test, then
+                # file is alawys marked as 'invalid'
                 if next_xml_invalid:
-                    filename = filename_base + 'part_' + str(xml_fragments_counter) + '.invalid.xml'
-                elif next_xml_postponed:
-                    filename = filename_base + 'part_' + str(xml_fragments_counter) + '.postponed.xml'
-                else:
-                    filename = filename_base + 'part_' + str(xml_fragments_counter) + '.valid.xml'
+                    vality = 'invalid'
+ 
+                filename = dir + '/' + family + '.' + base_name + '.part_' + str(xml_fragments_counter) + '.' + vality + '.xml'
 
                 write_fragment(buffer, filename)
                 buffer = []
                 search_mode = True
                 next_xml_invalid = False
-                next_xml_postponed = False
 
 if xml_headers_counter != xml_fragments_counter - xml_headers_correction:
-    print 'Warning in ' + prefix + ': XML headers (' + str(xml_headers_counter) + ', correction: ' + str(xml_headers_correction) + ') and ' \
+    print 'Warning in ' + base_name + ': XML headers (' + str(xml_headers_counter) + ', correction: ' + str(xml_headers_correction) + ') and ' \
           'generated fragments (' + str(xml_fragments_counter) + ') differ'
