@@ -117,7 +117,7 @@ std::string sendHttpSocket( std::string ip,
            "%s %s HTTP/1.1\n"
            "User-Agent: orion/%s\n"
            "Host: %s:%d\n"
-           "Accept: */*\n",
+           "Accept: application/xml, application/json\n",
            verb.c_str(), resource.c_str(), versionGet(), ip.c_str(), port);
 
   if ((!content_type.empty()) && (!content.empty()))
