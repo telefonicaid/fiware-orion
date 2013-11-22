@@ -68,3 +68,27 @@ TEST(postUnsubscribeContext, badSubscriptionId)
 
   EXPECT_STREQ(expected.c_str(), out.c_str());
 }
+
+
+
+/* ****************************************************************************
+*
+* notFound - 
+*/
+TEST(postUnsubscribeContext, notFound)
+{
+  ConnectionInfo ci("/ngsi10/unsubscribeContext",  "POST", "1.1");
+  const char*    fileName    = "ngsi10.unsubscribeContextRequest.subscriptionId.valid.xml";
+  std::string    expected    = "<unsubscribeContextResponse>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n  <statusCode>\n    <code>404</code>\n    <reasonPhrase>Subscription Not Found</reasonPhrase>\n  </statusCode>\n</unsubscribeContextResponse>\n";
+  std::string    out;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+
+  ci.outFormat    = XML;
+  ci.inFormat     = XML;
+  ci.payload      = testBuf;
+  ci.payloadSize  = strlen(testBuf);
+  out             = restService(&ci, rs);
+
+  EXPECT_STREQ(expected.c_str(), out.c_str());
+}

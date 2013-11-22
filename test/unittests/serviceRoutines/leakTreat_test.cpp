@@ -24,16 +24,8 @@
 */
 #include "gtest/gtest.h"
 
-#include "serviceRoutines/exitTreat.h"
+#include "serviceRoutines/leakTreat.h"
 #include "rest/RestService.h"
-
-
-
-/* ****************************************************************************
-*
-* harakiri - 
-*/
-extern bool harakiri;
 
 
 
@@ -43,8 +35,8 @@ extern bool harakiri;
 */
 static RestService rs[] = 
 {
-  { "GET ExitRequest",                            "GET",    ExitRequest,                           2, { "exit", "*"                                              }, "", exitTreat                                 },
-  { "GET ExitRequest",                            "GET",    ExitRequest,                           1, { "exit"                                                   }, "", exitTreat                                 },
+  { "GET LeakRequest",                            "GET",    LeakRequest,                           2, { "leak", "*"                                              }, "", leakTreat                                 },
+  { "GET LeakRequest",                            "GET",    LeakRequest,                           1, { "leak"                                                   }, "", leakTreat                                 },
   { "* *",                                        "",       InvalidRequest,                        0, {                                                          }, "", NULL                                      }
 };
 
@@ -54,27 +46,26 @@ static RestService rs[] =
 *
 * error - 
 */
-TEST(exitTreat, error)
+TEST(leakTreat, error)
 {
-  ConnectionInfo ci1("/exit",  "GET", "1.1");
-  ConnectionInfo ci2("/exit/nadadenada",  "GET", "1.1");
-  ConnectionInfo ci3("/exit/harakiri",  "GET", "1.1");
+  ConnectionInfo ci1("/leak",  "GET", "1.1");
+  ConnectionInfo ci2("/leak/nadadenada",  "GET", "1.1");
+  ConnectionInfo ci3("/leak/harakiri",  "GET", "1.1");
+
+  extern bool harakiri;
+  harakiri = true;
 
   std::string    expected1  = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad request</reasonPhrase>\n  <details>Password requested</details>\n</orionError>\n";
   std::string    expected2  = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad request</reasonPhrase>\n  <details>Request denied - password erroneous</details>\n</orionError>\n";
-  std::string    expected3  = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad request</reasonPhrase>\n  <details>no such service</details>\n</orionError>\n";
-  std::string    out;
 
-  harakiri = true;
+  std::string    out1       = restService(&ci1, rs);
+  std::string    out2       = restService(&ci2, rs);
 
-  out = restService(&ci1, rs);
-  EXPECT_EQ(expected1, out);
-
-  out =restService(&ci2, rs);
-  EXPECT_EQ(expected2, out);
+  EXPECT_STREQ(expected1.c_str(), out1.c_str());
+  EXPECT_STREQ(expected2.c_str(), out2.c_str());
 
   harakiri = false;
-
-  out = restService(&ci3, rs);
-  EXPECT_EQ(expected3, out);
+  std::string    expected3  = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad request</reasonPhrase>\n  <details>no such service</details>\n</orionError>\n";
+  std::string    out3       = restService(&ci3, rs);
+  EXPECT_STREQ(expected3.c_str(), out3.c_str());
 }

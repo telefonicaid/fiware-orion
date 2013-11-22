@@ -61,6 +61,7 @@ SET (SOURCES
     serviceRoutines/badVerbAllFour_test.cpp
     serviceRoutines/badVerbGetPostOnly_test.cpp
     serviceRoutines/badVerbGetPostDeleteOnly_test.cpp
+    serviceRoutines/badVerbGetDeleteOnly_test.cpp
     serviceRoutines/deleteIndividualContextEntity_test.cpp
     serviceRoutines/deleteIndividualContextEntityAttribute_test.cpp
     serviceRoutines/deleteIndividualContextEntityAttributes_test.cpp
@@ -193,6 +194,8 @@ SET (SOURCES
     serviceRoutines/badRequest_test.cpp
     serviceRoutines/versionTreat_test.cpp
     serviceRoutines/exitTreat_test.cpp
+    serviceRoutines/leakTreat_test.cpp
+    serviceRoutines/statisticsTreat_test.cpp
 
     mongoBackend/mongoConfManOperations_test.cpp
     mongoBackend/mongoDiscoverContextAvailability_test.cpp
