@@ -39,17 +39,16 @@ typedef enum TraceLevels
 
   /* Rest (20-39) */
   LmtRest = 20,
-  LmtRest2,        // More depth of messages for LmtRest,
   LmtRestCompare,
   LmtUrlParse,
   LmtHttpRequest,
   LmtHttpHeaders,
   LmtHttpDaemon,
-  LmtHttpPayload,
   LmtHttpUnsupportedHeader,
   LmtMhd,
   LmtRestReply,
   LmtSavedResponse,
+  LmtIncompletePayload,
 
   /* Parser (40-59) */
   LmtParse    = 40,

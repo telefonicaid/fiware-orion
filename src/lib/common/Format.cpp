@@ -89,7 +89,6 @@ Format formatParse(std::string formatString, std::string* charsetP)
   std::string format(wsStrip(cP));
 
   if      (format == "*/*")                               return XML;
-  else if (format == "application/x-www-form-urlencoded") return XML;
   else if (format == "application/xml")                   return XML;
   else if (format == "text/xml")                          return XML;
   else if (format == "text/json")                         return JSON;
