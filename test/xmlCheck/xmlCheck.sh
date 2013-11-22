@@ -75,6 +75,9 @@ function xsdGet()
   elif [ "$prefix" == "ngsi10" ]
   then
     echo $xsdDir/Ngsi10_Operations_v07.xsd
+  elif [ "$prefix" == "ngsi" ]
+  then
+    echo $xsdDir/Ngsi9_10_dataStructure_v07.xsd
   else
     echo "unknown file prefix: '"${prefix}"' for $xfile"
     exit 2
@@ -159,6 +162,7 @@ function harnessFiles()
   xmlPartsValid=$(find $TMP_DIR -name "ngsi*.valid.xml" | wc -l)
   xmlPartsInvalid=$(find $TMP_DIR -name "ngsi*.invalid.xml" | wc -l)
   xmlPartsPostponed=$(find $TMP_DIR -name "ngsi*.postponed.xml" | wc -l)
+  xmlPartsUnknown=$(find $TMP_DIR -name "unknown*.xml" | wc -l)
 }
 
 
@@ -330,11 +334,13 @@ typeset -i xmlPartsFound        # Number of XML parts created from harness direc
 typeset -i xmlPartsValid        # Number of XML parts that are valid
 typeset -i xmlPartsInvalid      # Number of XML parts that are invalid
 typeset -i xmlPartsPostponed    # Number of XML parts that are postponed
+typeset -i xmlPartsUnknown      # Number of XML parts that are unknown
 typeset -i xmlPartsProcessed    # Number of XML parts that were tested 
 typeset -i xmlPartsOK           # Number of XML parts that passed the test
 typeset -i xmlPartsErrors       # Number of XML parts that did not pass the test
 typeset -i xmlDocsFound         # xmlFilesFound + xmlPartsFound
 typeset -i xmlDocsProcessed     # xmlFilesProcessed + xmlPartsProcessed
+typeset -i xmlDocsPostponed     # xmlFilesPostponed + xmlPartsPostponed
 typeset -i xmlDocsOk            # xmlFilesOK + xmlPartsOK
 typeset -i xmlDocsErrors        # xmlFilesErrors + xmlPartsErrors
 
@@ -351,6 +357,7 @@ xmlPartsFound=$xmlPartsFound           # already taken care of by function 'harn
 xmlPartsValid=$xmlPartsValid           # already taken care of by function 'harnessFiles'
 xmlPartsInvalid=$xmlPartsInvalid       # already taken care of by function 'harnessFiles'
 xmlPartsPostponed=$xmlPartsPostponed   # already taken care of by function 'harnessFiles'
+xmlPartsUnknown=$xmlPartsUnknown       # already taken care of by function 'harnessFiles'
 xmlPartsProcessed=0
 xmlPartsOK=0
 xmlPartsErrors=0
@@ -442,15 +449,6 @@ xmlDocsErrors=$(expr $xmlFilesErrors + $xmlPartsErrors)
 
 
 
-# ------------------------------------------------------------------------------
-#
-# Keep?
-#
-if [ "$keep" == "off" ]
-then
-  rm -rf $TMP_DIR
-fi
-
 
 
 # ------------------------------------------------------------------------------
@@ -492,7 +490,7 @@ fi
 echo "Tested ${xmlDocsProcessed} (${xmlFilesProcessed} files + ${xmlPartsProcessed} parts) out of ${xmlDocsFound} (${xmlFilesFound} files + ${xmlPartsFound} parts) XML documents:"
 echo "  ${xmlDocsOk} documents passed the XML validity test"
 
-exitCode=8
+exitCode=7
 
 if [ "$xmlDocsErrors" != 0 ]
 then
@@ -506,7 +504,8 @@ fi
 
 echo
 echo "${xmlFilesInvalid} documents were not tested as they on purpose don't follow the XSD"
-echo "${xmlFilesPostponed} documents were not tested as they still have no XSD"
+xmlDocsPostponed=$xmlFilesPostponed+$xmlPartsPostponed
+echo "${xmlDocsPostponed} documents were not tested as they still have no XSD"
 
 if [ "$xmlFilesBadName" != 0 ]
 then
@@ -516,7 +515,27 @@ then
   do
     echo "  o $xfile"
   done
-  exit 7
+  exitCode=8
+fi
+
+if [ "$xmlPartsUnknown" != 0 ]
+then
+  echo
+  echo "WARNING: parts marked as unknown"
+  for xfile in $(find $TMP_DIR -name "unknown*.xml")
+  do
+    echo "  o $xfile"
+  done
+  exitCode=9
+fi
+
+# ------------------------------------------------------------------------------
+#
+# Keep?
+#
+if [ "$keep" == "off" ]
+then
+  rm -rf $TMP_DIR
 fi
 
 exit $exitCode

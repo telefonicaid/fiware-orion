@@ -240,11 +240,11 @@ echo "13: ++++++++++++++++++++"
 </unsubscribeContextResponse>
 10: ++++++++++++++++++++
 <?xml version="1.0"?>
-<errorCode>
+<orionError>
   <code>400</code>
   <reasonPhrase>bad ngsi9 request</reasonPhrase>
   <details>ngsi9 service '/NGSI9/notSupportedRequest' not found</details>
-</errorCode>
+</orionError>
 11: ++++++++++++++++++++
 <?xml version="1.0"?>
 <errorCode>
@@ -254,11 +254,11 @@ echo "13: ++++++++++++++++++++"
 </errorCode>
 12: ++++++++++++++++++++
 <?xml version="1.0"?>
-<errorCode>
+<orionError>
   <code>400</code>
   <reasonPhrase>bad request</reasonPhrase>
   <details>service '/notSupportedRequest' not found</details>
-</errorCode>
+</orionError>
 13: ++++++++++++++++++++
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
