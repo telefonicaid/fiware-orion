@@ -95,7 +95,10 @@ std::string OrionError::render(Format format, std::string indent)
   out += startTag(indent, tag, format);
   out += valueTag(indent + "  ", "code",          code,         format, true);
   out += valueTag(indent + "  ", "reasonPhrase",  reasonPhrase, format, details != "");
-  out += valueTag(indent + "  ", "details",       details,      format);
+
+  if (details != "")
+    out += valueTag(indent + "  ", "details",       details,      format);
+
   out += endTag(indent, tag, format);
 
   return out;

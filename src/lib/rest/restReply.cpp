@@ -320,7 +320,6 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string in
       reply = orionError.render(format, indent);
    }
 
-   LM_M(("reply: '%s'", reply.c_str()));
    return reply;
 }
 
