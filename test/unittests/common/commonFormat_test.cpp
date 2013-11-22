@@ -89,9 +89,6 @@ TEST(commonFormat, formatParse)
    format = formatParse("*/*", NULL);
    EXPECT_EQ(XML, format) << "bad translation for XML format (*/*)";
 
-   format = formatParse("application/x-www-form-urlencoded", NULL);
-   EXPECT_EQ(XML, format) << "bad translation for XML format (application/x-www-form-urlencoded)";
-
    format = formatParse("application/xml", NULL);
    EXPECT_EQ(XML, format) << "bad translation for XML format (application/xml)";
 
