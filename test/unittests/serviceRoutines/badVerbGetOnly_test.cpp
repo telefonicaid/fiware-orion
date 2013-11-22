@@ -50,8 +50,10 @@ static RestService rs[] =
 TEST(badVerbGetOnly, ok)
 {
   ConnectionInfo  ci("/version",  "PUT", "1.1");
-  std::string     expected = "<orionError>\n  <code>405</code>\n  <reasonPhrase>Method not allowed</reasonPhrase>\n  <details>Allow: GET</details>\n</orionError>\n";
+  std::string     expected = ""; // Bad verb gives no payload, only HTTP headers
   std::string     out      = restService(&ci, rs);
 
   EXPECT_EQ(expected, out);
+  EXPECT_EQ("Allow", ci.httpHeader[0]);
+  EXPECT_EQ("GET",   ci.httpHeaderValue[0]);
 }

@@ -181,19 +181,19 @@ echo "13: ++++++++++++++++++++"
   }
 }
 10: ++++++++++++++++++++
-"errorCode" : {
+"orionError" : {
   "code" : "400",
   "reasonPhrase" : "no request treating object found",
   "details" : "Sorry, no request treating object found for RequestType 'InvalidRequest'"
 }
 11: ++++++++++++++++++++
-"errorCode" : {
+"orionError" : {
   "code" : "400",
   "reasonPhrase" : "no request treating object found",
   "details" : "Sorry, no request treating object found for RequestType 'InvalidRequest'"
 }
 12: ++++++++++++++++++++
-"errorCode" : {
+"orionError" : {
   "code" : "400",
   "reasonPhrase" : "no request treating object found",
   "details" : "Sorry, no request treating object found for RequestType 'InvalidRequest'"

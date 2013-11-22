@@ -106,7 +106,7 @@ echo "+++++ Starting +++++++++++++++"
 EOF
 echo "+++++ Registration Done +++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X BAD_VERB -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S  --include --header 'Content-Type: application/json' --header 'Accept: application/json' -X BAD_VERB -d @- ) << EOF
 {
 	"entities": [
 		{
@@ -147,13 +147,11 @@ echo "+++++ Discovery Done +++++++++++++++"
   "registrationId" : "REGEX([0-9a-f]{24})"
 }
 +++++ Registration Done +++++++++++++++
-{
-  "errorCode" : {
-    "code" : "405",
-    "reasonPhrase" : "Method not allowed",
-    "details" : "Allow: POST"
-  }
-}
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST
+Date: REGEX(.*)
+
 +++++ Discovery Done +++++++++++++++
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then

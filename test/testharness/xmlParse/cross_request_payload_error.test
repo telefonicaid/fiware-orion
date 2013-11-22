@@ -247,11 +247,11 @@ echo "13: ++++++++++++++++++++"
 </orionError>
 11: ++++++++++++++++++++
 <?xml version="1.0"?>
-<errorCode>
+<orionError>
   <code>400</code>
   <reasonPhrase>bad ngsi10 request</reasonPhrase>
   <details>ngsi10 service '/NGSI10/notSupportedRequest' not found</details>
-</errorCode>
+</orionError>
 12: ++++++++++++++++++++
 <?xml version="1.0"?>
 <orionError>

@@ -60,7 +60,7 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X BAD_VERB -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X BAD_VERB --include -d @- ) << EOF
 {
   "contextRegistrations": [
     {
@@ -105,14 +105,11 @@ fi
 EOF
 echo "++++++++++++++++++++"
 --REGEXPECT--
-{
-  "registrationId" : "0",
-  "errorCode" : {
-    "code" : "405",
-    "reasonPhrase" : "Method not allowed",
-    "details" : "Allow: POST"
-  }
-}
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST
+Date: REGEX(.*)
+
 ++++++++++++++++++++
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
