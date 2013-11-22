@@ -53,8 +53,8 @@ TEST(badVerbAllFour, error)
   ConnectionInfo ci2("/ngsi10/contextEntities",      "PUST", "1.1");
   ConnectionInfo ci3("/ngsi10/",                     "PUST", "1.1");
   ConnectionInfo ci4("/ngsi10/1/2/3/4",              "PUST", "1.1");
-  std::string    expected  = "<errorCode>\n  <code>405</code>\n  <reasonPhrase>Method not allowed</reasonPhrase>\n  <details>Allow: POST, GET, PUT, DELETE</details>\n</errorCode>\n";
-  std::string    expected3 = "<errorCode>\n  <code>400</code>\n  <reasonPhrase>bad request</reasonPhrase>\n  <details>Service not recognized</details>\n</errorCode>\n";
+  std::string    expected  = "<orionError>\n  <code>405</code>\n  <reasonPhrase>Method not allowed</reasonPhrase>\n  <details>Allow: POST, GET, PUT, DELETE</details>\n</orionError>\n";
+  std::string    expected3 = "<orionError>\n  <code>400</code>\n  <reasonPhrase>bad request</reasonPhrase>\n  <details>Service not recognized</details>\n</orionError>\n";
   std::string    out;
 
   out = restService(&ci1, rs);

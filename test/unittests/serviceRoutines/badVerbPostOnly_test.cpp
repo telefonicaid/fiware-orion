@@ -48,7 +48,7 @@ static RestService rs[] =
 TEST(badVerbPostOnly, ok)
 {
   ConnectionInfo ci("/ngsi9/registerContext",  "PUT", "1.1");
-  std::string     expected = "<errorCode>\n  <code>405</code>\n  <reasonPhrase>Method not allowed</reasonPhrase>\n  <details>Allow: POST</details>\n</errorCode>\n";
+  std::string     expected = "<orionError>\n  <code>405</code>\n  <reasonPhrase>Method not allowed</reasonPhrase>\n  <details>Allow: POST</details>\n</orionError>\n";
   std::string     out = restService(&ci, rs);
 
   EXPECT_EQ(expected, out);

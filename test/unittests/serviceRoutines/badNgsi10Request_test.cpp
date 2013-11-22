@@ -49,7 +49,7 @@ TEST(badNgsi10Request, ok)
 {
   ConnectionInfo ci("/ngsi10/badbadbad",  "GET", "1.1");
   std::string    out = restService(&ci, rs);
-  std::string    expected = "<errorCode>\n  <code>400</code>\n  <reasonPhrase>bad ngsi10 request</reasonPhrase>\n  <details>ngsi10 service '/ngsi10/badbadbad' not found</details>\n</errorCode>\n";
+  std::string    expected = "<orionError>\n  <code>400</code>\n  <reasonPhrase>bad ngsi10 request</reasonPhrase>\n  <details>ngsi10 service '/ngsi10/badbadbad' not found</details>\n</orionError>\n";
 
   EXPECT_EQ(expected, out);
 }

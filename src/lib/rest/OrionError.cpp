@@ -59,6 +59,32 @@ OrionError::OrionError(int _code, std::string _reasonPhrase, std::string _detail
 
 /* ****************************************************************************
 *
+* OrionError::OrionError - 
+*/
+OrionError::OrionError(ErrorCode& errorCode)
+{
+  code          = errorCode.code;
+  reasonPhrase  = errorCode.reasonPhrase;
+  details       = errorCode.details;
+}
+
+
+
+/* ****************************************************************************
+*
+* OrionError::OrionError - 
+*/
+OrionError::OrionError(StatusCode& statusCode)
+{
+  code          = statusCode.code;
+  reasonPhrase  = statusCode.reasonPhrase;
+  details       = statusCode.details;
+}
+
+
+
+/* ****************************************************************************
+*
 * OrionError::render - 
 */
 std::string OrionError::render(Format format, std::string indent)
@@ -67,8 +93,8 @@ std::string OrionError::render(Format format, std::string indent)
   std::string tag     = "orionError";
 
   out += startTag(indent, tag, format);
-  out += valueTag(indent + "  ", "code",          code,         format);
-  out += valueTag(indent + "  ", "reasonPhrase",  reasonPhrase, format);
+  out += valueTag(indent + "  ", "code",          code,         format, true);
+  out += valueTag(indent + "  ", "reasonPhrase",  reasonPhrase, format, details != "");
   out += valueTag(indent + "  ", "details",       details,      format);
   out += endTag(indent, tag, format);
 

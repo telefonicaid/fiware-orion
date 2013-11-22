@@ -46,7 +46,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/HttpStatusCode.h"
 #include "rest/mhd.h"
-#include "rest/mhd.h"
+#include "rest/OrionError.h"
 #include "rest/restReply.h"
 #include "logMsg/traceLevels.h"
 
@@ -313,10 +313,14 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string in
    }
    else
    {
+      OrionError orionError(errorCode);
+
       LM_E(("Unknown tag: '%s', request == '%s'", tag.c_str(), request.c_str()));
-      reply = errorCode.render(format, indent);
+      
+      reply = orionError.render(format, indent);
    }
 
+   LM_M(("reply: '%s'", reply.c_str()));
    return reply;
 }
 

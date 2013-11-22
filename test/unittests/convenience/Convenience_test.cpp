@@ -78,7 +78,7 @@ TEST(Convenience, shortPath)
   ConnectionInfo  ci3("ngsi8", "GET", "1.1");
   ConnectionInfo  ci4("ngsi10/nada", "GET", "1.1");
   std::string     out;
-  std::string     expected = "<errorCode>\n  <code>400</code>\n  <reasonPhrase>bad request</reasonPhrase>\n  <details>Service not recognized</details>\n</errorCode>\n";
+  std::string     expected = "<orionError>\n  <code>400</code>\n  <reasonPhrase>bad request</reasonPhrase>\n  <details>Service not recognized</details>\n</orionError>\n";
 
   out = restService(&ci1, restServiceV);
   EXPECT_EQ(expected, out);
@@ -103,7 +103,7 @@ TEST(Convenience, badPathNgsi9)
 {
   ConnectionInfo            ci("ngsi9/badpathcomponent", "GET", "1.1");
   std::string               out;
-  std::string               expected = "<errorCode>\n  <code>400</code>\n  <reasonPhrase>bad request</reasonPhrase>\n  <details>Service not recognized</details>\n</errorCode>\n";
+  std::string               expected = "<orionError>\n  <code>400</code>\n  <reasonPhrase>bad request</reasonPhrase>\n  <details>Service not recognized</details>\n</orionError>\n";
 
   out = restService(&ci, restServiceV);
   EXPECT_EQ(expected, out);
@@ -119,7 +119,7 @@ TEST(Convenience, badPathNgsi10)
 {
   ConnectionInfo            ci("ngsi10/badpathcomponent", "GET", "1.1");
   std::string               out;
-  std::string               expected = "<errorCode>\n  <code>400</code>\n  <reasonPhrase>bad request</reasonPhrase>\n  <details>Service not recognized</details>\n</errorCode>\n";
+  std::string               expected = "<orionError>\n  <code>400</code>\n  <reasonPhrase>bad request</reasonPhrase>\n  <details>Service not recognized</details>\n</orionError>\n";
 
   out = restService(&ci, restServiceV);
   EXPECT_EQ(expected, out);
