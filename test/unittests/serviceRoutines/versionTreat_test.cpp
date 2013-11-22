@@ -50,7 +50,7 @@ TEST(versionTreat, ok)
   ConnectionInfo  ci("/version",  "GET", "1.1");
   std::string     out       = restService(&ci, rs);
 
-  // FIXME P4: Some day we'll do this ...
+  // FIXME P2: Some day we'll do this ...
   //
   // char*    expected =
   //   "<orion>\n"
@@ -76,4 +76,8 @@ TEST(versionTreat, ok)
   EXPECT_TRUE(strstr(out.c_str(), "<compiled_in>") != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "</compiled_in>") != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "</orion>") != NULL);
+
+  versionSet("1.2.3");
+  out       = restService(&ci, rs);
+  EXPECT_TRUE(strstr(out.c_str(), "<version>1.2.3</version>") != NULL);
 }
