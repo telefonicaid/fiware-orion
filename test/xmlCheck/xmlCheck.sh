@@ -490,7 +490,7 @@ fi
 echo "Tested ${xmlDocsProcessed} (${xmlFilesProcessed} files + ${xmlPartsProcessed} parts) out of ${xmlDocsFound} (${xmlFilesFound} files + ${xmlPartsFound} parts) XML documents:"
 echo "  ${xmlDocsOk} documents passed the XML validity test"
 
-exitCode=8
+exitCode=7
 
 if [ "$xmlDocsErrors" != 0 ]
 then
@@ -515,7 +515,7 @@ then
   do
     echo "  o $xfile"
   done
-  exitCode=7
+  exitCode=8
 fi
 
 if [ "$xmlPartsUnknown" != 0 ]
@@ -526,7 +526,7 @@ then
   do
     echo "  o $xfile"
   done
-  exitCode=7
+  exitCode=9
 fi
 
 # ------------------------------------------------------------------------------
