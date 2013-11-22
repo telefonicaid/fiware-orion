@@ -105,6 +105,7 @@ int restReply(ConnectionInfo* ciP, std::string answer)
 
   ++replyIx;
   LM_T(LmtRestReply, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answer.length(), ciP->httpStatusCode));
+  LM_T(LmtRestReply, ("Response payload: '%s'", answer.c_str()));
 
   if (answer == "")
     response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_NO, MHD_NO);
@@ -148,25 +149,6 @@ int restReply(ConnectionInfo* ciP, std::string answer)
     }
     return MHD_YES;
   }
-
-  return MHD_NO;
-}
-
-
-
-/* ****************************************************************************
-*
-* restReply - 
-*/
-int restReply(ConnectionInfo* ciP, MHD_Response* response)
-{
-  int ret;
-
-  ret = MHD_queue_response(ciP->connection, MHD_HTTP_OK, response);
-  MHD_destroy_response(response);
-
-  if (ret != MHD_YES)
-    LM_E(("MHD_queue_response failed: %d", ret));
 
   return MHD_NO;
 }
