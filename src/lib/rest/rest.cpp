@@ -398,7 +398,7 @@ static int connectionTreat
     }
   }
   else if ((*upload_data_size < ciP->httpHeaders.contentLength) && (*upload_data_size != 0))
-    LM_W(("Got INCOMPLETE POST payload (%d accumulated bytes): '%s'", *upload_data_size, upload_data));
+    LM_T(LmtIncompletePayload, ("Got INCOMPLETE POST payload (%d accumulated bytes): '%s'", *upload_data_size, upload_data));
   else if (*upload_data_size == 0)
   {
     if (ciP->requestEntityTooLarge == true)
