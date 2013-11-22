@@ -31,6 +31,14 @@
 
 /* ****************************************************************************
 *
+* harakiri - 
+*/
+extern bool harakiri;
+
+
+
+/* ****************************************************************************
+*
 * rs - 
 */
 static RestService rs[] = 
@@ -54,17 +62,19 @@ TEST(exitTreat, error)
 
   std::string    expected1  = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad request</reasonPhrase>\n  <details>Password requested</details>\n</orionError>\n";
   std::string    expected2  = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad request</reasonPhrase>\n  <details>Request denied - password erroneous</details>\n</orionError>\n";
+  std::string    expected3  = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad request</reasonPhrase>\n  <details>no such service</details>\n</orionError>\n";
+  std::string    out;
 
-  std::string    out1       = restService(&ci1, rs);
-  std::string    out2       = restService(&ci2, rs);
+  harakiri = true;
 
-  EXPECT_STREQ(expected1.c_str(), out1.c_str());
-  EXPECT_STREQ(expected2.c_str(), out2.c_str());
+  out = restService(&ci1, rs);
+  EXPECT_EQ(expected1, out);
 
-  extern bool harakiri;
+  out =restService(&ci2, rs);
+  EXPECT_EQ(expected2, out);
+
   harakiri = false;
 
-  std::string    expected3  = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad request</reasonPhrase>\n  <details>no such service</details>\n</orionError>\n";
-  std::string    out3       = restService(&ci3, rs);
-  EXPECT_STREQ(expected3.c_str(), out3.c_str());
+  out = restService(&ci3, rs);
+  EXPECT_EQ(expected3, out);
 }
