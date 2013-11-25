@@ -1,5 +1,5 @@
-#ifndef UPDATE_CONTEXT_ELEMENT_REQUEST_H
-#define UPDATE_CONTEXT_ELEMENT_REQUEST_H
+#ifndef GET_CONTEXT_ENTITY_TYPES_H
+#define GET_CONTEXT_ENTITY_TYPES_H
 
 /*
 *
@@ -28,27 +28,15 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
-#include "ngsi/AttributeDomainName.h"
-#include "ngsi/ContextAttributeVector.h"
-
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* UpdateContextElementRequest - 
+* getContextEntityTypes - 
 */
-typedef struct UpdateContextElementRequest
-{
-  AttributeDomainName        attributeDomainName;        // Optional
-  ContextAttributeVector     contextAttributeVector;     // Optional
-  MetadataVector             domainMetadataVector;       // Optional
-
-  std::string render(Format format, std::string indent);
-  std::string check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void        present(std::string indent);
-  void        release(void);
-} UpdateContextElementRequest;
+extern std::string getContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
 
 #endif
