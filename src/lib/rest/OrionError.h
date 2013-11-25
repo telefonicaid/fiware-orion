@@ -28,6 +28,8 @@
 #include <string>
 
 #include "common/Format.h"
+#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 
 
 
@@ -42,6 +44,8 @@ typedef struct OrionError
   std::string  details;
 
   OrionError();
+  OrionError(ErrorCode& errorCode);
+  OrionError(StatusCode& statusCode);
   OrionError(int _code, std::string _reasonPhrase, std::string _details);
 
   std::string  render(Format format, std::string indent);

@@ -52,8 +52,10 @@ static RestService rs[] =
 TEST(badVerbGetDeleteOnly, ok)
 {
   ConnectionInfo  ci("/statistics",  "PUT", "1.1");
-  std::string     expected = "<errorCode>\n  <code>405</code>\n  <reasonPhrase>Method not allowed</reasonPhrase>\n  <details>Allow: GET, DELETE</details>\n</errorCode>\n";
+  std::string     expected = ""; // Bad verb gives no payload, only HTTP headers
   std::string     out      = restService(&ci, rs);
 
   EXPECT_EQ(expected, out);
+  EXPECT_EQ("Allow",       ci.httpHeader[0]);
+  EXPECT_EQ("GET, DELETE", ci.httpHeaderValue[0]);
 }

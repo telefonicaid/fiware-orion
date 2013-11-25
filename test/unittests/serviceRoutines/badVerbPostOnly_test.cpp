@@ -48,8 +48,10 @@ static RestService rs[] =
 TEST(badVerbPostOnly, ok)
 {
   ConnectionInfo ci("/ngsi9/registerContext",  "PUT", "1.1");
-  std::string     expected = "<errorCode>\n  <code>405</code>\n  <reasonPhrase>Method not allowed</reasonPhrase>\n  <details>Allow: POST</details>\n</errorCode>\n";
+  std::string     expected = ""; // Bad verb gives no payload, only HTTP headers
   std::string     out = restService(&ci, rs);
 
   EXPECT_EQ(expected, out);
+  EXPECT_EQ("Allow", ci.httpHeader[0]);
+  EXPECT_EQ("POST",  ci.httpHeaderValue[0]);
 }

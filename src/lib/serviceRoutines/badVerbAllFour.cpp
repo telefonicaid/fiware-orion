@@ -41,12 +41,11 @@
 */
 std::string badVerbAllFour(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
-  std::string answer;
-
   ciP->httpHeader.push_back("Allow");
   ciP->httpHeaderValue.push_back("POST, GET, PUT, DELETE");
   ciP->httpStatusCode = SccBadVerb;
 
-  answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadVerb, "Method not allowed", "Allow: POST, GET, PUT, DELETE");
-  return answer;
+  LM_W(("bad verb for url '%s', method '%s'", ciP->url.c_str(), ciP->method.c_str()));
+
+  return "";
 }

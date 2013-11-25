@@ -52,4 +52,6 @@ TEST(badVerbGetPostOnly, ok)
   std::string     out      = restService(&ci, rs);
 
   EXPECT_EQ(expected, out);
+  EXPECT_EQ("Allow",      ci.httpHeader[0]);
+  EXPECT_EQ("POST, GET",  ci.httpHeaderValue[0]);
 }

@@ -115,7 +115,7 @@ EOF
 echo "+++++ Registration Done +++++"
 
 echo "+++++ Discovery +++++"
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X BAD_VERB -d @- | xmllint --format -) << EOF
+(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X BAD_VERB --include -d @-) << EOF
 <?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -143,14 +143,11 @@ echo "+++++ Discovery Done +++++"
 </registerContextResponse>
 +++++ Registration Done +++++
 +++++ Discovery +++++
-<?xml version="1.0"?>
-<discoverContextAvailabilityResponse>
-  <errorCode>
-    <code>405</code>
-    <reasonPhrase>Method not allowed</reasonPhrase>
-    <details>Allow: POST</details>
-  </errorCode>
-</discoverContextAvailabilityResponse>
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST
+Date: REGEX(.*)
+
 +++++ Discovery Done +++++
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then

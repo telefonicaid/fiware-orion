@@ -92,11 +92,13 @@ TEST(statisticsTreat, get)
 TEST(statisticsTreat, badVerb)
 {
   ConnectionInfo ci("/statistics",  "POLLUTE", "1.1");
-  std::string    expected  = "<errorCode>\n  <code>405</code>\n  <reasonPhrase>Method not allowed</reasonPhrase>\n  <details>Allow: GET, DELETE</details>\n</errorCode>\n";
+  std::string    expected  = ""; // no payload for bad verb, only http headers to indicate the error
   std::string    out;
 
   setTimer(new Timer());
   out = restService(&ci, rs);
 
   EXPECT_EQ(expected, out);
+  EXPECT_EQ("Allow",        ci.httpHeader[0]);
+  EXPECT_EQ("GET, DELETE",  ci.httpHeaderValue[0]);
 }

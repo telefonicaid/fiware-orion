@@ -49,7 +49,7 @@ TEST(badRequest, ok)
 {
   ConnectionInfo ci("/xxx/badbadbad",  "GET", "1.1");
   std::string    out      = restService(&ci, rs);
-  std::string    expected = "<errorCode>\n  <code>400</code>\n  <reasonPhrase>bad request</reasonPhrase>\n  <details>service '/xxx/badbadbad' not found</details>\n</errorCode>\n";
+  std::string    expected = "<orionError>\n  <code>400</code>\n  <reasonPhrase>bad request</reasonPhrase>\n  <details>service '/xxx/badbadbad' not found</details>\n</orionError>\n";
 
   EXPECT_EQ(expected, out);
 }
