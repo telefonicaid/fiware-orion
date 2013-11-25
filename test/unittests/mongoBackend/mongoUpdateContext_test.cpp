@@ -72,12 +72,12 @@ using ::testing::Return;
 * - deleteNEnt1Attr             - DELETE N entity, 1 attribute
 * - delete1EntNAttr             - DELETE 1 entity, N attributes
 * - deleteNEntNAttr             - DELETE N entity, N attributes
-* - entityNotfoundFail          - fail due to entity is not found
+* - createEntity                - a non-existing entity is created
 * - updateEmptyValueFail        - fail due to UPDATE with empty attribute value
 * - appendEmptyValueFail        - fail due to APPEND with empty attribute value
 * - updateAttrNotFoundFail      - fail due to UPDATE in not existing attribute
 * - deleteAttrNotFoundFail      - fail due to DELETE on not existing attribute
-* - mixSuccessAndFail           - mixing a sucessfull and failing operation in same request
+* - mixUpdateAndCreate          - mixing a regular update (on an existing entity) and entity creation in same request
 * - appendExistingAttr          - treated as UPDATE
 *
 * (N=2 without lost of generality)
@@ -4259,9 +4259,9 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
 
 /* ****************************************************************************
 *
-* entityNotfoundFail -
+* createEntity -
 */
-TEST(mongoUpdateContextRequest, entityNotfoundFail)
+TEST(mongoUpdateContextRequest, createEntity)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -4298,11 +4298,14 @@ TEST(mongoUpdateContextRequest, entityNotfoundFail)
     /* Context Element response # 1 */
     EXPECT_EQ("E4", RES_CER(0).entityId.id);
     EXPECT_EQ("T4", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    EXPECT_EQ(0, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
-    EXPECT_EQ("Entity not found", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("entity: (E4, T4, false)", RES_CER_STATUS(0).details);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);    
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -4313,7 +4316,7 @@ TEST(mongoUpdateContextRequest, entityNotfoundFail)
     /* entities collection */
     BSONObj ent;
     std::vector<BSONElement> attrs;
-    ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
+    ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
     EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -4386,6 +4389,18 @@ TEST(mongoUpdateContextRequest, entityNotfoundFail)
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
+    EXPECT_FALSE(a1.hasField("modDate"));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4" << "_id.type" << "T4"));
+    EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T4", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    a1 = getAttr(attrs, "A1", "TA1");
+    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
@@ -5105,9 +5120,9 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
 
 /* ****************************************************************************
 *
-* mixSuccessAndFail -
+* mixUpdateAndCreate -
 */
-TEST(mongoUpdateContextRequest, mixSuccessAndFail)
+TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
@@ -5145,10 +5160,10 @@ TEST(mongoUpdateContextRequest, mixSuccessAndFail)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
-    /* Context Element response #1 (sucess) */
+    /* Context Element response #1 */
     EXPECT_EQ("E1", RES_CER(0).entityId.id);
     EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
@@ -5157,14 +5172,17 @@ TEST(mongoUpdateContextRequest, mixSuccessAndFail)
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
-    /* Context Element response #2 (fail) */
+    /* Context Element response #2 (create) */
     EXPECT_EQ("E5", RES_CER(1).entityId.id);
     EXPECT_EQ("T5", RES_CER(1).entityId.type);
     EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    EXPECT_EQ(0, RES_CER(1).contextAttributeVector.size());
-    EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(1).code);
-    EXPECT_EQ("Entity not found", RES_CER_STATUS(1).reasonPhrase);
-    EXPECT_EQ("entity: (E5, T5, false)", RES_CER_STATUS(1).details);
+    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("A3", RES_CER_ATTR(1, 0)->name);
+    EXPECT_EQ("TA3", RES_CER_ATTR(1, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(1, 0)->value.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -5175,7 +5193,7 @@ TEST(mongoUpdateContextRequest, mixSuccessAndFail)
     /* entities collection */
     BSONObj ent;
     std::vector<BSONElement> attrs;
-    ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
+    ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
     EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -5249,6 +5267,18 @@ TEST(mongoUpdateContextRequest, mixSuccessAndFail)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E5" << "_id.type" << "T5"));
+    EXPECT_STREQ("E5", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T5", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    a3 = getAttr(attrs, "A3", "TA3");
+    EXPECT_STREQ("A3", C_STR_FIELD(a3, "name"));
+    EXPECT_STREQ("TA3",C_STR_FIELD(a3, "type"));
+    EXPECT_STREQ("new_val13", C_STR_FIELD(a3, "value"));
+    EXPECT_FALSE(a3.hasField("modDate"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));

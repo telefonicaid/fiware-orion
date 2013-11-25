@@ -560,7 +560,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     DBClientConnection* connection = getMongoConnection();
 
     /* Getting the entity in the request (helpful in other places) */
-    EntityId en = ceP->entityId;
+    EntityId en = ceP->entityId;    
 
     /* Not supporting isPattern = true currently */
     if (isTrue(en.isPattern)) {
@@ -705,7 +705,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         std::string err;
         processSubscriptions(en, &subsToNotify, &err);
 
-        /* To finish with this entity processing, add the correspoinding ContextElementResponse to
+        /* To finish with this entity processing, add the corresponding ContextElementResponse to
          * the global response */
         cerP->statusCode.fill(SccOk, "OK");
         responseP->contextElementResponseVector.push_back(cerP);
@@ -731,6 +731,24 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             std::string err;
             if (!createEntity(en, ceP->contextAttributeVector, &err)) {
                 buildGeneralErrorReponse(ceP, NULL, responseP, SccReceiverInternalError, "Database Error", err);
+            }
+           else {
+                /* Sucesfull creation: creating corresponding ContextElementResponse */
+                ContextElementResponse* cerP = new ContextElementResponse();
+                cerP->contextElement.entityId.id = en.id;
+                cerP->contextElement.entityId.type = en.type;
+                cerP->contextElement.entityId.isPattern = "false";
+
+                for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
+                    ContextAttribute* ca = new ContextAttribute();
+                    ca->name = ceP->contextAttributeVector.get(ix)->name;
+                    ca->type = ceP->contextAttributeVector.get(ix)->type;
+                    cerP->contextElement.contextAttributeVector.push_back(ca);
+                }
+
+                cerP->statusCode.fill(SccOk, "OK");
+                responseP->contextElementResponseVector.push_back(cerP);
+
             }
         }
 
