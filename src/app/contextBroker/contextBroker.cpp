@@ -81,6 +81,7 @@
 #include "serviceRoutines/getEntityByIdAttributeByName.h"
 #include "serviceRoutines/postEntityByIdAttributeByName.h"
 #include "serviceRoutines/getContextEntityTypes.h"
+#include "serviceRoutines/postContextEntityTypes.h"
 #include "serviceRoutines/getIndividualContextEntity.h"
 #include "serviceRoutines/putIndividualContextEntity.h"
 #include "serviceRoutines/badVerbPostOnly.h"
@@ -204,7 +205,7 @@ RestService restServiceV[] =
   // NGSI-9 Convenience operations
   { "GET ContextEntitiesByEntityId",              "GET",    ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                      }, "",                                             getContextEntitiesByEntityId              },
   { "POST ContextEntitiesByEntityId",             "POST",   ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                      }, "registerProviderRequest",                      postContextEntitiesByEntityId             },
-  { "* ContextEntitiesByEntityId",                "*",      ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                      }, "",                                             badVerbGetPostOnly                        },
+  { "* ContextEntitiesByEntityId",                "*",      ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                      }, "",                                             badVerbGetOnly                            },
 
   { "GET ContextEntityAttributes",                "GET",    ContextEntityAttributes,               4, { "ngsi9", "contextEntities", "*", "attributes"        }, "",                                             getContextEntityAttributes                },
   { "POST ContextEntityAttributes",               "POST",   ContextEntityAttributes,               4, { "ngsi9", "contextEntities", "*", "attributes"        }, "registerProviderRequest",                      postContextEntityAttributes               },
@@ -215,7 +216,8 @@ RestService restServiceV[] =
   { "* EntityByIdAttributeByName",                "*",      EntityByIdAttributeByName,             5, { "ngsi9", "contextEntities", "*", "attributes", "*"   }, "",                                             badVerbGetPostOnly                        },
 
   { "GET ContextEntityTypes",                     "GET",    ContextEntityTypes,                    3, { "ngsi9", "contextEntityTypes", "*"                   }, "",                                             getContextEntityTypes                     },
-  { "* ContextEntityTypes",                       "*",      ContextEntityTypes,                    3, { "ngsi9", "contextEntityTypes", "*"                   }, "",                                             badVerbGetPostOnly                        },
+  { "POST ContextEntityTypes",                    "POST",   ContextEntityTypes,                    3, { "ngsi9", "contextEntityTypes", "*"                   }, "",                                             postContextEntityTypes                    },
+  { "* ContextEntityTypes",                       "*",      ContextEntityTypes,                    3, { "ngsi9", "contextEntityTypes", "*"                   }, "",                                             badVerbGetOnly                            },
    
   // NGSI-10 Convenience operations
   { "GET IndividualContextEntity",                "GET",    IndividualContextEntity,               3, { "ngsi10", "contextEntities", "*"                     }, "",                                             getIndividualContextEntity                },
