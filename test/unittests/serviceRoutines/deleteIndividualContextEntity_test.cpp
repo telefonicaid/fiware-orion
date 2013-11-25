@@ -52,7 +52,7 @@ static RestService rs[] =
 TEST(deleteIndividualContextEntity, notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity701",  "DELETE", "1.1");
-  std::string    expected = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>Entity not found</reasonPhrase>\n  <details>entity: (entity701, , false)</details>\n</statusCode>\n";
+  std::string    expected = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>DELETE cannot be used to create new entities</reasonPhrase>\n</statusCode>\n";
   std::string    out      = restService(&ci, rs);
 
   LM_M(("out: '%s'", out.c_str()));

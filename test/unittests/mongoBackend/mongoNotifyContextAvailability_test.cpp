@@ -123,14 +123,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok)
   std::vector<BSONElement> attrs = contextRegistration.getField("attrs").Array();
   EXPECT_EQ(0, attrs.size());
 
-  /* entities collection: */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-  EXPECT_EQ(0, ent.getField("attrs").Array().size());
-
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk, res.responseCode.code);
@@ -206,14 +198,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_At0_Ok)
 
   std::vector<BSONElement> attrs = contextRegistration.getField("attrs").Array();
   EXPECT_EQ(0, attrs.size());
-
-  /* entities collection: */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-  EXPECT_EQ(0, ent.getField("attrs").Array().size());
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -303,21 +287,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtN_Ok)
   EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
   EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-  /* entities collection: */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-  std::vector<BSONElement> entAttrs = ent.getField("attrs").Array();
-  ASSERT_EQ(2, entAttrs.size());
-  BSONObj eattr0 = entAttrs[0].embeddedObject();
-  BSONObj eattr1 = entAttrs[1].embeddedObject();
-  EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-  EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-  EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-  EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk, res.responseCode.code);
@@ -405,21 +374,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtNnt_Ok)
   EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
   EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
   EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
-
-  /* entities collection: */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-  std::vector<BSONElement> entAttrs = ent.getField("attrs").Array();
-  ASSERT_EQ(2, entAttrs.size());
-  BSONObj eattr0 = entAttrs[0].embeddedObject();
-  BSONObj eattr1 = entAttrs[1].embeddedObject();
-  EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-  EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-  EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-  EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -509,21 +463,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtN_Ok)
   EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
   EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-  /* entities collection: */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-  std::vector<BSONElement> entAttrs = ent.getField("attrs").Array();
-  ASSERT_EQ(2, entAttrs.size());
-  BSONObj eattr0 = entAttrs[0].embeddedObject();
-  BSONObj eattr1 = entAttrs[1].embeddedObject();
-  EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-  EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-  EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-  EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk, res.responseCode.code);
@@ -612,21 +551,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
   EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
   EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-  /* entities collection: */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-  std::vector<BSONElement> entAttrs = ent.getField("attrs").Array();
-  ASSERT_EQ(2, entAttrs.size());
-  BSONObj eattr0 = entAttrs[0].embeddedObject();
-  BSONObj eattr1 = entAttrs[1].embeddedObject();
-  EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-  EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-  EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-  EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk, res.responseCode.code);
@@ -708,20 +632,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_At0_Ok)
     std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();
     EXPECT_EQ(0, regAttrs.size());
 
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-
-    BSONObj ent;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(0, ent.getField("attrs").Array().size());
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(0, ent.getField("attrs").Array().size());
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccOk, res.responseCode.code);
@@ -802,20 +712,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_At0_Ok)
 
     std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();
     EXPECT_EQ(0, regAttrs.size());
-
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-
-    BSONObj ent;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(0, ent.getField("attrs").Array().size());
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(0, ent.getField("attrs").Array().size());
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -910,35 +806,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtN_Ok)
     EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccOk, res.responseCode.code);
@@ -1031,35 +898,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtNnt_Ok)
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
-
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1154,35 +992,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtN_Ok)
     EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccOk, res.responseCode.code);
@@ -1276,35 +1085,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtNnt_Ok)
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccOk, res.responseCode.code);
@@ -1396,18 +1176,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_At0_Ok)
     attrs = contextRegistration.getField("attrs").Array();
     EXPECT_EQ(0, attrs.size());
 
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(0, ent.getField("attrs").Array().size());
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(0, ent.getField("attrs").Array().size());
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccOk, res.responseCode.code);
@@ -1498,18 +1266,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_At0_Ok)
     EXPECT_FALSE(ent0.hasField("type"));
     attrs = contextRegistration.getField("attrs").Array();
     EXPECT_EQ(0, attrs.size());
-
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(0, ent.getField("attrs").Array().size());
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(0, ent.getField("attrs").Array().size());
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1627,34 +1383,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtN_Ok)
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccOk, res.responseCode.code);
@@ -1770,34 +1498,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtNnt_Ok)
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
-
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1915,34 +1615,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtN_Ok)
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccOk, res.responseCode.code);
@@ -2059,34 +1731,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtNnt_Ok)
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccOk, res.responseCode.code);
@@ -2189,35 +1833,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_At0_Ok)
     regAttrs = contextRegistration.getField("attrs").Array();
     EXPECT_EQ(0, regAttrs.size());
 
-    /* entities collection: */
-    ASSERT_EQ(4, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent;
-    std::vector<BSONElement> entAttrs;
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    EXPECT_EQ(0, entAttrs.size());
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    EXPECT_EQ(0, entAttrs.size());
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    EXPECT_EQ(0, entAttrs.size());
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4" << "_id.type" << "T4"));
-    EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T4", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    EXPECT_EQ(0, entAttrs.size());
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccOk, res.responseCode.code);
@@ -2319,35 +1934,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_At0_Ok)
     EXPECT_FALSE(ent1.hasField("type"));
     regAttrs = contextRegistration.getField("attrs").Array();
     EXPECT_EQ(0, regAttrs.size());
-
-    /* entities collection: */
-    ASSERT_EQ(4, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent;
-    std::vector<BSONElement> entAttrs;
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    EXPECT_EQ(0, entAttrs.size());
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    EXPECT_EQ(0, entAttrs.size());
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    EXPECT_EQ(0, entAttrs.size());
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4"));
-    EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    EXPECT_EQ(0, entAttrs.size());
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2475,59 +2061,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtN_Ok)
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(4, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4" << "_id.type" << "T4"));
-    EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T4", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccOk, res.responseCode.code);
@@ -2653,59 +2186,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtNnt_Ok)
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
-
-    /* entities collection: */
-    ASSERT_EQ(4, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4" << "_id.type" << "T4"));
-    EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T4", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2833,59 +2313,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtN_Ok)
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(4, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4"));
-    EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccOk, res.responseCode.code);
@@ -3011,59 +2438,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtNnt_Ok)
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
-
-    /* entities collection: */
-    ASSERT_EQ(4, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4"));
-    EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

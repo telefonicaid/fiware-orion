@@ -721,9 +721,15 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                                  std::string("entity: (") + en.id + ", " + en.type + ", " + en.isPattern + ")");
 #endif
 
-        std::string err;
-        if (!createEntity(en, ceP->contextAttributeVector, &err)) {
-            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, "DatabaseError", err);
+        if (strcasecmp(action.c_str(), "delete") == 0) {
+            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound,
+                                     "DELETE cannot be used to create new entities");
+        }
+        else {
+            std::string err;
+            if (!createEntity(en, ceP->contextAttributeVector, &err)) {
+                buildGeneralErrorReponse(ceP, NULL, responseP, SccReceiverInternalError, "Database Error", err);
+            }
         }
 
     }

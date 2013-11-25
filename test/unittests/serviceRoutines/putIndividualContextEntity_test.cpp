@@ -26,12 +26,18 @@
 
 #include "logMsg/logMsg.h"
 
+#include "common/globals.h"
+
 #include "serviceRoutines/putIndividualContextEntity.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
 #include "testDataFromFile.h"
 
+#include "commonMocks.h"
+
+using ::testing::Throw;
+using ::testing::Return;
 
 
 /* ****************************************************************************
@@ -59,6 +65,11 @@ TEST(putIndividualContextEntity, ok)
   std::string    out;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+
+  TimerMock* timerMock = new TimerMock();
+  ON_CALL(*timerMock, getCurrentTime())
+          .WillByDefault(Return(1360232700));
+  setTimer(timerMock);
 
   ci.outFormat    = XML;
   ci.inFormat     = XML;

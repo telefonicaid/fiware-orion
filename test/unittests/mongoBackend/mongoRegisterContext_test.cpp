@@ -54,15 +54,12 @@ using ::testing::Return;
 * For the ok test, we will use tests that combine the following possibilities of request,
 * using the following naming: ce<X>_En<Y>[nt]_At[nt]<Z>_Ok
 *
-* - ContextRegistraitonElements: 1 or N
+* - ContextRegistrationElements: 1 or N
 * - Entities: 1 or N, the "nt" sufix mean that the entity/entities has/have no type
-* - Attributes: 0 or N, the "nt" sufix mean that the attribute/attributess has/have no type
+* - Attributes: 0 or N, the "nt" sufix mean that the attribute/attributes has/have no type
 * - ContextRegistrationAttributes: 0 or N
 *
 * (Without lost of generality in our tests N=2)
-*
-* In addition to these 24 tests, there are  4 tests that check cases when there are documents in the
-* entities collection that match with the registration (prefixed with "pre")
 *
 * In addition, we include some tests to check of notify context availability triggering upon
 * creation of context registration:
@@ -185,15 +182,6 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok)
   std::vector<BSONElement> attrs = contextRegistration.getField("attrs").Array();
   EXPECT_EQ(0, attrs.size());
 
-  /* entities collection: */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-  EXPECT_EQ(0, ent.getField("attrs").Array().size());
-  EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ("PT1M", res.duration.get());
@@ -271,15 +259,6 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_At0_Ok)
 
   std::vector<BSONElement> attrs = contextRegistration.getField("attrs").Array();
   EXPECT_EQ(0, attrs.size());
-
-  /* entities collection: */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-  EXPECT_EQ(0, ent.getField("attrs").Array().size());
-  EXPECT_EQ(1360232700, ent.getIntField("creDate"));
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -371,22 +350,6 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtN_Ok)
   EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
   EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-  /* entities collection: */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-  EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-  std::vector<BSONElement> entAttrs = ent.getField("attrs").Array();
-  ASSERT_EQ(2, entAttrs.size());
-  BSONObj eattr0 = entAttrs[0].embeddedObject();
-  BSONObj eattr1 = entAttrs[1].embeddedObject();
-  EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-  EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-  EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-  EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ("PT1M", res.duration.get());
@@ -476,22 +439,6 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtNnt_Ok)
   EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
   EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
   EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
-
-  /* entities collection: */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-  EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-  std::vector<BSONElement> entAttrs = ent.getField("attrs").Array();
-  ASSERT_EQ(2, entAttrs.size());
-  BSONObj eattr0 = entAttrs[0].embeddedObject();
-  BSONObj eattr1 = entAttrs[1].embeddedObject();
-  EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-  EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-  EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-  EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -583,30 +530,6 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtN_Ok)
   EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
   EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-  /* db.csubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1}): */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-  EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-  std::vector<BSONElement> entAttrs = ent.getField("attrs").Array();
-  ASSERT_EQ(2, entAttrs.size());
-  BSONObj eattr0 = entAttrs[0].embeddedObject();
-  BSONObj eattr1 = entAttrs[1].embeddedObject();
-  EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-  EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-  EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-  EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_EQ(oid, res.registrationId.get());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
   /* Release connection */
   mongoDisconnect();
 
@@ -688,22 +611,6 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtNnt_Ok)
   EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
   EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
   EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
-
-  /* entities collection: */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-  EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-  std::vector<BSONElement> entAttrs = ent.getField("attrs").Array();
-  ASSERT_EQ(2, entAttrs.size());
-  BSONObj eattr0 = entAttrs[0].embeddedObject();
-  BSONObj eattr1 = entAttrs[1].embeddedObject();
-  EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-  EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-  EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-  EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -788,22 +695,6 @@ TEST(mongoRegisterContextRequest, ce1_EnN_At0_Ok)
     std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();    
     EXPECT_EQ(0, regAttrs.size());
 
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-
-    BSONObj ent;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(0, ent.getField("attrs").Array().size());
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(0, ent.getField("attrs").Array().size());
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT1M", res.duration.get());
@@ -886,22 +777,6 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_At0_Ok)
 
     std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();
     EXPECT_EQ(0, regAttrs.size());
-
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-
-    BSONObj ent;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(0, ent.getField("attrs").Array().size());
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(0, ent.getField("attrs").Array().size());
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -999,37 +874,6 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtN_Ok)
     EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT1M", res.duration.get());
@@ -1125,37 +969,6 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtNnt_Ok)
     EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
-
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1253,37 +1066,6 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtN_Ok)
     EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT1M", res.duration.get());
@@ -1380,37 +1162,6 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtNnt_Ok)
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT1M", res.duration.get());
@@ -1503,20 +1254,6 @@ TEST(mongoRegisterContextRequest, ceN_En1_At0_Ok)
     attrs = contextRegistration.getField("attrs").Array();
     EXPECT_EQ(0, attrs.size());
 
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    EXPECT_EQ(0, ent.getField("attrs").Array().size());
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    EXPECT_EQ(0, ent.getField("attrs").Array().size());
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT1M", res.duration.get());
@@ -1608,20 +1345,6 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_At0_Ok)
     EXPECT_FALSE(ent0.hasField("type"));
     attrs = contextRegistration.getField("attrs").Array();
     EXPECT_EQ(0, attrs.size());
-
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    EXPECT_EQ(0, ent.getField("attrs").Array().size());
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    EXPECT_EQ(0, ent.getField("attrs").Array().size());
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1740,36 +1463,6 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtN_Ok)
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT1M", res.duration.get());
@@ -1887,36 +1580,6 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtNnt_Ok)
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT1M", res.duration.get());
@@ -2032,37 +1695,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtN_Ok)
     EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
-    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
-
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(eattr1, "type"));
+    EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));;
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2181,36 +1814,6 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtNnt_Ok)
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT1M", res.duration.get());
@@ -2314,39 +1917,6 @@ TEST(mongoRegisterContextRequest, ceN_EnN_At0_Ok)
     regAttrs = contextRegistration.getField("attrs").Array();
     EXPECT_EQ(0, regAttrs.size());
 
-    /* entities collection: */
-    ASSERT_EQ(4, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent;
-    std::vector<BSONElement> entAttrs;
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    EXPECT_EQ(0, entAttrs.size());
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    EXPECT_EQ(0, entAttrs.size());
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    EXPECT_EQ(0, entAttrs.size());
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4" << "_id.type" << "T4"));
-    EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T4", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    EXPECT_EQ(0, entAttrs.size());
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT1M", res.duration.get());
@@ -2449,39 +2019,6 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_At0_Ok)
     EXPECT_FALSE(ent1.hasField("type"));
     regAttrs = contextRegistration.getField("attrs").Array();
     EXPECT_EQ(0, regAttrs.size());
-
-    /* entities collection: */
-    ASSERT_EQ(4, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent;
-    std::vector<BSONElement> entAttrs;
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    EXPECT_EQ(0, entAttrs.size());
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    EXPECT_EQ(0, entAttrs.size());
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    EXPECT_EQ(0, entAttrs.size());
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4"));
-    EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    EXPECT_EQ(0, entAttrs.size());
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2610,63 +2147,6 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtN_Ok)
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(4, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4" << "_id.type" << "T4"));
-    EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T4", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT1M", res.duration.get());
@@ -2793,63 +2273,6 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtNnt_Ok)
     EXPECT_STREQ("A4", C_STR_FIELD(rattr1, "name"));
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
-
-    /* entities collection: */
-    ASSERT_EQ(4, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4" << "_id.type" << "T4"));
-    EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T4", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2978,63 +2401,6 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtN_Ok)
     EXPECT_STREQ("TA4", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(4, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4"));
-    EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT1M", res.duration.get());
@@ -3162,63 +2528,6 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtNnt_Ok)
     EXPECT_STREQ("", C_STR_FIELD(rattr1, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
-    /* entities collection: */
-    ASSERT_EQ(4, connection->count(ENTITIES_COLL, BSONObj()));
-    BSONObj ent, eattr0, eattr1;
-    std::vector<BSONElement> entAttrs;
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4"));
-    EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
-    entAttrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, entAttrs.size());
-    eattr0 = entAttrs[0].embeddedObject();
-    eattr1 = entAttrs[1].embeddedObject();
-    EXPECT_STREQ("A3", C_STR_FIELD(eattr0, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr0, "type"));
-    EXPECT_STREQ("A4", C_STR_FIELD(eattr1, "name"));
-    EXPECT_STREQ("", C_STR_FIELD(eattr1, "type"));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT1M", res.duration.get());
@@ -3236,413 +2545,6 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtNnt_Ok)
 
 }
 
-/* ****************************************************************************
-*
-* preEqualRegistrationNoAttrs -
-*/
-TEST(mongoRegisterContextRequest, preEqualRegistrationNoAttrs)
-{
-  HttpStatusCode           ms;
-  RegisterContextRequest   req;
-  RegisterContextResponse  res;
-
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E1", "T1");
-  ContextRegistration cr;
-  cr.entityIdVector.push_back(&en);
-  cr.providingApplication.set("http://dummy.com");
-
-  req.contextRegistrationVector.push_back(&cr);
-  req.duration.set("PT1M");
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Set initial state in database */
-  DBClientConnection* connection = getMongoConnection();
-  connection->insert(getEntitiesCollectionName(), BSON("_id" << BSON("id" << "E1" << "type" << "T1") << "attrs" << BSONArray()));
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res);
-
-  /* Check that every involved collection at MongoDB is as expected */
-  /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-   * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-  /* registrations collection: */
-  ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
-  BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
-  EXPECT_EQ(1360232760, reg.getIntField("expiration"));
-
-  std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
-  ASSERT_EQ(1, contextRegistrationV.size());
-  BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
-
-  EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();  
-  ASSERT_EQ(1, entities.size());
-  BSONObj ent0 = entities[0].embeddedObject();
-  EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-
-  std::vector<BSONElement> attrs = contextRegistration.getField("attrs").Array();
-  EXPECT_EQ(0, attrs.size());
-
-  /* entities collection: */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-  EXPECT_EQ(0, ent.getField("attrs").Array().size());
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_EQ(oid, res.registrationId.get());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  /* Release connection */
-  mongoDisconnect();
-
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
-
-}
-
-/* ****************************************************************************
-*
-* preLessAttributesInReg -
-*/
-
-TEST(mongoRegisterContextRequest, preLessAttributesInReg)
-{
-  HttpStatusCode           ms;
-  RegisterContextRequest   req;
-  RegisterContextResponse  res;
-
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E1", "T1");
-  ContextRegistrationAttribute cra("A1", "TA1", "false");
-  ContextRegistration cr;
-  cr.entityIdVector.push_back(&en);
-  cr.contextRegistrationAttributeVector.push_back(&cra);
-  cr.providingApplication.set("http://dummy.com");
-  req.contextRegistrationVector.push_back(&cr);
-  req.duration.set("PT1M");
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Set initial state in database */
-  DBClientConnection* connection = getMongoConnection();
-  BSONArray attrs = BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1") << BSON("name" << "A2" << "type" << "TA2"));
-  connection->insert(getEntitiesCollectionName(), BSON("_id" << BSON("id" << "E1" << "type" << "T1") << "attrs" << attrs));
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res);
-
-  /* Check that every involved collection at MongoDB is as expected */
-  /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-   * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-  /* registrations collection: */
-  ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
-  BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
-  EXPECT_EQ(1360232760, reg.getIntField("expiration"));
-
-  std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
-  ASSERT_EQ(1, contextRegistrationV.size());
-  BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
-
-  EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array(); 
-  ASSERT_EQ(1, entities.size());
-  BSONObj ent0 = entities[0].embeddedObject();
-  EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-
-  std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();  
-  ASSERT_EQ(1, regAttrs.size());
-  BSONObj rattr0 = regAttrs[0].embeddedObject();
-  EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
-  EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-  EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
-
-  /* entities collection: */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-  std::vector<BSONElement> entAttrs = ent.getField("attrs").Array();
-  ASSERT_EQ(2, entAttrs.size());
-  BSONObj eattr0 = entAttrs[0].embeddedObject();
-  BSONObj eattr1 = entAttrs[1].embeddedObject();
-  EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-  EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-  EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-  EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_EQ(oid, res.registrationId.get());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  /* Release connection */
-  mongoDisconnect();
-
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
-
-}
-
-/* ****************************************************************************
-*
-* preMoreAttributesInReg -
-*/
-
-TEST(mongoRegisterContextRequest, preMoreAttributesInReg)
-{
-  HttpStatusCode           ms;
-  RegisterContextRequest   req;
-  RegisterContextResponse  res;
-
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E1", "T1");
-  ContextRegistrationAttribute cra1("A1", "TA1", "false");
-  ContextRegistrationAttribute cra2("A2", "TA2", "true");
-  ContextRegistration cr;
-  cr.entityIdVector.push_back(&en);
-  cr.contextRegistrationAttributeVector.push_back(&cra1);
-  cr.contextRegistrationAttributeVector.push_back(&cra2);
-  cr.providingApplication.set("http://dummy.com");
-  req.contextRegistrationVector.push_back(&cr);
-  req.duration.set("PT1M");
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Set initial state in database */
-  DBClientConnection* connection = getMongoConnection();
-  BSONArray attrs = BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1"));
-  connection->insert(getEntitiesCollectionName(), BSON("_id" << BSON("id" << "E1" << "type" << "T1") << "attrs" << attrs));
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res);
-
-  /* Check that every involved collection at MongoDB is as expected */
-  /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-   * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-  /* registrations collection: */
-  ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
-  BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
-  EXPECT_EQ(1360232760, reg.getIntField("expiration"));
-
-  std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
-  ASSERT_EQ(1, contextRegistrationV.size());
-  BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
-
-  EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();  
-  ASSERT_EQ(1, entities.size());
-  BSONObj ent0 = entities[0].embeddedObject();
-  EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-
-  std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();
-  ASSERT_EQ(2, regAttrs.size());
-  BSONObj rattr0 = regAttrs[0].embeddedObject();
-  BSONObj rattr1 = regAttrs[1].embeddedObject();
-  EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
-  EXPECT_STREQ("TA1", C_STR_FIELD(rattr0, "type"));
-  EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
-  EXPECT_STREQ("A2", C_STR_FIELD(rattr1, "name"));
-  EXPECT_STREQ("TA2", C_STR_FIELD(rattr1, "type"));
-  EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
-
-  /* entities collection: */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-  std::vector<BSONElement> entAttrs = ent.getField("attrs").Array();
-  ASSERT_EQ(2, entAttrs.size());
-  BSONObj eattr0 = entAttrs[0].embeddedObject();
-  BSONObj eattr1 = entAttrs[1].embeddedObject();
-  EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-  EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-  EXPECT_STREQ("A2", C_STR_FIELD(eattr1, "name"));
-  EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_EQ(oid, res.registrationId.get());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  /* Release connection */
-  mongoDisconnect();
-
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
-
-}
-
-/* ****************************************************************************
-*
-* preSameNameDifferentType -
-*/
-
-TEST(mongoRegisterContextRequest, preMoreAttributesInRegSameNameDifferentType)
-{
-  HttpStatusCode           ms;
-  RegisterContextRequest   req;
-  RegisterContextResponse  res;  
-
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Forge the request (from "inside" to "outside") */
-  EntityId en("E1", "T1");
-  ContextRegistrationAttribute cra("A1", "TA2", "false");
-  ContextRegistration cr;
-  cr.entityIdVector.push_back(&en);
-  cr.contextRegistrationAttributeVector.push_back(&cra);
-  cr.providingApplication.set("http://dummy.com");
-  req.contextRegistrationVector.push_back(&cr);
-  req.duration.set("PT1M");
-
-  /* Prepare database */
-  prepareDatabase();
-
-  /* Set initial state in database */
-  DBClientConnection* connection = getMongoConnection();
-  BSONArray attrs = BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1"));
-  connection->insert(getEntitiesCollectionName(), BSON("_id" << BSON("id" << "E1" << "type" << "T1") << "attrs" << attrs));
-
-  /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res);
-
-  /* Check that every involved collection at MongoDB is as expected */
-  /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-   * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-  /* registrations collection: */
-  ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
-  BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
-  EXPECT_EQ(1360232760, reg.getIntField("expiration"));
-
-  std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
-  ASSERT_EQ(1, contextRegistrationV.size());
-  BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
-
-  EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
-  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();  
-  ASSERT_EQ(1, entities.size());
-  BSONObj ent0 = entities[0].embeddedObject();
-  EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
-
-  std::vector<BSONElement> regAttrs = contextRegistration.getField("attrs").Array();  
-  ASSERT_EQ(1, regAttrs.size());
-  BSONObj rattr0 = regAttrs[0].embeddedObject();
-  EXPECT_STREQ("A1", C_STR_FIELD(rattr0, "name"));
-  EXPECT_STREQ("TA2", C_STR_FIELD(rattr0, "type"));
-  EXPECT_STREQ("false", C_STR_FIELD(rattr0, "isDomain"));
-
-  /* entities collection: */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-  std::vector<BSONElement> entAttrs = ent.getField("attrs").Array();
-  ASSERT_EQ(2, entAttrs.size());
-  BSONObj eattr0 = entAttrs[0].embeddedObject();
-  BSONObj eattr1 = entAttrs[1].embeddedObject();
-  EXPECT_STREQ("A1", C_STR_FIELD(eattr0, "name"));
-  EXPECT_STREQ("TA1", C_STR_FIELD(eattr0, "type"));
-  EXPECT_STREQ("A1", C_STR_FIELD(eattr1, "name"));
-  EXPECT_STREQ("TA2", C_STR_FIELD(eattr1, "type"));
-
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ("PT1M", res.duration.get());
-  EXPECT_EQ(oid, res.registrationId.get());
-  EXPECT_EQ(SccOk, res.errorCode.code);
-  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  /* Clean the collections used for the test */
-  connection->remove(ENTITIES_COLL, BSONObj());
-  connection->remove(REGISTRATIONS_COLL, BSONObj());
-
-  /* Release connection */
-  mongoDisconnect();
-
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
-
-}
 
 /* ****************************************************************************
 *
@@ -3910,14 +2812,6 @@ TEST(mongoRegisterContextRequest, defaultDuration)
   std::vector<BSONElement> attrs = contextRegistration.getField("attrs").Array();
   EXPECT_EQ(0, attrs.size());
 
-  /* entities collection: */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  BSONObj ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-  EXPECT_EQ(0, ent.getField("attrs").Array().size());
-
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ("PT24H", res.duration.get());
@@ -3935,6 +2829,8 @@ TEST(mongoRegisterContextRequest, defaultDuration)
 
 }
 
+#if 0
+// count in entities collection
 /* ****************************************************************************
 *
 * MongoDbCountFail -
@@ -4002,7 +2898,10 @@ TEST(mongoRegisterContextRequest, MongoDbCountFail)
     EXPECT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
 }
+#endif
 
+#if 0
+// count in entities collection
 /* ****************************************************************************
 *
 * MongoDbFindOneFail -
@@ -4072,7 +2971,9 @@ TEST(mongoRegisterContextRequest, MongoDbFindOneFail)
     EXPECT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
 }
+#endif
 
+#if 0
 /* ****************************************************************************
 *
 * MongoDbUpdateEntityFail -
@@ -4219,6 +3120,7 @@ TEST(mongoRegisterContextRequest, MongoDbInsertEntityFail)
     EXPECT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
 }
+#endif
 
 /* ****************************************************************************
 *
@@ -4307,6 +3209,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
 
 }
 
+#if 0
 /* ****************************************************************************
 *
 * MongoDbEntitiesInconsistency -
@@ -4373,6 +3276,7 @@ TEST(mongoRegisterContextRequest, MongoDbEntitiesInconsistency)
     EXPECT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
 }
+#endif
 
 /* ****************************************************************************
 *
