@@ -104,6 +104,8 @@ TEST(mapPutIndividualContextEntity, notFoundThenFound)
 
   ms = mapPutIndividualContextEntity("MPICE2", &request, &response);
   EXPECT_EQ(SccOk, ms);
+  // FIXME: next should be change 404 -> 200 in the case PUT is interpreted as POST in this case, but
+  // not sure...
   EXPECT_EQ(404, response.errorCode.code);
 
   // Cleanup
