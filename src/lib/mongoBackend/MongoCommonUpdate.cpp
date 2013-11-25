@@ -511,6 +511,45 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
 
 /* ****************************************************************************
 *
+* createEntity -
+*
+*/
+static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string* err) {
+
+    DBClientConnection* connection = getMongoConnection();
+
+    LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName()));
+
+    BSONArrayBuilder attrsToAdd;
+    for (unsigned int ix = 0; ix < attrsV.size(); ++ix) {
+        attrsToAdd.append(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name << ENT_ATTRS_TYPE << attrsV.get(ix)->type));
+        LM_T(LmtMongo, ("new attribute: {name: %s, type: %s}", attrsV.get(ix)->name.c_str(), attrsV.get(ix)->type.c_str()));
+    }
+    BSONObj insertedDoc;
+    if (e.type == "") {
+        insertedDoc = BSON("_id" << BSON(ENT_ENTITY_ID << e.id) << ENT_ATTRS << attrsToAdd.arr() << ENT_CREATION_DATE << getCurrentTime());
+    }
+    else {
+        insertedDoc = BSON("_id" << BSON(ENT_ENTITY_ID << e.id << ENT_ENTITY_TYPE << e.type) << ENT_ATTRS << attrsToAdd.arr() << ENT_CREATION_DATE << getCurrentTime());
+    }
+    try {
+        LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getEntitiesCollectionName(), insertedDoc.toString().c_str()));
+        connection->insert(getEntitiesCollectionName(), insertedDoc);
+    }
+    catch( const DBException &e ) {
+        *err = std::string("collection: ") + getEntitiesCollectionName() +
+                " - insert(): " + insertedDoc.toString() +
+                " - exception: " + e.what();
+
+        return false;
+    }
+
+    return true;
+
+}
+
+/* ****************************************************************************
+*
 * processContextElement -
 *
 */
@@ -671,13 +710,22 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
     }
 
-    /* Alternativelly, we could do a count() before the query() to check this and early return. However
-     * this would add a sencond interaction with MongoDB */
+    /* If the entity didn't already exist, we create it. Note that alternativelly, we could do a count()
+     * before the query() to check this and early return. However this would add a sencond interaction with MongoDB */
     if (!atLeastOneResult) {
+
+#if 0
         buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound,
                                  "Entity not found",
                                  // FIXME: use toString once EntityID becomes objects
                                  std::string("entity: (") + en.id + ", " + en.type + ", " + en.isPattern + ")");
+#endif
+
+        std::string err;
+        if (!createEntity(en, ceP->contextAttributeVector, &err)) {
+            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, "DatabaseError", err);
+        }
+
     }
 
 }
