@@ -522,7 +522,9 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
 
     BSONArrayBuilder attrsToAdd;
     for (unsigned int ix = 0; ix < attrsV.size(); ++ix) {
-        attrsToAdd.append(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name << ENT_ATTRS_TYPE << attrsV.get(ix)->type));
+        attrsToAdd.append(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
+                               ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
+                               ENT_ATTRS_VALUE << attrsV.get(ix)->value));
         LM_T(LmtMongo, ("new attribute: {name: %s, type: %s}", attrsV.get(ix)->name.c_str(), attrsV.get(ix)->type.c_str()));
     }
     BSONObj insertedDoc;
