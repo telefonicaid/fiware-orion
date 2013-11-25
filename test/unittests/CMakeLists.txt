@@ -67,6 +67,7 @@ SET (SOURCES
     serviceRoutines/deleteIndividualContextEntityAttributes_test.cpp
     serviceRoutines/getContextEntitiesByEntityId_test.cpp
     serviceRoutines/getEntityByIdAttributeByName_test.cpp
+    serviceRoutines/getContextEntityTypes_test.cpp
     serviceRoutines/getIndividualContextEntity_test.cpp
     serviceRoutines/getContextEntityAttributes_test.cpp
     serviceRoutines/getIndividualContextEntityAttribute_test.cpp

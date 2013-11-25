@@ -1,6 +1,3 @@
-#ifndef UPDATE_CONTEXT_ELEMENT_REQUEST_H
-#define UPDATE_CONTEXT_ELEMENT_REQUEST_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -28,27 +25,30 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
-#include "ngsi/AttributeDomainName.h"
-#include "ngsi/ContextAttributeVector.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
+#include "convenienceMap/mapGetContextEntityTypes.h"
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
+#include "serviceRoutines/getContextEntityTypes.h"
 
 
 
 /* ****************************************************************************
 *
-* UpdateContextElementRequest - 
+* getContextEntityTypes - 
 */
-typedef struct UpdateContextElementRequest
+std::string getContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
-  AttributeDomainName        attributeDomainName;        // Optional
-  ContextAttributeVector     contextAttributeVector;     // Optional
-  MetadataVector             domainMetadataVector;       // Optional
+  std::string                          typeName     = compV[2];
+  std::string                          answer;
+  DiscoverContextAvailabilityResponse  response;
 
-  std::string render(Format format, std::string indent);
-  std::string check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void        present(std::string indent);
-  void        release(void);
-} UpdateContextElementRequest;
-
-#endif
+  LM_T(LmtConvenience, ("CONVENIENCE: got a  'GET' request for entity type '%s'", typeName.c_str()));
+  ciP->httpStatusCode = mapGetContextEntityTypes(typeName, &response);
+  answer = response.render(DiscoverContextAvailability, ciP->outFormat, "");
+  response.release();
+  
+  return answer;
+}

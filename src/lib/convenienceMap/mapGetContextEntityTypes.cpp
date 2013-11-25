@@ -1,6 +1,3 @@
-#ifndef UPDATE_CONTEXT_ELEMENT_REQUEST_H
-#define UPDATE_CONTEXT_ELEMENT_REQUEST_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -26,29 +23,27 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <vector>
 
-#include "common/Format.h"
-#include "ngsi/AttributeDomainName.h"
-#include "ngsi/ContextAttributeVector.h"
+#include "logMsg/logMsg.h"
 
+#include "convenienceMap/mapGetContextEntityTypes.h"
+#include "mongoBackend/mongoDiscoverContextAvailability.h"
+#include "ngsi/StatusCode.h"
+#include "ngsi9/DiscoverContextAvailabilityRequest.h"
+#include "ngsi9/DiscoverContextAvailabilityResponse.h"
+#include "rest/HttpStatusCode.h"
 
 
 
 /* ****************************************************************************
 *
-* UpdateContextElementRequest - 
+* mapGetContextEntityTypes - 
 */
-typedef struct UpdateContextElementRequest
+HttpStatusCode mapGetContextEntityTypes(std::string typeName, DiscoverContextAvailabilityResponse* response)
 {
-  AttributeDomainName        attributeDomainName;        // Optional
-  ContextAttributeVector     contextAttributeVector;     // Optional
-  MetadataVector             domainMetadataVector;       // Optional
+  DiscoverContextAvailabilityRequest  request;
+  EntityId                            entityId(".*", typeName, "true");
 
-  std::string render(Format format, std::string indent);
-  std::string check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void        present(std::string indent);
-  void        release(void);
-} UpdateContextElementRequest;
-
-#endif
+  request.entityIdVector.push_back(&entityId);
+  return mongoDiscoverContextAvailability(&request, response);
+}

@@ -1,5 +1,5 @@
-#ifndef UPDATE_CONTEXT_ELEMENT_REQUEST_H
-#define UPDATE_CONTEXT_ELEMENT_REQUEST_H
+#ifndef MAP_GET_CONTEXT_ENTITIES_BY_ENTITY_ID_H
+#define MAP_GET_CONTEXT_ENTITIES_BY_ENTITY_ID_H
 
 /*
 *
@@ -26,29 +26,16 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <vector>
 
-#include "common/Format.h"
-#include "ngsi/AttributeDomainName.h"
-#include "ngsi/ContextAttributeVector.h"
-
+#include "rest/HttpStatusCode.h"
+#include "ngsi9/DiscoverContextAvailabilityResponse.h"
 
 
 
 /* ****************************************************************************
 *
-* UpdateContextElementRequest - 
+* mapGetContextEntityTypes - 
 */
-typedef struct UpdateContextElementRequest
-{
-  AttributeDomainName        attributeDomainName;        // Optional
-  ContextAttributeVector     contextAttributeVector;     // Optional
-  MetadataVector             domainMetadataVector;       // Optional
-
-  std::string render(Format format, std::string indent);
-  std::string check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void        present(std::string indent);
-  void        release(void);
-} UpdateContextElementRequest;
+extern HttpStatusCode mapGetContextEntityTypes(std::string typeName, DiscoverContextAvailabilityResponse* response);
 
 #endif
