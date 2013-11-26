@@ -81,6 +81,7 @@
 #include "serviceRoutines/getEntityByIdAttributeByName.h"
 #include "serviceRoutines/postEntityByIdAttributeByName.h"
 #include "serviceRoutines/getContextEntityTypes.h"
+#include "serviceRoutines/postContextEntityTypes.h"
 #include "serviceRoutines/getIndividualContextEntity.h"
 #include "serviceRoutines/putIndividualContextEntity.h"
 #include "serviceRoutines/badVerbPostOnly.h"
@@ -215,6 +216,7 @@ RestService restServiceV[] =
   { "* EntityByIdAttributeByName",                "*",      EntityByIdAttributeByName,             5, { "ngsi9", "contextEntities", "*", "attributes", "*"   }, "",                                             badVerbGetPostOnly                        },
 
   { "GET ContextEntityTypes",                     "GET",    ContextEntityTypes,                    3, { "ngsi9", "contextEntityTypes", "*"                   }, "",                                             getContextEntityTypes                     },
+  { "POST ContextEntityTypes",                    "POST",   ContextEntityTypes,                    3, { "ngsi9", "contextEntityTypes", "*"                   }, "",                                             postContextEntityTypes                    },
   { "* ContextEntityTypes",                       "*",      ContextEntityTypes,                    3, { "ngsi9", "contextEntityTypes", "*"                   }, "",                                             badVerbGetPostOnly                        },
    
   // NGSI-10 Convenience operations

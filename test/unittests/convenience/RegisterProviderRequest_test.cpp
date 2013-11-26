@@ -84,7 +84,7 @@ TEST(RegisterProviderRequest, xml_ok)
   result = xmlTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, "registerProviderRequest", NULL);
   EXPECT_EQ("OK", result);
   rendered = reqData.rpr.res.render(XML, "");
-  expected = "<registerProviderRequest>\n  <registrationMetadata>\n    <contextMetadata>\n      <name>ID</name>\n      <type>string</type>\n      <value>1110</value>\n    </contextMetadata>\n    <contextMetadata>\n      <name>cm2</name>\n      <type>string</type>\n      <value>XXX</value>\n    </contextMetadata>\n  </registrationMetadata>\n  <duration>PT1S</duration>\n  <providingApplication>http://kz.tid.es/abc</providingApplication>\n  <registrationId>001122334455667788991234</registrationId>\n</registerProviderRequest>\n";  
+  expected = "<registerProviderRequest>\n  <registrationMetadata>\n    <contextMetadata>\n      <name>ID</name>\n      <type>string</type>\n      <value>1110</value>\n    </contextMetadata>\n    <contextMetadata>\n      <name>cm2</name>\n      <type>string</type>\n      <value>XXX</value>\n    </contextMetadata>\n  </registrationMetadata>\n  <duration>PT1S</duration>\n  <providingApplication>http://kz.tid.es/abc</providingApplication>\n  <registrationId>001122334455667788991234</registrationId>\n</registerProviderRequest>\n";
   EXPECT_EQ(expected, rendered);
 
 }
