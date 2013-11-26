@@ -60,46 +60,51 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}" 
+curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}" 
 echo "1: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "2: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI9/subscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curl localhost:${BROKER_PORT}/NGSI9/subscribeContextAvailability -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "3: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI9/updateContextAvailabilitySubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}" 
+curl localhost:${BROKER_PORT}/NGSI9/updateContextAvailabilitySubscription -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}" 
 echo "4: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI9/unsubscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curl localhost:${BROKER_PORT}/NGSI9/unsubscribeContextAvailability -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "5: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "6: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "7: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "8: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI10/updateContextSubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curl localhost:${BROKER_PORT}/NGSI10/updateContextSubscription -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "9: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "10: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI9/notSupportedRequest -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curl localhost:${BROKER_PORT}/NGSI9/notSupportedRequest -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "11: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI10/notSupportedRequest -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curl localhost:${BROKER_PORT}/NGSI10/notSupportedRequest -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "12: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/notSupportedRequest -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curl localhost:${BROKER_PORT}/notSupportedRequest -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
 echo "13: ++++++++++++++++++++"
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 101
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "errorCode" : {
     "code" : "400",
@@ -107,6 +112,11 @@ echo "13: ++++++++++++++++++++"
   }
 }
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "errorCode" : {
     "code" : "404",
@@ -114,6 +124,11 @@ echo "13: ++++++++++++++++++++"
   }
 }
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 124
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "subscriptionId" : "No Subscription ID",
   "errorCode" : {
@@ -122,6 +137,11 @@ echo "13: ++++++++++++++++++++"
   }
 }
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 124
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "subscriptionId" : "No Subscription ID",
   "errorCode" : {
@@ -130,6 +150,11 @@ echo "13: ++++++++++++++++++++"
   }
 }
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 136
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "subscriptionId" : "No Subscription ID",
   "statusCode" : {
@@ -138,6 +163,11 @@ echo "13: ++++++++++++++++++++"
   }
 }
 5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 81
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "errorCode" : {
     "code" : "400",
@@ -145,6 +175,11 @@ echo "13: ++++++++++++++++++++"
   }
 }
 6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 125
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "errorCode" : {
     "code" : "400",
@@ -153,6 +188,11 @@ echo "13: ++++++++++++++++++++"
   }
 }
 7: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 153
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "subscribeError" : {
     "errorCode" : {
@@ -163,6 +203,11 @@ echo "13: ++++++++++++++++++++"
   }
 }
 8: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 172
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "subscribeError" : {
     "subscriptionId" : "No Subscription ID",
@@ -173,6 +218,11 @@ echo "13: ++++++++++++++++++++"
   }
 }
 9: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 136
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "subscriptionId" : "No Subscription ID",
   "statusCode" : {
@@ -181,18 +231,33 @@ echo "13: ++++++++++++++++++++"
   }
 }
 10: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 181
+Content-Type: application/json
+Date: REGEX(.*)
+
 "orionError" : {
   "code" : "400",
   "reasonPhrase" : "no request treating object found",
   "details" : "Sorry, no request treating object found for RequestType 'InvalidRequest'"
 }
 11: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 181
+Content-Type: application/json
+Date: REGEX(.*)
+
 "orionError" : {
   "code" : "400",
   "reasonPhrase" : "no request treating object found",
   "details" : "Sorry, no request treating object found for RequestType 'InvalidRequest'"
 }
 12: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 181
+Content-Type: application/json
+Date: REGEX(.*)
+
 "orionError" : {
   "code" : "400",
   "reasonPhrase" : "no request treating object found",

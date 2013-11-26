@@ -61,7 +61,7 @@ fi
 
 --SHELL--
 echo "1: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI10/notifyContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X GET -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI10/notifyContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -X GET -d @- ) << EOF
 {
 	"subscriptionId": "012345678901234567890123",
 	"originator": "http://localhost/test",
@@ -130,17 +130,14 @@ echo "1: ***********************************"
 	]
 }
 EOF
-echo "2: ***********************************"
 --REGEXPECT--
 1: ***********************************
-"notifyContextResponse" : {
-  "statusCode" : {
-    "code" : "405",
-    "reasonPhrase" : "Method not allowed",
-    "details" : "Allow: POST"
-  }
-}
-2: ***********************************
+HTTP/1.1 100 Continue
+
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST
+Date: REGEX(.*)
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})

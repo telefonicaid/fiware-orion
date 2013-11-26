@@ -61,7 +61,7 @@ fi
 
 --SHELL--
 echo "1: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI9/notifyContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI9/notifyContextAvailability -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
 {
 	"subscriptionId": "012345678901234567890123",
 	"contextRegistrationResponses": [
@@ -115,10 +115,15 @@ EOF
 echo "2: ***********************************"
 --REGEXPECT--
 1: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
-  statusCode : {
-    "code": "200",
-    "reasonPhrase": "Ok"
+  "responseCode" : {
+    "code" : "200",
+    "reasonPhrase" : "OK"
   }
 }
 2: ***********************************

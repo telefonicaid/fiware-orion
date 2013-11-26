@@ -60,7 +60,7 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
 {
   "contextRegistrations": [
     {
@@ -93,6 +93,11 @@ fi
 EOF
 echo "++++++++++++++++++++"
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "duration" : "PT1M",
   "registrationId" : "REGEX([0-9a-f]{24})"

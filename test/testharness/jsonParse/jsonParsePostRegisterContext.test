@@ -61,7 +61,7 @@ fi
 
 --SHELL--
 echo "1: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
 {
   "contextRegistrations": [
     {
@@ -107,6 +107,11 @@ EOF
 echo "2: ***********************************"
 --REGEXPECT--
 1: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "duration" : "PT1M",
   "registrationId" : "REGEX([0-9a-f]{24})"

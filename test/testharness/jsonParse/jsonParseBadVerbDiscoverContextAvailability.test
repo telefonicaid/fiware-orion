@@ -61,7 +61,7 @@ fi
 
 --SHELL--
 echo "+++++ Starting +++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
 {
   "contextRegistrations": [
     {
@@ -106,7 +106,7 @@ echo "+++++ Starting +++++++++++++++"
 EOF
 echo "+++++ Registration Done +++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S  --include --header 'Content-Type: application/json' --header 'Accept: application/json' -X BAD_VERB -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S -i  --include --header 'Content-Type: application/json' --header 'Accept: application/json' -X BAD_VERB -d @- ) << EOF
 {
 	"entities": [
 		{
@@ -142,6 +142,11 @@ EOF
 echo "+++++ Discovery Done +++++++++++++++"
 --REGEXPECT--
 +++++ Starting +++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "duration" : "PT1M",
   "registrationId" : "REGEX([0-9a-f]{24})"

@@ -61,13 +61,13 @@ fi
 
 --SHELL--
 echo "1: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
 {
   "subscriptionId": "012345678901234567890123"
 }
 EOF
 echo "2: ***********************************"
-OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
 {
 	"entities": [
 		{
@@ -118,7 +118,7 @@ EOF)
 echo "$OUT"
 subscriptionId=$(echo "$OUT" | grep subscriptionId | awk -F\" '{ print $4 }')
 echo "3: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
 {
   "subscriptionId": "$subscriptionId"
 }
@@ -126,6 +126,11 @@ EOF
 echo "4: ***********************************"
 --REGEXPECT--
 1: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 142
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "subscriptionId" : "012345678901234567890123",
   "statusCode" : {
@@ -134,6 +139,11 @@ echo "4: ***********************************"
   }
 }
 2: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 134
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "subscribeResponse" : {
     "subscriptionId" : "REGEX([0-9a-f]{24})",
@@ -142,6 +152,11 @@ echo "4: ***********************************"
   }
 }
 3: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})",
   "statusCode" : {

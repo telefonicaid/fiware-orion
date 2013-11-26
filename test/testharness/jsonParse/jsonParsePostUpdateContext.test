@@ -61,7 +61,7 @@ fi
 
 --SHELL--
 echo "1: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
 {
 	"contextElements": {
 		"contextElement": {
@@ -98,7 +98,7 @@ echo "1: ***********************************"
 }
 EOF
 echo "2: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
 {
   "contextRegistrations": [
     {
@@ -142,7 +142,7 @@ echo "2: ***********************************"
 }
 EOF
 echo "3: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
 {
 	"contextElements": {
 		"contextElement": {
@@ -181,6 +181,11 @@ EOF
 echo "4: ***********************************"
 --REGEXPECT--
 1: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 329
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "contextResponses" : [
     {
@@ -198,11 +203,21 @@ echo "4: ***********************************"
   ]
 }
 2: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "duration" : "PT1M",
   "registrationId" : "REGEX([0-9a-f]{24})"
 }
 3: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 413
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
   "contextResponses" : [
     {
