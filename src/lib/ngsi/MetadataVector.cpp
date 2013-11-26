@@ -156,3 +156,19 @@ void MetadataVector::release(void)
 
   vec.clear();
 }
+
+
+
+/* ****************************************************************************
+*
+* MetadataVector::fill - 
+*/
+void MetadataVector::fill(MetadataVector& mV)
+{
+  for (unsigned int ix = 0; ix < mV.size(); ++ix)
+  {
+    Metadata* mP = new Metadata(mV.get(ix));
+
+    push_back(mP);
+  }
+}

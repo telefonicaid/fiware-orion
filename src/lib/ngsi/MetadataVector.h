@@ -52,6 +52,7 @@ typedef struct MetadataVector
   unsigned int size(void);
   Metadata*    get(int ix);
   void         release();
+  void         fill(MetadataVector& mV);
 } MetadataVector;
 
 #endif

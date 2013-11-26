@@ -27,7 +27,6 @@ SET (SOURCES
     mapGetContextEntityAttributes.cpp
     mapPostEntityByIdAttributeByName.cpp
     mapGetEntityByIdAttributeByName.cpp
-    mapPostContextEntityTypes.cpp
     mapGetContextEntityTypes.cpp
     mapGetIndividualContextEntity.cpp
     mapPutIndividualContextEntity.cpp
@@ -49,7 +48,6 @@ SET (HEADERS
     mapGetContextEntityAttributes.h
     mapPostEntityByIdAttributeByName.h
     mapGetEntityByIdAttributeByName.h
-    mapPostContextEntityTypes.h
     mapGetContextEntityTypes.h
     mapGetIndividualContextEntity.h
     mapPutIndividualContextEntity.h

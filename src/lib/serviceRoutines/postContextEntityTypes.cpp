@@ -28,10 +28,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenienceMap/mapPostContextEntityTypes.h"
 #include "ngsi/ParseData.h"
 #include "ngsi9/RegisterContextResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "serviceRoutines/postRegisterContext.h"  // instead of convenienceMap function, postRegisterContext is used
 #include "serviceRoutines/postContextEntityTypes.h"
 
 
@@ -42,14 +42,29 @@
 */
 std::string postContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
-  std::string              typeName     = compV[2];
-  std::string              answer;
-  RegisterContextResponse  response;
-
-  LM_T(LmtConvenience, ("CONVENIENCE: got a  'POST' request for entity type '%s'", typeName.c_str()));
-  ciP->httpStatusCode = mapPostContextEntityTypes(typeName, &response);
-  answer = response.render(ContextEntityTypes, ciP->outFormat, "");
-  response.release();
+  std::string  typeName     = compV[2];
+  std::string  answer;
   
+  // Transform RegisterProviderRequest into RegisterContextRequest
+  RegisterProviderRequest* rprP = &parseDataP->rpr.res;
+  RegisterContextRequest*  rcrP = &parseDataP->rcr.res;
+  ContextRegistration      cr;
+  EntityId                 entityId;
+
+  rcrP->duration       = rprP->duration;
+  rcrP->registrationId = rprP->registrationId;
+
+  entityId.type = typeName;
+  cr.registrationMetadataVector.fill(rprP->metadataVector);
+  cr.providingApplication = rprP->providingApplication;
+
+  cr.entityIdVector.push_back(&entityId);
+  cr.entityIdVectorPresent = true;
+  rcrP->contextRegistrationVector.push_back(&cr);
+
+  // Now call postRegisterContext (components and compV are not used)
+  answer = postRegisterContext(ciP, components, compV, parseDataP);
+  cr.registrationMetadataVector.release();
+
   return answer;
 }
