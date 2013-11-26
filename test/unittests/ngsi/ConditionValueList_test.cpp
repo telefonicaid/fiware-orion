@@ -38,9 +38,9 @@ TEST(ConditionValueList, ok)
 {
   ConditionValueList cvList;
   std::string        out;
-  std::string        expected1 = "<attributeList>\n  <attribute>cv1</attribute>\n</attributeList>\n";
-  std::string        expected2 = "\"attributeList\" : {\n  \"attribute\" : \"cv1\"\n}\n";
-  std::string        expected3 = "\"attributeList\" : {\n  \"attribute\" : \"cv1\",\n  \"attribute\" : \"cv2\"\n}\n";
+  std::string        expected1 = "<condValueList>\n  <condValue>cv1</condValue>\n</condValueList>\n";
+  std::string        expected2 = "\"condValueList\" : {\n  \"condValue\" : \"cv1\"\n}\n";
+  std::string        expected3 = "\"condValueList\" : {\n  \"condValue\" : \"cv1\",\n  \"condValue\" : \"cv2\"\n}\n";
 
   out = cvList.render(XML, "");
   EXPECT_STREQ("", out.c_str());
@@ -61,7 +61,7 @@ TEST(ConditionValueList, ok)
 
   cvList.push_back("");
   out = cvList.check(SubscribeContext, XML, "", "", 0);
-  EXPECT_STREQ("empty attribute name", out.c_str());
+  EXPECT_STREQ("empty condValue name", out.c_str());
 
   // Just to exercise the code
   cvList.present("");
