@@ -96,7 +96,7 @@ echo "2: ++++++++++++++++++++"
 (curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
 echo "3: ++++++++++++++++++++"
 
-# DELETE is now allowed
+# DELETE is not allowed
 curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room -s -S -X DELETE --include --header 'Content-Type: application/xml' --header 'Accept: application/xml'
 echo 4: ++++++++++++++++++++
 killall contextBroker

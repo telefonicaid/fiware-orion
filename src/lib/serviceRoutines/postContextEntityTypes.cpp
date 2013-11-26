@@ -62,7 +62,7 @@ std::string postContextEntityTypes(ConnectionInfo* ciP, int components, std::vec
   cr.entityIdVectorPresent = true;
   rcrP->contextRegistrationVector.push_back(&cr);
 
-  // Now call postRegisterContext (components and compV are not used)
+  // Now call postRegisterContext (postRegisterContext doesn't use the parameters 'components' and 'compV')
   answer = postRegisterContext(ciP, components, compV, parseDataP);
   cr.registrationMetadataVector.release();
 
