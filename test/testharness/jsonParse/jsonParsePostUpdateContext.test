@@ -185,14 +185,20 @@ echo "4: ***********************************"
   "contextResponses" : [
     {
       "contextElement" : {
+        "attributes" : [
+          {
+            "name" : "temperature",
+            "type" : "degree",
+            "contextValue" : ""
+          }
+        ],
         "type" : "Room",
         "isPattern" : "false",
         "id" : "ConferenceRoom"
       },
       "statusCode" : {
-        "code" : "404",
-        "reasonPhrase" : "Entity not found",
-        "details" : "entity: (ConferenceRoom, Room, false)"
+        "code" : "200",
+        "reasonPhrase" : "OK"
       }
     }
   ]

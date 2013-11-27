@@ -463,26 +463,10 @@ EOF
 4: ++++++++++++++++++++
 <?xml version="1.0"?>
 <queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context elements found</reasonPhrase>
+  </errorCode>
 </queryContextResponse>
 5: ++++++++++++++++++++
 <?xml version="1.0"?>
@@ -495,68 +479,18 @@ EOF
 6: ++++++++++++++++++++
 <?xml version="1.0"?>
 <queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context elements found</reasonPhrase>
+  </errorCode>
 </queryContextResponse>
 7: ++++++++++++++++++++
 <?xml version="1.0"?>
 <queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context elements found</reasonPhrase>
+  </errorCode>
 </queryContextResponse>
 8: ++++++++++++++++++++
 <?xml version="1.0"?>
@@ -585,26 +519,10 @@ EOF
 11: ++++++++++++++++++++
 <?xml version="1.0"?>
 <queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context elements found</reasonPhrase>
+  </errorCode>
 </queryContextResponse>
 12: ++++++++++++++++++++
 <?xml version="1.0"?>
@@ -645,11 +563,6 @@ EOF
           <id>OfficeRoom</id>
         </entityId>
         <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
-          </contextAttribute>
           <contextAttribute>
             <name>pressure</name>
             <type>clima</type>
@@ -709,11 +622,6 @@ EOF
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
-          </contextAttribute>
-          <contextAttribute>
             <name>pressure</name>
             <type>clima</type>
             <contextValue>p23</contextValue>
@@ -736,11 +644,6 @@ EOF
           <id>OfficeRoom</id>
         </entityId>
         <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
-          </contextAttribute>
           <contextAttribute>
             <name>pressure</name>
             <type>clima</type>
@@ -763,26 +666,10 @@ EOF
 16: ++++++++++++++++++++
 <?xml version="1.0"?>
 <queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context elements found</reasonPhrase>
+  </errorCode>
 </queryContextResponse>
 17: ++++++++++++++++++++
 <?xml version="1.0"?>
@@ -793,44 +680,10 @@ EOF
 18: ++++++++++++++++++++
 <?xml version="1.0"?>
 <queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom2</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context elements found</reasonPhrase>
+  </errorCode>
 </queryContextResponse>
 19: ++++++++++++++++++++
 <?xml version="1.0"?>
@@ -843,11 +696,6 @@ EOF
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
-          </contextAttribute>
-          <contextAttribute>
             <name>pressure</name>
             <type>clima</type>
             <contextValue>p23</contextValue>
@@ -856,24 +704,6 @@ EOF
             <name>lightstatus</name>
             <type>light</type>
             <contextValue>L23</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom2</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue/>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
