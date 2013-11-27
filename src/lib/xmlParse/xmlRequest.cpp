@@ -108,6 +108,8 @@ static XmlRequest xmlRequest[] =
   { ContextEntityTypes,                    "*",    "registerProviderRequest",                      rprParseVector,   rprInit,   rprRelease,   rprPresent,   rprCheck   },
   { ContextEntityTypeAttributeContainer,   "POST", "registerProviderRequest",                      rprParseVector,   rprInit,   rprRelease,   rprPresent,   rprCheck   },
   { ContextEntityTypeAttributeContainer,   "*",    "registerProviderRequest",                      rprParseVector,   rprInit,   rprRelease,   rprPresent,   rprCheck   },
+  { ContextEntityTypeAttribute,            "POST", "registerProviderRequest",                      rprParseVector,   rprInit,   rprRelease,   rprPresent,   rprCheck   },
+  { ContextEntityTypeAttribute,            "*",    "registerProviderRequest",                      rprParseVector,   rprInit,   rprRelease,   rprPresent,   rprCheck   },
 
   { UpdateContextElement,                  "POST", "updateContextElementRequest",                  ucerParseVector,  ucerInit,  ucerRelease,  ucerPresent,  ucerCheck  },
   { IndividualContextEntity,               "PUT",  "updateContextElementRequest",                  ucerParseVector,  ucerInit,  ucerRelease,  ucerPresent,  ucerCheck  },

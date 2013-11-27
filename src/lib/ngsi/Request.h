@@ -56,6 +56,7 @@ typedef enum RequestType
   EntityByIdAttributeByName,
   ContextEntityTypes,
   ContextEntityTypeAttributeContainer,
+  ContextEntityTypeAttribute,
 
   IndividualContextEntity                = 31,
   IndividualContextEntityAttributes,
