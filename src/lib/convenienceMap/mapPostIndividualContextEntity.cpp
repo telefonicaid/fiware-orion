@@ -81,6 +81,7 @@ HttpStatusCode mapPostIndividualContextEntity(std::string entityId, AppendContex
      ContextAttribute* caP = new ContextAttribute(ucContextElementResponse->contextElement.contextAttributeVector.get(caIx));
      
      car->contextAttributeVector.push_back(caP);
+     car->statusCode.fill(&ucContextElementResponse->statusCode);
   }
 
   response->contextResponseVector.push_back(car);
