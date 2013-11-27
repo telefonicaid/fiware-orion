@@ -71,6 +71,8 @@ SET (SOURCES
     serviceRoutines/postContextEntityTypes_test.cpp
     serviceRoutines/getContextEntityTypeAttributeContainer_test.cpp
     serviceRoutines/postContextEntityTypeAttributeContainer_test.cpp
+    serviceRoutines/getContextEntityTypeAttribute_test.cpp
+    serviceRoutines/postContextEntityTypeAttribute_test.cpp
     serviceRoutines/getIndividualContextEntity_test.cpp
     serviceRoutines/getContextEntityAttributes_test.cpp
     serviceRoutines/getIndividualContextEntityAttribute_test.cpp

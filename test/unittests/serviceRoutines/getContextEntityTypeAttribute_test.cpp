@@ -27,7 +27,8 @@
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/postRegisterContext.h"
-#include "serviceRoutines/getContextEntityTypes.h"
+#include "serviceRoutines/getContextEntityTypeAttribute.h"
+#include "serviceRoutines/postContextEntityTypeAttribute.h"
 #include "serviceRoutines/badVerbGetPostOnly.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
@@ -48,11 +49,12 @@ using ::testing::Return;
 */
 static RestService rs[] = 
 {
-  { "POST RegisterContext",   "POST", RegisterContext,    2, { "ngsi9", "registerContext"         }, "", postRegisterContext   },
-  { "GET ContextEntityTypes", "GET",  ContextEntityTypes, 3, { "ngsi9", "contextEntityTypes", "*" }, "", getContextEntityTypes },
-  { "* ContextEntityTypes",   "*",    ContextEntityTypes, 3, { "ngsi9", "contextEntityTypes", "*" }, "", badVerbGetPostOnly    },
-  { "* InvalidRequest",       "*",    InvalidRequest,     0, { "*", "*", "*", "*", "*", "*"       }, "", badRequest            },
-  { "* *",                    "",     InvalidRequest,     0, {                                    }, "", NULL                  }
+  { "POST RegisterContext",             "POST", RegisterContext,            2, { "ngsi9", "registerContext"                            }, "",                        postRegisterContext            },
+  { "GET ContextEntityTypeAttribute",   "GET",  ContextEntityTypeAttribute, 5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*" }, "",                        getContextEntityTypeAttribute  },
+  { "POST ContextEntityTypeAttribute",  "POST", ContextEntityTypeAttribute, 5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*" }, "registerProviderRequest", postContextEntityTypeAttribute },
+  { "* ContextEntityTypeAttribute",     "*",    ContextEntityTypeAttribute, 5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*" }, "",                        badVerbGetPostOnly             },
+  { "* InvalidRequest",                 "*",    InvalidRequest,             0, { "*", "*", "*", "*", "*", "*"                          }, "",                        badRequest                     },
+  { "* *",                              "",     InvalidRequest,             0, {                                                       }, "",                        NULL                           }
 };
 
 
@@ -61,19 +63,18 @@ static RestService rs[] =
 *
 * nothingFound - 
 */
-TEST(getContextEntityTypes, nothingFound)
+TEST(getContextEntityTypeAttribute, nothingFound)
 {
-  ConnectionInfo ci("/ngsi9/contextEntityTypes/TYPE_123",  "GET", "1.1");
+  ConnectionInfo ci("/ngsi9/contextEntityTypes/TYPE_123/attributes/temperature",  "GET", "1.1");
   std::string    expected = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element registrations found</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
-
-  // Cleaning database before starting the test, as it may cause a "false positive" otherwise (it happened in Jenkins)
-  setupDatabase();
 
   std::string    out;
 
   TimerMock* timerMock = new TimerMock();
   ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
   setTimer(timerMock);
+
+  setupDatabase();
 
   ci.outFormat = XML;
   out          = restService(&ci, rs);
@@ -89,10 +90,10 @@ TEST(getContextEntityTypes, nothingFound)
 *
 * somethingFound - 
 */
-TEST(getContextEntityTypes, somethingFound)
+TEST(getContextEntityTypeAttribute, somethingFound)
 {
-  ConnectionInfo ci1("/ngsi9/registerContext",          "POST", "1.1");
-  ConnectionInfo ci2("/ngsi9/contextEntityTypes/Room",  "GET", "1.1");
+  ConnectionInfo ci1("/ngsi9/registerContext",                                 "POST", "1.1");
+  ConnectionInfo ci2("/ngsi9/contextEntityTypes/Room/attributes/temperature",  "GET",  "1.1");
   const char*    registerXmlFile = "ngsi9.registerContextRequest.ok.valid.xml";
   std::string    expectedStart   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <registrationId>";
   std::string    expected2       = "<discoverContextAvailabilityResponse>\n  <contextRegistrationResponseList>\n    <contextRegistrationResponse>\n      <contextRegistration>\n        <entityIdList>\n          <entityId type=\"Room\" isPattern=\"false\">\n            <id>ConferenceRoom</id>\n          </entityId>\n          <entityId type=\"Room\" isPattern=\"false\">\n            <id>OfficeRoom</id>\n          </entityId>\n        </entityIdList>\n        <contextRegistrationAttributeList>\n          <contextRegistrationAttribute>\n            <name>temperature</name>\n            <type>degree</type>\n            <isDomain>false</isDomain>\n          </contextRegistrationAttribute>\n        </contextRegistrationAttributeList>\n        <providingApplication>http://localhost:1028/application</providingApplication>\n      </contextRegistration>\n    </contextRegistrationResponse>\n  </contextRegistrationResponseList>\n</discoverContextAvailabilityResponse>\n";
@@ -106,6 +107,7 @@ TEST(getContextEntityTypes, somethingFound)
   // Avoid forwarding of messages
   extern int fwdPort;
   int saved = fwdPort;
+
   setupDatabase();
 
 
@@ -121,11 +123,11 @@ TEST(getContextEntityTypes, somethingFound)
   ci1.payload      = testBuf;
   ci1.payloadSize  = strlen(testBuf);
   out              = restService(&ci1, rs);
+  LM_M(("OUT: '%s'", out.c_str()));
 
   char* outStart  = (char*) out.c_str();
   outStart[expectedStart.length()] = 0;
   EXPECT_EQ(expectedStart, outStart);
-
 
   //
   // Now discover
