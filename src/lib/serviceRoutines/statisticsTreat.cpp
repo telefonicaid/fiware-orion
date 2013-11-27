@@ -86,6 +86,7 @@ std::string statisticsTreat(ConnectionInfo* ciP, int components, std::vector<std
      noOfEntityByIdAttributeByName            = -1;
      noOfContextEntityTypes                   = -1;
      noOfContextEntityTypeAttributeContainer  = -1;
+     noOfContextEntityTypeAttribute           = -1;
 
      noOfIndividualContextEntity              = -1;
      noOfIndividualContextEntityAttributes    = -1;
@@ -133,6 +134,7 @@ std::string statisticsTreat(ConnectionInfo* ciP, int components, std::vector<std
   if (noOfEntityByIdAttributeByName != -1)            out += valueTag(indent + "  ", "entityByIdAttributeByName",               noOfEntityByIdAttributeByName + 1,            ciP->outFormat);
   if (noOfContextEntityTypes != -1)                   out += valueTag(indent + "  ", "contextEntityTypes",                      noOfContextEntityTypes + 1,                   ciP->outFormat);
   if (noOfContextEntityTypeAttributeContainer != -1)  out += valueTag(indent + "  ", "contextEntityTypeAttributeContainer",     noOfContextEntityTypeAttributeContainer + 1,  ciP->outFormat);
+  if (noOfContextEntityTypeAttribute != -1)           out += valueTag(indent + "  ", "contextEntityTypeAttribute",              noOfContextEntityTypeAttribute + 1,           ciP->outFormat);
 
   if (noOfIndividualContextEntity != -1)              out += valueTag(indent + "  ", "individualContextEntity",                 noOfIndividualContextEntity + 1,              ciP->outFormat);
   if (noOfIndividualContextEntityAttributes != -1)    out += valueTag(indent + "  ", "individualContextEntityAttributes",       noOfIndividualContextEntityAttributes + 1,    ciP->outFormat);
