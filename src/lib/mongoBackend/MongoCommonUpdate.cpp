@@ -732,9 +732,23 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             if (!createEntity(en, ceP->contextAttributeVector, &err)) {
                 buildGeneralErrorReponse(ceP, NULL, responseP, SccReceiverInternalError, "Database Error", err);
             }
-           else {
-                /* Sucesfull creation: creating corresponding ContextElementResponse */
+            else {
+
                 ContextElementResponse* cerP = new ContextElementResponse();
+
+                /* Sucesfull creation: send notifications */
+                std::map<string, BSONObj*> subsToNotify;
+                for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
+                    std::string err;
+                    if (!addTriggeredSubscriptions(en.id, en.type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err)) {
+                        cerP->statusCode.fill(SccReceiverInternalError, "Database Error", err );
+                        responseP->contextElementResponseVector.push_back(cerP);
+                        LM_RVE((err.c_str()));
+                    }
+                }
+                processSubscriptions(en, &subsToNotify, &err);
+
+                /* Sucesfull creation: creating corresponding ContextElementResponse */                
                 cerP->contextElement.entityId.id = en.id;
                 cerP->contextElement.entityId.type = en.type;
                 cerP->contextElement.entityId.isPattern = "false";
