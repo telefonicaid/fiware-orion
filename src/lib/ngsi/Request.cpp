@@ -50,6 +50,7 @@ const char* requestType(RequestType rt)
   case ContextEntityAttributes:                     return "ContextEntityAttributes";
   case EntityByIdAttributeByName:                   return "EntityByIdAttributeByName";
   case ContextEntityTypes:                          return "ContextEntityTypes";
+  case ContextEntityTypeAttributeContainer:         return "ContextEntityTypeAttributeContainer";
   case IndividualContextEntity:                     return "IndividualContextEntity";
   case IndividualContextEntityAttributes:           return "IndividualContextEntityAttributes";
   case IndividualContextEntityAttribute:            return "IndividualContextEntityAttribute";
