@@ -68,6 +68,7 @@ HttpStatusCode mapPutIndividualContextEntity(std::string entityId, UpdateContext
   {
     ContextAttribute* caP = new ContextAttribute(ceP->contextAttributeVector.get(ix));
     carP->contextAttributeVector.push_back(caP);
+    carP->statusCode.fill(&ucResponse.contextElementResponseVector.get(0)->statusCode);
   }
 
   response->contextResponseVector.push_back(carP);
