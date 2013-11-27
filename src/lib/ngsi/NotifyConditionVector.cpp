@@ -39,7 +39,7 @@
 std::string NotifyConditionVector::render(Format format, std::string indent)
 {
   std::string out = "";
-  std::string tag = "contextAttributeList";
+  std::string tag = "notifyConditions";
 
   if (vec.size() == 0)
     return "";
