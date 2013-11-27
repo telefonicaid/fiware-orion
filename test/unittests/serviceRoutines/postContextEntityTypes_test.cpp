@@ -26,7 +26,8 @@
 
 #include "logMsg/logMsg.h"
 
-#include "serviceRoutines/postRegisterContext.h"
+#include "serviceRoutines/postContextEntityTypes.h"
+#include "serviceRoutines/badVerbGetPostOnly.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
@@ -46,9 +47,10 @@ using ::testing::Return;
 */
 static RestService rs[] = 
 {
-  { "POST RegisterContext",                       "POST",   RegisterContext,                       2, { "ngsi9",  "registerContext"                          }, "", postRegisterContext                       },
-  { "* InvalidRequest",                           "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "* *",                                        "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "POST ContextEntityTypes", "POST", ContextEntityTypes, 3, { "ngsi9", "contextEntityTypes", "*" }, "", postContextEntityTypes },
+  { "* ContextEntityTypes",    "*",    ContextEntityTypes, 3, { "ngsi9", "contextEntityTypes", "*" }, "", badVerbGetPostOnly     },
+  { "* InvalidRequest",        "*",    InvalidRequest,     0, { "*", "*", "*", "*", "*", "*"       }, "", badRequest             },
+  { "* *",                     "",     InvalidRequest,     0, {                                    }, "", NULL                   }
 };
 
 
@@ -57,7 +59,7 @@ static RestService rs[] =
 *
 * ok - 
 */
-TEST(postRegisterContext, ok)
+TEST(postContextEntityTypes, ok)
 {
   // Avoid forwarding of messages
   extern int fwdPort;
@@ -67,22 +69,15 @@ TEST(postRegisterContext, ok)
 
   fwdPort = 0;
 
-  ConnectionInfo ci("/ngsi9/registerContext",  "POST", "1.1");
-  std::string    expectedStart   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <registrationId>";
-  const char*    fileName        = "ngsi9.registerContextRequest.ok.valid.xml";
+  ConnectionInfo ci("/ngsi9/contextEntityTypes/TYPE_123",  "POST", "1.1");
+  std::string    expectedStart = "<registerContextResponse>\n  <duration>PT1S</duration>\n  <registrationId>";
+  const char*    fileName      = "ngsi9.registerProviderRequest.noRegistrationId.postponed.xml";
   std::string    out;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
   TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
+  ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
   setTimer(timerMock);
 
   ci.outFormat    = XML;
@@ -93,11 +88,8 @@ TEST(postRegisterContext, ok)
 
   char* outStart  = (char*) out.c_str();
   outStart[expectedStart.length()] = 0;
-  EXPECT_STREQ(expectedStart.c_str(), outStart);
-
-  // Putting old value back
-  fwdPort = saved;
+  EXPECT_EQ(expectedStart, outStart);
 
   delete timerMock;
-  delete notifierMock;
+  fwdPort = saved;
 }

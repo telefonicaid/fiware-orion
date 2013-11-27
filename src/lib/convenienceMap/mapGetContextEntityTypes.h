@@ -1,5 +1,5 @@
-#ifndef METADATA_VECTOR_H
-#define METADATA_VECTOR_H
+#ifndef MAP_GET_CONTEXT_ENTITIES_BY_ENTITY_ID_H
+#define MAP_GET_CONTEXT_ENTITIES_BY_ENTITY_ID_H
 
 /*
 *
@@ -26,33 +26,16 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <vector>
 
-#include "ngsi/Metadata.h"
+#include "rest/HttpStatusCode.h"
+#include "ngsi9/DiscoverContextAvailabilityResponse.h"
 
 
 
 /* ****************************************************************************
 *
-* MetadataVector - 
+* mapGetContextEntityTypes - 
 */
-typedef struct MetadataVector
-{
-  std::vector<Metadata*>  vec;
-
-  std::string  tag;        // Help variable for the 'render' method
-
-  MetadataVector(std::string _tag = "registrationMetadata");
-
-  void         tagSet(std::string tagName);
-  std::string  render(Format format, std::string indent, bool comma = false);
-  std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void         present(std::string metadataType, std::string indent);
-  void         push_back(Metadata* item);
-  unsigned int size(void);
-  Metadata*    get(int ix);
-  void         release();
-  void         fill(MetadataVector& mV);
-} MetadataVector;
+extern HttpStatusCode mapGetContextEntityTypes(std::string typeName, DiscoverContextAvailabilityResponse* response);
 
 #endif

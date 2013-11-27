@@ -1,6 +1,3 @@
-#ifndef METADATA_VECTOR_H
-#define METADATA_VECTOR_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -26,33 +23,27 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <vector>
 
-#include "ngsi/Metadata.h"
+#include "logMsg/logMsg.h"
+
+#include "convenienceMap/mapGetContextEntityTypes.h"
+#include "mongoBackend/mongoDiscoverContextAvailability.h"
+#include "ngsi/StatusCode.h"
+#include "ngsi9/DiscoverContextAvailabilityRequest.h"
+#include "ngsi9/DiscoverContextAvailabilityResponse.h"
+#include "rest/HttpStatusCode.h"
 
 
 
 /* ****************************************************************************
 *
-* MetadataVector - 
+* mapGetContextEntityTypes - 
 */
-typedef struct MetadataVector
+HttpStatusCode mapGetContextEntityTypes(std::string typeName, DiscoverContextAvailabilityResponse* response)
 {
-  std::vector<Metadata*>  vec;
+  DiscoverContextAvailabilityRequest  request;
+  EntityId                            entityId(".*", typeName, "true");
 
-  std::string  tag;        // Help variable for the 'render' method
-
-  MetadataVector(std::string _tag = "registrationMetadata");
-
-  void         tagSet(std::string tagName);
-  std::string  render(Format format, std::string indent, bool comma = false);
-  std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void         present(std::string metadataType, std::string indent);
-  void         push_back(Metadata* item);
-  unsigned int size(void);
-  Metadata*    get(int ix);
-  void         release();
-  void         fill(MetadataVector& mV);
-} MetadataVector;
-
-#endif
+  request.entityIdVector.push_back(&entityId);
+  return mongoDiscoverContextAvailability(&request, response);
+}

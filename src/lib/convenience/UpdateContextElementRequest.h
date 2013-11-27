@@ -43,6 +43,7 @@ typedef struct UpdateContextElementRequest
 {
   AttributeDomainName        attributeDomainName;        // Optional
   ContextAttributeVector     contextAttributeVector;     // Optional
+  MetadataVector             domainMetadataVector;       // Optional
 
   std::string render(Format format, std::string indent);
   std::string check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);

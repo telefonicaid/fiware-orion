@@ -37,33 +37,35 @@
 */
 typedef enum RequestType
 {
-  RegisterContext = 0,
+  RegisterContext = 1,
   DiscoverContextAvailability,
   SubscribeContextAvailability,
   UpdateContextAvailabilitySubscription,
   UnsubscribeContextAvailability,
   NotifyContextAvailability,
 
-  QueryContext = 6,
+  QueryContext = 11,
   SubscribeContext,
   UpdateContextSubscription,
   UnsubscribeContext,
   NotifyContext,
   UpdateContext,
 
-  ContextEntitiesByEntityId = 12,
+  ContextEntitiesByEntityId = 21,
   ContextEntityAttributes,
   EntityByIdAttributeByName,
+  ContextEntityTypes,
+  ContextEntityTypeAttributeContainer,
 
-  IndividualContextEntity                = 15,
+  IndividualContextEntity                = 31,
   IndividualContextEntityAttributes,
   IndividualContextEntityAttribute,
 
-  UpdateContextElement = 18,
+  UpdateContextElement = 41,
   AppendContextElement,
   UpdateContextAttribute,
 
-  LogRequest = 21,
+  LogRequest = 51,
   VersionRequest,
   ExitRequest,
   LeakRequest,

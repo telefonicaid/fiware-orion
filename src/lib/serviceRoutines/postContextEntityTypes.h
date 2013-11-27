@@ -1,5 +1,5 @@
-#ifndef METADATA_VECTOR_H
-#define METADATA_VECTOR_H
+#ifndef POST_NGSI9_CONTEXT_ENTITY_TYPES_H
+#define POST_NGSI9_CONTEXT_ENTITY_TYPES_H
 
 /*
 *
@@ -28,31 +28,18 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/Metadata.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
 
 
 
 /* ****************************************************************************
 *
-* MetadataVector - 
+* postContextEntityTypes - 
 */
-typedef struct MetadataVector
-{
-  std::vector<Metadata*>  vec;
-
-  std::string  tag;        // Help variable for the 'render' method
-
-  MetadataVector(std::string _tag = "registrationMetadata");
-
-  void         tagSet(std::string tagName);
-  std::string  render(Format format, std::string indent, bool comma = false);
-  std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void         present(std::string metadataType, std::string indent);
-  void         push_back(Metadata* item);
-  unsigned int size(void);
-  Metadata*    get(int ix);
-  void         release();
-  void         fill(MetadataVector& mV);
-} MetadataVector;
+extern std::string postContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
 
 #endif

@@ -80,6 +80,8 @@
 #include "serviceRoutines/postContextEntityAttributes.h"
 #include "serviceRoutines/getEntityByIdAttributeByName.h"
 #include "serviceRoutines/postEntityByIdAttributeByName.h"
+#include "serviceRoutines/getContextEntityTypes.h"
+#include "serviceRoutines/postContextEntityTypes.h"
 #include "serviceRoutines/getIndividualContextEntity.h"
 #include "serviceRoutines/putIndividualContextEntity.h"
 #include "serviceRoutines/badVerbPostOnly.h"
@@ -213,7 +215,14 @@ RestService restServiceV[] =
   { "POST EntityByIdAttributeByName",             "POST",   EntityByIdAttributeByName,             5, { "ngsi9", "contextEntities", "*", "attributes", "*"   }, "registerProviderRequest",                      postEntityByIdAttributeByName             },
   { "* EntityByIdAttributeByName",                "*",      EntityByIdAttributeByName,             5, { "ngsi9", "contextEntities", "*", "attributes", "*"   }, "",                                             badVerbGetPostOnly                        },
 
+  { "GET ContextEntityTypes",                     "GET",    ContextEntityTypes,                    3, { "ngsi9", "contextEntityTypes", "*"                   }, "",                                             getContextEntityTypes                     },
+  { "POST ContextEntityTypes",                    "POST",   ContextEntityTypes,                    3, { "ngsi9", "contextEntityTypes", "*"                   }, "registerProviderRequest",                      postContextEntityTypes                    },
+  { "* ContextEntityTypes",                       "*",      ContextEntityTypes,                    3, { "ngsi9", "contextEntityTypes", "*"                   }, "",                                             badVerbGetPostOnly                        },
    
+  { "GET ContextEntityTypeAttributeContainer",    "GET",    ContextEntityTypeAttributeContainer,   4, { "ngsi9", "contextEntityTypes", "*", "attributes"     }, "",                                             getContextEntityTypes                     },
+  { "POST ContextEntityTypeAttributeContainer",   "POST",   ContextEntityTypeAttributeContainer,   4, { "ngsi9", "contextEntityTypes", "*", "attributes"     }, "registerProviderRequest",                      postContextEntityTypes                    },
+  { "* ContextEntityTypeAttributeContainer",      "*",      ContextEntityTypeAttributeContainer,   4, { "ngsi9", "contextEntityTypes", "*", "attributes"     }, "",                                             badVerbGetPostOnly                        },
+
   // NGSI-10 Convenience operations
   { "GET IndividualContextEntity",                "GET",    IndividualContextEntity,               3, { "ngsi10", "contextEntities", "*"                     }, "",                                             getIndividualContextEntity                },
   { "PUT IndividualContextEntity",                "PUT",    IndividualContextEntity,               3, { "ngsi10", "contextEntities", "*"                     }, "updateContextElementRequest",                  putIndividualContextEntity                },

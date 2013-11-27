@@ -80,4 +80,8 @@ TEST(versionTreat, ok)
   versionSet("1.2.3");
   out       = restService(&ci, rs);
   EXPECT_TRUE(strstr(out.c_str(), "<version>1.2.3</version>") != NULL);
+
+  versionSet("1.2.3");
+  std::string version = versionGet();
+  EXPECT_EQ("1.2.3", version);
 }

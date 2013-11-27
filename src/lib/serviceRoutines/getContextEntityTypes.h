@@ -1,5 +1,5 @@
-#ifndef METADATA_VECTOR_H
-#define METADATA_VECTOR_H
+#ifndef GET_CONTEXT_ENTITY_TYPES_H
+#define GET_CONTEXT_ENTITY_TYPES_H
 
 /*
 *
@@ -28,31 +28,15 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/Metadata.h"
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* MetadataVector - 
+* getContextEntityTypes - 
 */
-typedef struct MetadataVector
-{
-  std::vector<Metadata*>  vec;
-
-  std::string  tag;        // Help variable for the 'render' method
-
-  MetadataVector(std::string _tag = "registrationMetadata");
-
-  void         tagSet(std::string tagName);
-  std::string  render(Format format, std::string indent, bool comma = false);
-  std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void         present(std::string metadataType, std::string indent);
-  void         push_back(Metadata* item);
-  unsigned int size(void);
-  Metadata*    get(int ix);
-  void         release();
-  void         fill(MetadataVector& mV);
-} MetadataVector;
+extern std::string getContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
 
 #endif

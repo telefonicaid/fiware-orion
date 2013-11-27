@@ -67,6 +67,8 @@ extern int noOfNotificationsSent;
 extern int noOfContextEntitiesByEntityId;
 extern int noOfContextEntityAttributes;
 extern int noOfEntityByIdAttributeByName;
+extern int noOfContextEntityTypes;
+extern int noOfContextEntityTypeAttributeContainer;
 extern int noOfIndividualContextEntity;
 extern int noOfIndividualContextEntityAttributes;
 extern int noOfIndividualContextEntityAttribute;

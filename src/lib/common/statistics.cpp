@@ -64,12 +64,17 @@ int noOfNotificationsSent                    = -1;
 int noOfContextEntitiesByEntityId            = -1;
 int noOfContextEntityAttributes              = -1;
 int noOfEntityByIdAttributeByName            = -1;
+int noOfContextEntityTypes                   = -1;
+int noOfContextEntityTypeAttributeContainer  = -1;
+
 int noOfIndividualContextEntity              = -1;
 int noOfIndividualContextEntityAttributes    = -1;
 int noOfIndividualContextEntityAttribute     = -1;
+
 int noOfUpdateContextElement                 = -1;
 int noOfAppendContextElement                 = -1;
 int noOfUpdateContextAttribute               = -1;
+
 int noOfLogRequests                          = -1;
 int noOfVersionRequests                      = -1;
 int noOfExitRequests                         = -1;
@@ -108,7 +113,8 @@ void statisticsUpdate(RequestType request, Format inFormat)
    case ContextEntitiesByEntityId:              ++noOfContextEntitiesByEntityId; break;
    case ContextEntityAttributes:                ++noOfContextEntityAttributes; break;
    case EntityByIdAttributeByName:              ++noOfEntityByIdAttributeByName; break;
-
+   case ContextEntityTypes:                     ++noOfContextEntityTypes; break;
+   case ContextEntityTypeAttributeContainer:    ++noOfContextEntityTypeAttributeContainer; break;
    case IndividualContextEntity:                ++noOfIndividualContextEntity; break;
    case IndividualContextEntityAttributes:      ++noOfIndividualContextEntityAttributes; break;
    case IndividualContextEntityAttribute:       ++noOfIndividualContextEntityAttribute; break;
