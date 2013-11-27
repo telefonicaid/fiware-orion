@@ -31,6 +31,10 @@
 #include "rest/RestService.h"
 
 #include "testDataFromFile.h"
+#include "commonMocks.h"
+
+using ::testing::Throw;
+using ::testing::Return;
 
 
 
@@ -60,6 +64,11 @@ TEST(putIndividualContextEntityAttributes, createEntity)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
+  TimerMock* timerMock = new TimerMock();
+  ON_CALL(*timerMock, getCurrentTime())
+          .WillByDefault(Return(1360232700));
+  setTimer(timerMock);
+
   ci.outFormat    = XML;
   ci.inFormat     = XML;
   ci.payload      = testBuf;
@@ -67,4 +76,7 @@ TEST(putIndividualContextEntityAttributes, createEntity)
   out             = restService(&ci, rs);
 
   EXPECT_STREQ(expected.c_str(), out.c_str());
+
+  delete timerMock;
+  setTimer(NULL);
 }

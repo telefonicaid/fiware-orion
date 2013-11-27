@@ -78,4 +78,7 @@ TEST(putIndividualContextEntity, ok)
   out             = restService(&ci, rs);
 
   EXPECT_STREQ(expected.c_str(), out.c_str());
+
+  delete timerMock;
+  setTimer(NULL);
 }

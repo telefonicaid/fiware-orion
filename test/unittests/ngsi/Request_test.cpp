@@ -61,6 +61,7 @@ TEST(Request, requestType)
     { ContextEntityAttributes,                   "ContextEntityAttributes"                                },
     { ContextEntityTypes,                        "ContextEntityTypes"                                     },
     { ContextEntityTypeAttributeContainer,       "ContextEntityTypeAttributeContainer"                    },
+    { ContextEntityTypeAttribute,                "ContextEntityTypeAttribute"                             },
     { EntityByIdAttributeByName,                 "EntityByIdAttributeByName"                              },
     { IndividualContextEntity,                   "IndividualContextEntity"                                },
     { IndividualContextEntityAttributes,         "IndividualContextEntityAttributes"                      },
