@@ -335,6 +335,8 @@ coverage_unit_test: build_unit_test
 	lcov -r coverage/broker.info "test/unittests/*" -o coverage/broker.info	
 	lcov -r coverage/broker.info "src/lib/logMsg/*" -o coverage/broker.info
 	lcov -r coverage/broker.info "src/lib/parseArgs/*" -o coverage/broker.info
+	# app/ contains application itself, not libraries which make sense to measure unit_test coverage
+	lcov -r coverage/broker.info "src/app/*" -o coverage/broker.info
 	genhtml -o coverage coverage/broker.info
 
 coverage_functional_test: install_coverage
