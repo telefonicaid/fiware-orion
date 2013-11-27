@@ -49,12 +49,12 @@ static RestService rs[] =
 
 /* ****************************************************************************
 *
-* notFound - 
+* createEntity -
 */
-TEST(postIndividualContextEntityAttributes, notFound)
+TEST(postIndividualContextEntityAttributes, createEntity)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity11/attributes",  "POST", "1.1");
-  std::string    expected      = "<appendContextElementResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Entity not found</reasonPhrase>\n    <details>entity: (entity11, , false)</details>\n  </errorCode>\n</appendContextElementResponse>\n";
+  std::string    expected = "<appendContextElementResponse>\n  <contextResponseList>\n    <contextAttributeResponse>\n      <statusCode>\n        <code>200</code>\n        <reasonPhrase></reasonPhrase>\n      </statusCode>\n    </contextAttributeResponse>\n  </contextResponseList>\n</appendContextElementResponse>\n";
   const char*    fileName      = "ngsi10.updateContextElementRequest.ok.valid.xml";
   std::string    out;
 
