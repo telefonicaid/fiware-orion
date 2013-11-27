@@ -122,6 +122,8 @@ post_install_libs:
 	cp src/lib/common/*.h /usr/local/include/contextBroker/common         
 	cp $(CMAKE_BUILD_TYPE)/src/lib/common/libcommon.a  /usr/local/lib 
 
+	chmod a+r /usr/local/include/contextBroker/common/compileInfo.h
+
 	cd /usr/local/include/contextBroker  && rm -rf convenience && mkdir -p convenience
 	cp src/lib/convenience/*.h /usr/local/include/contextBroker/convenience         
 	cp $(CMAKE_BUILD_TYPE)/src/lib/convenience/libconvenience.a  /usr/local/lib 
