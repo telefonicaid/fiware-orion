@@ -100,16 +100,10 @@ echo "+++++ 2. lookup the entity +++++"
 +++++ 2. lookup the entity +++++
 <?xml version="1.0"?>
 <contextAttributeResponse>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>temperature</name>
-      <type>degree</type>
-      <contextValue/>
-    </contextAttribute>
-  </contextAttributeList>
   <statusCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
+    <code>404</code>
+    <reasonPhrase>Entity Not Found</reasonPhrase>
+    <details>entity01</details>
   </statusCode>
 </contextAttributeResponse>
 --TEARDOWN--
