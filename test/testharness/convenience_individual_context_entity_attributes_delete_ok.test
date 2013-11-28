@@ -102,7 +102,8 @@ echo "+++++ 2. delete the entity +++++"
 <?xml version="1.0"?>
 <statusCode>
   <code>404</code>
-  <reasonPhrase>DELETE cannot be used to create new entities</reasonPhrase>
+  <reasonPhrase>Entity Not Found</reasonPhrase>
+  <details>entity01</details>
 </statusCode>
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then

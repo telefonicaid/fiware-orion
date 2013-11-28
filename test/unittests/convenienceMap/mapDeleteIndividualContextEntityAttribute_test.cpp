@@ -87,8 +87,8 @@ TEST(mapDeleteIndividualContextEntityAttribute, notFound)
   ms = mapDeleteIndividualContextEntityAttribute("ID2", "NAME2", &sc);
 
   EXPECT_EQ(SccContextElementNotFound, sc.code);
-  EXPECT_STREQ("DELETE cannot be used to create new entities", sc.reasonPhrase.c_str());
-  EXPECT_EQ(0, sc.details.size());
+  EXPECT_STREQ("Entity Not Found", sc.reasonPhrase.c_str());
+  EXPECT_STREQ("ID2", sc.details.c_str());
 
   mongoDisconnect();
 }

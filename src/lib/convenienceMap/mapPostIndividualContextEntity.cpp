@@ -80,9 +80,9 @@ HttpStatusCode mapPostIndividualContextEntity(std::string entityId, AppendContex
      LM_T(LmtClone, ("Copying ContextAttribute %d", caIx));
      ContextAttribute* caP = new ContextAttribute(ucContextElementResponse->contextElement.contextAttributeVector.get(caIx));
      
-     car->contextAttributeVector.push_back(caP);
-     car->statusCode.fill(&ucContextElementResponse->statusCode);
+     car->contextAttributeVector.push_back(caP);     
   }
+  car->statusCode.fill(&ucContextElementResponse->statusCode);
 
   response->contextResponseVector.push_back(car);
   response->errorCode.fill(&ucResponse.contextElementResponseVector.get(0)->statusCode);

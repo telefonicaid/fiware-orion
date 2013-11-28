@@ -560,7 +560,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     DBClientConnection* connection = getMongoConnection();
 
     /* Getting the entity in the request (helpful in other places) */
-    EntityId en = ceP->entityId;    
+    EntityId en = ceP->entityId;
 
     /* Not supporting isPattern = true currently */
     if (isTrue(en.isPattern)) {
@@ -712,13 +712,12 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
     }
 
-    /* If the entity didn't already exist, we create it. Note that alternativelly, we could do a count()
+    /* If the entity didn't already exist, we create it. Note that alternatively, we could do a count()
      * before the query() to check this and early return. However this would add a sencond interaction with MongoDB */
     if (!atLeastOneResult) {
 
         if (strcasecmp(action.c_str(), "delete") == 0) {
-            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound,
-                                     "DELETE cannot be used to create new entities");
+            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, "Entity Not Found", en.id);
         }
         else {
             std::string err;
@@ -729,7 +728,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
                 ContextElementResponse* cerP = new ContextElementResponse();
 
-                /* Sucesfull creation: send notifications */
+                /* Succesfull creation: send notifications */
                 std::map<string, BSONObj*> subsToNotify;
                 for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                     std::string err;
@@ -741,15 +740,12 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 }
                 processSubscriptions(en, &subsToNotify, &err);
 
-                /* Sucesfull creation: creating corresponding ContextElementResponse */                
-                cerP->contextElement.entityId.id = en.id;
-                cerP->contextElement.entityId.type = en.type;
-                cerP->contextElement.entityId.isPattern = "false";
+                /* Succesfull creation: creating corresponding ContextElementResponse */
+                cerP->contextElement.entityId.fill(en.id, en.type, "false");
 
                 for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
-                    ContextAttribute* ca = new ContextAttribute();
-                    ca->name = ceP->contextAttributeVector.get(ix)->name;
-                    ca->type = ceP->contextAttributeVector.get(ix)->type;
+                    ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
+                    ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);
                     cerP->contextElement.contextAttributeVector.push_back(ca);
                 }
 
