@@ -716,13 +716,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
      * before the query() to check this and early return. However this would add a sencond interaction with MongoDB */
     if (!atLeastOneResult) {
 
-#if 0
-        buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound,
-                                 "Entity not found",
-                                 // FIXME: use toString once EntityID becomes objects
-                                 std::string("entity: (") + en.id + ", " + en.type + ", " + en.isPattern + ")");
-#endif
-
         if (strcasecmp(action.c_str(), "delete") == 0) {
             buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound,
                                      "DELETE cannot be used to create new entities");
