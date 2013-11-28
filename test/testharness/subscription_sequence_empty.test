@@ -444,7 +444,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 </unsubscribeContextResponse>
 10: ++++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 1079
+Content-Length: 909
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -460,11 +460,6 @@ Content-Type: application/xml
           <id>OfficeRoom</id>
         </entityId>
         <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue></contextValue>
-          </contextAttribute>
           <contextAttribute>
             <name>pressure</name>
             <type>clima</type>
@@ -487,7 +482,7 @@ Content-Type: application/xml
 
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 1079
+Content-Length: 909
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -503,11 +498,6 @@ Content-Type: application/xml
           <id>OfficeRoom</id>
         </entityId>
         <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue></contextValue>
-          </contextAttribute>
           <contextAttribute>
             <name>pressure</name>
             <type>clima</type>
@@ -530,7 +520,7 @@ Content-Type: application/xml
 
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 1079
+Content-Length: 909
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -546,11 +536,6 @@ Content-Type: application/xml
           <id>OfficeRoom</id>
         </entityId>
         <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue></contextValue>
-          </contextAttribute>
           <contextAttribute>
             <name>pressure</name>
             <type>clima</type>
@@ -573,7 +558,7 @@ Content-Type: application/xml
 
 =======================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 1079
+Content-Length: 909
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -589,11 +574,6 @@ Content-Type: application/xml
           <id>OfficeRoom</id>
         </entityId>
         <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue></contextValue>
-          </contextAttribute>
           <contextAttribute>
             <name>pressure</name>
             <type>clima</type>
@@ -666,14 +646,14 @@ Content-Type: application/xml
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>t39</contextValue>
-          </contextAttribute>
-          <contextAttribute>
             <name>lightstatus</name>
             <type>light</type>
             <contextValue>L23</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>t39</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>

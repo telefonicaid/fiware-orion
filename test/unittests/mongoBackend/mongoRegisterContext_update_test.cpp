@@ -72,8 +72,6 @@ using ::testing::Return;
 * This function is called before every test, to populate some information in the
 * registrations collection.
 *
-* Note that entities are not created in the entities collections. This allows us to check if
-* entities are created as expected during updates.
 */
 static void prepareDatabase(void) {
 
@@ -261,18 +259,6 @@ TEST(mongoRegisterContext_update, updateCase1)
   EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
   EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
 
-  /* entities collection (new entity added) */
-  ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-  ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-  attrs = ent.getField("attrs").Array();
-  ASSERT_EQ(1, attrs.size());
-  attr0 = attrs[0].embeddedObject();
-  EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
-  EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
-
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ("PT1M", res.duration.get());
@@ -393,18 +379,6 @@ TEST(mongoRegisterContext_update, updateCase2)
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
-
-    /* entities collection (new entity added) */
-    ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
-    ent = connection->findOne(ENTITIES_COLL, BSONObj());
-
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
-    attr0 = attrs[0].embeddedObject();
-    EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -536,9 +510,6 @@ TEST(mongoRegisterContext_update, updateNotFound)
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
-
-    /* entities collection (new entity added) */
-    EXPECT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -677,9 +648,6 @@ TEST(mongoRegisterContext_update, updateWrongIdString)
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
 
-    /* entities collection (no entity added) */
-    EXPECT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(0, res.duration.get().size());
@@ -812,9 +780,6 @@ TEST(DISABLED_mongoRegisterContext_update, updateWrongIdNoHex)
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
-
-    /* entities collection (no entity added) */
-    EXPECT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -967,9 +932,6 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
     EXPECT_STREQ("A1", C_STR_FIELD(attr0, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(attr0, "type"));
     EXPECT_STREQ("true", C_STR_FIELD(attr0, "isDomain"));
-
-    /* entities collection (no entity added) */
-    EXPECT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
 }
 

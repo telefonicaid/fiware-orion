@@ -85,7 +85,7 @@ static void prepareDatabase(std::string id, std::string type)
 *
 * notFoundThenFound - 
 */
-TEST(mapPutIndividualContextEntity, notFoundThenFound)
+TEST(mapPutIndividualContextEntity, createTwoEntities)
 {
   HttpStatusCode                ms;
   UpdateContextElementRequest   request;
@@ -104,7 +104,7 @@ TEST(mapPutIndividualContextEntity, notFoundThenFound)
 
   ms = mapPutIndividualContextEntity("MPICE2", &request, &response);
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(404, response.errorCode.code);
+  EXPECT_EQ(200, response.errorCode.code);
 
   // Cleanup
   StatusCode sCode;

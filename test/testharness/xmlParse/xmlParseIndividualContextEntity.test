@@ -184,27 +184,36 @@ echo "9: +++++++++++++++++++++++++++++"
 2: +++++++++++++++++++++++++++++
 <?xml version="1.0"?>
 <appendContextElementResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>Entity not found</reasonPhrase>
-    <details>entity: (ENTITY_ID, , false)</details>
-  </errorCode>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>pressure</name>
+          <type>clima</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
 </appendContextElementResponse>
 3: +++++++++++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextElementResponse>
   <errorCode>
-    <code>404</code>
-    <reasonPhrase>Entity not found</reasonPhrase>
-    <details>entity: (ENTITY_ID, , false)</details>
+    <code>472</code>
+    <reasonPhrase>Not Found Attribute in UPDATE</reasonPhrase>
+    <details>action: UPDATE - entity: (ENTITY_ID, ) - offending attribute: temperature</details>
   </errorCode>
 </updateContextElementResponse>
 4: +++++++++++++++++++++++++++++
 <?xml version="1.0"?>
 <statusCode>
-  <code>404</code>
-  <reasonPhrase>Entity not found</reasonPhrase>
-  <details>entity: (ENTITY_ID, , false)</details>
+  <code>200</code>
+  <reasonPhrase>OK</reasonPhrase>
 </statusCode>
 5: +++++++++++++++++++++++++++++
 <?xml version="1.0"?>
@@ -221,9 +230,9 @@ echo "9: +++++++++++++++++++++++++++++"
     </entityId>
     <contextAttributeList>
       <contextAttribute>
-        <name>temperature</name>
-        <type>degree</type>
-        <contextValue/>
+        <name>pressure</name>
+        <type>clima</type>
+        <contextValue>p23</contextValue>
       </contextAttribute>
     </contextAttributeList>
   </contextElement>
@@ -245,8 +254,8 @@ echo "9: +++++++++++++++++++++++++++++"
         </contextAttribute>
       </contextAttributeList>
       <statusCode>
-        <code>0</code>
-        <reasonPhrase/>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextAttributeResponse>
   </contextResponseList>
@@ -254,21 +263,11 @@ echo "9: +++++++++++++++++++++++++++++"
 8: +++++++++++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextElementResponse>
-  <contextResponseList>
-    <contextAttributeResponse>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>temperature</name>
-          <type>degree</type>
-          <contextValue/>
-        </contextAttribute>
-      </contextAttributeList>
-      <statusCode>
-        <code>0</code>
-        <reasonPhrase/>
-      </statusCode>
-    </contextAttributeResponse>
-  </contextResponseList>
+  <errorCode>
+    <code>472</code>
+    <reasonPhrase>Not Found Attribute in UPDATE</reasonPhrase>
+    <details>action: UPDATE - entity: (ENTITY_ID, ) - offending attribute: temperature</details>
+  </errorCode>
 </updateContextElementResponse>
 9: +++++++++++++++++++++++++++++
 <?xml version="1.0"?>

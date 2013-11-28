@@ -104,17 +104,11 @@ echo "+++++ 2. lookup the entity +++++"
     <entityId type="" isPattern="false">
       <id>entity01</id>
     </entityId>
-    <contextAttributeList>
-      <contextAttribute>
-        <name>temperature</name>
-        <type>degree</type>
-        <contextValue/>
-      </contextAttribute>
-    </contextAttributeList>
   </contextElement>
   <statusCode>
-    <code>200</code>
-    <reasonPhrase>OK</reasonPhrase>
+    <code>404</code>
+    <reasonPhrase>Entity Not Found</reasonPhrase>
+    <details>entity01</details>
   </statusCode>
 </contextElementResponse>
 --TEARDOWN--

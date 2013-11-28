@@ -95,32 +95,25 @@ done
 
 --SHELL--
 
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
-  <registerContextRequest>
-    <contextRegistrationList>
-      <contextRegistration>
-        <entityIdList>
+<updateContextRequest>
+  <contextElementList>
+        <contextElement>
           <entityId type="Room" isPattern="false">
-            <id>ConferenceRoom</id>
+              <id>OfficeRoom</id>
           </entityId>
-          <entityId type="Room" isPattern="false">
-            <id>OfficeRoom</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:1028</providingApplication>
-      </contextRegistration>
-    </contextRegistrationList>
-    <duration>PT1H</duration>
-    <registrationId></registrationId>
-  </registerContextRequest>
+          <contextAttributeList>
+            <contextAttribute>
+              <name>temperature</name>
+              <type>clima</type>
+              <contextValue>t100</contextValue>
+            </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>UPDATE</updateAction>
+</updateContextRequest>
 EOF
 echo "1: ++++++++++++++++++++"
 
@@ -271,10 +264,28 @@ echo "TIMES: $TIMES"
 
 --REGEXPECT--
 <?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>clima</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
 1: ++++++++++++++++++++
 <?xml version="1.0"?>
 <subscribeContextResponse>
@@ -337,7 +348,7 @@ echo "TIMES: $TIMES"
 </unsubscribeContextResponse>
 8: ++++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 736
+Content-Length: 739
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -355,8 +366,8 @@ Content-Type: application/xml
         <contextAttributeList>
           <contextAttribute>
             <name>temperature</name>
-            <type>degree</type>
-            <contextValue></contextValue>
+            <type>clima</type>
+            <contextValue>t100</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>

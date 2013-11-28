@@ -87,8 +87,8 @@ TEST(mapDeleteIndividualContextEntityAttribute, notFound)
   ms = mapDeleteIndividualContextEntityAttribute("ID2", "NAME2", &sc);
 
   EXPECT_EQ(SccContextElementNotFound, sc.code);
-  EXPECT_STREQ("Entity not found", sc.reasonPhrase.c_str());
-  EXPECT_STREQ("entity: (ID2, , false)", sc.details.c_str());
+  EXPECT_STREQ("Entity Not Found", sc.reasonPhrase.c_str());
+  EXPECT_STREQ("ID2", sc.details.c_str());
 
   mongoDisconnect();
 }
