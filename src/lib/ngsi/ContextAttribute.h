@@ -32,6 +32,7 @@
 #include "common/Format.h"
 #include "ngsi/Request.h"
 
+#define METADATA_ID "ID"
 
 
 /* ****************************************************************************
@@ -48,6 +49,8 @@ typedef struct ContextAttribute
   ContextAttribute();
   ContextAttribute(ContextAttribute* caP);
   ContextAttribute(std::string _name, std::string _type, std::string _value = "");
+
+  std::string  getId();
 
   std::string  render(Format format, std::string indent, bool isInVector = false);
   std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);

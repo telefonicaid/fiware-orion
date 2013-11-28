@@ -522,10 +522,30 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
 
     BSONArrayBuilder attrsToAdd;
     for (unsigned int ix = 0; ix < attrsV.size(); ++ix) {
-        attrsToAdd.append(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
-                               ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
-                               ENT_ATTRS_VALUE << attrsV.get(ix)->value));
-        LM_T(LmtMongo, ("new attribute: {name: %s, type: %s}", attrsV.get(ix)->name.c_str(), attrsV.get(ix)->type.c_str()));
+        std::string attrId = attrsV.get(ix)->getId();
+        // FIXME P6: I don't like this approach, it is not DRY. It would be better to create the
+        // base attribute, then append the last item (id) only in the case it is used)
+        if (attrId.length() == 0) {
+            attrsToAdd.append(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
+                                   ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
+                                   ENT_ATTRS_VALUE << attrsV.get(ix)->value));
+            LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
+                            attrsV.get(ix)->name.c_str(),
+                            attrsV.get(ix)->type.c_str(),
+                            attrsV.get(ix)->value.c_str()));
+        }
+        else {
+            attrsToAdd.append(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
+                                    ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
+                                    ENT_ATTRS_VALUE << attrsV.get(ix)->value <<
+                                    ENT_ATTRS_ID << attrId));
+            LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s, id: %s}",
+                            attrsV.get(ix)->name.c_str(),
+                            attrsV.get(ix)->type.c_str(),
+                            attrsV.get(ix)->value.c_str(),
+                            attrId.c_str()));
+        }
+
     }
     BSONObj insertedDoc;
     if (e.type == "") {
@@ -746,6 +766,12 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                     ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
                     ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);
+
+                    if (caP->getId().length() != 0) {
+                        Metadata* md = new Metadata("ID", "string", caP->getId());
+                        ca->metadataVector.push_back(md);
+                    }
+
                     cerP->contextElement.contextAttributeVector.push_back(ca);
                 }
 
