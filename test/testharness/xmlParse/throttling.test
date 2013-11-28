@@ -60,8 +60,12 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
+print_headers () {
+  cat headers.out
+  echo $response | xmllint --format -
+}
 echo "1: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/ngsi10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+response=$((curl localhost:${BROKER_PORT}/ngsi10/subscribeContext $curl_options -s -S --dump-header headers.out --header "Content-Type: application/xml" -d @-) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -72,12 +76,13 @@ echo "1: +++++++++++++++++++++++++++++"
   <reference>http://localhost:${LISTENER_PORT}/notify</reference>
   <throttling>PT5H</throttling>
 </subscribeContextRequest>
-EOF
+EOF)
+print_headers
 echo "2: +++++++++++++++++++++++++++++"
 
 # Bad throttling syntax
 #INVALID_XML
-(curl localhost:${BROKER_PORT}/ngsi10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+response=$((curl localhost:${BROKER_PORT}/ngsi10/subscribeContext -s -S  --dump-header headers.out --header 'Content-Type: application/xml' -d @- ) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -88,11 +93,17 @@ echo "2: +++++++++++++++++++++++++++++"
   <reference>http://localhost:${LISTENER_PORT}/notify</reference>
   <throttling>PT5R</throttling>
 </subscribeContextRequest>
-EOF
+EOF)
+print_headers
 
 echo "3: +++++++++++++++++++++++++++++"
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 227
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
@@ -102,6 +113,11 @@ echo "3: +++++++++++++++++++++++++++++"
   </subscribeResponse>
 </subscribeContextResponse>
 2: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 260
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeError>
@@ -122,3 +138,4 @@ else
   # Waiting for valgrind to terminate (sleep 10)
   sleep 10
 fi
+rm headers.out
