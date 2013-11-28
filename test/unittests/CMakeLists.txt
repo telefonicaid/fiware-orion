@@ -99,9 +99,6 @@ SET (SOURCES
     serviceRoutines/postQueryContext_test.cpp
 
     convenience/Convenience_test.cpp
-    convenienceMap/mapEntityByIdAttributeByName_test.cpp
-    convenienceMap/mapContextEntitiesByEntityId_test.cpp
-    convenienceMap/mapContextEntityAttributes_test.cpp
     convenienceMap/mapDeleteIndividualContextEntity_test.cpp
     convenienceMap/mapGetIndividualContextEntity_test.cpp
     convenienceMap/mapPostIndividualContextEntity_test.cpp
