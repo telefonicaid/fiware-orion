@@ -58,6 +58,11 @@ const char* requestType(RequestType rt)
   case UpdateContextElement:                        return "UpdateContextElement";
   case AppendContextElement:                        return "AppendContextElement";
   case UpdateContextAttribute:                      return "UpdateContextAttribute";
+
+  case Ngsi10ContextEntityTypes:                    return "ContextEntityTypes";
+  case Ngsi10ContextEntityTypesAttributeContainer:  return "ContextEntityTypesAttributeContainer";
+  case Ngsi10ContextEntityTypesAttribute:           return "ContextEntityTypesAttribute";
+
   case LogRequest:                                  return "Log";
   case VersionRequest:                              return "Version";
   case StatisticsRequest:                           return "Statistics";

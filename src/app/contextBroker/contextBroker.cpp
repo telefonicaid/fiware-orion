@@ -98,6 +98,7 @@
 #include "serviceRoutines/postIndividualContextEntityAttributes.h"
 #include "serviceRoutines/deleteIndividualContextEntityAttributes.h"
 #include "serviceRoutines/getIndividualContextEntityAttribute.h"
+#include "serviceRoutines/getNgsi10ContextEntityTypes.h"
 #include "serviceRoutines/postIndividualContextEntityAttribute.h"
 #include "serviceRoutines/deleteIndividualContextEntityAttribute.h"
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
@@ -249,6 +250,8 @@ RestService restServiceV[] =
   { "DELETE IndividualContextEntityAttribute",    "DELETE", IndividualContextEntityAttribute,      5, { "ngsi10", "contextEntities", "*", "attributes", "*"  }, "",                                             deleteIndividualContextEntityAttribute    },
   { "* IndividualContextEntityAttribute",         "*",      IndividualContextEntityAttribute,      5, { "ngsi10", "contextEntities", "*", "attributes", "*"  }, "",                                             badVerbGetPostDeleteOnly                  },
   
+  { "GET Ngsi10ContextEntityTypes",               "GET",    Ngsi10ContextEntityTypes,              3, { "ngsi10", "contextEntityTypes", "*"                  }, "",                                             getNgsi10ContextEntityTypes               },
+  { "* Ngsi10ContextEntityTypes",                 "*",      Ngsi10ContextEntityTypes,              3, { "ngsi10", "contextEntityTypes", "*"                  }, "",                                             badVerbGetOnly                            },
 
   // log request
   { "GET LogRequest",                             "GET",    LogRequest,                            2, { "log", "verbose"                                     }, "",                                             logVerboseTreat                           },

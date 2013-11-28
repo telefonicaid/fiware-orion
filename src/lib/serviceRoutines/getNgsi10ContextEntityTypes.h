@@ -1,5 +1,5 @@
-#ifndef QUERY_CONTEXT_REQUEST_H
-#define QUERY_CONTEXT_REQUEST_H
+#ifndef GET_NGSI10_CONTEXT_ENTITY_TYPES_H
+#define GET_NGSI10_CONTEXT_ENTITY_TYPES_H
 
 /*
 *
@@ -26,32 +26,17 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "ngsi/Request.h"
-#include "ngsi/AttributeList.h"
-#include "ngsi/EntityIdVector.h"
-#include "ngsi/Restriction.h"
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* QueryContextRequest - 
+* getNgsi10ContextEntityTypes - 
 */
-typedef struct QueryContextRequest
-{
-  EntityIdVector    entityIdVector; // Mandatory
-  AttributeList     attributeList;  // Optional
-  Restriction       restriction;    // Optional
-
-  int               restrictions;
-
-  QueryContextRequest();
-  std::string   render(RequestType requestType, Format format, std::string indent);
-  std::string   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void          present(std::string indent);
-  void          release(void);
-  void          fill(std::string entityId, std::string entityType, std::string attributeName);
-} QueryContextRequest;
+extern std::string getNgsi10ContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
 
 #endif

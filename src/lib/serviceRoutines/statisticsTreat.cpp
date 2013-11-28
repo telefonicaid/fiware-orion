@@ -95,6 +95,10 @@ std::string statisticsTreat(ConnectionInfo* ciP, int components, std::vector<std
      noOfAppendContextElement                 = -1;
      noOfUpdateContextAttribute               = -1;
 
+     noOfNgsi10ContextEntityTypes                    = -1;
+     noOfNgsi10ContextEntityTypesAttributeContainer  = -1;
+     noOfNgsi10ContextEntityTypesAttribute           = -1;
+
      noOfLogRequests                          = -1;
      noOfVersionRequests                      = -1;
      noOfExitRequests                         = -1;
@@ -142,6 +146,10 @@ std::string statisticsTreat(ConnectionInfo* ciP, int components, std::vector<std
   if (noOfUpdateContextElement != -1)                 out += valueTag(indent + "  ", "updateContextElement",                    noOfUpdateContextElement + 1,                 ciP->outFormat);
   if (noOfAppendContextElement != -1)                 out += valueTag(indent + "  ", "appendContextElement",                    noOfAppendContextElement + 1,                 ciP->outFormat);
   if (noOfUpdateContextAttribute != -1)               out += valueTag(indent + "  ", "updateContextAttribute",                  noOfUpdateContextAttribute + 1,               ciP->outFormat);
+
+  if (noOfNgsi10ContextEntityTypes != -1)                    out += valueTag(indent + "  ", "contextEntityTypesNgsi10",                      noOfNgsi10ContextEntityTypes + 1,                    ciP->outFormat);
+  if (noOfNgsi10ContextEntityTypesAttributeContainer != -1)  out += valueTag(indent + "  ", "contextEntityTypeAttributeContainerNgsi10",     noOfNgsi10ContextEntityTypesAttributeContainer + 1,  ciP->outFormat);
+  if (noOfNgsi10ContextEntityTypesAttribute != -1)           out += valueTag(indent + "  ", "contextEntityTypeAttributeNgsi10",              noOfNgsi10ContextEntityTypesAttribute + 1,           ciP->outFormat);
 
   if (noOfLogRequests != -1)                          out += valueTag(indent + "  ", "logRequests",                             noOfLogRequests + 1,                          ciP->outFormat);
   if (noOfVersionRequests != -1)                      out += valueTag(indent + "  ", "versionRequests",                         noOfVersionRequests + 1,                      ciP->outFormat);

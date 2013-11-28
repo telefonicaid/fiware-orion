@@ -57,6 +57,7 @@ getIndividualContextEntityAttribute.cpp
 postIndividualContextEntityAttribute.cpp
 deleteIndividualContextEntityAttribute.cpp
 deleteIndividualContextEntity.cpp
+getNgsi10ContextEntityTypes.cpp
 badVerbPostOnly.cpp
 badVerbAllFour.cpp
 badVerbGetPostOnly.cpp
@@ -107,6 +108,7 @@ getIndividualContextEntityAttribute.h
 postIndividualContextEntityAttribute.h
 deleteIndividualContextEntityAttribute.h
 deleteIndividualContextEntity.h
+getNgsi10ContextEntityTypes.h
 badVerbPostOnly.h
 badVerbAllFour.h
 badVerbGetPostOnly.h
