@@ -341,14 +341,6 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
                 LM_T(LmtMongo, ("Entity registration: {id: %s, type: %s}", en->id.c_str(), en->type.c_str()));
             }
 
-#if 0
-            /* Check if we have to insert/update the entity of some of the attributes in the entities collection */
-            std::string err;
-            if (!checkAndCreateEntity(*en, cr->contextRegistrationAttributeVector.vec, &err)) {
-                responseP->errorCode.fill(SccReceiverInternalError, "Database Error", err);
-                LM_RE(SccOk, ("Database Error: '%s'", responseP->errorCode.reasonPhrase.c_str()));
-            }
-#endif
         }
 
         BSONArrayBuilder attrs;
