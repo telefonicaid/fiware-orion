@@ -30,6 +30,8 @@
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
+#include "testInit.h"
+
 
 
 /* ****************************************************************************
@@ -51,6 +53,8 @@ static RestService rs[] =
 */
 TEST(getIndividualContextEntityAttribute, notFound)
 {
+  setupDatabase();
+
   ConnectionInfo ci("/ngsi10/contextEntities/entity01/attributes/temperathure",  "GET", "1.1");
   std::string    expected = "<contextAttributeResponse>\n  <statusCode>\n    <code>404</code>\n    <reasonPhrase>Entity Not Found</reasonPhrase>\n    <details>entity01</details>\n  </statusCode>\n</contextAttributeResponse>\n";
 
