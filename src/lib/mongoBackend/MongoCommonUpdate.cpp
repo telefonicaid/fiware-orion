@@ -728,7 +728,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
                 ContextElementResponse* cerP = new ContextElementResponse();
 
-                /* Succesfull creation: send notifications */
+                /* Successfull creation: send notifications */
                 std::map<string, BSONObj*> subsToNotify;
                 for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                     std::string err;
@@ -740,7 +740,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 }
                 processSubscriptions(en, &subsToNotify, &err);
 
-                /* Succesfull creation: creating corresponding ContextElementResponse */
+                /* Successfull creation: creating corresponding ContextElementResponse */
                 cerP->contextElement.entityId.fill(en.id, en.type, "false");
 
                 for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
