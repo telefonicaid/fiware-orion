@@ -1,6 +1,3 @@
-#ifndef QUERY_CONTEXT_REQUEST_H
-#define QUERY_CONTEXT_REQUEST_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -26,32 +23,32 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "ngsi/Request.h"
-#include "ngsi/AttributeList.h"
-#include "ngsi/EntityIdVector.h"
-#include "ngsi/Restriction.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
+#include "serviceRoutines/postQueryContext.h"
+#include "serviceRoutines/getNgsi10ContextEntityTypes.h"
 
 
 
 /* ****************************************************************************
 *
-* QueryContextRequest - 
+* getNgsi10ContextEntityTypes - 
+*
+* GET /ngsi10/contextEntityTypes/{typeName}
 */
-typedef struct QueryContextRequest
+std::string getNgsi10ContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
-  EntityIdVector    entityIdVector; // Mandatory
-  AttributeList     attributeList;  // Optional
-  Restriction       restriction;    // Optional
+  std::string typeName = compV[2];
 
-  int               restrictions;
-
-  QueryContextRequest();
-  std::string   render(RequestType requestType, Format format, std::string indent);
-  std::string   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void          present(std::string indent);
-  void          release(void);
-  void          fill(std::string entityId, std::string entityType, std::string attributeName);
-} QueryContextRequest;
-
-#endif
+  LM_T(LmtConvenience, ("CONVENIENCE: got a  'GET' request for entity type '%s'", typeName.c_str()));
+  parseDataP->qcr.res.fill(".*", typeName, "");
+  std::string answer = postQueryContext(ciP, components, compV, parseDataP);
+  parseDataP->qcr.res.release();
+  
+  return answer;
+}

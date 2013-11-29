@@ -97,6 +97,7 @@ SET (SOURCES
     serviceRoutines/putIndividualContextEntity_test.cpp
     serviceRoutines/putIndividualContextEntityAttributes_test.cpp
     serviceRoutines/postQueryContext_test.cpp
+    serviceRoutines/getNgsi10ContextEntityTypes_test.cpp
 
     convenience/Convenience_test.cpp
     convenienceMap/mapDeleteIndividualContextEntity_test.cpp

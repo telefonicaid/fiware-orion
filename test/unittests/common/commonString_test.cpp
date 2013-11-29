@@ -271,6 +271,19 @@ TEST(string, parseEmptyUrl)
 
 /* ****************************************************************************
 *
+* i2s - 
+*/
+TEST(commonString, i2s)
+{
+  char  ph[32];
+  char* p;
+  
+  p = i2s(19, ph);
+  EXPECT_STREQ(p, "19");
+}
+
+/* ****************************************************************************
+*
 * parsedUptime -
 */
 TEST(string, parsedUptime)

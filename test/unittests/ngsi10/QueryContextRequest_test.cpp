@@ -29,6 +29,7 @@
 
 #include "common/globals.h"
 #include "rest/ConnectionInfo.h"
+#include "ngsi/Request.h"
 #include "jsonParse/jsonRequest.h"
 #include "xmlParse/xmlRequest.h"
 #include "xmlParse/xmlParse.h"
@@ -520,4 +521,29 @@ TEST(QueryContextRequest, noRestriction_xml)
   lmTraceLevelSet(LmtDump, false);
 
   EXPECT_EQ("OK", result) << "noRestriction";
+}
+
+
+
+/* ****************************************************************************
+*
+* fill - 
+*/
+TEST(QueryContextRequest, fill)
+{
+  QueryContextRequest q0;
+  QueryContextRequest q1;
+  std::string         out;
+  std::string         expected0 = "<queryContextRequest>\n  <entityIdList>\n    <entityId type=\"\" isPattern=\"true\">\n      <id></id>\n    </entityId>\n  </entityIdList>\n  <restriction>\n  </restriction>\n</queryContextRequest>\n";
+  std::string         expected1 = "<queryContextRequest>\n  <entityIdList>\n    <entityId type=\"ETYPE\" isPattern=\"true\">\n      <id>EID</id>\n    </entityId>\n  </entityIdList>\n  <attributeList>\n    <attribute>Attribute</attribute>\n  </attributeList>\n  <restriction>\n  </restriction>\n</queryContextRequest>\n";
+
+  q0.fill("", "", "");
+  q0.restrictions = 0;
+  out = q0.render(QueryContext, XML, "");
+  EXPECT_EQ(expected0, out);
+
+  q1.fill("EID", "ETYPE", "Attribute");
+  q1.restrictions = 0;
+  out = q1.render(QueryContext, XML, "");
+  EXPECT_EQ(expected1, out);
 }
