@@ -30,6 +30,8 @@
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
+#include "testInit.h"
+
 
 
 /* ****************************************************************************
@@ -55,6 +57,8 @@ TEST(getIndividualContextEntityAttributes, notFound)
   std::string    expected = "<contextElementResponse>\n  <contextElement>\n    <entityId type=\"\" isPattern=\"false\">\n      <id>entity11</id>\n    </entityId>\n  </contextElement>\n  <statusCode>\n    <code>404</code>\n    <reasonPhrase>Entity Not Found</reasonPhrase>\n    <details>entity11</details>\n  </statusCode>\n</contextElementResponse>\n";
 
   std::string    out;
+
+  setupDatabase();
 
   ci.outFormat = XML;
   out          = restService(&ci, rs);

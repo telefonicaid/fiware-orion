@@ -68,9 +68,12 @@ int noOfContextEntityTypes                   = -1;
 int noOfContextEntityTypeAttributeContainer  = -1;
 int noOfContextEntityTypeAttribute           = -1;
 
-int noOfIndividualContextEntity              = -1;
-int noOfIndividualContextEntityAttributes    = -1;
-int noOfIndividualContextEntityAttribute     = -1;
+int noOfIndividualContextEntity                     = -1;
+int noOfIndividualContextEntityAttributes           = -1;
+int noOfIndividualContextEntityAttribute            = -1;
+int noOfNgsi10ContextEntityTypes                    = -1;
+int noOfNgsi10ContextEntityTypesAttributeContainer  = -1;
+int noOfNgsi10ContextEntityTypesAttribute           = -1;
 
 int noOfUpdateContextElement                 = -1;
 int noOfAppendContextElement                 = -1;
@@ -121,9 +124,12 @@ void statisticsUpdate(RequestType request, Format inFormat)
    case IndividualContextEntityAttributes:      ++noOfIndividualContextEntityAttributes; break;
    case IndividualContextEntityAttribute:       ++noOfIndividualContextEntityAttribute; break;
 
-   case UpdateContextElement:                   ++noOfUpdateContextElement; break;
-   case AppendContextElement:                   ++noOfAppendContextElement; break;
-   case UpdateContextAttribute:                 ++noOfUpdateContextAttribute; break;
+   case UpdateContextElement:                       ++noOfUpdateContextElement; break;
+   case AppendContextElement:                       ++noOfAppendContextElement; break;
+   case UpdateContextAttribute:                     ++noOfUpdateContextAttribute; break;
+   case Ngsi10ContextEntityTypes:                   ++noOfNgsi10ContextEntityTypes; break;
+   case Ngsi10ContextEntityTypesAttributeContainer: ++noOfNgsi10ContextEntityTypesAttributeContainer; break;
+   case Ngsi10ContextEntityTypesAttribute:          ++noOfNgsi10ContextEntityTypesAttribute; break;
 
    case LogRequest:                             ++noOfLogRequests; break;
    case VersionRequest:                         ++noOfVersionRequests; break;

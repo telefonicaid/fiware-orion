@@ -98,6 +98,7 @@
 #include "serviceRoutines/postIndividualContextEntityAttributes.h"
 #include "serviceRoutines/deleteIndividualContextEntityAttributes.h"
 #include "serviceRoutines/getIndividualContextEntityAttribute.h"
+#include "serviceRoutines/getNgsi10ContextEntityTypes.h"
 #include "serviceRoutines/postIndividualContextEntityAttribute.h"
 #include "serviceRoutines/deleteIndividualContextEntityAttribute.h"
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
@@ -249,6 +250,10 @@ RestService restServiceV[] =
   { "DELETE IndividualContextEntityAttribute",    "DELETE", IndividualContextEntityAttribute,      5, { "ngsi10", "contextEntities", "*", "attributes", "*"  }, "",                                             deleteIndividualContextEntityAttribute    },
   { "* IndividualContextEntityAttribute",         "*",      IndividualContextEntityAttribute,      5, { "ngsi10", "contextEntities", "*", "attributes", "*"  }, "",                                             badVerbGetPostDeleteOnly                  },
   
+  { "GET Ngsi10ContextEntityTypes",                    "GET",    Ngsi10ContextEntityTypes,                    3, { "ngsi10", "contextEntityTypes", "*"                }, "",                                    getNgsi10ContextEntityTypes               },
+  { "* Ngsi10ContextEntityTypes",                      "*",      Ngsi10ContextEntityTypes,                    3, { "ngsi10", "contextEntityTypes", "*"                }, "",                                    badVerbGetOnly                            },
+  { "GET Ngsi10ContextEntityTypesAttributeContainer",  "GET",    Ngsi10ContextEntityTypesAttributeContainer,  4, { "ngsi10", "contextEntityTypes", "*", "attributes"  }, "",                                    getNgsi10ContextEntityTypes               },
+  { "* Ngsi10ContextEntityTypes",                      "*",      Ngsi10ContextEntityTypesAttributeContainer,  4, { "ngsi10", "contextEntityTypes", "*", "attributes"  }, "",                                    badVerbGetOnly                            },
 
   // log request
   { "GET LogRequest",                             "GET",    LogRequest,                            2, { "log", "verbose"                                     }, "",                                             logVerboseTreat                           },
@@ -316,7 +321,20 @@ RestService restServiceNgsi9V[] =
   { "GET EntityByIdAttributeByName",              "GET",    EntityByIdAttributeByName,             5, { "ngsi9", "contextEntities", "*", "attributes", "*"   }, "",                                             getEntityByIdAttributeByName              },
   { "POST EntityByIdAttributeByName",             "POST",   EntityByIdAttributeByName,             5, { "ngsi9", "contextEntities", "*", "attributes", "*"   }, "registerProviderRequest",                      postEntityByIdAttributeByName             },
   { "* EntityByIdAttributeByName",                "*",      EntityByIdAttributeByName,             5, { "ngsi9", "contextEntities", "*", "attributes", "*"   }, "",                                             badVerbGetPostOnly                        },
-  
+
+  { "GET ContextEntityTypes",                     "GET",    ContextEntityTypes,                    3, { "ngsi9", "contextEntityTypes", "*"                   }, "",                                             getContextEntityTypes                     },
+  { "POST ContextEntityTypes",                    "POST",   ContextEntityTypes,                    3, { "ngsi9", "contextEntityTypes", "*"                   }, "registerProviderRequest",                      postContextEntityTypes                    },
+  { "* ContextEntityTypes",                       "*",      ContextEntityTypes,                    3, { "ngsi9", "contextEntityTypes", "*"                   }, "",                                             badVerbGetPostOnly                        },
+   
+  { "GET ContextEntityTypeAttributeContainer",    "GET",    ContextEntityTypeAttributeContainer,   4, { "ngsi9", "contextEntityTypes", "*", "attributes"     }, "",                                             getContextEntityTypes                     },
+  { "POST ContextEntityTypeAttributeContainer",   "POST",   ContextEntityTypeAttributeContainer,   4, { "ngsi9", "contextEntityTypes", "*", "attributes"     }, "registerProviderRequest",                      postContextEntityTypes                    },
+  { "* ContextEntityTypeAttributeContainer",      "*",      ContextEntityTypeAttributeContainer,   4, { "ngsi9", "contextEntityTypes", "*", "attributes"     }, "",                                             badVerbGetPostOnly                        },
+
+  { "GET ContextEntityTypeAttribute",             "GET",    ContextEntityTypeAttribute,            5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*" }, "",                                             getContextEntityTypeAttribute            },
+  { "POST ContextEntityTypeAttribute",            "POST",   ContextEntityTypeAttribute,            5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*" }, "registerProviderRequest",                      postContextEntityTypeAttribute           },
+  { "* ContextEntityTypeAttribute",               "*",      ContextEntityTypeAttribute,            5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*" }, "",                                             badVerbGetPostOnly                       },
+
+
 
   // log request
   { "GET LogRequest",                             "GET",    LogRequest,                            2, { "log", "verbose"                                     }, "",                                             logVerboseTreat                           },

@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "common/Format.h"
+#include "convenience/RegisterProviderRequest.h"
 #include "ngsi/ContextRegistrationVector.h"
 #include "ngsi/Duration.h"
 #include "ngsi/RegistrationId.h"
@@ -49,6 +50,7 @@ typedef struct RegisterContextRequest
   std::string   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void          present(void);
   void          release(void);
+  void          fill(RegisterProviderRequest& rpr, std::string entityId, std::string entityType, std::string attributeName);
 } RegisterContextRequest;
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef MAP_POST_CONTEXT_ENTITIES_BY_ENTITY_ID_H
-#define MAP_POST_CONTEXT_ENTITIES_BY_ENTITY_ID_H
+#ifndef GET_NGSI10_CONTEXT_ENTITY_TYPES_H
+#define GET_NGSI10_CONTEXT_ENTITY_TYPES_H
 
 /*
 *
@@ -26,16 +26,17 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "convenience/RegisterProviderRequest.h"
-#include "ngsi9/RegisterContextResponse.h"
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* mapPostContextEntitiesByEntityId - 
+* getNgsi10ContextEntityTypes - 
 */
-extern HttpStatusCode mapPostContextEntitiesByEntityId(std::string id, RegisterProviderRequest* rpr, RegisterContextResponse* response);
+extern std::string getNgsi10ContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
 
 #endif

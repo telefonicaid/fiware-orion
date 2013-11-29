@@ -28,9 +28,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenienceMap/mapPostContextEntitiesByEntityId.h"
-#include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
+#include "ngsi9/RegisterContextRequest.h"
+#include "serviceRoutines/postRegisterContext.h"  // instead of convenienceMap function, postRegisterContext is used
 #include "serviceRoutines/postContextEntitiesByEntityId.h"
 
 
@@ -38,17 +39,19 @@
 /* ****************************************************************************
 *
 * postContextEntitiesByEntityId - 
+*
+* POST /ngsi9/contextEntities/{entityId}
 */
 std::string postContextEntitiesByEntityId(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
-  std::string              entityId = compV[2];
-  std::string              answer;
-  RegisterContextResponse  response;
+  std::string  entityId = compV[2];
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'POST' request for entityId '%s'", entityId.c_str()));
-  ciP->httpStatusCode = mapPostContextEntitiesByEntityId(entityId, &parseDataP->rpr.res, &response);
-  answer = response.render(RegisterContext, ciP->outFormat, "");
-  response.release();
+  // Transform RegisterProviderRequest into RegisterContextRequest
+  parseDataP->rcr.res.fill(parseDataP->rpr.res, entityId, "", "");
+
+  // Now call postRegisterContext (postRegisterContext doesn't use the parameters 'components' and 'compV')
+  std::string answer = postRegisterContext(ciP, components, compV, parseDataP);
+  parseDataP->rpr.res.release();
 
   return answer;
 }
