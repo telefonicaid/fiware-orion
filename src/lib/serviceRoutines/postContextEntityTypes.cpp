@@ -39,32 +39,19 @@
 /* ****************************************************************************
 *
 * postContextEntityTypes - 
+*
+* POST /ngsi9/contextEntityTypes/{entityType}
 */
 std::string postContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
-  std::string  typeName     = compV[2];
-  std::string  answer;
+  std::string  entityType    = compV[2];
   
   // Transform RegisterProviderRequest into RegisterContextRequest
-  RegisterProviderRequest* rprP = &parseDataP->rpr.res;
-  RegisterContextRequest*  rcrP = &parseDataP->rcr.res;
-  ContextRegistration      cr;
-  EntityId                 entityId;
-
-  rcrP->duration       = rprP->duration;
-  rcrP->registrationId = rprP->registrationId;
-
-  entityId.type = typeName;
-  cr.registrationMetadataVector.fill(rprP->metadataVector);
-  cr.providingApplication = rprP->providingApplication;
-
-  cr.entityIdVector.push_back(&entityId);
-  cr.entityIdVectorPresent = true;
-  rcrP->contextRegistrationVector.push_back(&cr);
+  parseDataP->rcr.res.fill(parseDataP->rpr.res, "", entityType, "");
 
   // Now call postRegisterContext (postRegisterContext doesn't use the parameters 'components' and 'compV')
-  answer = postRegisterContext(ciP, components, compV, parseDataP);
-  cr.registrationMetadataVector.release();
+  std::string answer = postRegisterContext(ciP, components, compV, parseDataP);
+  parseDataP->rpr.res.release();
 
   return answer;
 }
