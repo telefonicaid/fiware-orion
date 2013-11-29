@@ -43,12 +43,12 @@
 * (and used from) a global place, maybe as part as the class-refactoring within
 * EntityId or Attribute class methods.
 */
-bool smartAttrMatch(std::string id1, std::string type1, std::string id2, std::string type2) {
+bool smartAttrMatch(std::string name1, std::string type1, std::string id1, std::string name2, std::string type2, std::string id2) {
     if (type2 == "") {
-        return id1 == id2;
+        return (name1 == name2 && id1 == id2);
     }
     else {
-        return (id1 == id2 && type1 == type2);
+        return (name1 == name2 && type1 == type2 && id1 == id2);
     }
 }
 
@@ -71,7 +71,11 @@ static bool checkAndUpdate (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
 
     newAttr->append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
     newAttr->append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
-    if (smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_TYPE), ca.name, ca.type)) {
+    if (STR_FIELD(attr, ENT_ATTRS_ID) != "") {
+        newAttr->append(ENT_ATTRS_ID, STR_FIELD(attr, ENT_ATTRS_ID));
+    }
+    if (smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_TYPE), STR_FIELD(attr, ENT_ATTRS_ID),
+                       ca.name, ca.type, ca.getId())) {
         /* Attribute match: update value */
         newAttr->append(ENT_ATTRS_VALUE, ca.value);
         updated = true;
@@ -113,7 +117,8 @@ static bool checkAndUpdate (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
 static bool checkAndDelete (BSONObjBuilder* newAttr, BSONObj attr, ContextAttribute ca) {
 
     bool deleted = true;
-    if (!smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_TYPE), ca.name, ca.type)) {
+    if (!smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_TYPE), STR_FIELD(attr, ENT_ATTRS_ID),
+                        ca.name, ca.type, ca.getId())) {
         /* Attribute doesn't match: value is included "as is" */
         newAttr->append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
         newAttr->append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
@@ -189,12 +194,48 @@ static void appendAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
         newAttr.append(ENT_ATTRS_NAME, caP->name);
         newAttr.append(ENT_ATTRS_TYPE, caP->type);
         newAttr.append(ENT_ATTRS_VALUE, caP->value);
+        if (caP->getId() != "") {
+            newAttr.append(ENT_ATTRS_ID, caP->getId());
+        }
         newAttr.append(ENT_ATTRS_MODIFICATION_DATE, getCurrentTime());
         newAttrsBuilder.append(newAttr.obj());
     }
     *newAttrs = newAttrsBuilder.arr();
 
 }
+
+/* ****************************************************************************
+*
+* legalAppend -
+*
+* Check that the client is not trying to mix attributes ID and no ID for the same
+* name
+*
+*/
+static bool legalAppend(BSONObj* attrs, ContextAttribute* caP) {
+
+    if (caP->getId() == "") {
+        /* Attribute attempting to append hasn't ID. Thus, no attribute with same name can have ID in attrs */
+        for( BSONObj::iterator i = attrs->begin(); i.more(); ) {
+            BSONObj attr = i.next().embeddedObject();
+            if (STR_FIELD(attr, ENT_ATTRS_NAME) == caP->name && STR_FIELD(attr, ENT_ATTRS_TYPE) == caP->type && STR_FIELD(attr, ENT_ATTRS_ID) != "") {
+                return false;
+            }
+        }
+        return true;
+    }
+    else {
+        /* Attribute attempting to append has ID. Thus, no attribute with same name cannot have ID in attrs */
+        for( BSONObj::iterator i = attrs->begin(); i.more(); ) {
+            BSONObj attr = i.next().embeddedObject();
+            if (STR_FIELD(attr, ENT_ATTRS_NAME) == caP->name && STR_FIELD(attr, ENT_ATTRS_TYPE) == caP->type && STR_FIELD(attr, ENT_ATTRS_ID) == "") {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
 
 /* ****************************************************************************
 *
@@ -426,6 +467,10 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
         ContextAttribute* ca = new ContextAttribute();
         ca->name = ceP->contextAttributeVector.get(ix)->name;
         ca->type = ceP->contextAttributeVector.get(ix)->type;
+        if (ceP->contextAttributeVector.get(ix)->getId() != "") {
+            Metadata*  md = new Metadata(METADATA_ID, "string", ceP->contextAttributeVector.get(ix)->getId());
+            ca->metadataVector.push_back(md);
+        }
         cerP->contextElement.contextAttributeVector.push_back(ca);
 
         /* actualUpdate could be changed to false in the "update" case. For "delete" and
@@ -451,8 +496,23 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
             }
         }
         else if (strcasecmp(action.c_str(), "append") == 0) {
-            appendAttribute(attrs, newAttrs, ceP->contextAttributeVector.get(ix));
-            *attrs = *newAttrs;
+            if (legalAppend(attrs, ceP->contextAttributeVector.get(ix))) {
+                appendAttribute(attrs, newAttrs, ceP->contextAttributeVector.get(ix));
+                *attrs = *newAttrs;
+            }
+            else {
+                /* If legalAppend() returns false, then that particular attribute can not be appended. In this case,
+                 * we interrupt the processing an early return with
+                 * a error StatusCode */
+                cerP->statusCode.fill(SccInvalidParameter,
+                                      "It is not allowed to APPEND an attribute with ID when another with the same name is in place or viceversa",
+                                      std::string("action: APPEND") +
+                                          // FIXME: use toString once EntityID and ContextAttribute becomes objects
+                                          " - entity: (" + entityId + ", " + entityType + ")" +
+                                          " - offending attribute: " + ceP->contextAttributeVector.get(ix)->name);
+                responseP->contextElementResponseVector.push_back(cerP);
+                return false;
+            }
         }
         else if (strcasecmp(action.c_str(), "delete") == 0) {
             if (deleteAttribute(attrs, newAttrs, ceP->contextAttributeVector.get(ix))) {
@@ -768,7 +828,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                     ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);
 
                     if (caP->getId().length() != 0) {
-                        Metadata* md = new Metadata("ID", "string", caP->getId());
+                        Metadata* md = new Metadata(METADATA_ID, "string", caP->getId());
                         ca->metadataVector.push_back(md);
                     }
 
