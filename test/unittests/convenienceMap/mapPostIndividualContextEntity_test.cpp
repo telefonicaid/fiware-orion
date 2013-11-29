@@ -104,9 +104,9 @@ TEST(mapPostIndividualContextEntity, emptyDb)
   prepareDatabase("", "");
   ms = mapPostIndividualContextEntity("MPICE", &request, &response);
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(404, response.errorCode.code);
-  EXPECT_EQ("Entity not found", response.errorCode.reasonPhrase);
-  EXPECT_EQ("entity: (MPICE, , false)", response.errorCode.details);
+  EXPECT_EQ(SccOk, response.errorCode.code);
+  EXPECT_EQ("OK", response.errorCode.reasonPhrase);
+  EXPECT_EQ(0, response.errorCode.details.size());
 }
 
 
@@ -137,9 +137,9 @@ TEST(mapPostIndividualContextEntity, found)
 
 /* ****************************************************************************
 *
-* notFound - 
+* newEntity -
 */
-TEST(mapPostIndividualContextEntity, notFound)
+TEST(mapPostIndividualContextEntity, newEntity)
 {
   HttpStatusCode                ms;
   AppendContextElementRequest   request;
@@ -154,6 +154,6 @@ TEST(mapPostIndividualContextEntity, notFound)
 
   ms = mapPostIndividualContextEntity("MPICE2", &request, &response);
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(404, response.errorCode.code);
-  EXPECT_STREQ("Entity not found", response.errorCode.reasonPhrase.c_str());
+  EXPECT_EQ(SccOk, response.errorCode.code);
+  EXPECT_STREQ("OK", response.errorCode.reasonPhrase.c_str());
 }

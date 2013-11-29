@@ -74,9 +74,9 @@ static void prepareDatabase(std::string id, std::string type)
 
 /* ****************************************************************************
 *
-* notFoundThenFound - 
+* newEntityThenNewEntity -
 */
-TEST(mapPostIndividualContextEntityAttributes, notFoundThenFound)
+TEST(mapPostIndividualContextEntityAttributes, newEntityThenNewEntity)
 {
   HttpStatusCode                ms;
   AppendContextElementRequest   request;
@@ -91,9 +91,9 @@ TEST(mapPostIndividualContextEntityAttributes, notFoundThenFound)
 
   ms = mapPostIndividualContextEntityAttributes("MPICE", &request, &response);
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(200, response.errorCode.code);
+  EXPECT_EQ(SccOk, response.errorCode.code);
 
   ms = mapPostIndividualContextEntityAttributes("MPICE2", &request, &response);
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(404, response.errorCode.code);
+  EXPECT_EQ(SccOk, response.errorCode.code);
 }

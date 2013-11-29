@@ -218,6 +218,9 @@ SET (SOURCES
     mongoBackend/mongoNotifyContextAvailability_test.cpp
 
     jsonParse/jsonRequest_test.cpp
+
+    rest/OrionError_test.cpp
+    rest/Verb_test.cpp
 )
 
 SET (HEADERS

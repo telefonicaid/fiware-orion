@@ -19,7 +19,7 @@
 # fermin at tid dot es
 
 --NAME--
-Convenience Individual Context Entity - PUT FAILS
+Convenience Individual Context Entity - PUT CREATE
 
 --SHELL-INIT--
 # Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
@@ -88,10 +88,21 @@ EOF
 <updateContextElementResponse>
   <contextResponseList>
     <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue/>
+        </contextAttribute>
+        <contextAttribute>
+          <name>pressure</name>
+          <type>clima</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
       <statusCode>
-        <code>404</code>
-        <reasonPhrase>Entity not found</reasonPhrase>
-        <details>entity: (entity01, , false)</details>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextAttributeResponse>
   </contextResponseList>

@@ -32,6 +32,7 @@
 
 #include "testDataFromFile.h"
 
+#include "testInit.h"
 
 
 /* ****************************************************************************
@@ -54,6 +55,8 @@ static RestService rs[] =
 TEST(postQueryContext, notFound)
 {
   lmTraceSet("0-255");
+
+  setupDatabase();
 
   ConnectionInfo ci("/ngsi10/queryContext",  "POST", "1.1");
   std::string    expected      = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context elements found</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";

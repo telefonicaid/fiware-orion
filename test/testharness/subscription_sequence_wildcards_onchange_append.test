@@ -583,14 +583,14 @@ Content-Type: application/xml
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>t39</contextValue>
-          </contextAttribute>
-          <contextAttribute>
             <name>pressure</name>
             <type>clima</type>
             <contextValue>p83</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>t39</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>

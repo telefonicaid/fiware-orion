@@ -20,7 +20,7 @@
       </metadata>
     </contextAttribute>
     <contextAttribute>
-      <name>temperature</name>
+      <name>pressure</name>
       <type>Room</type>
       <contextValue>10</contextValue>
       <metadata>

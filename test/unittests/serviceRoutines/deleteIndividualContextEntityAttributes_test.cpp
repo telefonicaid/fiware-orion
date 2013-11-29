@@ -50,7 +50,7 @@ static RestService rs[] =
 TEST(deleteIndividualContextEntityAttributes, notFound)
 {
   ConnectionInfo  ci("/ngsi10/contextEntities/entity901/attributes",  "DELETE", "1.1");
-  std::string     expected = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>Entity not found</reasonPhrase>\n  <details>entity: (entity901, , false)</details>\n</statusCode>\n";
+  std::string     expected = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>Entity Not Found</reasonPhrase>\n  <details>entity901</details>\n</statusCode>\n";
   std::string     out      = restService(&ci, rs);
 
   EXPECT_STREQ(expected.c_str(), out.c_str());

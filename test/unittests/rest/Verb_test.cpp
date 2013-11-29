@@ -1,6 +1,3 @@
-#ifndef ORION_ERROR_H
-#define ORION_ERROR_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,30 +22,26 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-
-#include "common/Format.h"
-#include "ngsi/ErrorCode.h"
-#include "ngsi/StatusCode.h"
-
+#include "gtest/gtest.h"
+#include "logMsg/logMsg.h"
+#include "rest/Verb.h"
 
 
 /* ****************************************************************************
 *
-* OrionError - 
+* all - 
 */
-typedef struct OrionError
+TEST(Verb, all)
 {
-  int          code;
-  std::string  reasonPhrase;
-  std::string  details;
-
-  OrionError();
-  OrionError(ErrorCode& errorCode);
-  OrionError(StatusCode& statusCode);
-  OrionError(int _code, std::string _reasonPhrase, std::string _details = "");
-
-  std::string  render(Format format, std::string indent);
-} OrionError;
-
-#endif
+   EXPECT_STREQ("GET",          verbName(GET));
+   EXPECT_STREQ("PUT",          verbName(PUT));
+   EXPECT_STREQ("POST",         verbName(POST));
+   EXPECT_STREQ("DELETE",       verbName(DELETE));
+   EXPECT_STREQ("PATCH",        verbName(PATCH));
+   EXPECT_STREQ("HEAD",         verbName(HEAD));
+   EXPECT_STREQ("OPTIONS",      verbName(OPTIONS));
+   EXPECT_STREQ("TRACE",        verbName(TRACE));
+   EXPECT_STREQ("CONNECT",      verbName(CONNECT));
+   EXPECT_STREQ("NOVERB",       verbName(NOVERB));
+   EXPECT_STREQ("Unknown verb", verbName((Verb) 1234));
+}

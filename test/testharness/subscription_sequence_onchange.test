@@ -661,14 +661,14 @@ Content-Type: application/xml
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>t100</contextValue>
-          </contextAttribute>
-          <contextAttribute>
             <name>lightstatus</name>
             <type>light</type>
             <contextValue>L23</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>t100</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -699,14 +699,14 @@ Content-Type: application/xml
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>t100</contextValue>
-          </contextAttribute>
-          <contextAttribute>
             <name>lightstatus</name>
             <type>light</type>
             <contextValue>L53</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>t100</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -737,14 +737,14 @@ Content-Type: application/xml
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>t39</contextValue>
-          </contextAttribute>
-          <contextAttribute>
             <name>lightstatus</name>
             <type>light</type>
             <contextValue>L63</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>t39</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
