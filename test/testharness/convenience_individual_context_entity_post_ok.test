@@ -124,8 +124,8 @@ EOF
         </contextAttribute>
       </contextAttributeList>
       <statusCode>
-        <code>0</code>
-        <reasonPhrase/>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextAttributeResponse>
   </contextResponseList>

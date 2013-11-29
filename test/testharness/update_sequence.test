@@ -553,28 +553,7 @@ echo "18: ++++++++++++++++++++"
   <updateAction>UPDATE</updateAction>
 </updateContextRequest>
 EOF
-echo "19: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<updateContextRequest>
-  <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>kOfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
-          <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p111</contextValue>
-                </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>UPDATE</updateAction>
-</updateContextRequest>
-EOF
 --REGEXPECT--
 <?xml version="1.0"?>
 <updateContextResponse>
@@ -584,11 +563,17 @@ EOF
         <entityId type="Room" isPattern="false">
           <id>OfficeRoom</id>
         </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
       </contextElement>
       <statusCode>
-        <code>404</code>
-        <reasonPhrase>Entity not found</reasonPhrase>
-        <details>entity: (OfficeRoom, Room, false)</details>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -602,11 +587,17 @@ EOF
         <entityId type="Room" isPattern="false">
           <id>OfficeRoom</id>
         </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
       </contextElement>
       <statusCode>
-        <code>404</code>
-        <reasonPhrase>Entity not found</reasonPhrase>
-        <details>entity: (OfficeRoom, Room, false)</details>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
     <contextElementResponse>
@@ -614,11 +605,17 @@ EOF
         <entityId type="Room" isPattern="false">
           <id>ConferenceRoom</id>
         </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
       </contextElement>
       <statusCode>
-        <code>404</code>
-        <reasonPhrase>Entity not found</reasonPhrase>
-        <details>entity: (ConferenceRoom, Room, false)</details>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -647,9 +644,8 @@ EOF
         </contextAttributeList>
       </contextElement>
       <statusCode>
-        <code>472</code>
-        <reasonPhrase>Not Found Attribute in UPDATE</reasonPhrase>
-        <details>action: UPDATE - entity: (OfficeRoom, Room) - offending attribute: pressure</details>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -672,9 +668,8 @@ EOF
         </contextAttributeList>
       </contextElement>
       <statusCode>
-        <code>472</code>
-        <reasonPhrase>Not Found Attribute in UPDATE</reasonPhrase>
-        <details>action: UPDATE - entity: (OfficeRoom, Room) - offending attribute: pressure</details>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
     <contextElementResponse>
@@ -691,9 +686,8 @@ EOF
         </contextAttributeList>
       </contextElement>
       <statusCode>
-        <code>472</code>
-        <reasonPhrase>Not Found Attribute in UPDATE</reasonPhrase>
-        <details>action: UPDATE - entity: (ConferenceRoom, Room) - offending attribute: pressure</details>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -782,9 +776,8 @@ EOF
         </contextAttributeList>
       </contextElement>
       <statusCode>
-        <code>472</code>
-        <reasonPhrase>Not Found Attribute in UPDATE</reasonPhrase>
-        <details>action: UPDATE - entity: (ConferenceRoom, Room) - offending attribute: pressure</details>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -975,9 +968,8 @@ EOF
         </contextAttributeList>
       </contextElement>
       <statusCode>
-        <code>472</code>
-        <reasonPhrase>Not Found Attribute in UPDATE</reasonPhrase>
-        <details>action: UPDATE - entity: (ConferenceRoom, Room) - offending attribute: pressure</details>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -1101,27 +1093,8 @@ EOF
         </contextAttributeList>
       </contextElement>
       <statusCode>
-        <code>472</code>
-        <reasonPhrase>Not Found Attribute in UPDATE</reasonPhrase>
-        <details>action: UPDATE - entity: (ConferenceRoom, Room) - offending attribute: pressure</details>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
-19: ++++++++++++++++++++
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>kOfficeRoom</id>
-        </entityId>
-      </contextElement>
-      <statusCode>
-        <code>404</code>
-        <reasonPhrase>Entity not found</reasonPhrase>
-        <details>entity: (kOfficeRoom, Room, false)</details>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>

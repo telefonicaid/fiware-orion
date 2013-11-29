@@ -43,6 +43,9 @@ postContextEntityAttributes.cpp
 getEntityByIdAttributeByName.cpp
 postEntityByIdAttributeByName.cpp
 getContextEntityTypes.cpp
+postContextEntityTypes.cpp
+getContextEntityTypeAttribute.cpp
+postContextEntityTypeAttribute.cpp
 getIndividualContextEntity.cpp
 putIndividualContextEntity.cpp
 postIndividualContextEntity.cpp
@@ -90,6 +93,9 @@ postContextEntityAttributes.h
 getEntityByIdAttributeByName.h
 postEntityByIdAttributeByName.h
 getContextEntityTypes.h
+postContextEntityTypes.h
+getContextEntityTypeAttribute.h
+postContextEntityTypeAttribute.h
 getIndividualContextEntity.h
 putIndividualContextEntity.h
 postIndividualContextEntity.h

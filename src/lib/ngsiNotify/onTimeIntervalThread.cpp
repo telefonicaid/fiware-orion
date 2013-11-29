@@ -59,7 +59,7 @@ static void doNotification(OnIntervalThreadParams* params) {
 
     int current = getCurrentTime();
 
-    /* Send notification (only if subscription is not expired)*/
+    /* Send notification (only if subscription is not expired and there is actual data)*/
     if (current < csi.expiration) {
 
         /* Throttling check (only if throttling is used and at least one notification has been sent) */
@@ -73,19 +73,25 @@ static void doNotification(OnIntervalThreadParams* params) {
                 LM_RVE(("error invoking mongoGetContextElementResponses: '%s'", err.c_str()));
             }
 
-            /* Complete NotifyContextRequest */
-            // FIXME: implement a proper originator string
-            ncr.originator.set("localhost");
-            ncr.subscriptionId.set(params->subId);
+            if (ncr.contextElementResponseVector.size() > 0) {
 
-            params->notifier->sendNotifyContextRequest(&ncr, csi.url, csi.format);
+                /* Complete NotifyContextRequest */
+                // FIXME: implement a proper originator string
+                ncr.originator.set("localhost");
+                ncr.subscriptionId.set(params->subId);
 
-            ncr.contextElementResponseVector.release();
+                params->notifier->sendNotifyContextRequest(&ncr, csi.url, csi.format);
 
-            /* Update database fields due to new notification */
-            if (mongoUpdateCsubNewNotification(params->subId, &err) != SccOk) {
-                csi.release();
-                LM_RVE(("error invoking mongoUpdateCsubNewNotification: '%s'", err.c_str()));
+                ncr.contextElementResponseVector.release();
+
+                /* Update database fields due to new notification */
+                if (mongoUpdateCsubNewNotification(params->subId, &err) != SccOk) {
+                    csi.release();
+                    LM_RVE(("error invoking mongoUpdateCsubNewNotification: '%s'", err.c_str()));
+                }
+            }
+            else {
+                LM_T(LmtNotifier, ("notification not sent due to empty context elements response vector)"));
             }
         }
         else {

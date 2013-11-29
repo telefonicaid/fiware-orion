@@ -42,7 +42,7 @@
 std::string ConditionValueList::render(Format format, std::string indent)
 {
   std::string  out = "";
-  std::string  tag = "attributeList";
+  std::string  tag = "condValueList";
 
   if (vec.size() == 0)
     return "";
@@ -50,7 +50,7 @@ std::string ConditionValueList::render(Format format, std::string indent)
   out += startTag(indent, tag, format);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += valueTag(indent + "  ", "attribute", vec[ix], format, ix != vec.size() - 1);
+    out += valueTag(indent + "  ", "condValue", vec[ix], format, ix != vec.size() - 1);
 
   out += endTag(indent, tag, format);
 
@@ -68,7 +68,7 @@ std::string ConditionValueList::check(RequestType requestType, Format format, st
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     if (vec[ix] == "")
-      return "empty attribute name";
+      return "empty condValue name";
   }
 
   return "OK";

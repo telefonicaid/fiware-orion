@@ -19,7 +19,7 @@
 # fermin at tid dot es
 
 --NAME--
-Convenience Individual Context Entity - POST FAILS
+Convenience Individual Context Entity - POST CREATE
 
 --SHELL-INIT--
 # Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
@@ -86,11 +86,26 @@ EOF
 +++++ 1. post an entity +++++
 <?xml version="1.0"?>
 <appendContextElementResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>Entity not found</reasonPhrase>
-    <details>entity: (entity01, , false)</details>
-  </errorCode>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue/>
+        </contextAttribute>
+        <contextAttribute>
+          <name>pressure</name>
+          <type>clima</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
 </appendContextElementResponse>
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then

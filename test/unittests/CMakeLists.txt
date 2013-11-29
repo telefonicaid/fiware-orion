@@ -68,6 +68,11 @@ SET (SOURCES
     serviceRoutines/getContextEntitiesByEntityId_test.cpp
     serviceRoutines/getEntityByIdAttributeByName_test.cpp
     serviceRoutines/getContextEntityTypes_test.cpp
+    serviceRoutines/postContextEntityTypes_test.cpp
+    serviceRoutines/getContextEntityTypeAttributeContainer_test.cpp
+    serviceRoutines/postContextEntityTypeAttributeContainer_test.cpp
+    serviceRoutines/getContextEntityTypeAttribute_test.cpp
+    serviceRoutines/postContextEntityTypeAttribute_test.cpp
     serviceRoutines/getIndividualContextEntity_test.cpp
     serviceRoutines/getContextEntityAttributes_test.cpp
     serviceRoutines/getIndividualContextEntityAttribute_test.cpp
@@ -216,6 +221,9 @@ SET (SOURCES
     mongoBackend/mongoNotifyContextAvailability_test.cpp
 
     jsonParse/jsonRequest_test.cpp
+
+    rest/OrionError_test.cpp
+    rest/Verb_test.cpp
 )
 
 SET (HEADERS

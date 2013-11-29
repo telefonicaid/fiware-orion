@@ -46,7 +46,7 @@ typedef struct OrionError
   OrionError();
   OrionError(ErrorCode& errorCode);
   OrionError(StatusCode& statusCode);
-  OrionError(int _code, std::string _reasonPhrase, std::string _details);
+  OrionError(int _code, std::string _reasonPhrase, std::string _details = "");
 
   std::string  render(Format format, std::string indent);
 } OrionError;

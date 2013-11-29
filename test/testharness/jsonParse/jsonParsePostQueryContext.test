@@ -205,44 +205,10 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "attributes" : [
-          {
-            "name" : "temperature",
-            "type" : "degree",
-            "contextValue" : ""
-          }
-        ],
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "ConferenceRoom"
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    },
-    {
-      "contextElement" : {
-        "attributes" : [
-          {
-            "name" : "temperature",
-            "type" : "degree",
-            "contextValue" : ""
-          }
-        ],
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "OfficeRoom"
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+  "errorCode" : {
+    "code" : "404",
+    "reasonPhrase" : "No context elements found"
+  }
 }
 4: ***********************************
 --TEARDOWN--

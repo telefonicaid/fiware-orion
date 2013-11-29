@@ -101,8 +101,9 @@ echo "+++++ 2. delete the entity attribute +++++"
 +++++ 2. delete the entity attribute +++++
 <?xml version="1.0"?>
 <statusCode>
-  <code>200</code>
-  <reasonPhrase>OK</reasonPhrase>
+  <code>404</code>
+  <reasonPhrase>Entity Not Found</reasonPhrase>
+  <details>entity01</details>
 </statusCode>
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then

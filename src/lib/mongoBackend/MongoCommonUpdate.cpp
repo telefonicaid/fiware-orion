@@ -511,6 +511,47 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
 
 /* ****************************************************************************
 *
+* createEntity -
+*
+*/
+static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string* err) {
+
+    DBClientConnection* connection = getMongoConnection();
+
+    LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName()));
+
+    BSONArrayBuilder attrsToAdd;
+    for (unsigned int ix = 0; ix < attrsV.size(); ++ix) {
+        attrsToAdd.append(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
+                               ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
+                               ENT_ATTRS_VALUE << attrsV.get(ix)->value));
+        LM_T(LmtMongo, ("new attribute: {name: %s, type: %s}", attrsV.get(ix)->name.c_str(), attrsV.get(ix)->type.c_str()));
+    }
+    BSONObj insertedDoc;
+    if (e.type == "") {
+        insertedDoc = BSON("_id" << BSON(ENT_ENTITY_ID << e.id) << ENT_ATTRS << attrsToAdd.arr() << ENT_CREATION_DATE << getCurrentTime());
+    }
+    else {
+        insertedDoc = BSON("_id" << BSON(ENT_ENTITY_ID << e.id << ENT_ENTITY_TYPE << e.type) << ENT_ATTRS << attrsToAdd.arr() << ENT_CREATION_DATE << getCurrentTime());
+    }
+    try {
+        LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getEntitiesCollectionName(), insertedDoc.toString().c_str()));
+        connection->insert(getEntitiesCollectionName(), insertedDoc);
+    }
+    catch( const DBException &e ) {
+        *err = std::string("collection: ") + getEntitiesCollectionName() +
+                " - insert(): " + insertedDoc.toString() +
+                " - exception: " + e.what();
+
+        return false;
+    }
+
+    return true;
+
+}
+
+/* ****************************************************************************
+*
 * processContextElement -
 *
 */
@@ -664,20 +705,56 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         std::string err;
         processSubscriptions(en, &subsToNotify, &err);
 
-        /* To finish with this entity processing, add the correspoinding ContextElementResponse to
+        /* To finish with this entity processing, add the corresponding ContextElementResponse to
          * the global response */
         cerP->statusCode.fill(SccOk, "OK");
         responseP->contextElementResponseVector.push_back(cerP);
 
     }
 
-    /* Alternativelly, we could do a count() before the query() to check this and early return. However
-     * this would add a sencond interaction with MongoDB */
+    /* If the entity didn't already exist, we create it. Note that alternatively, we could do a count()
+     * before the query() to check this and early return. However this would add a sencond interaction with MongoDB */
     if (!atLeastOneResult) {
-        buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound,
-                                 "Entity not found",
-                                 // FIXME: use toString once EntityID becomes objects
-                                 std::string("entity: (") + en.id + ", " + en.type + ", " + en.isPattern + ")");
+
+        if (strcasecmp(action.c_str(), "delete") == 0) {
+            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, "Entity Not Found", en.id);
+        }
+        else {
+            std::string err;
+            if (!createEntity(en, ceP->contextAttributeVector, &err)) {
+                buildGeneralErrorReponse(ceP, NULL, responseP, SccReceiverInternalError, "Database Error", err);
+            }
+            else {
+
+                ContextElementResponse* cerP = new ContextElementResponse();
+
+                /* Successfull creation: send notifications */
+                std::map<string, BSONObj*> subsToNotify;
+                for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
+                    std::string err;
+                    if (!addTriggeredSubscriptions(en.id, en.type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err)) {
+                        cerP->statusCode.fill(SccReceiverInternalError, "Database Error", err );
+                        responseP->contextElementResponseVector.push_back(cerP);
+                        LM_RVE((err.c_str()));
+                    }
+                }
+                processSubscriptions(en, &subsToNotify, &err);
+
+                /* Successfull creation: creating corresponding ContextElementResponse */
+                cerP->contextElement.entityId.fill(en.id, en.type, "false");
+
+                for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
+                    ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
+                    ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);
+                    cerP->contextElement.contextAttributeVector.push_back(ca);
+                }
+
+                cerP->statusCode.fill(SccOk, "OK");
+                responseP->contextElementResponseVector.push_back(cerP);
+
+            }
+        }
+
     }
 
 }

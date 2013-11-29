@@ -69,8 +69,8 @@ echo "+++++ 1. delete an entity +++++"
 <?xml version="1.0"?>
 <statusCode>
   <code>404</code>
-  <reasonPhrase>Entity not found</reasonPhrase>
-  <details>entity: (entity01, , false)</details>
+  <reasonPhrase>Entity Not Found</reasonPhrase>
+  <details>entity01</details>
 </statusCode>
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then

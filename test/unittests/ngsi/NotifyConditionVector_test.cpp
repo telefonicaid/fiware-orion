@@ -41,7 +41,7 @@ TEST(NotifyConditionVector, render)
   NotifyConditionVector  ncV;
   std::string            rendered;
   std::string            expected1 = "";
-  std::string            expected2 = "<contextAttributeList>\n  <notifyCondition>\n    <type>Type</type>\n  </notifyCondition>\n</contextAttributeList>\n";
+  std::string            expected2 = "<notifyConditions>\n  <notifyCondition>\n    <type>Type</type>\n  </notifyCondition>\n</notifyConditions>\n";
   
   rendered = ncV.render(XML, "");
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());

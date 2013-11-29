@@ -65,6 +65,8 @@ int noOfContextEntitiesByEntityId            = -1;
 int noOfContextEntityAttributes              = -1;
 int noOfEntityByIdAttributeByName            = -1;
 int noOfContextEntityTypes                   = -1;
+int noOfContextEntityTypeAttributeContainer  = -1;
+int noOfContextEntityTypeAttribute           = -1;
 
 int noOfIndividualContextEntity              = -1;
 int noOfIndividualContextEntityAttributes    = -1;
@@ -113,7 +115,8 @@ void statisticsUpdate(RequestType request, Format inFormat)
    case ContextEntityAttributes:                ++noOfContextEntityAttributes; break;
    case EntityByIdAttributeByName:              ++noOfEntityByIdAttributeByName; break;
    case ContextEntityTypes:                     ++noOfContextEntityTypes; break;
-
+   case ContextEntityTypeAttributeContainer:    ++noOfContextEntityTypeAttributeContainer; break;
+   case ContextEntityTypeAttribute:             ++noOfContextEntityTypeAttribute; break;
    case IndividualContextEntity:                ++noOfIndividualContextEntity; break;
    case IndividualContextEntityAttributes:      ++noOfIndividualContextEntityAttributes; break;
    case IndividualContextEntityAttribute:       ++noOfIndividualContextEntityAttribute; break;

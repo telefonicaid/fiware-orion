@@ -95,6 +95,10 @@ EOF
 echo "2: ++++++++++++++++++++"
 (curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
 echo "3: ++++++++++++++++++++"
+
+# DELETE is not allowed
+curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room -s -S -X DELETE --include --header 'Content-Type: application/xml' --header 'Accept: application/xml'
+echo 4: ++++++++++++++++++++
 killall contextBroker
 --REGEXPECT--
 0: ++++++++++++++++++++
@@ -138,6 +142,12 @@ killall contextBroker
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 3: ++++++++++++++++++++
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST, GET
+Date: REGEX(.*)
+
+4: ++++++++++++++++++++
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})

@@ -122,6 +122,8 @@ post_install_libs:
 	cp src/lib/common/*.h /usr/local/include/contextBroker/common         
 	cp $(CMAKE_BUILD_TYPE)/src/lib/common/libcommon.a  /usr/local/lib 
 
+	chmod a+r /usr/local/include/contextBroker/common/compileInfo.h
+
 	cd /usr/local/include/contextBroker  && rm -rf convenience && mkdir -p convenience
 	cp src/lib/convenience/*.h /usr/local/include/contextBroker/convenience         
 	cp $(CMAKE_BUILD_TYPE)/src/lib/convenience/libconvenience.a  /usr/local/lib 
@@ -261,9 +263,9 @@ build_unit_test: prepare_unit_test
 unit_test: build_unit_test
 	@echo '------------------------------- unit_test starts ---------------------------------'
 	if [ -z "${TEST_FILTER}" ]; then \
-	   BUILD_UNITTEST/test/unittests/unitTest --gtest_output=xml:BUILD_UNITTEST/unit_test.xml; \
+	   BUILD_UNITTEST/test/unittests/unitTest -t 0-255 --gtest_output=xml:BUILD_UNITTEST/unit_test.xml; \
         else \
-	   BUILD_UNITTEST/test/unittests/unitTest --gtest_output=xml:BUILD_UNITTEST/unit_test.xml --gtest_filter=${TEST_FILTER}; \
+	   BUILD_UNITTEST/test/unittests/unitTest -t 0-255 --gtest_output=xml:BUILD_UNITTEST/unit_test.xml --gtest_filter=${TEST_FILTER}; \
         fi
 	@echo '------------------------------- unit_test ended ---------------------------------'
 
@@ -335,6 +337,8 @@ coverage_unit_test: build_unit_test
 	lcov -r coverage/broker.info "test/unittests/*" -o coverage/broker.info	
 	lcov -r coverage/broker.info "src/lib/logMsg/*" -o coverage/broker.info
 	lcov -r coverage/broker.info "src/lib/parseArgs/*" -o coverage/broker.info
+	# app/ contains application itself, not libraries which make sense to measure unit_test coverage
+	lcov -r coverage/broker.info "src/app/*" -o coverage/broker.info
 	genhtml -o coverage coverage/broker.info
 
 coverage_functional_test: install_coverage
