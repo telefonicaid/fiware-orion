@@ -46,7 +46,7 @@ std::string getNgsi10ContextEntityTypes(ConnectionInfo* ciP, int components, std
   std::string typeName = compV[2];
 
   LM_T(LmtConvenience, ("CONVENIENCE: got a  'GET' request for entity type '%s'", typeName.c_str()));
-  parseDataP->qcr.res.fill("", typeName, "");
+  parseDataP->qcr.res.fill(".*", typeName, "");
   std::string answer = postQueryContext(ciP, components, compV, parseDataP);
   parseDataP->qcr.res.release();
   

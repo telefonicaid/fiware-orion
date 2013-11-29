@@ -250,8 +250,10 @@ RestService restServiceV[] =
   { "DELETE IndividualContextEntityAttribute",    "DELETE", IndividualContextEntityAttribute,      5, { "ngsi10", "contextEntities", "*", "attributes", "*"  }, "",                                             deleteIndividualContextEntityAttribute    },
   { "* IndividualContextEntityAttribute",         "*",      IndividualContextEntityAttribute,      5, { "ngsi10", "contextEntities", "*", "attributes", "*"  }, "",                                             badVerbGetPostDeleteOnly                  },
   
-  { "GET Ngsi10ContextEntityTypes",               "GET",    Ngsi10ContextEntityTypes,              3, { "ngsi10", "contextEntityTypes", "*"                  }, "",                                             getNgsi10ContextEntityTypes               },
-  { "* Ngsi10ContextEntityTypes",                 "*",      Ngsi10ContextEntityTypes,              3, { "ngsi10", "contextEntityTypes", "*"                  }, "",                                             badVerbGetOnly                            },
+  { "GET Ngsi10ContextEntityTypes",                    "GET",    Ngsi10ContextEntityTypes,                    3, { "ngsi10", "contextEntityTypes", "*"                }, "",                                    getNgsi10ContextEntityTypes               },
+  { "* Ngsi10ContextEntityTypes",                      "*",      Ngsi10ContextEntityTypes,                    3, { "ngsi10", "contextEntityTypes", "*"                }, "",                                    badVerbGetOnly                            },
+  { "GET Ngsi10ContextEntityTypesAttributeContainer",  "GET",    Ngsi10ContextEntityTypesAttributeContainer,  4, { "ngsi10", "contextEntityTypes", "*", "attributes"  }, "",                                    getNgsi10ContextEntityTypes               },
+  { "* Ngsi10ContextEntityTypes",                      "*",      Ngsi10ContextEntityTypesAttributeContainer,  4, { "ngsi10", "contextEntityTypes", "*", "attributes"  }, "",                                    badVerbGetOnly                            },
 
   // log request
   { "GET LogRequest",                             "GET",    LogRequest,                            2, { "log", "verbose"                                     }, "",                                             logVerboseTreat                           },

@@ -19,7 +19,7 @@
 # fermin at tid dot es
 
 --NAME--
-Convenience NGSI10 Context Entity Types
+Convenience NGSI10 Context Entity Types Attribute Container
 --SHELL-INIT--
 # Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
 running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
@@ -63,7 +63,7 @@ fi
 
 # query for all entities of type "Room"
 echo "1: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room/attributes -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
 
 # Add an entity of type Room, with one attribute: 'temperature'
 echo "2: ++++++++++++++++++++"
@@ -96,16 +96,16 @@ EOF
 
 # query for all entities of type "Room"
 echo "3: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room/attributes -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
 
 
 # query for all entities of type "Room2"
 echo "4: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room2 -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room2/attributes -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
 echo "5: ++++++++++++++++++++"
 
 # DELETE is not allowed
-curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room -s -S -X DELETE --include --header 'Content-Type: application/xml' --header 'Accept: application/xml'
+curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room/attributes -s -S -X DELETE --include --header 'Content-Type: application/xml' --header 'Accept: application/xml'
 echo 6: ++++++++++++++++++++
 # POST
 # PUT
