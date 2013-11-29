@@ -19,7 +19,7 @@
 # fermin at tid dot es
 
 --NAME--
-CM forwards PSB OK
+CM forwards PSB using ConvOp
 --SHELL-INIT--
 # Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
 running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
@@ -41,7 +41,7 @@ if [ $running_broker -ne 0 ]; then
 fi
 
 echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-contextBroker -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME}
+contextBroker -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t255
 # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
 sleep 1
 
@@ -87,10 +87,6 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-# Initial checks
-echo CM_PORT=$CM_PORT
-echo BROKER_PORT=$BROKER_PORT
-ps aux | grep contextBroker
 
 # Do a NGSI10 request to check that the CM does not accept NGSI10 requests
 (curl localhost:${CM_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
@@ -138,7 +134,7 @@ echo "2: ++++++++++++++++++++"
 <?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
-      <entityId type=".*" isPattern="true">
+      <entityId type="" isPattern="false">
         <id>ConferenceRoom</id>
       </entityId>
     </entityIdList>
@@ -151,14 +147,10 @@ echo "3: ++++++++++++++++++++"
 <?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
-      <entityId type=".*" isPattern="true">
+      <entityId type="" isPattern="false">
         <id>ConferenceRoom</id>
       </entityId>
     </entityIdList>
-    <attributeList>
-      <attribute>temperature</attribute>
-      <attribute>pressure</attribute>
-    </attributeList>
   </discoverContextAvailabilityRequest>
 EOF
 echo "4: ++++++++++++++++++++"
@@ -179,8 +171,9 @@ echo "4: ++++++++++++++++++++"
       <value>XXX</value>
     </contextMetadata>
   </metadata>
-  <duration>PT1H</duration>
+  <duration>PT9H</duration>
   <providingApplication>http://localhost:1028/mycar</providingApplication>
+  <registrationId>$REG_ID</registrationId>
 </registerProviderRequest>
 EOF
 echo "5: ++++++++++++++++++++"
@@ -190,7 +183,7 @@ echo "5: ++++++++++++++++++++"
 <?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
-      <entityId type=".*" isPattern="true">
+      <entityId type="" isPattern="false">
         <id>MyCar</id>
       </entityId>
     </entityIdList>
@@ -203,7 +196,7 @@ echo "6: ++++++++++++++++++++"
 <?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
-      <entityId type=".*" isPattern="true">
+      <entityId type="" isPattern="false">
         <id>MyCar</id>
       </entityId>
     </entityIdList>
@@ -289,7 +282,7 @@ fi
 4: ++++++++++++++++++++
 <?xml version="1.0"?>
 <registerContextResponse>
-  <duration>PT5H</duration>
+  <duration>PT9H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 5: ++++++++++++++++++++
