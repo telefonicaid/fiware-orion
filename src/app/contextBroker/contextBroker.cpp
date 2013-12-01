@@ -260,6 +260,10 @@ RestService restServiceV[] =
   { "GET Ngsi10ContextEntityTypesAttribute",           "GET",    Ngsi10ContextEntityTypesAttribute,           5, { "ngsi10", "contextEntityTypes", "*", "attributes", "*" }, "",                                getNgsi10ContextEntityTypesAttribute      },
   { "* Ngsi10ContextEntityTypesAttribute",             "*",      Ngsi10ContextEntityTypesAttribute,           5, { "ngsi10", "contextEntityTypes", "*", "attributes", "*" }, "",                                badVerbGetOnly                            },
   
+  { "POST Subscriptions",                              "POST",   SubscribeContext,                            2, { "ngsi10", "subscriptions"                              }, "subscribeContextRequest",         postSubscribeContext                      },
+  { "* Subscriptions",                                 "*",      SubscribeContext,                            2, { "ngsi10", "subscriptions"                              }, "subscribeContextRequest",         badVerbPostOnly                           },
+
+
   // log request
   { "GET LogRequest",                             "GET",    LogRequest,                            2, { "log", "verbose"                                     }, "",                                             logVerboseTreat                           },
   { "PUT LogRequest",                             "PUT",    LogRequest,                            3, { "log", "verbose", "*"                                }, "",                                             logVerboseTreat                           },
