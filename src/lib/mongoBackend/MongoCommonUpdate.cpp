@@ -123,6 +123,10 @@ static bool checkAndDelete (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
         newAttr->append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
         newAttr->append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
         newAttr->append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
+        string id = STR_FIELD(attr, ENT_ATTRS_ID);
+        if (id != "") {
+            newAttr->append(ENT_ATTRS_ID, STR_FIELD(attr, ENT_ATTRS_ID));
+        }
         deleted = false;
     }
 
@@ -206,13 +210,13 @@ static void appendAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
 
 /* ****************************************************************************
 *
-* legalAppend -
+* legalIdUsage -
 *
 * Check that the client is not trying to mix attributes ID and no ID for the same
 * name
 *
 */
-static bool legalAppend(BSONObj* attrs, ContextAttribute* caP) {
+static bool legalIdUsage(BSONObj* attrs, ContextAttribute* caP) {
 
     if (caP->getId() == "") {
         /* Attribute attempting to append hasn't ID. Thus, no attribute with same name can have ID in attrs */
@@ -234,6 +238,35 @@ static bool legalAppend(BSONObj* attrs, ContextAttribute* caP) {
         }
         return true;
     }
+}
+
+/* ****************************************************************************
+*
+* legalIdUsage -
+*
+* Check that the client is not trying to mix attributes ID and no ID for the same
+* name
+*
+*/
+static bool legalIdUsage(ContextAttributeVector caV) {
+
+    for (unsigned int ix = 0; ix < caV.size(); ++ix) {
+        std::string attrName = caV.get(ix)->name;
+        std::string attrType = caV.get(ix)->type;
+        std::string attrId = caV.get(ix)->getId();
+        if (attrId == "") {
+            /* Search for attribute with same name and type, but with actual ID to detect inconsistency */
+            for (unsigned int jx = 0; jx < caV.size(); ++jx) {
+                ContextAttribute* ca = caV.get(jx);
+                if (attrName == ca->name && attrType == ca->type && ca->getId() != "") {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+
 }
 
 
@@ -496,12 +529,12 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
             }
         }
         else if (strcasecmp(action.c_str(), "append") == 0) {
-            if (legalAppend(attrs, ceP->contextAttributeVector.get(ix))) {
+            if (legalIdUsage(attrs, ceP->contextAttributeVector.get(ix))) {
                 appendAttribute(attrs, newAttrs, ceP->contextAttributeVector.get(ix));
                 *attrs = *newAttrs;
             }
             else {
-                /* If legalAppend() returns false, then that particular attribute can not be appended. In this case,
+                /* If legalIdUsage() returns false, then that particular attribute can not be appended. In this case,
                  * we interrupt the processing an early return with
                  * a error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter,
@@ -574,11 +607,18 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
 * createEntity -
 *
 */
-static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string* err) {
+static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string* errReason, std::string* errDetail) {
 
     DBClientConnection* connection = getMongoConnection();
 
     LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName()));
+
+    if (!legalIdUsage(attrsV)) {
+        *errReason = "It is not allowed to create an entity with attribute of same name with ID an not ID";
+        // FIXME: use toString once EntityID and ContextAttribute becomes objects
+        *errDetail = "entity: (" + e.id + ", " + e.type + ")";
+        return false;
+    }
 
     BSONArrayBuilder attrsToAdd;
     for (unsigned int ix = 0; ix < attrsV.size(); ++ix) {
@@ -619,7 +659,8 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
         connection->insert(getEntitiesCollectionName(), insertedDoc);
     }
     catch( const DBException &e ) {
-        *err = std::string("collection: ") + getEntitiesCollectionName() +
+        *errReason = "Database Error";
+        *errDetail = std::string("collection: ") + getEntitiesCollectionName() +
                 " - insert(): " + insertedDoc.toString() +
                 " - exception: " + e.what();
 
@@ -708,9 +749,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         atLeastOneResult = true;
 
         ContextElementResponse* cerP = new ContextElementResponse();
-        cerP->contextElement.entityId.id = entityId;
-        cerP->contextElement.entityId.type = entityType;
-        cerP->contextElement.entityId.isPattern = "false";
+        cerP->contextElement.entityId.fill(entityId, entityType, "false");
 
         /* We start with the attrs array in the entity document, which is manipulated by the
          * {update|delete|append}Attrsr() function for each one of the attributes in the
@@ -799,16 +838,31 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         if (strcasecmp(action.c_str(), "delete") == 0) {
             buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, "Entity Not Found", en.id);
         }
-        else {
-            std::string err;
-            if (!createEntity(en, ceP->contextAttributeVector, &err)) {
-                buildGeneralErrorReponse(ceP, NULL, responseP, SccReceiverInternalError, "Database Error", err);
+        else {            
+
+            /* Creating the part of the response that doesn't depend on success or failure */
+            ContextElementResponse* cerP = new ContextElementResponse();
+            cerP->contextElement.entityId.fill(en.id, en.type, "false");
+            for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
+                ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
+                ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);
+
+                if (caP->getId().length() != 0) {
+                    Metadata* md = new Metadata(METADATA_ID, "string", caP->getId());
+                    ca->metadataVector.push_back(md);
+                }
+
+                cerP->contextElement.contextAttributeVector.push_back(ca);
+            }
+
+            std::string errReason, errDetail;
+            if (!createEntity(en, ceP->contextAttributeVector, &errReason, &errDetail)) {
+                cerP->statusCode.fill(SccInvalidParameter, errReason, errDetail);
             }
             else {
+                cerP->statusCode.fill(SccOk, "OK");
 
-                ContextElementResponse* cerP = new ContextElementResponse();
-
-                /* Successfull creation: send notifications */
+                /* Successfull creation: send potential notifications */
                 std::map<string, BSONObj*> subsToNotify;
                 for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                     std::string err;
@@ -818,27 +872,9 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                         LM_RVE((err.c_str()));
                     }
                 }
-                processSubscriptions(en, &subsToNotify, &err);
-
-                /* Successfull creation: creating corresponding ContextElementResponse */
-                cerP->contextElement.entityId.fill(en.id, en.type, "false");
-
-                for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
-                    ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
-                    ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);
-
-                    if (caP->getId().length() != 0) {
-                        Metadata* md = new Metadata(METADATA_ID, "string", caP->getId());
-                        ca->metadataVector.push_back(md);
-                    }
-
-                    cerP->contextElement.contextAttributeVector.push_back(ca);
-                }
-
-                cerP->statusCode.fill(SccOk, "OK");
-                responseP->contextElementResponseVector.push_back(cerP);
-
+                processSubscriptions(en, &subsToNotify, &errReason);
             }
+            responseP->contextElementResponseVector.push_back(cerP);
         }
 
     }
