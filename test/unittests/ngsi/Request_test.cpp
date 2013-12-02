@@ -75,6 +75,7 @@ TEST(Request, requestType)
     { Ngsi10ContextEntityTypes,                    "Ngsi10ContextEntityTypes"                               },
     { Ngsi10ContextEntityTypesAttributeContainer,  "Ngsi10ContextEntityTypesAttributeContainer"             },
     { Ngsi10ContextEntityTypesAttribute,           "Ngsi10ContextEntityTypesAttribute"                      },
+    { Ngsi10SubscriptionsConvOp,                   "Ngsi10SubscriptionsConvOp"                              },
 
     { LogRequest,                                  "Log"                                                    },
     { VersionRequest,                              "Version"                                                },

@@ -46,22 +46,24 @@ const char* requestType(RequestType rt)
   case UnsubscribeContext:                          return "UnsubscribeContext";
   case NotifyContext:                               return "NotifyContext";
   case UpdateContext:                               return "UpdateContext";
+
   case ContextEntitiesByEntityId:                   return "ContextEntitiesByEntityId";
   case ContextEntityAttributes:                     return "ContextEntityAttributes";
   case EntityByIdAttributeByName:                   return "EntityByIdAttributeByName";
   case ContextEntityTypes:                          return "ContextEntityTypes";
   case ContextEntityTypeAttributeContainer:         return "ContextEntityTypeAttributeContainer";
   case ContextEntityTypeAttribute:                  return "ContextEntityTypeAttribute";
+
   case IndividualContextEntity:                     return "IndividualContextEntity";
   case IndividualContextEntityAttributes:           return "IndividualContextEntityAttributes";
   case IndividualContextEntityAttribute:            return "IndividualContextEntityAttribute";
   case UpdateContextElement:                        return "UpdateContextElement";
   case AppendContextElement:                        return "AppendContextElement";
   case UpdateContextAttribute:                      return "UpdateContextAttribute";
-
   case Ngsi10ContextEntityTypes:                    return "Ngsi10ContextEntityTypes";
   case Ngsi10ContextEntityTypesAttributeContainer:  return "Ngsi10ContextEntityTypesAttributeContainer";
   case Ngsi10ContextEntityTypesAttribute:           return "Ngsi10ContextEntityTypesAttribute";
+  case Ngsi10SubscriptionsConvOp:                   return "Ngsi10SubscriptionsConvOp";
 
   case LogRequest:                                  return "Log";
   case VersionRequest:                              return "Version";
