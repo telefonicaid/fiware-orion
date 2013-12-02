@@ -28,12 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "ngsi/ParseData.h"
-#include "ngsi/EntityId.h"
-#include "ngsi/ContextRegistration.h"
-#include "ngsi/ContextRegistrationAttribute.h"
-#include "ngsi9/RegisterContextResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
+#include "ngsi9/RegisterContextRequest.h"
 #include "serviceRoutines/postRegisterContext.h"  // instead of convenienceMap function, postRegisterContext is used
 #include "serviceRoutines/postContextEntityTypeAttribute.h"
 
@@ -42,36 +39,20 @@
 /* ****************************************************************************
 *
 * postContextEntityTypeAttribute - 
+*
+* POST /ngsi9/contextEntityTypes/{typeName}/attributes/{attributeName}
 */
 std::string postContextEntityTypeAttribute(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
-  std::string  typeName     = compV[2];
+  std::string  entityIdType   = compV[2];
   std::string  attributeName  = compV[4];  
-  std::string  answer;
   
   // Transform RegisterProviderRequest into RegisterContextRequest
-  RegisterProviderRequest*      rprP = &parseDataP->rpr.res;
-  RegisterContextRequest*       rcrP = &parseDataP->rcr.res;
-  ContextRegistration           cr;
-  EntityId                      entityId;
-  ContextRegistrationAttribute  attribute(attributeName, "", "false");
-
-  rcrP->duration       = rprP->duration;
-  rcrP->registrationId = rprP->registrationId;
-
-  entityId.type = typeName;
-  cr.registrationMetadataVector.fill(rprP->metadataVector);
-  cr.providingApplication = rprP->providingApplication;
-
-  cr.entityIdVector.push_back(&entityId);
-  cr.entityIdVectorPresent = true;
-
-  cr.contextRegistrationAttributeVector.push_back(&attribute);
-  rcrP->contextRegistrationVector.push_back(&cr);
+  parseDataP->rcr.res.fill(parseDataP->rpr.res, "", entityIdType, attributeName);
 
   // Now call postRegisterContext (postRegisterContext doesn't use the parameters 'components' and 'compV')
-  answer = postRegisterContext(ciP, components, compV, parseDataP);
-  cr.registrationMetadataVector.release();
+  std::string answer = postRegisterContext(ciP, components, compV, parseDataP);
+  parseDataP->rpr.res.release();
 
   return answer;
 }

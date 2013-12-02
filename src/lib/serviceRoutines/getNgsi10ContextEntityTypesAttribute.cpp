@@ -1,6 +1,3 @@
-#ifndef MAP_POST_CONTEXT_ENTITY_ATTRIBUTES_H
-#define MAP_POST_CONTEXT_ENTITY_ATTRIBUTES_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -26,16 +23,33 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "convenience/RegisterProviderRequest.h"
-#include "ngsi9/RegisterContextResponse.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
+#include "serviceRoutines/postQueryContext.h"
+#include "serviceRoutines/getNgsi10ContextEntityTypesAttribute.h"
 
 
 
 /* ****************************************************************************
 *
-* mapPostContextEntityAttributes - 
+* getNgsi10ContextEntityTypesAttribute - 
+*
+* GET /ngsi10/contextEntityTypes/{typeName}/attributes/{attributeName}
 */
-extern HttpStatusCode mapPostContextEntityAttributes(std::string id, RegisterProviderRequest* rpr,  RegisterContextResponse* response);
+std::string getNgsi10ContextEntityTypesAttribute(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+{
+  std::string typeName      = compV[2];
+  std::string attributeName = compV[4];
 
-#endif
+  LM_T(LmtConvenience, ("CONVENIENCE: got a  'GET' request for entity type '%s', attribute name '%s'", typeName.c_str(), attributeName.c_str()));
+  parseDataP->qcr.res.fill(".*", typeName, attributeName);
+  std::string answer = postQueryContext(ciP, components, compV, parseDataP);
+  parseDataP->qcr.res.release();
+  
+  return answer;
+}

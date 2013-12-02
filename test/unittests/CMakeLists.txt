@@ -97,11 +97,10 @@ SET (SOURCES
     serviceRoutines/putIndividualContextEntity_test.cpp
     serviceRoutines/putIndividualContextEntityAttributes_test.cpp
     serviceRoutines/postQueryContext_test.cpp
+    serviceRoutines/getNgsi10ContextEntityTypes_test.cpp
+    serviceRoutines/getNgsi10ContextEntityTypesAttribute_test.cpp
 
     convenience/Convenience_test.cpp
-    convenienceMap/mapEntityByIdAttributeByName_test.cpp
-    convenienceMap/mapContextEntitiesByEntityId_test.cpp
-    convenienceMap/mapContextEntityAttributes_test.cpp
     convenienceMap/mapDeleteIndividualContextEntity_test.cpp
     convenienceMap/mapGetIndividualContextEntity_test.cpp
     convenienceMap/mapPostIndividualContextEntity_test.cpp

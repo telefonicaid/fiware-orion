@@ -26,7 +26,8 @@
 
 #include "logMsg/logMsg.h"
 
-#include "serviceRoutines/getIndividualContextEntityAttributes.h"
+#include "serviceRoutines/getNgsi10ContextEntityTypesAttribute.h"
+#include "serviceRoutines/badVerbGetOnly.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
@@ -40,9 +41,10 @@
 */
 static RestService rs[] = 
 {
-  { "GET IndividualContextEntityAttributes",      "GET",    IndividualContextEntityAttributes,     4, { "ngsi10", "contextEntities", "*", "attributes"       }, "", getIndividualContextEntityAttributes      },
-  { "* InvalidRequest",                           "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "* *",                                        "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "GET Ngsi10ContextEntityTypesAttribute", "GET", Ngsi10ContextEntityTypesAttribute, 5, { "ngsi10", "contextEntityTypes", "*", "attributes", "*" }, "", getNgsi10ContextEntityTypesAttribute },
+  { "* Ngsi10ContextEntityTypesAttribute",   "*",   Ngsi10ContextEntityTypesAttribute, 5, { "ngsi10", "contextEntityTypes", "*", "attributes", "*" }, "", badVerbGetOnly                       },
+  { "* InvalidRequest",                      "*",   InvalidRequest,                    0, { "*", "*", "*", "*", "*", "*"                           }, "", badRequest                           },
+  { "* *",                                   "",    InvalidRequest,                    0, {                                                        }, "", NULL                                 }
 };
 
 
@@ -51,11 +53,10 @@ static RestService rs[] =
 *
 * notFound - 
 */
-TEST(getIndividualContextEntityAttributes, notFound)
+TEST(getNgsi10ContextEntityTypesAttribute, notFound)
 {
-  ConnectionInfo ci("/ngsi10/contextEntities/entity11/attributes",  "GET", "1.1");
-  std::string    expected = "<contextElementResponse>\n  <contextElement>\n    <entityId type=\"\" isPattern=\"false\">\n      <id>entity11</id>\n    </entityId>\n  </contextElement>\n  <statusCode>\n    <code>404</code>\n    <reasonPhrase>Entity Not Found</reasonPhrase>\n    <details>entity11</details>\n  </statusCode>\n</contextElementResponse>\n";
-
+  ConnectionInfo ci("/ngsi10/contextEntityTypes/entity11/attributes/Attribute11",  "GET", "1.1");
+  std::string    expected = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context elements found</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
   std::string    out;
 
   setupDatabase();

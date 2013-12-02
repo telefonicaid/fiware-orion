@@ -51,6 +51,7 @@ typedef struct QueryContextRequest
   std::string   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void          present(std::string indent);
   void          release(void);
+  void          fill(std::string entityId, std::string entityType, std::string attributeName);
 } QueryContextRequest;
 
 #endif

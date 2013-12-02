@@ -1,6 +1,3 @@
-#ifndef MAP_POST_CONTEXT_ENTITIES_BY_ENTITY_ID_H
-#define MAP_POST_CONTEXT_ENTITIES_BY_ENTITY_ID_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -26,16 +23,32 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "convenience/RegisterProviderRequest.h"
-#include "ngsi9/RegisterContextResponse.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
+#include "serviceRoutines/postQueryContext.h"
+#include "serviceRoutines/getNgsi10ContextEntityTypes.h"
 
 
 
 /* ****************************************************************************
 *
-* mapPostContextEntitiesByEntityId - 
+* getNgsi10ContextEntityTypes - 
+*
+* GET /ngsi10/contextEntityTypes/{typeName}
 */
-extern HttpStatusCode mapPostContextEntitiesByEntityId(std::string id, RegisterProviderRequest* rpr, RegisterContextResponse* response);
+std::string getNgsi10ContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+{
+  std::string typeName = compV[2];
 
-#endif
+  LM_T(LmtConvenience, ("CONVENIENCE: got a  'GET' request for entity type '%s'", typeName.c_str()));
+  parseDataP->qcr.res.fill(".*", typeName, "");
+  std::string answer = postQueryContext(ciP, components, compV, parseDataP);
+  parseDataP->qcr.res.release();
+  
+  return answer;
+}

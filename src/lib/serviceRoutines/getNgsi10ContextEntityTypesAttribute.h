@@ -1,3 +1,6 @@
+#ifndef GET_NGSI10_CONTEXT_ENTITY_TYPES_ATTRIBUTE_H
+#define GET_NGSI10_CONTEXT_ENTITY_TYPES_ATTRIBUTE_H
+
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -20,39 +23,20 @@
 * For those usages not covered by this license please contact with
 * fermin at tid dot es
 *
-* Author: Fermin Galan
+* Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "logMsg/logMsg.h"
-
-#include "ngsi/StatusCode.h"
-#include "convenience/RegisterProviderRequest.h"
-#include "ngsi9/RegisterContextResponse.h"
-#include "ngsi9/RegisterContextRequest.h"
-#include "convenienceMap/mapPostContextEntitiesByEntityId.h"
-#include "mongoBackend/mongoRegisterContext.h"
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* mapPostContextEntitiesByEntityId - 
+* getNgsi10ContextEntityTypesAttribute - 
 */
-HttpStatusCode mapPostContextEntitiesByEntityId(std::string id, RegisterProviderRequest* rpr, RegisterContextResponse* response)
-{
-   RegisterContextRequest request;
-   ContextRegistration    cr;
-   EntityId               entityId(id, "", "false");
+extern std::string getNgsi10ContextEntityTypesAttribute(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
 
-   cr.entityIdVector.push_back(&entityId);
-   cr.registrationMetadataVector = rpr->metadataVector;
-   cr.providingApplication       = rpr->providingApplication;
-
-   request.duration              = rpr->duration;
-   request.registrationId        = rpr->registrationId;
-
-   request.contextRegistrationVector.push_back(&cr);
-
-   return mongoRegisterContext(&request, response);
-}
+#endif
