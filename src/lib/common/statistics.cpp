@@ -74,6 +74,7 @@ int noOfIndividualContextEntityAttribute            = -1;
 int noOfNgsi10ContextEntityTypes                    = -1;
 int noOfNgsi10ContextEntityTypesAttributeContainer  = -1;
 int noOfNgsi10ContextEntityTypesAttribute           = -1;
+int noOfNgsi10SubscriptionsConvOp                   = -1;
 
 int noOfUpdateContextElement                 = -1;
 int noOfAppendContextElement                 = -1;
@@ -130,6 +131,7 @@ void statisticsUpdate(RequestType request, Format inFormat)
    case Ngsi10ContextEntityTypes:                   ++noOfNgsi10ContextEntityTypes; break;
    case Ngsi10ContextEntityTypesAttributeContainer: ++noOfNgsi10ContextEntityTypesAttributeContainer; break;
    case Ngsi10ContextEntityTypesAttribute:          ++noOfNgsi10ContextEntityTypesAttribute; break;
+   case Ngsi10SubscriptionsConvOp:                  ++noOfNgsi10SubscriptionsConvOp; break;
 
    case LogRequest:                             ++noOfLogRequests; break;
    case VersionRequest:                         ++noOfVersionRequests; break;

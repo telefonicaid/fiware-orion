@@ -64,6 +64,7 @@ typedef enum RequestType
   Ngsi10ContextEntityTypes,
   Ngsi10ContextEntityTypesAttributeContainer,
   Ngsi10ContextEntityTypesAttribute,
+  Ngsi10SubscriptionsConvOp,
 
   UpdateContextElement = 41,
   AppendContextElement,

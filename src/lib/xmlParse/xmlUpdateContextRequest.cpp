@@ -87,8 +87,6 @@ static int entityIdId(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got an entityId:id: '%s'", node->value()));
 
-  if ((reqData->upcr.entityIdP->id != "") && (reqData->upcr.entityIdP->id != node->value()))
-    LM_W(("Overwriting entityId:id (was '%s') for '%s'", reqData->upcr.entityIdP->id.c_str(), node->value()));
   reqData->upcr.entityIdP->id = node->value();
 
   return 0;

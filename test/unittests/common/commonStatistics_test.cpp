@@ -61,6 +61,7 @@ TEST(commonStatistics, statisticsUpdate)
   noOfNgsi10ContextEntityTypes               = 0;
   noOfNgsi10ContextEntityTypesAttributeContainer = 0;
   noOfNgsi10ContextEntityTypesAttribute      = 0;
+  noOfNgsi10SubscriptionsConvOp              = 0;
   noOfLogRequests                            = 0;
   noOfVersionRequests                        = 0;
   noOfExitRequests                           = 0;
@@ -95,6 +96,7 @@ TEST(commonStatistics, statisticsUpdate)
   statisticsUpdate(Ngsi10ContextEntityTypes, XML);
   statisticsUpdate(Ngsi10ContextEntityTypesAttributeContainer, JSON);
   statisticsUpdate(Ngsi10ContextEntityTypesAttribute, XML);
+  statisticsUpdate(Ngsi10SubscriptionsConvOp, JSON);
   statisticsUpdate(LogRequest, XML);
   statisticsUpdate(VersionRequest, JSON);
   statisticsUpdate(ExitRequest, XML);
@@ -127,6 +129,7 @@ TEST(commonStatistics, statisticsUpdate)
   EXPECT_EQ(1, noOfNgsi10ContextEntityTypes);
   EXPECT_EQ(1, noOfNgsi10ContextEntityTypesAttributeContainer);
   EXPECT_EQ(1, noOfNgsi10ContextEntityTypesAttribute);
+  EXPECT_EQ(1, noOfNgsi10SubscriptionsConvOp);
   EXPECT_EQ(1, noOfLogRequests);
   EXPECT_EQ(1, noOfVersionRequests);
   EXPECT_EQ(1, noOfExitRequests);
@@ -136,5 +139,5 @@ TEST(commonStatistics, statisticsUpdate)
   EXPECT_EQ(1, noOfRegisterResponses);
 
   EXPECT_EQ(16, noOfXmlRequests);
-  EXPECT_EQ(15, noOfJsonRequests);
+  EXPECT_EQ(16, noOfJsonRequests);
 }
