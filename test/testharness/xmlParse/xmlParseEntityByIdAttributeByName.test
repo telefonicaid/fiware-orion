@@ -8,7 +8,7 @@
 # License, or (at your option) any later version.
 #
 # Orion Context Broker is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# but WITHresponse ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 # General Public License for more details.
 #
@@ -60,9 +60,13 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
+print_headers () {
+  cat headers.out
+  echo $response | xmllint --format -
+}
 echo "1: ++++++++++++++++++++"
 # Make a registration using conv op /NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01
-OUT=$((curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01 -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01 -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
@@ -81,13 +85,14 @@ OUT=$((curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes/
   <providingApplication>http://kz.tid.es/abc</providingApplication>
 </registerProviderRequest>
 EOF)
-REG_ID=$(echo "$OUT" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$OUT"
+REG_ID=$(echo "$response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
+cat headers.out
+echo $response | xmllint --format -
 
 
 # Make a discovery to see that the registration went OK
 echo "2: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -100,7 +105,7 @@ EOF
 
 # Modify the first registration
 echo "3: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01 -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+(curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01 -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
@@ -123,7 +128,7 @@ EOF
 echo "4: ++++++++++++++++++++"
 
 # Now discover that very registration again to see the change
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -136,18 +141,18 @@ EOF
 echo "5: ++++++++++++++++++++"
 
 # Now try the GET method
-curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01 -s -S | xmllint --format -
+curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01 -s -S --dump-header headers.out | xmllint --format -
 echo "6: ++++++++++++++++++++"
 
 # And a GET that fails
-curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID2/attributes -s -S | xmllint --format -
+curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID2/attributes -s -S --dump-header headers.out | xmllint --format -
 echo "7: ++++++++++++++++++++"
 
 # DELETE and PUT should give errors
-curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01 -s -S -X DELETE --include
+curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01 -s -S --dump-header headers.out -X DELETE --include
 echo "8: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01 -s -S -X PUT --include --header 'Content-Type: application/xml' -d @-) << EOF
+(curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01 -s -S --dump-header headers.out -X PUT --include --header 'Content-Type: application/xml' -d @-) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>

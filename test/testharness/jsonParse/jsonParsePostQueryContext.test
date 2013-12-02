@@ -200,7 +200,7 @@ Date: REGEX(.*)
 }
 3: ***********************************
 HTTP/1.1 200 OK
-Content-Length: 790
+Content-Length: 95
 Content-Type: application/json
 Date: REGEX(.*)
 

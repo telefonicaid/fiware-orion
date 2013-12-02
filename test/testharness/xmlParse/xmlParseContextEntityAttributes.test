@@ -8,7 +8,7 @@
 # License, or (at your option) any later version.
 #
 # Orion Context Broker is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# but WITHresponse ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 # General Public License for more details.
 #
@@ -60,9 +60,13 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
+print_headers () {
+  cat headers.out
+  echo $response | xmllint --format -
+}
 echo "1: ++++++++++++++++++++"
 # Make a registration using conv op /NGSI9/contextEntities/ENTITY_ID/attributes
-OUT=$((curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
@@ -81,13 +85,13 @@ OUT=$((curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes 
   <providingApplication>http://kz.tid.es/abc</providingApplication>
 </registerProviderRequest>
 EOF)
-REG_ID=$(echo "$OUT" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$OUT"
+REG_ID=$(echo "$response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
+print_headers
 
 
 # Make a discovery to see that the registration went OK
 echo "2: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -96,11 +100,12 @@ echo "2: ++++++++++++++++++++"
       </entityId>
     </entityIdList>
   </discoverContextAvailabilityRequest>
-EOF
+EOF)
+print_headers
 
 # Modify the first registration
 echo "3: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
@@ -119,11 +124,12 @@ echo "3: ++++++++++++++++++++"
   <providingApplication>http://kz.tid.es/abc2</providingApplication>
   <registrationId>$REG_ID</registrationId>
 </registerProviderRequest>
-EOF
+EOF)
+print_headers
 echo "4: ++++++++++++++++++++"
 
 # Now discover that very registration again to see the change
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -132,22 +138,26 @@ echo "4: ++++++++++++++++++++"
       </entityId>
     </entityIdList>
   </discoverContextAvailabilityRequest>
-EOF
+EOF)
+print_headers
 echo "5: ++++++++++++++++++++"
 
 # Now try the GET method
-curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes -s -S | xmllint --format -
+response=$(curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes -s -S --dump-header headers.out | xmllint --format -)
+print_headers
 echo "6: ++++++++++++++++++++"
 
 # And a GET that fails
-curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID2/attributes -s -S | xmllint --format -
+response=$(curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID2/attributes -s -S --dump-header headers.out | xmllint --format -)
+print_headers
 echo "7: ++++++++++++++++++++"
 
 # DELETE and PUT should give errors
-curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes -s -S -X DELETE --include
+response=$(curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes -s -S --dump-header headers.out -X DELETE --include)
+print_headers
 echo "8: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes -s -S -X PUT --include --header 'Content-Type: application/xml' -d @-) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes -s -S --dump-header headers.out -X PUT --include --header 'Content-Type: application/xml' -d @-) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
@@ -165,17 +175,28 @@ echo "8: ++++++++++++++++++++"
   <duration>PT2H</duration>
   <providingApplication>http://kz.tid.es/abc2</providingApplication>
 </registerProviderRequest>
-EOF
+EOF)
+print_headers
 echo "9: ++++++++++++++++++++"
 
 --REGEXPECT--
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 497
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -192,12 +213,22 @@ echo "9: ++++++++++++++++++++"
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT2H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 498
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -214,6 +245,11 @@ echo "9: ++++++++++++++++++++"
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 498
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -230,6 +266,11 @@ echo "9: ++++++++++++++++++++"
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 199
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <errorCode>

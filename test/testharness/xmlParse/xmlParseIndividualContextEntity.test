@@ -62,11 +62,11 @@ fi
 --SHELL--
 # 1. GET that fails
 echo "1: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format -)
+response=$((curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format -)
 
 # 2. POST that fails
 echo "2: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
@@ -82,7 +82,7 @@ EOF
 
 # 3. PUT that fails
 echo "3: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X PUT -d @- | xmllint --format -) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X PUT -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
   <attributeDomainName></attributeDomainName>
@@ -98,11 +98,11 @@ EOF
 
 # 4. DELETE that fails
 echo "4: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X DELETE | xmllint --format -)
+response=$((curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X DELETE | xmllint --format -)
 
 # 5. Register an entity
 echo "5: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -128,11 +128,11 @@ EOF
 
 # 6. GET that is OK
 echo "6: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format -)
+response=$((curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format -)
 
 # 7. POST that is OK
 echo "7: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
@@ -148,7 +148,7 @@ EOF
 
 # 8. PUT that is OK
 echo "8: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X PUT -d @- | xmllint --format -) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X PUT -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
   <attributeDomainName></attributeDomainName>
@@ -164,7 +164,7 @@ EOF
 
 # 9. DELETE that is OK
 echo "9: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X DELETE | xmllint --format -)
+response=$((curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X DELETE | xmllint --format -)
 
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++

@@ -60,7 +60,11 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X BAD_VERB --include -d @-) << EOF
+print_headers () {
+  cat headers.out
+  echo $response | xmllint --format -
+}
+response=$((curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X BAD_VERB --include -d @-) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -110,7 +114,8 @@ fi
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>
-EOF
+EOF)
+print_headers
 echo "++++++++++++++++++++"
 --REGEXPECT--
 HTTP/1.1 100 Continue

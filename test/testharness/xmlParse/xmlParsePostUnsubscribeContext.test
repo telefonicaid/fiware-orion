@@ -60,14 +60,14 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextRequest>
   <subscriptionId>012345678901234567890123</subscriptionId>
 </unsubscribeContextRequest>
 EOF
 echo "2: ***********************************"
-OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -112,7 +112,7 @@ EOF)
 echo "$OUT"
 subscriptionId=$(echo "$OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "3: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextRequest>
   <subscriptionId>$subscriptionId</subscriptionId>

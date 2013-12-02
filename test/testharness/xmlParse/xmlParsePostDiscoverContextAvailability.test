@@ -61,7 +61,7 @@ fi
 
 --SHELL--
 echo "+++++ Registration +++++"
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -115,7 +115,7 @@ EOF
 echo "+++++ Registration Done +++++"
 
 echo "+++++ Discovery +++++"
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
