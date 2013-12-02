@@ -284,7 +284,7 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -456,7 +456,7 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -628,7 +628,7 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -826,7 +826,7 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1027,7 +1027,7 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1213,7 +1213,7 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1391,7 +1391,7 @@ TEST(mongoUpdateContextRequest, update1EntNAttrSameName)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1575,7 +1575,7 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1767,7 +1767,7 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1943,7 +1943,7 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2119,7 +2119,7 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2331,7 +2331,7 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2547,7 +2547,7 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2743,7 +2743,7 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2936,7 +2936,7 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -3149,7 +3149,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -3315,7 +3315,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -3481,7 +3481,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -3668,7 +3668,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -3859,7 +3859,7 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -4037,7 +4037,7 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -4210,7 +4210,7 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -4383,7 +4383,7 @@ TEST(mongoUpdateContextRequest, createEntity)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -4568,7 +4568,7 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -4759,7 +4759,7 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -4936,7 +4936,7 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -5107,7 +5107,7 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -5278,7 +5278,7 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -5448,7 +5448,7 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -5623,7 +5623,7 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -5819,7 +5819,7 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -5992,7 +5992,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -6214,7 +6214,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -6438,7 +6438,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -6666,7 +6666,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -6902,7 +6902,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -7120,7 +7120,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -7337,7 +7337,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -7553,7 +7553,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -7769,7 +7769,7 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -7980,7 +7980,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -8046,7 +8046,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    //EXPECT_EQ(0, res.errorCode.code) << which kind of test do here to ensure this has not been asigned?
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
