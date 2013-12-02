@@ -58,6 +58,7 @@ postIndividualContextEntityAttribute.cpp
 deleteIndividualContextEntityAttribute.cpp
 deleteIndividualContextEntity.cpp
 getNgsi10ContextEntityTypes.cpp
+getNgsi10ContextEntityTypesAttribute.cpp
 badVerbPostOnly.cpp
 badVerbAllFour.cpp
 badVerbGetPostOnly.cpp
