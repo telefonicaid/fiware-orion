@@ -89,6 +89,7 @@
 #include "serviceRoutines/getIndividualContextEntity.h"
 #include "serviceRoutines/putIndividualContextEntity.h"
 #include "serviceRoutines/badVerbPostOnly.h"
+#include "serviceRoutines/badVerbPutDeleteOnly.h"
 #include "serviceRoutines/badVerbGetPostOnly.h"
 #include "serviceRoutines/postIndividualContextEntity.h"
 #include "serviceRoutines/deleteIndividualContextEntity.h"
@@ -102,6 +103,9 @@
 #include "serviceRoutines/getNgsi10ContextEntityTypesAttribute.h"
 #include "serviceRoutines/postIndividualContextEntityAttribute.h"
 #include "serviceRoutines/deleteIndividualContextEntityAttribute.h"
+#include "serviceRoutines/putSubscriptionConvOp.h"
+#include "serviceRoutines/deleteSubscriptionConvOp.h"
+
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
 #include "serviceRoutines/badVerbGetOnly.h"
 #include "serviceRoutines/badVerbGetDeleteOnly.h"
@@ -260,9 +264,12 @@ RestService restServiceV[] =
   { "GET Ngsi10ContextEntityTypesAttribute",           "GET",    Ngsi10ContextEntityTypesAttribute,           5, { "ngsi10", "contextEntityTypes", "*", "attributes", "*" }, "",                                getNgsi10ContextEntityTypesAttribute      },
   { "* Ngsi10ContextEntityTypesAttribute",             "*",      Ngsi10ContextEntityTypesAttribute,           5, { "ngsi10", "contextEntityTypes", "*", "attributes", "*" }, "",                                badVerbGetOnly                            },
   
-  { "POST Subscriptions",                              "POST",   SubscribeContext,                            2, { "ngsi10", "subscriptions"                              }, "subscribeContextRequest",         postSubscribeContext                      },
-  { "* Subscriptions",                                 "*",      SubscribeContext,                            2, { "ngsi10", "subscriptions"                              }, "subscribeContextRequest",         badVerbPostOnly                           },
+  { "POST Subscriptions",                              "POST",   SubscribeContext,                            2, { "ngsi10", "subscriptions"                              }, "subscribeContextRequest",          postSubscribeContext                      },
+  { "* Subscriptions",                                 "*",      SubscribeContext,                            2, { "ngsi10", "subscriptions"                              }, "",                                 badVerbPostOnly                           },
 
+  { "PUT Subscription",                                "POST",   Ngsi10SubscriptionsConvOp,                   3, { "ngsi10", "subscriptions", "*"                         }, "updateContextSubscriptionRequest", putSubscriptionConvOp                     },
+  { "DELETE Subscription",                             "DELETE", Ngsi10SubscriptionsConvOp,                   3, { "ngsi10", "subscriptions", "*"                         }, "",                                 deleteSubscriptionConvOp                  },
+  { "* Subscription",                                  "*",      Ngsi10SubscriptionsConvOp,                   3, { "ngsi10", "subscriptions", "*"                         }, "",                                 badVerbPutDeleteOnly                      },
 
   // log request
   { "GET LogRequest",                             "GET",    LogRequest,                            2, { "log", "verbose"                                     }, "",                                             logVerboseTreat                           },
