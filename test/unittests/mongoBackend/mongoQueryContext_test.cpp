@@ -65,6 +65,7 @@ using ::testing::Throw;
 * - queryNEntWA0Attr
 * - queryNEntWA1Attr
 * - queryNoType
+* - queryIdMetadata
 *
 * (N=2 without loss of generality)
 * (WA = Without Attributes)
@@ -78,6 +79,7 @@ using ::testing::Throw;
 * - queryPatternFail
 * - queryMixPatternAndNotPattern
 * - queryNoTypePattern
+* - queryIdMetadataPattern
 *
 * Simulating fails in MongoDB connection:
 *
@@ -230,6 +232,44 @@ static void prepareDatabasePatternTrue(void) {
   connection->insert(ENTITIES_COLL, en4);
   connection->insert(ENTITIES_COLL, en5);
   connection->insert(ENTITIES_COLL, en6);
+
+}
+
+/* ****************************************************************************
+*
+* prepareDatabaseWithAttributeIds -
+*
+* This function is called before every test, to populate some information in the
+* entities collection.
+*/
+static void prepareDatabaseWithAttributeIds(void) {
+
+    /* Start with the base entities */
+    prepareDatabase();
+
+    /* Add someones with metadata ID */
+
+    DBClientConnection* connection = getMongoConnection();
+    BSONObj en1 = BSON("_id" << BSON("id" << "E10" << "type" << "T") <<
+                       "attrs" << BSON_ARRAY(
+                          BSON("name" << "A1" << "type" << "TA1" << "value" << "A" << "id" << "ID1") <<
+                          BSON("name" << "A1" << "type" << "TA1" << "value" << "B" << "id" << "ID2") <<
+                          BSON("name" << "A1" << "type" << "TA11" << "value" << "C") <<
+                          BSON("name" << "A2" << "type" << "TA2" << "value" << "D")
+                          )
+                      );
+
+    BSONObj en2 = BSON("_id" << BSON("id" << "E11" << "type" << "T") <<
+                       "attrs" << BSON_ARRAY(
+                          BSON("name" << "A1" << "type" << "TA1" << "value" << "E" << "id" << "ID1") <<
+                          BSON("name" << "A1" << "type" << "TA1" << "value" << "F" << "id" << "ID2") <<
+                          BSON("name" << "A1" << "type" << "TA11" << "value" << "G") <<
+                          BSON("name" << "A2" << "type" << "TA2" << "value" << "H")
+                          )
+                      );
+
+    connection->insert(ENTITIES_COLL, en1);
+    connection->insert(ENTITIES_COLL, en2);
 
 }
 
@@ -1012,6 +1052,67 @@ TEST(mongoQueryContextRequest, queryNoType)
     mongoDisconnect();
 }
 
+/* ****************************************************************************
+*
+* queryIdMetadata -
+*
+*/
+TEST(mongoQueryContextRequest, queryIdMetadata)
+{
+    HttpStatusCode         ms;
+    QueryContextRequest   req;
+    QueryContextResponse  res;
+
+    /* Prepare database */
+    prepareDatabaseWithAttributeIds();
+
+    /* Forge the request (from "inside" to "outside") */
+    EntityId en("E10", "T", "false");
+    req.entityIdVector.push_back(&en);
+    req.attributeList.push_back("A1");
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoQueryContext(&req, &res);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E10", RES_CER(0).entityId.id);
+    EXPECT_EQ("T", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ("A", RES_CER_ATTR(0, 0)->value);
+    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
+    EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 1)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 1)->type);
+    EXPECT_EQ("B", RES_CER_ATTR(0, 1)->value);
+    ASSERT_EQ(1, RES_CER_ATTR(0, 1)->metadataVector.size());
+    EXPECT_EQ("ID", RES_CER_ATTR(0, 1)->metadataVector.get(0)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 1)->metadataVector.get(0)->type);
+    EXPECT_EQ("ID2", RES_CER_ATTR(0, 1)->metadataVector.get(0)->value);
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 2)->name);
+    EXPECT_EQ("TA11", RES_CER_ATTR(0, 2)->type);
+    EXPECT_EQ("C", RES_CER_ATTR(0, 2)->value);
+    ASSERT_EQ(0, RES_CER_ATTR(0, 2)->metadataVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+    /* Release connection */
+    mongoDisconnect();
+}
+
 
 /* ****************************************************************************
 *
@@ -1470,6 +1571,94 @@ TEST(mongoQueryContextRequest, queryNoTypePattern)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
+
+    /* Release connection */
+    mongoDisconnect();
+}
+
+/* ****************************************************************************
+*
+* queryIdMetadataPattern -
+*
+*/
+TEST(mongoQueryContextRequest, queryIdMetadataPattern)
+{
+    HttpStatusCode         ms;
+    QueryContextRequest   req;
+    QueryContextResponse  res;
+
+    /* Prepare database */
+    prepareDatabaseWithAttributeIds();
+
+    /* Forge the request (from "inside" to "outside") */
+    EntityId en("E1[0-1]", "T", "true");
+    req.entityIdVector.push_back(&en);
+    req.attributeList.push_back("A1");
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoQueryContext(&req, &res);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(2, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E10", RES_CER(0).entityId.id);
+    EXPECT_EQ("T", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ("A", RES_CER_ATTR(0, 0)->value);
+    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
+    EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 1)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 1)->type);
+    EXPECT_EQ("B", RES_CER_ATTR(0, 1)->value);
+    ASSERT_EQ(1, RES_CER_ATTR(0, 1)->metadataVector.size());
+    EXPECT_EQ("ID", RES_CER_ATTR(0, 1)->metadataVector.get(0)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 1)->metadataVector.get(0)->type);
+    EXPECT_EQ("ID2", RES_CER_ATTR(0, 1)->metadataVector.get(0)->value);
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 2)->name);
+    EXPECT_EQ("TA11", RES_CER_ATTR(0, 2)->type);
+    EXPECT_EQ("C", RES_CER_ATTR(0, 2)->value);
+    ASSERT_EQ(0, RES_CER_ATTR(0, 2)->metadataVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+    /* Context Element response # 2 */
+    EXPECT_EQ("E11", RES_CER(1).entityId.id);
+    EXPECT_EQ("T", RES_CER(1).entityId.type);
+    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+    ASSERT_EQ(3, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
+    EXPECT_EQ("E", RES_CER_ATTR(1, 0)->value);
+    ASSERT_EQ(1, RES_CER_ATTR(1, 0)->metadataVector.size());
+    EXPECT_EQ("ID", RES_CER_ATTR(1, 0)->metadataVector.get(0)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(1, 0)->metadataVector.get(0)->type);
+    EXPECT_EQ("ID1", RES_CER_ATTR(1, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("A1", RES_CER_ATTR(1, 1)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(1, 1)->type);
+    EXPECT_EQ("F", RES_CER_ATTR(1, 1)->value);
+    ASSERT_EQ(1, RES_CER_ATTR(1, 1)->metadataVector.size());
+    EXPECT_EQ("ID", RES_CER_ATTR(1, 1)->metadataVector.get(0)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(1, 1)->metadataVector.get(0)->type);
+    EXPECT_EQ("ID2", RES_CER_ATTR(1, 1)->metadataVector.get(0)->value);
+    EXPECT_EQ("A1", RES_CER_ATTR(1, 2)->name);
+    EXPECT_EQ("TA11", RES_CER_ATTR(1, 2)->type);
+    EXPECT_EQ("G", RES_CER_ATTR(1, 2)->value);
+    ASSERT_EQ(0, RES_CER_ATTR(1, 2)->metadataVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
     /* Release connection */
     mongoDisconnect();
