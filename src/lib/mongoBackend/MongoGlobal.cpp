@@ -531,16 +531,17 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
             ca.type = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
             ca.value = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
 
-            // FIXME: we don't take metadata into account at the moment
-            //attr.metadataV = ..
-
             if (!includeEmpty && ca.value.length() == 0) {
                 continue;
             }
 
             if (includedAttribute(ca, &attrL)) {
 
-                ContextAttribute* caP = new ContextAttribute(ca.name, ca.type, ca.value);
+                ContextAttribute* caP = new ContextAttribute(ca.name, ca.type, ca.value);                                
+                if (STR_FIELD(queryAttr, ENT_ATTRS_ID) != "") {
+                    Metadata* md = new Metadata(NGSI_MD_ID, "string", STR_FIELD(queryAttr, ENT_ATTRS_ID));
+                    caP->metadataVector.push_back(md);
+                }
 
                 cer->contextElement.contextAttributeVector.push_back(caP);
             }
