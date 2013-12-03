@@ -1,6 +1,3 @@
-#ifndef POST_SUBSCRIBE_CONTEXT_H
-#define POST_SUBSCRIBE_CONTEXT_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -30,13 +27,27 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-
+#include "rest/restReply.h"
+#include "serviceRoutines/postUpdateContextSubscription.h"
+#include "serviceRoutines/putSubscriptionConvOp.h"
 
 
 /* ****************************************************************************
 *
-* postSubscribeContext - 
+* putSubscriptionConvOp - 
 */
-extern std::string postSubscribeContext(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+std::string putSubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+{
+  std::string                        subscriptionId = compV[2];
+  UpdateContextSubscriptionRequest*  ucsrP = &parseDataP->ucsr.res;
 
-#endif
+  if (subscriptionId != ucsrP->subscriptionId.get())
+  {
+    std::string out;
+
+    out = restErrorReplyGet(ciP, ciP->outFormat, "", "updateContextSubscription", SccBadRequest, "unmatching subscriptionId URI/payload", subscriptionId);
+    return out;
+  }
+
+  return postUpdateContextSubscription(ciP, components, compV, parseDataP);
+}
