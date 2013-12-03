@@ -539,7 +539,7 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
 
                 ContextAttribute* caP = new ContextAttribute(ca.name, ca.type, ca.value);                                
                 if (STR_FIELD(queryAttr, ENT_ATTRS_ID) != "") {
-                    Metadata* md = new Metadata(METADATA_ID, "string", STR_FIELD(queryAttr, ENT_ATTRS_ID));
+                    Metadata* md = new Metadata(NGSI_MD_ID, "string", STR_FIELD(queryAttr, ENT_ATTRS_ID));
                     caP->metadataVector.push_back(md);
                 }
 

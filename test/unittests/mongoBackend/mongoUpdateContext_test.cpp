@@ -210,7 +210,7 @@ static void prepareDatabaseWithAttributeIds(void) {
     /* Start with the base entities */
     prepareDatabase();
 
-    /* Add someones with metadata ID */
+    /* Add some entities with metadata ID */
 
     DBClientConnection* connection = getMongoConnection();
     BSONObj en = BSON("_id" << BSON("id" << "E10" << "type" << "T10") <<
@@ -4781,7 +4781,7 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
     ASSERT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
-    EXPECT_EQ("It is not allowed to create an entity with attribute of same name with ID an not ID", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("Attributes with same name with ID and not ID at the same time in the same entity are forbidden", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("entity: (E4, T4)", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */

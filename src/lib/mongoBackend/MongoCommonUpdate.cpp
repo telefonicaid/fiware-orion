@@ -45,10 +45,10 @@
 */
 bool smartAttrMatch(std::string name1, std::string type1, std::string id1, std::string name2, std::string type2, std::string id2) {
     if (type2 == "") {
-        return (name1 == name2 && id1 == id2);
+        return ((name1 == name2) && (id1 == id2));
     }
     else {
-        return (name1 == name2 && type1 == type2 && id1 == id2);
+        return ((name1 == name2) && (type1 == type2) && (id1 == id2));
     }
 }
 
@@ -501,7 +501,7 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
         ca->name = ceP->contextAttributeVector.get(ix)->name;
         ca->type = ceP->contextAttributeVector.get(ix)->type;
         if (ceP->contextAttributeVector.get(ix)->getId() != "") {
-            Metadata*  md = new Metadata(METADATA_ID, "string", ceP->contextAttributeVector.get(ix)->getId());
+            Metadata*  md = new Metadata(NGSI_MD_ID, "string", ceP->contextAttributeVector.get(ix)->getId());
             ca->metadataVector.push_back(md);
         }
         cerP->contextElement.contextAttributeVector.push_back(ca);
@@ -614,7 +614,7 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
     LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName()));
 
     if (!legalIdUsage(attrsV)) {
-        *errReason = "It is not allowed to create an entity with attribute of same name with ID an not ID";
+        *errReason = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden";
         // FIXME: use toString once EntityID and ContextAttribute becomes objects
         *errDetail = "entity: (" + e.id + ", " + e.type + ")";
         return false;
@@ -848,7 +848,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);
 
                 if (caP->getId().length() != 0) {
-                    Metadata* md = new Metadata(METADATA_ID, "string", caP->getId());
+                    Metadata* md = new Metadata(NGSI_MD_ID, "string", caP->getId());
                     ca->metadataVector.push_back(md);
                 }
 
@@ -862,7 +862,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             else {
                 cerP->statusCode.fill(SccOk, "OK");
 
-                /* Successfull creation: send potential notifications */
+                /* Successful creation: send potential notifications */
                 std::map<string, BSONObj*> subsToNotify;
                 for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                     std::string err;

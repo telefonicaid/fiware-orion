@@ -247,7 +247,7 @@ static void prepareDatabaseWithAttributeIds(void) {
     /* Start with the base entities */
     prepareDatabase();
 
-    /* Add someones with metadata ID */
+    /* Add some entities with metadata ID */
 
     DBClientConnection* connection = getMongoConnection();
     BSONObj en1 = BSON("_id" << BSON("id" << "E10" << "type" << "T") <<

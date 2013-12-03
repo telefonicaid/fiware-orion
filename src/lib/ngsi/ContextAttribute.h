@@ -32,7 +32,7 @@
 #include "common/Format.h"
 #include "ngsi/Request.h"
 
-#define METADATA_ID "ID"
+#define NGSI_MD_ID "ID"
 
 
 /* ****************************************************************************
