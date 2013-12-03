@@ -1,6 +1,3 @@
-#ifndef POST_SUBSCRIBE_CONTEXT_H
-#define POST_SUBSCRIBE_CONTEXT_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -28,15 +25,27 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/restReply.h"
+#include "serviceRoutines/badVerbPutDeleteOnly.h"
 
 
 
 /* ****************************************************************************
 *
-* postSubscribeContext - 
+* badVerbPutDeleteOnly - 
 */
-extern std::string postSubscribeContext(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+std::string badVerbPutDeleteOnly(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+{
+  ciP->httpHeader.push_back("Allow");
+  ciP->httpHeaderValue.push_back("PUT, DELETE");
+  ciP->httpStatusCode = SccBadVerb;
 
-#endif
+  LM_W(("bad verb for url '%s', method '%s'", ciP->url.c_str(), ciP->method.c_str()));
+
+  return "";
+}

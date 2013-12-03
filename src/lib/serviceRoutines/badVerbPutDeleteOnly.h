@@ -1,5 +1,5 @@
-#ifndef POST_SUBSCRIBE_CONTEXT_H
-#define POST_SUBSCRIBE_CONTEXT_H
+#ifndef BAD_VERB_PUT_DELETE_ONLY_H
+#define BAD_VERB_PUT_DELETE_ONLY_H
 
 /*
 *
@@ -28,15 +28,17 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
+
 
 
 
 /* ****************************************************************************
 *
-* postSubscribeContext - 
+* badVerbPutDeleteOnly - 
 */
-extern std::string postSubscribeContext(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+extern std::string badVerbPutDeleteOnly(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
 
 #endif
+

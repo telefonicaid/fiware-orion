@@ -1,5 +1,5 @@
-#ifndef POST_SUBSCRIBE_CONTEXT_H
-#define POST_SUBSCRIBE_CONTEXT_H
+#ifndef PUT_SUBSCRIPTION_CONV_OP_H
+#define PUT_SUBSCRIPTION_CONV_OP_H
 
 /*
 *
@@ -35,8 +35,9 @@
 
 /* ****************************************************************************
 *
-* postSubscribeContext - 
+* putSubscriptionConvOp - 
 */
-extern std::string postSubscribeContext(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+extern std::string putSubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
 
 #endif
+
