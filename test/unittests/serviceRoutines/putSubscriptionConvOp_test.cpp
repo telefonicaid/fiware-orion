@@ -36,6 +36,7 @@
 
 #include "testDataFromFile.h"
 #include "commonMocks.h"
+#include "testInit.h"
 
 using ::testing::_;
 using ::testing::Throw;
@@ -77,6 +78,8 @@ TEST(putSubscriptionConvOp, put)
   std::string    out;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+
+  setupDatabase();
 
   NotifierMock* notifierMock = new NotifierMock();
   setNotifier(notifierMock);
