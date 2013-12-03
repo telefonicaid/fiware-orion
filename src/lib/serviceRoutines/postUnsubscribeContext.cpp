@@ -47,4 +47,3 @@ std::string postUnsubscribeContext(ConnectionInfo* ciP, int components, std::vec
 
   return answer;
 }
-

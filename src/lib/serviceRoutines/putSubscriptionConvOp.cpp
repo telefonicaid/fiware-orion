@@ -27,9 +27,9 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/restReply.h"
 #include "serviceRoutines/postUpdateContextSubscription.h"
 #include "serviceRoutines/putSubscriptionConvOp.h"
-
 
 
 /* ****************************************************************************
@@ -38,12 +38,16 @@
 */
 std::string putSubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
-  std::string                        answer;
   std::string                        subscriptionId = compV[2];
   UpdateContextSubscriptionRequest*  ucsrP = &parseDataP->ucsr.res;
 
   if (subscriptionId != ucsrP->subscriptionId.get())
-    return "unmatching subscriptionId URI/payload";
+  {
+    std::string out;
+
+    out = restErrorReplyGet(ciP, ciP->outFormat, "", "updateContextSubscription", SccBadRequest, "unmatching subscriptionId URI/payload", subscriptionId);
+    return out;
+  }
 
   return postUpdateContextSubscription(ciP, components, compV, parseDataP);
 }
