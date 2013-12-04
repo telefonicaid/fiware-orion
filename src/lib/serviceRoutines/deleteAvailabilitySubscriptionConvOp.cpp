@@ -27,21 +27,21 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "serviceRoutines/postUnsubscribeContext.h"
-#include "serviceRoutines/deleteSubscriptionConvOp.h"
+#include "serviceRoutines/postUnsubscribeContextAvailability.h"
+#include "serviceRoutines/deleteAvailabilitySubscriptionConvOp.h"
 
 
 
 /* ****************************************************************************
 *
-* deleteSubscriptionConvOp - 
+* deleteAvailabilitySubscriptionConvOp - 
 */
-std::string deleteSubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string deleteAvailabilitySubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
-  std::string                        subscriptionId = compV[2];
-  UnsubscribeContextRequest*         uncrP          = &parseDataP->uncr.res;
+  UnsubscribeContextAvailabilityRequest*  ucarP          = &parseDataP->ucar.res;
+  std::string                             subscriptionId = compV[2];
 
-  uncrP->subscriptionId = subscriptionId; 
+  ucarP->subscriptionId = subscriptionId;
 
-  return postUnsubscribeContext(ciP, components, compV, parseDataP);
+  return postUnsubscribeContextAvailability(ciP, components, compV, parseDataP);
 }

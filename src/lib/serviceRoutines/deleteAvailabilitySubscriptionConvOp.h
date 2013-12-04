@@ -1,3 +1,6 @@
+#ifndef DELETE_AVAILABILITY_SUBSCRIPTION_CONV_OP_H
+#define DELETE_AVAILABILITY_SUBSCRIPTION_CONV_OP_H
+
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -27,21 +30,13 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "serviceRoutines/postUnsubscribeContext.h"
-#include "serviceRoutines/deleteSubscriptionConvOp.h"
 
 
 
 /* ****************************************************************************
 *
-* deleteSubscriptionConvOp - 
+* deleteAvailabilitySubscriptionConvOp - 
 */
-std::string deleteSubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
-{
-  std::string                        subscriptionId = compV[2];
-  UnsubscribeContextRequest*         uncrP          = &parseDataP->uncr.res;
+extern std::string deleteAvailabilitySubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
 
-  uncrP->subscriptionId = subscriptionId; 
-
-  return postUnsubscribeContext(ciP, components, compV, parseDataP);
-}
+#endif

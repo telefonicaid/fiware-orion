@@ -22,26 +22,49 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-#include <vector>
-
-#include "ngsi/ParseData.h"
-#include "rest/ConnectionInfo.h"
-#include "serviceRoutines/postUnsubscribeContext.h"
-#include "serviceRoutines/deleteSubscriptionConvOp.h"
+#include "unittest.h"
+#include "testInit.h"
 
 
 
 /* ****************************************************************************
 *
-* deleteSubscriptionConvOp - 
+* Forward declarations
 */
-std::string deleteSubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+static NotifierMock* notifierMock = NULL;
+static TimerMock*    timerMock    = NULL;
+
+
+
+/* ****************************************************************************
+*
+* utInit - unit test init
+*
+*/
+void utInit(void)
 {
-  std::string                        subscriptionId = compV[2];
-  UnsubscribeContextRequest*         uncrP          = &parseDataP->uncr.res;
+  notifierMock = new NotifierMock();
+  setNotifier(notifierMock);
+  
+  timerMock = new TimerMock();
+  ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
+  setTimer(timerMock);
 
-  uncrP->subscriptionId = subscriptionId; 
+  setupDatabase();
+}
 
-  return postUnsubscribeContext(ciP, components, compV, parseDataP);
+
+
+/* ****************************************************************************
+*
+* utExit - unit test exit
+*
+*/
+void utExit(void)
+{
+  setTimer(NULL);
+  setNotifier(NULL);
+
+  delete timerMock;
+  delete notifierMock;
 }

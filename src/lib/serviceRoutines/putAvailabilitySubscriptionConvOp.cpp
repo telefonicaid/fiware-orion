@@ -27,21 +27,28 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "serviceRoutines/postUnsubscribeContext.h"
-#include "serviceRoutines/deleteSubscriptionConvOp.h"
+#include "rest/restReply.h"
 
+#include "serviceRoutines/postUpdateContextAvailabilitySubscription.h"
+#include "serviceRoutines/putAvailabilitySubscriptionConvOp.h"
 
 
 /* ****************************************************************************
 *
-* deleteSubscriptionConvOp - 
+* putAvailabilitySubscriptionConvOp - 
 */
-std::string deleteSubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string putAvailabilitySubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
-  std::string                        subscriptionId = compV[2];
-  UnsubscribeContextRequest*         uncrP          = &parseDataP->uncr.res;
+  std::string                                    subscriptionId  = compV[2];
+  UpdateContextAvailabilitySubscriptionRequest*  ucasP           = &parseDataP->ucas.res;
 
-  uncrP->subscriptionId = subscriptionId; 
+  if (subscriptionId != ucasP->subscriptionId.get())
+  {
+    std::string out;
 
-  return postUnsubscribeContext(ciP, components, compV, parseDataP);
+    out = restErrorReplyGet(ciP, ciP->outFormat, "", "updateContextAvailabilitySubscription", SccBadRequest, "unmatching subscriptionId URI/payload", subscriptionId);
+    return out;
+  }
+
+  return postUpdateContextAvailabilitySubscription(ciP, components, compV, parseDataP);
 }
