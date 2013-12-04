@@ -55,6 +55,7 @@ SET (SOURCES
     main_UnitTest.cpp
     testDataFromFile.cpp
     testInit.cpp
+    unittest.cpp
 
     serviceRoutines/badVerbGetOnly_test.cpp
     serviceRoutines/badVerbPostOnly_test.cpp
@@ -107,6 +108,7 @@ SET (SOURCES
     serviceRoutines/exitTreat_test.cpp
     serviceRoutines/leakTreat_test.cpp
     serviceRoutines/statisticsTreat_test.cpp
+    serviceRoutines/putAvailabilitySubscriptionConvOp_test.cpp
 
     convenience/Convenience_test.cpp
     convenienceMap/mapDeleteIndividualContextEntity_test.cpp

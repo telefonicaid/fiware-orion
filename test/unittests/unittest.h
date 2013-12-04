@@ -1,3 +1,6 @@
+#ifndef UNIT_TEST_H
+#define UNIT_TEST_H
+
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -22,26 +25,33 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-#include <vector>
-
-#include "ngsi/ParseData.h"
-#include "rest/ConnectionInfo.h"
-#include "serviceRoutines/postUnsubscribeContext.h"
-#include "serviceRoutines/deleteSubscriptionConvOp.h"
+#include "testDataFromFile.h"
+#include "commonMocks.h"
 
 
 
 /* ****************************************************************************
 *
-* deleteSubscriptionConvOp - 
+* namespaces
 */
-std::string deleteSubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
-{
-  std::string                        subscriptionId = compV[2];
-  UnsubscribeContextRequest*         uncrP          = &parseDataP->uncr.res;
+using ::testing::_;
+using ::testing::Throw;
+using ::testing::Return;
 
-  uncrP->subscriptionId = subscriptionId; 
 
-  return postUnsubscribeContext(ciP, components, compV, parseDataP);
-}
+
+/* ****************************************************************************
+*
+* utInit - unit test init
+*/
+extern void utInit(void);
+
+
+
+/* ****************************************************************************
+*
+* utExit - unit test exit
+*/
+extern void utExit(void);
+
+#endif

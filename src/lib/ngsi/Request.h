@@ -57,6 +57,7 @@ typedef enum RequestType
   ContextEntityTypes,
   ContextEntityTypeAttributeContainer,
   ContextEntityTypeAttribute,
+  Ngsi9SubscriptionsConvOp,
 
   IndividualContextEntity                = 31,
   IndividualContextEntityAttributes,

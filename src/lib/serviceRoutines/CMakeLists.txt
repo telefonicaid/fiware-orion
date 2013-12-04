@@ -61,6 +61,8 @@ getNgsi10ContextEntityTypes.cpp
 getNgsi10ContextEntityTypesAttribute.cpp
 putSubscriptionConvOp.cpp
 deleteSubscriptionConvOp.cpp
+putAvailabilitySubscriptionConvOp.cpp
+deleteAvailabilitySubscriptionConvOp.cpp
 badVerbPostOnly.cpp
 badVerbAllFour.cpp
 badVerbGetPostOnly.cpp
