@@ -61,7 +61,7 @@ fi
 
 --SHELL--
 echo "1: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI9/notifyContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI9/notifyContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <notifyContextAvailabilityRequest>
 	<subscriptionId>012345678901234567890123</subscriptionId>
@@ -103,9 +103,11 @@ echo "1: ***********************************"
 		</contextRegistrationResponse>
 	</contextRegistrationResponseList>
 </notifyContextAvailabilityRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "2: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI9/notifyContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI9/notifyContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <notifyContextAvailabilityRequest>
 	<subscriptionId>01234567890123456789012</subscriptionId>
@@ -147,10 +149,19 @@ echo "2: ***********************************"
 		</contextRegistrationResponse>
 	</contextRegistrationResponseList>
 </notifyContextAvailabilityRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "3: ***********************************"
 --REGEXPECT--
 1: ***********************************
+HTTP/1.1 100 Continue
+
+HTTP/1.1 200 OK
+Content-Length: 165
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <notifyContextAvailabilityResponse>
   <responseCode>
@@ -159,6 +170,13 @@ echo "3: ***********************************"
   </responseCode>
 </notifyContextAvailabilityResponse>
 2: ***********************************
+HTTP/1.1 100 Continue
+
+HTTP/1.1 200 OK
+Content-Length: 193
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <notifyContextAvailabilityResponse>
   <responseCode>

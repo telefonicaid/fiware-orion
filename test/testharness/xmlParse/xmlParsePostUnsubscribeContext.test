@@ -60,14 +60,16 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextRequest>
   <subscriptionId>012345678901234567890123</subscriptionId>
 </unsubscribeContextRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "2: ***********************************"
-OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -109,17 +111,25 @@ OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --dump-header
   <throttling>P5Y</throttling>
 </subscribeContextRequest>
 EOF)
-echo "$OUT"
-subscriptionId=$(echo "$OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
+cat headers.out
+echo $response | xmllint --format -
+subscriptionId=$(echo "$response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "3: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextRequest>
   <subscriptionId>$subscriptionId</subscriptionId>
 </unsubscribeContextRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "4: ***********************************"
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 227
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <unsubscribeContextResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -129,6 +139,11 @@ echo "4: ***********************************"
   </statusCode>
 </unsubscribeContextResponse>
 2: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 224
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
@@ -138,6 +153,11 @@ echo "4: ***********************************"
   </subscribeResponse>
 </subscribeContextResponse>
 3: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 207
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <unsubscribeContextResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>

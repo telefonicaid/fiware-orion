@@ -60,14 +60,21 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI9/unsubscribeContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI9/unsubscribeContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextAvailabilityRequest>
   <subscriptionId>012345678901234567890123</subscriptionId>
 </unsubscribeContextAvailabilityRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "2: ***********************************"
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 251
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <unsubscribeContextAvailabilityResponse>
   <subscriptionId>012345678901234567890123</subscriptionId>
