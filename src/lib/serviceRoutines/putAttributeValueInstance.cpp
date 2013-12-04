@@ -99,6 +99,11 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
 
   s = mongoUpdateContext(&request, &response);
   
-  LM_M(("Responses: %d", response.contextElementResponseVector.size()));
-  return "ok";
+  StatusCode statusCode;
+  if (response.contextElementResponseVector.size() == 0)
+    statusCode.fill(SccContextElementNotFound, "The ContextElement requested is not found", entityId + "-" + attributeName);
+  else
+    statusCode.fill(SccOk, "OK", "");
+
+  return statusCode.render(ciP->outFormat, "", false);
 }

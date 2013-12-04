@@ -9,8 +9,7 @@ echo
 echo
 
 
-DATA1="<?xml version="1.0" encoding="UTF-8"?>
-<appendContextElementRequest>
+DATA1="<appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
     <contextAttribute>
@@ -28,6 +27,18 @@ DATA1="<?xml version="1.0" encoding="UTF-8"?>
   </contextAttributeList>
 </appendContextElementRequest>"
 
+DATA2="<updateContextAttributeRequest>
+  <type>Room</type>
+  <contextValue>10</contextValue>
+  <metadata>
+    <contextMetadata>
+      <name>ID</name>
+      <type>none</type>
+      <value>left</value>
+    </contextMetadata>
+  </metadata>
+</updateContextAttributeRequest>"
+
 # 1. Query without anything found
 echo "1. Query without anything found:"
 echo "--------------------------------------------------"
@@ -36,14 +47,15 @@ echo "--------------------------------------------------"
 echo
 echo
 
-# 2. Add an entity with Attribute A1, metadata-ID 'left'
 
+# 2. Add an entity with Attribute A1, metadata-ID 'left'
 echo "2. Add an entity with Attribute A1, metadata-ID 'left'"
 echo "--------------------------------------------------"
 curl localhost:1026/ngsi10/contextEntities/E01/attributes -d "$DATA1" -X POST --header "Content-Type: application/xml"
 echo "--------------------------------------------------"
 echo
 echo
+
 
 # 3. Same query - this time A1 is found
 echo "3. Same query - this time A1 is found"
@@ -52,3 +64,43 @@ curl localhost:1026/ngsi10/contextEntities/E01/attributes/A1/left -X GET
 echo "--------------------------------------------------"
 echo
 echo
+
+
+# 4. Erroneous update E01-A1-left
+echo "4. Erroneous update E01-A1-left"
+echo "--------------------------------------------------"
+curl localhost:1026/ngsi10/contextEntities/E01/attributes/A1/right -d "$DATA2" -X PUT --header "Content-Type: application/xml"
+echo "--------------------------------------------------"
+echo
+echo
+
+
+
+# 5. update E01-A1-left
+echo "5. update E01-A1-left"
+echo "--------------------------------------------------"
+curl localhost:1026/ngsi10/contextEntities/E01/attributes/A1/left -d "$DATA2" -X PUT --header "Content-Type: application/xml"
+echo "--------------------------------------------------"
+echo
+echo
+
+
+
+# 6. Delete the attribute value instance
+echo "6. Delete the attribute value instance"
+echo "--------------------------------------------------"
+curl localhost:1026/ngsi10/contextEntities/E01/attributes/A1/left -X DELETE
+echo "--------------------------------------------------"
+echo
+echo
+
+
+
+# 7. Query without anything found
+echo "7. Query without anything found:"
+echo "--------------------------------------------------"
+curl localhost:1026/ngsi10/contextEntities/E01/attributes/A1/left -X GET
+echo "--------------------------------------------------"
+echo
+echo
+
