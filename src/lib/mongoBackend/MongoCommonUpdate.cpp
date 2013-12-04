@@ -43,12 +43,12 @@
 * (and used from) a global place, maybe as part as the class-refactoring within
 * EntityId or Attribute class methods.
 */
-bool smartAttrMatch(std::string id1, std::string type1, std::string id2, std::string type2) {
+bool smartAttrMatch(std::string name1, std::string type1, std::string id1, std::string name2, std::string type2, std::string id2) {
     if (type2 == "") {
-        return id1 == id2;
+        return ((name1 == name2) && (id1 == id2));
     }
     else {
-        return (id1 == id2 && type1 == type2);
+        return ((name1 == name2) && (type1 == type2) && (id1 == id2));
     }
 }
 
@@ -71,7 +71,11 @@ static bool checkAndUpdate (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
 
     newAttr->append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
     newAttr->append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
-    if (smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_TYPE), ca.name, ca.type)) {
+    if (STR_FIELD(attr, ENT_ATTRS_ID) != "") {
+        newAttr->append(ENT_ATTRS_ID, STR_FIELD(attr, ENT_ATTRS_ID));
+    }
+    if (smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_TYPE), STR_FIELD(attr, ENT_ATTRS_ID),
+                       ca.name, ca.type, ca.getId())) {
         /* Attribute match: update value */
         newAttr->append(ENT_ATTRS_VALUE, ca.value);
         updated = true;
@@ -113,11 +117,16 @@ static bool checkAndUpdate (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
 static bool checkAndDelete (BSONObjBuilder* newAttr, BSONObj attr, ContextAttribute ca) {
 
     bool deleted = true;
-    if (!smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_TYPE), ca.name, ca.type)) {
+    if (!smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_TYPE), STR_FIELD(attr, ENT_ATTRS_ID),
+                        ca.name, ca.type, ca.getId())) {
         /* Attribute doesn't match: value is included "as is" */
         newAttr->append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
         newAttr->append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
         newAttr->append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
+        string id = STR_FIELD(attr, ENT_ATTRS_ID);
+        if (id != "") {
+            newAttr->append(ENT_ATTRS_ID, STR_FIELD(attr, ENT_ATTRS_ID));
+        }
         deleted = false;
     }
 
@@ -189,12 +198,77 @@ static void appendAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
         newAttr.append(ENT_ATTRS_NAME, caP->name);
         newAttr.append(ENT_ATTRS_TYPE, caP->type);
         newAttr.append(ENT_ATTRS_VALUE, caP->value);
+        if (caP->getId() != "") {
+            newAttr.append(ENT_ATTRS_ID, caP->getId());
+        }
         newAttr.append(ENT_ATTRS_MODIFICATION_DATE, getCurrentTime());
         newAttrsBuilder.append(newAttr.obj());
     }
     *newAttrs = newAttrsBuilder.arr();
 
 }
+
+/* ****************************************************************************
+*
+* legalIdUsage -
+*
+* Check that the client is not trying to mix attributes ID and no ID for the same
+* name
+*
+*/
+static bool legalIdUsage(BSONObj* attrs, ContextAttribute* caP) {
+
+    if (caP->getId() == "") {
+        /* Attribute attempting to append hasn't ID. Thus, no attribute with same name can have ID in attrs */
+        for( BSONObj::iterator i = attrs->begin(); i.more(); ) {
+            BSONObj attr = i.next().embeddedObject();
+            if (STR_FIELD(attr, ENT_ATTRS_NAME) == caP->name && STR_FIELD(attr, ENT_ATTRS_TYPE) == caP->type && STR_FIELD(attr, ENT_ATTRS_ID) != "") {
+                return false;
+            }
+        }
+        return true;
+    }
+    else {
+        /* Attribute attempting to append has ID. Thus, no attribute with same name cannot have ID in attrs */
+        for( BSONObj::iterator i = attrs->begin(); i.more(); ) {
+            BSONObj attr = i.next().embeddedObject();
+            if (STR_FIELD(attr, ENT_ATTRS_NAME) == caP->name && STR_FIELD(attr, ENT_ATTRS_TYPE) == caP->type && STR_FIELD(attr, ENT_ATTRS_ID) == "") {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+/* ****************************************************************************
+*
+* legalIdUsage -
+*
+* Check that the client is not trying to mix attributes ID and no ID for the same
+* name
+*
+*/
+static bool legalIdUsage(ContextAttributeVector caV) {
+
+    for (unsigned int ix = 0; ix < caV.size(); ++ix) {
+        std::string attrName = caV.get(ix)->name;
+        std::string attrType = caV.get(ix)->type;
+        std::string attrId = caV.get(ix)->getId();
+        if (attrId == "") {
+            /* Search for attribute with same name and type, but with actual ID to detect inconsistency */
+            for (unsigned int jx = 0; jx < caV.size(); ++jx) {
+                ContextAttribute* ca = caV.get(jx);
+                if (attrName == ca->name && attrType == ca->type && ca->getId() != "") {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+
+}
+
 
 /* ****************************************************************************
 *
@@ -426,6 +500,10 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
         ContextAttribute* ca = new ContextAttribute();
         ca->name = ceP->contextAttributeVector.get(ix)->name;
         ca->type = ceP->contextAttributeVector.get(ix)->type;
+        if (ceP->contextAttributeVector.get(ix)->getId() != "") {
+            Metadata*  md = new Metadata(NGSI_MD_ID, "string", ceP->contextAttributeVector.get(ix)->getId());
+            ca->metadataVector.push_back(md);
+        }
         cerP->contextElement.contextAttributeVector.push_back(ca);
 
         /* actualUpdate could be changed to false in the "update" case. For "delete" and
@@ -451,8 +529,23 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
             }
         }
         else if (strcasecmp(action.c_str(), "append") == 0) {
-            appendAttribute(attrs, newAttrs, ceP->contextAttributeVector.get(ix));
-            *attrs = *newAttrs;
+            if (legalIdUsage(attrs, ceP->contextAttributeVector.get(ix))) {
+                appendAttribute(attrs, newAttrs, ceP->contextAttributeVector.get(ix));
+                *attrs = *newAttrs;
+            }
+            else {
+                /* If legalIdUsage() returns false, then that particular attribute can not be appended. In this case,
+                 * we interrupt the processing an early return with
+                 * a error StatusCode */
+                cerP->statusCode.fill(SccInvalidParameter,
+                                      "It is not allowed to APPEND an attribute with ID when another with the same name is in place or viceversa",
+                                      std::string("action: APPEND") +
+                                          // FIXME: use toString once EntityID and ContextAttribute becomes objects
+                                          " - entity: (" + entityId + ", " + entityType + ")" +
+                                          " - offending attribute: " + ceP->contextAttributeVector.get(ix)->name);
+                responseP->contextElementResponseVector.push_back(cerP);
+                return false;
+            }
         }
         else if (strcasecmp(action.c_str(), "delete") == 0) {
             if (deleteAttribute(attrs, newAttrs, ceP->contextAttributeVector.get(ix))) {
@@ -514,18 +607,45 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
 * createEntity -
 *
 */
-static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string* err) {
+static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string* errReason, std::string* errDetail) {
 
     DBClientConnection* connection = getMongoConnection();
 
     LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName()));
 
+    if (!legalIdUsage(attrsV)) {
+        *errReason = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden";
+        // FIXME: use toString once EntityID and ContextAttribute becomes objects
+        *errDetail = "entity: (" + e.id + ", " + e.type + ")";
+        return false;
+    }
+
     BSONArrayBuilder attrsToAdd;
     for (unsigned int ix = 0; ix < attrsV.size(); ++ix) {
-        attrsToAdd.append(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
-                               ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
-                               ENT_ATTRS_VALUE << attrsV.get(ix)->value));
-        LM_T(LmtMongo, ("new attribute: {name: %s, type: %s}", attrsV.get(ix)->name.c_str(), attrsV.get(ix)->type.c_str()));
+        std::string attrId = attrsV.get(ix)->getId();
+        // FIXME P6: I don't like this approach, it is not DRY. It would be better to create the
+        // base attribute, then append the last item (id) only in the case it is used)
+        if (attrId.length() == 0) {
+            attrsToAdd.append(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
+                                   ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
+                                   ENT_ATTRS_VALUE << attrsV.get(ix)->value));
+            LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
+                            attrsV.get(ix)->name.c_str(),
+                            attrsV.get(ix)->type.c_str(),
+                            attrsV.get(ix)->value.c_str()));
+        }
+        else {
+            attrsToAdd.append(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
+                                    ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
+                                    ENT_ATTRS_VALUE << attrsV.get(ix)->value <<
+                                    ENT_ATTRS_ID << attrId));
+            LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s, id: %s}",
+                            attrsV.get(ix)->name.c_str(),
+                            attrsV.get(ix)->type.c_str(),
+                            attrsV.get(ix)->value.c_str(),
+                            attrId.c_str()));
+        }
+
     }
     BSONObj insertedDoc;
     if (e.type == "") {
@@ -539,7 +659,8 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
         connection->insert(getEntitiesCollectionName(), insertedDoc);
     }
     catch( const DBException &e ) {
-        *err = std::string("collection: ") + getEntitiesCollectionName() +
+        *errReason = "Database Error";
+        *errDetail = std::string("collection: ") + getEntitiesCollectionName() +
                 " - insert(): " + insertedDoc.toString() +
                 " - exception: " + e.what();
 
@@ -628,9 +749,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         atLeastOneResult = true;
 
         ContextElementResponse* cerP = new ContextElementResponse();
-        cerP->contextElement.entityId.id = entityId;
-        cerP->contextElement.entityId.type = entityType;
-        cerP->contextElement.entityId.isPattern = "false";
+        cerP->contextElement.entityId.fill(entityId, entityType, "false");
 
         /* We start with the attrs array in the entity document, which is manipulated by the
          * {update|delete|append}Attrsr() function for each one of the attributes in the
@@ -719,16 +838,31 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         if (strcasecmp(action.c_str(), "delete") == 0) {
             buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, "Entity Not Found", en.id);
         }
-        else {
-            std::string err;
-            if (!createEntity(en, ceP->contextAttributeVector, &err)) {
-                buildGeneralErrorReponse(ceP, NULL, responseP, SccReceiverInternalError, "Database Error", err);
+        else {            
+
+            /* Creating the part of the response that doesn't depend on success or failure */
+            ContextElementResponse* cerP = new ContextElementResponse();
+            cerP->contextElement.entityId.fill(en.id, en.type, "false");
+            for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
+                ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
+                ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);
+
+                if (caP->getId().length() != 0) {
+                    Metadata* md = new Metadata(NGSI_MD_ID, "string", caP->getId());
+                    ca->metadataVector.push_back(md);
+                }
+
+                cerP->contextElement.contextAttributeVector.push_back(ca);
+            }
+
+            std::string errReason, errDetail;
+            if (!createEntity(en, ceP->contextAttributeVector, &errReason, &errDetail)) {
+                cerP->statusCode.fill(SccInvalidParameter, errReason, errDetail);
             }
             else {
+                cerP->statusCode.fill(SccOk, "OK");
 
-                ContextElementResponse* cerP = new ContextElementResponse();
-
-                /* Successfull creation: send notifications */
+                /* Successful creation: send potential notifications */
                 std::map<string, BSONObj*> subsToNotify;
                 for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                     std::string err;
@@ -738,21 +872,9 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                         LM_RVE((err.c_str()));
                     }
                 }
-                processSubscriptions(en, &subsToNotify, &err);
-
-                /* Successfull creation: creating corresponding ContextElementResponse */
-                cerP->contextElement.entityId.fill(en.id, en.type, "false");
-
-                for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
-                    ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
-                    ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);
-                    cerP->contextElement.contextAttributeVector.push_back(ca);
-                }
-
-                cerP->statusCode.fill(SccOk, "OK");
-                responseP->contextElementResponseVector.push_back(cerP);
-
+                processSubscriptions(en, &subsToNotify, &errReason);
             }
+            responseP->contextElementResponseVector.push_back(cerP);
         }
 
     }

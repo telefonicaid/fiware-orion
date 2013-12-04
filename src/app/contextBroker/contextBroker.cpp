@@ -85,10 +85,13 @@
 #include "serviceRoutines/postContextEntityTypes.h"
 #include "serviceRoutines/getContextEntityTypeAttribute.h"
 #include "serviceRoutines/postContextEntityTypeAttribute.h"
+#include "serviceRoutines/putAvailabilitySubscriptionConvOp.h"
+#include "serviceRoutines/deleteAvailabilitySubscriptionConvOp.h"
 
 #include "serviceRoutines/getIndividualContextEntity.h"
 #include "serviceRoutines/putIndividualContextEntity.h"
 #include "serviceRoutines/badVerbPostOnly.h"
+#include "serviceRoutines/badVerbPutDeleteOnly.h"
 #include "serviceRoutines/badVerbGetPostOnly.h"
 #include "serviceRoutines/postIndividualContextEntity.h"
 #include "serviceRoutines/deleteIndividualContextEntity.h"
@@ -102,6 +105,9 @@
 #include "serviceRoutines/getNgsi10ContextEntityTypesAttribute.h"
 #include "serviceRoutines/postIndividualContextEntityAttribute.h"
 #include "serviceRoutines/deleteIndividualContextEntityAttribute.h"
+#include "serviceRoutines/putSubscriptionConvOp.h"
+#include "serviceRoutines/deleteSubscriptionConvOp.h"
+
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
 #include "serviceRoutines/badVerbGetOnly.h"
 #include "serviceRoutines/badVerbGetDeleteOnly.h"
@@ -166,7 +172,7 @@ PaArgument paArgs[] =
 * "/ngsi9/registerContext" becomes a component vector of the two components
 * "ngsi9" and "registerContext".
 *
-* Each line contains the needed information for ONE service:
+* Each line contains the necessary information for ONE service:
 *   std::string   name        - just for debugging purposes
 *   std::string   verb        - GET/POST/PUT/DELETE
 *   RequestType   request     - The type of the request
@@ -209,60 +215,70 @@ RestService restServiceV[] =
 
 
   // NGSI-9 Convenience operations
-  { "GET ContextEntitiesByEntityId",              "GET",    ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                      }, "",                                             getContextEntitiesByEntityId              },
-  { "POST ContextEntitiesByEntityId",             "POST",   ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                      }, "registerProviderRequest",                      postContextEntitiesByEntityId             },
-  { "* ContextEntitiesByEntityId",                "*",      ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                      }, "",                                             badVerbGetPostOnly                        },
+  { "GET ContextEntitiesByEntityId",                   "GET",    ContextEntitiesByEntityId,                   3, { "ngsi9", "contextEntities", "*"                      } , "",                                  getContextEntitiesByEntityId             },
+  { "POST ContextEntitiesByEntityId",                  "POST",   ContextEntitiesByEntityId,                   3, { "ngsi9", "contextEntities", "*"                      } , "registerProviderRequest",           postContextEntitiesByEntityId            },
+  { "* ContextEntitiesByEntityId",                     "*",      ContextEntitiesByEntityId,                   3, { "ngsi9", "contextEntities", "*"                      } , "",                                  badVerbGetPostOnly                       },
 
-  { "GET ContextEntityAttributes",                "GET",    ContextEntityAttributes,               4, { "ngsi9", "contextEntities", "*", "attributes"        }, "",                                             getContextEntityAttributes                },
-  { "POST ContextEntityAttributes",               "POST",   ContextEntityAttributes,               4, { "ngsi9", "contextEntities", "*", "attributes"        }, "registerProviderRequest",                      postContextEntityAttributes               },
-  { "* ContextEntityAttributes",                  "*",      ContextEntityAttributes,               4, { "ngsi9", "contextEntities", "*", "attributes"        }, "",                                             badVerbGetPostOnly                        },
+  { "GET ContextEntityAttributes",                     "GET",    ContextEntityAttributes,                     4, { "ngsi9", "contextEntities", "*", "attributes"        } , "",                                  getContextEntityAttributes               },
+  { "POST ContextEntityAttributes",                    "POST",   ContextEntityAttributes,                     4, { "ngsi9", "contextEntities", "*", "attributes"        } , "registerProviderRequest",           postContextEntityAttributes              },
+  { "* ContextEntityAttributes",                       "*",      ContextEntityAttributes,                     4, { "ngsi9", "contextEntities", "*", "attributes"        } , "",                                  badVerbGetPostOnly                       },
 
-  { "GET EntityByIdAttributeByName",              "GET",    EntityByIdAttributeByName,             5, { "ngsi9", "contextEntities", "*", "attributes", "*"   }, "",                                             getEntityByIdAttributeByName              },
-  { "POST EntityByIdAttributeByName",             "POST",   EntityByIdAttributeByName,             5, { "ngsi9", "contextEntities", "*", "attributes", "*"   }, "registerProviderRequest",                      postEntityByIdAttributeByName             },
-  { "* EntityByIdAttributeByName",                "*",      EntityByIdAttributeByName,             5, { "ngsi9", "contextEntities", "*", "attributes", "*"   }, "",                                             badVerbGetPostOnly                        },
+  { "GET EntityByIdAttributeByName",                   "GET",    EntityByIdAttributeByName,                   5, { "ngsi9", "contextEntities", "*", "attributes", "*"   } , "",                                  getEntityByIdAttributeByName             },
+  { "POST EntityByIdAttributeByName",                  "POST",   EntityByIdAttributeByName,                   5, { "ngsi9", "contextEntities", "*", "attributes", "*"   } , "registerProviderRequest",           postEntityByIdAttributeByName            },
+  { "* EntityByIdAttributeByName",                     "*",      EntityByIdAttributeByName,                   5, { "ngsi9", "contextEntities", "*", "attributes", "*"   } , "",                                  badVerbGetPostOnly                       },
 
-  { "GET ContextEntityTypes",                     "GET",    ContextEntityTypes,                    3, { "ngsi9", "contextEntityTypes", "*"                   }, "",                                             getContextEntityTypes                     },
-  { "POST ContextEntityTypes",                    "POST",   ContextEntityTypes,                    3, { "ngsi9", "contextEntityTypes", "*"                   }, "registerProviderRequest",                      postContextEntityTypes                    },
-  { "* ContextEntityTypes",                       "*",      ContextEntityTypes,                    3, { "ngsi9", "contextEntityTypes", "*"                   }, "",                                             badVerbGetPostOnly                        },
+  { "GET ContextEntityTypes",                          "GET",    ContextEntityTypes,                          3, { "ngsi9", "contextEntityTypes", "*"                   } , "",                                  getContextEntityTypes                    },
+  { "POST ContextEntityTypes",                         "POST",   ContextEntityTypes,                          3, { "ngsi9", "contextEntityTypes", "*"                   } , "registerProviderRequest",           postContextEntityTypes                   },
+  { "* ContextEntityTypes",                            "*",      ContextEntityTypes,                          3, { "ngsi9", "contextEntityTypes", "*"                   } , "",                                  badVerbGetPostOnly                       },
    
-  { "GET ContextEntityTypeAttributeContainer",    "GET",    ContextEntityTypeAttributeContainer,   4, { "ngsi9", "contextEntityTypes", "*", "attributes"     }, "",                                             getContextEntityTypes                     },
-  { "POST ContextEntityTypeAttributeContainer",   "POST",   ContextEntityTypeAttributeContainer,   4, { "ngsi9", "contextEntityTypes", "*", "attributes"     }, "registerProviderRequest",                      postContextEntityTypes                    },
-  { "* ContextEntityTypeAttributeContainer",      "*",      ContextEntityTypeAttributeContainer,   4, { "ngsi9", "contextEntityTypes", "*", "attributes"     }, "",                                             badVerbGetPostOnly                        },
+  { "GET ContextEntityTypeAttributeContainer",         "GET",    ContextEntityTypeAttributeContainer,         4, { "ngsi9", "contextEntityTypes", "*", "attributes"     } , "",                                  getContextEntityTypes                    },
+  { "POST ContextEntityTypeAttributeContainer",        "POST",   ContextEntityTypeAttributeContainer,         4, { "ngsi9", "contextEntityTypes", "*", "attributes"     } , "registerProviderRequest",           postContextEntityTypes                   },
+  { "* ContextEntityTypeAttributeContainer",           "*",      ContextEntityTypeAttributeContainer,         4, { "ngsi9", "contextEntityTypes", "*", "attributes"     } , "",                                  badVerbGetPostOnly                       },
 
-  { "GET ContextEntityTypeAttribute",             "GET",    ContextEntityTypeAttribute,            5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*" }, "",                                             getContextEntityTypeAttribute            },
-  { "POST ContextEntityTypeAttribute",            "POST",   ContextEntityTypeAttribute,            5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*" }, "registerProviderRequest",                      postContextEntityTypeAttribute           },
-  { "* ContextEntityTypeAttribute",               "*",      ContextEntityTypeAttribute,            5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*" }, "",                                             badVerbGetPostOnly                       },
+  { "GET ContextEntityTypeAttribute",                  "GET",    ContextEntityTypeAttribute,                  5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*"  }, "",                                             getContextEntityTypeAttribute        },
+  { "POST ContextEntityTypeAttribute",                 "POST",   ContextEntityTypeAttribute,                  5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*"  }, "registerProviderRequest",                      postContextEntityTypeAttribute       },
+  { "* ContextEntityTypeAttribute",                    "*",      ContextEntityTypeAttribute,                  5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*"  }, "",                                             badVerbGetPostOnly                   },
+  { "POST Subscriptions",                              "POST",   SubscribeContextAvailability,                2, { "ngsi9", "contextAvailabilitySubscriptions"            }, "subscribeContextAvailabilityRequest",          postSubscribeContextAvailability     },
+  { "* Subscriptions",                                 "*",      SubscribeContextAvailability,                2, { "ngsi9", "contextAvailabilitySubscriptions"            }, "",                                             badVerbPostOnly                      },
+
+  { "PUT Subscription",                                "PUT",    Ngsi9SubscriptionsConvOp,                    3, { "ngsi9", "contextAvailabilitySubscriptions", "*"       }, "updateContextAvailabilitySubscriptionRequest", putAvailabilitySubscriptionConvOp    },
+  { "DELETE Subscription",                             "DELETE", Ngsi9SubscriptionsConvOp,                    3, { "ngsi9", "contextAvailabilitySubscriptions", "*"       }, "",                                             deleteAvailabilitySubscriptionConvOp },
+  { "* Subscription",                                  "*",      Ngsi9SubscriptionsConvOp,                    3, { "ngsi9", "contextAvailabilitySubscriptions", "*"       }, "",                                             badVerbPutDeleteOnly                 },
+
 
   // NGSI-10 Convenience operations
-  { "GET IndividualContextEntity",                "GET",    IndividualContextEntity,               3, { "ngsi10", "contextEntities", "*"                     }, "",                                             getIndividualContextEntity                },
-  { "PUT IndividualContextEntity",                "PUT",    IndividualContextEntity,               3, { "ngsi10", "contextEntities", "*"                     }, "updateContextElementRequest",                  putIndividualContextEntity                },
-  { "POST IndividualContextEntity",               "POST",   IndividualContextEntity,               3, { "ngsi10", "contextEntities", "*"                     }, "appendContextElementRequest",                  postIndividualContextEntity               },
-  { "DELETE IndividualContextEntity",             "DELETE", IndividualContextEntity,               3, { "ngsi10", "contextEntities", "*"                     }, "",                                             deleteIndividualContextEntity             },
-  { "* IndividualContextEntity",                  "*",      IndividualContextEntity,               3, { "ngsi10", "contextEntities", "*"                     }, "",                                             badVerbAllFour                            },
+  { "GET IndividualContextEntity",                     "GET",    IndividualContextEntity,                     3, { "ngsi10", "contextEntities", "*"                       }, "",                                getIndividualContextEntity                },
+  { "PUT IndividualContextEntity",                     "PUT",    IndividualContextEntity,                     3, { "ngsi10", "contextEntities", "*"                       }, "updateContextElementRequest",     putIndividualContextEntity                },
+  { "POST IndividualContextEntity",                    "POST",   IndividualContextEntity,                     3, { "ngsi10", "contextEntities", "*"                       }, "appendContextElementRequest",     postIndividualContextEntity               },
+  { "DELETE IndividualContextEntity",                  "DELETE", IndividualContextEntity,                     3, { "ngsi10", "contextEntities", "*"                       }, "",                                deleteIndividualContextEntity             },
+  { "* IndividualContextEntity",                       "*",      IndividualContextEntity,                     3, { "ngsi10", "contextEntities", "*"                       }, "",                                badVerbAllFour                            },
 
-  { "GET IndividualContextEntityAttributes",      "GET",    IndividualContextEntityAttributes,     4, { "ngsi10", "contextEntities", "*", "attributes"       }, "",                                             getIndividualContextEntityAttributes      },
-  { "PUT IndividualContextEntityAttributes",      "PUT",    IndividualContextEntityAttributes,     4, { "ngsi10", "contextEntities", "*", "attributes"       }, "updateContextElementRequest",                  putIndividualContextEntityAttributes      },
-  { "POST IndividualContextEntityAttributes",     "POST",   IndividualContextEntityAttributes,     4, { "ngsi10", "contextEntities", "*", "attributes"       }, "appendContextElementRequest",                  postIndividualContextEntityAttributes     },
-  { "DELETE IndividualContextEntityAttributes",   "DELETE", IndividualContextEntityAttributes,     4, { "ngsi10", "contextEntities", "*", "attributes"       }, "",                                             deleteIndividualContextEntityAttributes   },
-  { "* IndividualContextEntityAttributes",        "*",      IndividualContextEntityAttributes,     4, { "ngsi10", "contextEntities", "*", "attributes"       }, "",                                             badVerbAllFour                            },
+  { "GET IndividualContextEntityAttributes",           "GET",    IndividualContextEntityAttributes,           4, { "ngsi10", "contextEntities", "*", "attributes"         }, "",                                getIndividualContextEntityAttributes      },
+  { "PUT IndividualContextEntityAttributes",           "PUT",    IndividualContextEntityAttributes,           4, { "ngsi10", "contextEntities", "*", "attributes"         }, "updateContextElementRequest",     putIndividualContextEntityAttributes      },
+  { "POST IndividualContextEntityAttributes",          "POST",   IndividualContextEntityAttributes,           4, { "ngsi10", "contextEntities", "*", "attributes"         }, "appendContextElementRequest",     postIndividualContextEntityAttributes     },
+  { "DELETE IndividualContextEntityAttributes",        "DELETE", IndividualContextEntityAttributes,           4, { "ngsi10", "contextEntities", "*", "attributes"         }, "",                                deleteIndividualContextEntityAttributes   },
+  { "* IndividualContextEntityAttributes",             "*",      IndividualContextEntityAttributes,           4, { "ngsi10", "contextEntities", "*", "attributes"         }, "",                                badVerbAllFour                            },
 
-  { "GET IndividualContextEntityAttribute",       "GET",    IndividualContextEntityAttribute,      5, { "ngsi10", "contextEntities", "*", "attributes", "*"  }, "",                                             getIndividualContextEntityAttribute       },
-  { "POST IndividualContextEntityAttribute",      "POST",   IndividualContextEntityAttribute,      5, { "ngsi10", "contextEntities", "*", "attributes", "*"  }, "updateContextAttributeRequest",                postIndividualContextEntityAttribute      },
-  { "DELETE IndividualContextEntityAttribute",    "DELETE", IndividualContextEntityAttribute,      5, { "ngsi10", "contextEntities", "*", "attributes", "*"  }, "",                                             deleteIndividualContextEntityAttribute    },
-  { "* IndividualContextEntityAttribute",         "*",      IndividualContextEntityAttribute,      5, { "ngsi10", "contextEntities", "*", "attributes", "*"  }, "",                                             badVerbGetPostDeleteOnly                  },
+  { "GET IndividualContextEntityAttribute",            "GET",    IndividualContextEntityAttribute,            5, { "ngsi10", "contextEntities", "*", "attributes", "*"    }, "",                                getIndividualContextEntityAttribute       },
+  { "POST IndividualContextEntityAttribute",           "POST",   IndividualContextEntityAttribute,            5, { "ngsi10", "contextEntities", "*", "attributes", "*"    }, "updateContextAttributeRequest",   postIndividualContextEntityAttribute      },
+  { "DELETE IndividualContextEntityAttribute",         "DELETE", IndividualContextEntityAttribute,            5, { "ngsi10", "contextEntities", "*", "attributes", "*"    }, "",                                deleteIndividualContextEntityAttribute    },
+  { "* IndividualContextEntityAttribute",              "*",      IndividualContextEntityAttribute,            5, { "ngsi10", "contextEntities", "*", "attributes", "*"    }, "",                                badVerbGetPostDeleteOnly                  },
   
-  { "GET Ngsi10ContextEntityTypes",                    "GET",    Ngsi10ContextEntityTypes,                    3, { "ngsi10", "contextEntityTypes", "*"                }, "",                                    getNgsi10ContextEntityTypes               },
-  { "* Ngsi10ContextEntityTypes",                      "*",      Ngsi10ContextEntityTypes,                    3, { "ngsi10", "contextEntityTypes", "*"                }, "",                                    badVerbGetOnly                            },
+  { "GET Ngsi10ContextEntityTypes",                    "GET",    Ngsi10ContextEntityTypes,                    3, { "ngsi10", "contextEntityTypes", "*"                    }, "",                                getNgsi10ContextEntityTypes               },
+  { "* Ngsi10ContextEntityTypes",                      "*",      Ngsi10ContextEntityTypes,                    3, { "ngsi10", "contextEntityTypes", "*"                    }, "",                                badVerbGetOnly                            },
 
-  { "GET Ngsi10ContextEntityTypesAttributeContainer",  "GET",    Ngsi10ContextEntityTypesAttributeContainer,  4, { "ngsi10", "contextEntityTypes", "*", "attributes"  }, "",                                    getNgsi10ContextEntityTypes               },
-  { "* Ngsi10ContextEntityTypes",                      "*",      Ngsi10ContextEntityTypesAttributeContainer,  4, { "ngsi10", "contextEntityTypes", "*", "attributes"  }, "",                                    badVerbGetOnly                            },
+  { "GET Ngsi10ContextEntityTypesAttributeContainer",  "GET",    Ngsi10ContextEntityTypesAttributeContainer,  4, { "ngsi10", "contextEntityTypes", "*", "attributes"      }, "",                                getNgsi10ContextEntityTypes               },
+  { "* Ngsi10ContextEntityTypes",                      "*",      Ngsi10ContextEntityTypesAttributeContainer,  4, { "ngsi10", "contextEntityTypes", "*", "attributes"      }, "",                                badVerbGetOnly                            },
 
   { "GET Ngsi10ContextEntityTypesAttribute",           "GET",    Ngsi10ContextEntityTypesAttribute,           5, { "ngsi10", "contextEntityTypes", "*", "attributes", "*" }, "",                                getNgsi10ContextEntityTypesAttribute      },
   { "* Ngsi10ContextEntityTypesAttribute",             "*",      Ngsi10ContextEntityTypesAttribute,           5, { "ngsi10", "contextEntityTypes", "*", "attributes", "*" }, "",                                badVerbGetOnly                            },
   
-  { "POST Subscriptions",                              "POST",   SubscribeContext,                            2, { "ngsi10", "subscriptions"                              }, "subscribeContextRequest",         postSubscribeContext                      },
-  { "* Subscriptions",                                 "*",      SubscribeContext,                            2, { "ngsi10", "subscriptions"                              }, "subscribeContextRequest",         badVerbPostOnly                           },
+  { "POST Subscriptions",                              "POST",   SubscribeContext,                            2, { "ngsi10", "contextSubscriptions"                       }, "subscribeContextRequest",          postSubscribeContext                     },
+  { "* Subscriptions",                                 "*",      SubscribeContext,                            2, { "ngsi10", "contextSubscriptions"                       }, "",                                 badVerbPostOnly                          },
 
+  { "PUT Subscription",                                "PUT",    Ngsi10SubscriptionsConvOp,                   3, { "ngsi10", "contextSubscriptions", "*"                  }, "updateContextSubscriptionRequest", putSubscriptionConvOp                    },
+  { "DELETE Subscription",                             "DELETE", Ngsi10SubscriptionsConvOp,                   3, { "ngsi10", "contextSubscriptions", "*"                  }, "",                                 deleteSubscriptionConvOp                 },
+  { "* Subscription",                                  "*",      Ngsi10SubscriptionsConvOp,                   3, { "ngsi10", "contextSubscriptions", "*"                  }, "",                                 badVerbPutDeleteOnly                     },
 
   // log request
   { "GET LogRequest",                             "GET",    LogRequest,                            2, { "log", "verbose"                                     }, "",                                             logVerboseTreat                           },

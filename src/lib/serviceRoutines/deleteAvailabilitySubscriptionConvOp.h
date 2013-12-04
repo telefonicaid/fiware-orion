@@ -1,5 +1,5 @@
-#ifndef POST_SUBSCRIBE_CONTEXT_H
-#define POST_SUBSCRIBE_CONTEXT_H
+#ifndef DELETE_AVAILABILITY_SUBSCRIPTION_CONV_OP_H
+#define DELETE_AVAILABILITY_SUBSCRIPTION_CONV_OP_H
 
 /*
 *
@@ -35,8 +35,8 @@
 
 /* ****************************************************************************
 *
-* postSubscribeContext - 
+* deleteAvailabilitySubscriptionConvOp - 
 */
-extern std::string postSubscribeContext(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+extern std::string deleteAvailabilitySubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
 
 #endif

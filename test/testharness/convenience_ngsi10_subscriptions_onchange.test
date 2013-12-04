@@ -124,33 +124,34 @@ done
 EOF
 echo "1: ++++++++++++++++++++"
 
-SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscriptions -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/contextSubscriptions -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
   </entityIdList>
   <attributeList>
-        <attribute>temperature</attribute>
-        <attribute>lightstatus</attribute>
+    <attribute>temperature</attribute>
+    <attribute>lightstatus</attribute>
   </attributeList>
   <reference>http://localhost:${LISTENER_PORT}/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
-        <notifyCondition>
-          <type>ONCHANGE</type>
-          <condValueList>
-                <condValue>temperature</condValue>
-                <condValue>lightstatus</condValue>
-          </condValueList>          
-        </notifyCondition>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>temperature</condValue>
+        <condValue>lightstatus</condValue>
+      </condValueList>          
+    </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "$SUB_OUT"
+echo SUB_ID: $SUB_ID > /tmp/SUB_ID
 echo "2: ++++++++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
@@ -219,7 +220,7 @@ EOF
 
 echo "4: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContextSubscription -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+(curl localhost:${BROKER_PORT}/NGSI10/contextSubscriptions/${SUB_ID} -X PUT -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
 <?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>P1Y</duration>
@@ -350,13 +351,8 @@ echo "8: ++++++++++++++++++++"
 </updateContextRequest>
 EOF
 echo "9: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<unsubscribeContextRequest>
-  <subscriptionId>$SUB_ID</subscriptionId>
-</unsubscribeContextRequest>
-EOF
+echo SUB_ID: ${SUB_ID} >> /tmp/SUB_ID
+curl localhost:${BROKER_PORT}/NGSI10/contextSubscriptions/${SUB_ID} -X DELETE -s -S | xmllint --format -
 echo "10: ++++++++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF

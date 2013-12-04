@@ -1,6 +1,3 @@
-#ifndef POST_SUBSCRIBE_CONTEXT_H
-#define POST_SUBSCRIBE_CONTEXT_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,18 +22,49 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-#include <vector>
-
-#include "ngsi/ParseData.h"
-#include "rest/ConnectionInfo.h"
+#include "unittest.h"
+#include "testInit.h"
 
 
 
 /* ****************************************************************************
 *
-* postSubscribeContext - 
+* Forward declarations
 */
-extern std::string postSubscribeContext(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+static NotifierMock* notifierMock = NULL;
+static TimerMock*    timerMock    = NULL;
 
-#endif
+
+
+/* ****************************************************************************
+*
+* utInit - unit test init
+*
+*/
+void utInit(void)
+{
+  notifierMock = new NotifierMock();
+  setNotifier(notifierMock);
+  
+  timerMock = new TimerMock();
+  ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
+  setTimer(timerMock);
+
+  setupDatabase();
+}
+
+
+
+/* ****************************************************************************
+*
+* utExit - unit test exit
+*
+*/
+void utExit(void)
+{
+  setTimer(NULL);
+  setNotifier(NULL);
+
+  delete timerMock;
+  delete notifierMock;
+}

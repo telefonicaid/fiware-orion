@@ -53,6 +53,7 @@ const char* requestType(RequestType rt)
   case ContextEntityTypes:                          return "ContextEntityTypes";
   case ContextEntityTypeAttributeContainer:         return "ContextEntityTypeAttributeContainer";
   case ContextEntityTypeAttribute:                  return "ContextEntityTypeAttribute";
+  case Ngsi9SubscriptionsConvOp:                    return "Ngsi9SubscriptionsConvOp";
 
   case IndividualContextEntity:                     return "IndividualContextEntity";
   case IndividualContextEntityAttributes:           return "IndividualContextEntityAttributes";

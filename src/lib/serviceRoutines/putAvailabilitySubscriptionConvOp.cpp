@@ -1,6 +1,3 @@
-#ifndef POST_SUBSCRIBE_CONTEXT_H
-#define POST_SUBSCRIBE_CONTEXT_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -30,13 +27,28 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/restReply.h"
 
+#include "serviceRoutines/postUpdateContextAvailabilitySubscription.h"
+#include "serviceRoutines/putAvailabilitySubscriptionConvOp.h"
 
 
 /* ****************************************************************************
 *
-* postSubscribeContext - 
+* putAvailabilitySubscriptionConvOp - 
 */
-extern std::string postSubscribeContext(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+std::string putAvailabilitySubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+{
+  std::string                                    subscriptionId  = compV[2];
+  UpdateContextAvailabilitySubscriptionRequest*  ucasP           = &parseDataP->ucas.res;
 
-#endif
+  if (subscriptionId != ucasP->subscriptionId.get())
+  {
+    std::string out;
+
+    out = restErrorReplyGet(ciP, ciP->outFormat, "", "updateContextAvailabilitySubscription", SccBadRequest, "unmatching subscriptionId URI/payload", subscriptionId);
+    return out;
+  }
+
+  return postUpdateContextAvailabilitySubscription(ciP, components, compV, parseDataP);
+}

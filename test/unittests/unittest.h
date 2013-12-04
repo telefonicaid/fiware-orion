@@ -1,5 +1,5 @@
-#ifndef POST_SUBSCRIBE_CONTEXT_H
-#define POST_SUBSCRIBE_CONTEXT_H
+#ifndef UNIT_TEST_H
+#define UNIT_TEST_H
 
 /*
 *
@@ -25,18 +25,33 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-#include <vector>
-
-#include "ngsi/ParseData.h"
-#include "rest/ConnectionInfo.h"
+#include "testDataFromFile.h"
+#include "commonMocks.h"
 
 
 
 /* ****************************************************************************
 *
-* postSubscribeContext - 
+* namespaces
 */
-extern std::string postSubscribeContext(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+using ::testing::_;
+using ::testing::Throw;
+using ::testing::Return;
+
+
+
+/* ****************************************************************************
+*
+* utInit - unit test init
+*/
+extern void utInit(void);
+
+
+
+/* ****************************************************************************
+*
+* utExit - unit test exit
+*/
+extern void utExit(void);
 
 #endif

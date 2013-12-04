@@ -121,6 +121,11 @@ static XmlRequest xmlRequest[] =
   { AppendContextElement,                  "POST", "appendContextElementRequest",                  acerParseVector,  acerInit,  acerRelease,  acerPresent,  acerCheck  },
   { UpdateContextAttribute,                "POST", "updateContextAttributeRequest",                upcarParseVector, upcarInit, upcarRelease, upcarPresent, upcarCheck },
 
+  { SubscribeContext,                      "POST", "subscribeContextRequest",                      scrParseVector,   scrInit,   scrRelease,   scrPresent,   scrCheck   },
+  { Ngsi10SubscriptionsConvOp,             "PUT",  "updateContextSubscriptionRequest",             ucsrParseVector,  ucsrInit,  ucsrRelease,  ucsrPresent,  ucsrCheck  },
+  { Ngsi9SubscriptionsConvOp,              "POST", "subscribeContextAvailabilityRequest",          scarParseVector,  scarInit,  scarRelease,  scarPresent,  scarCheck  },
+  { Ngsi9SubscriptionsConvOp,              "PUT",  "updateContextvailabilitySubscriptionRequest",  ucasParseVector,  ucasInit,  ucasRelease,  ucasPresent,  ucasCheck  },
+
   // Responses
   { RegisterResponse,                      "POST", "registerContextResponse",                      rcrsParseVector,  rcrsInit,  rcrsRelease,  rcrsPresent,  rcrsCheck  },
 

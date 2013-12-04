@@ -1,6 +1,3 @@
-#ifndef POST_SUBSCRIBE_CONTEXT_H
-#define POST_SUBSCRIBE_CONTEXT_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -30,13 +27,21 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "serviceRoutines/postUnsubscribeContext.h"
+#include "serviceRoutines/deleteSubscriptionConvOp.h"
 
 
 
 /* ****************************************************************************
 *
-* postSubscribeContext - 
+* deleteSubscriptionConvOp - 
 */
-extern std::string postSubscribeContext(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+std::string deleteSubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+{
+  std::string                        subscriptionId = compV[2];
+  UnsubscribeContextRequest*         uncrP          = &parseDataP->uncr.res;
 
-#endif
+  uncrP->subscriptionId = subscriptionId; 
+
+  return postUnsubscribeContext(ciP, components, compV, parseDataP);
+}

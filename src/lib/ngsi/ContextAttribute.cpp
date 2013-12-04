@@ -80,7 +80,19 @@ ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::st
    value = _value;
 }
 
-
+/* ****************************************************************************
+*
+* ContextAttribute::getId() -
+*/
+std::string ContextAttribute::getId()
+{
+  for (unsigned int ix = 0; ix < metadataVector.size(); ++ix) {
+      if (metadataVector.get(ix)->name == NGSI_MD_ID) {
+          return metadataVector.get(ix)->value;
+      }
+  }
+  return "";
+}
 
 /* ****************************************************************************
 *
