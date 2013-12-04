@@ -28,6 +28,7 @@
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutines/postUnsubscribeContextAvailability.h"
+#include "serviceRoutines/deleteAvailabilitySubscriptionConvOp.h"
 
 
 
