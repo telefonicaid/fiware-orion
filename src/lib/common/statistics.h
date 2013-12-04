@@ -79,6 +79,7 @@ extern int noOfUpdateContextAttribute;
 extern int noOfNgsi10ContextEntityTypes;
 extern int noOfNgsi10ContextEntityTypesAttributeContainer;
 extern int noOfNgsi10ContextEntityTypesAttribute;
+extern int noOfNgsi10SubscriptionsConvOp;
 extern int noOfLogRequests;
 extern int noOfVersionRequests;
 extern int noOfExitRequests;

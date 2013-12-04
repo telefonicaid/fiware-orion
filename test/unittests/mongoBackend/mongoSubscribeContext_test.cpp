@@ -7631,7 +7631,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
             .Times(0);
     // FIXME: note that processOntimeIntervalCondition() is called before the document is
     // inserted in database. Same will happend with processOnChangeCondition(). Maybe
-    // a better approach is to create thread and sendNotifyContextRequest only in case of sucessfull document
+    // a better approach is to create thread and sendNotifyContextRequest only in case of successful document
     // inserting. Once fixed, change Times(1) to Time(0). Add also a new test to check on
     // processOnChangeCondition()
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_))

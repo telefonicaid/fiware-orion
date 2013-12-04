@@ -99,6 +99,14 @@ SET (SOURCES
     serviceRoutines/postQueryContext_test.cpp
     serviceRoutines/getNgsi10ContextEntityTypes_test.cpp
     serviceRoutines/getNgsi10ContextEntityTypesAttribute_test.cpp
+    serviceRoutines/putSubscriptionConvOp_test.cpp
+    serviceRoutines/badNgsi10Request_test.cpp
+    serviceRoutines/badNgsi9Request_test.cpp
+    serviceRoutines/badRequest_test.cpp
+    serviceRoutines/versionTreat_test.cpp
+    serviceRoutines/exitTreat_test.cpp
+    serviceRoutines/leakTreat_test.cpp
+    serviceRoutines/statisticsTreat_test.cpp
 
     convenience/Convenience_test.cpp
     convenienceMap/mapDeleteIndividualContextEntity_test.cpp
@@ -193,14 +201,6 @@ SET (SOURCES
     ngsi/SubscriptionId_test.cpp
     ngsi/Throttling_test.cpp
     ngsi/UpdateActionType_test.cpp
-
-    serviceRoutines/badNgsi10Request_test.cpp
-    serviceRoutines/badNgsi9Request_test.cpp
-    serviceRoutines/badRequest_test.cpp
-    serviceRoutines/versionTreat_test.cpp
-    serviceRoutines/exitTreat_test.cpp
-    serviceRoutines/leakTreat_test.cpp
-    serviceRoutines/statisticsTreat_test.cpp
 
     mongoBackend/mongoConfManOperations_test.cpp
     mongoBackend/mongoDiscoverContextAvailability_test.cpp

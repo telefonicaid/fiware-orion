@@ -59,12 +59,15 @@ deleteIndividualContextEntityAttribute.cpp
 deleteIndividualContextEntity.cpp
 getNgsi10ContextEntityTypes.cpp
 getNgsi10ContextEntityTypesAttribute.cpp
+putSubscriptionConvOp.cpp
+deleteSubscriptionConvOp.cpp
 badVerbPostOnly.cpp
 badVerbAllFour.cpp
 badVerbGetPostOnly.cpp
 badVerbGetPostDeleteOnly.cpp
 badVerbGetOnly.cpp
 badVerbGetDeleteOnly.cpp
+badVerbPutDeleteOnly.cpp
 badNgsi9Request.cpp
 badNgsi10Request.cpp
 badRequest.cpp
@@ -116,6 +119,7 @@ badVerbGetPostOnly.h
 badVerbGetPostDeleteOnly.h
 badVerbGetOnly.h
 badVerbGetDeleteOnly.h
+badVerbPutDeleteOnly.h
 badNgsi9Request.h
 badNgsi10Request.h
 badRequest.h
