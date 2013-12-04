@@ -1,0 +1,54 @@
+# 0. Reset database
+echo "0. Reset database"
+echo "--------------------------------------------------"
+
+scripts/dbReset.sh orion
+
+echo "--------------------------------------------------"
+echo
+echo
+
+
+DATA1="<?xml version="1.0" encoding="UTF-8"?>
+<appendContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type></type>
+      <contextValue>10</contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>none</type>
+          <value>left</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>"
+
+# 1. Query without anything found
+echo "1. Query without anything found:"
+echo "--------------------------------------------------"
+curl localhost:1026/ngsi10/contextEntities/E01/attributes/A1/left -X GET
+echo "--------------------------------------------------"
+echo
+echo
+
+# 2. Add an entity with Attribute A1, metadata-ID 'left'
+
+echo "2. Add an entity with Attribute A1, metadata-ID 'left'"
+echo "--------------------------------------------------"
+curl localhost:1026/ngsi10/contextEntities/E01/attributes -d "$DATA1" -X POST --header "Content-Type: application/xml"
+echo "--------------------------------------------------"
+echo
+echo
+
+# 3. Same query - this time A1 is found
+echo "3. Same query - this time A1 is found"
+echo "--------------------------------------------------"
+curl localhost:1026/ngsi10/contextEntities/E01/attributes/A1/left -X GET
+echo "--------------------------------------------------"
+echo
+echo

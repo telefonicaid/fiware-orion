@@ -70,6 +70,7 @@ TEST(Request, requestType)
     { IndividualContextEntity,                     "IndividualContextEntity"                                },
     { IndividualContextEntityAttributes,           "IndividualContextEntityAttributes"                      },
     { IndividualContextEntityAttribute,            "IndividualContextEntityAttribute"                       },
+    { AttributeValueInstance,                      "AttributeValueInstance"                                 },
     { UpdateContextElement,                        "UpdateContextElement"                                   },
     { AppendContextElement,                        "AppendContextElement"                                   },
     { UpdateContextAttribute,                      "UpdateContextAttribute"                                 },

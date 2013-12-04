@@ -72,6 +72,7 @@ extern int noOfContextEntityTypeAttributeContainer;
 extern int noOfContextEntityTypeAttribute;
 extern int noOfIndividualContextEntity;
 extern int noOfIndividualContextEntityAttributes;
+extern int noOfAttributeValueInstance;
 extern int noOfIndividualContextEntityAttribute;
 extern int noOfUpdateContextElement;
 extern int noOfAppendContextElement;

@@ -25,29 +25,27 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/restReply.h"
-#include "serviceRoutines/postUpdateContextSubscription.h"
-#include "serviceRoutines/putSubscriptionConvOp.h"
+#include "serviceRoutines/badVerbGetPutDeleteOnly.h"
+
 
 
 /* ****************************************************************************
 *
-* putSubscriptionConvOp - 
+* badVerbGetPutDeleteOnly - 
 */
-std::string putSubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string badVerbGetPutDeleteOnly(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
-  std::string                        subscriptionId = compV[2];
-  UpdateContextSubscriptionRequest*  ucsrP          = &parseDataP->ucsr.res;
+  ciP->httpHeader.push_back("Allow");
+  ciP->httpHeaderValue.push_back("GET, PUT, DELETE");
+  ciP->httpStatusCode = SccBadVerb;
 
-  if (subscriptionId != ucsrP->subscriptionId.get())
-  {
-    std::string out;
+  LM_W(("bad verb for url '%s', method '%s'", ciP->url.c_str(), ciP->method.c_str()));
 
-    out = restErrorReplyGet(ciP, ciP->outFormat, "", "updateContextSubscription", SccBadRequest, "unmatching subscriptionId URI/payload", subscriptionId);
-    return out;
-  }
-
-  return postUpdateContextSubscription(ciP, components, compV, parseDataP);
+  return "";
 }
