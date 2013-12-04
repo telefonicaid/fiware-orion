@@ -16,7 +16,6 @@
 	<reference>http://10.1.1.1:80/test/interfaceNotification
 	</reference>
 	<duration>PT1M</duration>
-	<subscriptionId>111222333444555666777888</subscriptionId>
   <restriction>
     <attributeExpression>ATTR_EXPR</attributeExpression>
     <scope>
@@ -26,4 +25,5 @@
       </operationScope>
     </scope>
   </restriction>
+	<subscriptionId>111222333444555666777888</subscriptionId>
 </subscribeContextAvailabilityRequest>
