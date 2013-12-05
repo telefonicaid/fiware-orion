@@ -270,8 +270,9 @@ RestService restServiceV[] =
   
   { "GET IndividualContextEntityAttribute",            "GET",    AttributeValueInstance,                      6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              getAttributeValueInstance                 },
   { "PUT IndividualContextEntityAttribute",            "PUT",    AttributeValueInstance,                      6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "updateContextAttributeRequest", putAttributeValueInstance                 },
+  { "POST IndividualContextEntityAttribute",           "POST",   AttributeValueInstance,                      6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "updateContextAttributeRequest", badVerbGetPutDeleteOnly                   },
   { "DELETE IndividualContextEntityAttribute",         "DELETE", AttributeValueInstance,                      6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              deleteAttributeValueInstance              },
-  { "* IndividualContextEntityAttribute",              "*",      AttributeValueInstance,                      6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              badVerbGetPutDeleteOnly                   },
+  { "* IndividualContextEntityAttribute",              "*",      AttributeValueInstance,                      6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "updateContextAttributeRequest", badVerbGetPutDeleteOnly                   },
 
   { "GET Ngsi10ContextEntityTypes",                    "GET",    Ngsi10ContextEntityTypes,                    3, { "ngsi10", "contextEntityTypes", "*"                    }, "",                                getNgsi10ContextEntityTypes               },
   { "* Ngsi10ContextEntityTypes",                      "*",      Ngsi10ContextEntityTypes,                    3, { "ngsi10", "contextEntityTypes", "*"                    }, "",                                badVerbGetOnly                            },
