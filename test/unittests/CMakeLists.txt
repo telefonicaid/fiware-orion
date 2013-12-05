@@ -112,6 +112,7 @@ SET (SOURCES
     serviceRoutines/putAvailabilitySubscriptionConvOp_test.cpp
     serviceRoutines/deleteAttributeValueInstance_test.cpp
     serviceRoutines/putAttributeValueInstance_test.cpp
+    serviceRoutines/getAttributeValueInstance_test.cpp
 
     convenience/Convenience_test.cpp
     convenienceMap/mapDeleteIndividualContextEntity_test.cpp
