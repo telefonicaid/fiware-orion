@@ -36,26 +36,17 @@
 #include "mongoBackend/mongoRegisterContext.h"
 #include "ngsi9/RegisterContextResponse.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
-#include "testInit.h"
-#include "commonMocks.h"
 
-
-
-using ::testing::_;
-using ::testing::Throw;
-using ::testing::Return;
+#include "unittest.h"
 
 
 
 /* ****************************************************************************
 *
-* prepareDatabase -
+* populateDatabase -
 */
-static void prepareDatabase(std::string id, std::string type)
+static void populateDatabase(std::string id, std::string type)
 {
-  /* Set database */
-  setupDatabase();
-
   DBClientConnection* connection = getMongoConnection();
 
   /* We create one entity:
@@ -83,30 +74,32 @@ static void prepareDatabase(std::string id, std::string type)
 
 /* ****************************************************************************
 *
-* notFoundThenFound - 
+* updateOkAndError - 
 */
-TEST(mapPutIndividualContextEntity, createTwoEntities)
+TEST(mapPutIndividualContextEntity, updateOkAndError)
 {
   HttpStatusCode                ms;
   UpdateContextElementRequest   request;
   UpdateContextElementResponse  response;
 
-  /* Set timer */
-  Timer* t = new Timer();
-  setTimer(t);
+  utInit();
 
-  prepareDatabase("MPICE", "ttt");
+  populateDatabase("MPICE", "ttt");
   request.attributeDomainName.set("ad");
 
+  // OK
   ms = mapPutIndividualContextEntity("MPICE", &request, &response);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(200, response.errorCode.code);
 
+  // Not found
   ms = mapPutIndividualContextEntity("MPICE2", &request, &response);
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(200, response.errorCode.code);
+  EXPECT_EQ(404, response.errorCode.code);
 
   // Cleanup
   StatusCode sCode;
   mapDeleteIndividualContextEntity("MPICE", &sCode);
+
+  utExit();
 }
