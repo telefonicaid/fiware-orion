@@ -112,7 +112,7 @@ done
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>UPDATE</updateAction>
+  <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
 echo "1: ++++++++++++++++++++"
@@ -134,7 +134,7 @@ echo "1: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>UPDATE</updateAction>
+  <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
 echo "2: ++++++++++++++++++++"
