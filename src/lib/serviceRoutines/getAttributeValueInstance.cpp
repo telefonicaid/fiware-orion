@@ -63,14 +63,14 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
 
   if (response.contextElementResponseVector.size() == 0)
   {
-     car.statusCode.fill(SccContextElementNotFound, "The ContextElement requested is not found", entityId + "-" + attributeName);
+    car.statusCode.fill(SccContextElementNotFound, "The ContextElement requested is not found", entityId + "-" + attributeName);
   }
   else
   {
-     ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
+    ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
 
-     car.contextAttributeVector.push_back(cerP->contextElement.contextAttributeVector.get(0));
-     car.statusCode.fill(&cerP->statusCode);
+    car.contextAttributeVector.push_back(cerP->contextElement.contextAttributeVector.get(0));
+    car.statusCode.fill(&cerP->statusCode);
   }
 
   return car.render(ciP->outFormat, "");

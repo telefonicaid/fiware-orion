@@ -63,13 +63,25 @@ std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, st
   request.contextElementVector.push_back(&ce);
   request.updateActionType.set("DELETE");
 
+  response.errorCode.code = SccOk;
   s = mongoUpdateContext(&request, &response);
   
   StatusCode statusCode;
   if (response.contextElementResponseVector.size() == 0)
     statusCode.fill(SccContextElementNotFound, "The ContextElement requested is not found", entityId + "-" + attributeName);
+  else if (response.contextElementResponseVector.size() == 1)
+  {
+     ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
+
+    if (response.errorCode.code != SccOk)
+      statusCode.fill(&response.errorCode);
+    else if (cerP->statusCode.code != SccOk)
+       statusCode.fill(&cerP->statusCode);
+    else
+       statusCode.fill(SccOk, "OK", "");
+  }
   else
-    statusCode.fill(SccOk, "OK", "");
+     statusCode.fill(SccReceiverInternalError, "Internal Error", "More than one response from deleteAttributeValueInstance::mongoUpdateContext");
 
   return statusCode.render(ciP->outFormat, "", false);
 }

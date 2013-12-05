@@ -133,6 +133,13 @@ killall contextBroker
             <name>temperature</name>
             <type>degree</type>
             <contextValue/>
+            <metadata>
+              <contextMetadata>
+                <name>ID</name>
+                <type>string</type>
+                <value>3</value>
+              </contextMetadata>
+            </metadata>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -157,6 +164,13 @@ killall contextBroker
             <name>temperature</name>
             <type>degree</type>
             <contextValue>c23</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>ID</name>
+                <type>string</type>
+                <value>3</value>
+              </contextMetadata>
+            </metadata>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>

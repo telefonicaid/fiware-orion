@@ -103,10 +103,13 @@ std::string ContextAttribute::render(Format format, std::string indent, bool isI
   std::string out = "";
   std::string tag = "contextAttribute";
 
+  metadataVector.tagSet("metadata");
+
   out += startTag(indent, tag, format, false);
   out += valueTag(indent + "  ", "name",         name,  format, true);
   out += valueTag(indent + "  ", "type",         type,  format, true);
   out += valueTag(indent + "  ", "contextValue", value, format, false);
+  out += metadataVector.render(format, indent + "  ", false);
   out += endTag(indent, tag, format, isInVector);
 
   return out;
