@@ -74,9 +74,9 @@ static void populateDatabase(std::string id, std::string type)
 
 /* ****************************************************************************
 *
-* notFoundThenFound - 
+* updateOkAndError - 
 */
-TEST(mapPutIndividualContextEntity, createTwoEntities)
+TEST(mapPutIndividualContextEntity, updateOkAndError)
 {
   HttpStatusCode                ms;
   UpdateContextElementRequest   request;
@@ -87,13 +87,15 @@ TEST(mapPutIndividualContextEntity, createTwoEntities)
   populateDatabase("MPICE", "ttt");
   request.attributeDomainName.set("ad");
 
+  // OK
   ms = mapPutIndividualContextEntity("MPICE", &request, &response);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(200, response.errorCode.code);
 
+  // Not found
   ms = mapPutIndividualContextEntity("MPICE2", &request, &response);
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(200, response.errorCode.code);
+  EXPECT_EQ(404, response.errorCode.code);
 
   // Cleanup
   StatusCode sCode;
