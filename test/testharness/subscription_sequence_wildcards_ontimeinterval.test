@@ -112,7 +112,7 @@ done
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>UPDATE</updateAction>
+  <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
 echo "1: ++++++++++++++++++++"
@@ -134,39 +134,10 @@ echo "1: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>UPDATE</updateAction>
+  <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
 echo "2: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-  <registerContextRequest>
-    <contextRegistrationList>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Room" isPattern="false">
-            <id>ConferenceRoom2</id>
-          </entityId>
-          <entityId type="Room" isPattern="false">
-            <id>OfficeRoom2</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:1028/applicationReg2</providingApplication>
-      </contextRegistration>
-    </contextRegistrationList>
-    <duration>PT1H</duration>
-    <registrationId></registrationId>
-  </registerContextRequest>
-EOF
-echo "3: ++++++++++++++++++++"
 
 SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
@@ -195,7 +166,7 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "$SUB_OUT"
-echo "4: ++++++++++++++++++++"
+echo "3: ++++++++++++++++++++"
 
 #Wait 11 seconds, so we will receive 6 notifications (t=0, t=2, t=4, t=6, t=8, t=10)
 sleep 11
@@ -206,7 +177,7 @@ sleep 11
   <subscriptionId>$SUB_ID</subscriptionId>
 </unsubscribeContextRequest>
 EOF
-echo "5: ++++++++++++++++++++"
+echo "4: ++++++++++++++++++++"
 
 #Get accumulated data (only the first notification and the notification times)
 curl localhost:${LISTENER_PORT}/dump -s -S | head -n 51
@@ -264,19 +235,13 @@ echo "TIMES: $TIMES"
 </updateContextResponse>
 2: ++++++++++++++++++++
 <?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
-3: ++++++++++++++++++++
-<?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
     <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
     <duration>PT5H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-4: ++++++++++++++++++++
+3: ++++++++++++++++++++
 <?xml version="1.0"?>
 <unsubscribeContextResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -285,7 +250,7 @@ echo "TIMES: $TIMES"
     <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </unsubscribeContextResponse>
-5: ++++++++++++++++++++
+4: ++++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 1287
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
