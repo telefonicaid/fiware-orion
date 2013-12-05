@@ -63,8 +63,7 @@ static RestService rs[] =
 TEST(putAttributeValueInstance, notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/E1/attributes/A1/left",  "PUT", "1.1");
-  std::string    expected   = "<statusCode>\n  <code>200</code>\n  <reasonPhrase>OK</reasonPhrase>\n</statusCode>\n";
-  std::string    want       = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>Entity Not Found</reasonPhrase>\n  <details>E1</details>\n</statusCode>\n";
+  std::string    expected   = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>Entity Not Found</reasonPhrase>\n  <details>E1</details>\n</statusCode>\n";
   const char*    fileName   = "ngsi10.putAttributeValueInstance.A1-left.ok.postponed.xml";
   std::string    out;
 

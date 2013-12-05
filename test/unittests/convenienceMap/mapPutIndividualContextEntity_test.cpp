@@ -36,26 +36,17 @@
 #include "mongoBackend/mongoRegisterContext.h"
 #include "ngsi9/RegisterContextResponse.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
-#include "testInit.h"
-#include "commonMocks.h"
 
-
-
-using ::testing::_;
-using ::testing::Throw;
-using ::testing::Return;
+#include "unittest.h"
 
 
 
 /* ****************************************************************************
 *
-* prepareDatabase -
+* populateDatabase -
 */
-static void prepareDatabase(std::string id, std::string type)
+static void populateDatabase(std::string id, std::string type)
 {
-  /* Set database */
-  setupDatabase();
-
   DBClientConnection* connection = getMongoConnection();
 
   /* We create one entity:
@@ -91,11 +82,9 @@ TEST(mapPutIndividualContextEntity, createTwoEntities)
   UpdateContextElementRequest   request;
   UpdateContextElementResponse  response;
 
-  /* Set timer */
-  Timer* t = new Timer();
-  setTimer(t);
+  utInit();
 
-  prepareDatabase("MPICE", "ttt");
+  populateDatabase("MPICE", "ttt");
   request.attributeDomainName.set("ad");
 
   ms = mapPutIndividualContextEntity("MPICE", &request, &response);
@@ -109,4 +98,6 @@ TEST(mapPutIndividualContextEntity, createTwoEntities)
   // Cleanup
   StatusCode sCode;
   mapDeleteIndividualContextEntity("MPICE", &sCode);
+
+  utExit();
 }
