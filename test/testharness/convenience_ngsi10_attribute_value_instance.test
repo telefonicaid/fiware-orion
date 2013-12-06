@@ -228,7 +228,7 @@ killall contextBroker
 <orionError>
   <code>400</code>
   <reasonPhrase>no request treating object found</reasonPhrase>
-  <details>Sorry, no request treating object found for RequestType 'AttributeValueInstance'</details>
+  <details>Sorry, no request treating object found for RequestType 'AttributeValueInstance', method 'POST'</details>
 </orionError>
 6: ++++++++++++++++++++
 <?xml version="1.0"?>
