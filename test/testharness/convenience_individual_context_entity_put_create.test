@@ -81,9 +81,82 @@ echo "+++++ 1. put an entity +++++"
 </updateContextElementRequest>
 EOF
 
+echo "+++++ 2. create the entity +++++"
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<appendContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>temperature</name>
+      <type>degree</type>
+      <contextValue>10</contextValue>
+    </contextAttribute>
+    <contextAttribute>
+      <name>pressure</name>
+      <type>clima</type>
+      <contextValue>p23</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</updateContextElementRequest>
+EOF
+
+echo "+++++ 3. put an entity +++++"
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X PUT -d @- | xmllint --format - ) << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<updateContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>temperature</name>
+      <type>degree</type>
+      <contextValue>10</contextValue>
+    </contextAttribute>
+    <contextAttribute>
+      <name>pressure</name>
+      <type>clima</type>
+      <contextValue>p23</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</updateContextElementRequest>
+EOF
+
 
 --REGEXPECT--
 +++++ 1. put an entity +++++
+<?xml version="1.0"?>
+<updateContextElementResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>Entity Not Found</reasonPhrase>
+    <details>entity01</details>
+  </errorCode>
+</updateContextElementResponse>
++++++ 2. create the entity +++++
+<?xml version="1.0"?>
+<appendContextElementResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue/>
+        </contextAttribute>
+        <contextAttribute>
+          <name>pressure</name>
+          <type>clima</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</appendContextElementResponse>
++++++ 3. put an entity +++++
 <?xml version="1.0"?>
 <updateContextElementResponse>
   <contextResponseList>

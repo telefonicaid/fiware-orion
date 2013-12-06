@@ -61,66 +61,65 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-echo "+++++ 1. register an entity"
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
-<?xml version="1.0"?>
-  <registerContextRequest>
-    <contextRegistrationList>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Room" isPattern="false">
-            <id>entity01</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:1028/application</providingApplication>
-      </contextRegistration>
-    </contextRegistrationList>
-    <duration>PT1H</duration>
-    <registrationId></registrationId>
-  </registerContextRequest>
+echo "+++++ 1. create an entity"
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<appendContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>pressure</name>
+      <type>clima</type>
+      <contextValue>p23</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>
 EOF
 
-echo
-echo "+++++ 2. add to the entity"
+echo "+++++ 2. update the entity"
 (curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X PUT -d @- | xmllint --format - ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
     <contextAttribute>
-      <name>temperature</name>
-      <type>degree</type>
-      <contextValue>10</contextValue>
+      <name>pressure</name>
+      <type>clima</type>
+      <contextValue>p24</contextValue>
     </contextAttribute>
   </contextAttributeList>
 </updateContextElementRequest>
 EOF
 
-
 --REGEXPECT--
-+++++ 1. register an entity
++++++ 1. create an entity
 <?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
-
-+++++ 2. add to the entity
+<appendContextElementResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>pressure</name>
+          <type>clima</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</appendContextElementResponse>
++++++ 2. update the entity
 <?xml version="1.0"?>
 <updateContextElementResponse>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>
         <contextAttribute>
-          <name>temperature</name>
-          <type>degree</type>
+          <name>pressure</name>
+          <type>clima</type>
           <contextValue/>
         </contextAttribute>
       </contextAttributeList>
