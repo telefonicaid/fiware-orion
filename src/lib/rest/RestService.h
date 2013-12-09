@@ -31,6 +31,8 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
+#include "xmlParse/xmlRequest.h"
+#include "jsonParse/jsonRequest.h"
 
 
 
@@ -49,7 +51,6 @@ typedef std::string (*RestServiceHandler)(ConnectionInfo* ciP, int compononts, s
 typedef std::string (*RestTreat)(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* reqDataP);
 typedef struct RestService
 {
-  std::string   name;
   std::string   verb;
   RequestType   request;
   int           components;
@@ -65,5 +66,13 @@ typedef struct RestService
 * restService - 
 */
 extern std::string restService(ConnectionInfo* ciP, RestService* serviceV);
+
+
+
+/* ****************************************************************************
+*
+* payloadParse - 
+*/
+extern std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService* service, XmlRequest** reqPP, JsonRequest** jsonPP);
 
 #endif

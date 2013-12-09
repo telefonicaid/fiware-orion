@@ -40,9 +40,9 @@
 */
 static RestService rs[] = 
 {
-  { "GET IndividualContextEntityAttribute",       "GET",    IndividualContextEntityAttribute,      5, { "ngsi10", "contextEntities", "*", "attributes", "*"  }, "", getIndividualContextEntityAttribute       },
-  { "* InvalidRequest",                           "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "* *",                                        "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "GET",    IndividualContextEntityAttribute,      5, { "ngsi10", "contextEntities", "*", "attributes", "*"  }, "", getIndividualContextEntityAttribute       },
+  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
+  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
 };
 
 

@@ -44,9 +44,9 @@ using ::testing::Return;
 */
 static RestService rs[] = 
 {
-  { "GET EntityByIdAttributeByName",              "GET",    EntityByIdAttributeByName,             5, { "ngsi9", "contextEntities", "*", "attributes", "*"   }, "", getEntityByIdAttributeByName              },
-  { "* InvalidRequest",                           "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "* *",                                        "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "GET",    EntityByIdAttributeByName,             5, { "ngsi9", "contextEntities", "*", "attributes", "*"   }, "", getEntityByIdAttributeByName              },
+  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
+  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
 };
 
 

@@ -41,9 +41,9 @@
 */
 static RestService rs[] = 
 {
-  { "POST QueryContext",                          "POST",   QueryContext,                          2, { "ngsi10", "queryContext"                             }, "", postQueryContext                          },
-  { "* InvalidRequest",                           "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "* *",                                        "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "POST",   QueryContext,                          2, { "ngsi10", "queryContext"                             }, "", postQueryContext                          },
+  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
+  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
 };
 
 

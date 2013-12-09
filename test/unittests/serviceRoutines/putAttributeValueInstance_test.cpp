@@ -45,13 +45,13 @@
 */
 static RestService rs[] = 
 {
-  { "POST IndividualContextEntityAttributes",  "POST",   IndividualContextEntityAttributes, 4, { "ngsi10", "contextEntities", "*", "attributes"           }, "appendContextElementRequest",   postIndividualContextEntityAttributes },
-  { "GET IndividualContextEntityAttribute",    "GET",    AttributeValueInstance,            6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              getAttributeValueInstance             },
-  { "PUT IndividualContextEntityAttribute",    "PUT",    AttributeValueInstance,            6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "updateContextAttributeRequest", putAttributeValueInstance             },
-  { "DELETE IndividualContextEntityAttribute", "DELETE", AttributeValueInstance,            6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              deleteAttributeValueInstance          },
-  { "* IndividualContextEntityAttribute",      "*",      AttributeValueInstance,            6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              badVerbGetPutDeleteOnly               },
-  { "* InvalidRequest",                        "*",      InvalidRequest,                    0, { "*", "*", "*", "*", "*", "*"                             }, "",                              badRequest                            },
-  { "* *",                                     "",       InvalidRequest,                    0, {                                                          }, "",                              NULL                                  }
+  { "POST",   IndividualContextEntityAttributes, 4, { "ngsi10", "contextEntities", "*", "attributes"           }, "appendContextElementRequest",   postIndividualContextEntityAttributes },
+  { "GET",    AttributeValueInstance,            6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              getAttributeValueInstance             },
+  { "PUT",    AttributeValueInstance,            6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "updateContextAttributeRequest", putAttributeValueInstance             },
+  { "DELETE", AttributeValueInstance,            6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              deleteAttributeValueInstance          },
+  { "*",      AttributeValueInstance,            6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              badVerbGetPutDeleteOnly               },
+  { "*",      InvalidRequest,                    0, { "*", "*", "*", "*", "*", "*"                             }, "",                              badRequest                            },
+  { "",       InvalidRequest,                    0, {                                                          }, "",                              NULL                                  }
 };
 
 
@@ -62,20 +62,41 @@ static RestService rs[] =
 */
 TEST(putAttributeValueInstance, notFound)
 {
-  ConnectionInfo ci("/ngsi10/contextEntities/E1/attributes/A1/left",  "PUT", "1.1");
-  std::string    expected   = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>Entity Not Found</reasonPhrase>\n  <details>E1</details>\n</statusCode>\n";
+  ConnectionInfo ci1("/ngsi10/contextEntities/E1/attributes/A1/left",  "PUT", "1.1");
+  ConnectionInfo ci2("/ngsi10/contextEntities/E1/attributes/A1/right",  "PUT", "1.1");
+  ConnectionInfo ci3("/ngsi10/contextEntities/E1/attributes/A1/left",  "PUT", "1.1");
+  std::string    expected1   = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>Entity Not Found</reasonPhrase>\n  <details>E1</details>\n</statusCode>\n";
+  std::string    expected2  = "<statusCode>\n  <code>400</code>\n  <reasonPhrase>unmatching metadata ID value URI/payload</reasonPhrase>\n  <details>right vs left</details>\n</statusCode>\n";
+  std::string    expected3  = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>Entity Not Found</reasonPhrase>\n  <details>E1</details>\n</statusCode>\n";
   const char*    fileName   = "ngsi10.putAttributeValueInstance.A1-left.ok.postponed.xml";
+  const char*    fileName2  = "ngsi10.putAttributeValueInstance.noIdMetadata.postponed.xml";
   std::string    out;
 
   utInit();
   
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
-  ci.outFormat    = XML;
-  ci.inFormat     = XML;
-  ci.payload      = testBuf;
-  ci.payloadSize  = strlen(testBuf);
-  out             = restService(&ci, rs);
-  EXPECT_EQ(expected, out);
+  ci1.outFormat    = XML;
+  ci1.inFormat     = XML;
+  ci1.payload      = testBuf;
+  ci1.payloadSize  = strlen(testBuf);
+  out             = restService(&ci1, rs);
+  EXPECT_EQ(expected1, out);
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  ci2.outFormat    = XML;
+  ci2.inFormat     = XML;
+  ci2.payload      = testBuf;
+  ci2.payloadSize  = strlen(testBuf);
+  out             = restService(&ci2, rs);
+  EXPECT_EQ(expected2, out);
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName2)) << "Error getting test data from '" << fileName2 << "'";
+  ci3.outFormat    = XML;
+  ci3.inFormat     = XML;
+  ci3.payload      = testBuf;
+  ci3.payloadSize  = strlen(testBuf);
+  out             = restService(&ci3, rs);
+  EXPECT_EQ(expected3, out);
 
   utExit();
 }

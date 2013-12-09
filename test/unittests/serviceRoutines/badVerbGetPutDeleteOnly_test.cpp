@@ -35,8 +35,8 @@
 */
 static RestService rs[] = 
 {
-  { "* IndividualContextEntityAttribute",       "*",      AttributeValueInstance, 6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              badVerbGetPutDeleteOnly      },
-  { "* *",                                      "",       InvalidRequest,         0, {                                                          }, "",                              NULL                         }
+  { "*",      AttributeValueInstance, 6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              badVerbGetPutDeleteOnly      },
+  { "",       InvalidRequest,         0, {                                                          }, "",                              NULL                         }
 };
 
 

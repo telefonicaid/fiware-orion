@@ -406,7 +406,8 @@ static int connectionTreat
       char detail[256];
 
       snprintf(detail, sizeof(detail), "payload size: %d", ciP->httpHeaders.contentLength);
-      restErrorReply(ciP, ciP->outFormat, "", ciP->url, 413, "Payload Too Large", detail);
+      std::string out = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, "Payload Too Large", detail);
+      restReply(ciP, out);
     }
     else
     {
@@ -432,20 +433,6 @@ void restInit(char* _bind, unsigned short _port, RestService* _restServiceV)
    restServiceV  = _restServiceV;
 
    savedResponse[0] = 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* restStop - 
-*/
-void restStop(void)
-{
-   if (mhdDaemon == NULL)
-      LM_E(("MHD not started"));
-   else
-      MHD_stop_daemon(mhdDaemon);
 }
 
 

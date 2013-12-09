@@ -49,12 +49,12 @@ using ::testing::Return;
 */
 static RestService rs[] = 
 {
-  { "POST RegisterContext",             "POST", RegisterContext,            2, { "ngsi9", "registerContext"                            }, "",                        postRegisterContext            },
-  { "GET ContextEntityTypeAttribute",   "GET",  ContextEntityTypeAttribute, 5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*" }, "",                        getContextEntityTypeAttribute  },
-  { "POST ContextEntityTypeAttribute",  "POST", ContextEntityTypeAttribute, 5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*" }, "registerProviderRequest", postContextEntityTypeAttribute },
-  { "* ContextEntityTypeAttribute",     "*",    ContextEntityTypeAttribute, 5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*" }, "",                        badVerbGetPostOnly             },
-  { "* InvalidRequest",                 "*",    InvalidRequest,             0, { "*", "*", "*", "*", "*", "*"                          }, "",                        badRequest                     },
-  { "* *",                              "",     InvalidRequest,             0, {                                                       }, "",                        NULL                           }
+  { "POST", RegisterContext,            2, { "ngsi9", "registerContext"                            }, "",                        postRegisterContext            },
+  { "GET",  ContextEntityTypeAttribute, 5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*" }, "",                        getContextEntityTypeAttribute  },
+  { "POST", ContextEntityTypeAttribute, 5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*" }, "registerProviderRequest", postContextEntityTypeAttribute },
+  { "*",    ContextEntityTypeAttribute, 5, { "ngsi9", "contextEntityTypes", "*", "attributes", "*" }, "",                        badVerbGetPostOnly             },
+  { "*",    InvalidRequest,             0, { "*", "*", "*", "*", "*", "*"                          }, "",                        badRequest                     },
+  { "",     InvalidRequest,             0, {                                                       }, "",                        NULL                           }
 };
 
 

@@ -108,6 +108,8 @@ std::string entityIdParse(RequestType requestType, xml_node<>* node, EntityId* e
 {
   for (xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute())
   {
+    LM_M(("attribute name: %s", attr->name()));
+
     if (attr->name() == std::string("type"))
     {
       entityIdP->type = attr->value();

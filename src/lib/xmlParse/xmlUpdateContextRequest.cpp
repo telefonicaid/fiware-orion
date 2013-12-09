@@ -66,6 +66,7 @@ static int entityId(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got an entityId"));
 
+  LM_M(("Calling entityIdParse"));
   std::string es = entityIdParse(SubscribeContext, node, reqData->upcr.entityIdP);
 
   if (es != "OK")

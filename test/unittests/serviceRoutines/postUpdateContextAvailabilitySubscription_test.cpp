@@ -40,9 +40,9 @@
 */
 static RestService rs[] = 
 {
-  { "POST UpdateContextAvailabilitySubscription", "POST",   UpdateContextAvailabilitySubscription, 2, { "ngsi9",  "updateContextAvailabilitySubscription"    }, "", postUpdateContextAvailabilitySubscription },
-  { "* InvalidRequest",                           "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "* *",                                        "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "POST",   UpdateContextAvailabilitySubscription, 2, { "ngsi9",  "updateContextAvailabilitySubscription"    }, "", postUpdateContextAvailabilitySubscription },
+  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
+  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
 };
 
 
