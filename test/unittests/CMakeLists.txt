@@ -63,6 +63,7 @@ SET (SOURCES
     serviceRoutines/badVerbGetPostOnly_test.cpp
     serviceRoutines/badVerbGetPostDeleteOnly_test.cpp
     serviceRoutines/badVerbGetDeleteOnly_test.cpp
+    serviceRoutines/badVerbGetPutDeleteOnly_test.cpp
     serviceRoutines/deleteIndividualContextEntity_test.cpp
     serviceRoutines/deleteIndividualContextEntityAttribute_test.cpp
     serviceRoutines/deleteIndividualContextEntityAttributes_test.cpp
@@ -109,6 +110,9 @@ SET (SOURCES
     serviceRoutines/leakTreat_test.cpp
     serviceRoutines/statisticsTreat_test.cpp
     serviceRoutines/putAvailabilitySubscriptionConvOp_test.cpp
+    serviceRoutines/deleteAttributeValueInstance_test.cpp
+    serviceRoutines/putAttributeValueInstance_test.cpp
+    serviceRoutines/getAttributeValueInstance_test.cpp
 
     convenience/Convenience_test.cpp
     convenienceMap/mapDeleteIndividualContextEntity_test.cpp

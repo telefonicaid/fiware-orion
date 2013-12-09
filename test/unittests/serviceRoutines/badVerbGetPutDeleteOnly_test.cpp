@@ -1,6 +1,3 @@
-#ifndef UNIT_TEST_H
-#define UNIT_TEST_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,34 +22,36 @@
 *
 * Author: Ken Zangelin
 */
-#include "testDataFromFile.h"
-#include "commonMocks.h"
-#include "testInit.h"
+#include "gtest/gtest.h"
+
+#include "serviceRoutines/badVerbGetPutDeleteOnly.h"
+#include "rest/RestService.h"
 
 
 
 /* ****************************************************************************
 *
-* namespaces
+* rs - 
 */
-using ::testing::_;
-using ::testing::Throw;
-using ::testing::Return;
+static RestService rs[] = 
+{
+  { "* IndividualContextEntityAttribute",       "*",      AttributeValueInstance, 6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              badVerbGetPutDeleteOnly      },
+  { "* *",                                      "",       InvalidRequest,         0, {                                                          }, "",                              NULL                         }
+};
 
 
 
 /* ****************************************************************************
 *
-* utInit - unit test init
+* ok - 
 */
-extern void utInit(void);
+TEST(badVerbGetPutDeleteOnly, ok)
+{
+  ConnectionInfo  ci("/ngsi10/contextEntities/entityId01/attributes/temperature/14",  "POST", "1.1");
+  std::string     expected = ""; // Bad verb gives no payload, only HTTP headers
+  std::string     out      = restService(&ci, rs);
 
-
-
-/* ****************************************************************************
-*
-* utExit - unit test exit
-*/
-extern void utExit(void);
-
-#endif
+  EXPECT_EQ(expected, out);
+  EXPECT_EQ("Allow", ci.httpHeader[0]);
+  EXPECT_EQ("GET, PUT, DELETE",  ci.httpHeaderValue[0]);
+}

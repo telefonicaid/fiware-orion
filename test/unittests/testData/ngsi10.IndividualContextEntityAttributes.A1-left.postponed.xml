@@ -1,0 +1,17 @@
+<appendContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type></type>
+      <contextValue>10</contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>none</type>
+          <value>left</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>

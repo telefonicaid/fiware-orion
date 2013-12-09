@@ -1,6 +1,3 @@
-#ifndef UNIT_TEST_H
-#define UNIT_TEST_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,34 +22,30 @@
 *
 * Author: Ken Zangelin
 */
-#include "testDataFromFile.h"
-#include "commonMocks.h"
-#include "testInit.h"
+#include <string>
+#include <vector>
+
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/restReply.h"
+#include "serviceRoutines/badVerbGetPutDeleteOnly.h"
 
 
 
 /* ****************************************************************************
 *
-* namespaces
+* badVerbGetPutDeleteOnly - 
 */
-using ::testing::_;
-using ::testing::Throw;
-using ::testing::Return;
+std::string badVerbGetPutDeleteOnly(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+{
+  ciP->httpHeader.push_back("Allow");
+  ciP->httpHeaderValue.push_back("GET, PUT, DELETE");
+  ciP->httpStatusCode = SccBadVerb;
 
+  LM_W(("bad verb for url '%s', method '%s'", ciP->url.c_str(), ciP->method.c_str()));
 
-
-/* ****************************************************************************
-*
-* utInit - unit test init
-*/
-extern void utInit(void);
-
-
-
-/* ****************************************************************************
-*
-* utExit - unit test exit
-*/
-extern void utExit(void);
-
-#endif
+  return "";
+}

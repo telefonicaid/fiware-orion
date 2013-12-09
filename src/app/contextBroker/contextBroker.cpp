@@ -107,7 +107,11 @@
 #include "serviceRoutines/deleteIndividualContextEntityAttribute.h"
 #include "serviceRoutines/putSubscriptionConvOp.h"
 #include "serviceRoutines/deleteSubscriptionConvOp.h"
+#include "serviceRoutines/getAttributeValueInstance.h"
+#include "serviceRoutines/putAttributeValueInstance.h"
+#include "serviceRoutines/deleteAttributeValueInstance.h"
 
+#include "serviceRoutines/badVerbGetPutDeleteOnly.h"
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
 #include "serviceRoutines/badVerbGetOnly.h"
 #include "serviceRoutines/badVerbGetDeleteOnly.h"
@@ -264,6 +268,11 @@ RestService restServiceV[] =
   { "DELETE IndividualContextEntityAttribute",         "DELETE", IndividualContextEntityAttribute,            5, { "ngsi10", "contextEntities", "*", "attributes", "*"    }, "",                                deleteIndividualContextEntityAttribute    },
   { "* IndividualContextEntityAttribute",              "*",      IndividualContextEntityAttribute,            5, { "ngsi10", "contextEntities", "*", "attributes", "*"    }, "",                                badVerbGetPostDeleteOnly                  },
   
+  { "GET AttributeValueInstance",                      "GET",    AttributeValueInstance,                      6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              getAttributeValueInstance                 },
+  { "PUT AttributeValueInstance",                      "PUT",    AttributeValueInstance,                      6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "updateContextAttributeRequest", putAttributeValueInstance                 },
+  { "DELETE AttributeValueInstance",                   "DELETE", AttributeValueInstance,                      6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              deleteAttributeValueInstance              },
+  { "* AttributeValueInstance",                        "*",      AttributeValueInstance,                      6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              badVerbGetPutDeleteOnly                   },
+
   { "GET Ngsi10ContextEntityTypes",                    "GET",    Ngsi10ContextEntityTypes,                    3, { "ngsi10", "contextEntityTypes", "*"                    }, "",                                getNgsi10ContextEntityTypes               },
   { "* Ngsi10ContextEntityTypes",                      "*",      Ngsi10ContextEntityTypes,                    3, { "ngsi10", "contextEntityTypes", "*"                    }, "",                                badVerbGetOnly                            },
 

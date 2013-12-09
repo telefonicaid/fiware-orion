@@ -95,32 +95,6 @@ done
 
 --SHELL--
 
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-  <registerContextRequest>
-    <contextRegistrationList>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Room" isPattern="false">
-            <id>OfficeRoom</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:1028</providingApplication>
-      </contextRegistration>
-    </contextRegistrationList>
-    <duration>PT1H</duration>
-    <registrationId></registrationId>
-  </registerContextRequest>
-EOF
-echo "1: ++++++++++++++++++++"
-
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
 <updateContextRequest>
@@ -138,10 +112,10 @@ echo "1: ++++++++++++++++++++"
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>UPDATE</updateAction>
+  <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
-echo "2: ++++++++++++++++++++"
+echo "1: ++++++++++++++++++++"
 
 #Subscribe for 5 seconds
 SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
@@ -169,21 +143,14 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "$SUB_OUT"
-echo "3: ++++++++++++++++++++"
+echo "2: ++++++++++++++++++++"
 
 #Sleep 10 seconds. Only 3 subscriptions arrive (at time 0, 2 and 4)
 sleep 10s
 
 curl localhost:${LISTENER_PORT}/dump -s -S 
-echo "4: ++++++++++++++++++++"
 
 --REGEXPECT--
-<?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
-1: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -207,7 +174,7 @@ echo "4: ++++++++++++++++++++"
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-2: ++++++++++++++++++++
+1: ++++++++++++++++++++
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
@@ -215,7 +182,7 @@ echo "4: ++++++++++++++++++++"
     <duration>PT5S</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-3: ++++++++++++++++++++
+2: ++++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 738
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -315,7 +282,6 @@ Content-Type: application/xml
 </notifyContextRequest>
 
 =======================================
-4: ++++++++++++++++++++
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})

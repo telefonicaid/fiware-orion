@@ -205,6 +205,8 @@ static std::string tagGet(std::string request)
     return "updateContextResponse";
   else if ((request == "notifyContext") || (request == "/ngsi10/notifyContext") || (request == "/NGSI10/notifyContext") || (request == "notifyContextRequest"))
     return "notifyContextResponse";
+  else if (request == "StatusCode")
+    return "StatusCode";
 
   return "UnknownTag";
 }
@@ -292,6 +294,11 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string in
    {
       NotifyContextResponse ncr(errorCode);
       reply =  ncr.render(NotifyContext, format, indent);
+   }
+   else if (tag == "StatusCode")
+   {
+     StatusCode sc((HttpStatusCode) code, reasonPhrase, detail);
+     reply = sc.render(format, indent);
    }
    else
    {

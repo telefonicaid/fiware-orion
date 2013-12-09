@@ -89,6 +89,7 @@ TEST(commonStatistics, statisticsUpdate)
   statisticsUpdate(EntityByIdAttributeByName, XML);
   statisticsUpdate(IndividualContextEntity, JSON);
   statisticsUpdate(IndividualContextEntityAttributes, XML);
+  statisticsUpdate(AttributeValueInstance, JSON);
   statisticsUpdate(IndividualContextEntityAttribute, JSON);
   statisticsUpdate(UpdateContextElement, JSON);
   statisticsUpdate(AppendContextElement, XML);
@@ -139,5 +140,5 @@ TEST(commonStatistics, statisticsUpdate)
   EXPECT_EQ(1, noOfRegisterResponses);
 
   EXPECT_EQ(16, noOfXmlRequests);
-  EXPECT_EQ(16, noOfJsonRequests);
+  EXPECT_EQ(17, noOfJsonRequests);
 }

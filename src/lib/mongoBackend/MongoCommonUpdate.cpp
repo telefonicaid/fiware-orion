@@ -835,7 +835,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
      * before the query() to check this and early return. However this would add a sencond interaction with MongoDB */
     if (!atLeastOneResult) {
 
-        if (strcasecmp(action.c_str(), "delete") == 0) {
+        if (strcasecmp(action.c_str(), "append") != 0) {
             buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, "Entity Not Found", en.id);
         }
         else {            

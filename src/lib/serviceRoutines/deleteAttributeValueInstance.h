@@ -1,5 +1,5 @@
-#ifndef UNIT_TEST_H
-#define UNIT_TEST_H
+#ifndef DELETE_ATTRIBUTE_VALUE_INSTANCE_H
+#define DELETE_ATTRIBUTE_VALUE_INSTANCE_H
 
 /*
 *
@@ -25,34 +25,18 @@
 *
 * Author: Ken Zangelin
 */
-#include "testDataFromFile.h"
-#include "commonMocks.h"
-#include "testInit.h"
+#include <string>
+#include <vector>
+
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* namespaces
+* deleteAttributeValueInstance - 
 */
-using ::testing::_;
-using ::testing::Throw;
-using ::testing::Return;
-
-
-
-/* ****************************************************************************
-*
-* utInit - unit test init
-*/
-extern void utInit(void);
-
-
-
-/* ****************************************************************************
-*
-* utExit - unit test exit
-*/
-extern void utExit(void);
+extern std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
 
 #endif
