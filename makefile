@@ -383,4 +383,9 @@ files_compliance:
 xml_check:
 	test/xmlCheck/xmlCheck.sh --xsd-dir $(XSD_DIR)
 
+sonar_metrics: unit_test coverage
+	cd BUILD_COVERAGE && gcovr -r /home/fermin/src/fiware-orion/src --gcov-exclude='.*parseArgs.*' --gcov-exclude='.*logMsg.*' -x -o ../coverage.xml && cd ..
+	sed s#filename=\"#filename=\"src/#g coverage.xml > coverage_sonar.xml
+	cppcheck --xml -j 8 --enable=all -I src/lib/ -i src/lib/parseArgs -i src/lib/logMsg src/ 2>cppcheck-result.xml
+
 .PHONY: rpm mock mock32 mock64 valgrind
