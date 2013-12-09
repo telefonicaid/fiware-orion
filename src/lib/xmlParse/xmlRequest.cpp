@@ -217,53 +217,28 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
   //
   if (((ciP->verb == POST) || (ciP->verb == PUT)) && (payloadWord.length() != 0))
   {
-    char* payloadStart = (char*) content;
-
-    if (reqP->parseVector == NULL)
-    {
-      std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccNotImplemented, "Not Implemented", std::string("Sorry, the '") + reqP->keyword.c_str() + "' object is not implemented");
-      LM_RE(errorReply, ("Not Implemented"));
-    }
+    std::string  errorReply;
+    char*        payloadStart = (char*) content;
 
     // Skip '<?xml version="1.0" encoding="UTF-8"?> ' ?
     if (strncmp(payloadStart, "<?xml", 5) == 0)
     {
-      char* oldPayloadStart = payloadStart;
-
-      payloadStart = strstr(payloadStart, ">");
-      if (payloadStart == NULL)
-      {
-        LM_E(("Found '<?xml' but NOT '>' in '%s'", oldPayloadStart));
-        payloadStart = (char*) content;  // Going back ...
-      }
-      else
-      {
-        oldPayloadStart = payloadStart;
-        payloadStart = strstr(payloadStart, "<");
-         
-        if (payloadStart == NULL)
-        {
-          LM_E(("Found '<?xml' and '>' but NOT '<' in '%s'", oldPayloadStart));
-          payloadStart = (char*) content;  // Going back ...
-        }
-      }
+      ++payloadStart;
+      payloadStart = strstr(payloadStart, "<");
     }
 
+    // Skip '<'
     if (*payloadStart == '<')
-    {
-       ++payloadStart; // Skip '<'
-    }
+       ++payloadStart;
 
     if (strncasecmp(payloadWord.c_str(), payloadStart, payloadWord.length()) != 0)
     {
-      std::string  errorReply;
-
       errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, "Invalid payload", std::string("Expected '") + payloadWord + "' payload, got '" + payloadStart + "'");
       LM_RE(errorReply, ("Invalid payload: wanted: '%s', got '%s'", payloadWord.c_str(), payloadStart));
     }
   }
 
-  if (reqP->init == NULL) // No payload
+  if (reqP->init == NULL) // No payload treating function
     return "OK";
 
   reqP->init(parseDataP);

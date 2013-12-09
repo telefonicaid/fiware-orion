@@ -49,12 +49,12 @@ using ::testing::Return;
 */
 static RestService rs[] = 
 {
-  { "POST SubscribeContext",  "POST",   SubscribeContext,           2, { "ngsi10", "subscribeContext"           }, "",                                 postSubscribeContext     },
-  { "PUT Subscription",       "PUT",    Ngsi10SubscriptionsConvOp,  3, { "ngsi10", "contextSubscriptions", "*"  }, "updateContextSubscriptionRequest", putSubscriptionConvOp    },
-  { "DELETE Subscription",    "DELETE", Ngsi10SubscriptionsConvOp,  3, { "ngsi10", "contextSubscriptions", "*"  }, "",                                 deleteSubscriptionConvOp },
-  { "* Subscription",         "*",      Ngsi10SubscriptionsConvOp,  3, { "ngsi10", "contextSubscriptions", "*"  }, "",                                 badVerbPutDeleteOnly     },
-  { "* InvalidRequest",       "*",      InvalidRequest,             0, { "*", "*", "*", "*", "*", "*"           }, "",                                 badRequest               },
-  { "* *",                    "",       InvalidRequest,             0, {                                        }, "",                                 NULL                     }
+  { "POST",   SubscribeContext,           2, { "ngsi10", "subscribeContext"           }, "",                                 postSubscribeContext     },
+  { "PUT",    Ngsi10SubscriptionsConvOp,  3, { "ngsi10", "contextSubscriptions", "*"  }, "updateContextSubscriptionRequest", putSubscriptionConvOp    },
+  { "DELETE", Ngsi10SubscriptionsConvOp,  3, { "ngsi10", "contextSubscriptions", "*"  }, "",                                 deleteSubscriptionConvOp },
+  { "*",      Ngsi10SubscriptionsConvOp,  3, { "ngsi10", "contextSubscriptions", "*"  }, "",                                 badVerbPutDeleteOnly     },
+  { "*",      InvalidRequest,             0, { "*", "*", "*", "*", "*", "*"           }, "",                                 badRequest               },
+  { "",       InvalidRequest,             0, {                                        }, "",                                 NULL                     }
 };
      
 

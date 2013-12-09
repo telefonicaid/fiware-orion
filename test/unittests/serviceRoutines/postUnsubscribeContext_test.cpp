@@ -40,9 +40,9 @@
 */
 static RestService rs[] = 
 {
-  { "POST UnsubscribeContext",                    "POST",   UnsubscribeContext,                    2, { "ngsi10", "unsubscribeContext"                       }, "", postUnsubscribeContext                    },
-  { "* InvalidRequest",                           "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "* *",                                        "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "POST",   UnsubscribeContext,                    2, { "ngsi10", "unsubscribeContext"                       }, "", postUnsubscribeContext                    },
+  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
+  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
 };
 
 

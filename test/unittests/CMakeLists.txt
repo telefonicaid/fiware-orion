@@ -227,8 +227,17 @@ SET (SOURCES
 
     jsonParse/jsonRequest_test.cpp
 
+    xmlParse/xmlAppendContextElementRequest_test.cpp
+    xmlParse/xmlRegisterContextRequest_test.cpp
+    xmlParse/xmlRegisterContextResponse_test.cpp
+    xmlParse/xmlRequest_test.cpp
+    xmlParse/xmlUpdateContextElementRequest_test.cpp
+    xmlParse/xmlUpdateContextRequest_test.cpp
+
     rest/OrionError_test.cpp
     rest/Verb_test.cpp
+    rest/restReply_test.cpp
+    rest/RestService_test.cpp
 )
 
 SET (HEADERS

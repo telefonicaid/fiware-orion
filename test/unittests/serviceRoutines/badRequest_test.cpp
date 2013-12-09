@@ -35,8 +35,8 @@
 */
 static RestService rs[] = 
 {
-   { "* InvalidRequest",                           "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                             }, "", badRequest                                },
-   { "* *",                                        "",       InvalidRequest,                        0, {                                                          }, "", NULL                                      }
+   { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                             }, "", badRequest                                },
+   { "",       InvalidRequest,                        0, {                                                          }, "", NULL                                      }
 };
 
 

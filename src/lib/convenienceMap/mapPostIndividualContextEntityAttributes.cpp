@@ -58,12 +58,6 @@ HttpStatusCode mapPostIndividualContextEntityAttributes(std::string entityId, Ap
 
   ms = mongoUpdateContext(&ucRequest, &ucResponse);
 
-  if (ucResponse.contextElementResponseVector.size() == 0)
-  {
-     response->errorCode = ucResponse.errorCode;
-     return ms;
-  }
-
   ContextAttributeResponse* car                      = new ContextAttributeResponse();
   ContextElementResponse*   ucContextElementResponse = ucResponse.contextElementResponseVector.get(0);
 

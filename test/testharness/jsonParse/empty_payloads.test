@@ -183,20 +183,20 @@ echo "13: ++++++++++++++++++++"
 10: ++++++++++++++++++++
 "orionError" : {
   "code" : "400",
-  "reasonPhrase" : "no request treating object found",
-  "details" : "Sorry, no request treating object found for RequestType 'InvalidRequest'"
+  "reasonPhrase" : "bad ngsi9 request",
+  "details" : "ngsi9 service '/NGSI9/notSupportedRequest' not found"
 }
 11: ++++++++++++++++++++
 "orionError" : {
   "code" : "400",
-  "reasonPhrase" : "no request treating object found",
-  "details" : "Sorry, no request treating object found for RequestType 'InvalidRequest'"
+  "reasonPhrase" : "bad ngsi10 request",
+  "details" : "ngsi10 service '/NGSI10/notSupportedRequest' not found"
 }
 12: ++++++++++++++++++++
 "orionError" : {
   "code" : "400",
-  "reasonPhrase" : "no request treating object found",
-  "details" : "Sorry, no request treating object found for RequestType 'InvalidRequest'"
+  "reasonPhrase" : "bad request",
+  "details" : "service '/notSupportedRequest' not found"
 }
 13: ++++++++++++++++++++
 --TEARDOWN--

@@ -61,14 +61,6 @@ HttpStatusCode mapPostIndividualContextEntity(std::string entityId, AppendContex
   ms = mongoUpdateContext(&ucRequest, &ucResponse);
   LM_T(LmtMetadataDoubleFree, ("Back from mongoUpdateContext"));
 
-  if (ucResponse.contextElementResponseVector.size() == 0)
-  {
-     response->errorCode = ucResponse.errorCode;
-     LM_E(("ZERO size of contextElementResponseVector from mongoUpdateContext"));
-     delete ceP;
-     return ms;
-  }
-
   ContextAttributeResponse* car                      = new ContextAttributeResponse();
   ContextElementResponse*   ucContextElementResponse = ucResponse.contextElementResponseVector.get(0);
 

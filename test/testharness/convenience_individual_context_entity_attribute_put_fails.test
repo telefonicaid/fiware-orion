@@ -62,16 +62,15 @@ fi
 
 --SHELL--
 echo "+++++ 1. put an entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes/attr01 -s -S --header 'Content-Type: application/xml' -X PUT -d "<nothing></nothing>" | xmllint --format -)
+curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes/attr01 -s -S --header 'Content-Type: application/xml' -X PUT -d "<nothing></nothing>" --include
 
 --REGEXPECT--
 +++++ 1. put an entity +++++
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>no request treating object found</reasonPhrase>
-  <details>Sorry, no request treating object found for RequestType 'IndividualContextEntityAttribute', method 'PUT'</details>
-</orionError>
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: GET, POST, DELETE
+Date: REGEX(.*)
+
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})

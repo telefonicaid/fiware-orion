@@ -33,14 +33,8 @@
 #include "mongoBackend/mongoRegisterContext.h"
 #include "ngsi9/RegisterContextResponse.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
-#include "testInit.h"
-#include "commonMocks.h"
 
-
-
-using ::testing::_;
-using ::testing::Throw;
-using ::testing::Return;
+#include "unittest.h"
 
 
 
@@ -53,12 +47,7 @@ static void prepareDatabase(std::string id, std::string type)
   static DBClientConnection* connection = NULL;
 
   if (connection == NULL)
-  {
-    /* Set database */
-    setupDatabase();
-
     connection = getMongoConnection();
-  }
 
   /* Create one entity:
    *
@@ -96,17 +85,15 @@ TEST(mapPostIndividualContextEntity, emptyDb)
   AppendContextElementRequest   request;
   AppendContextElementResponse  response;
 
-  /* Set timer */
-  Timer* t = new Timer();
-  setTimer(t);
+  utInit();
 
-  // Empty database
-  prepareDatabase("", "");
   ms = mapPostIndividualContextEntity("MPICE", &request, &response);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk, response.errorCode.code);
   EXPECT_EQ("OK", response.errorCode.reasonPhrase);
   EXPECT_EQ(0, response.errorCode.details.size());
+
+  utExit();
 }
 
 
@@ -121,16 +108,16 @@ TEST(mapPostIndividualContextEntity, found)
   AppendContextElementRequest   request;
   AppendContextElementResponse  response;
 
-  /* Set timer */
-  Timer* t = new Timer();
-  setTimer(t);
-
+  utInit();
   prepareDatabase("MPICE", "ttt");
+
   request.attributeDomainName.set("ad");
 
   ms = mapPostIndividualContextEntity("MPICE", &request, &response);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(200, response.errorCode.code);
+
+  utExit();
 }
 
 
@@ -145,15 +132,15 @@ TEST(mapPostIndividualContextEntity, newEntity)
   AppendContextElementRequest   request;
   AppendContextElementResponse  response;
 
-  /* Set timer */
-  Timer* t = new Timer();
-  setTimer(t);
-
+  utInit();
   prepareDatabase("MPICE", "ttt");
+
   request.attributeDomainName.set("ad");
 
   ms = mapPostIndividualContextEntity("MPICE2", &request, &response);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk, response.errorCode.code);
   EXPECT_STREQ("OK", response.errorCode.reasonPhrase.c_str());
+
+  utExit();
 }

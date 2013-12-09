@@ -45,9 +45,9 @@ using ::testing::Return;
 */
 static RestService rs[] = 
 {
-  { "POST SubscribeContextAvailability",          "POST",   SubscribeContextAvailability,          2, { "ngsi9",  "subscribeContextAvailability"             }, "", postSubscribeContextAvailability          },
-  { "* InvalidRequest",                           "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "* *",                                        "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "POST",   SubscribeContextAvailability,          2, { "ngsi9",  "subscribeContextAvailability"             }, "", postSubscribeContextAvailability          },
+  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
+  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
 };
 
 
