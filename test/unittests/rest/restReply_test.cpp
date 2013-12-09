@@ -207,6 +207,8 @@ TEST(restReply, restErrorReplyGet)
   std::string     out;
   ConnectionInfo  ci("/ngsi/test", "POST", "1.1");
   
+  utInit();
+
   out = restErrorReplyGet(&ci, XML, "", rcr1, 200, "ok", "detail");
   EXPECT_EQ(out, rcrExpected);
   out = restErrorReplyGet(&ci, XML, "", rcr2, 200, "ok", "detail");
@@ -433,4 +435,6 @@ TEST(restReply, restErrorReplyGet)
   EXPECT_EQ(out, ncrExpected2);
   out = restErrorReplyGet(&ci, XML, "", ncr4, 400, "Bad Request", "detail");
   EXPECT_EQ(out, ncrExpected2);
+
+  utExit();
 }

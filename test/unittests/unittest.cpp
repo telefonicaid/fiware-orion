@@ -29,10 +29,30 @@
 
 /* ****************************************************************************
 *
+* debugging - 
+*
+* FIXME P4 - these counters are useful (only visible if UT_DEBUG is defined)
+*            to detect calls to utInit without respective call to utExit.
+*            All of it should be removed as soon as we implement the new
+*            more complete TRST macro (I_TEST?)
+* 
+*/
+//#define UT_DEBUG
+#ifdef UT_DEBUG
+static int noOfInits = 0;
+static int noOfExits = 0;
+#endif
+
+
+
+/* ****************************************************************************
+*
 * Forward declarations
 */
 static NotifierMock* notifierMock = NULL;
 static TimerMock*    timerMock    = NULL;
+
+
 
 
 
@@ -43,14 +63,33 @@ static TimerMock*    timerMock    = NULL;
 */
 void utInit(void)
 {
+#ifdef UT_DEBUG
+  ++noOfInits;
+  printf("**************** IN utInit (%d inits, %d exits)\n", noOfInits, noOfExits);
+#endif
+
   notifierMock = new NotifierMock();
+  if (notifierMock == NULL)
+  {
+    fprintf(stderr, "error allocating NotifierMock: %s\n", strerror(errno));
+    exit(1);
+  }
   setNotifier(notifierMock);
   
   timerMock = new TimerMock();
+  if (timerMock == NULL)
+  {
+    fprintf(stderr, "error allocating TimerMock: %s\n", strerror(errno));
+    exit(1);
+  }
   ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
   setTimer(timerMock);
 
   setupDatabase();
+
+#ifdef UT_DEBUG
+  printf("**************** FROM utInit (%d inits, %d exits)\n", noOfInits, noOfExits);
+#endif
 }
 
 
@@ -62,9 +101,24 @@ void utInit(void)
 */
 void utExit(void)
 {
+#ifdef UT_DEBUG
+  ++noOfExits;
+  printf("**************** IN utExit (%d inits, %d exits)\n", noOfInits, noOfExits);
+#endif
+
+  if (timerMock)
+    delete timerMock;
+
+  if (notifierMock)
+    delete notifierMock;
+
+  timerMock    = NULL;
+  notifierMock = NULL;
+
   setTimer(NULL);
   setNotifier(NULL);
 
-  delete timerMock;
-  delete notifierMock;
+#ifdef UT_DEBUG
+  printf("**************** FROM utExit (%d inits, %d exits)\n", noOfInits, noOfExits);
+#endif
 }
