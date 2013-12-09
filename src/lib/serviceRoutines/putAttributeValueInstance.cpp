@@ -97,7 +97,7 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   request.contextElementVector.push_back(&ce);
   request.updateActionType.set("UPDATE");
 
-  response.errorCode.code = SccOk;
+  response.errorCode.code = NO_ERROR_CODE;
   s = mongoUpdateContext(&request, &response);
   
   StatusCode statusCode;
@@ -107,9 +107,9 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   {
     ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
 
-    if (response.errorCode.code != SccOk)
+    if (response.errorCode.code != NO_ERROR_CODE)
       statusCode.fill(&response.errorCode);
-    else if (cerP->statusCode.code != SccOk)
+    else if (cerP->statusCode.code != SccNone)
       statusCode.fill(&cerP->statusCode);
     else
       statusCode.fill(SccOk, "OK", "");
