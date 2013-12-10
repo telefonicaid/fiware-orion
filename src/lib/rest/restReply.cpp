@@ -55,7 +55,7 @@
 *
 * formatedAnswer - 
 */
-static std::string formatedAnswer
+std::string formatedAnswer
 (
   Format       format,
   std::string  header,
@@ -85,7 +85,7 @@ static std::string formatedAnswer
       answer += std::string("}");
    }
    else
-      answer = header + ": " + tag1 + "=" + value1 + ", " + tag2 + "=" + tag2;
+      answer = header + ": " + tag1 + "=" + value1 + ", " + tag2 + "=" + value2;
 
    return answer;
 }
@@ -310,33 +310,4 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string in
    }
 
    return reply;
-}
-
-
-/* ****************************************************************************
-*
-* restErrorReply - 
-*/
-void restErrorReply(ConnectionInfo* ciP, Format format, std::string indent, std::string request, int code, std::string reasonPhrase, std::string detail)
-{
-  std::string reply = restErrorReplyGet(ciP, format, indent, request, code, reasonPhrase, detail);
-
-  restReply(ciP, reply);
-}
-
-
-
-/* ****************************************************************************
-*
-* restErrorReply - 
-*/
-void restErrorReply(ConnectionInfo* ciP, Format format, std::string indent, HttpStatusCode code, std::string reasonPhrase, std::string detail)
-{
-  ErrorCode     errorCode(code, reasonPhrase, detail);
-  std::string   reply;
-
-  ciP->httpStatusCode = SccOk;
-
-  reply = errorCode.render(format, indent);
-  restReply(ciP, reply);
 }

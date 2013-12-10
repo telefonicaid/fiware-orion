@@ -38,11 +38,11 @@
 */
 static RestService rs[] = 
 {
-  { "GET StatisticsRequest",     "GET",    StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
-  { "DELETE StatisticsRequest",  "DELETE", StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
-  { "* StatisticsRequest",       "*",      StatisticsRequest, 1, { "statistics" }, "", badVerbGetDeleteOnly },
+  { "GET",    StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
+  { "DELETE", StatisticsRequest, 1, { "statistics" }, "", statisticsTreat      },
+  { "*",      StatisticsRequest, 1, { "statistics" }, "", badVerbGetDeleteOnly },
 
-  { "* *",                       "",       InvalidRequest,    0, {              }, "", NULL                 }
+  { "",       InvalidRequest,    0, {              }, "", NULL                 }
 };
 
 

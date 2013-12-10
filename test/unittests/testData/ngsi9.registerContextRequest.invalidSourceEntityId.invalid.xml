@@ -1,0 +1,31 @@
+<registerContextRequest>
+  <contextRegistrationList>
+		<contextRegistration>
+      <registrationMetadata>
+				<contextMetadata>
+					<name>association1</name>
+					<type>Association</type>
+					<value>
+						<entityAssociation>
+              <sourceEntityId type="TemperatureSensor" isPattern="false" badAttr="12">
+								<id>Sensor5</id>			
+							</sourceEntityId>
+              <targetEntityId type="House" isPattern="false">
+								<id>house_3</id>			
+							</targetEntityId>
+						</entityAssociation>
+						<AttributeAssociationList>
+							<AttributeAssociation>
+        				<sourceAttribute>measurement</sourceAttribute>
+       					<targetAttribute>indoorTemperature</targetAttribute>
+							</AttributeAssociation>
+						</AttributeAssociationList>
+					</value>
+				</contextMetadata>			
+      </registrationMetadata>
+			<providingApplication>http://www.fi-ware.eu/NGSI/association</providingApplication>
+		</contextRegistration>
+	</contextRegistrationList>
+  <duration>PT1H</duration>
+	<registrationId></registrationId>
+</registerContextRequest>

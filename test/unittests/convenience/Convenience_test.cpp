@@ -44,9 +44,9 @@
 */
 RestService restServiceV[] =
 {
-  { "POST RegisterContext",                       "POST",   RegisterContext,                       2, { "ngsi9",  "registerContext"                       }, "", postRegisterContext                       },
-  { "GET ContextEntitiesByEntityId",              "GET",    ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                   }, "", getContextEntitiesByEntityId              },
-  { "InvalidRequest",                             "",       InvalidRequest,                        0, {                                                   }, "", NULL                                      }
+  { "POST",   RegisterContext,                       2, { "ngsi9",  "registerContext"                       }, "", postRegisterContext                       },
+  { "GET",    ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                   }, "", getContextEntitiesByEntityId              },
+  { "",       InvalidRequest,                        0, {                                                   }, "", NULL                                      }
 };
 
 

@@ -35,8 +35,8 @@
 */
 static RestService rs[] = 
 {
-  { "* RegisterContext",                          "*",      RegisterContext,                       2, { "ngsi9",  "registerContext"                          }, "", badVerbPostOnly                           },
-  { "* *",                                        "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "*",      RegisterContext,                       2, { "ngsi9",  "registerContext"                          }, "", badVerbPostOnly                           },
+  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
 };
 
 

@@ -46,12 +46,4 @@ extern void restInit(char* bindIp, unsigned short port, RestService* restService
 */
 extern int restStart(void);
 
-
-
-/* ****************************************************************************
-*
-* restStop - 
-*/
-extern void restStop(void);
-
 #endif

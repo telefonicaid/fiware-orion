@@ -115,7 +115,7 @@ EOF
 echo "4: ++++++++++++++++++++"
 (curl localhost:{$BROKER_PORT}/ngsi10/contextEntities/E01/attributes/A1/left  | xmllint --format -)
 echo "5: ++++++++++++++++++++"
-(curl localhost:{$BROKER_PORT}/ngsi10/contextEntities/E01/attributes/A1/left --header "Content-Type: application/xml" -X POST -d @- | xmllint --format -) << EOF
+(curl localhost:{$BROKER_PORT}/ngsi10/contextEntities/E01/attributes/A1/left --header "Content-Type: application/xml" -X POST --include -d @-) << EOF
 <updateContextAttributeRequest>
   <type>Room</type>
   <contextValue>10</contextValue>
@@ -224,12 +224,11 @@ killall contextBroker
   </statusCode>
 </contextAttributeResponse>
 5: ++++++++++++++++++++
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>no request treating object found</reasonPhrase>
-  <details>Sorry, no request treating object found for RequestType 'AttributeValueInstance', method 'POST'</details>
-</orionError>
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: GET, PUT, DELETE
+Date: REGEX(.*)
+
 6: ++++++++++++++++++++
 <?xml version="1.0"?>
 <statusCode>

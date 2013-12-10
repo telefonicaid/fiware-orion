@@ -35,22 +35,22 @@
 */
 static RestService rs[] = 
 {
-   { "GET LogRequest",                             "GET",    LogRequest,                            2, { "log", "verbose"                                         }, logVerboseTreat                           },
-   { "PUT LogRequest",                             "PUT",    LogRequest,                            3, { "log", "verbose", "*"                                    }, logVerboseTreat                           },
-   { "POST LogRequest",                            "POST",   LogRequest,                            3, { "log", "verbose", "*"                                    }, logVerboseTreat                           },
-   { "DELETE LogRequest",                          "DELETE", LogRequest,                            2, { "log", "verbose"                                         }, logVerboseTreat                           },
+   { "GET",    LogRequest,                            2, { "log", "verbose"                                         }, logVerboseTreat                           },
+   { "PUT",    LogRequest,                            3, { "log", "verbose", "*"                                    }, logVerboseTreat                           },
+   { "POST",   LogRequest,                            3, { "log", "verbose", "*"                                    }, logVerboseTreat                           },
+   { "DELETE", LogRequest,                            2, { "log", "verbose"                                         }, logVerboseTreat                           },
 
-   { "GET LogRequest",                             "GET",    LogRequest,                            2, { "log", "traceLevel"                                      }, logTraceTreat                             },
-   { "PUT LogRequest",                             "PUT",    LogRequest,                            3, { "log", "traceLevel", "*"                                 }, logTraceTreat                             },
-   { "POST LogRequest",                            "POST",   LogRequest,                            3, { "log", "traceLevel", "*"                                 }, logTraceTreat                             },
-   { "DELETE LogRequest",                          "DELETE", LogRequest,                            2, { "log", "traceLevel"                                      }, logTraceTreat                             },
+   { "GET",    LogRequest,                            2, { "log", "traceLevel"                                      }, logTraceTreat                             },
+   { "PUT",    LogRequest,                            3, { "log", "traceLevel", "*"                                 }, logTraceTreat                             },
+   { "POST",   LogRequest,                            3, { "log", "traceLevel", "*"                                 }, logTraceTreat                             },
+   { "DELETE", LogRequest,                            2, { "log", "traceLevel"                                      }, logTraceTreat                             },
 
-   { "* LogRequest",                               "*",      LogRequest,                            2, { "log", "*"                                               }, logErrorTreat                             },
-   { "* LogRequest",                               "*",      LogRequest,                            3, { "log", "*", "*"                                          }, logErrorTreat                             },
+   { "*",      LogRequest,                            2, { "log", "*"                                               }, logErrorTreat                             },
+   { "*",      LogRequest,                            3, { "log", "*", "*"                                          }, logErrorTreat                             },
 
-   { "* InvalidRequest",                           "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                             }, badRequest                                },
+   { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                             }, badRequest                                },
 
-   { "* *",                                        "",       InvalidRequest,                        0, {                                                          }, NULL                                      }
+   { "",       InvalidRequest,                        0, {                                                          }, NULL                                      }
 };
 
 

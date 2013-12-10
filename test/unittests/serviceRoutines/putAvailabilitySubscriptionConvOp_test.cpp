@@ -43,15 +43,15 @@
 */
 static RestService rs[] = 
 {
-  { "POST Subscriptions",     "POST",   SubscribeContextAvailability, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, "subscribeContextAvailabilityRequest",          postSubscribeContextAvailability         },
-  { "* Subscriptions",        "*",      SubscribeContextAvailability, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, "",                                             badVerbPostOnly                          },
+  { "POST",   SubscribeContextAvailability, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, "subscribeContextAvailabilityRequest",          postSubscribeContextAvailability         },
+  { "*",      SubscribeContextAvailability, 2, { "ngsi9", "contextAvailabilitySubscriptions"      }, "",                                             badVerbPostOnly                          },
 
-  { "PUT Subscription",       "PUT",    Ngsi9SubscriptionsConvOp,     3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "updateContextAvailabilitySubscriptionRequest", putAvailabilitySubscriptionConvOp        },
-  { "DELETE Subscription",    "DELETE", Ngsi9SubscriptionsConvOp,     3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "",                                             deleteAvailabilitySubscriptionConvOp     },
-  { "* Subscription",         "*",      Ngsi9SubscriptionsConvOp,     3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "",                                             badVerbPutDeleteOnly                     },
+  { "PUT",    Ngsi9SubscriptionsConvOp,     3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "updateContextAvailabilitySubscriptionRequest", putAvailabilitySubscriptionConvOp        },
+  { "DELETE", Ngsi9SubscriptionsConvOp,     3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "",                                             deleteAvailabilitySubscriptionConvOp     },
+  { "*",      Ngsi9SubscriptionsConvOp,     3, { "ngsi9", "contextAvailabilitySubscriptions", "*" }, "",                                             badVerbPutDeleteOnly                     },
 
-  { "* InvalidRequest",       "*",     InvalidRequest,                0, { "*", "*", "*", "*", "*", "*"                     }, "",                                 badRequest                                           },
-  { "* *",                    "",      InvalidRequest,                0, {                                                  }, "",                                 NULL                                                 }
+  { "*",     InvalidRequest,                0, { "*", "*", "*", "*", "*", "*"                     }, "",                                 badRequest                                           },
+  { "",      InvalidRequest,                0, {                                                  }, "",                                 NULL                                                 }
 };
      
 

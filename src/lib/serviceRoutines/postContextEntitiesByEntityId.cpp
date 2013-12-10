@@ -52,6 +52,7 @@ std::string postContextEntitiesByEntityId(ConnectionInfo* ciP, int components, s
   // Now call postRegisterContext (postRegisterContext doesn't use the parameters 'components' and 'compV')
   std::string answer = postRegisterContext(ciP, components, compV, parseDataP);
   parseDataP->rpr.res.release();
+  parseDataP->rcr.res.release();
 
   return answer;
 }

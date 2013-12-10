@@ -35,9 +35,9 @@
 */
 static RestService rs[] = 
 {
-  { "GET LeakRequest",                            "GET",    LeakRequest,                           2, { "leak", "*"                                              }, "", leakTreat                                 },
-  { "GET LeakRequest",                            "GET",    LeakRequest,                           1, { "leak"                                                   }, "", leakTreat                                 },
-  { "* *",                                        "",       InvalidRequest,                        0, {                                                          }, "", NULL                                      }
+  { "GET",    LeakRequest,                           2, { "leak", "*"                                              }, "", leakTreat                                 },
+  { "GET",    LeakRequest,                           1, { "leak"                                                   }, "", leakTreat                                 },
+  { "",       InvalidRequest,                        0, {                                                          }, "", NULL                                      }
 };
 
 

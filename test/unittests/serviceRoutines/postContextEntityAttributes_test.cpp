@@ -45,9 +45,9 @@ using ::testing::Return;
 */
 static RestService rs[] = 
 {
-  { "POST ContextEntityAttributes",               "POST",   ContextEntityAttributes,               4, { "ngsi9", "contextEntities", "*", "attributes"        }, "", postContextEntityAttributes               },
-  { "* InvalidRequest",                           "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "* *",                                        "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "POST",   ContextEntityAttributes,               4, { "ngsi9", "contextEntities", "*", "attributes"        }, "", postContextEntityAttributes               },
+  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
+  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
 };
 
 

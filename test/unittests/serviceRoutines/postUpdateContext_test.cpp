@@ -45,9 +45,9 @@ using ::testing::Return;
 */
 static RestService rs[] = 
 {
-  { "POST UpdateContext",                         "POST",   UpdateContext,                         2, { "ngsi10", "updateContext"                            }, "", postUpdateContext                         },
-  { "* InvalidRequest",                           "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "* *",                                        "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "POST",   UpdateContext,                         2, { "ngsi10", "updateContext"                            }, "", postUpdateContext                         },
+  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
+  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
 };
 
 

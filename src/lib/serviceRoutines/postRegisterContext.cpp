@@ -81,8 +81,6 @@ static void registerContextForward(ConnectionInfo* ciP, ParseData* parseDataP, R
 
     /* New registration case */
     hsc = mongoRegisterContext(&parseDataP->rcr.res, rcrP);
-    if (hsc != SccOk)
-       LM_E(("mongoRegisterContext error %d", hsc));
 
     std::string payload  = parseDataP->rcr.res.render(RegisterContext, ciP->inFormat, "");
     std::string response = fordwardRegisterContext(fwdHost, fwdPort, payload);
