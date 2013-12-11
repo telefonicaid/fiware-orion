@@ -48,12 +48,12 @@ std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService
 {
   std::string result = "NONE";
 
-  LM_T(LmtParse, ("parsing data for service '%s'. Method: '%s'", requestType(service->request), ciP->method.c_str()));
-  LM_T(LmtParse, ("outFormat: %s", formatToString(ciP->outFormat)));
+  LM_T(LmtPayload, ("parsing data for service '%s'. Method: '%s'", requestType(service->request), ciP->method.c_str()));
+  LM_T(LmtPayload, ("outFormat: %s", formatToString(ciP->outFormat)));
 
   if (ciP->inFormat == XML)
   {
-    LM_T(LmtParse, ("Calling xmlTreat for service request %d, payloadWord '%s'", service->request, service->payloadWord.c_str()));
+    LM_T(LmtPayload, ("Calling xmlTreat for service request %d, payloadWord '%s'", service->request, service->payloadWord.c_str()));
     result = xmlTreat(ciP->payload, ciP, parseDataP, service->request, service->payloadWord, reqPP);
   }
   else if (ciP->inFormat == JSON)
@@ -64,8 +64,8 @@ std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService
     return "Bad inFormat";
   }
 
-  LM_T(LmtParse, ("result: '%s'", result.c_str()));
-  LM_T(LmtParse, ("outFormat: %s", formatToString(ciP->outFormat)));
+  LM_T(LmtPayload, ("result: '%s'", result.c_str()));
+  LM_T(LmtPayload, ("outFormat: %s", formatToString(ciP->outFormat)));
 
   if (result != "OK")
   {
@@ -136,9 +136,9 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     {
       std::string response;
 
-      LM_T(LmtParse, ("Parsing payload for URL '%s', method '%s', service vector index: %d", ciP->url.c_str(), ciP->method.c_str(), ix));
+      LM_T(LmtPayload, ("Parsing payload for URL '%s', method '%s', service vector index: %d", ciP->url.c_str(), ciP->method.c_str(), ix));
       response = payloadParse(ciP, &parseData, &serviceV[ix], &reqP, &jsonReqP);
-      LM_T(LmtParse, ("payloadParse returns '%s'", response.c_str()));
+      LM_T(LmtPayload, ("payloadParse returns '%s'", response.c_str()));
       if (response != "OK")
       {
         restReply(ciP, response);
