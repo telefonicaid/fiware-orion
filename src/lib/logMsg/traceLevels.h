@@ -52,7 +52,10 @@ typedef enum TraceLevels
 
   /* Parser (40-59) */
   LmtParse    = 40,
-  LmtPayload,
+  LmtInPayload,
+  LmtOutPayload,
+  LmtParsedPayload,
+
   LmtPresent,
   LmtNew,
   LmtTreat,
