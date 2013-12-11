@@ -247,57 +247,55 @@ typedef struct LogMsg
 *
 * LM_V - log verbose message
 */
-#define LM_V(s)                                                               \
-do {                                                                          \
-   char* text;                                                                \
-                                                                              \
-   if (lmOk('V', 0) == LmsOk)                                                 \
-   {                                                                          \
-      if ((text = lmTextGet s) != NULL)                                       \
-      {                                                                       \
-         lmOut(text, 'V', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
-         ::free(text);                                                        \
-      }                                                                       \
-   }                                                                          \
+#define LM_V(s)                                                            \
+do {                                                                       \
+  if (lmOk('V', 0) == LmsOk)                                               \
+  {                                                                        \
+    char* text;                                                            \
+                                                                           \
+    if ((text = lmTextGet s) != NULL)                                      \
+    {                                                                      \
+      lmOut(text, 'V', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
+      ::free(text);                                                        \
+    }                                                                      \
+  }                                                                        \
 } while (0)
 
-#define LM_V2(s)                                                              \
-do {                                                                          \
-   char* text;                                                                \
-                                                                              \
-   if (lmOk('2', 0) == LmsOk)                                                 \
-   {                                                                          \
-      if ((text = lmTextGet s) != NULL)                                       \
-      {                                                                       \
-         lmOut(text, '2', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
-         ::free(text);                                                        \
-      }                                                                       \
-   }                                                                          \
+#define LM_V2(s)                                                           \
+do {                                                                       \
+  if (lmOk('2', 0) == LmsOk)                                               \
+  {                                                                        \
+    char* text;                                                            \
+                                                                           \
+    if ((text = lmTextGet s) != NULL)                                      \
+    {                                                                      \
+      lmOut(text, '2', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
+      ::free(text);                                                        \
+    }                                                                      \
+  }                                                                        \
 } while (0)
 
 
-#define LM_V3(s)                                                              \
-do {                                                                          \
-   char* text;                                                                \
-                                                                              \
-   if (lmOk('3', 0) == LmsOk)                                                 \
-   {                                                                          \
-      if ((text = lmTextGet s) != NULL)                                       \
-      {                                                                       \
-         lmOut(text, '3', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
-         ::free(text);                                                        \
-      }                                                                       \
-   }                                                                          \
+#define LM_V3(s)                                                           \
+do {                                                                       \
+  if (lmOk('3', 0) == LmsOk)                                               \
+  {                                                                        \
+    char* text;                                                            \
+                                                                           \
+    if ((text = lmTextGet s) != NULL)                                      \
+    {                                                                      \
+      lmOut(text, '3', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
+      ::free(text);                                                        \
+    }                                                                      \
+  }                                                                        \
 } while (0)
 
 
 #define LM_V4(s)                                                              \
 do {                                                                          \
-   char* text;                                                                \
-                                                                              \
    if (lmOk('4', 0) == LmsOk)                                                 \
    {                                                                          \
-      if ((text = lmTextGet s) != NULL)                                       \
+      if ((char* text = lmTextGet s) != NULL)                                 \
       {                                                                       \
          lmOut(text, '4', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
          ::free(text);                                                        \
@@ -306,32 +304,32 @@ do {                                                                          \
 } while (0)
 
 
-#define LM_V5(s)                                                              \
-do {                                                                          \
-   char* text;                                                                \
-                                                                              \
-   if (lmOk('5', 0) == LmsOk)                                                 \
-   {                                                                          \
-      if ((text = lmTextGet s) != NULL)                                       \
-      {                                                                       \
-         lmOut(text, '5', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
-         ::free(text);                                                        \
-      }                                                                       \
-   }                                                                          \
+#define LM_V5(s)                                                            \
+do {                                                                        \
+  if (lmOk('5', 0) == LmsOk)                                                \
+  {                                                                         \
+    char* text;                                                             \
+                                                                            \
+    if ((text = lmTextGet s) != NULL)                                       \
+    {                                                                       \
+      lmOut(text, '5', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
+      ::free(text);                                                         \
+    }                                                                       \
+  }                                                                         \
 } while (0)
 
-#define LM_LV(s)                                                              \
-do {                                                                          \
-char* text;                                                                   \
-                                                                              \
-if (lmOk('V', 0) == LmsOk)                                                    \
-{                                                                             \
-if ((text = lmTextGet s) != NULL)                                             \
-{                                                                             \
-lmOut(text, 'V', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL,false);    \
-::free(text);                                                                 \
-}                                                                             \
-}                                                                             \
+#define LM_LV(s)                                                                 \
+do {                                                                             \
+  if (lmOk('V', 0) == LmsOk)                                                     \
+  {                                                                              \
+    char* text;                                                                  \
+                                                                                 \
+    if ((text = lmTextGet s) != NULL)                                            \
+    {                                                                            \
+      lmOut(text, 'V', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL,false); \
+      ::free(text);                                                              \
+    }                                                                            \
+  }                                                                              \
 } while (0)
 
 
@@ -346,15 +344,13 @@ lmOut(text, 'V', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL,false);    \
  * LM_LM - log message ( only local ) // Not hoock function
  */
 
-#define LM_LM(s)                                                             \
-do {                                                                         \
-char* text;                                                                  \
-                                                                             \
-if ((text = lmTextGet s) != NULL)                                            \
-{                                                                            \
-lmOut(text, 'M', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL , false); \
-::free(text);                                                                \
-}                                                                            \
+#define LM_LM(s)                                                                 \
+do {                                                                             \
+  if ((char* text = lmTextGet s) != NULL)                                        \
+  {                                                                              \
+    lmOut(text, 'M', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL , false); \
+    ::free(text);                                                                \
+  }                                                                              \
 } while (0)
 
 /* ****************************************************************************
@@ -362,15 +358,13 @@ lmOut(text, 'M', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL , false); \
  * LM_LW - log warning message ( only local ) // Not hoock function
  */
 
-#define LM_LW(s)                                                            \
-do {                                                                        \
-char* text;                                                                 \
-                                                                            \
-if ((text = lmTextGet s) != NULL)                                           \
-{                                                                           \
-lmOut(text, 'W', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL,false);  \
-::free(text);                                                               \
-}                                                                           \
+#define LM_LW(s)                                                               \
+do {                                                                           \
+  if ((char* text = lmTextGet s) != NULL)                                      \
+  {                                                                            \
+    lmOut(text, 'W', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL,false); \
+    ::free(text);                                                              \
+  }                                                                            \
 } while (0)
 
 
@@ -382,15 +376,15 @@ lmOut(text, 'W', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL,false);  \
 *
 * LM_M - log message
 */
-#define LM_M(s)                                                            \
-do {                                                                       \
-   char* text;                                                             \
-                                                                           \
-   if ((text = lmTextGet s) != NULL)                                       \
-   {                                                                       \
-      lmOut(text, 'M', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
-      ::free(text);                                                          \
-   }                                                                       \
+#define LM_M(s)                                                           \
+do {                                                                      \
+  char* text;                                                             \
+                                                                          \
+  if ((text = lmTextGet s) != NULL)                                       \
+  {                                                                       \
+    lmOut(text, 'M', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
+    ::free(text);                                                         \
+  }                                                                       \
 } while (0)
 #endif
 
@@ -402,15 +396,15 @@ do {                                                                       \
 *
 * LM_H - "hidden" log message
 */
-#define LM_H(s)                                                            \
-do {                                                                       \
-   char* text;                                                             \
-                                                                           \
-   if ((text = lmTextGet s) != NULL)                                       \
-   {                                                                       \
-      lmOut(text, 'H', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
-      ::free(text);                                                          \
-   }                                                                       \
+#define LM_H(s)                                                           \
+do {                                                                      \
+  char* text;                                                             \
+                                                                          \
+  if ((text = lmTextGet s) != NULL)                                       \
+  {                                                                       \
+    lmOut(text, 'H', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
+    ::free(text);                                                         \
+  }                                                                       \
 } while (0)
 #endif
 
@@ -422,15 +416,15 @@ do {                                                                       \
 *
 * LM_C - log message with timestamp
 */
-#define LM_S(s)                                                            \
-do {                                                                       \
-   char* text;                                                             \
-                                                                           \
-   if ((text = lmTextGet s) != NULL)                                       \
-   {                                                                       \
-      lmOut(text, 'S', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
-      ::free(text);                                                          \
-   }                                                                       \
+#define LM_S(s)                                                          \
+do {                                                                     \
+  char* text;                                                            \
+                                                                         \
+  if ((text = lmTextGet s) != NULL)                                      \
+  {                                                                      \
+    lmOut(text, 'S', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
+    ::free(text);                                                        \
+  }                                                                      \
 } while (0)
 #endif
 
@@ -442,15 +436,15 @@ do {                                                                       \
 *
 * LM_F - log message
 */
-#define LM_F(s)                                                          \
-do {                                                                     \
-   char* text;                                                           \
-                                                                         \
-   if ((text = lmTextGet s) != NULL)                                     \
-   {                                                                     \
-      lmOut(text, 'F', __FILE__, __LINE__, "***", 0, NULL);              \
-      ::free(text);                                                        \
-   }                                                                     \
+#define LM_F(s)                                                        \
+do {                                                                   \
+  char* text;                                                          \
+                                                                       \
+  if ((text = lmTextGet s) != NULL)                                    \
+  {                                                                    \
+    lmOut(text, 'F', __FILE__, __LINE__, "***", 0, NULL);              \
+    ::free(text);                                                      \
+  }                                                                    \
 } while (0)
 #endif
 
@@ -462,15 +456,15 @@ do {                                                                     \
 *
 * LM_W - log warning message
 */
-#define LM_W(s)                                                            \
-do {                                                                       \
-   char* text;                                                             \
-                                                                           \
-   if ((text = lmTextGet s) != NULL)                                       \
-   {                                                                       \
-      lmOut(text, 'W', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
-      ::free(text);                                                          \
-   }                                                                       \
+#define LM_W(s)                                                          \
+do {                                                                     \
+  char* text;                                                            \
+                                                                         \
+  if ((text = lmTextGet s) != NULL)                                      \
+  {                                                                      \
+    lmOut(text, 'W', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
+    ::free(text);                                                        \
+  }                                                                      \
 } while (0)
 #endif
 
@@ -484,26 +478,25 @@ do {                                                                       \
 * LM_E - log error message
 */
 
-#define LM_E(s)                                                            \
-do {                                                                       \
-   char* text;                                                             \
-                                                                           \
-   if ((text = lmTextGet s) != NULL)                                       \
-   {                                                                       \
-      lmOut(text, 'E', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
-      ::free(text);                                                          \
-   }                                                                       \
+#define LM_E(s)                                                           \
+do {                                                                      \
+  char* text;                                                             \
+  if ((text = lmTextGet s) != NULL)                                       \
+  {                                                                       \
+    lmOut(text, 'E', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
+    ::free(text);                                                         \
+  }                                                                       \
 } while (0)
 
-#define LM_LE(s)                                                            \
-do {                                                                       \
-char* text;                                                             \
-\
-if ((text = lmTextGet s) != NULL)                                       \
-{                                                                       \
-lmOut(text, 'E', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL,false); \
-::free(text);                                                          \
-}                                                                       \
+#define LM_LE(s)                                                               \
+do {                                                                           \
+  char* text;                                                                  \
+                                                                               \
+  if ((text = lmTextGet s) != NULL)                                            \
+  {                                                                            \
+    lmOut(text, 'E', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL,false); \
+    ::free(text);                                                              \
+  }                                                                            \
 } while (0)
 
 #endif
@@ -540,18 +533,18 @@ do {                                                                       \
 *
 * LMS_V - log verbose message
 */
-#define LMS_V(s)                                                                    \
-do {                                                                                \
-   char* text;                                                                      \
-                                                                                    \
-   if (lmOk('V', 0) == LmsOk)                                                       \
-   {                                                                                \
-      if ((text = lmTextGet s) != NULL)                                             \
-      {                                                                             \
-         lmAddMsgBuf(text, 'V', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
-         ::free(text);                                                                \
-      }                                                                             \
-   }                                                                                \
+#define LMS_V(s)                                                                  \
+do {                                                                              \
+  if (lmOk('V', 0) == LmsOk)                                                      \
+  {                                                                               \
+    char* text;                                                                   \
+                                                                                  \
+    if ((text = lmTextGet s) != NULL)                                             \
+    {                                                                             \
+      lmAddMsgBuf(text, 'V', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
+      ::free(text);                                                               \
+    }                                                                             \
+  }                                                                               \
 } while (0)
 #endif
 
@@ -570,7 +563,7 @@ do {                                                                            
    if ((text = lmTextGet s) != NULL)                                             \
    {                                                                             \
       lmAddMsgBuf(text, 'M', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
-      ::free(text);                                                                \
+      ::free(text);                                                              \
    }                                                                             \
 } while (0)
 #endif

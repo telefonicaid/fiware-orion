@@ -47,11 +47,9 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   QueryContextResponse     response;
   std::string              entityId      = compV[2];
   std::string              attributeName = compV[4];
-  std::string              valueId       = compV[5];
   EntityId*                eP            = new EntityId(entityId, "", "false");
   HttpStatusCode           s;
   StatusCode               sc;
-  std::string              out;
   ContextAttributeResponse car;
 
   request.entityIdVector.push_back(eP);
@@ -59,7 +57,7 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
 
   s = mongoQueryContext(&request, &response);
   if (s == SccOk)
-    LM_M(("Got %d replies for attribute-ID %s-%s", response.contextElementResponseVector.size(), attributeName.c_str(), valueId.c_str()));
+    LM_M(("Got %d replies for attribute-ID %s", response.contextElementResponseVector.size(), attributeName.c_str()));
 
   if (response.contextElementResponseVector.size() == 0)
   {

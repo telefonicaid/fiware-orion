@@ -266,9 +266,9 @@ void paUsage(void)
 		if ((aP->isBuiltin == false) && (firstUserOptionFound == false))
 		{
 			firstUserOptionFound = true;
-			strncat(paResultString, "\n",       sizeof(paResultString) - 1);
-			strncat(paResultString, spacePad,   sizeof(paResultString) - 1);
-			strncat(paResultString, "        ", sizeof(paResultString) - 1);
+			strncat(paResultString, "\n",       sizeof(paResultString) - 1 - strlen(paResultString));
+			strncat(paResultString, spacePad,   sizeof(paResultString) - 1 - strlen(paResultString));
+			strncat(paResultString, "        ", sizeof(paResultString) - 1 - strlen(paResultString));
 		}
 
 		if (PA_IS_OPTION(aP) && (aP->sort == PaOpt))

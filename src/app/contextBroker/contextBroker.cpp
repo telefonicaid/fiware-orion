@@ -611,7 +611,10 @@ int main(int argC, char* argV[])
 
   int r;
   if ((r = restStart()) != 0)
-     LM_X(1, ("restStart: error %d", r));
+  {
+    fprintf(stderr, "restStart: error %d\n", r);
+    LM_X(1, ("restStart: error %d", r));
+  }
 
   // Give the rest library the correct version string of this executable
   versionSet(ORION_VERSION);
