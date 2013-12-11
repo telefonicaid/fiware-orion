@@ -304,7 +304,6 @@ static int connectionTreat
     *con_cls         = (void*) ciP;
 
     ciP->callNo                    = 1;
-    ciP->httpHeaders.contentLength = 0;
     ciP->requestEntityTooLarge     = false;
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);

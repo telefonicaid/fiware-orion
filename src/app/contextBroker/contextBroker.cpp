@@ -484,7 +484,6 @@ void daemonize(void)
 void sigHandler(int sigNo)
 {
   int fd;
-  int s;
 
   LM_M(("In sigHandler - caught signal %d", sigNo));
 
@@ -504,7 +503,8 @@ void sigHandler(int sigNo)
     break;
 
   case SIGUSR2:
-    s  = lmPathRegister("/tmp", "DEF", "DEF", NULL);
+     // FIXME P7: "/tmp" ... Not always correct
+    lmPathRegister("/tmp", "DEF", "DEF", NULL);
     LM_M(("Caught SIGUSR2 - log goes on"));
     break;
   }
