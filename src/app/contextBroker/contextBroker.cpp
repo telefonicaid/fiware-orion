@@ -37,6 +37,7 @@
 
 #include "parseArgs/parseArgs.h"
 #include "parseArgs/paConfig.h"
+#include "parseArgs/paBuiltin.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -503,8 +504,7 @@ void sigHandler(int sigNo)
     break;
 
   case SIGUSR2:
-     // FIXME P7: "/tmp" ... Not always correct
-    lmPathRegister("/tmp", "DEF", "DEF", NULL);
+    lmPathRegister(paLogDir, "DEF", "DEF", NULL);
     LM_M(("Caught SIGUSR2 - log goes on"));
     break;
   }
