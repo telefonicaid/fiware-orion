@@ -48,12 +48,12 @@ std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService
 {
   std::string result = "NONE";
 
-  LM_T(LmtParse, ("parsing data for service '%s'. Method: '%s'", requestType(service->request), ciP->method.c_str()));
-  LM_T(LmtParse, ("outFormat: %s", formatToString(ciP->outFormat)));
+  LM_T(LmtParsedPayload, ("parsing data for service '%s'. Method: '%s'", requestType(service->request), ciP->method.c_str()));
+  LM_T(LmtParsedPayload, ("outFormat: %s", formatToString(ciP->outFormat)));
 
   if (ciP->inFormat == XML)
   {
-    LM_T(LmtParse, ("Calling xmlTreat for service request %d, payloadWord '%s'", service->request, service->payloadWord.c_str()));
+    LM_T(LmtParsedPayload, ("Calling xmlTreat for service request %d, payloadWord '%s'", service->request, service->payloadWord.c_str()));
     result = xmlTreat(ciP->payload, ciP, parseDataP, service->request, service->payloadWord, reqPP);
   }
   else if (ciP->inFormat == JSON)
@@ -64,8 +64,8 @@ std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService
     return "Bad inFormat";
   }
 
-  LM_T(LmtParse, ("result: '%s'", result.c_str()));
-  LM_T(LmtParse, ("outFormat: %s", formatToString(ciP->outFormat)));
+  LM_T(LmtParsedPayload, ("result: '%s'", result.c_str()));
+  LM_T(LmtParsedPayload, ("outFormat: %s", formatToString(ciP->outFormat)));
 
   if (result != "OK")
   {
@@ -136,9 +136,9 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     {
       std::string response;
 
-      LM_T(LmtParse, ("Parsing payload for URL '%s', method '%s', service vector index: %d", ciP->url.c_str(), ciP->method.c_str(), ix));
+      LM_T(LmtParsedPayload, ("Parsing payload for URL '%s', method '%s', service vector index: %d", ciP->url.c_str(), ciP->method.c_str(), ix));
       response = payloadParse(ciP, &parseData, &serviceV[ix], &reqP, &jsonReqP);
-      LM_T(LmtParse, ("payloadParse returns '%s'", response.c_str()));
+      LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
       if (response != "OK")
       {
         restReply(ciP, response);
@@ -153,22 +153,18 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       }
     }
 
-    LM_T(LmtHeavyTest, ("Treating service %s %s", serviceV[ix].verb.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
+    LM_T(LmtService, ("Treating service %s %s", serviceV[ix].verb.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
     statisticsUpdate(serviceV[ix].request, ciP->inFormat);
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
     if (reqP != NULL)
     {
-      LM_T(LmtMetadataDoubleFree, ("releasing parseData '%s'", reqP->keyword.c_str()));
       reqP->release(&parseData);
-      LM_T(LmtMetadataDoubleFree, ("parseData released"));
     }
 
     if (jsonReqP != NULL)
     {
-      LM_T(LmtMetadataDoubleFree, ("releasing parseData '%s'", jsonReqP->keyword.c_str()));
       jsonReqP->release(&parseData);
-      LM_T(LmtMetadataDoubleFree, ("parseData released"));
     }
 
     compV.clear();

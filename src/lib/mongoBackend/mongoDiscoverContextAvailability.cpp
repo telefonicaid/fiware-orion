@@ -257,9 +257,7 @@ HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityReque
   }
 
   HttpStatusCode hsCode = conventionalDiscoverContextAvailability(requestP, responseP);
-  if (hsCode == SccOk)
-    LM_T(LmtHeavyTest, ("/NGSI9/discoverContextAvailability OK"));
-  else
+  if (hsCode != SccOk)
     ++noOfDiscoveryErrors;
 
   LM_SR(hsCode);

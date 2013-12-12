@@ -58,6 +58,7 @@ typedef struct ConnectionInfo
     outFormat      = XML;
     charset        = "";
     httpStatusCode = SccOk;
+    fractioned     = false;
 
     if      (_method == "POST")    verb = POST;
     else if (_method == "PUT")     verb = PUT;
@@ -82,7 +83,8 @@ typedef struct ConnectionInfo
   char                      payloadWord[64];
   std::string               answer;
   MHD_PostProcessor*        postProcessor;
-   
+  bool                      fractioned;
+
   // Outgoing
   HttpStatusCode            httpStatusCode;
   std::vector<std::string>  httpHeader;

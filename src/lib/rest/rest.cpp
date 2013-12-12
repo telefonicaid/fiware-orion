@@ -76,11 +76,15 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "host") == 0)            headerP->host           = value;
   else if (strcasecmp(key.c_str(), "accept") == 0)          headerP->accept         = value;
   else if (strcasecmp(key.c_str(), "expect") == 0)          headerP->expect         = value;
+  else if (strcasecmp(key.c_str(), "connection") == 0)      headerP->connection     = value;
   else if (strcasecmp(key.c_str(), "content-type") == 0)    headerP->contentType    = value;
   else if (strcasecmp(key.c_str(), "content-length") == 0)  headerP->contentLength  = atoi(value);
   else
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
 
+
+  if ((headerP->connection != "") && (headerP->connection != "close"))
+     LM_W(("connection '%s' - currently not supported, sorry ..."));
 
   /* Note that the strategy to "fix" the Content-Type is to replace the ";" with 0
    * to "deactivate" this part of the string in the checking done at connectionTreat() */
@@ -393,12 +397,17 @@ static int connectionTreat
 
     if (ciP->httpHeaders.contentLength == 0)
     {
+      if (ciP->fractioned == true)
+        LM_T(LmtRest, ("Received entire payload of fractioned message (%d bytes)", ciP->httpHeaders.contentLength));
       restService(ciP, restServiceV);
       return MHD_YES;
     }
   }
   else if ((*upload_data_size < ciP->httpHeaders.contentLength) && (*upload_data_size != 0))
+  {
     LM_T(LmtIncompletePayload, ("Got INCOMPLETE POST payload (%d accumulated bytes): '%s'", *upload_data_size, upload_data));
+    ciP->fractioned = true;
+  }
   else if (*upload_data_size == 0)
   {
     if (ciP->requestEntityTooLarge == true)
@@ -411,7 +420,9 @@ static int connectionTreat
     }
     else
     {
-      LM_T(LmtService, ("Calling restService '%s' with payload: '%s'", ciP->url.c_str(), ciP->payload));
+      LM_T(LmtInPayload, ("Calling restService '%s' with payload: '%s'", ciP->url.c_str(), ciP->payload));
+      if (ciP->fractioned == true)
+        LM_T(LmtRest, ("Received entire payload of fractioned message (%d bytes)", ciP->httpHeaders.contentLength));
       restService(ciP, restServiceV);
     }
   }
