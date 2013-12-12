@@ -2373,7 +2373,6 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
         lrV[i].offset = oldOffset;
         lrV[i].remove = false;
 
-        // line[strlen(line) - 1] = 0;
         LOG_OUT(("got line %d: '%s'", i, line));
         oldOffset = ftell(fP);
         ++i;
