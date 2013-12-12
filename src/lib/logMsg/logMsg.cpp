@@ -1443,7 +1443,7 @@ char* lmTextGet(const char* format, ...)
     va_start(args, format);
 
     /* Print message to variable */
-    vsnprintf(vmsg, sizeof(vmsg), format, args);
+    vsnprintf(vmsg, LINE_MAX, format, args);
     va_end(args);
 
     return vmsg;
@@ -2111,13 +2111,14 @@ LmStatus lmReopen(int index)
     
     while (true)
     {
-        char line[LINE_MAX];
-        int len;
-        int nb;
+        char* line = (char*) calloc(1, LINE_MAX);
+        int   len;
+        int   nb;
 
         if (fgets(line, LINE_MAX, fP) == NULL)
         {
             s = LmsFgets;
+            free(line);
             break;
         }
 
@@ -2137,15 +2138,18 @@ LmStatus lmReopen(int index)
             if (write(fd, buf, strlen(buf)) != (int) strlen(buf))
             {
                 s = LmsWrite;
+                free(line);
                 break;
             }   
             ++newLogLines;
+            free(line);
             break;
         }
         
         if ((nb = write(fd, line, len)) != len)
         {
             s = LmsWrite;
+            free(line);
             break;
         }
         else
@@ -2185,9 +2189,9 @@ LmStatus lmReopen(int index)
 */
 long lmLogLineGet(char* typeP, char* dateP, int* msP, char* progNameP, char* fileNameP, int* lineNoP, int* pidP, int* tidP, char* funcNameP, char* messageP, long offset, char** allP)
 {
-    static FILE*  fP = NULL;
-    char          line[LINE_MAX];
-    char*         lineP = line;
+    static FILE*  fP     = NULL;
+    char*         line   = (char*) calloc(1, LINE_MAX);
+    char*         lineP  = line;
     char*         delimiter;
     long          ret;
     char*         nada;
@@ -2200,6 +2204,7 @@ long lmLogLineGet(char* typeP, char* dateP, int* msP, char* progNameP, char* fil
         if (fP != NULL)
             fclose(fP);
         fP = NULL;
+        free(line);
         return 0;
     }
 
@@ -2209,6 +2214,7 @@ long lmLogLineGet(char* typeP, char* dateP, int* msP, char* progNameP, char* fil
         if ((fP = fopen(fds[0].info, "r")) == NULL)
         {
             // printf("error opening log file '%s'\n", fds[0].info);
+            free(line);
             return -1;
         }
 
@@ -2231,6 +2237,7 @@ long lmLogLineGet(char* typeP, char* dateP, int* msP, char* progNameP, char* fil
     {
         fclose(fP);
         fP = NULL;
+        free(line);
         return -2; // EOF
     }
 
@@ -2287,9 +2294,11 @@ long lmLogLineGet(char* typeP, char* dateP, int* msP, char* progNameP, char* fil
 
     ret = ftell(fP);
     // printf("Line parsed - returning %lu\n", ret);
+    free(line);
     return ret;
 
 lmerror:
+    free(line);
     fclose(fP);
     fP = NULL;
     // printf("Error in line: %s", lineP);
