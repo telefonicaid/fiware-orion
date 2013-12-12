@@ -250,6 +250,7 @@ static Format wantedOutputSupported(std::string acceptList, std::string* charset
 *
 * upload_data_size has to do with payload and only valid for such requests.
 */
+static int requests = 0;
 static int connectionTreat
 (
    void*            cls,
@@ -263,7 +264,6 @@ static int connectionTreat
 )
 {
   ConnectionInfo* ciP      = (ConnectionInfo*) *con_cls;
-  static int      requests = 0;
 
   if (ciP == NULL)
     ++requests;
@@ -304,7 +304,6 @@ static int connectionTreat
     *con_cls         = (void*) ciP;
 
     ciP->callNo                    = 1;
-    ciP->httpHeaders.contentLength = 0;
     ciP->requestEntityTooLarge     = false;
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
@@ -459,7 +458,7 @@ int restStart(void)
 
   int ret = inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr));
   if (ret != 1) {
-    LM_RE(1, ("could not parse bind IP address %s", bindIp));
+    LM_RE(2, ("could not parse bind IP address %s", bindIp));
   }
 
   sad.sin_family = AF_INET;
@@ -481,7 +480,7 @@ int restStart(void)
                                MHD_OPTION_END);
   
   if (mhdDaemon == NULL)
-     LM_RE(1, ("MHD_start_daemon failed"));
+     LM_RE(3, ("MHD_start_daemon failed"));
 
   return 0;
 }

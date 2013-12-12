@@ -77,10 +77,8 @@ static void registerContextForward(ConnectionInfo* ciP, ParseData* parseDataP, R
   /* Forward registerContext */
   if (parseDataP->rcr.res.registrationId.isEmpty())
   {
-    HttpStatusCode hsc;
-
     /* New registration case */
-    hsc = mongoRegisterContext(&parseDataP->rcr.res, rcrP);
+    mongoRegisterContext(&parseDataP->rcr.res, rcrP);
 
     std::string payload  = parseDataP->rcr.res.render(RegisterContext, ciP->inFormat, "");
     std::string response = fordwardRegisterContext(fwdHost, fwdPort, payload);

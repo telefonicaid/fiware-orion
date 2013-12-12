@@ -37,8 +37,9 @@
 *
 * EntityId - 
 */
-typedef struct EntityId
+class EntityId
 {
+public:
   std::string  id;         // Mandatory
   std::string  type;       // Optional
   std::string  isPattern;  // Optional
@@ -54,6 +55,6 @@ typedef struct EntityId
   void         fill(std::string _id, std::string _type, std::string _isPattern);
   void         present(std::string indent, int ix);
   void         release(void);
-} EntityId;
+};
 
 #endif

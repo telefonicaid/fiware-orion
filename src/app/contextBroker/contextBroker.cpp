@@ -37,6 +37,7 @@
 
 #include "parseArgs/parseArgs.h"
 #include "parseArgs/paConfig.h"
+#include "parseArgs/paBuiltin.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -484,7 +485,6 @@ void daemonize(void)
 void sigHandler(int sigNo)
 {
   int fd;
-  int s;
 
   LM_M(("In sigHandler - caught signal %d", sigNo));
 
@@ -504,7 +504,7 @@ void sigHandler(int sigNo)
     break;
 
   case SIGUSR2:
-    s  = lmPathRegister("/tmp", "DEF", "DEF", NULL);
+    lmPathRegister(paLogDir, "DEF", "DEF", NULL);
     LM_M(("Caught SIGUSR2 - log goes on"));
     break;
   }
@@ -611,7 +611,10 @@ int main(int argC, char* argV[])
 
   int r;
   if ((r = restStart()) != 0)
-     LM_X(1, ("restStart: error %d", r));
+  {
+    fprintf(stderr, "restStart: error %d\n", r);
+    LM_X(1, ("restStart: error %d", r));
+  }
 
   // Give the rest library the correct version string of this executable
   versionSet(ORION_VERSION);

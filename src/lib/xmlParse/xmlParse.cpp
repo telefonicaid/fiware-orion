@@ -66,12 +66,14 @@ void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std
       int r;
 
       if ((r = parseVector[ix].treat(node, reqDataP)) != 0)
+      {
+        fprintf(stderr, "parse vector treat function error: %d\n", r);
         LM_E(("parse vector treat function error: %d", r));
+      }
 
       treated = true;
       break;
     }
-
   }
 
   if (treated == false)
