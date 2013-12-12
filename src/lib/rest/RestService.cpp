@@ -153,22 +153,18 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       }
     }
 
-    LM_T(LmtHeavyTest, ("Treating service %s %s", serviceV[ix].verb.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
+    LM_T(LmtService, ("Treating service %s %s", serviceV[ix].verb.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
     statisticsUpdate(serviceV[ix].request, ciP->inFormat);
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
     if (reqP != NULL)
     {
-      LM_T(LmtMetadataDoubleFree, ("releasing parseData '%s'", reqP->keyword.c_str()));
       reqP->release(&parseData);
-      LM_T(LmtMetadataDoubleFree, ("parseData released"));
     }
 
     if (jsonReqP != NULL)
     {
-      LM_T(LmtMetadataDoubleFree, ("releasing parseData '%s'", jsonReqP->keyword.c_str()));
       jsonReqP->release(&parseData);
-      LM_T(LmtMetadataDoubleFree, ("parseData released"));
     }
 
     compV.clear();

@@ -46,7 +46,6 @@ typedef enum TraceLevels
   LmtHttpDaemon,
   LmtHttpUnsupportedHeader,
   LmtMhd,
-  LmtRestReply,
   LmtSavedResponse,
   LmtIncompletePayload,
 
@@ -63,8 +62,8 @@ typedef enum TraceLevels
   LmtNullNode,
 
   /* RestService and Service (60-79) */
-  LmtConvenience = 60,
-  LmtService,
+  LmtService     = 60,
+  LmtConvenience,
 
   /* ConvenienceMap (80-99) */
   LmtClone = 80,
@@ -75,7 +74,6 @@ typedef enum TraceLevels
   /* Cleanup (120-139) */
   LmtDestructor = 120,
   LmtRelease,
-  LmtMetadataDoubleFree,
 
   /* Types (140-159) */
   LmtEntityId = 140,
@@ -89,9 +87,6 @@ typedef enum TraceLevels
   LmtCm = 180,
   LmtIotaXmlReg,
   LmtIotaXmlObs,
-
-  LmtHeavyTest = 255
-
 } TraceLevels;
 
 
