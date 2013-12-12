@@ -56,8 +56,6 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   request.attributeList.push_back(attributeName);
 
   s = mongoQueryContext(&request, &response);
-  if (s == SccOk)
-    LM_M(("Got %d replies for attribute-ID %s", response.contextElementResponseVector.size(), attributeName.c_str()));
 
   if (response.contextElementResponseVector.size() == 0)
   {

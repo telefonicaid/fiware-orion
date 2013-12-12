@@ -85,12 +85,12 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, xml_invalidEntityAttribute)
 */
 TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
 {
-  ParseData       reqData;
+  ParseData       parseData;
   const char*     fileName = "updateContextAvailabilitySubscriptionRequest_ok.json";
   ConnectionInfo  ci("", "POST", "1.1");
-  std::string     expected1 =   "{\n  \"entities\" : [\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"ConferenceRoom\"\n    },\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"OfficeRoom\"\n    }\n  ]\n  \"attributeList\" : {\n    \"attribute\" : \"temperature\",\n    \"attribute\" : \"occupancy\",\n    \"attribute\" : \"lightstatus\"\n  }\n  \"duration\" : \"PT1M\",\n  \"restriction\" : {\n    \"attributeExpression\" : \"AE\"\n    \"scope\" : {\n      \"operationScope\" : {\n        \"type\" : \"st1\"\n        \"value\" : \"1\"\n      }\n      \"operationScope\" : {\n        \"type\" : \"st2\"\n        \"value\" : \"2\"\n      }\n    }\n  }\n  \"subscriptionId\" : \"012345678901234567890123\"\n}\n";
-  std::string     expected2 = "{\n  \"entities\" : [\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"ConferenceRoom\"\n    },\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"OfficeRoom\"\n    }\n  ]\n  \"attributeList\" : {\n    \"attribute\" : \"temperature\",\n    \"attribute\" : \"occupancy\",\n    \"attribute\" : \"lightstatus\"\n  }\n  \"duration\" : \"PT1M\",\n  \"restriction\" : {\n    \"attributeExpression\" : \"AE\"\n    \"scope\" : {\n      \"operationScope\" : {\n        \"type\" : \"st1\"\n        \"value\" : \"1\"\n      }\n      \"operationScope\" : {\n        \"type\" : \"st2\"\n        \"value\" : \"2\"\n      }\n    }\n  }\n  \"subscriptionId\" : \"012345678901234567890123\"\n}\n";
-  std::string     expected3 = "{\n  \"entities\" : [\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"ConferenceRoom\"\n    },\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"OfficeRoom\"\n    }\n  ]\n  \"attributeList\" : {\n    \"attribute\" : \"temperature\",\n    \"attribute\" : \"occupancy\",\n    \"attribute\" : \"lightstatus\"\n  }\n  \"duration\" : \"PT1M\",\n  \"restriction\" : {\n    \"attributeExpression\" : \"AE\"\n    \"scope\" : {\n      \"operationScope\" : {\n        \"type\" : \"st1\"\n        \"value\" : \"1\"\n      }\n      \"operationScope\" : {\n        \"type\" : \"st2\"\n        \"value\" : \"2\"\n      }\n    }\n  }\n  \"subscriptionId\" : \"012345678901234567890123\"\n}\n";
+  std::string     expected1 =   "{\n  \"entities\" : [\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"ConferenceRoom\"\n    },\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"OfficeRoom\"\n    }\n  ],\n  \"attributeList\" : {\n    \"attribute\" : \"temperature\",\n    \"attribute\" : \"occupancy\",\n    \"attribute\" : \"lightstatus\"\n  },\n  \"duration\" : \"PT1M\",\n  \"restriction\" : {\n    \"attributeExpression\" : \"AE\"\n    \"scope\" : {\n      \"operationScope\" : {\n        \"type\" : \"st1\"\n        \"value\" : \"1\"\n      }\n      \"operationScope\" : {\n        \"type\" : \"st2\"\n        \"value\" : \"2\"\n      }\n    }\n  },\n  \"subscriptionId\" : \"012345678901234567890123\"\n}\n";
+  std::string     expected2 = "{\n  \"entities\" : [\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"ConferenceRoom\"\n    },\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"OfficeRoom\"\n    }\n  ],\n  \"attributeList\" : {\n    \"attribute\" : \"temperature\",\n    \"attribute\" : \"occupancy\",\n    \"attribute\" : \"lightstatus\"\n  },\n  \"duration\" : \"PT1M\",\n  \"restriction\" : {\n    \"attributeExpression\" : \"AE\"\n    \"scope\" : {\n      \"operationScope\" : {\n        \"type\" : \"st1\"\n        \"value\" : \"1\"\n      }\n      \"operationScope\" : {\n        \"type\" : \"st2\"\n        \"value\" : \"2\"\n      }\n    }\n  },\n  \"subscriptionId\" : \"012345678901234567890123\"\n}\n";
+  std::string     expected3 = "{\n  \"entities\" : [\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"ConferenceRoom\"\n    },\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"OfficeRoom\"\n    }\n  ],\n  \"attributeList\" : {\n    \"attribute\" : \"temperature\",\n    \"attribute\" : \"occupancy\",\n    \"attribute\" : \"lightstatus\"\n  },\n  \"duration\" : \"PT1M\",\n  \"restriction\" : {\n    \"attributeExpression\" : \"AE\"\n    \"scope\" : {\n      \"operationScope\" : {\n        \"type\" : \"st1\"\n        \"value\" : \"1\"\n      }\n      \"operationScope\" : {\n        \"type\" : \"st2\"\n        \"value\" : \"2\"\n      }\n    }\n  },\n  \"subscriptionId\" : \"012345678901234567890123\"\n}\n";
   std::string     rendered;
   std::string     check;
 
@@ -100,14 +100,17 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
   lmTraceLevelSet(LmtDump, true);
-  std::string result = jsonTreat(testBuf, &ci, &reqData, UpdateContextAvailabilitySubscription, "updateContextAvailabilitySubscriptionRequest", NULL);
+  LM_M(("Before jsonTreat: parseData.ucas.restrictions == %d", parseData.ucas.restrictions));
+  std::string result = jsonTreat(testBuf, &ci, &parseData, UpdateContextAvailabilitySubscription, "updateContextAvailabilitySubscriptionRequest", NULL);
+  LM_M(("After jsonTreat: parseData.ucas.restrictions == %d", parseData.ucas.restrictions));
   lmTraceLevelSet(LmtDump, false);
   EXPECT_EQ("OK", result) << "this test should be OK";
 
-  UpdateContextAvailabilitySubscriptionRequest* ucasP = &reqData.ucas.res;
+  UpdateContextAvailabilitySubscriptionRequest* ucasP = &parseData.ucas.res;
+  LM_M(("New pointer: ucasP->restrictions = %d", ucasP->restrictions));
 
   rendered = ucasP->render(UpdateContextAvailabilitySubscription, JSON, "");
-  EXPECT_EQ(expected1, rendered);
+  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
 
   check = ucasP->check(UpdateContextAvailabilitySubscription, JSON, "", "predetected error", 0);
   EXPECT_EQ(expected2, rendered);
@@ -121,7 +124,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
 
 /* ****************************************************************************
 *
-* json_ok - 
+* json_invalidIsPattern - 
 */
 TEST(UpdateContextAvailabilitySubscriptionRequest, json_invalidIsPattern)
 {

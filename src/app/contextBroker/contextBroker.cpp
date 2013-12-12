@@ -486,7 +486,7 @@ void sigHandler(int sigNo)
 {
   int fd;
 
-  LM_M(("In sigHandler - caught signal %d", sigNo));
+  LM_F(("In sigHandler - caught signal %d", sigNo));
 
   switch (sigNo)
   {
@@ -497,15 +497,15 @@ void sigHandler(int sigNo)
 
   case SIGUSR1:
     fd = lmFirstDiskFileDescriptor();
-    LM_M(("Caught SIGUSR1 - inhibiting logs (on fd %d) until SIGUSR2 arrives", fd));
+    LM_F(("Caught SIGUSR1 - inhibiting logs (on fd %d) until SIGUSR2 arrives", fd));
     lmFdUnregister(fd);
     close(fd);
-    LM_M(("Caught SIGUSR1 - this message should not be seen in log file, only on stdout"));
+    LM_F(("Caught SIGUSR1 - this message should not be seen in log file, only on stdout"));
     break;
 
   case SIGUSR2:
     lmPathRegister(paLogDir, "DEF", "DEF", NULL);
-    LM_M(("Caught SIGUSR2 - log goes on"));
+    LM_F(("Caught SIGUSR2 - log goes on"));
     break;
   }
 }
@@ -566,7 +566,7 @@ int main(int argC, char* argV[])
 
   pidFile();
 
-  LM_M(("Opening mongo connection"));
+  LM_F(("Opening mongo connection"));
   std::string entitiesCollection                      = std::string(dbName) + ".entities";
   std::string registrationCollection                  = std::string(dbName) + ".registrations";
   std::string subscribeContextCollection              = std::string(dbName) + ".csubs";
@@ -575,7 +575,7 @@ int main(int argC, char* argV[])
 
   if (!mongoConnect(dbHost, dbName, user, pwd))
     LM_X(1, ("MongoDB error"));
-  LM_M(("Connected to %s:%s as user %s", dbHost, dbName, user));
+  LM_F(("Connected to %s:%s as user %s", dbHost, dbName, user));
 
   setEntitiesCollectionName(entitiesCollection.c_str());
   setRegistrationsCollectionName(registrationCollection.c_str());
@@ -590,13 +590,13 @@ int main(int argC, char* argV[])
   setNotifier(new Notifier());
 
   if (ngsi9Only)
-      LM_M(("Running in NGSI9 only mode"));
+      LM_F(("Running in NGSI9 only mode"));
 
   /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (only if not ngsi9 mode) */
   if (!ngsi9Only)
      recoverOntimeIntervalThreads();
 
-  LM_M(("Listening on port %d", port));
+  LM_F(("Listening on port %d", port));
   if (ngsi9Only)
     restInit(localIp, port, restServiceNgsi9V);
   else

@@ -145,6 +145,7 @@ static std::string restriction(std::string path, std::string value, ParseData* r
   LM_T(LmtParse, ("Got a restriction"));
 
   ++reqDataP->ucas.restrictions;
+  ++reqDataP->ucas.res.restrictions;
 
   return "OK";
 }
