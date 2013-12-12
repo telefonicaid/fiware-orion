@@ -68,10 +68,6 @@ std::string SubscribeContextRequest::render(RequestType requestType, Format form
   bool         commaAfterAttributeList         = referenceRendered || durationRendered || restrictionRendered ||notifyConditionVectorRendered || throttlingRendered;
   bool         commaAfterEntityIdVector        = attributeListRendered || referenceRendered || durationRendered || restrictionRendered ||notifyConditionVectorRendered || throttlingRendered;
 
-  LM_M(("notifyConditionVectorRendered == %s", notifyConditionVectorRendered? "true" : "false"));
-  LM_M(("throttlingRendered == %s", throttlingRendered? "true" : "false"));
-  LM_M(("commaAfterRestriction == %s", commaAfterRestriction? "true" : "false"));
-
   out += startTag(indent, tag, format, false);
   out += entityIdVector.render(format, indent2, commaAfterEntityIdVector);
   out += attributeList.render(format, indent2, commaAfterAttributeList);
