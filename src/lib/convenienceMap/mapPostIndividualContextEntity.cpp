@@ -48,8 +48,6 @@ HttpStatusCode mapPostIndividualContextEntity(std::string entityId, AppendContex
   UpdateContextResponse  ucResponse;
   ContextElement*        ceP = new ContextElement();
 
-  LM_T(LmtMetadataDoubleFree, ("In mapPostIndividualContextEntity"));
-
   ceP->entityId.fill(entityId, "", "false");
   ceP->attributeDomainName    = request->attributeDomainName;
   ceP->contextAttributeVector.fill(request->contextAttributeVector); // Here I get a pointer to the metadata that is freed twice ...
@@ -57,16 +55,13 @@ HttpStatusCode mapPostIndividualContextEntity(std::string entityId, AppendContex
   ucRequest.contextElementVector.push_back(ceP);
   ucRequest.updateActionType.set("Append");
 
-  LM_T(LmtMetadataDoubleFree, ("Calling mongoUpdateContext"));
   ms = mongoUpdateContext(&ucRequest, &ucResponse);
-  LM_T(LmtMetadataDoubleFree, ("Back from mongoUpdateContext"));
 
   ContextAttributeResponse* car                      = new ContextAttributeResponse();
   ContextElementResponse*   ucContextElementResponse = ucResponse.contextElementResponseVector.get(0);
 
   car->contextAttributeVector.vec.clear();
 
-  LM_T(LmtMetadataDoubleFree, ("Copying contextAttributeVector from ucContextElementResponse"));
   for (unsigned caIx = 0; caIx < ucContextElementResponse->contextElement.contextAttributeVector.size(); ++caIx)
   {
      LM_T(LmtClone, ("Copying ContextAttribute %d", caIx));
@@ -79,11 +74,8 @@ HttpStatusCode mapPostIndividualContextEntity(std::string entityId, AppendContex
   response->contextResponseVector.push_back(car);
   response->errorCode.fill(&ucResponse.contextElementResponseVector.get(0)->statusCode);
 
-  LM_T(LmtMetadataDoubleFree, ("\n----------- Releasing UpdateContextRequest ---------------------------"));
   ucRequest.release();
-  LM_T(LmtMetadataDoubleFree, ("\n----------- Releasing UpdateContextResponse ---------------------------"));
   ucResponse.release();
-  LM_T(LmtMetadataDoubleFree, ("\n----------- Two release DONE ---------------------------"));
 
   return ms;
 }

@@ -42,6 +42,7 @@ typedef struct HttpHeaders
   std::string   expect;
   std::string   contentType;
   unsigned int  contentLength;
+  std::string   connection;
 } HttpHeaders;
 
 #endif
