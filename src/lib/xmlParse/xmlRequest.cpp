@@ -258,7 +258,6 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
   //
   if (reqPP != NULL)
   {
-    LM_T(LmtMetadataDoubleFree, ("Saving pointer to '%s' to free later (hope it hasn't been freed already ...)", reqP->keyword.c_str()));
     *reqPP = reqP;
   }
 

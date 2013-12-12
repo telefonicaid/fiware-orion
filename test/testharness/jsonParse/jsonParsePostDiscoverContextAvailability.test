@@ -104,7 +104,7 @@ echo "+++++ Starting +++++++++++++++"
   "duration": "PT1M"
 }
 EOF
-echo "+++++ Registration Done +++++++++++++++"
+echo "+++++ Registration 1 Done +++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
 {
@@ -139,14 +139,96 @@ echo "+++++ Registration Done +++++++++++++++"
   }
 }
 EOF
-echo "+++++ Discovery Done +++++++++++++++"
+echo "+++++ Discovery 1 Done +++++++++++++++"
+echo "+++++ Register 2: two attributes in vector +++++++++++++++"
+(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "type": "Room",
+          "isPattern": "false",
+          "id": "BathRoom"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "isDomain": "false",
+          "metadatas": [
+            {
+              "name": "ID",
+              "type": "string",
+              "value": "1110"
+            }
+          ]
+        },
+        {
+          "name": "pressure",
+          "type": "bar",
+          "isDomain": "false",
+          "metadatas": [
+            {
+              "name": "ID",
+              "type": "string",
+              "value": "1110"
+            }
+          ]
+        }
+      ],
+      "metadatas": [
+        {
+          "name": "ID",
+          "type": "string",
+          "value": "2212"
+        }
+      ],
+      "providingApplication": "http://192.168.100.1:70/application"
+    }
+  ],
+  "duration": "PT1M"
+}
+EOF
+echo "+++++ Registration 2 Done +++++++++++++++"
+
+(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
+{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "BathRoom"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "pressure"
+  ],
+  "restriction": {
+    "attributeExpression" : "Attribute Expression",
+    "scopes": [
+      {
+        "type" : "st1",
+        "value" : "sv1"
+      },
+      {
+        "type" : "st2",
+        "value" : "sv2"
+      }
+    ]
+  }
+}
+EOF
+echo "+++++ Discovery 2 Done +++++++++++++++"
 --REGEXPECT--
 +++++ Starting +++++++++++++++
 {
   "duration" : "PT1M",
   "registrationId" : "REGEX([0-9a-f]{24})"
 }
-+++++ Registration Done +++++++++++++++
++++++ Registration 1 Done +++++++++++++++
 {
   "contextRegistrationResponses" : [
     {
@@ -175,7 +257,42 @@ echo "+++++ Discovery Done +++++++++++++++"
     }
   ]
 }
-+++++ Discovery Done +++++++++++++++
++++++ Discovery 1 Done +++++++++++++++
++++++ Register 2: two attributes in vector +++++++++++++++
+{
+  "duration" : "PT1M",
+  "registrationId" : "REGEX([0-9a-f]{24})"
+}
++++++ Registration 2 Done +++++++++++++++
+{
+  "contextRegistrationResponses" : [
+    {
+      "contextRegistration" : {
+        "entities" : [
+          {
+            "type" : "Room",
+            "isPattern" : "false",
+            "id" : "BathRoom"
+          }
+        ],
+        "attributes" : [
+          {
+            "name" : "temperature",
+            "type" : "degree",
+            "isDomain" : "false"
+          },
+          {
+            "name" : "pressure",
+            "type" : "bar",
+            "isDomain" : "false"
+          }
+        ],
+        "providingApplication" : "http://192.168.100.1:70/application"
+      }
+    }
+  ]
+}
++++++ Discovery 2 Done +++++++++++++++
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})
