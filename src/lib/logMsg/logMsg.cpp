@@ -125,8 +125,7 @@ char         progNameV[512];         /* where to store progName            */
 #define SUB              1
 #define TRACE_LEVELS     256
 #define FDS_MAX          2
-// FIXME : duplicate LINE_MAX, with some registers appears "LM ERROR: LINE TOO LONG"
-#define LINE_MAX         16384 
+#define LINE_MAX         (16 * 1024)
 #define TEXT_MAX         512
 #define FORMAT_LEN       512
 #define FORMAT_DEF       "TYPE:DATE:TID:EXEC/FILE[LINE] FUNC: TEXT"
@@ -647,14 +646,14 @@ static char* timeGet(int index, char* line, int lineSize)
 *
 * timeStampGet - 
 */
-static char* timeStampGet(char *line)
+static char* timeStampGet(char* line, int len)
 {
     struct timeval tv;
     
 
     gettimeofday(&tv, NULL);
 
-    snprintf(line, LINE_MAX, "timestamp: %d.%.6d secs\n", (int)tv.tv_sec, (int)tv.tv_usec);
+    snprintf(line, len, "timestamp: %d.%.6d secs\n", (int)tv.tv_sec, (int)tv.tv_usec);
     
     return line;
 }
@@ -1438,26 +1437,16 @@ LmStatus lmAux(char* a)
 char* lmTextGet(const char* format, ...)
 {
     va_list        args;
-    char           vmsg[LINE_MAX/2];
-    char*          allocedString;
-    // Goyo. Removing '\n' end of log line
-    //char*          nl;
+    char*          vmsg = (char*) calloc(1, LINE_MAX);
 
     /* "Parse" the varible arguments */
     va_start(args, format);
 
     /* Print message to variable */
-    vsnprintf(vmsg, sizeof(vmsg), format, args);
-    vmsg[LINE_MAX/2 - 1] = 0;
+    vsnprintf(vmsg, LINE_MAX, format, args);
     va_end(args);
 
-    // Goyo. Removing '\n' end of log line
-    //if ((nl = strchr(vmsg, '\n')) != NULL)
-        //*nl = 0;
-
-    allocedString = (char*) strdup(vmsg);
-
-    return allocedString;
+    return vmsg;
 }
 
 
@@ -1703,7 +1692,7 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
                int tLev, const char* stre , bool use_hook )
 {
     int   i;
-    char  line[LINE_MAX];
+    char* line = (char*) calloc(1, LINE_MAX);
     int   sz;
     char  format[FORMAT_LEN + 1];
     char* tmP;
@@ -1715,6 +1704,7 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
     if (inSigHandler && (type != 'X' || type != 'x'))
     {
         lmAddMsgBuf(text, type, file, lineNo, fName, tLev, (char*) stre);
+        free(line);
         return LmsOk;
     } 
 
@@ -1723,8 +1713,6 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
     POINTER_CHECK(format);
     POINTER_CHECK(text);
     
-    
-    memset(line,   0, sizeof(line));
     memset(format, 0, sizeof(format));
 
     if ((type != 'H') && lmOutHook && lmOutHookActive == true)
@@ -1752,14 +1740,14 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
         if (type == 'R')
         {
             if (text[1] != ':')
-                snprintf(line, sizeof(line), "R: %s\n%c", text, 0);
+                snprintf(line, LINE_MAX, "R: %s\n%c", text, 0);
             else
-                snprintf(line, sizeof(line), "%s\n%c", text, 0);
+                snprintf(line, LINE_MAX, "%s\n%c", text, 0);
         }
         else if (type == 'S')
         {
-            char stampStr[LINE_MAX];
-            snprintf(line, sizeof(line), "%s:%s", text, timeStampGet(stampStr));
+            char stampStr[128];
+            snprintf(line, LINE_MAX, "%s:%s", text, timeStampGet(stampStr, 128));
         }
         else
         {
@@ -1768,12 +1756,12 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
                continue;
 
             if ((strlen(format) + strlen(text) + strlen(line)) > LINE_MAX)
-              snprintf(line, sizeof(line), "%s[%d]: %s\n%c", file, lineNo, "LM ERROR: LINE TOO LONG", 0);
+              snprintf(line, LINE_MAX, "%s[%d]: %s\n%c", file, lineNo, "LM ERROR: LINE TOO LONG", 0);
             else
-                snprintf(line, sizeof(line), format, text);
+                snprintf(line, LINE_MAX, format, text);
         }
         if (stre != NULL)
-            strncat(line, stre, sizeof(line) - 1);
+            strncat(line, stre, LINE_MAX - 1);
 
         sz = strlen(line);
         
@@ -1817,6 +1805,7 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
             assert(false);
 
         /* exit here, just in case */
+        free(line);
         exit(tLev);
     }
     
@@ -1834,13 +1823,18 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
                     continue;
 
                 if ((s = lmClear(i, keepLines, lastLines)) != LmsOk)
+                {
+                    free(line);
                     return s;
+                }
             }
         }
     }
 
+    free(line);
     return LmsOk;
 }
+
 
 
 /* ****************************************************************************
@@ -2117,13 +2111,14 @@ LmStatus lmReopen(int index)
     
     while (true)
     {
-        char line[LINE_MAX];
-        int len;
-        int nb;
+        char* line = (char*) calloc(1, LINE_MAX);
+        int   len;
+        int   nb;
 
         if (fgets(line, LINE_MAX, fP) == NULL)
         {
             s = LmsFgets;
+            free(line);
             break;
         }
 
@@ -2143,15 +2138,18 @@ LmStatus lmReopen(int index)
             if (write(fd, buf, strlen(buf)) != (int) strlen(buf))
             {
                 s = LmsWrite;
+                free(line);
                 break;
             }   
             ++newLogLines;
+            free(line);
             break;
         }
         
         if ((nb = write(fd, line, len)) != len)
         {
             s = LmsWrite;
+            free(line);
             break;
         }
         else
@@ -2191,9 +2189,9 @@ LmStatus lmReopen(int index)
 */
 long lmLogLineGet(char* typeP, char* dateP, int* msP, char* progNameP, char* fileNameP, int* lineNoP, int* pidP, int* tidP, char* funcNameP, char* messageP, long offset, char** allP)
 {
-    static FILE*  fP = NULL;
-    char          line[LINE_MAX];
-    char*         lineP = line;
+    static FILE*  fP     = NULL;
+    char*         line   = (char*) calloc(1, LINE_MAX);
+    char*         lineP  = line;
     char*         delimiter;
     long          ret;
     char*         nada;
@@ -2206,6 +2204,7 @@ long lmLogLineGet(char* typeP, char* dateP, int* msP, char* progNameP, char* fil
         if (fP != NULL)
             fclose(fP);
         fP = NULL;
+        free(line);
         return 0;
     }
 
@@ -2215,6 +2214,7 @@ long lmLogLineGet(char* typeP, char* dateP, int* msP, char* progNameP, char* fil
         if ((fP = fopen(fds[0].info, "r")) == NULL)
         {
             // printf("error opening log file '%s'\n", fds[0].info);
+            free(line);
             return -1;
         }
 
@@ -2237,6 +2237,7 @@ long lmLogLineGet(char* typeP, char* dateP, int* msP, char* progNameP, char* fil
     {
         fclose(fP);
         fP = NULL;
+        free(line);
         return -2; // EOF
     }
 
@@ -2293,9 +2294,11 @@ long lmLogLineGet(char* typeP, char* dateP, int* msP, char* progNameP, char* fil
 
     ret = ftell(fP);
     // printf("Line parsed - returning %lu\n", ret);
+    free(line);
     return ret;
 
 lmerror:
+    free(line);
     fclose(fP);
     fP = NULL;
     // printf("Error in line: %s", lineP);
@@ -2321,7 +2324,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
 {
     LineRemove* lrV;
     void*       initialLrv;
-    char        line[LINE_MAX];
+    char*       line = (char*) calloc(1, LINE_MAX);
     int         i;
     int         j = 0;
     FILE*       fP;
@@ -2370,7 +2373,6 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
         lrV[i].offset = oldOffset;
         lrV[i].remove = false;
 
-        line[strlen(line) - 1] = 0;
         LOG_OUT(("got line %d: '%s'", i, line));
         oldOffset = ftell(fP);
         ++i;
@@ -2407,8 +2409,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
  Removing:
     fdPos = ftell(fP);
     rewind(fP);
-    snprintf(tmpName, sizeof(tmpName), "%s_%d", fds[index].info,
-               (int) getpid());
+    snprintf(tmpName, sizeof(tmpName), "%s_%d", fds[index].info, (int) getpid());
     if ((fd = open(tmpName, O_WRONLY | O_CREAT | O_TRUNC, 0666)) == -1)
     {
         perror("open");
@@ -2436,7 +2437,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
     {
         if (lrV[i].remove == false)
         {
-            char   line[LINE_MAX];
+            char*  line = (char*) calloc(1, LINE_MAX);
             char*  lineP;
 
             if (fseek(fP, lrV[i].offset, SEEK_SET) != 0)
@@ -2453,7 +2454,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
             if (newLogLines == 2)
             {
                 time_t     now = time(NULL);
-                struct tm tmP;
+                struct tm  tmP;
                 char       tm[80];
                 char       buf[80];
                 
@@ -2466,6 +2467,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
             }
 
             ++newLogLines;
+            free(line);
         }
     }
 
@@ -2495,7 +2497,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
 
     logLines = newLogLines;
     LOG_OUT(("Set logLines to %d", logLines));
-
+    free(line);
     return LmsOk;
 }
 

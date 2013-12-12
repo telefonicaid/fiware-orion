@@ -1389,7 +1389,7 @@ extern LmStatus lmOut
   const char*  fName,
   int          tLev,
   const char*  stre,
-  bool use_hoock = true
+  bool         use_hook = true
 );
 
 
