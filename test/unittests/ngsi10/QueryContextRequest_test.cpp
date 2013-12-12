@@ -107,7 +107,9 @@ TEST(QueryContextRequest, ok_json)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_ok.json";  
+  const char*     fileName     = "queryContextRequest_ok.json";  
+  const char*     expectedFile = "ngsi10.queryContextRequest_ok.expected.valid.json";
+  std::string     rendered;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
@@ -128,12 +130,10 @@ TEST(QueryContextRequest, ok_json)
   
   qcrP->present(""); // No output
 
-  std::string rendered;
-  std::string expected = "{\n  \"entities\" : [\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"ConferenceRoom\"\n    },\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"OfficeRoom\"\n    }\n  ]\n  \"attributeList\" : {\n    \"attribute\" : \"temperature\",\n    \"attribute\" : \"occupancy\",\n    \"attribute\" : \"lightstatus\"\n  }\n  \"restriction\" : {\n    \"attributeExpression\" : \"Attribute Expression\"\n    \"scope\" : {\n      \"operationScope\" : {\n        \"type\" : \"st1\"\n        \"value\" : \"sv1\"\n      }\n      \"operationScope\" : {\n        \"type\" : \"st2\"\n        \"value\" : \"sv2\"\n      }\n    }\n  }\n}\n";
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), expectedFile)) << "Error getting test data from '" << expectedFile << "'";
   rendered = qcrP->render(QueryContext, JSON, "");
-  LM_M(("Rendered: %s", rendered.c_str()));
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   qcrP->present("");
   qcrP->release();
@@ -534,8 +534,8 @@ TEST(QueryContextRequest, fill)
   QueryContextRequest q0;
   QueryContextRequest q1;
   std::string         out;
-  std::string         expected0 = "<queryContextRequest>\n  <entityIdList>\n    <entityId type=\"\" isPattern=\"true\">\n      <id></id>\n    </entityId>\n  </entityIdList>\n  <restriction>\n  </restriction>\n</queryContextRequest>\n";
-  std::string         expected1 = "<queryContextRequest>\n  <entityIdList>\n    <entityId type=\"ETYPE\" isPattern=\"true\">\n      <id>EID</id>\n    </entityId>\n  </entityIdList>\n  <attributeList>\n    <attribute>Attribute</attribute>\n  </attributeList>\n  <restriction>\n  </restriction>\n</queryContextRequest>\n";
+  std::string         expected0 = "<queryContextRequest>\n  <entityIdList>\n    <entityId type=\"\" isPattern=\"true\">\n      <id></id>\n    </entityId>\n  </entityIdList>\n</queryContextRequest>\n";
+  std::string         expected1 = "<queryContextRequest>\n  <entityIdList>\n    <entityId type=\"ETYPE\" isPattern=\"true\">\n      <id>EID</id>\n    </entityId>\n  </entityIdList>\n  <attributeList>\n    <attribute>Attribute</attribute>\n  </attributeList>\n</queryContextRequest>\n";
 
   q0.fill("", "", "");
   q0.restrictions = 0;

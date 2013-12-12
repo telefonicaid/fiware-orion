@@ -36,7 +36,7 @@
 *
 * ScopeVector::render - 
 */
-std::string ScopeVector::render(Format format, std::string indent)
+std::string ScopeVector::render(Format format, std::string indent, bool comma)
 {
   std::string out = "";
   std::string tag = "scope";
@@ -44,11 +44,10 @@ std::string ScopeVector::render(Format format, std::string indent)
   if (vec.size() == 0)
     return "";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, tag, format, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ");
-  out += endTag(indent, tag, format);
-
+     out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
+  out += endTag(indent, tag, format, comma, true);
 
   return out;
 }

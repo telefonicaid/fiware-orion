@@ -52,14 +52,12 @@ UpdateContextAvailabilitySubscriptionRequest::UpdateContextAvailabilitySubscript
 */
 std::string UpdateContextAvailabilitySubscriptionRequest::render(RequestType requestType, Format format, std::string indent)
 {
-  std::string   out = "";
-  std::string   tag = "updateContextAvailabilitySubscriptionRequest";
-
+  std::string   out                      = "";
+  std::string   tag                      = "updateContextAvailabilitySubscriptionRequest";
   bool          subscriptionRendered     = true; // FIXME P9: Right now subscriptionId ALWAYS renders
   bool          restrictionRendered      = restrictions != 0;
   bool          durationRendered         = duration.get() != "";
   bool          attributeListRendered    = attributeList.size() != 0;
-
   bool          commaAfterSubscriptionId = false; // last element
   bool          commaAfterRestriction    = subscriptionRendered;
   bool          commaAfterDuration       = restrictionRendered || subscriptionRendered;

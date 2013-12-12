@@ -82,13 +82,14 @@ std::string Restriction::render(Format format, std::string indent, int restricti
 {
   std::string  tag = "restriction";
   std::string  out = "";
+  bool         scopeVectorRendered = scopeVector.size() != 0;
 
   if (restrictions == 0)
     return "";
 
   out += startTag(indent, tag, format);
-  out += attributeExpression.render(format, indent + "  ");
-  out += scopeVector.render(format, indent + "  ");
+  out += attributeExpression.render(format, indent + "  ", scopeVectorRendered);
+  out += scopeVector.render(format, indent + "  ", false);
   out += endTag(indent, tag, format, comma);
 
   return out;

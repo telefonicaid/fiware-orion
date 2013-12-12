@@ -52,13 +52,18 @@ QueryContextRequest::QueryContextRequest()
 */
 std::string QueryContextRequest::render(RequestType requestType, Format format, std::string indent)
 {
-  std::string out = "";
-  std::string tag = "queryContextRequest";
+  std::string   out                      = "";
+  std::string   tag                      = "queryContextRequest";
+  bool          attributeListRendered    = attributeList.size() != 0;
+  bool          restrictionRendered      = restrictions != 0;
+  bool          commaAfterAttributeList  = restrictionRendered;
+  bool          commaAfterEntityIdVector = attributeListRendered || restrictionRendered;
 
+  LM_M(("Here: restrictions == %d", restrictions));
   out += startTag(indent, tag, format, false);
-  out += entityIdVector.render(format, indent + "  ");
-  out += attributeList.render(format, indent + "  ");
-  out += restriction.render(format, indent + "  ");
+  out += entityIdVector.render(format, indent + "  ", commaAfterEntityIdVector);
+  out += attributeList.render(format,  indent + "  ", commaAfterAttributeList);
+  out += restriction.render(format,    indent + "  ", restrictions, false);
   out += endTag(indent, tag, format);
 
   return out;

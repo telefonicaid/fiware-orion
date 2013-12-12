@@ -217,6 +217,7 @@ static std::string scopeValue(std::string path, std::string value, ParseData* re
 static std::string restriction(std::string path, std::string value, ParseData* reqDataP)
 {
   reqDataP->qcr.res.restrictions += 1;
+  LM_M(("reqDataP->qcr.res.restrictions == %d", reqDataP->qcr.res.restrictions));
   return "OK";
 }
 

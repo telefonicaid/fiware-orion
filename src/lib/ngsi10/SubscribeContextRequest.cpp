@@ -49,18 +49,37 @@ SubscribeContextRequest::SubscribeContextRequest()
 */
 std::string SubscribeContextRequest::render(RequestType requestType, Format format, std::string indent)
 {
-  std::string out      = "";
-  std::string tag      = "subscribeContextRequest";
-  std::string indent2  = indent + "  ";
+  std::string  out                             = "";
+  std::string  tag                             = "subscribeContextRequest";
+  std::string  indent2                         = indent + "  ";
+
+  bool         attributeListRendered           = attributeList.size() != 0;
+  bool         referenceRendered               = true;  // Mandatory
+  bool         durationRendered                = duration.get() != "";
+  bool         restrictionRendered             = restrictions != 0;
+  bool         notifyConditionVectorRendered   = notifyConditionVector.size() != 0;
+  bool         throttlingRendered              = throttling.get() != "";
+
+  bool         commaAfterThrottling            = false; // Last element;
+  bool         commaAfterNotifyConditionVector = throttlingRendered;
+  bool         commaAfterRestriction           = notifyConditionVectorRendered || throttlingRendered;
+  bool         commaAfterDuration              = restrictionRendered || notifyConditionVectorRendered || throttlingRendered;
+  bool         commaAfterReference             = durationRendered || restrictionRendered ||notifyConditionVectorRendered || throttlingRendered;
+  bool         commaAfterAttributeList         = referenceRendered || durationRendered || restrictionRendered ||notifyConditionVectorRendered || throttlingRendered;
+  bool         commaAfterEntityIdVector        = attributeListRendered || referenceRendered || durationRendered || restrictionRendered ||notifyConditionVectorRendered || throttlingRendered;
+
+  LM_M(("notifyConditionVectorRendered == %s", notifyConditionVectorRendered? "true" : "false"));
+  LM_M(("throttlingRendered == %s", throttlingRendered? "true" : "false"));
+  LM_M(("commaAfterRestriction == %s", commaAfterRestriction? "true" : "false"));
 
   out += startTag(indent, tag, format, false);
-  out += entityIdVector.render(format, indent2);
-  out += attributeList.render(format, indent2);
-  out += reference.render(format, indent2);
-  out += duration.render(format, indent2);
-  out += restriction.render(format, indent2);
-  out += notifyConditionVector.render(format, indent2);
-  out += throttling.render(format, indent2);
+  out += entityIdVector.render(format, indent2, commaAfterEntityIdVector);
+  out += attributeList.render(format, indent2, commaAfterAttributeList);
+  out += reference.render(format, indent2, commaAfterReference);
+  out += duration.render(format, indent2, commaAfterDuration);
+  out += restriction.render(format, indent2, restrictions, commaAfterRestriction);
+  out += notifyConditionVector.render(format, indent2, commaAfterNotifyConditionVector);
+  out += throttling.render(format, indent2, commaAfterThrottling);
   out += endTag(indent, tag, format);
 
   return out;

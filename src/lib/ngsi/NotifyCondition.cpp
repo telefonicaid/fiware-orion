@@ -36,15 +36,21 @@
 *
 * NotifyCondition::render - 
 */
-std::string NotifyCondition::render(Format format, std::string indent)
+std::string NotifyCondition::render(Format format, std::string indent, bool notLastInVector)
 {
   std::string out = "";
   std::string tag = "notifyCondition";
 
-  out += startTag(indent, tag, format);
-  out += valueTag(indent + "  ", "type", type, format);
-  out += condValueList.render(format, indent + "  ");
-  out += restriction.render(format, indent + "  ");
+  bool condValueListRendered   = condValueList.size() != 0;
+  bool restrictionRendered     = restriction.get() != ""; 
+  bool commaAfterRestriction   = false; // last element
+  bool commaAfterCondValueList = restrictionRendered;
+  bool commaAfterType          = condValueListRendered || restrictionRendered;
+
+  out += startTag(indent, tag, tag, format, false, false);
+  out += valueTag(indent + "  ", "type", type, format, commaAfterType);
+  out += condValueList.render(format, indent + "  ",   commaAfterCondValueList);
+  out += restriction.render(format,   indent + "  ",   commaAfterRestriction);
   out += endTag(indent, tag, format);
 
   return out;
