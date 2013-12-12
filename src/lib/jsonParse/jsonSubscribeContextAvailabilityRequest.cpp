@@ -164,7 +164,7 @@ static std::string restriction(std::string path, std::string value, ParseData* r
 {
   LM_T(LmtParse, ("Got a restriction"));
 
-  ++reqDataP->scar.restrictions;
+  ++reqDataP->scar.res.restrictions;
 
   return "OK";
 }
