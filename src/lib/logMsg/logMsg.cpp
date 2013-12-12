@@ -1443,7 +1443,7 @@ char* lmTextGet(const char* format, ...)
     va_start(args, format);
 
     /* Print message to variable */
-    vsnprintf(vmsg, sizeof(vmsg), format, args);
+    vsnprintf(vmsg, LINE_MAX, format, args);
     va_end(args);
 
     return vmsg;
