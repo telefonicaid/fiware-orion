@@ -279,11 +279,12 @@ void jsonScarInit(ParseData* reqDataP)
 {
   jsonScarRelease(reqDataP);
 
+  reqDataP->scar.entityIdP             = NULL;
+  reqDataP->scar.scopeP                = NULL;
   reqDataP->errorString                = "";
 
-  reqDataP->scar.entityIdP             = NULL;
-  reqDataP->scar.restrictions          = 0;
-  reqDataP->scar.scopeP                = NULL;
+  reqDataP->scar.res.restrictions      = 0;
+  reqDataP->scar.res.restriction.attributeExpression.set("");
 }
 
 

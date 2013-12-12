@@ -196,9 +196,13 @@ static int subscriptionId(xml_node<>* node, ParseData* reqData)
 */
 void ucasInit(ParseData* reqData)
 {
+  ucasRelease(reqData);
+
   reqData->ucas.scopeP        = NULL;
-  reqData->ucas.restrictions  = 0;
   reqData->errorString        = "";
+
+  reqData->ucas.res.restrictions  = 0;
+  reqData->ucas.res.restriction.attributeExpression.set("");
 }
 
 

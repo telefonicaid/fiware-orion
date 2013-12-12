@@ -257,11 +257,12 @@ void jsonUcasInit(ParseData* reqDataP)
 {
   jsonUcasRelease(reqDataP);
 
+  reqDataP->ucas.entityIdP             = NULL;
+  reqDataP->ucas.scopeP                = NULL;
   reqDataP->errorString                = "";
 
-  reqDataP->ucas.entityIdP             = NULL;
-  reqDataP->ucas.restrictions          = 0;
-  reqDataP->ucas.scopeP                = NULL;
+  reqDataP->ucas.res.restrictions      = 0;
+  reqDataP->ucas.res.restriction.attributeExpression.set("");
 }
 
 

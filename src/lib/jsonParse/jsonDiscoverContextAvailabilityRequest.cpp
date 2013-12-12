@@ -245,9 +245,12 @@ void jsonDcarInit(ParseData* reqDataP)
 {
   jsonDcarRelease(reqDataP);
 
-  reqDataP->dcar.entityIdP              = NULL;
-  reqDataP->dcar.scopeP                 = NULL;
-  reqDataP->dcar.restrictions           = 0;
+  reqDataP->dcar.entityIdP     = NULL;
+  reqDataP->dcar.scopeP        = NULL;
+  reqDataP->errorString        = "";
+
+  reqDataP->dcar.res.restrictions = 0;
+  reqDataP->dcar.res.restriction.attributeExpression.set("");
 }
 
 
@@ -269,7 +272,7 @@ void jsonDcarRelease(ParseData* reqDataP)
 */
 std::string jsonDcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-   return reqDataP->dcar.res.check(DiscoverContextAvailability, ciP->outFormat, "", reqDataP->errorString, reqDataP->dcar.restrictions);
+   return reqDataP->dcar.res.check(DiscoverContextAvailability, ciP->outFormat, "", reqDataP->errorString, reqDataP->dcar.res.restrictions);
 }
 
 

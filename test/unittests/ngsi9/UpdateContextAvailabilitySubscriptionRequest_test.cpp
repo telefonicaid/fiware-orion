@@ -100,14 +100,11 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_ok)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
   lmTraceLevelSet(LmtDump, true);
-  LM_M(("Before jsonTreat: parseData.ucas.restrictions == %d", parseData.ucas.restrictions));
   std::string result = jsonTreat(testBuf, &ci, &parseData, UpdateContextAvailabilitySubscription, "updateContextAvailabilitySubscriptionRequest", NULL);
-  LM_M(("After jsonTreat: parseData.ucas.restrictions == %d", parseData.ucas.restrictions));
   lmTraceLevelSet(LmtDump, false);
   EXPECT_EQ("OK", result) << "this test should be OK";
 
   UpdateContextAvailabilitySubscriptionRequest* ucasP = &parseData.ucas.res;
-  LM_M(("New pointer: ucasP->restrictions = %d", ucasP->restrictions));
 
   rendered = ucasP->render(UpdateContextAvailabilitySubscription, JSON, "");
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());
