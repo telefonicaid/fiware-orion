@@ -383,6 +383,10 @@ files_compliance:
 xml_check:
 	test/xmlCheck/xmlCheck.sh --xsd-dir $(XSD_DIR)
 
+cppcheck:
+	cppcheck --xml -j 8 --enable=all -I src/lib/ src/ 2> cppcheck-result.xml
+	cat cppcheck-result.xml | grep "error file" | wc -l
+
 sonar_metrics: unit_test coverage
 	cd BUILD_COVERAGE && gcovr -r ../src --gcov-exclude='.*parseArgs.*' --gcov-exclude='.*logMsg.*' -x -o ../coverage.xml && cd ..
 	sed s#filename=\"#filename=\"src/#g coverage.xml > coverage_sonar.xml

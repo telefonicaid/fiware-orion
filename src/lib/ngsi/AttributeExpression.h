@@ -44,7 +44,7 @@ typedef struct AttributeExpression
   void          set(std::string value);
   std::string   get(void);
   bool          isEmpty(void);
-  std::string   render(Format format, std::string indent);  
+  std::string   render(Format format, std::string indent, bool comma);
   void          present(std::string indent);
   const char*   c_str();
   void          release(void);

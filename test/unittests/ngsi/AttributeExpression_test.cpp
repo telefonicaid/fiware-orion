@@ -42,11 +42,11 @@ TEST(AttributeExpression, ok)
    EXPECT_STREQ("AE", ae.get().c_str());
 
    ae.set("");
-   EXPECT_STREQ("", ae.render(XML, "").c_str());
+   EXPECT_STREQ("", ae.render(XML, "", false).c_str());
 
    ae.set("AE");
-   EXPECT_STREQ("<attributeExpression>AE</attributeExpression>\n", ae.render(XML, "").c_str());
-   EXPECT_STREQ("\"attributeExpression\" : \"AE\"\n", ae.render(JSON, "").c_str());
+   EXPECT_STREQ("<attributeExpression>AE</attributeExpression>\n", ae.render(XML, "", false).c_str());
+   EXPECT_STREQ("\"attributeExpression\" : \"AE\"\n", ae.render(JSON, "", false).c_str());
 
    EXPECT_STREQ("AE", ae.c_str());
 }

@@ -42,7 +42,6 @@
 */
 std::string postIndividualContextEntity(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
-  std::string                   path;
   std::string                   entityId = compV[2];
   std::string                   answer;
   AppendContextElementResponse  response;
@@ -51,9 +50,7 @@ std::string postIndividualContextEntity(ConnectionInfo* ciP, int components, std
 
   ciP->httpStatusCode = mapPostIndividualContextEntity(entityId, &parseDataP->acer.res, &response);
   answer = response.render(ciP->outFormat, "");
-  LM_T(LmtMetadataDoubleFree, ("Releasing AppendContextElementResponse"));
   response.release();
 
-  LM_T(LmtMetadataDoubleFree, ("Returning answer"));
   return answer;
 }

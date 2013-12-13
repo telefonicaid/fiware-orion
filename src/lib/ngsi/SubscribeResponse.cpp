@@ -49,11 +49,13 @@ std::string SubscribeResponse::render(Format format, std::string indent)
 {
   std::string out  = "";
   std::string tag  = "subscribeResponse";
+  bool durationRendered    = !duration.isEmpty();
+  bool throttlingRendered  = !throttling.isEmpty();
 
   out += startTag(indent, tag, format);
-  out += subscriptionId.render(format, indent + "  ", true);
-  out += duration.render(format, indent + "  ");
-  out += throttling.render(format, indent + "  ");
+  out += subscriptionId.render(format, indent + "  ", durationRendered || throttlingRendered);
+  out += duration.render(format, indent + "  ", throttlingRendered);
+  out += throttling.render(format, indent + "  ", false);
   out += endTag(indent, tag, format);
 
   return out;

@@ -173,7 +173,7 @@ static xml_node<>* xmlDocPrepare(char* xml)
   {
     doc.parse<0>(xml);     // 0 means default parse flags
   }
-  catch (parse_error e)
+  catch (parse_error& e)
   {
     LM_RE(NULL, ("PARSE ERROR: %s", e.what()));
   }
@@ -192,7 +192,6 @@ static xml_node<>* xmlDocPrepare(char* xml)
 std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseDataP, RequestType request, std::string payloadWord, XmlRequest** reqPP)
 {
   xml_node<>*   father    = xmlDocPrepare((char*) content);
-  std::string   res       = "OK";
   XmlRequest*   reqP      = xmlRequestGet(request, ciP->method);
 
   if (father == NULL)
@@ -259,7 +258,6 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
   //
   if (reqPP != NULL)
   {
-    LM_T(LmtMetadataDoubleFree, ("Saving pointer to '%s' to free later (hope it hasn't been freed already ...)", reqP->keyword.c_str()));
     *reqPP = reqP;
   }
 

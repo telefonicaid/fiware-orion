@@ -126,10 +126,10 @@ void Throttling::present(std::string indent)
 *
 * Throttling::render - 
 */
-std::string Throttling::render(Format format, std::string indent)
+std::string Throttling::render(Format format, std::string indent, bool comma)
 {
   if (string == "")
     return "";
 
-  return valueTag(indent, "throttling", string, format);
+  return valueTag(indent, "throttling", string, format, comma);
 }

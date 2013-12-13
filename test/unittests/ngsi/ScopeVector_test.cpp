@@ -41,12 +41,12 @@ TEST(ScopeVector, renderAndRelease)
   std::string    expected2 = "<scope>\n  <operationScope>\n    <type>Type</type>\n    <value>Value</value>\n  </operationScope>\n</scope>\n";
   std::string    rendered;
 
-  rendered = sV.render(XML, "");
+  rendered = sV.render(XML, "", false);
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());
 
   sV.push_back(s);
 
-  rendered = sV.render(XML, "");
+  rendered = sV.render(XML, "", false);
   EXPECT_STREQ(expected2.c_str(), rendered.c_str());
 
   EXPECT_EQ(sV.size(), 1);

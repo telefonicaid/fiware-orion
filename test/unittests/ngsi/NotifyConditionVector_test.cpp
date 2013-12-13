@@ -43,18 +43,18 @@ TEST(NotifyConditionVector, render)
   std::string            expected1 = "";
   std::string            expected2 = "<notifyConditions>\n  <notifyCondition>\n    <type>Type</type>\n  </notifyCondition>\n</notifyConditions>\n";
   
-  rendered = ncV.render(XML, "");
+  rendered = ncV.render(XML, "", false);
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());
 
   ncP->type = "Type";
   ncV.push_back(ncP);
 
-  rendered = ncV.render(XML, "");
+  rendered = ncV.render(XML, "", false);
   EXPECT_STREQ(expected2.c_str(), rendered.c_str());
 
   ncV.release();
 
-  rendered = ncV.render(XML, "");
+  rendered = ncV.render(XML, "", false);
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());
 }
 

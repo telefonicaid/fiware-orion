@@ -409,6 +409,5 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
     responseP->registrationId.set(oid.str());
     responseP->errorCode.fill(SccOk, "OK");
 
-    LM_T(LmtHeavyTest, ("/NGSI9/registerContext OK (registrationId: '%s')", responseP->registrationId.get().c_str()));
     return SccOk;
 }

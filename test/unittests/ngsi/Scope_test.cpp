@@ -41,7 +41,7 @@ TEST(Scope, render)
   std::string  rendered;
   std::string  expected = "<operationScope>\n  <type>Type</type>\n  <value>Value</value>\n</operationScope>\n";
 
-  rendered = scope.render(XML, "");
+  rendered = scope.render(XML, "", false);
   EXPECT_STREQ(expected.c_str(), rendered.c_str());
 
   scope.release();

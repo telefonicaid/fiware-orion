@@ -90,13 +90,16 @@ int socketHttpConnect(std::string host, unsigned short port)
 */
 #define MSG_SIZE (8 * 1024 * 1024)
 char msg[MSG_SIZE];
-std::string sendHttpSocket( std::string ip,
-                           unsigned short port,
-                           std::string verb,
-                           std::string resource,
-                           std::string content_type,
-                           std::string content,
-                           bool waitForResponse)
+std::string sendHttpSocket
+(
+   std::string     ip,
+   unsigned short  port,
+   std::string     verb,
+   std::string     resource,
+   std::string     content_type,
+   std::string     content,
+   bool            waitForResponse
+)
 {
   char         buffer[TAM_BUF];
   char         response[TAM_BUF];;
@@ -118,25 +121,23 @@ std::string sendHttpSocket( std::string ip,
            "User-Agent: orion/%s\n"
            "Host: %s:%d\n"
            "Accept: application/xml, application/json\n",
-           verb.c_str(), resource.c_str(), versionGet(), ip.c_str(), port);
+           verb.c_str(), resource.c_str(), versionGet(), ip.c_str(), (int) port);
 
   if ((!content_type.empty()) && (!content.empty()))
   {
     char   rest[512];
-
-    memset(rest, 0, 512);
 
     sprintf(rest,
             "Content-Type: %s\n"
             "Content-Length: %zu\n",
             content_type.c_str(), content.length() + 1);
 
-    strncat(msg, rest, sizeof(msg));
-    strncat(msg, "\n", sizeof(msg));
-    strncat(msg, content.c_str(), sizeof(msg));
+    strncat(msg, rest, sizeof(msg) - strlen(msg));
+    strncat(msg, "\n", sizeof(msg) - strlen(msg));
+    strncat(msg, content.c_str(), sizeof(msg) - strlen(msg));
   }
 
-  strncat(msg, "\n", sizeof(msg));
+  strncat(msg, "\n", sizeof(msg) - strlen(msg));
 
   int fd = socketHttpConnect(ip, port); // Connecting to HTTP server
   if (fd == -1)
@@ -164,7 +165,7 @@ std::string sendHttpSocket( std::string ip,
       else
       {
           memcpy(response, buffer, nb);
-          LM_V5(("Received from HTTP server :\n %s", response));
+          LM_V5(("Received from HTTP server:\n%s", response));
       }
 
       if (strlen(response) > 0)

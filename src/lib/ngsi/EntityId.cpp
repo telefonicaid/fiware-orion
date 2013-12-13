@@ -37,12 +37,8 @@
 *
 * EntityId::EntityId -
 */
-EntityId::EntityId()
+EntityId::EntityId() : tag("entityId")
 {
-  id         = "";
-  type       = "";
-  isPattern  = "";
-  tag        = "entityId";
 }
 
 
@@ -51,12 +47,8 @@ EntityId::EntityId()
 *
 * EntityId::EntityId -
 */
-EntityId::EntityId(std::string _id, std::string _type, std::string _isPattern, std::string _tag)
+EntityId::EntityId(std::string _id, std::string _type, std::string _isPattern, std::string _tag) : id(_id), type(_type), isPattern(_isPattern), tag(_tag)
 {
-  id         = _id;
-  type       = _type;
-  isPattern  = _isPattern;
-  tag        = _tag;
 }
 
 

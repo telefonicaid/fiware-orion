@@ -43,14 +43,10 @@
 std::string getIndividualContextEntity(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
   std::string             answer;
-  std::string             path;
   std::string             entityId = compV[2];
   ContextElementResponse  response;  
 
-  for (int ix = 0; ix < components; ++ix)
-    path += std::string("/") + compV[ix];
-
-  LM_T(LmtConvenience, ("CONVENIENCE: got 'GET' request with %d components: %s", components, path.c_str()));
+  LM_T(LmtConvenience, ("CONVENIENCE: got 'GET' request with %d components", components));
 
   ciP->httpStatusCode = mapGetIndividualContextEntity(entityId, &response);
   answer = response.render(ciP->outFormat, "");

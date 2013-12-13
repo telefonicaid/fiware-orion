@@ -47,7 +47,7 @@ std::string ContextRegistrationAttributeVector::render(Format format, std::strin
 
   out += startTag(indent, xmlTag, jsonTag, format, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ");
+    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
   out += endTag(indent, xmlTag, format, comma, true);
 
   return out;

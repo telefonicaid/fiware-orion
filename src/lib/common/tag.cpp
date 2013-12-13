@@ -143,3 +143,30 @@ std::string valueTag(std::string indent, std::string tagName, int value, Format 
    else
      return indent + "\"" + tagName + "\" : \"" + val + "\"\n";
 }
+
+
+
+/* ****************************************************************************
+*
+* valueTag -  
+*/
+std::string valueTag(std::string indent, std::string xmlTag, std::string jsonTag, std::string value, Format format, bool showComma, bool isAssociation)
+{
+   if (format == XML)
+     return indent + "<" + xmlTag + ">" + value + "</" + xmlTag + ">" + "\n";
+
+   if (jsonTag == "")
+   {
+     if (showComma == true)
+       return indent + "\"" + value + "\",\n";
+     else
+       return indent + "\"" + value + "\"\n";
+   }
+   else
+   {
+     if (showComma == true)
+       return indent + "\"" + jsonTag + "\" : \"" + value + "\",\n";
+     else
+       return indent + "\"" + jsonTag + "\" : \"" + value + "\"\n";
+   }
+}

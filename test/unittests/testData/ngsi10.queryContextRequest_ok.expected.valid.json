@@ -1,0 +1,32 @@
+{
+  "entities" : [
+    {
+      "type" : "Room",
+      "isPattern" : "false",
+      "id" : "ConferenceRoom"
+    },
+    {
+      "type" : "Room",
+      "isPattern" : "false",
+      "id" : "OfficeRoom"
+    }
+  ],
+  "attributeList" : {
+    "attribute" : "temperature",
+    "attribute" : "occupancy",
+    "attribute" : "lightstatus"
+  },
+  "restriction" : {
+    "attributeExpression" : "Attribute Expression",
+    "scope" : [
+      {
+        "type" : "st1",
+        "value" : "sv1"
+      },
+      {
+        "type" : "st2",
+        "value" : "sv2"
+      }
+    ]
+  }
+}

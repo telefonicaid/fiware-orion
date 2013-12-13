@@ -50,9 +50,8 @@ std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, st
   std::string                     attributeName = compV[4];
   std::string                     valueId       = compV[5];
   ContextAttribute*               attributeP    = new ContextAttribute(attributeName, "", "false");
-  ContextElement                  ce;
-  HttpStatusCode                  s;
   Metadata*                       mP            = new Metadata("ID", "", valueId);
+  ContextElement                  ce;
 
   attributeP->metadataVector.push_back(mP);
   
@@ -64,7 +63,7 @@ std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, st
   request.updateActionType.set("DELETE");
 
   response.errorCode.code = NO_ERROR_CODE;
-  s = mongoUpdateContext(&request, &response);
+  mongoUpdateContext(&request, &response);
   
   StatusCode statusCode;
   if (response.contextElementResponseVector.size() == 0)

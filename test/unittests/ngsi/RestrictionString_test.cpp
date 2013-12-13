@@ -88,15 +88,15 @@ TEST(RestrictionString, render)
   std::string  expected2 = "<restriction>String</restriction>\n";
   std::string  expected3 = "\"restriction\" : \"String\"\n";
 
-  rendered = restrictionString.render(XML, "");
+  rendered = restrictionString.render(XML, "", false);
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());
 
   restrictionString.string = "String";
 
-  rendered = restrictionString.render(XML, "");
+  rendered = restrictionString.render(XML, "", false);
   EXPECT_STREQ(expected2.c_str(), rendered.c_str());
 
-  rendered = restrictionString.render(JSON, "");
+  rendered = restrictionString.render(JSON, "", false);
   EXPECT_STREQ(expected3.c_str(), rendered.c_str());
 }
 

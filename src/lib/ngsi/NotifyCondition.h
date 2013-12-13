@@ -45,7 +45,7 @@ typedef struct NotifyCondition
   ConditionValueList        condValueList;   // Optional
   RestrictionString         restriction;     // Optional
 
-  std::string   render(Format format, std::string indent);
+  std::string   render(Format format, std::string indent, bool notLastInVector);
   std::string   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void          present(std::string indent, int ix);
   void          release(void);

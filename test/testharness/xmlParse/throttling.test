@@ -19,7 +19,7 @@
 # fermin at tid dot es
 
 --NAME--
-throttling
+XML throttling
 --SHELL-INIT--
 # Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
 running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)

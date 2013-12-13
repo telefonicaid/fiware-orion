@@ -40,7 +40,7 @@ typedef struct ScopeVector
 {
   std::vector<Scope*>  vec;
 
-  std::string  render(Format format, std::string indent);
+  std::string  render(Format format, std::string indent, bool comma);
   std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void         present(std::string indent);
   void         push_back(Scope* item);

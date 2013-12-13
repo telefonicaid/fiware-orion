@@ -98,12 +98,12 @@ void AttributeExpression::present(std::string indent)
 *
 * AttributeExpression::render - 
 */
-std::string AttributeExpression::render(Format format, std::string indent)
+std::string AttributeExpression::render(Format format, std::string indent, bool comma)
 {
   if (string == "")
     return "";
   else
-    return valueTag(indent, "attributeExpression", string, format);
+    return valueTag(indent, "attributeExpression", string, format, comma);
 }
 
 

@@ -62,15 +62,15 @@ Scope::Scope(std::string _type, std::string _value)
 *
 * Scope::render - 
 */
-std::string Scope::render(Format format, std::string indent)
+std::string Scope::render(Format format, std::string indent, bool notLastInVector)
 {
   std::string out = "";
   std::string tag = "operationScope";
 
-  out += startTag(indent, tag, format);
-  out += valueTag(indent + "  ", "type", type, format);
+  out += startTag(indent, tag, tag, format, false, false);
+  out += valueTag(indent + "  ", "type", type, format, true);
   out += valueTag(indent + "  ", "value", value, format);
-  out += endTag(indent, tag, format);
+  out += endTag(indent, tag, format, notLastInVector);
 
   return out;
 }

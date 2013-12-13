@@ -55,7 +55,6 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   ContextAttribute*               attributeP    = new ContextAttribute(attributeName, "", "false");
   bool                            idFound       = false;
   ContextElement                  ce;
-  HttpStatusCode                  s;
 
   //
   // Any metadata ID in the payload?
@@ -98,7 +97,7 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   request.updateActionType.set("UPDATE");
 
   response.errorCode.code = NO_ERROR_CODE;
-  s = mongoUpdateContext(&request, &response);
+  mongoUpdateContext(&request, &response);
   
   StatusCode statusCode;
   if (response.contextElementResponseVector.size() == 0)
