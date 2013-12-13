@@ -380,8 +380,9 @@ valgrind:
 files_compliance:
 	scripts/check_files_compliance.py .
 
-xml_check:
+data_check:
 	test/xmlCheck/xmlCheck.sh --xsd-dir $(XSD_DIR)
+	test/jsonCheck.sh
 
 cppcheck:
 	cppcheck --xml -j 8 --enable=all -I src/lib/ src/ 2> cppcheck-result.xml
