@@ -38,7 +38,7 @@
 */
 MetadataVector::MetadataVector(std::string _tag) {
   vec.clear();
-  tag = _tag;
+  tagSet(_tag);
 }
 
 /* ****************************************************************************
@@ -49,6 +49,7 @@ void MetadataVector::tagSet(std::string tagName)
 {
   tag = tagName;
 }
+
 
 
 /* ****************************************************************************
