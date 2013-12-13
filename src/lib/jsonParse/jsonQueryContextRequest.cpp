@@ -216,7 +216,7 @@ static std::string scopeValue(std::string path, std::string value, ParseData* re
 */
 static std::string restriction(std::string path, std::string value, ParseData* reqDataP)
 {
-  reqDataP->qcr.restrictions += 1;
+  reqDataP->qcr.res.restrictions += 1;
   return "OK";
 }
 
@@ -259,7 +259,10 @@ void jsonQcrInit(ParseData* reqDataP)
 
   reqDataP->qcr.entityIdP              = NULL;
   reqDataP->qcr.scopeP                 = NULL;
-  reqDataP->qcr.restrictions           = 0;
+  reqDataP->errorString                = "";
+
+  reqDataP->qcr.res.restrictions           = 0;
+  reqDataP->qcr.res.restriction.attributeExpression.set("");
 }
 
 
@@ -281,7 +284,7 @@ void jsonQcrRelease(ParseData* reqDataP)
 */
 std::string jsonQcrCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-   return reqDataP->qcr.res.check(DiscoverContextAvailability, ciP->outFormat, "", reqDataP->errorString, reqDataP->qcr.restrictions);
+   return reqDataP->qcr.res.check(DiscoverContextAvailability, ciP->outFormat, "", reqDataP->errorString, reqDataP->qcr.res.restrictions);
 }
 
 

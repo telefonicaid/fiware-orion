@@ -95,14 +95,14 @@ TEST(Reference, render)
   std::string  expected3 = "\"reference\" : \"REF\"\n";
 
   reference .set("");
-  rendered = reference.render(XML, "");
+  rendered = reference.render(XML, "", false);
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());
 
   reference .set("REF");
-  rendered = reference.render(XML, "");
+  rendered = reference.render(XML, "", false);
   EXPECT_STREQ(expected2.c_str(), rendered.c_str());
 
-  rendered = reference.render(JSON, "");
+  rendered = reference.render(JSON, "", false);
   EXPECT_STREQ(expected3.c_str(), rendered.c_str());
 }
 

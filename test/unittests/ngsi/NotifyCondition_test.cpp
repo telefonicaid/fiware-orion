@@ -56,7 +56,7 @@ TEST(NotifyCondition, render)
   std::string      expected = "<notifyCondition>\n  <type></type>\n</notifyCondition>\n";
   std::string      rendered;
 
-  rendered = nc.render(XML, "");
+  rendered = nc.render(XML, "", false);
   EXPECT_STREQ(expected.c_str(), rendered.c_str());
 }
 

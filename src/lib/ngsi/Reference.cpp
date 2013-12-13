@@ -102,12 +102,12 @@ void Reference::present(std::string indent)
 *
 * Reference::render - 
 */
-std::string Reference::render(Format format, std::string indent)
+std::string Reference::render(Format format, std::string indent, bool comma)
 {
   if (string == "")
     return "";
 
-  return valueTag(indent, "reference", string, format);
+  return valueTag(indent, "reference", string, format, comma);
 }
 
 

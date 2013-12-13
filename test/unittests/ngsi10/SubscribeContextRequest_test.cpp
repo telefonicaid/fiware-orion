@@ -104,11 +104,11 @@ TEST(SubscribeContextRequest, ok_json)
   scrP->present(""); // No output
 
   std::string rendered;
+  const char* expectedFile = "ngsi10.subscribeContextRequest_ok.expected.valid.json";
 
-   std::string expected = "{\n  \"entities\" : [\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"ConferenceRoom\"\n    },\n    {\n      \"type\" : \"Room\",\n      \"isPattern\" : \"false\",\n      \"id\" : \"OfficeRoom\"\n    }\n  ]\n  \"attributeList\" : {\n    \"attribute\" : \"temperature\",\n    \"attribute\" : \"occupancy\",\n    \"attribute\" : \"lightstatus\"\n  }\n  \"reference\" : \"127.0.0.1\"\n  \"duration\" : \"P5Y\",\n  \"restriction\" : {\n    \"attributeExpression\" : \"testRestriction\"\n    \"scope\" : {\n      \"operationScope\" : {\n        \"type\" : \"t1\"\n        \"value\" : \"v1\"\n      }\n      \"operationScope\" : {\n        \"type\" : \"t2\"\n        \"value\" : \"v2\"\n      }\n    }\n  }\n  \"notifyConditions\" : {\n    \"notifyCondition\" : {\n      \"type\" : \"ONTIMEINTERVAL\"\n      \"condValueList\" : {\n        \"condValue\" : \"temperature\",\n        \"condValue\" : \"lightstatus\"\n      }\n      \"restriction\" : \"restriction\"\n    }\n  }\n  \"throttling\" : \"P5Y\"\n}\n";
-
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), expectedFile)) << "Error getting test data from '" << expectedFile << "'";
   rendered = scrP->render(SubscribeContext, JSON, "");
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   scrP->release();
 }

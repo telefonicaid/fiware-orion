@@ -47,6 +47,14 @@ extern char testBuf[TEST_BUFFER_SIZE];
 
 /* ****************************************************************************
 *
+* expectedBuf - writable char vector to hold the output data
+*/
+extern char expectedBuf[TEST_BUFFER_SIZE];
+
+
+
+/* ****************************************************************************
+*
 * toString - 
 */
 extern std::string toString(int i);

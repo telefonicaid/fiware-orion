@@ -96,12 +96,12 @@ void RestrictionString::present(std::string indent)
 *
 * RestrictionString::render - 
 */
-std::string RestrictionString::render(Format format, std::string indent)
+std::string RestrictionString::render(Format format, std::string indent, bool comma)
 {
   if (string == "")
     return "";
 
-  return valueTag(indent, "restriction", string, format);
+  return valueTag(indent, "restriction", string, format, comma);
 }
 
 

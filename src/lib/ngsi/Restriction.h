@@ -43,7 +43,7 @@ typedef struct Restriction
   AttributeExpression  attributeExpression;   // Mandatory
   ScopeVector          scopeVector;           // Optional
 
-  std::string   render(Format format, std::string indent);
+  std::string   render(Format format, std::string indent, int restrictions = 1, bool comma = false);
   std::string   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void          present(std::string indent);
   void          release();

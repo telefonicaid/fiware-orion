@@ -90,14 +90,14 @@ TEST(Throttling, render)
   std::string  expected3 = "\"throttling\" : \"PT1S\"\n";
 
   t.set("");
-  rendered = t.render(XML, "");
+  rendered = t.render(XML, "", false);
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());
 
   t.set("PT1S");
-  rendered = t.render(XML, "");
+  rendered = t.render(XML, "", false);
   EXPECT_STREQ(expected2.c_str(), rendered.c_str());
 
-  rendered = t.render(JSON, "");
+  rendered = t.render(JSON, "", false);
   EXPECT_STREQ(expected3.c_str(), rendered.c_str());
 }
 

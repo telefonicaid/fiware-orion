@@ -128,6 +128,7 @@ std::string SubscriptionId::render(Format format, std::string indent, bool comma
 {
   std::string xString = string;
   
+  // FIXME P9 this violates the XSD and must be fixed
   if (xString == "")
     xString = std::string("No Subscription ID");
 

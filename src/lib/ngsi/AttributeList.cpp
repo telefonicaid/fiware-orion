@@ -39,7 +39,7 @@
 *
 * render - 
 */
-std::string AttributeList::render(Format format, std::string indent)
+std::string AttributeList::render(Format format, std::string indent, bool comma)
 {
   std::string  out = "";
   std::string  tag = "attributeList";
@@ -52,7 +52,7 @@ std::string AttributeList::render(Format format, std::string indent)
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
     out += valueTag(indent + "  ", "attribute", attributeV[ix], format, ix != attributeV.size() - 1);
 
-  out += endTag(indent, tag, format);
+  out += endTag(indent, tag, format, comma);
 
   return out;
 }
