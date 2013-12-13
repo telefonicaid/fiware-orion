@@ -1,25 +1,25 @@
 {
   "contextRegistrations": [
-  {                  
+  {
     "entities": [
       {
          "type": "Room",
          "isPattern": "false",
          "id": "Room1"
-      },                              
+      },
       {
         "type": "Room",
         "isPattern": "false",
         "id": "Room2"
-      }                     
-    ],                    
+      }
+    ],
     "attributes": [
-      {                   
+      {
         "name": "temperature",
         "type": "centigrade",
         "isDomain": "false"
       },
-      {                   
+      {
         "name": "pressure",
         "type": "mmHg",
         "isDomain": "false"
