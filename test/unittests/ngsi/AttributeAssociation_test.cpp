@@ -43,7 +43,7 @@ TEST(AttributeAssociation, ok)
   aa.source = "source";
   aa.target = "target";
 
-  out = aa.render(XML, "  ");
+  out = aa.render(XML, "  ", false);
   EXPECT_STREQ(expected.c_str(), out.c_str());
 
   out = aa.check(RegisterContext, XML, "", "", 0);

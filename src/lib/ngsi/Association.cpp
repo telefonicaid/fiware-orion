@@ -52,12 +52,13 @@ std::string Association::check(RequestType requestType, Format format, std::stri
 *
 * render - 
 */
-std::string Association::render(Format format, std::string indent)
+std::string Association::render(Format format, std::string indent, bool comma)
 {
-  std::string out = ""; 
-     
-  out += entityAssociation.render(format, indent + "  ");
-  out += attributeAssociationList.render(format, indent + "  ");  
+  std::string  out                              = ""; 
+  bool         attributeAssociationListRendered = attributeAssociationList.size() != 0;
+
+  out += entityAssociation.render(format, indent + "  ", attributeAssociationListRendered);
+  out += attributeAssociationList.render(format, indent + "  ", false);
 
   return out;
 }

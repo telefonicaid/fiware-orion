@@ -82,10 +82,9 @@ TEST(NotifyContextRequest, json_ok)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "notifyContextRequest_ok.json";
+  const char*     fileName     = "notifyContextRequest_ok.json";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
-
   
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
@@ -103,10 +102,11 @@ TEST(NotifyContextRequest, json_ok)
   ncrP->present("");
 
   std::string rendered;
-  std::string expected = "{\n  \"subscriptionId\" : \"012345678901234567890123\",\n  \"originator\" : \"http://localhost/test\",\n  \"contextResponses\" : [\n    {\n      \"contextElement\" : {\n        \"attributeDomainName\" : \"ADN\",\n        \"attributes\" : [\n          {\n            \"name\" : \"temperature\",\n            \"type\" : \"Room\",\n            \"contextValue\" : \"10\"\n            \"metadatas\" : [\n              {\n                \"name\" : \"ID\",\n                \"type\" : \"string\",\n                \"value\" : \"1110\"\n              },\n              {\n                \"name\" : \"id\",\n                \"type\" : \"integer\",\n                \"value\" : \"12\"\n              }\n            ]\n          },\n          {\n            \"name\" : \"temperature\",\n            \"type\" : \"Room\",\n            \"contextValue\" : \"10\"\n            \"metadatas\" : [\n              {\n                \"name\" : \"ID\",\n                \"type\" : \"string\",\n                \"value\" : \"1110\"\n              },\n              {\n                \"name\" : \"id\",\n                \"type\" : \"integer\",\n                \"value\" : \"55\"\n              }\n            ]\n          }\n        ],\n        \"metadatas\" : [\n          {\n            \"name\" : \"m1\",\n            \"type\" : \"t1\",\n            \"value\" : \"v1\"\n          },\n          {\n            \"name\" : \"m2\",\n            \"type\" : \"t2\",\n            \"value\" : \"v2\"\n          }\n        ],\n        \"type\" : \"Room\",\n        \"isPattern\" : \"false\",\n        \"id\" : \"ConferenceRoom\"\n      },\n      \"statusCode\" : {\n        \"code\" : \"200\",\n        \"reasonPhrase\" : \"Ok\",\n        \"details\" : \"a\"\n      }\n    }\n  ]\n}\n";
+  const char* expectedFile = "ngsi10.notifyContextRequest_ok.expected1.valid.json";
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), expectedFile)) << "Error getting test data from '" << expectedFile << "'";
   rendered = ncrP->render(NotifyContext, JSON, "");
-  EXPECT_EQ(expected, rendered);
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   ncrP->release();
 }

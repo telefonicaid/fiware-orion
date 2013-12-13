@@ -73,7 +73,7 @@ TEST(ContextElement, Check)
 
   // render
   std::string cs2render = "<contextElement>\n  <entityId type=\"\" isPattern=\"\">\n    <id>id</id>\n  </entityId>\n</contextElement>\n";
-  std::string out       = ce2.render(XML, "");
+  std::string out       = ce2.render(XML, "", false);
   EXPECT_STREQ(cs2render.c_str(), out.c_str());
 
   // present

@@ -43,7 +43,7 @@ EntityAssociation::EntityAssociation() : source("", "", "", "sourceEntityId"), t
 *
 * render - 
 */
-std::string EntityAssociation::render(Format format, std::string indent)
+std::string EntityAssociation::render(Format format, std::string indent, bool comma)
 {
   std::string out;
   std::string tag = "entityAssociation";
@@ -51,7 +51,7 @@ std::string EntityAssociation::render(Format format, std::string indent)
   out += startTag(indent, tag, format, false);
   out += source.render(format, indent + "  ", true, true, "source");
   out += target.render(format, indent + "  ", false, true, "target");
-  out += endTag(indent, tag, format);
+  out += endTag(indent, tag, format, comma);
 
   return out;
 }
