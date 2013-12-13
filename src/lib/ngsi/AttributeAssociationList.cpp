@@ -62,7 +62,7 @@ std::string AttributeAssociationList::render(Format format, std::string indent, 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
      out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
 
-  out += endTag(indent, xmlTag, format, comma);
+  out += endTag(indent, xmlTag, format, comma, true, false);
 
   return out;
 }

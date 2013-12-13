@@ -39,13 +39,28 @@ TEST(ContextRegistrationAttributeVector, render)
 {
   ContextRegistrationAttributeVector crav;
   ContextRegistrationAttribute       cra("name", "type", "false");
+  ContextRegistrationAttribute       cra2("name2", "type2", "true");
   std::string                        out;
-  std::string                        expected = "<contextRegistrationAttributeList>\n  <contextRegistrationAttribute>\n    <name>name</name>\n    <type>type</type>\n    <isDomain>false</isDomain>\n  </contextRegistrationAttribute>\n</contextRegistrationAttributeList>\n";
+  std::string                        expected1xml  = "<contextRegistrationAttributeList>\n  <contextRegistrationAttribute>\n    <name>name</name>\n    <type>type</type>\n    <isDomain>false</isDomain>\n  </contextRegistrationAttribute>\n</contextRegistrationAttributeList>\n";
+  std::string                        expected1json = "\"attributes\" : [\n  {\n    \"name\" : \"name\",\n    \"type\" : \"type\",\n    \"isDomain\" : \"false\"\n  }\n]\n";
+  std::string                        expected2xml  = "<contextRegistrationAttributeList>\n  <contextRegistrationAttribute>\n    <name>name</name>\n    <type>type</type>\n    <isDomain>false</isDomain>\n  </contextRegistrationAttribute>\n  <contextRegistrationAttribute>\n    <name>name2</name>\n    <type>type2</type>\n    <isDomain>true</isDomain>\n  </contextRegistrationAttribute>\n</contextRegistrationAttributeList>\n";
+  std::string                        expected2json = "\"attributes\" : [\n  {\n    \"name\" : \"name\",\n    \"type\" : \"type\",\n    \"isDomain\" : \"false\"\n  },\n  {\n    \"name\" : \"name2\",\n    \"type\" : \"type2\",\n    \"isDomain\" : \"true\"\n  }\n]\n";
 
   out = crav.render(XML, "");
   EXPECT_STREQ("", out.c_str());
 
+  out = crav.render(JSON, "");
+  EXPECT_STREQ("", out.c_str());
+
   crav.push_back(&cra);
   out = crav.render(XML, "");
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  EXPECT_STREQ(expected1xml.c_str(), out.c_str());
+  out = crav.render(JSON, "");
+  EXPECT_STREQ(expected1json.c_str(), out.c_str());
+
+  crav.push_back(&cra2);
+  out = crav.render(XML, "");
+  EXPECT_STREQ(expected2xml.c_str(), out.c_str());
+  out = crav.render(JSON, "");
+  EXPECT_STREQ(expected2json.c_str(), out.c_str());
 }

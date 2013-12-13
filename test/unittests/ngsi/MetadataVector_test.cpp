@@ -35,17 +35,27 @@
 TEST(MetadataVector, render)
 {
   Metadata        m("Name", "Type", "Value");
+  Metadata        m2("Name2", "Type2", "Value2");
   MetadataVector  mV("MV");
-  std::string     expected1 = "<MV>\n  <contextMetadata>\n    <name>Name</name>\n    <type>Type</type>\n    <value>Value</value>\n  </contextMetadata>\n</MV>\n";
-  std::string     expected2 = "<mv>\n  <contextMetadata>\n    <name>Name</name>\n    <type>Type</type>\n    <value>Value</value>\n  </contextMetadata>\n</mv>\n";
+  std::string     expected1xml  = "<MV>\n  <contextMetadata>\n    <name>Name</name>\n    <type>Type</type>\n    <value>Value</value>\n  </contextMetadata>\n</MV>\n";
+  std::string     expected1json = "\"metadatas\" : [\n  {\n    \"name\" : \"Name\",\n    \"type\" : \"Type\",\n    \"value\" : \"Value\"\n  }\n]\n";
+  std::string     expected2xml  = "<mv>\n  <contextMetadata>\n    <name>Name</name>\n    <type>Type</type>\n    <value>Value</value>\n  </contextMetadata>\n</mv>\n";
+  std::string     expected3xml  = "<mv>\n  <contextMetadata>\n    <name>Name</name>\n    <type>Type</type>\n    <value>Value</value>\n  </contextMetadata>\n  <contextMetadata>\n    <name>Name2</name>\n    <type>Type2</type>\n    <value>Value2</value>\n  </contextMetadata>\n</mv>\n";
+  std::string     expected3json = "\"metadatas\" : [\n  {\n    \"name\" : \"Name\",\n    \"type\" : \"Type\",\n    \"value\" : \"Value\"\n  },\n  {\n    \"name\" : \"Name2\",\n    \"type\" : \"Type2\",\n    \"value\" : \"Value2\"\n  }\n]\n";
   std::string     rendered;
 
   mV.push_back(&m);
 
   rendered = mV.render(XML, "");
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  EXPECT_STREQ(expected1xml.c_str(), rendered.c_str());
+  rendered = mV.render(JSON, "");
+  EXPECT_STREQ(expected1json.c_str(), rendered.c_str());
 
   mV.tagSet("mv");
   rendered = mV.render(XML, "");
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  EXPECT_STREQ(expected2xml.c_str(), rendered.c_str());
+
+  mV.push_back(&m2);
+  rendered = mV.render(XML, "");
+  EXPECT_STREQ(expected3xml.c_str(), rendered.c_str());
 }

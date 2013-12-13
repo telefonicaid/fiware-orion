@@ -20,7 +20,7 @@
 		"attributeExpression" : "Attribute Expression",
 		"scopes": [
 			{
-				"type" : "st1",
+				"type" : "st1"
 			},
 			{
 				"type" : "st2",

@@ -44,7 +44,7 @@ extern std::string startTag(std::string indent, std::string xmlTag, std::string 
 *
 * endTag -  
 */
-extern std::string endTag(std::string indent, std::string tagName, Format format, bool comma = false, bool isVector = false);
+extern std::string endTag(std::string indent, std::string tagName, Format format, bool comma = false, bool isVector = false, bool nl = true);
 
 
 

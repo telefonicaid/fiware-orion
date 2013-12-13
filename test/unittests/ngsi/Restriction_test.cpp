@@ -80,8 +80,8 @@ TEST(Restriction, render)
 {
   Restriction  restriction;
   std::string  rendered;
-  std::string  expected = "<restriction>\n</restriction>\n";
+  std::string  expected = "";
 
-  rendered = restriction.render(XML, "");
+  rendered = restriction.render(XML, "", 0, false);
   EXPECT_STREQ(expected.c_str(), rendered.c_str());
 }
