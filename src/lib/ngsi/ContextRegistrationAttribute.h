@@ -47,7 +47,7 @@ typedef struct ContextRegistrationAttribute
 
   ContextRegistrationAttribute();
   ContextRegistrationAttribute(std::string _name, std::string _type, std::string _isDomain = "");
-  std::string     render(Format format, std::string indent, bool isInVector = false);
+  std::string     render(Format format, std::string indent, bool comma = false);
   std::string     check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void            present(int ix, std::string indent);
   void            release(void);

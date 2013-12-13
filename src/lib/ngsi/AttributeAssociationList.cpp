@@ -48,20 +48,21 @@ void AttributeAssociationList::push_back(AttributeAssociation* aaP)
 *
 * render - 
 */
-std::string AttributeAssociationList::render(Format format, std::string indent)
+std::string AttributeAssociationList::render(Format format, std::string indent, bool comma)
 {
-  std::string out = "";
-  std::string tag = "AttributeAssociationList";
+  std::string out     = "";
+  std::string xmlTag  = "AttributeAssociationList";
+  std::string jsonTag = "associations";
 
   if (vec.size() == 0)
     return "";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, xmlTag, jsonTag, format, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ");
+     out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
 
-  out += endTag(indent, tag, format);
+  out += endTag(indent, xmlTag, format, comma);
 
   return out;
 }

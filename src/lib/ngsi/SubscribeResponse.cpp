@@ -45,18 +45,18 @@ SubscribeResponse::SubscribeResponse()
 *
 * SubscribeResponse::render - 
 */
-std::string SubscribeResponse::render(Format format, std::string indent)
+std::string SubscribeResponse::render(Format format, std::string indent, bool comma)
 {
-  std::string out  = "";
-  std::string tag  = "subscribeResponse";
-  bool durationRendered    = !duration.isEmpty();
-  bool throttlingRendered  = !throttling.isEmpty();
+  std::string  out                 = "";
+  std::string  tag                 = "subscribeResponse";
+  bool         durationRendered    = !duration.isEmpty();
+  bool         throttlingRendered  = !throttling.isEmpty();
 
   out += startTag(indent, tag, format);
   out += subscriptionId.render(format, indent + "  ", durationRendered || throttlingRendered);
   out += duration.render(format, indent + "  ", throttlingRendered);
   out += throttling.render(format, indent + "  ", false);
-  out += endTag(indent, tag, format);
+  out += endTag(indent, tag, format, comma);
 
   return out;
 }

@@ -40,11 +40,11 @@ TEST(ProvidingApplication, render)
   ProvidingApplication  pa;
   std::string           out;
 
-  out = pa.render(XML, "");
+  out = pa.render(XML, "", false);
   EXPECT_STREQ("", out.c_str());
 
   pa.set("PA");
-  out = pa.render(XML, "");
+  out = pa.render(XML, "", false);
   EXPECT_STREQ("<providingApplication>PA</providingApplication>\n", out.c_str());
 }
 

@@ -41,7 +41,7 @@ TEST(AttributeAssociationList, ok)
   std::string              out;
   std::string              expected = "<AttributeAssociationList>\n  <AttributeAssociation>\n    <sourceAttribute>Source</sourceAttribute>\n    <targetAttribute>Target</targetAttribute>\n  </AttributeAssociation>\n</AttributeAssociationList>\n";
 
-  out = aal.render(XML, "");
+  out = aal.render(XML, "", false);
   EXPECT_STREQ("", out.c_str());
 
   aa.source = "Source";
@@ -50,7 +50,7 @@ TEST(AttributeAssociationList, ok)
   aal.push_back(&aa);
   ASSERT_EQ(1, aal.size());
 
-  out = aal.render(XML, "");
+  out = aal.render(XML, "", false);
   EXPECT_STREQ(expected.c_str(), out.c_str());
 
   AttributeAssociation* aa1;

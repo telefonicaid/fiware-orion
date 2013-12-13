@@ -40,7 +40,7 @@ typedef struct EntityAssociation
 
   EntityAssociation();
 
-  std::string render(Format format, std::string indent);
+  std::string render(Format format, std::string indent, bool comma);
   std::string check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
 } EntityAssociation;
 

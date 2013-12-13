@@ -52,7 +52,7 @@ TEST(Association, ok)
    out = a.check(RegisterContext, XML, "", "", 0);
    EXPECT_STREQ("OK", out.c_str());
 
-   out = a.render(XML, "");
+   out = a.render(XML, "", false);
    EXPECT_STREQ(expected.c_str(), out.c_str());
 
    a.release();

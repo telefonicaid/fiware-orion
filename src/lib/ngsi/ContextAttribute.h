@@ -52,7 +52,7 @@ typedef struct ContextAttribute
 
   std::string  getId();
 
-  std::string  render(Format format, std::string indent, bool isInVector = false);
+  std::string  render(Format format, std::string indent, bool comma = false);
   std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void         present(std::string indent, int ix);
   void         release(void);

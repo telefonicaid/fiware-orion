@@ -44,7 +44,7 @@ typedef struct SubscribeError
   ErrorCode       errorCode;          // Mandatory
 
   SubscribeError();
-  std::string render(RequestType requestType, Format format, std::string indent);
+  std::string render(RequestType requestType, Format format, std::string indent, bool comma = false);
   std::string check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
 } SubscribeError;
 

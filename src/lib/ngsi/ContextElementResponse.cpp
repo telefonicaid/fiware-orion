@@ -43,8 +43,8 @@ std::string ContextElementResponse::render(Format format, std::string indent, bo
   std::string out      = "";
 
   out += startTag(indent, xmlTag, jsonTag, format, false, false);
-  out += contextElement.render(format, indent + "  ");
-  out += statusCode.render(format, indent + "  ");
+  out += contextElement.render(format, indent + "  ", true);
+  out += statusCode.render(format, indent + "  ", false);
   out += endTag(indent, xmlTag, format, comma, false);
 
   return out;
