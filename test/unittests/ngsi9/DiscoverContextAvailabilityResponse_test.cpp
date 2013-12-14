@@ -108,7 +108,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   dcarP->release();
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
   EXPECT_STREQ("{\n}\n", rendered.c_str());
-
+  free(dcarP);
 
 
   // 2. One contextRegistrationResponse - errorCode inside ContextRegistrationResponse - only providingApplication in ContextRegistration
@@ -380,6 +380,8 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   dcarP->release();
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
   EXPECT_STREQ("{\n}\n", rendered.c_str());
+
+  free(dcarP);
 
   utExit();
 }

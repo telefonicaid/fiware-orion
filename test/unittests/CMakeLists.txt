@@ -149,12 +149,13 @@ SET (SOURCES
     ngsi9/DiscoverContextAvailabilityRequest_test.cpp
     ngsi9/DiscoverContextAvailabilityResponse_test.cpp
     ngsi9/SubscribeAvailabilityRequest_test.cpp
-    ngsi9/SubscribeAvailabilityResponse_test.cpp
+    ngsi9/SubscribeContextAvailabilityResponse_test.cpp
     ngsi9/NotifyContextAvailabilityRequest_test.cpp
     ngsi9/NotifyContextAvailabilityResponse_test.cpp
     ngsi9/UnsubscribeContextAvailabilityRequest_test.cpp
     ngsi9/UnsubscribeContextAvailabilityResponse_test.cpp
     ngsi9/UpdateContextAvailabilitySubscriptionRequest_test.cpp
+    ngsi9/UpdateContextAvailabilitySubscriptionResponse_test.cpp
 
     ngsi10/QueryContextRequest_test.cpp
     ngsi10/QueryContextResponse_test.cpp

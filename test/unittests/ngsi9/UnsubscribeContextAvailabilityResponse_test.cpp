@@ -28,6 +28,8 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi/ErrorCode.h"
 
+#include "unittest.h"
+
 
 
 /* ****************************************************************************
@@ -38,6 +40,8 @@ TEST(UnsubscribeContextAvailabilityResponse, constructorsAndRender)
 {
   UnsubscribeContextAvailabilityResponse  ucar1;
   SubscriptionId                          subscriptionId;
+
+  utInit();
 
   subscriptionId.set("111122223333444455556666");
 
@@ -54,4 +58,47 @@ TEST(UnsubscribeContextAvailabilityResponse, constructorsAndRender)
 
   rendered = ucar3.render(UnsubscribeContext, XML, "");
   EXPECT_STREQ(expected.c_str(), rendered.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* jsonRender - 
+*
+*/
+TEST(UnsubscribeContextAvailabilityResponse, jsonRender)
+{
+  const char*                              filename1  = "ngsi9.unsubscribeContextAvailabilityResponse.jsonRender1.valid.json";
+  const char*                              filename2  = "ngsi9.unsubscribeContextAvailabilityResponse.jsonRender2.valid.json";
+  UnsubscribeContextAvailabilityResponse*  ucasP;
+  std::string                              rendered;
+
+  utInit();
+
+  // Preparations
+  ucasP = new UnsubscribeContextAvailabilityResponse();
+  ucasP->subscriptionId.set("012345678901234567890123");
+
+  // 1. short and ok statusCode
+  ucasP->statusCode.fill(SccOk, "OK");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
+  rendered = ucasP->render(UpdateContextAvailabilitySubscription, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+  
+  // 2. Long and !OK statusCode
+  ucasP->statusCode.fill(SccBadRequest, "Bad request", "no details");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
+  rendered = ucasP->render(UpdateContextAvailabilitySubscription, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+
+  free(ucasP);
+
+  utExit();
 }
