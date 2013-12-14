@@ -166,7 +166,7 @@ TEST(restReply, restErrorReplyGet)
   std::string qcr2 = "/ngsi10/queryContext";
   std::string qcr3 = "/NGSI10/queryContext";
   std::string qcr4 = "queryContextRequest";
-  std::string qcrExpected  = "<queryContextResponse>\n  <errorCode>\n    <code>200</code>\n    <reasonPhrase>ok</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</queryContextResponse>\n";
+  std::string qcrExpected  = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Query without hits</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
   std::string qcrExpected2 = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</queryContextResponse>\n";
   
   std::string scr1 = "subscribeContext";

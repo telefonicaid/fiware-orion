@@ -74,8 +74,16 @@ std::string QueryContextResponse::render(RequestType requestType, Format format,
 
   out += startTag(indent, tag, format, false);
 
-  if (errorCode.code == NO_ERROR_CODE)
-     out += contextElementResponseVector.render(format, indent + "  ");
+  if ((errorCode.code == NO_ERROR_CODE) || (errorCode.code == SccOk))
+  {
+    if (contextElementResponseVector.size() == 0)
+    {
+      errorCode.fill(SccContextElementNotFound, "Query without hits", "");
+      out += errorCode.render(format, indent + "  ");
+    }
+    else 
+      out += contextElementResponseVector.render(format, indent + "  ");
+  }
   else
      out += errorCode.render(format, indent + "  ");
 

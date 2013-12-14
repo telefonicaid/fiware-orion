@@ -1,0 +1,28 @@
+{
+  "contextRegistrationResponses" : [
+    {
+      "contextRegistration" : {
+        "entities" : [
+          {
+            "type" : "EType",
+            "isPattern" : "false",
+            "id" : "E01"
+          }
+        ],
+        "providingApplication" : "http://tid.test.com/unitTest"
+      }
+    },
+    {
+      "contextRegistration" : {
+        "entities" : [
+          {
+            "type" : "EType",
+            "isPattern" : "false",
+            "id" : "E02"
+          }
+        ],
+        "providingApplication" : "http://tid.test.com/unitTest2"
+      }
+    }
+  ]
+}
