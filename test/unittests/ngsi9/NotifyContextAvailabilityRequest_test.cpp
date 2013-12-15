@@ -33,7 +33,7 @@
 #include "rest/ConnectionInfo.h"
 #include "xmlParse/xmlRequest.h"
 
-#include "testDataFromFile.h"
+#include "unittest.h"
 
 
 
@@ -139,4 +139,69 @@ TEST(NotifyContextAvailabilityRequest, check)
   ncr.subscriptionId.set("12345");
   check = ncr.check(NotifyContextAvailability, XML, "", "", 0);
   EXPECT_EQ(expected3, check);
+}
+
+
+
+/* ****************************************************************************
+*
+* json_render - 
+*/
+TEST(NotifyContextAvailabilityRequest, json_render)
+{
+  const char*                          filename1  = "ngsi10.notifyContextAvailabilityRequest.jsonRender1.valid.json";
+  const char*                          filename2  = "ngsi10.notifyContextAvailabilityRequest.jsonRender2.valid.json";
+  NotifyContextAvailabilityRequest*    ncarP;
+  std::string                          rendered;
+  ContextRegistrationResponse*         crrP;
+  EntityId*                            eidP  = new EntityId("E01", "EType", "false");
+
+  utInit();
+
+  //
+  // Both subscriptionId and contextRegistrationResponseVector are MANDATORY.
+  // Just two tests here:
+  //  1. contextRegistrationResponseVector with ONE contextRegistrationResponse instance
+  //  2. contextRegistrationResponseVector with TWO contextRegistrationResponse instances
+  //
+
+
+
+  // Preparation
+  ncarP = new NotifyContextAvailabilityRequest();
+  ncarP->subscriptionId.set("012345678901234567890123");
+
+  crrP = new ContextRegistrationResponse();
+  ncarP->contextRegistrationResponseVector.push_back(crrP);
+  crrP->contextRegistration.entityIdVector.push_back(eidP);
+  crrP->contextRegistration.providingApplication.set("http://www.tid.es/NotifyContextAvailabilityRequestTest");
+
+  // Test 1. contextRegistrationResponseVector with ONE contextRegistrationResponse instance
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
+  rendered = ncarP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  
+
+  
+  // Test 2. contextRegistrationResponseVector with TWO contextRegistrationResponse instances
+  Metadata*                     mdP   = new Metadata("M01", "MType", "123");
+  ContextRegistrationAttribute* craP  = new ContextRegistrationAttribute("CRA1", "CType", "false");
+
+  eidP->fill("E02", "EType", "false");
+  crrP = new ContextRegistrationResponse();
+  ncarP->contextRegistrationResponseVector.push_back(crrP);
+
+  crrP->contextRegistration.entityIdVector.push_back(eidP);
+  crrP->contextRegistration.entityIdVectorPresent = true;
+  crrP->contextRegistration.contextRegistrationAttributeVector.push_back(craP);
+  crrP->contextRegistration.registrationMetadataVector.push_back(mdP);
+
+  crrP->contextRegistration.providingApplication.set("http://www.tid.es/NotifyContextAvailabilityRequestTest2");
+  
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
+  rendered = ncarP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+  
+  utExit();
 }
