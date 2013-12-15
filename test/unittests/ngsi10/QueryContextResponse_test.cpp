@@ -137,6 +137,8 @@ TEST(QueryContextResponse, json_render)
   rendered = qcrP->render(QueryContext, JSON, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
+
+
   // 6. ContextElement: +entityId +attributeDomainName -contextAttributeVector +domainMetadataVector
   mdP = new Metadata("md6", "string", "FIN6");
   cerP->contextElement.domainMetadataVector.push_back(mdP);
@@ -167,6 +169,7 @@ TEST(QueryContextResponse, json_render)
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
+
   // 9. ContextElement: contextAttributeVector of two attributes
   caP = new ContextAttribute("ca9", "string", "context attribute 9");
   cerP->contextElement.contextAttributeVector.push_back(caP);
@@ -174,6 +177,8 @@ TEST(QueryContextResponse, json_render)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename9)) << "Error getting test data from '" << filename9 << "'";
   rendered = qcrP->render(QueryContext, JSON, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+
 
   // 10. ContextElement: domainMetadataVector of two metadatas
   mdP = new Metadata("md10", "string", "FIN10");

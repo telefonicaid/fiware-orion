@@ -194,7 +194,7 @@ TEST(restReply, restErrorReplyGet)
   std::string ucr2 = "/ngsi10/updateContext";
   std::string ucr3 = "/NGSI10/updateContext";
   std::string ucr4 = "updateContextRequest";
-  std::string ucrExpected  = "<updateContextResponse>\n  <errorCode>\n    <code>200</code>\n    <reasonPhrase>ok</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</updateContextResponse>\n";
+  std::string ucrExpected  = "<updateContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>The ContextElement requested is not found</reasonPhrase>\n  </errorCode>\n</updateContextResponse>\n";
   std::string ucrExpected2 = "<updateContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</updateContextResponse>\n";
   
   std::string ncr1 = "notifyContext";
@@ -210,231 +210,231 @@ TEST(restReply, restErrorReplyGet)
   utInit();
 
   out = restErrorReplyGet(&ci, XML, "", rcr1, 200, "ok", "detail");
-  EXPECT_EQ(out, rcrExpected);
+  EXPECT_EQ(rcrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", rcr2, 200, "ok", "detail");
-  EXPECT_EQ(out, rcrExpected);
+  EXPECT_EQ(rcrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", rcr3, 200, "ok", "detail");
-  EXPECT_EQ(out, rcrExpected);
+  EXPECT_EQ(rcrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", rcr4, 200, "ok", "detail");
-  EXPECT_EQ(out, rcrExpected);
+  EXPECT_EQ(rcrExpected, out);
 
   out = restErrorReplyGet(&ci, XML, "", rcr1, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, rcrExpected2);
+  EXPECT_EQ(rcrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", rcr2, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, rcrExpected2);
+  EXPECT_EQ(rcrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", rcr3, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, rcrExpected2);
+  EXPECT_EQ(rcrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", rcr4, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, rcrExpected2);
+  EXPECT_EQ(rcrExpected2, out);
 
 
   out = restErrorReplyGet(&ci, XML, "", dcar1, 200, "ok", "detail");
-  EXPECT_EQ(out, dcarExpected);
+  EXPECT_EQ(dcarExpected, out);
   out = restErrorReplyGet(&ci, XML, "", dcar2, 200, "ok", "detail");
-  EXPECT_EQ(out, dcarExpected);
+  EXPECT_EQ(dcarExpected, out);
   out = restErrorReplyGet(&ci, XML, "", dcar3, 200, "ok", "detail");
-  EXPECT_EQ(out, dcarExpected);
+  EXPECT_EQ(dcarExpected, out);
   out = restErrorReplyGet(&ci, XML, "", dcar4, 200, "ok", "detail");
-  EXPECT_EQ(out, dcarExpected);
+  EXPECT_EQ(dcarExpected, out);
 
   out = restErrorReplyGet(&ci, XML, "", dcar1, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, dcarExpected2);
+  EXPECT_EQ(dcarExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", dcar2, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, dcarExpected2);
+  EXPECT_EQ(dcarExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", dcar3, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, dcarExpected2);
+  EXPECT_EQ(dcarExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", dcar4, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, dcarExpected2);
+  EXPECT_EQ(dcarExpected2, out);
 
 
   out = restErrorReplyGet(&ci, XML, "", scar1, 200, "ok", "detail");
-  EXPECT_EQ(out, scarExpected);
+  EXPECT_EQ(scarExpected, out);
   out = restErrorReplyGet(&ci, XML, "", scar2, 200, "ok", "detail");
-  EXPECT_EQ(out, scarExpected);
+  EXPECT_EQ(scarExpected, out);
   out = restErrorReplyGet(&ci, XML, "", scar3, 200, "ok", "detail");
-  EXPECT_EQ(out, scarExpected);
+  EXPECT_EQ(scarExpected, out);
   out = restErrorReplyGet(&ci, XML, "", scar4, 200, "ok", "detail");
-  EXPECT_EQ(out, scarExpected);
+  EXPECT_EQ(scarExpected, out);
 
   out = restErrorReplyGet(&ci, XML, "", scar1, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, scarExpected2);
+  EXPECT_EQ(scarExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", scar2, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, scarExpected2);
+  EXPECT_EQ(scarExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", scar3, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, scarExpected2);
+  EXPECT_EQ(scarExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", scar4, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, scarExpected2);
+  EXPECT_EQ(scarExpected2, out);
 
 
   out = restErrorReplyGet(&ci, XML, "", ucas1, 200, "ok", "detail");
-  EXPECT_EQ(out, ucasExpected);
+  EXPECT_EQ(ucasExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ucas2, 200, "ok", "detail");
-  EXPECT_EQ(out, ucasExpected);
+  EXPECT_EQ(ucasExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ucas3, 200, "ok", "detail");
-  EXPECT_EQ(out, ucasExpected);
+  EXPECT_EQ(ucasExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ucas4, 200, "ok", "detail");
-  EXPECT_EQ(out, ucasExpected);
+  EXPECT_EQ(ucasExpected, out);
 
   out = restErrorReplyGet(&ci, XML, "", ucas1, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ucasExpected2);
+  EXPECT_EQ(ucasExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ucas2, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ucasExpected2);
+  EXPECT_EQ(ucasExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ucas3, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ucasExpected2);
+  EXPECT_EQ(ucasExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ucas4, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ucasExpected2);
+  EXPECT_EQ(ucasExpected2, out);
 
 
   out = restErrorReplyGet(&ci, XML, "", ucar1, 200, "ok", "detail");
-  EXPECT_EQ(out, ucarExpected);
+  EXPECT_EQ(ucarExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ucar2, 200, "ok", "detail");
-  EXPECT_EQ(out, ucarExpected);
+  EXPECT_EQ(ucarExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ucar3, 200, "ok", "detail");
-  EXPECT_EQ(out, ucarExpected);
+  EXPECT_EQ(ucarExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ucar4, 200, "ok", "detail");
-  EXPECT_EQ(out, ucarExpected);
+  EXPECT_EQ(ucarExpected, out);
 
   out = restErrorReplyGet(&ci, XML, "", ucar1, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ucarExpected2);
+  EXPECT_EQ(ucarExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ucar2, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ucarExpected2);
+  EXPECT_EQ(ucarExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ucar3, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ucarExpected2);
+  EXPECT_EQ(ucarExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ucar4, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ucarExpected2);
+  EXPECT_EQ(ucarExpected2, out);
 
 
   out = restErrorReplyGet(&ci, XML, "", ncar1, 200, "ok", "detail");
-  EXPECT_EQ(out, ncarExpected);
+  EXPECT_EQ(ncarExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ncar2, 200, "ok", "detail");
-  EXPECT_EQ(out, ncarExpected);
+  EXPECT_EQ(ncarExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ncar3, 200, "ok", "detail");
-  EXPECT_EQ(out, ncarExpected);
+  EXPECT_EQ(ncarExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ncar4, 200, "ok", "detail");
-  EXPECT_EQ(out, ncarExpected);
+  EXPECT_EQ(ncarExpected, out);
 
   out = restErrorReplyGet(&ci, XML, "", ncar1, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ncarExpected2);
+  EXPECT_EQ(ncarExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ncar2, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ncarExpected2);
+  EXPECT_EQ(ncarExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ncar3, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ncarExpected2);
+  EXPECT_EQ(ncarExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ncar4, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ncarExpected2);
+  EXPECT_EQ(ncarExpected2, out);
 
 
   out = restErrorReplyGet(&ci, XML, "", qcr1, 200, "ok", "detail");
-  EXPECT_EQ(out, qcrExpected);
+  EXPECT_EQ(qcrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", qcr2, 200, "ok", "detail");
-  EXPECT_EQ(out, qcrExpected);
+  EXPECT_EQ(qcrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", qcr3, 200, "ok", "detail");
-  EXPECT_EQ(out, qcrExpected);
+  EXPECT_EQ(qcrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", qcr4, 200, "ok", "detail");
-  EXPECT_EQ(out, qcrExpected);
+  EXPECT_EQ(qcrExpected, out);
 
   out = restErrorReplyGet(&ci, XML, "", qcr1, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, qcrExpected2);
+  EXPECT_EQ(qcrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", qcr2, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, qcrExpected2);
+  EXPECT_EQ(qcrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", qcr3, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, qcrExpected2);
+  EXPECT_EQ(qcrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", qcr4, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, qcrExpected2);
+  EXPECT_EQ(qcrExpected2, out);
 
 
   out = restErrorReplyGet(&ci, XML, "", scr1, 200, "ok", "detail");
-  EXPECT_EQ(out, scrExpected);
+  EXPECT_EQ(scrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", scr2, 200, "ok", "detail");
-  EXPECT_EQ(out, scrExpected);
+  EXPECT_EQ(scrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", scr3, 200, "ok", "detail");
-  EXPECT_EQ(out, scrExpected);
+  EXPECT_EQ(scrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", scr4, 200, "ok", "detail");
-  EXPECT_EQ(out, scrExpected);
+  EXPECT_EQ(scrExpected, out);
 
   out = restErrorReplyGet(&ci, XML, "", scr1, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, scrExpected2);
+  EXPECT_EQ(scrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", scr2, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, scrExpected2);
+  EXPECT_EQ(scrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", scr3, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, scrExpected2);
+  EXPECT_EQ(scrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", scr4, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, scrExpected2);
+  EXPECT_EQ(scrExpected2, out);
 
 
   out = restErrorReplyGet(&ci, XML, "", ucs1, 200, "ok", "detail");
-  EXPECT_EQ(out, ucsExpected);
+  EXPECT_EQ(ucsExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ucs2, 200, "ok", "detail");
-  EXPECT_EQ(out, ucsExpected);
+  EXPECT_EQ(ucsExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ucs3, 200, "ok", "detail");
-  EXPECT_EQ(out, ucsExpected);
+  EXPECT_EQ(ucsExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ucs4, 200, "ok", "detail");
-  EXPECT_EQ(out, ucsExpected);
+  EXPECT_EQ(ucsExpected, out);
 
   out = restErrorReplyGet(&ci, XML, "", ucs1, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ucsExpected2);
+  EXPECT_EQ(ucsExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ucs2, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ucsExpected2);
+  EXPECT_EQ(ucsExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ucs3, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ucsExpected2);
+  EXPECT_EQ(ucsExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ucs4, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ucsExpected2);
+  EXPECT_EQ(ucsExpected2, out);
 
 
   out = restErrorReplyGet(&ci, XML, "", uscr1, 200, "ok", "detail");
-  EXPECT_EQ(out, uscrExpected);
+  EXPECT_EQ(uscrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", uscr2, 200, "ok", "detail");
-  EXPECT_EQ(out, uscrExpected);
+  EXPECT_EQ(uscrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", uscr3, 200, "ok", "detail");
-  EXPECT_EQ(out, uscrExpected);
+  EXPECT_EQ(uscrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", uscr4, 200, "ok", "detail");
-  EXPECT_EQ(out, uscrExpected);
+  EXPECT_EQ(uscrExpected, out);
 
   out = restErrorReplyGet(&ci, XML, "", uscr1, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, uscrExpected2);
+  EXPECT_EQ(uscrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", uscr2, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, uscrExpected2);
+  EXPECT_EQ(uscrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", uscr3, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, uscrExpected2);
+  EXPECT_EQ(uscrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", uscr4, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, uscrExpected2);
+  EXPECT_EQ(uscrExpected2, out);
 
 
   out = restErrorReplyGet(&ci, XML, "", ucr1, 200, "ok", "detail");
-  EXPECT_EQ(out, ucrExpected);
+  EXPECT_EQ(ucrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ucr2, 200, "ok", "detail");
-  EXPECT_EQ(out, ucrExpected);
+  EXPECT_EQ(ucrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ucr3, 200, "ok", "detail");
-  EXPECT_EQ(out, ucrExpected);
+  EXPECT_EQ(ucrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ucr4, 200, "ok", "detail");
-  EXPECT_EQ(out, ucrExpected);
+  EXPECT_EQ(ucrExpected, out);
 
   out = restErrorReplyGet(&ci, XML, "", ucr1, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ucrExpected2);
+  EXPECT_EQ(ucrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ucr2, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ucrExpected2);
+  EXPECT_EQ(ucrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ucr3, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ucrExpected2);
+  EXPECT_EQ(ucrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ucr4, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ucrExpected2);
+  EXPECT_EQ(ucrExpected2, out);
 
 
   out = restErrorReplyGet(&ci, XML, "", ncr1, 200, "ok", "detail");
-  EXPECT_EQ(out, ncrExpected);
+  EXPECT_EQ(ncrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ncr2, 200, "ok", "detail");
-  EXPECT_EQ(out, ncrExpected);
+  EXPECT_EQ(ncrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ncr3, 200, "ok", "detail");
-  EXPECT_EQ(out, ncrExpected);
+  EXPECT_EQ(ncrExpected, out);
   out = restErrorReplyGet(&ci, XML, "", ncr4, 200, "ok", "detail");
-  EXPECT_EQ(out, ncrExpected);
+  EXPECT_EQ(ncrExpected, out);
 
   out = restErrorReplyGet(&ci, XML, "", ncr1, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ncrExpected2);
+  EXPECT_EQ(ncrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ncr2, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ncrExpected2);
+  EXPECT_EQ(ncrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ncr3, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ncrExpected2);
+  EXPECT_EQ(ncrExpected2, out);
   out = restErrorReplyGet(&ci, XML, "", ncr4, 400, "Bad Request", "detail");
-  EXPECT_EQ(out, ncrExpected2);
+  EXPECT_EQ(ncrExpected2, out);
 
   utExit();
 }
