@@ -1,0 +1,23 @@
+{
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "EType",
+        "isPattern" : "false",
+        "id" : "E01",
+        "attributeDomainName" : "AttrDomain",
+        "metadatas" : [
+          {
+            "name" : "md6",
+            "type" : "string",
+            "value" : "FIN6"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}

@@ -165,7 +165,7 @@ echo "13: ++++++++++++++++++++"
 8: ++++++++++++++++++++
 {
   "subscribeError" : {
-    "subscriptionId" : "No Subscription ID",
+    "subscriptionId" : "000000000000000000000000",
     "errorCode" : {
       "code" : "404",
       "reasonPhrase" : "Subscription Not Found"

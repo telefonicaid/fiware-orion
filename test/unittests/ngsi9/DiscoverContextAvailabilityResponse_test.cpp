@@ -84,6 +84,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   const char*                           filename17 = "ngsi9.discoverContextAvailabilityResponse.jsonRender17.valid.json";
   const char*                           filename18 = "ngsi9.discoverContextAvailabilityResponse.jsonRender18.valid.json";
   const char*                           filename19 = "ngsi9.discoverContextAvailabilityResponse.jsonRender19.valid.json";
+  const char*                           filename20 = "ngsi9.discoverContextAvailabilityResponse.jsonRender20.valid.json";
   std::string                           rendered;
   DiscoverContextAvailabilityResponse*  dcarP      = new DiscoverContextAvailabilityResponse();
   ContextRegistrationResponse*          crrP;
@@ -374,6 +375,30 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   dcarP->errorCode.fill(SccBadRequest, "Bad Request");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename19)) << "Error getting test data from '" << filename19 << "'";
+  rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+  dcarP->release();
+  rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
+  EXPECT_STREQ("{\n}\n", rendered.c_str());
+
+
+  // 20. Two ContextRegistrationResponses
+  crrP = new ContextRegistrationResponse();
+  eidP = new EntityId("E01", "EType", "false");
+
+  crrP->contextRegistration.entityIdVector.push_back(eidP);
+  crrP->contextRegistration.providingApplication.set("http://tid.test.com/unitTest");
+  dcarP->responseVector.push_back(crrP);
+
+  crrP = new ContextRegistrationResponse();
+  eidP = new EntityId("E02", "EType", "false");
+
+  crrP->contextRegistration.entityIdVector.push_back(eidP);
+  crrP->contextRegistration.providingApplication.set("http://tid.test.com/unitTest2");
+  dcarP->responseVector.push_back(crrP);
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename20)) << "Error getting test data from '" << filename20 << "'";
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
