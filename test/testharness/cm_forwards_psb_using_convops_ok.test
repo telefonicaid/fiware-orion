@@ -89,7 +89,7 @@ fi
 --SHELL--
 
 # Do a NGSI10 request to check that the CM does not accept NGSI10 requests
-(curl localhost:${CM_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+response=$((curl localhost:${CM_PORT}/NGSI10/queryContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -102,11 +102,13 @@ fi
     <attribute>lightstatus</attribute>
   </attributeList>
 </queryContextRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "1: ++++++++++++++++++++"
 
 # Do initial registration in the CM
-REG_OUT=$((curl localhost:${CM_PORT}/NGSI9/contextEntities/ConferenceRoom -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+response=$((curl localhost:${CM_PORT}/NGSI9/contextEntities/ConferenceRoom -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
@@ -125,12 +127,13 @@ REG_OUT=$((curl localhost:${CM_PORT}/NGSI9/contextEntities/ConferenceRoom -s -S 
   <providingApplication>http://localhost:1028/application</providingApplication>
 </registerProviderRequest>
 EOF)
-REG_ID=$(echo "$REG_OUT" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$REG_OUT"
+cat headers.out
+echo $response | xmllint --format -
+REG_ID=$(echo "$response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "2: ++++++++++++++++++++"
 
 # Check the registration in CM 
-(curl localhost:${CM_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+response=$((curl localhost:${CM_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -139,11 +142,13 @@ echo "2: ++++++++++++++++++++"
       </entityId>
     </entityIdList>
   </discoverContextAvailabilityRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "3: ++++++++++++++++++++"
 
 # Check the registration in PSB
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -152,11 +157,13 @@ echo "3: ++++++++++++++++++++"
       </entityId>
     </entityIdList>
   </discoverContextAvailabilityRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "4: ++++++++++++++++++++"
 
 # Update registration in CM
-(curl localhost:${CM_PORT}/NGSI9/contextEntities/MyCar -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+response=$((curl localhost:${CM_PORT}/NGSI9/contextEntities/MyCar -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
@@ -175,11 +182,13 @@ echo "4: ++++++++++++++++++++"
   <providingApplication>http://localhost:1028/mycar</providingApplication>
   <registrationId>$REG_ID</registrationId>
 </registerProviderRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "5: ++++++++++++++++++++"
 
 # Check the registration in CM
-(curl localhost:${CM_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+response=$((curl localhost:${CM_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -188,11 +197,13 @@ echo "5: ++++++++++++++++++++"
       </entityId>
     </entityIdList>
   </discoverContextAvailabilityRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "6: ++++++++++++++++++++"
 
 # Check the registration in PSB
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -201,7 +212,9 @@ echo "6: ++++++++++++++++++++"
       </entityId>
     </entityIdList>
   </discoverContextAvailabilityRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "7: ++++++++++++++++++++"
 
 # Check that everything is ok at database layer
@@ -235,6 +248,11 @@ else
 fi
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <orionError>
   <code>400</code>
@@ -242,12 +260,22 @@ fi
   <details>service '/NGSI10/queryContext' not found</details>
 </orionError>
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 515
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -264,6 +292,11 @@ fi
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 515
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -280,12 +313,22 @@ fi
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT9H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 500
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -302,6 +345,11 @@ fi
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 500
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
