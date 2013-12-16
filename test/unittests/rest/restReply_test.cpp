@@ -166,7 +166,7 @@ TEST(restReply, restErrorReplyGet)
   std::string qcr2 = "/ngsi10/queryContext";
   std::string qcr3 = "/NGSI10/queryContext";
   std::string qcr4 = "queryContextRequest";
-  std::string qcrExpected  = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Query without hits</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  std::string qcrExpected  = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
   std::string qcrExpected2 = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</queryContextResponse>\n";
   
   std::string scr1 = "subscribeContext";
@@ -194,7 +194,7 @@ TEST(restReply, restErrorReplyGet)
   std::string ucr2 = "/ngsi10/updateContext";
   std::string ucr3 = "/NGSI10/updateContext";
   std::string ucr4 = "updateContextRequest";
-  std::string ucrExpected  = "<updateContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>The ContextElement requested is not found</reasonPhrase>\n  </errorCode>\n</updateContextResponse>\n";
+  std::string ucrExpected  = "<updateContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</updateContextResponse>\n";
   std::string ucrExpected2 = "<updateContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</updateContextResponse>\n";
   
   std::string ncr1 = "notifyContext";

@@ -40,7 +40,7 @@ TEST(UpdateContextResponse, constructors)
   ErrorCode              ec(SccBadRequest, "RP", "D");
   UpdateContextResponse  ucr2(ec);
   std::string            rendered;
-  std::string            expected1 = "<updateContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>The ContextElement requested is not found</reasonPhrase>\n  </errorCode>\n</updateContextResponse>\n";
+  std::string            expected1 = "<updateContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</updateContextResponse>\n";
   std::string            expected2 = "<updateContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>RP</reasonPhrase>\n    <details>D</details>\n  </errorCode>\n</updateContextResponse>\n";
 
   utInit();
