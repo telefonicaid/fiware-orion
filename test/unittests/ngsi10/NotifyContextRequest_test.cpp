@@ -37,7 +37,7 @@
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
 
-#include "testDataFromFile.h"
+#include "unittest.h"
 
 
 
@@ -205,4 +205,59 @@ TEST(NotifyContextResponse, Constructor)
    ErrorCode ec(SccOk, "3", "4");
    NotifyContextResponse ncr2(ec);
    EXPECT_EQ(SccOk, ncr2.responseCode.code);
+}
+
+
+
+/* ****************************************************************************
+*
+* json_render - 
+*/
+TEST(NotifyContextRequest, json_render)
+{
+  const char*              filename1  = "ngsi10.notifyContextRequest.jsonRender1.valid.json";
+  const char*              filename2  = "ngsi10.notifyContextRequest.jsonRender2.valid.json";
+  const char*              filename3  = "ngsi10.notifyContextRequest.jsonRender3.valid.json";
+  NotifyContextRequest*    ncrP;
+  ContextElementResponse*  cerP;
+  std::string              rendered;
+
+  utInit();
+  
+  // Preparation 
+  ncrP = new NotifyContextRequest();
+  ncrP->subscriptionId.set("012345678901234567890123");
+  ncrP->originator.set("http://www.tid.es/NotifyContextRequestUnitTest");
+
+  // 1. Without ContextResponseList
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
+  rendered = ncrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+
+
+  // 2. With ContextResponseList
+  cerP = new ContextElementResponse();
+  cerP->contextElement.entityId.fill("E01", "EType", "false");
+  ncrP->contextElementResponseVector.push_back(cerP);
+  cerP->statusCode.fill(SccOk, "OK");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
+  rendered = ncrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+
+
+  // 3. ContextResponseList with two instances
+  cerP = new ContextElementResponse();
+  cerP->contextElement.entityId.fill("E02", "EType", "false");
+  ncrP->contextElementResponseVector.push_back(cerP);
+  cerP->statusCode.fill(SccOk, "OK");
+  
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
+  rendered = ncrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+
+  utExit();
 }

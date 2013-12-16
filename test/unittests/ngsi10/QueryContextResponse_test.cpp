@@ -41,8 +41,8 @@ TEST(QueryContextResponse, ok_xml)
   QueryContextResponse  qcr1;
   QueryContextResponse  qcr2(ec);
   std::string           rendered;
-  std::string           expected1 = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Query without hits</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
-  std::string           expected2 = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Query without hits</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  std::string           expected1 = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  std::string           expected2 = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
 
   rendered = qcr1.render(QueryContext, XML, "");
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());
