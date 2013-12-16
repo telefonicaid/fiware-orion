@@ -103,6 +103,9 @@ make debug DESTDIR=$RPM_BUILD_ROOT BUILD_ARCH=%{build_arch}
 #FIXME There is an open issue with "make release" malfunction. Until get fixed, we will build in debug mode
 #make install DESTDIR=$RPM_BUILD_ROOT
 make install_debug DESTDIR=$RPM_BUILD_ROOT
+# rpmbuild seems to do the strip step automatically. However, this would fail after chmod, so we "manually" do
+# it as part of our %install script
+strip $RPM_BUILD_ROOT/usr/bin/contextBroker
 chmod 555 $RPM_BUILD_ROOT/usr/bin/contextBroker
 mkdir -p $RPM_BUILD_ROOT/var/%{name}
 mkdir -p $RPM_BUILD_ROOT/etc/init.d
