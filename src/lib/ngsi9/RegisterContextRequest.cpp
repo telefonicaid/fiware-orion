@@ -41,14 +41,21 @@
 */
 std::string RegisterContextRequest::render(RequestType requestType, Format format, std::string indent)
 {
-  std::string out = "";
-  std::string tag = "registerContextRequest";
+  std::string  out                                 = "";
+  std::string  xmlTag                              = "registerContextRequest";
+  bool         durationRendered                    = duration.get() != "";
+  bool         registrationIdRendered              = registrationId.get() != "";
+  bool         commaAfterRegistrationId            = false; // Last element
+  bool         commaAfterDuration                  = registrationIdRendered;
+  bool         commaAfterContextRegistrationVector = registrationIdRendered || durationRendered;
 
-  out += startTag(indent, tag, format, false);
-  out += contextRegistrationVector.render(format, indent + "  ");
-  out += duration.render(format, indent + "  ");
-  out += registrationId.render(format, indent + "  ");
-  out += endTag(indent, tag, format);
+  out += startTag(indent, xmlTag, "", format, false, false);
+
+  out += contextRegistrationVector.render(format, indent + "  ", commaAfterContextRegistrationVector);
+  out += duration.render(format,                  indent + "  ", commaAfterDuration);
+  out += registrationId.render(format,            indent + "  ", commaAfterRegistrationId);
+
+  out += endTag(indent, xmlTag, format, false);
 
   return out;
 }

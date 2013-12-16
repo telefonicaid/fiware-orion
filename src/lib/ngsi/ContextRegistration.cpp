@@ -48,17 +48,23 @@ ContextRegistration::ContextRegistration()
 *
 * ContextRegistration::render - 
 */
-std::string ContextRegistration::render(Format format, std::string indent)
+std::string ContextRegistration::render(Format format, std::string indent, bool comma)
 {
   std::string out = "";
   std::string tag = "contextRegistration";
 
+  //
+  // About JSON commas;
+  // As providingApplication is MANDATORY and it is the last item in ContextRegistration,
+  // the problem with the JSON commas disappear. All fields will have 'comma set to true'.
+  // All, except providingApplication of course :-)
+  //
   out += startTag(indent, tag, format);
   out += entityIdVector.render(format, indent + "  ", true);
   out += contextRegistrationAttributeVector.render(format, indent + "  ", true);
   out += registrationMetadataVector.render(format, indent + "  ", true);
-  out += providingApplication.render(format, indent + "  ");
-  out += endTag(indent, tag, format);
+  out += providingApplication.render(format, indent + "  ", false);
+  out += endTag(indent, tag, format, comma);
 
   return out;
 }

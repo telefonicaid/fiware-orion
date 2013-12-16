@@ -36,15 +36,16 @@
 *
 * render - 
 */
-std::string AttributeAssociation::render(Format format, std::string indent)
+std::string AttributeAssociation::render(Format format, std::string indent, bool comma)
 {
-  std::string out = "";
-  std::string tag = "AttributeAssociation";
+  std::string  out                     = "";
+  std::string  tag                     = "AttributeAssociation";
+  bool         targetAttributeRendered = target != "";
 
   out += startTag(indent, tag, format);
-  out += valueTag(indent + "  ", "sourceAttribute", source, format);
-  out += valueTag(indent + "  ", "targetAttribute", target, format);
-  out += endTag(indent, tag, format);
+  out += valueTag(indent + "  ", "sourceAttribute", source, format, targetAttributeRendered);
+  out += valueTag(indent + "  ", "targetAttribute", target, format, false);
+  out += endTag(indent, tag, format, comma);
 
   return out;
 }

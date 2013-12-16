@@ -82,19 +82,18 @@ std::string startTag(std::string indent, std::string xmlTag, std::string jsonTag
 *
 * endTag -  
 */
-std::string endTag(std::string indent, std::string tagName, Format format, bool comma, bool isVector)
+std::string endTag(std::string indent, std::string tagName, Format format, bool comma, bool isVector, bool nl)
 {
   if (format == XML)
     return indent + "</" + tagName + ">\n";
 
-  if (isVector && comma)
-     return indent + "],\n";
-  else if (isVector && !comma)
-     return indent + "]\n";
-  else if (!isVector && comma)
-    return indent + "},\n";
-  else
-    return indent + "}\n";
+  std::string out = indent;;
+
+  out += isVector?  "]"  : "}";
+  out += comma?     ","  : "";
+  out += nl?        "\n" : "";
+
+  return out;
 }
 
 

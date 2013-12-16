@@ -72,9 +72,14 @@ TEST(ContextElement, Check)
   EXPECT_EQ(ceVector.check(UpdateContext, XML, "", "", 0), "OK");
 
   // render
-  std::string cs2render = "<contextElement>\n  <entityId type=\"\" isPattern=\"\">\n    <id>id</id>\n  </entityId>\n</contextElement>\n";
-  std::string out       = ce2.render(XML, "");
-  EXPECT_STREQ(cs2render.c_str(), out.c_str());
+  std::string cs2expect1xml  = "<contextElement>\n  <entityId type=\"\" isPattern=\"\">\n    <id>id</id>\n  </entityId>\n</contextElement>\n";
+  std::string cs2expect1json = "\"contextElement\" : {\n  \"type\" : \"\",\n  \"isPattern\" : \"\",\n  \"id\" : \"id\"\n}\n";
+  std::string out;
+
+  out = ce2.render(XML, "", false);
+  EXPECT_STREQ(cs2expect1xml.c_str(), out.c_str());
+  out = ce2.render(JSON, "", false);
+  EXPECT_STREQ(cs2expect1json.c_str(), out.c_str());
 
   // present
   ce2.present("", -1);

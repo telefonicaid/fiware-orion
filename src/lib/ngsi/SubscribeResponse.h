@@ -46,7 +46,7 @@ typedef struct SubscribeResponse
 
   SubscribeResponse();
 
-  std::string render(Format format, std::string indent);
+  std::string render(Format format, std::string indent, bool comma = false);
 } SubscribeResponse;
 
 #endif

@@ -42,6 +42,7 @@ TEST(NotifyConditionVector, render)
   std::string            rendered;
   std::string            expected1 = "";
   std::string            expected2 = "<notifyConditions>\n  <notifyCondition>\n    <type>Type</type>\n  </notifyCondition>\n</notifyConditions>\n";
+  std::string            expected3 = "\"notifyConditions\" : [\n  {\n    \"type\" : \"Type\"\n  }\n]\n";
   
   rendered = ncV.render(XML, "", false);
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());
@@ -51,6 +52,8 @@ TEST(NotifyConditionVector, render)
 
   rendered = ncV.render(XML, "", false);
   EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  rendered = ncV.render(JSON, "", false);
+  EXPECT_STREQ(expected3.c_str(), rendered.c_str());
 
   ncV.release();
 

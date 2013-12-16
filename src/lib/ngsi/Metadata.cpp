@@ -91,7 +91,7 @@ std::string Metadata::render(Format format, std::string indent, bool comma)
   out += valueTag(indent + "  ", "type", type, format, true);
 
   if (type == "Association")
-     xValue = std::string("\n") + association.render(format, indent + "  ");
+    xValue = std::string("\n") + association.render(format, indent + "  ", false);
 
   out += valueTag(indent + "  ", "value", xValue, format, false, (type == "Association"));
   out += endTag(indent, tag, format, comma);

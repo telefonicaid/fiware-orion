@@ -37,24 +37,28 @@
 *
 * ContextElement::render - 
 */
-std::string ContextElement::render(Format format, std::string indent)
+std::string ContextElement::render(Format format, std::string indent, bool comma)
 {
-  std::string out = "";
-  std::string tag = "contextElement";
+  std::string  out                              = "";
+  std::string  xmlTag                           = "contextElement";
+  std::string  jsonTag                          = "contextElement";
+  bool         attributeDomainNameRendered      = attributeDomainName.get() != "";
+  bool         contextAttributeVectorRendered   = contextAttributeVector.size() != 0;
+  bool         domainMetadataVectorRendered     = domainMetadataVector.size() != 0;
 
-  out += startTag(indent, tag, format);
+  bool         commaAfterDomainMetadataVector   = false; // Last element
+  bool         commaAfterContextAttributeVector = domainMetadataVectorRendered;
+  bool         commaAfterAttributeDomainName    = domainMetadataVectorRendered || contextAttributeVectorRendered;
+  bool         commaAfterEntityId               = domainMetadataVectorRendered || contextAttributeVectorRendered || attributeDomainNameRendered;
 
-  if (format == XML)
-    out += entityId.render(format, indent + "  ");
+  out += startTag(indent, xmlTag, jsonTag, format, false, true);
 
-  out += attributeDomainName.render(format, indent + "  ", true);
-  out += contextAttributeVector.render(format, indent + "  ", true);
-  out += domainMetadataVector.render(format, indent + "  ", true);
+  out += entityId.render(format,               indent + "  ", commaAfterEntityId, false);
+  out += attributeDomainName.render(format,    indent + "  ", commaAfterAttributeDomainName);
+  out += contextAttributeVector.render(format, indent + "  ", commaAfterContextAttributeVector);
+  out += domainMetadataVector.render(format,   indent + "  ", commaAfterDomainMetadataVector);
 
-  if (format == JSON)
-    out += entityId.render(format, indent + "  ", false);
-
-  out += endTag(indent, tag, format, true, false);
+  out += endTag(indent, xmlTag, format, comma, false);
 
   return out;
 }

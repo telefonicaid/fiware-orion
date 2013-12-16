@@ -43,13 +43,13 @@ TEST(ContextElementVector, render)
   ContextElementVector  ceV;
   std::string           expected = "<contextElementList>\n  <contextElement>\n    <entityId type=\"E_TYPE\" isPattern=\"\">\n      <id>E_ID</id>\n    </entityId>\n  </contextElement>\n</contextElementList>\n";
 
-  rendered = ceV.render(XML, "");
+  rendered = ceV.render(XML, "", false);
   EXPECT_STREQ("", rendered.c_str());
 
   ceP->entityId = eId;
   ceV.push_back(ceP);
 
-  rendered = ceV.render(XML, "");
+  rendered = ceV.render(XML, "", false);
   EXPECT_STREQ(expected.c_str(), rendered.c_str());
 
   ceV.release();

@@ -49,11 +49,11 @@ void ContextRegistrationResponseVector::push_back(ContextRegistrationResponse* i
 *
 * ContextRegistrationResponseVector::render - 
 */
-std::string ContextRegistrationResponseVector::render(Format format, std::string indent)
+std::string ContextRegistrationResponseVector::render(Format format, std::string indent, bool comma)
 {
-  std::string  out    = "";
-  std::string  xmlTag = "contextRegistrationResponseList";
-  std::string jsonTag = "contextRegistrationResponses";
+  std::string  out     = "";
+  std::string  xmlTag  = "contextRegistrationResponseList";
+  std::string  jsonTag = "contextRegistrationResponses";
 
   if (vec.size() == 0)
     return "";
@@ -63,7 +63,7 @@ std::string ContextRegistrationResponseVector::render(Format format, std::string
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
      out += vec[ix]->render(format, indent + "  ", (ix != vec.size() - 1));
 
-  out += endTag(indent, xmlTag, format, false, true);
+  out += endTag(indent, xmlTag, format, comma, true);
 
   return out;
 }

@@ -69,9 +69,9 @@ std::string UpdateContextSubscriptionResponse::render(RequestType requestType, F
   out += startTag(indent, tag, format, false);
 
   if (subscribeError.errorCode.code == NO_ERROR_CODE)
-    out += subscribeResponse.render(format, indent + "  ");
+     out += subscribeResponse.render(format, indent + "  ", false);
   else
-    out += subscribeError.render(UpdateContextSubscription, format, indent + "  ");
+     out += subscribeError.render(UpdateContextSubscription, format, indent + "  ", false);
 
   out += endTag(indent, tag, format);
 

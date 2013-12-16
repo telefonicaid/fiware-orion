@@ -53,11 +53,14 @@ TEST(NotifyCondition, Creation)
 TEST(NotifyCondition, render)
 {
   NotifyCondition  nc;
-  std::string      expected = "<notifyCondition>\n  <type></type>\n</notifyCondition>\n";
+  std::string      expected1xml  = "<notifyCondition>\n  <type></type>\n</notifyCondition>\n";
+  std::string      expected1json = "{\n  \"type\" : \"\"\n}\n";
   std::string      rendered;
 
   rendered = nc.render(XML, "", false);
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+  EXPECT_STREQ(expected1xml.c_str(), rendered.c_str());
+  rendered = nc.render(JSON, "", false);
+  EXPECT_STREQ(expected1json.c_str(), rendered.c_str());
 }
 
 
