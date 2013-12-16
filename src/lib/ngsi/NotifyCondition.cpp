@@ -61,6 +61,8 @@ std::string NotifyCondition::render(Format format, std::string indent, bool notL
 /* ****************************************************************************
 *
 * NotifyCondition::check - 
+*
+* FIXME: P5 - in case of errors a formated result string should be returned ... ?
 */
 std::string NotifyCondition::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {

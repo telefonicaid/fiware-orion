@@ -39,10 +39,14 @@ TEST(Scope, render)
 {
   Scope        scope("Type", "Value");
   std::string  rendered;
-  std::string  expected = "<operationScope>\n  <type>Type</type>\n  <value>Value</value>\n</operationScope>\n";
+  std::string  expected1xml  = "<operationScope>\n  <type>Type</type>\n  <value>Value</value>\n</operationScope>\n";
+  std::string  expected1json = "{\n  \"type\" : \"Type\",\n  \"value\" : \"Value\"\n}\n";
 
   rendered = scope.render(XML, "", false);
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+  EXPECT_STREQ(expected1xml.c_str(), rendered.c_str());
+
+  rendered = scope.render(JSON, "", false);
+  EXPECT_STREQ(expected1json.c_str(), rendered.c_str());
 
   scope.release();
 }

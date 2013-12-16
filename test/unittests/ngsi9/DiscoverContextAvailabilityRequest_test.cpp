@@ -882,7 +882,7 @@ TEST(DiscoverContextAvailabilityRequest, emptyScopeValue_json)
 TEST(DiscoverContextAvailabilityRequest, parseError_json)
 {
   ParseData       reqData;
-  const char*     fileName = "discoverContextAvailabilityRequest_parseError.json";
+  const char*     fileName = "ngsi9.discoverContextAvailabilityRequest.parseError.invalid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;

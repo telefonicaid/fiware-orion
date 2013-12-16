@@ -90,13 +90,23 @@ vMsg Git repo home: $SRC_TOP
 # -----------------------------------------------------------------------------
 # starting actual work
 
+typeset -i files
+typeset -i errors
+files=0
+errors=0
 exitValue=0
-for FILE in $(ls $SRC_TOP/test/unittests/testData/*.json)
+for FILE in $(find $SRC_TOP/test/ -name "*.json" | grep -v '\.invalid\.json'$)
 do
-   cat $FILE | python -m json.tool > /dev/null
-   if [ "$?" -eq "1" ]; then
-      echo "File $FILE is not a well-formed JSON document"
-      exitValue=1
-   fi
+  cat $FILE | python -m json.tool > /dev/null
+  if [ "$?" -eq "1" ]; then
+    echo "File $FILE is not a well-formed JSON document"
+    exitValue=1
+    errors=$errors+1
+  fi
+  files=$files+1
 done
+
+echo $0: $files json files examined
+echo $0: $errors erroneous json files found
+
 exit $exitValue

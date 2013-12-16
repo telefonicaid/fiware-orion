@@ -37,14 +37,17 @@ TEST(ErrorCode, render)
   ErrorCode    e1;
   ErrorCode    e2(200, "REASON", "DETAILS");
   std::string  rendered;
-  std::string  expected1 = "<errorCode>\n  <code>500</code>\n  <reasonPhrase> - ZERO code set to 500</reasonPhrase>\n</errorCode>\n";
-  std::string  expected2 = "<errorCode>\n  <code>200</code>\n  <reasonPhrase>REASON</reasonPhrase>\n  <details>DETAILS</details>\n</errorCode>\n";
+  std::string  expected1xml  = "<errorCode>\n  <code>500</code>\n  <reasonPhrase> - ZERO code set to 500</reasonPhrase>\n</errorCode>\n";
+  std::string  expected1json = "\"errorCode\" : {\n  \"code\" : \"500\",\n  \"reasonPhrase\" : \" - ZERO code set to 500\"\n}\n";
+  std::string  expected2xml  = "<errorCode>\n  <code>200</code>\n  <reasonPhrase>REASON</reasonPhrase>\n  <details>DETAILS</details>\n</errorCode>\n";
 
   rendered = e1.render(XML, "");
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  EXPECT_STREQ(expected1xml.c_str(), rendered.c_str());
+  rendered = e1.render(JSON, "");
+  EXPECT_STREQ(expected1json.c_str(), rendered.c_str());
 
   rendered = e2.render(XML, "");
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  EXPECT_STREQ(expected2xml.c_str(), rendered.c_str());
 }
 
 

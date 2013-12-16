@@ -39,16 +39,22 @@ TEST(ContextRegistrationResponse, render)
 {
   ContextRegistrationResponse  crr;
   std::string                  rendered;
-  std::string                  expected1 = "<contextRegistrationResponse>\n  <contextRegistration>\n  </contextRegistration>\n</contextRegistrationResponse>\n";
-  std::string                  expected2 = "<contextRegistrationResponse>\n  <contextRegistration>\n  </contextRegistration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase></reasonPhrase>\n  </errorCode>\n</contextRegistrationResponse>\n";
+  std::string                  expected1xml  = "<contextRegistrationResponse>\n  <contextRegistration>\n  </contextRegistration>\n</contextRegistrationResponse>\n";
+  std::string                  expected1json = "{\n  \"contextRegistration\" : {\n  }\n}\n";
+  std::string                  expected2xml  = "<contextRegistrationResponse>\n  <contextRegistration>\n  </contextRegistration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase></reasonPhrase>\n  </errorCode>\n</contextRegistrationResponse>\n";
+  std::string                  expected2json = "{\n  \"contextRegistration\" : {\n  },\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"\"\n  }\n}\n";
 
   crr.errorCode.code = NO_ERROR_CODE;
   rendered = crr.render(XML, "");
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  EXPECT_STREQ(expected1xml.c_str(), rendered.c_str());
+  rendered = crr.render(JSON, "");
+  EXPECT_STREQ(expected1json.c_str(), rendered.c_str());
 
   crr.errorCode.code = 400;
   rendered = crr.render(XML, "");
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  EXPECT_STREQ(expected2xml.c_str(), rendered.c_str());
+  rendered = crr.render(JSON, "");
+  EXPECT_STREQ(expected2json.c_str(), rendered.c_str());
 }
 
 
