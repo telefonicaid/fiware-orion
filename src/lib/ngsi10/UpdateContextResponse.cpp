@@ -88,7 +88,7 @@ std::string UpdateContextResponse::render(RequestType requestType, Format format
   {
     if (contextElementResponseVector.size() == 0)
     {
-      errorCode.fill(SccContextElementNotFound, "The ContextElement requested is not found", "");
+      errorCode.fill(SccContextElementNotFound, "No context element found", "");
       out += errorCode.render(format, indent + "  ");
     }
     else

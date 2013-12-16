@@ -78,7 +78,7 @@ std::string QueryContextResponse::render(RequestType requestType, Format format,
   {
     if (contextElementResponseVector.size() == 0)
     {
-      errorCode.fill(SccContextElementNotFound, "Query without hits", "");
+      errorCode.fill(SccContextElementNotFound, "No context element found", "");
       out += errorCode.render(format, indent + "  ");
     }
     else 
