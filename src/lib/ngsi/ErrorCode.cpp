@@ -161,5 +161,7 @@ void ErrorCode::present(std::string indent)
 */
 void ErrorCode::release(void)
 {
-   /* This method is included for the sake of homogeneity */
+   code = NO_ERROR_CODE;
+   reasonPhrase = "";
+   details      = "";
 }

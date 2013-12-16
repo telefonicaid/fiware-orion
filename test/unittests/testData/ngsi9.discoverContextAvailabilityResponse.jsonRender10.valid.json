@@ -1,0 +1,9 @@
+{
+  "contextRegistrationResponses" : [
+    {
+      "contextRegistration" : {
+        "providingApplication" : "http://tid.test.com/unitTest10"
+      }
+    }
+  ]
+}
