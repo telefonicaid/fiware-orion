@@ -39,7 +39,7 @@
 std::string putSubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
   std::string                        subscriptionId = compV[2];
-  UpdateContextSubscriptionRequest*  ucsrP = &parseDataP->ucsr.res;
+  UpdateContextSubscriptionRequest*  ucsrP          = &parseDataP->ucsr.res;
 
   if (subscriptionId != ucsrP->subscriptionId.get())
   {

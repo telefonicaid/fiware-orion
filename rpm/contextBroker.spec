@@ -103,6 +103,10 @@ make debug DESTDIR=$RPM_BUILD_ROOT BUILD_ARCH=%{build_arch}
 #FIXME There is an open issue with "make release" malfunction. Until get fixed, we will build in debug mode
 #make install DESTDIR=$RPM_BUILD_ROOT
 make install_debug DESTDIR=$RPM_BUILD_ROOT
+# rpmbuild seems to do the strip step automatically. However, this would fail after chmod, so we "manually" do
+# it as part of our %install script
+strip $RPM_BUILD_ROOT/usr/bin/contextBroker
+chmod 555 $RPM_BUILD_ROOT/usr/bin/contextBroker
 mkdir -p $RPM_BUILD_ROOT/var/%{name}
 mkdir -p $RPM_BUILD_ROOT/etc/init.d
 mkdir -p $RPM_BUILD_ROOT/etc/profile.d
@@ -157,6 +161,22 @@ Using these interfaces, clients can do several operations:
 %files -n %{name}-fiware
 
 %changelog
+* Mon Dec 16 2013 Fermin Galan <fermin@tid.es> 0.9.0-1 (FIWARE-3.2.3-1)
+- Complete JSON support for NGSI9/10 standard operations
+- Decoupled NGSI9 and NGSI10 functionality
+- Complete convenience operations support (XML payload in/out), except the ones related to attribute domains
+- Much improved alignment with FI-WARE NGSI XSD in XML payloads
+- Support for metadata ID attribute in queryContext, updateContext and equivalent convenience operations
+- FIX avoid sending empty notifications with ONTIMEINTERVAL (issue #47)
+- Tracelevels changes and cleanup
+- Trace for incomplete payload and unsupported HTTP headers moved from warning log to tracelevel log
+- ADD trace for output payload (under LmtRestReply tracelevel)
+- Proper "User-Agent" and "Accept" headers in notifications sent
+- FIX no Content-Type HTTP header for responses without payload
+- FIX using HTTP 400 instead of 500 for payload parsing errors
+- FIX proper payload per URL operation (issue #old72)
+- FIX buffer overflow problems in logging subsystem
+
 * Wed Oct 30 2013 Fermin Galan <fermin@tid.es> 0.8.1-1 (FIWARE-3.2.1-1)
 - First version released as open source
 - ADD lastest-updates.py script 

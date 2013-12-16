@@ -53,13 +53,16 @@ void UpdateContextRequest::init(void)
 */
 std::string UpdateContextRequest::render(RequestType requestType, Format format, std::string indent)
 {
-  std::string out = "";
-  std::string tag = "updateContextRequest";
+  std::string  out = "";
+  std::string  tag = "updateContextRequest";
 
+  // JSON commas:
+  // Both fields are MANDATORY, so, comma after "contextElementVector"
+  //
   out += startTag(indent, tag, format, false);
-  out += contextElementVector.render(format, indent + "  ");
-  out += updateActionType.render(format, indent + "  ");
-  out += endTag(indent, tag, format);
+  out += contextElementVector.render(format, indent + "  ", true);
+  out += updateActionType.render(format, indent + "  ", false);
+  out += endTag(indent, tag, format, false);
 
   return out;
 }

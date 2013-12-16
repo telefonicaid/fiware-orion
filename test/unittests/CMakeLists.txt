@@ -55,6 +55,7 @@ SET (SOURCES
     main_UnitTest.cpp
     testDataFromFile.cpp
     testInit.cpp
+    unittest.cpp
 
     serviceRoutines/badVerbGetOnly_test.cpp
     serviceRoutines/badVerbPostOnly_test.cpp
@@ -62,6 +63,7 @@ SET (SOURCES
     serviceRoutines/badVerbGetPostOnly_test.cpp
     serviceRoutines/badVerbGetPostDeleteOnly_test.cpp
     serviceRoutines/badVerbGetDeleteOnly_test.cpp
+    serviceRoutines/badVerbGetPutDeleteOnly_test.cpp
     serviceRoutines/deleteIndividualContextEntity_test.cpp
     serviceRoutines/deleteIndividualContextEntityAttribute_test.cpp
     serviceRoutines/deleteIndividualContextEntityAttributes_test.cpp
@@ -107,6 +109,10 @@ SET (SOURCES
     serviceRoutines/exitTreat_test.cpp
     serviceRoutines/leakTreat_test.cpp
     serviceRoutines/statisticsTreat_test.cpp
+    serviceRoutines/putAvailabilitySubscriptionConvOp_test.cpp
+    serviceRoutines/deleteAttributeValueInstance_test.cpp
+    serviceRoutines/putAttributeValueInstance_test.cpp
+    serviceRoutines/getAttributeValueInstance_test.cpp
 
     convenience/Convenience_test.cpp
     convenienceMap/mapDeleteIndividualContextEntity_test.cpp
@@ -143,12 +149,13 @@ SET (SOURCES
     ngsi9/DiscoverContextAvailabilityRequest_test.cpp
     ngsi9/DiscoverContextAvailabilityResponse_test.cpp
     ngsi9/SubscribeAvailabilityRequest_test.cpp
-    ngsi9/SubscribeAvailabilityResponse_test.cpp
+    ngsi9/SubscribeContextAvailabilityResponse_test.cpp
     ngsi9/NotifyContextAvailabilityRequest_test.cpp
     ngsi9/NotifyContextAvailabilityResponse_test.cpp
     ngsi9/UnsubscribeContextAvailabilityRequest_test.cpp
     ngsi9/UnsubscribeContextAvailabilityResponse_test.cpp
     ngsi9/UpdateContextAvailabilitySubscriptionRequest_test.cpp
+    ngsi9/UpdateContextAvailabilitySubscriptionResponse_test.cpp
 
     ngsi10/QueryContextRequest_test.cpp
     ngsi10/QueryContextResponse_test.cpp
@@ -221,8 +228,17 @@ SET (SOURCES
 
     jsonParse/jsonRequest_test.cpp
 
+    xmlParse/xmlAppendContextElementRequest_test.cpp
+    xmlParse/xmlRegisterContextRequest_test.cpp
+    xmlParse/xmlRegisterContextResponse_test.cpp
+    xmlParse/xmlRequest_test.cpp
+    xmlParse/xmlUpdateContextElementRequest_test.cpp
+    xmlParse/xmlUpdateContextRequest_test.cpp
+
     rest/OrionError_test.cpp
     rest/Verb_test.cpp
+    rest/restReply_test.cpp
+    rest/RestService_test.cpp
 )
 
 SET (HEADERS

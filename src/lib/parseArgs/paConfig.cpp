@@ -264,14 +264,14 @@ void paConfigCleanup(void)
 
 	if (paManExitStatus)
     {
-       LM_M(("Freeing paManExitStatus"));
+       LM_F(("Freeing paManExitStatus"));
 		free(paManExitStatus);
         paManExitStatus = NULL;
     }
 
 	if (paManAuthor)
     {
-       LM_M(("Freeing paManAuthor"));
+       LM_F(("Freeing paManAuthor"));
 		free(paManAuthor);
         paManAuthor = NULL;
     }

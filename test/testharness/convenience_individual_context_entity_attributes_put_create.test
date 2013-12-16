@@ -68,19 +68,44 @@ echo "+++++ 1. put an entity +++++"
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
     <contextAttribute>
-      <name>temperature</name>
+      <name>A1</name>
       <type>degree</type>
-      <contextValue>10</contextValue>
-    </contextAttribute>
-    <contextAttribute>
-      <name>pressure</name>
-      <type>clima</type>
-      <contextValue>p23</contextValue>
+      <contextValue>1</contextValue>
     </contextAttribute>
   </contextAttributeList>
 </updateContextElementRequest>
 EOF
 
+echo "+++++ 2. post an entity +++++"
+(curl localhost:{$BROKER_PORT}/ngsi10/contextEntities/entity01/attributes --header "Content-Type: application/xml" -X POST -d @- | xmllint --format -) << EOF
+<appendContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>degree</type>
+      <contextValue>2</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>
+EOF
+
+echo "+++++ 3. put an entity +++++"
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes -s -S --header 'Content-Type: application/xml' -X PUT -d @- | xmllint --format - ) << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<updateContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>degree</type>
+      <contextValue>3</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</updateContextElementRequest>
+EOF
+
+echo "+++++ 4. done +++++"
 
 --REGEXPECT--
 +++++ 1. put an entity +++++
@@ -88,15 +113,42 @@ EOF
 <updateContextElementResponse>
   <contextResponseList>
     <contextAttributeResponse>
+      <statusCode>
+        <code>404</code>
+        <reasonPhrase>Entity Not Found</reasonPhrase>
+        <details>entity01</details>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</updateContextElementResponse>
++++++ 2. post an entity +++++
+<?xml version="1.0"?>
+<appendContextElementResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
       <contextAttributeList>
         <contextAttribute>
-          <name>temperature</name>
+          <name>A1</name>
           <type>degree</type>
           <contextValue/>
         </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</appendContextElementResponse>
++++++ 3. put an entity +++++
+<?xml version="1.0"?>
+<updateContextElementResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
         <contextAttribute>
-          <name>pressure</name>
-          <type>clima</type>
+          <name>A1</name>
+          <type>degree</type>
           <contextValue/>
         </contextAttribute>
       </contextAttributeList>
@@ -107,6 +159,7 @@ EOF
     </contextAttributeResponse>
   </contextResponseList>
 </updateContextElementResponse>
++++++ 4. done +++++
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})

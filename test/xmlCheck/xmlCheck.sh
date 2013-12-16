@@ -457,7 +457,7 @@ xmlDocsErrors=$(expr $xmlFilesErrors + $xmlPartsErrors)
 #
 if [ "$file" != "" ]
 then
-  if [ "$ERR" != "0"
+  if [ "$ERR" != "0" ]
   then
     exit 6
   else

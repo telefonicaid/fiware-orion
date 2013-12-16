@@ -39,21 +39,21 @@ TEST(ConditionValueList, ok)
   ConditionValueList cvList;
   std::string        out;
   std::string        expected1 = "<condValueList>\n  <condValue>cv1</condValue>\n</condValueList>\n";
-  std::string        expected2 = "\"condValueList\" : {\n  \"condValue\" : \"cv1\"\n}\n";
-  std::string        expected3 = "\"condValueList\" : {\n  \"condValue\" : \"cv1\",\n  \"condValue\" : \"cv2\"\n}\n";
+  std::string        expected2 = "\"condValueList\" : [\n  \"cv1\"\n]\n";
+  std::string        expected3 = "\"condValueList\" : [\n  \"cv1\",\n  \"cv2\"\n]\n";
 
-  out = cvList.render(XML, "");
+  out = cvList.render(XML, "", false);
   EXPECT_STREQ("", out.c_str());
 
   cvList.push_back("cv1");
-  out = cvList.render(XML, "");
+  out = cvList.render(XML, "", false);
   EXPECT_STREQ(expected1.c_str(), out.c_str());
 
-  out = cvList.render(JSON, "");
+  out = cvList.render(JSON, "", false);
   EXPECT_STREQ(expected2.c_str(), out.c_str());
 
   cvList.push_back("cv2");
-  out = cvList.render(JSON, "");
+  out = cvList.render(JSON, "", false);
   EXPECT_STREQ(expected3.c_str(), out.c_str());
 
   out = cvList.check(SubscribeContext, XML, "", "", 0);

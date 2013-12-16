@@ -39,9 +39,9 @@
 */
 static RestService rs[] = 
 {
-  { "DELETE IndividualContextEntity",             "DELETE", IndividualContextEntity,               3, { "ngsi10", "contextEntities", "*"                     }, "", deleteIndividualContextEntity             },
-  { "* InvalidRequest",                           "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "* *",                                        "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "DELETE", IndividualContextEntity,               3, { "ngsi10", "contextEntities", "*"                     }, "", deleteIndividualContextEntity             },
+  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
+  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
 };
 
 

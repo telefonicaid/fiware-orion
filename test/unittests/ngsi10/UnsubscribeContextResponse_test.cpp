@@ -28,6 +28,8 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi/ErrorCode.h"
 
+#include "unittest.h"
+
 
 
 /* ****************************************************************************
@@ -52,4 +54,45 @@ TEST(UnsubscribeContextResponse, constructorsAndRender)
   EXPECT_STREQ(expected.c_str(), rendered.c_str());
 
   uncr1.release();
+}
+
+
+
+/* ****************************************************************************
+*
+* jsonRender - 
+*/
+TEST(UnsubscribeContextResponse, jsonRender)
+{
+  const char*                  filename1  = "ngsi10.unsubscribeContextResponse.jsonRender1.valid.json";
+  const char*                  filename2  = "ngsi10.unsubscribeContextResponse.jsonRender2.valid.json";
+  UnsubscribeContextResponse*  uncrP;
+  std::string                  rendered;
+
+  utInit();
+
+  // Preparations
+  uncrP = new UnsubscribeContextResponse();
+
+  // 1. 400, with details
+  uncrP->subscriptionId.set("012345678901234567890123");
+  uncrP->statusCode.fill(SccBadRequest, "Bad Request", "details");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
+  rendered = uncrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+
+
+  // 2. 200, no details
+  uncrP->subscriptionId.set("012345678901234567890123");
+  uncrP->statusCode.fill(SccOk, "OK");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
+  rendered = uncrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+  delete uncrP;
+
+  utExit();
 }

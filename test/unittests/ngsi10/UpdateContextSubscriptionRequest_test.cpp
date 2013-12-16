@@ -105,18 +105,23 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     fileName  = "updateContextSubscription_badLength.json";
-  std::string     expected1 = "{\n  \"subscribeError\" : {\n    \"subscriptionId\" : \"9212ce4b0c214479be429e2\",\n    \"errorCode\" : {\n      \"code\" : \"400\",\n      \"reasonPhrase\" : \"bad length (24 chars expected)\"\n    }\n  }\n}\n";
+  std::string     rendered;
+  std::string     checked;
+  const char*     expectedFile1 = "ngsi10.updateContextSubscriptionRequest_badLength.expected1.valid.json";
+  const char*     expectedFile2 = "ngsi10.updateContextSubscriptionRequest_badLength.expected2.valid.json";
+  const char*     expectedFile3 = "ngsi10.updateContextSubscriptionRequest_badLength.expected3.valid.json";
+  const char*     expectedFile4 = "ngsi10.updateContextSubscriptionRequest_badLength.expected4.valid.json";
   
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), expectedFile1)) << "Error getting test data from '" << expectedFile1 << "'";
   lmTraceLevelSet(LmtDump, true);
-  std::string result = jsonTreat(testBuf, &ci, &parseData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  rendered = jsonTreat(testBuf, &ci, &parseData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
   lmTraceLevelSet(LmtDump, false);
-
-  EXPECT_EQ(expected1, result);
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   //
   // With the data obtained, render, present and release methods are exercised
@@ -125,21 +130,18 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
   
   ucsrP->present(""); // No output
 
-  std::string rendered;
-  std::string checked;
-  std::string expected2 = "{\n  \"duration\" : \"P5Y\",\n  \"restriction\" : {\n    \"attributeExpression\" : \"AE\"\n    \"scope\" : {\n      \"operationScope\" : {\n        \"type\" : \"t1\"\n        \"value\" : \"1\"\n      }\n      \"operationScope\" : {\n        \"type\" : \"t2\"\n        \"value\" : \"2\"\n      }\n    }\n  }\n  \"subscriptionId\" : \"9212ce4b0c214479be429e2\"\n  \"notifyConditions\" : {\n    \"notifyCondition\" : {\n      \"type\" : \"ONCHANGE\"\n      \"condValueList\" : {\n        \"condValue\" : \"CondValue1\",\n        \"condValue\" : \"CondValue2\"\n      }\n      \"restriction\" : \"restriction\"\n    }\n  }\n  \"throttling\" : \"P5Y\"\n}\n";
-  std::string expected3 = "{\n  \"subscribeError\" : {\n    \"subscriptionId\" : \"9212ce4b0c214479be429e2\",\n    \"errorCode\" : {\n      \"code\" : \"400\",\n      \"reasonPhrase\" : \"FORCED ERROR\"\n    }\n  }\n}\n";
-  std::string expected4 = "{\n  \"subscribeError\" : {\n    \"subscriptionId\" : \"9212ce4b0c214479be429e2\",\n    \"errorCode\" : {\n      \"code\" : \"400\",\n      \"reasonPhrase\" : \"syntax error in duration string\"\n    }\n  }\n}\n";
-
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), expectedFile2)) << "Error getting test data from '" << expectedFile2 << "'";
   rendered = ucsrP->render(UpdateContextSubscription, JSON, "");
-  EXPECT_EQ(expected2, rendered);
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), expectedFile3)) << "Error getting test data from '" << expectedFile3 << "'";
   checked  = ucsrP->check(UpdateContextSubscription, JSON, "", "FORCED ERROR", 0);
-  EXPECT_EQ(expected3, checked);
+  EXPECT_STREQ(expectedBuf, checked.c_str());
 
   ucsrP->duration.set("XXXYYYZZZ");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), expectedFile4)) << "Error getting test data from '" << expectedFile4 << "'";
   checked  = ucsrP->check(UpdateContextSubscription, JSON, "", "", 0);
-  EXPECT_EQ(expected4, checked);
+  EXPECT_STREQ(expectedBuf, checked.c_str());
 
   ucsrP->present("");
   ucsrP->release();

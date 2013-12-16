@@ -210,7 +210,7 @@ Date: REGEX(.*)
 
 {
   "subscribeError" : {
-    "subscriptionId" : "No Subscription ID",
+    "subscriptionId" : "000000000000000000000000",
     "errorCode" : {
       "code" : "404",
       "reasonPhrase" : "Subscription Not Found"
@@ -238,8 +238,8 @@ Date: REGEX(.*)
 
 "orionError" : {
   "code" : "400",
-  "reasonPhrase" : "no request treating object found",
-  "details" : "Sorry, no request treating object found for RequestType 'InvalidRequest'"
+  "reasonPhrase" : "bad ngsi9 request",
+  "details" : "ngsi9 service '/NGSI9/notSupportedRequest' not found"
 }
 11: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -249,8 +249,8 @@ Date: REGEX(.*)
 
 "orionError" : {
   "code" : "400",
-  "reasonPhrase" : "no request treating object found",
-  "details" : "Sorry, no request treating object found for RequestType 'InvalidRequest'"
+  "reasonPhrase" : "bad ngsi10 request",
+  "details" : "ngsi10 service '/NGSI10/notSupportedRequest' not found"
 }
 12: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -260,8 +260,8 @@ Date: REGEX(.*)
 
 "orionError" : {
   "code" : "400",
-  "reasonPhrase" : "no request treating object found",
-  "details" : "Sorry, no request treating object found for RequestType 'InvalidRequest'"
+  "reasonPhrase" : "bad request",
+  "details" : "service '/notSupportedRequest' not found"
 }
 13: ++++++++++++++++++++
 --TEARDOWN--

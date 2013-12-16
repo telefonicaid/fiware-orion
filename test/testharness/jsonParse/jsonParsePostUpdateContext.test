@@ -94,7 +94,7 @@ echo "1: ***********************************"
 			]
 		}
 	},
-	"updateAction": "UPDATE"
+	"updateAction": "APPEND"
 }
 EOF
 echo "2: ***********************************"
@@ -190,16 +190,16 @@ Date: REGEX(.*)
   "contextResponses" : [
     {
       "contextElement" : {
+        "type" : "Room",
+        "isPattern" : "false",
+        "id" : "ConferenceRoom",
         "attributes" : [
           {
             "name" : "temperature",
             "type" : "degree",
             "contextValue" : ""
           }
-        ],
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "ConferenceRoom"
+        ]
       },
       "statusCode" : {
         "code" : "200",
@@ -228,16 +228,16 @@ Date: REGEX(.*)
   "contextResponses" : [
     {
       "contextElement" : {
+        "type" : "Room",
+        "isPattern" : "false",
+        "id" : "ConferenceRoom",
         "attributes" : [
           {
             "name" : "temperature",
             "type" : "degree",
             "contextValue" : ""
           }
-        ],
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "ConferenceRoom"
+        ]
       },
       "statusCode" : {
         "code" : "200",

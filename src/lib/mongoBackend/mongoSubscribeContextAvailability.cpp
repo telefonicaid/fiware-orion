@@ -119,6 +119,5 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
     responseP->duration = requestP->duration;
     responseP->subscriptionId.set(oid.str());
 
-    LM_T(LmtHeavyTest, ("/NGSI9/subscribeContextAvailability OK (subscriptionId: '%s')", responseP->subscriptionId.get().c_str()));
     LM_SR(SccOk);
 }

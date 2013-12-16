@@ -44,7 +44,7 @@ int             statisticsTime  = -1;
 *
 * isTrue - 
 */
-bool isTrue(const std::string s)
+bool isTrue(const std::string& s)
 {
   if (strcasecmp(s.c_str(), "true") == 0)
     return true;
@@ -60,7 +60,7 @@ bool isTrue(const std::string s)
 *
 * isFalse - 
 */
-bool isFalse(const std::string s)
+bool isFalse(const std::string& s)
 {
   if (strcasecmp(s.c_str(), "false") == 0)
     return true;

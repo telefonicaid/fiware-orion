@@ -37,9 +37,8 @@
 * MetadataVector::MetadataVector -
 */
 MetadataVector::MetadataVector(std::string _tag) {
-  LM_T(LmtMetadataDoubleFree, ("MetadataVector is created at %p", this));
   vec.clear();
-  tag = _tag;
+  tagSet(_tag);
 }
 
 /* ****************************************************************************
@@ -50,6 +49,7 @@ void MetadataVector::tagSet(std::string tagName)
 {
   tag = tagName;
 }
+
 
 
 /* ****************************************************************************

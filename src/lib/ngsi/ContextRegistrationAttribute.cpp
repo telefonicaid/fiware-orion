@@ -55,18 +55,24 @@ ContextRegistrationAttribute::ContextRegistrationAttribute(std::string _name, st
 *
 * ContextRegistrationAttribute::render - 
 */
-std::string ContextRegistrationAttribute::render(Format format, std::string indent)
+std::string ContextRegistrationAttribute::render(Format format, std::string indent, bool comma)
 {
   std::string xmlTag   = "contextRegistrationAttribute";
   std::string jsonTag  = "registrationAttribute";
   std::string out      = "";
 
+  //
+  // About JSON commas:
+  // The field isDomain is mandatory, so all field before that will
+  // have the comma set to true for the render methods.
+  // The only doubt here is whether isDomain should have the comma or not,
+  // that depends on whether the metadataVector is empty or not.
   out += startTag(indent, xmlTag, jsonTag, format, false, false);
   out += valueTag(indent + "  ", "name",     name, format, true);
   out += valueTag(indent + "  ", "type",     type, format, true);
   out += valueTag(indent + "  ", "isDomain", isDomain, format, metadataVector.size() != 0);
   out += metadataVector.render(format, indent + "  ");
-  out += endTag(indent, xmlTag, format);
+  out += endTag(indent, xmlTag, format, comma);
 
   return out;
 }

@@ -98,16 +98,24 @@ std::string ContextAttribute::getId()
 *
 * render - 
 */
-std::string ContextAttribute::render(Format format, std::string indent, bool isInVector)
+std::string ContextAttribute::render(Format format, std::string indent, bool comma)
 {
-  std::string out = "";
-  std::string tag = "contextAttribute";
+  std::string  out                    = "";
+  std::string  xmlTag                 = "contextAttribute";
+  std::string  jsonTag                = "attribute";
+  bool         commaAfterContextValue = metadataVector.size() != 0;
 
-  out += startTag(indent, tag, format, false);
+  metadataVector.tagSet("metadata");
+
+  // About JSON commas:
+  // contextValue is MANDATORY, so up to that field, all will wear the JSON comma
+  // contextValue itself has a comma if metadataVector is rendered
+  out += startTag(indent, xmlTag, jsonTag, format, false, false);
   out += valueTag(indent + "  ", "name",         name,  format, true);
   out += valueTag(indent + "  ", "type",         type,  format, true);
-  out += valueTag(indent + "  ", "contextValue", value, format, false);
-  out += endTag(indent, tag, format, isInVector);
+  out += valueTag(indent + "  ", "contextValue", value, format, commaAfterContextValue);
+  out += metadataVector.render(format, indent + "  ", false);
+  out += endTag(indent, xmlTag, format, comma);
 
   return out;
 }

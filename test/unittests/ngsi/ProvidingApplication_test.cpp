@@ -39,13 +39,15 @@ TEST(ProvidingApplication, render)
 {
   ProvidingApplication  pa;
   std::string           out;
+  std::string           expected1xml  = "<providingApplication>PA</providingApplication>\n";
+  std::string           expected1json = "\"providingApplication\" : \"PA\"\n";
 
-  out = pa.render(XML, "");
+  out = pa.render(XML, "", false);
   EXPECT_STREQ("", out.c_str());
 
   pa.set("PA");
-  out = pa.render(XML, "");
-  EXPECT_STREQ("<providingApplication>PA</providingApplication>\n", out.c_str());
+  out = pa.render(XML, "", false);
+  EXPECT_STREQ(expected1xml.c_str(), out.c_str());
 }
 
 

@@ -76,11 +76,15 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "host") == 0)            headerP->host           = value;
   else if (strcasecmp(key.c_str(), "accept") == 0)          headerP->accept         = value;
   else if (strcasecmp(key.c_str(), "expect") == 0)          headerP->expect         = value;
+  else if (strcasecmp(key.c_str(), "connection") == 0)      headerP->connection     = value;
   else if (strcasecmp(key.c_str(), "content-type") == 0)    headerP->contentType    = value;
   else if (strcasecmp(key.c_str(), "content-length") == 0)  headerP->contentLength  = atoi(value);
   else
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
 
+
+  if ((headerP->connection != "") && (headerP->connection != "close"))
+     LM_W(("connection '%s' - currently not supported, sorry ..."));
 
   /* Note that the strategy to "fix" the Content-Type is to replace the ";" with 0
    * to "deactivate" this part of the string in the checking done at connectionTreat() */
@@ -246,6 +250,7 @@ static Format wantedOutputSupported(std::string acceptList, std::string* charset
 *
 * upload_data_size has to do with payload and only valid for such requests.
 */
+static int requests = 0;
 static int connectionTreat
 (
    void*            cls,
@@ -259,7 +264,6 @@ static int connectionTreat
 )
 {
   ConnectionInfo* ciP      = (ConnectionInfo*) *con_cls;
-  static int      requests = 0;
 
   if (ciP == NULL)
     ++requests;
@@ -300,7 +304,6 @@ static int connectionTreat
     *con_cls         = (void*) ciP;
 
     ciP->callNo                    = 1;
-    ciP->httpHeaders.contentLength = 0;
     ciP->requestEntityTooLarge     = false;
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
@@ -393,12 +396,17 @@ static int connectionTreat
 
     if (ciP->httpHeaders.contentLength == 0)
     {
+      if (ciP->fractioned == true)
+        LM_T(LmtRest, ("Received entire payload of fractioned message (%d bytes)", ciP->httpHeaders.contentLength));
       restService(ciP, restServiceV);
       return MHD_YES;
     }
   }
   else if ((*upload_data_size < ciP->httpHeaders.contentLength) && (*upload_data_size != 0))
+  {
     LM_T(LmtIncompletePayload, ("Got INCOMPLETE POST payload (%d accumulated bytes): '%s'", *upload_data_size, upload_data));
+    ciP->fractioned = true;
+  }
   else if (*upload_data_size == 0)
   {
     if (ciP->requestEntityTooLarge == true)
@@ -406,11 +414,14 @@ static int connectionTreat
       char detail[256];
 
       snprintf(detail, sizeof(detail), "payload size: %d", ciP->httpHeaders.contentLength);
-      restErrorReply(ciP, ciP->outFormat, "", ciP->url, 413, "Payload Too Large", detail);
+      std::string out = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, "Payload Too Large", detail);
+      restReply(ciP, out);
     }
     else
     {
-      LM_T(LmtService, ("Calling restService '%s' with payload: '%s'", ciP->url.c_str(), ciP->payload));
+      LM_T(LmtInPayload, ("Calling restService '%s' with payload: '%s'", ciP->url.c_str(), ciP->payload));
+      if (ciP->fractioned == true)
+        LM_T(LmtRest, ("Received entire payload of fractioned message (%d bytes)", ciP->httpHeaders.contentLength));
       restService(ciP, restServiceV);
     }
   }
@@ -438,20 +449,6 @@ void restInit(char* _bind, unsigned short _port, RestService* _restServiceV)
 
 /* ****************************************************************************
 *
-* restStop - 
-*/
-void restStop(void)
-{
-   if (mhdDaemon == NULL)
-      LM_E(("MHD not started"));
-   else
-      MHD_stop_daemon(mhdDaemon);
-}
-
-
-
-/* ****************************************************************************
-*
 * restStart - 
 */
 int restStart(void)
@@ -461,7 +458,7 @@ int restStart(void)
 
   int ret = inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr));
   if (ret != 1) {
-    LM_RE(1, ("could not parse bind IP address %s", bindIp));
+    LM_RE(2, ("could not parse bind IP address %s", bindIp));
   }
 
   sad.sin_family = AF_INET;
@@ -483,7 +480,7 @@ int restStart(void)
                                MHD_OPTION_END);
   
   if (mhdDaemon == NULL)
-     LM_RE(1, ("MHD_start_daemon failed"));
+     LM_RE(3, ("MHD_start_daemon failed"));
 
   return 0;
 }

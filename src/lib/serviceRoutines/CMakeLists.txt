@@ -61,6 +61,8 @@ getNgsi10ContextEntityTypes.cpp
 getNgsi10ContextEntityTypesAttribute.cpp
 putSubscriptionConvOp.cpp
 deleteSubscriptionConvOp.cpp
+putAvailabilitySubscriptionConvOp.cpp
+deleteAvailabilitySubscriptionConvOp.cpp
 badVerbPostOnly.cpp
 badVerbAllFour.cpp
 badVerbGetPostOnly.cpp
@@ -68,12 +70,16 @@ badVerbGetPostDeleteOnly.cpp
 badVerbGetOnly.cpp
 badVerbGetDeleteOnly.cpp
 badVerbPutDeleteOnly.cpp
+badVerbGetPutDeleteOnly
 badNgsi9Request.cpp
 badNgsi10Request.cpp
 badRequest.cpp
 postNotifyContext.cpp
 postNotifyContextAvailability.cpp
 statisticsTreat.cpp
+getAttributeValueInstance.cpp
+putAttributeValueInstance.cpp
+deleteAttributeValueInstance.cpp
 )
 
 SET (HEADERS

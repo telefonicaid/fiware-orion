@@ -44,7 +44,6 @@ std::string getContextEntityTypeAttribute(ConnectionInfo* ciP, int components, s
 {
   std::string                          entityType     = compV[2];
   std::string                          attributeName  = compV[4];
-  std::string                          answer;
   DiscoverContextAvailabilityRequest*  requestP = &parseDataP->dcar.res;
   EntityId                             entityId(".*", entityType, "true");
   

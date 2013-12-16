@@ -46,17 +46,17 @@
 *
 * entityId - 
 */
-static int entityId(xml_node<>* node, ParseData* reqData)
+static int entityId(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an entityId"));
 
-  reqData->scar.entityIdP = new EntityId();
-  reqData->scar.res.entityIdVector.push_back(reqData->scar.entityIdP);
+  reqDataP->scar.entityIdP = new EntityId();
+  reqDataP->scar.res.entityIdVector.push_back(reqDataP->scar.entityIdP);
 
-  std::string es = entityIdParse(SubscribeContextAvailability, node, reqData->scar.entityIdP);
+  std::string es = entityIdParse(SubscribeContextAvailability, node, reqDataP->scar.entityIdP);
 
   if (es != "OK")
-    reqData->errorString = es;
+    reqDataP->errorString = es;
   
   return 0;
 }
@@ -67,11 +67,11 @@ static int entityId(xml_node<>* node, ParseData* reqData)
 *
 * entityIdId - 
 */
-static int entityIdId(xml_node<>* node, ParseData* reqData)
+static int entityIdId(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an entityId:id: '%s'", node->value()));
 
-  reqData->scar.entityIdP->id = node->value();
+  reqDataP->scar.entityIdP->id = node->value();
 
   return 0;
 }
@@ -82,11 +82,11 @@ static int entityIdId(xml_node<>* node, ParseData* reqData)
 *
 * reference - 
 */
-static int reference(xml_node<>* node, ParseData* reqData)
+static int reference(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a reference: '%s'", node->value()));
 
-  reqData->scar.res.reference.set(node->value());
+  reqDataP->scar.res.reference.set(node->value());
   return 0;
 }
 
@@ -96,10 +96,10 @@ static int reference(xml_node<>* node, ParseData* reqData)
 *
 * attribute - 
 */
-static int attribute(xml_node<>* node, ParseData* reqData)
+static int attribute(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an attribute"));
-  reqData->scar.res.attributeList.push_back(node->value());
+  reqDataP->scar.res.attributeList.push_back(node->value());
 
   return 0;
 }
@@ -110,10 +110,10 @@ static int attribute(xml_node<>* node, ParseData* reqData)
 *
 * restriction - 
 */
-static int restriction(xml_node<>* node, ParseData* reqData)
+static int restriction(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a restriction"));
-  ++reqData->scar.res.restrictions;
+  ++reqDataP->scar.res.restrictions;
 
   return 0;
 }
@@ -124,10 +124,10 @@ static int restriction(xml_node<>* node, ParseData* reqData)
 *
 * attributeExpression - 
 */
-static int attributeExpression(xml_node<>* node, ParseData* reqData)
+static int attributeExpression(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an attributeExpression: '%s'", node->value()));
-  reqData->scar.res.restriction.attributeExpression.set(node->value());
+  reqDataP->scar.res.restriction.attributeExpression.set(node->value());
   return 0;
 }
 
@@ -137,13 +137,13 @@ static int attributeExpression(xml_node<>* node, ParseData* reqData)
 *
 * operationScope - 
 */
-static int operationScope(xml_node<>* node, ParseData* reqData)
+static int operationScope(xml_node<>* node, ParseData* reqDataP)
 {
   Scope* newScopeP = new Scope();
 
   LM_T(LmtParse, ("Got an operationScope"));
-  reqData->scar.scopeP = newScopeP;
-  reqData->scar.res.restriction.scopeVector.push_back(reqData->scar.scopeP);
+  reqDataP->scar.scopeP = newScopeP;
+  reqDataP->scar.res.restriction.scopeVector.push_back(reqDataP->scar.scopeP);
 
   return 0;
 }
@@ -154,10 +154,10 @@ static int operationScope(xml_node<>* node, ParseData* reqData)
 *
 * scopeType - 
 */
-static int scopeType(xml_node<>* node, ParseData* reqData)
+static int scopeType(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a scopeType: '%s'", node->value()));
-  reqData->scar.scopeP->type = node->value();
+  reqDataP->scar.scopeP->type = node->value();
   return 0;
 }
 
@@ -167,10 +167,10 @@ static int scopeType(xml_node<>* node, ParseData* reqData)
 *
 * scopeValue - 
 */
-static int scopeValue(xml_node<>* node, ParseData* reqData)
+static int scopeValue(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a scopeValue: '%s'", node->value()));
-  reqData->scar.scopeP->value = node->value();
+  reqDataP->scar.scopeP->value = node->value();
   return 0;
 }
 
@@ -180,10 +180,10 @@ static int scopeValue(xml_node<>* node, ParseData* reqData)
 *
 * duration - 
 */
-static int duration(xml_node<>* node, ParseData* reqData)
+static int duration(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a duration: '%s'", node->value()));
-  reqData->scar.res.duration.set(node->value());
+  reqDataP->scar.res.duration.set(node->value());
 
   return 0;
 }
@@ -193,11 +193,11 @@ static int duration(xml_node<>* node, ParseData* reqData)
 *
 * subscriptionId - 
 */
-static int subscriptionId(xml_node<>* node, ParseData* reqData)
+static int subscriptionId(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a subscriptionId: '%s'", node->value()));
 
-  reqData->scar.res.subscriptionId.set(node->value());
+  reqDataP->scar.res.subscriptionId.set(node->value());
   return 0;
 }
 
@@ -207,16 +207,16 @@ static int subscriptionId(xml_node<>* node, ParseData* reqData)
 *
 * scarInit - 
 */
-void scarInit(ParseData* reqData)
+void scarInit(ParseData* reqDataP)
 {
-  reqData->errorString                 = "";
+  scarRelease(reqDataP);
 
-  reqData->scar.entityIdP              = NULL;
-  reqData->scar.scopeP                 = NULL;
-  reqData->scar.restrictions           = 0;
-  reqData->scar.res.restrictions       = 0;
+  reqDataP->scar.entityIdP              = NULL;
+  reqDataP->scar.scopeP                 = NULL;
+  reqDataP->errorString                 = "";
 
-  reqData->scar.res.restriction.attributeExpression.set("");
+  reqDataP->scar.res.restrictions       = 0;
+  reqDataP->scar.res.restriction.attributeExpression.set("");
 }
 
 
@@ -225,9 +225,9 @@ void scarInit(ParseData* reqData)
 *
 * scarRelease - 
 */
-void scarRelease(ParseData* reqData)
+void scarRelease(ParseData* reqDataP)
 {
-  reqData->scar.res.release();
+  reqDataP->scar.res.release();
 }
 
 
@@ -236,9 +236,9 @@ void scarRelease(ParseData* reqData)
 *
 * scarCheck - 
 */
-std::string scarCheck(ParseData* reqData, ConnectionInfo* ciP)
+std::string scarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  return reqData->scar.res.check(SubscribeContextAvailability, ciP->outFormat, "", reqData->errorString, 0);
+  return reqDataP->scar.res.check(SubscribeContextAvailability, ciP->outFormat, "", reqDataP->errorString, 0);
 }
 
 
@@ -247,12 +247,12 @@ std::string scarCheck(ParseData* reqData, ConnectionInfo* ciP)
 *
 * scarPresent - 
 */
-void scarPresent(ParseData* reqData)
+void scarPresent(ParseData* reqDataP)
 {
   if (!lmTraceIsSet(LmtDump))
     return;
 
-  reqData->scar.res.present("");
+  reqDataP->scar.res.present("");
 }
 
 

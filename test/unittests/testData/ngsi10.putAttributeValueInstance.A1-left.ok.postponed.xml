@@ -1,0 +1,11 @@
+<updateContextAttributeRequest>
+  <type>Room</type>
+  <contextValue>10</contextValue>
+  <metadata>
+    <contextMetadata>
+      <name>ID</name>
+      <type>none</type>
+      <value>left</value>
+    </contextMetadata>
+  </metadata>
+</updateContextAttributeRequest>

@@ -49,15 +49,17 @@ ContextRegistrationResponse::ContextRegistrationResponse()
 */
 std::string ContextRegistrationResponse::render(Format format, std::string indent, bool comma)
 {
-  std::string xmlTag   = "contextRegistrationResponse";
-  std::string jsonTag  = "contextRegistration";
-  std::string out      = "";
+  std::string  xmlTag            = "contextRegistrationResponse";
+  std::string  jsonTag           = "contextRegistration";
+  std::string  out               = "";
+  bool         errorCodeRendered = errorCode.code != NO_ERROR_CODE;
 
   out += startTag(indent, xmlTag, jsonTag, format, false, false);
-  out += contextRegistration.render(format, indent + "  ");
 
-  if (errorCode.code != NO_ERROR_CODE)
-    out += errorCode.render(format, indent + "  ");
+  out += contextRegistration.render(format, indent + "  ", errorCodeRendered);
+
+  if (errorCodeRendered)
+     out += errorCode.render(format, indent + "  ", false);
 
   out += endTag(indent, xmlTag, format, comma);
 

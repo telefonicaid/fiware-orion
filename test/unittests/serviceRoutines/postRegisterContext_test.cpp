@@ -30,13 +30,7 @@
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "testDataFromFile.h"
-#include "testInit.h"
-#include "commonMocks.h"
-
-using ::testing::_;
-using ::testing::Throw;
-using ::testing::Return;
+#include "unittest.h"
 
 
 
@@ -46,9 +40,9 @@ using ::testing::Return;
 */
 static RestService rs[] = 
 {
-  { "POST RegisterContext",                       "POST",   RegisterContext,                       2, { "ngsi9",  "registerContext"                          }, "", postRegisterContext                       },
-  { "* InvalidRequest",                           "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "* *",                                        "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "POST",   RegisterContext,                       2, { "ngsi9",  "registerContext"                          }, "", postRegisterContext                       },
+  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
+  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
 };
 
 
@@ -59,32 +53,22 @@ static RestService rs[] =
 */
 TEST(postRegisterContext, ok)
 {
+  ConnectionInfo ci("/ngsi9/registerContext",  "POST", "1.1");
+  ConnectionInfo ci2("/ngsi9/registerContext",  "POST", "1.1");
+  std::string    expectedStart   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <registrationId>";
+  std::string    expected2       = "<registerContextResponse>\n  <registrationId>012345678901234567890123</registrationId>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Registration Not Found</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
+  const char*    fileName        = "ngsi9.registerContextRequest.ok.valid.xml";
+  const char*    fileName2       = "ngsi9.registerContextRequest.update.valid.xml";
+  std::string    out;
+
   // Avoid forwarding of messages
   extern int fwdPort;
   int saved = fwdPort;
-
-  setupDatabase();
-
   fwdPort = 0;
 
-  ConnectionInfo ci("/ngsi9/registerContext",  "POST", "1.1");
-  std::string    expectedStart   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <registrationId>";
-  const char*    fileName        = "ngsi9.registerContextRequest.ok.valid.xml";
-  std::string    out;
+  utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
-
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
   ci.outFormat    = XML;
   ci.inFormat     = XML;
   ci.payload      = testBuf;
@@ -95,9 +79,16 @@ TEST(postRegisterContext, ok)
   outStart[expectedStart.length()] = 0;
   EXPECT_STREQ(expectedStart.c_str(), outStart);
 
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName2)) << "Error getting test data from '" << fileName2 << "'";
+  ci2.outFormat    = XML;
+  ci2.inFormat     = XML;
+  ci2.payload      = testBuf;
+  ci2.payloadSize  = strlen(testBuf);
+  out              = restService(&ci2, rs);
+  EXPECT_EQ(expected2, out);
+
   // Putting old value back
   fwdPort = saved;
 
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 }

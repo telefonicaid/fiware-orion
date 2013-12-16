@@ -64,7 +64,8 @@ TEST(ContextElementResponse, check)
 TEST(ContextElementResponse, render)
 {
    ContextElementResponse  cer;
-   std::string             expected = "<contextElementResponse>\n  <contextElement>\n    <entityId type=\"Type\" isPattern=\"false\">\n      <id>ID</id>\n    </entityId>\n  </contextElement>\n  <statusCode>\n    <code>200</code>\n    <reasonPhrase>reason</reasonPhrase>\n    <details>details</details>\n  </statusCode>\n</contextElementResponse>\n";
+   std::string             expected1xml  = "<contextElementResponse>\n  <contextElement>\n    <entityId type=\"Type\" isPattern=\"false\">\n      <id>ID</id>\n    </entityId>\n  </contextElement>\n  <statusCode>\n    <code>200</code>\n    <reasonPhrase>reason</reasonPhrase>\n    <details>details</details>\n  </statusCode>\n</contextElementResponse>\n";
+   std::string             expected1json = "{\n  \"contextElement\" : {\n    \"type\" : \"Type\",\n    \"isPattern\" : \"false\",\n    \"id\" : \"ID\"\n  },\n  \"statusCode\" : {\n    \"code\" : \"200\",\n    \"reasonPhrase\" : \"reason\",\n    \"details\" : \"details\"\n  }\n}\n";
    std::string             out;
 
    cer.contextElement.entityId.id         = "ID";
@@ -74,7 +75,9 @@ TEST(ContextElementResponse, render)
    cer.statusCode.fill(SccOk, "reason", "details");
 
    out = cer.render(XML, "");
-   EXPECT_STREQ(expected.c_str(), out.c_str());
+   EXPECT_STREQ(expected1xml.c_str(), out.c_str());
+   out = cer.render(JSON, "");
+   EXPECT_STREQ(expected1json.c_str(), out.c_str());
 }
 
 

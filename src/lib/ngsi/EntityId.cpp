@@ -37,12 +37,8 @@
 *
 * EntityId::EntityId -
 */
-EntityId::EntityId()
+EntityId::EntityId() : tag("entityId")
 {
-  id         = "";
-  type       = "";
-  isPattern  = "";
-  tag        = "entityId";
 }
 
 
@@ -51,12 +47,8 @@ EntityId::EntityId()
 *
 * EntityId::EntityId -
 */
-EntityId::EntityId(std::string _id, std::string _type, std::string _isPattern, std::string _tag)
+EntityId::EntityId(std::string _id, std::string _type, std::string _isPattern, std::string _tag) : id(_id), type(_type), isPattern(_isPattern), tag(_tag)
 {
-  id         = _id;
-  type       = _type;
-  isPattern  = _isPattern;
-  tag        = _tag;
 }
 
 
@@ -91,13 +83,25 @@ std::string EntityId::render(Format format, std::string indent, bool comma, bool
   }
   else
   {
-    bool isAssoc = !assocTag.empty();
+    bool        isAssoc = !assocTag.empty();
+    std::string indent2 = indent;
+
+    if (isInVector)
+       indent2 += "  ";
+
     out += (isInVector? indent + (isAssoc? "\"" + assocTag + "\" : ": "") + "{\n": "");
-    out += indent + (isInVector? "  " : "") + "\"type\" : \""      + type      + "\","  + "\n";
-    out += indent + (isInVector? "  " : "") + "\"isPattern\" : \"" + isPattern + "\","  + "\n";
-    out += indent + (isInVector? "  " : "") + "\"id\" : \""        + id        + "\""   + "\n";
-    out += (isInVector? indent + "}" : "");
-    out += (comma == true)? ",\n" : (isInVector? "\n" : "");
+    out += indent2 + "\"type\" : \""      + type      + "\","  + "\n";
+    out += indent2 + "\"isPattern\" : \"" + isPattern + "\","  + "\n";
+    out += indent2 + "\"id\" : \""        + id        + "\"";
+
+    if ((comma == true) && (isInVector == false))
+       out += ",\n";
+    else
+    {
+      out += "\n";
+      out += (isInVector? indent + "}" : "");
+      out += (comma == true)? ",\n" : (isInVector? "\n" : "");
+    }
   }
 
   return out;

@@ -82,19 +82,18 @@ std::string startTag(std::string indent, std::string xmlTag, std::string jsonTag
 *
 * endTag -  
 */
-std::string endTag(std::string indent, std::string tagName, Format format, bool comma, bool isVector)
+std::string endTag(std::string indent, std::string tagName, Format format, bool comma, bool isVector, bool nl)
 {
   if (format == XML)
     return indent + "</" + tagName + ">\n";
 
-  if (isVector && comma)
-     return indent + "],\n";
-  else if (isVector && !comma)
-     return indent + "]\n";
-  else if (!isVector && comma)
-    return indent + "},\n";
-  else
-    return indent + "}\n";
+  std::string out = indent;;
+
+  out += isVector?  "]"  : "}";
+  out += comma?     ","  : "";
+  out += nl?        "\n" : "";
+
+  return out;
 }
 
 
@@ -142,4 +141,31 @@ std::string valueTag(std::string indent, std::string tagName, int value, Format 
      return indent + "\"" + tagName + "\" : \"" + val + "\",\n";
    else
      return indent + "\"" + tagName + "\" : \"" + val + "\"\n";
+}
+
+
+
+/* ****************************************************************************
+*
+* valueTag -  
+*/
+std::string valueTag(std::string indent, std::string xmlTag, std::string jsonTag, std::string value, Format format, bool showComma, bool isAssociation)
+{
+   if (format == XML)
+     return indent + "<" + xmlTag + ">" + value + "</" + xmlTag + ">" + "\n";
+
+   if (jsonTag == "")
+   {
+     if (showComma == true)
+       return indent + "\"" + value + "\",\n";
+     else
+       return indent + "\"" + value + "\"\n";
+   }
+   else
+   {
+     if (showComma == true)
+       return indent + "\"" + jsonTag + "\" : \"" + value + "\",\n";
+     else
+       return indent + "\"" + jsonTag + "\" : \"" + value + "\"\n";
+   }
 }

@@ -43,29 +43,28 @@
 *
 * ConnectionInfo - 
 */
-typedef struct ConnectionInfo
+class ConnectionInfo
 {
-  ConnectionInfo(std::string _url, std::string _method, std::string _version)
+public:
+  ConnectionInfo(std::string _url, std::string _method, std::string _version) : url(_url), method(_method), version(_version)
   {
-    url            = _url;
-    method         = _method;
-    version        = _version;
-    answer         = "";
-    connection     = NULL;
-    payload        = NULL;
-    payloadSize    = 0;
-    inFormat       = XML;
-    outFormat      = XML;
-    charset        = "";
-    httpStatusCode = SccOk;
+    connection            = NULL;
+    payload               = NULL;
+    payloadSize           = 0;
+    inFormat              = XML;
+    outFormat             = XML;
+    httpStatusCode        = SccOk;
+    fractioned            = false;
+    callNo                = 0;
+    requestEntityTooLarge = false;
+
+    memset(payloadWord, 0, sizeof(payloadWord));
 
     if      (_method == "POST")    verb = POST;
     else if (_method == "PUT")     verb = PUT;
     else if (_method == "GET")     verb = GET;
     else if (_method == "DELETE")  verb = DELETE;
     else                           verb = GET;
-
-    httpHeaders.gotHeaders = false;
   }
 
   MHD_Connection*           connection;
@@ -81,16 +80,14 @@ typedef struct ConnectionInfo
   int                       payloadSize;
   char                      payloadWord[64];
   std::string               answer;
-  MHD_PostProcessor*        postProcessor;
-   
+  bool                      fractioned;
+  int                       callNo;
+  bool                      requestEntityTooLarge;
+
   // Outgoing
   HttpStatusCode            httpStatusCode;
   std::vector<std::string>  httpHeader;
   std::vector<std::string>  httpHeaderValue;
-
-  int                       callNo;
-  bool                      requestEntityTooLarge;
-
-} ConnectionInfo;
+};
 
 #endif

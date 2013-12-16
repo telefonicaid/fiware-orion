@@ -99,12 +99,12 @@ void ProvidingApplication::present(std::string indent)
 *
 * ProvidingApplication::render - 
 */
-std::string ProvidingApplication::render(Format format, std::string indent)
+std::string ProvidingApplication::render(Format format, std::string indent, bool comma)
 {
   if (string == "")
     return "";
 
-  return valueTag(indent, "providingApplication", string, format);
+  return valueTag(indent, "providingApplication", string, format, comma);
 }
 
 

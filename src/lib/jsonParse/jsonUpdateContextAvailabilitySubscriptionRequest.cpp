@@ -144,7 +144,7 @@ static std::string restriction(std::string path, std::string value, ParseData* r
 {
   LM_T(LmtParse, ("Got a restriction"));
 
-  ++reqDataP->ucas.restrictions;
+  ++reqDataP->ucas.res.restrictions;
 
   return "OK";
 }
@@ -257,11 +257,12 @@ void jsonUcasInit(ParseData* reqDataP)
 {
   jsonUcasRelease(reqDataP);
 
+  reqDataP->ucas.entityIdP             = NULL;
+  reqDataP->ucas.scopeP                = NULL;
   reqDataP->errorString                = "";
 
-  reqDataP->ucas.entityIdP             = NULL;
-  reqDataP->ucas.restrictions          = 0;
-  reqDataP->ucas.scopeP                = NULL;
+  reqDataP->ucas.res.restrictions      = 0;
+  reqDataP->ucas.res.restriction.attributeExpression.set("");
 }
 
 

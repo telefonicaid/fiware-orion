@@ -43,7 +43,6 @@
 std::string putIndividualContextEntity(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
   std::string                   answer;
-  std::string                   path;
   std::string                   entityId = compV[2];
   UpdateContextElementResponse  response;
 

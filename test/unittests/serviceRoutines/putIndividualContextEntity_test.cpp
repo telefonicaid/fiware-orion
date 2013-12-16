@@ -46,21 +46,21 @@ using ::testing::Return;
 */
 static RestService rs[] = 
 {
-  { "PUT IndividualContextEntity",                "PUT",    IndividualContextEntity,               3, { "ngsi10", "contextEntities", "*"                     }, "", putIndividualContextEntity                },
-  { "* InvalidRequest",                           "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
-  { "* *",                                        "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "PUT",    IndividualContextEntity,               3, { "ngsi10", "contextEntities", "*"                     }, "", putIndividualContextEntity                },
+  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "", badRequest                                },
+  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
 };
 
 
 
 /* ****************************************************************************
 *
-* ok - 
+* notFound - 
 */
-TEST(putIndividualContextEntity, ok)
+TEST(putIndividualContextEntity, notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity011",  "PUT", "1.1");  
-  std::string    expected    = "<updateContextElementResponse>\n  <contextResponseList>\n    <contextAttributeResponse>\n      <contextAttributeList>\n        <contextAttribute>\n          <name>temperature</name>\n          <type>degree</type>\n          <contextValue></contextValue>\n        </contextAttribute>\n        <contextAttribute>\n          <name>pressure</name>\n          <type>clima</type>\n          <contextValue></contextValue>\n        </contextAttribute>\n      </contextAttributeList>\n      <statusCode>\n        <code>200</code>\n        <reasonPhrase>OK</reasonPhrase>\n      </statusCode>\n    </contextAttributeResponse>\n  </contextResponseList>\n</updateContextElementResponse>\n";
+  std::string    expected    = "<updateContextElementResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Entity Not Found</reasonPhrase>\n    <details>entity011</details>\n  </errorCode>\n</updateContextElementResponse>\n";
   const char*    fileName    = "ngsi10.updateContextElementRequest.valid.xml";
   std::string    out;
 
@@ -77,7 +77,7 @@ TEST(putIndividualContextEntity, ok)
   ci.payloadSize  = strlen(testBuf);
   out             = restService(&ci, rs);
 
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  EXPECT_EQ(expected, out);
 
   delete timerMock;
   setTimer(NULL);

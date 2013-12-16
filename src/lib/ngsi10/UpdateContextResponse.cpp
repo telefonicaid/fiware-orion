@@ -80,10 +80,20 @@ std::string UpdateContextResponse::render(RequestType requestType, Format format
 
   out += startTag(indent, tag, format, false);
 
-  if (errorCode.code != NO_ERROR_CODE)
-     out += errorCode.render(format, indent + "  ");
+  if ((errorCode.code != NO_ERROR_CODE) && (errorCode.code != SccOk))
+  {
+    out += errorCode.render(format, indent + "  ");
+  }
   else
-     out += contextElementResponseVector.render(format, indent + "  ");
+  {
+    if (contextElementResponseVector.size() == 0)
+    {
+      errorCode.fill(SccContextElementNotFound, "No context element found", "");
+      out += errorCode.render(format, indent + "  ");
+    }
+    else
+      out += contextElementResponseVector.render(format, indent + "  ");
+  }
   
   out += endTag(indent, tag, format);
 

@@ -27,25 +27,34 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "ngsi9/SubscribeContextAvailabilityResponse.h"
+#include "xmlParse/xmlRequest.h"
+#include "ngsi/ParseData.h"
+#include "ngsi/Request.h"
+
+#include "unittest.h"
+
 
 
 /* ****************************************************************************
 *
-* constructors - 
+* ok - 
 */
-TEST(SubscribeContextAvailabilityResponse, constructors)
+TEST(xmlUpdateContextElementRequest, ok)
 {
-  SubscribeContextAvailabilityResponse* scar1 = new SubscribeContextAvailabilityResponse();
-  SubscribeContextAvailabilityResponse  scar2("012345678901234567890123", "PT1S");
-  ErrorCode                             ec(SccBadRequest, "Reason", "Detail");
-  SubscribeContextAvailabilityResponse  scar3("012345678901234567890124", ec);
+  ConnectionInfo  ci("/ngsi10/contextEntities/E01", "PUT", "1.1");
+  const char*     fileName = "ngsi10.updateContextElementRequestWithMetadata.valid.xml";
+  ParseData       parseData;
+  std::string     expected = "OK";
+  std::string     out;
 
-  EXPECT_EQ("", scar1->subscriptionId.get());
-  delete(scar1);
+  utInit();
 
-  EXPECT_EQ("012345678901234567890123", scar2.subscriptionId.get());
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
-  EXPECT_EQ("012345678901234567890124", scar3.subscriptionId.get());
-  EXPECT_EQ(SccBadRequest, scar3.errorCode.code);
+  ci.inFormat  = XML;
+  ci.outFormat = XML;
+  out  = xmlTreat(testBuf, &ci, &parseData, IndividualContextEntity, "updateContextElementRequest", NULL);
+  EXPECT_EQ(expected, out);
+
+  utExit();
 }

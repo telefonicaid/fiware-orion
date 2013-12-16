@@ -65,10 +65,12 @@ TEST(Request, requestType)
     { ContextEntityTypeAttributeContainer,         "ContextEntityTypeAttributeContainer"                    },
     { ContextEntityTypeAttribute,                  "ContextEntityTypeAttribute"                             },
     { EntityByIdAttributeByName,                   "EntityByIdAttributeByName"                              },
+    { Ngsi9SubscriptionsConvOp,                    "Ngsi9SubscriptionsConvOp"                               },
 
     { IndividualContextEntity,                     "IndividualContextEntity"                                },
     { IndividualContextEntityAttributes,           "IndividualContextEntityAttributes"                      },
     { IndividualContextEntityAttribute,            "IndividualContextEntityAttribute"                       },
+    { AttributeValueInstance,                      "AttributeValueInstance"                                 },
     { UpdateContextElement,                        "UpdateContextElement"                                   },
     { AppendContextElement,                        "AppendContextElement"                                   },
     { UpdateContextAttribute,                      "UpdateContextAttribute"                                 },

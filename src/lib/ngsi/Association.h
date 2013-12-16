@@ -39,7 +39,7 @@ typedef struct Association
   EntityAssociation         entityAssociation;
   AttributeAssociationList  attributeAssociationList;
 
-  std::string  render(Format format, std::string indent);
+  std::string  render(Format format, std::string indent, bool comma);
   std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void         present(std::string metadataType, int ix, std::string indent);
   void         release(void);

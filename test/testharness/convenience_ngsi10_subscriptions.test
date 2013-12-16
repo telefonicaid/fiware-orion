@@ -19,7 +19,7 @@
 # fermin at tid dot es
 
 --NAME--
-Subscriptions with conv ops
+NGSI10 Convenience Subscriptions
 --SHELL-INIT--
 # Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
 running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
@@ -41,7 +41,7 @@ if [ $running_broker -ne 0 ]; then
 fi
 
 echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 255"
+CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
 if [ "$VALGRIND" == "" ]; then
   $CB_START_CMD
   # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
@@ -60,7 +60,6 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-
 # 1. Create a subscription
 echo "1: ++++++++++++++++++++"
 SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/contextSubscriptions -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) << EOF
@@ -153,4 +152,3 @@ else
   # Waiting for valgrind to terminate (sleep 10)
   sleep 10
 fi
-kill $(curl localhost:${LISTENER_PORT}/pid -s -S)

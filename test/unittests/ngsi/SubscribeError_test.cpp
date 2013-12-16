@@ -39,17 +39,20 @@ TEST(SubscribeError, render)
 {
   SubscribeError  se;
   std::string     rendered;
-  std::string     expected1 = "<subscribeError>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>reason</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</subscribeError>\n";
-  std::string     expected2 = "<subscribeError>\n  <subscriptionId>SUB_123</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>reason</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</subscribeError>\n";
+  std::string     expected1xml  = "<subscribeError>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>reason</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</subscribeError>\n";
+  std::string     expected2xml  = "<subscribeError>\n  <subscriptionId>SUB_123</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>reason</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</subscribeError>\n";
+  std::string     expected1json = "\"subscribeError\" : {\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"reason\",\n    \"details\" : \"detail\"\n  }\n}\n";
 
   se.subscriptionId.set("SUB_123");
   se.errorCode.fill(SccBadRequest, "reason", "detail");
 
   rendered = se.render(RegisterContext, XML, "");
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  EXPECT_STREQ(expected1xml.c_str(), rendered.c_str());
+  rendered = se.render(RegisterContext, JSON, "");
+  EXPECT_STREQ(expected1json.c_str(), rendered.c_str());
 
   rendered = se.render(SubscribeContext, XML, "");
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  EXPECT_STREQ(expected2xml.c_str(), rendered.c_str());
 }
 
 

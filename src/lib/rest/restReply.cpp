@@ -55,7 +55,7 @@
 *
 * formatedAnswer - 
 */
-static std::string formatedAnswer
+std::string formatedAnswer
 (
   Format       format,
   std::string  header,
@@ -85,7 +85,7 @@ static std::string formatedAnswer
       answer += std::string("}");
    }
    else
-      answer = header + ": " + tag1 + "=" + value1 + ", " + tag2 + "=" + tag2;
+      answer = header + ": " + tag1 + "=" + value1 + ", " + tag2 + "=" + value2;
 
    return answer;
 }
@@ -104,8 +104,8 @@ int restReply(ConnectionInfo* ciP, std::string answer)
   MHD_Response*  response;
 
   ++replyIx;
-  LM_T(LmtRestReply, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answer.length(), ciP->httpStatusCode));
-  LM_T(LmtRestReply, ("Response payload: '%s'", answer.c_str()));
+  LM_T(LmtOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answer.length(), ciP->httpStatusCode));
+  LM_T(LmtOutPayload, ("Response payload: '%s'", answer.c_str()));
 
   if (answer == "")
     response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_NO, MHD_NO);
@@ -205,6 +205,8 @@ static std::string tagGet(std::string request)
     return "updateContextResponse";
   else if ((request == "notifyContext") || (request == "/ngsi10/notifyContext") || (request == "/NGSI10/notifyContext") || (request == "notifyContextRequest"))
     return "notifyContextResponse";
+  else if (request == "StatusCode")
+    return "StatusCode";
 
   return "UnknownTag";
 }
@@ -293,6 +295,11 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string in
       NotifyContextResponse ncr(errorCode);
       reply =  ncr.render(NotifyContext, format, indent);
    }
+   else if (tag == "StatusCode")
+   {
+     StatusCode sc((HttpStatusCode) code, reasonPhrase, detail);
+     reply = sc.render(format, indent);
+   }
    else
    {
       OrionError orionError(errorCode);
@@ -303,33 +310,4 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string in
    }
 
    return reply;
-}
-
-
-/* ****************************************************************************
-*
-* restErrorReply - 
-*/
-void restErrorReply(ConnectionInfo* ciP, Format format, std::string indent, std::string request, int code, std::string reasonPhrase, std::string detail)
-{
-  std::string reply = restErrorReplyGet(ciP, format, indent, request, code, reasonPhrase, detail);
-
-  restReply(ciP, reply);
-}
-
-
-
-/* ****************************************************************************
-*
-* restErrorReply - 
-*/
-void restErrorReply(ConnectionInfo* ciP, Format format, std::string indent, HttpStatusCode code, std::string reasonPhrase, std::string detail)
-{
-  ErrorCode     errorCode(code, reasonPhrase, detail);
-  std::string   reply;
-
-  ciP->httpStatusCode = SccOk;
-
-  reply = errorCode.render(format, indent);
-  restReply(ciP, reply);
 }

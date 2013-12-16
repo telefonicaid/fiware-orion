@@ -67,10 +67,12 @@ int noOfEntityByIdAttributeByName            = -1;
 int noOfContextEntityTypes                   = -1;
 int noOfContextEntityTypeAttributeContainer  = -1;
 int noOfContextEntityTypeAttribute           = -1;
+int noOfNgsi9SubscriptionsConvOp             = -1;
 
 int noOfIndividualContextEntity                     = -1;
 int noOfIndividualContextEntityAttributes           = -1;
 int noOfIndividualContextEntityAttribute            = -1;
+int noOfAttributeValueInstance                      = -1;
 int noOfNgsi10ContextEntityTypes                    = -1;
 int noOfNgsi10ContextEntityTypesAttributeContainer  = -1;
 int noOfNgsi10ContextEntityTypesAttribute           = -1;
@@ -101,29 +103,31 @@ void statisticsUpdate(RequestType request, Format inFormat)
 
    switch (request)
    {
-   case RegisterContext:                        ++noOfRegistrations; break;
-   case DiscoverContextAvailability:            ++noOfDiscoveries; break;
-   case SubscribeContextAvailability:           ++noOfAvailabilitySubscriptions; break;
-   case UpdateContextAvailabilitySubscription:  ++noOfAvailabilitySubscriptionUpdates; break;
-   case UnsubscribeContextAvailability:         ++noOfAvailabilityUnsubscriptions; break;
-   case NotifyContextAvailability:              ++noOfAvailabilityNotificationsReceived; break;
+   case RegisterContext:                            ++noOfRegistrations; break;
+   case DiscoverContextAvailability:                ++noOfDiscoveries; break;
+   case SubscribeContextAvailability:               ++noOfAvailabilitySubscriptions; break;
+   case UpdateContextAvailabilitySubscription:      ++noOfAvailabilitySubscriptionUpdates; break;
+   case UnsubscribeContextAvailability:             ++noOfAvailabilityUnsubscriptions; break;
+   case NotifyContextAvailability:                  ++noOfAvailabilityNotificationsReceived; break;
 
-   case QueryContext:                           ++noOfQueries; break;
-   case SubscribeContext:                       ++noOfSubscriptions; break;
-   case UpdateContextSubscription:              ++noOfSubscriptionUpdates; break;
-   case UnsubscribeContext:                     ++noOfUnsubscriptions; break;
-   case NotifyContext:                          ++noOfNotificationsReceived; break;
-   case UpdateContext:                          ++noOfUpdates; break;
+   case QueryContext:                               ++noOfQueries; break;
+   case SubscribeContext:                           ++noOfSubscriptions; break;
+   case UpdateContextSubscription:                  ++noOfSubscriptionUpdates; break;
+   case UnsubscribeContext:                         ++noOfUnsubscriptions; break;
+   case NotifyContext:                              ++noOfNotificationsReceived; break;
+   case UpdateContext:                              ++noOfUpdates; break;
 
-   case ContextEntitiesByEntityId:              ++noOfContextEntitiesByEntityId; break;
-   case ContextEntityAttributes:                ++noOfContextEntityAttributes; break;
-   case EntityByIdAttributeByName:              ++noOfEntityByIdAttributeByName; break;
-   case ContextEntityTypes:                     ++noOfContextEntityTypes; break;
-   case ContextEntityTypeAttributeContainer:    ++noOfContextEntityTypeAttributeContainer; break;
-   case ContextEntityTypeAttribute:             ++noOfContextEntityTypeAttribute; break;
-   case IndividualContextEntity:                ++noOfIndividualContextEntity; break;
-   case IndividualContextEntityAttributes:      ++noOfIndividualContextEntityAttributes; break;
-   case IndividualContextEntityAttribute:       ++noOfIndividualContextEntityAttribute; break;
+   case ContextEntitiesByEntityId:                  ++noOfContextEntitiesByEntityId; break;
+   case ContextEntityAttributes:                    ++noOfContextEntityAttributes; break;
+   case EntityByIdAttributeByName:                  ++noOfEntityByIdAttributeByName; break;
+   case ContextEntityTypes:                         ++noOfContextEntityTypes; break;
+   case ContextEntityTypeAttributeContainer:        ++noOfContextEntityTypeAttributeContainer; break;
+   case ContextEntityTypeAttribute:                 ++noOfContextEntityTypeAttribute; break;
+   case IndividualContextEntity:                    ++noOfIndividualContextEntity; break;
+   case IndividualContextEntityAttributes:          ++noOfIndividualContextEntityAttributes; break;
+   case AttributeValueInstance:                     ++noOfAttributeValueInstance; break;
+   case IndividualContextEntityAttribute:           ++noOfIndividualContextEntityAttribute; break;
+   case Ngsi9SubscriptionsConvOp:                   ++noOfNgsi9SubscriptionsConvOp; break;
 
    case UpdateContextElement:                       ++noOfUpdateContextElement; break;
    case AppendContextElement:                       ++noOfAppendContextElement; break;
@@ -133,13 +137,13 @@ void statisticsUpdate(RequestType request, Format inFormat)
    case Ngsi10ContextEntityTypesAttribute:          ++noOfNgsi10ContextEntityTypesAttribute; break;
    case Ngsi10SubscriptionsConvOp:                  ++noOfNgsi10SubscriptionsConvOp; break;
 
-   case LogRequest:                             ++noOfLogRequests; break;
-   case VersionRequest:                         ++noOfVersionRequests; break;
-   case ExitRequest:                            ++noOfExitRequests; break;
-   case LeakRequest:                            ++noOfLeakRequests; break;
-   case StatisticsRequest:                      ++noOfStatisticsRequests; break;
+   case LogRequest:                                 ++noOfLogRequests; break;
+   case VersionRequest:                             ++noOfVersionRequests; break;
+   case ExitRequest:                                ++noOfExitRequests; break;
+   case LeakRequest:                                ++noOfLeakRequests; break;
+   case StatisticsRequest:                          ++noOfStatisticsRequests; break;
 
-   case InvalidRequest:                         ++noOfInvalidRequests; break;
-   case RegisterResponse:                       ++noOfRegisterResponses; break;
+   case InvalidRequest:                             ++noOfInvalidRequests; break;
+   case RegisterResponse:                           ++noOfRegisterResponses; break;
    }
 }

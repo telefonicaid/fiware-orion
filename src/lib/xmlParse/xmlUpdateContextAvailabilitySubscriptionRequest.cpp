@@ -100,7 +100,7 @@ static int attribute(xml_node<>* node, ParseData* reqData)
 static int restriction(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a restriction"));
-  ++reqData->ucas.restrictions;
+  ++reqData->ucas.res.restrictions;
 
   return 0;
 }
@@ -196,9 +196,13 @@ static int subscriptionId(xml_node<>* node, ParseData* reqData)
 */
 void ucasInit(ParseData* reqData)
 {
+  ucasRelease(reqData);
+
   reqData->ucas.scopeP        = NULL;
-  reqData->ucas.restrictions  = 0;
   reqData->errorString        = "";
+
+  reqData->ucas.res.restrictions  = 0;
+  reqData->ucas.res.restriction.attributeExpression.set("");
 }
 
 

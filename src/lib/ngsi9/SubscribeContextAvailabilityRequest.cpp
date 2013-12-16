@@ -62,8 +62,8 @@ std::string SubscribeContextAvailabilityRequest::render(RequestType requestType,
   out += startTag(indent, tag, format, false);
   out += entityIdVector.render(format, indent2);
   out += attributeList.render(format, indent2);
-  out += reference.render(format, indent2);
-  out += duration.render(format, indent2);
+  out += reference.render(format, indent2, true); // FIXME P9: durationRendered || restrictionRendered || subscriptionIdRendered
+  out += duration.render(format, indent2, true);  // FIXME P9: restrictionRendered || subscriptionIdRendered
   out += restriction.render(format, indent2);
   out += subscriptionId.render(format, indent2);
   out += endTag(indent, tag, format);

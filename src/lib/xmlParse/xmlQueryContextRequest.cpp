@@ -175,13 +175,14 @@ static int scopeValue(xml_node<>* node, ParseData* reqDataP)
 */
 void qcrInit(ParseData* reqDataP)
 {
+  qcrRelease(reqDataP);
+
   reqDataP->qcr.entityIdP            = NULL;
   reqDataP->qcr.scopeP               = NULL;
-  reqDataP->qcr.restrictions         = 0;
-  reqDataP->qcr.res.restrictions     = 0;
   reqDataP->errorString              = "";
 
-  LM_T(LmtRestriction, ("restrictions %d", reqDataP->qcr.res.restrictions));
+  reqDataP->qcr.res.restrictions     = 0;
+  reqDataP->qcr.res.restriction.attributeExpression.set("");
 }
 
 

@@ -69,11 +69,11 @@ std::string SubscribeContextResponse::render(RequestType requestType, Format for
   out += startTag(indent, tag, format, false);
 
   if (subscribeError.errorCode.code == NO_ERROR_CODE)
-    out += subscribeResponse.render(format, indent + "  ");
+     out += subscribeResponse.render(format, indent + "  ", false);
   else
-    out += subscribeError.render(SubscribeContext, format, indent + "  ");
+     out += subscribeError.render(SubscribeContext, format, indent + "  ", false);
 
-  out += endTag(indent, tag, format);
+  out += endTag(indent, tag, format, false);
 
   return out;
 }

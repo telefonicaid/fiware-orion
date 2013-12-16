@@ -35,6 +35,12 @@
 */
 typedef struct HttpHeaders
 {
+  HttpHeaders()
+  {
+    gotHeaders    = false;
+    contentLength = 0;
+  }
+
   bool          gotHeaders;
   std::string   userAgent;
   std::string   host;
@@ -42,6 +48,7 @@ typedef struct HttpHeaders
   std::string   expect;
   std::string   contentType;
   unsigned int  contentLength;
+  std::string   connection;
 } HttpHeaders;
 
 #endif

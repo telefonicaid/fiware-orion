@@ -42,10 +42,10 @@ TEST(ContextRegistrationVector, render)
   std::string                out;
   std::string                expected = "<contextRegistrationList>\n  <contextRegistration>\n  </contextRegistration>\n</contextRegistrationList>\n";
 
-  out = crv.render(XML, "");
+  out = crv.render(XML, "", false);
   EXPECT_STREQ("", out.c_str());
 
   crv.push_back(&cr);
-  out = crv.render(XML, "");
+  out = crv.render(XML, "", false);
   EXPECT_STREQ(expected.c_str(), out.c_str());
 }

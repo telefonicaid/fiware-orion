@@ -51,9 +51,15 @@ std::string NotifyContextAvailabilityRequest::render(RequestType requestType, Fo
   std::string out = "";
   std::string tag = "notifyContextAvailabilityRequest";
 
+  //
+  // Note on JSON commas:
+  //  Both subscriptionId and contextRegistrationResponseVector are MANDATORY.
+  //  Always comma for subscriptionId.
+  //  With an empty contextRegistrationResponseVector there would be no notification
+  //
   out += startTag(indent, tag, format, false);
   out += subscriptionId.render(format, indent + "  ", true);
-  out += contextRegistrationResponseVector.render(format, indent  + "  ");
+  out += contextRegistrationResponseVector.render(format, indent  + "  ", false);
   out += endTag(indent, tag, format);
 
   return out;

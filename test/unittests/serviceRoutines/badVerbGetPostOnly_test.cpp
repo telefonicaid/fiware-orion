@@ -35,8 +35,8 @@
 */
 static RestService rs[] = 
 {
-  { "* ContextEntitiesByEntityId",                "*",      ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                      }, "", badVerbGetPostOnly                        },
-  { "* *",                                        "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
+  { "*",      ContextEntitiesByEntityId,             3, { "ngsi9", "contextEntities", "*"                      }, "", badVerbGetPostOnly                        },
+  { "",       InvalidRequest,                        0, {                                                      }, "", NULL                                      }
 };
 
 

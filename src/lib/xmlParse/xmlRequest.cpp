@@ -116,6 +116,7 @@ static XmlRequest xmlRequest[] =
   { IndividualContextEntity,               "POST", "appendContextElementRequest",                  acerParseVector,  acerInit,  acerRelease,  acerPresent,  acerCheck  },
 
   { IndividualContextEntityAttribute,      "POST", "updateContextAttributeRequest",                upcarParseVector, upcarInit, upcarRelease, upcarPresent, upcarCheck },
+  { AttributeValueInstance,                "PUT",  "updateContextAttributeRequest",                upcarParseVector, upcarInit, upcarRelease, upcarPresent, upcarCheck },
   { IndividualContextEntityAttributes,     "POST", "appendContextElementRequest",                  acerParseVector,  acerInit,  acerRelease,  acerPresent,  acerCheck  },
   { IndividualContextEntityAttributes,     "PUT",  "updateContextElementRequest",                  ucerParseVector,  ucerInit,  ucerRelease,  ucerPresent,  ucerCheck  },
   { AppendContextElement,                  "POST", "appendContextElementRequest",                  acerParseVector,  acerInit,  acerRelease,  acerPresent,  acerCheck  },
@@ -123,6 +124,8 @@ static XmlRequest xmlRequest[] =
 
   { SubscribeContext,                      "POST", "subscribeContextRequest",                      scrParseVector,   scrInit,   scrRelease,   scrPresent,   scrCheck   },
   { Ngsi10SubscriptionsConvOp,             "PUT",  "updateContextSubscriptionRequest",             ucsrParseVector,  ucsrInit,  ucsrRelease,  ucsrPresent,  ucsrCheck  },
+  { Ngsi9SubscriptionsConvOp,              "POST", "subscribeContextAvailabilityRequest",          scarParseVector,  scarInit,  scarRelease,  scarPresent,  scarCheck  },
+  { Ngsi9SubscriptionsConvOp,              "PUT",  "updateContextvailabilitySubscriptionRequest",  ucasParseVector,  ucasInit,  ucasRelease,  ucasPresent,  ucasCheck  },
 
   // Responses
   { RegisterResponse,                      "POST", "registerContextResponse",                      rcrsParseVector,  rcrsInit,  rcrsRelease,  rcrsPresent,  rcrsCheck  },
@@ -170,7 +173,7 @@ static xml_node<>* xmlDocPrepare(char* xml)
   {
     doc.parse<0>(xml);     // 0 means default parse flags
   }
-  catch (parse_error e)
+  catch (parse_error& e)
   {
     LM_RE(NULL, ("PARSE ERROR: %s", e.what()));
   }
@@ -189,7 +192,6 @@ static xml_node<>* xmlDocPrepare(char* xml)
 std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseDataP, RequestType request, std::string payloadWord, XmlRequest** reqPP)
 {
   xml_node<>*   father    = xmlDocPrepare((char*) content);
-  std::string   res       = "OK";
   XmlRequest*   reqP      = xmlRequestGet(request, ciP->method);
 
   if (father == NULL)
@@ -203,7 +205,7 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", requestType(request),
                                                SccBadRequest,
                                                "no request treating object found",
-                                               std::string("Sorry, no request treating object found for RequestType '") + requestType(request) + "'");
+                                               std::string("Sorry, no request treating object found for RequestType '") + requestType(request) + "', method '" + ciP->method + "'");
 
     LM_RE(errorReply, ("Sorry, no request treating object found for RequestType %d (%s), method %s", request, requestType(request), ciP->method.c_str()));
   }
@@ -214,53 +216,28 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
   //
   if (((ciP->verb == POST) || (ciP->verb == PUT)) && (payloadWord.length() != 0))
   {
-    char* payloadStart = (char*) content;
-
-    if (reqP->parseVector == NULL)
-    {
-      std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccNotImplemented, "Not Implemented", std::string("Sorry, the '") + reqP->keyword.c_str() + "' object is not implemented");
-      LM_RE(errorReply, ("Not Implemented"));
-    }
+    std::string  errorReply;
+    char*        payloadStart = (char*) content;
 
     // Skip '<?xml version="1.0" encoding="UTF-8"?> ' ?
     if (strncmp(payloadStart, "<?xml", 5) == 0)
     {
-      char* oldPayloadStart = payloadStart;
-
-      payloadStart = strstr(payloadStart, ">");
-      if (payloadStart == NULL)
-      {
-        LM_E(("Found '<?xml' but NOT '>' in '%s'", oldPayloadStart));
-        payloadStart = (char*) content;  // Going back ...
-      }
-      else
-      {
-        oldPayloadStart = payloadStart;
-        payloadStart = strstr(payloadStart, "<");
-         
-        if (payloadStart == NULL)
-        {
-          LM_E(("Found '<?xml' and '>' but NOT '<' in '%s'", oldPayloadStart));
-          payloadStart = (char*) content;  // Going back ...
-        }
-      }
+      ++payloadStart;
+      payloadStart = strstr(payloadStart, "<");
     }
 
+    // Skip '<'
     if (*payloadStart == '<')
-    {
-       ++payloadStart; // Skip '<'
-    }
+       ++payloadStart;
 
     if (strncasecmp(payloadWord.c_str(), payloadStart, payloadWord.length()) != 0)
     {
-      std::string  errorReply;
-
       errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, "Invalid payload", std::string("Expected '") + payloadWord + "' payload, got '" + payloadStart + "'");
       LM_RE(errorReply, ("Invalid payload: wanted: '%s', got '%s'", payloadWord.c_str(), payloadStart));
     }
   }
 
-  if (reqP->init == NULL) // No payload
+  if (reqP->init == NULL) // No payload treating function
     return "OK";
 
   reqP->init(parseDataP);
@@ -281,7 +258,6 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
   //
   if (reqPP != NULL)
   {
-    LM_T(LmtMetadataDoubleFree, ("Saving pointer to '%s' to free later (hope it hasn't been freed already ...)", reqP->keyword.c_str()));
     *reqPP = reqP;
   }
 

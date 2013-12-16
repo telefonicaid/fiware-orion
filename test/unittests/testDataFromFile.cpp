@@ -45,6 +45,14 @@ char testBuf[TEST_BUFFER_SIZE];
 
 /* ****************************************************************************
 *
+* expectedBuf - writable char vector to hold the output data
+*/
+char expectedBuf[TEST_BUFFER_SIZE];
+
+
+
+/* ****************************************************************************
+*
 * toString - 
 */
 std::string toString(int i)
@@ -90,6 +98,3 @@ std::string testDataFromFile(char* buffer, int bufSize, const char* fileName)
   
   return "OK";
 }
-
-
-

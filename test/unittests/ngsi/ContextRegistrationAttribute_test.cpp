@@ -39,8 +39,12 @@ TEST(ContextRegistrationAttribute, render)
 {
   ContextRegistrationAttribute  cra("name", "type", "false");
   std::string                   out;
-  std::string                   expected = "<contextRegistrationAttribute>\n  <name>name</name>\n  <type>type</type>\n  <isDomain>false</isDomain>\n</contextRegistrationAttribute>\n";
+  std::string                   expected1xml  = "<contextRegistrationAttribute>\n  <name>name</name>\n  <type>type</type>\n  <isDomain>false</isDomain>\n</contextRegistrationAttribute>\n";
+  std::string                   expected1json = "{\n  \"name\" : \"name\",\n  \"type\" : \"type\",\n  \"isDomain\" : \"false\"\n}\n";
 
   out = cra.render(XML, "");
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  EXPECT_STREQ(expected1xml.c_str(), out.c_str());
+
+  out = cra.render(JSON, "");
+  EXPECT_STREQ(expected1json.c_str(), out.c_str());
 }

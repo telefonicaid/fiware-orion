@@ -46,7 +46,7 @@ HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextR
     for (unsigned int ix= 0; ix < requestP->contextElementResponseVector.size(); ++ix) {
         /* We use 'ucr' to conform processContextElement signature but we are not doing anything with that */
         UpdateContextResponse ucr;
-        processContextElement(&requestP->contextElementResponseVector.get(ix)->contextElement, &ucr, "update");
+        processContextElement(&requestP->contextElementResponseVector.get(ix)->contextElement, &ucr, "append");
     }
 
     responseP->responseCode.fill(SccOk, "OK");

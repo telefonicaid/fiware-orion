@@ -169,11 +169,13 @@ static int scopeValue(xml_node<>* node, ParseData* reqDataP)
 */
 void dcarInit(ParseData* reqDataP)
 {
+  dcarRelease(reqDataP);
+
   reqDataP->dcar.entityIdP     = NULL;
   reqDataP->dcar.scopeP        = NULL;
-  reqDataP->dcar.restrictions  = 0;
-
   reqDataP->errorString        = "";
+
+  reqDataP->dcar.res.restrictions = 0;
   reqDataP->dcar.res.restriction.attributeExpression.set("");
 }
 
@@ -196,7 +198,7 @@ void dcarRelease(ParseData* reqDataP)
 */
 std::string dcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-   return reqDataP->dcar.res.check(DiscoverContextAvailability, ciP->outFormat, "", reqDataP->errorString, reqDataP->dcar.restrictions);
+   return reqDataP->dcar.res.check(DiscoverContextAvailability, ciP->outFormat, "", reqDataP->errorString, reqDataP->dcar.res.restrictions);
 }
 
 

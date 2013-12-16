@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
+#include "unittest.h"
 
 
 
@@ -49,4 +50,92 @@ TEST(UpdateContextSubscriptionResponse, constructors)
 
   rendered = ucsr2.render(UpdateContextSubscription, XML, "");
   EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* jsonRender - 
+*/
+TEST(UpdateContextSubscriptionResponse, json_render)
+{
+  const char*                         filename1  = "ngsi10.updateContextSubscriptionResponse.jsonRender1.valid.json";
+  const char*                         filename2  = "ngsi10.updateContextSubscriptionResponse.jsonRender2.valid.json";
+  const char*                         filename3  = "ngsi10.updateContextSubscriptionResponse.jsonRender3.valid.json";
+  const char*                         filename4  = "ngsi10.updateContextSubscriptionResponse.jsonRender4.valid.json";
+  const char*                         filename5  = "ngsi10.updateContextSubscriptionResponse.jsonRender5.valid.json";
+  const char*                         filename6  = "ngsi10.updateContextSubscriptionResponse.jsonRender6.valid.json";
+  UpdateContextSubscriptionResponse*  ucsrP;
+  std::string                         rendered;
+
+  utInit();
+
+  // Preparations
+  ucsrP = new UpdateContextSubscriptionResponse();
+
+  // 1. subscribeError, -subscriptionId, with details
+  // 2. subscribeError, +subscriptionId, no details
+  // 3. subscribeResponse: +subscription -duration -throttling
+  // 4. subscribeResponse: +subscription -duration +throttling
+  // 5. subscribeResponse: +subscription +duration -throttling
+  // 6. subscribeResponse: +subscription +duration +throttling
+
+  // 1.
+  ucsrP->subscribeError.errorCode.fill(SccBadRequest, "Bad Request", "details");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
+  rendered = ucsrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+
+
+  // 2.
+  ucsrP->subscribeError.errorCode.fill(SccBadRequest, "Bad Request", "");
+  ucsrP->subscribeError.subscriptionId.set("012345678901234567890123");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
+  rendered = ucsrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+  ucsrP->subscribeError.errorCode.fill(NO_ERROR_CODE, "", "");
+
+
+
+  // 3.
+  ucsrP->subscribeResponse.subscriptionId.set("012345678901234567890123");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
+  rendered = ucsrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+
+
+  // 4.
+  ucsrP->subscribeResponse.throttling.set("PT1M");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
+  rendered = ucsrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+
+
+  // 5.
+  ucsrP->subscribeResponse.throttling.set("");
+  ucsrP->subscribeResponse.duration.set("PT1H");
+  
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename5)) << "Error getting test data from '" << filename5 << "'";
+  rendered = ucsrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+
+
+  // 6.
+  ucsrP->subscribeResponse.throttling.set("PT1M");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename6)) << "Error getting test data from '" << filename6 << "'";
+  rendered = ucsrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+  utExit();
 }

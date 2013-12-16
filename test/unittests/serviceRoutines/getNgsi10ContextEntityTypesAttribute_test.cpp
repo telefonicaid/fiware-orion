@@ -41,10 +41,10 @@
 */
 static RestService rs[] = 
 {
-  { "GET Ngsi10ContextEntityTypesAttribute", "GET", Ngsi10ContextEntityTypesAttribute, 5, { "ngsi10", "contextEntityTypes", "*", "attributes", "*" }, "", getNgsi10ContextEntityTypesAttribute },
-  { "* Ngsi10ContextEntityTypesAttribute",   "*",   Ngsi10ContextEntityTypesAttribute, 5, { "ngsi10", "contextEntityTypes", "*", "attributes", "*" }, "", badVerbGetOnly                       },
-  { "* InvalidRequest",                      "*",   InvalidRequest,                    0, { "*", "*", "*", "*", "*", "*"                           }, "", badRequest                           },
-  { "* *",                                   "",    InvalidRequest,                    0, {                                                        }, "", NULL                                 }
+  { "GET", Ngsi10ContextEntityTypesAttribute, 5, { "ngsi10", "contextEntityTypes", "*", "attributes", "*" }, "", getNgsi10ContextEntityTypesAttribute },
+  { "*",   Ngsi10ContextEntityTypesAttribute, 5, { "ngsi10", "contextEntityTypes", "*", "attributes", "*" }, "", badVerbGetOnly                       },
+  { "*",   InvalidRequest,                    0, { "*", "*", "*", "*", "*", "*"                           }, "", badRequest                           },
+  { "",    InvalidRequest,                    0, {                                                        }, "", NULL                                 }
 };
 
 
