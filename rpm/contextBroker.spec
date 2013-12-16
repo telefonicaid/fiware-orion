@@ -103,6 +103,7 @@ make debug DESTDIR=$RPM_BUILD_ROOT BUILD_ARCH=%{build_arch}
 #FIXME There is an open issue with "make release" malfunction. Until get fixed, we will build in debug mode
 #make install DESTDIR=$RPM_BUILD_ROOT
 make install_debug DESTDIR=$RPM_BUILD_ROOT
+chmod 555 $RPM_BUILD_ROOT/usr/bin/contextBroker
 mkdir -p $RPM_BUILD_ROOT/var/%{name}
 mkdir -p $RPM_BUILD_ROOT/etc/init.d
 mkdir -p $RPM_BUILD_ROOT/etc/profile.d
