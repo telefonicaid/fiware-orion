@@ -129,3 +129,33 @@ function brokerStart()
   localBrokerStop CB
   localBrokerStart CB $traceLevels
 }
+
+
+
+# ------------------------------------------------------------------------------
+#
+# brokerStop - 
+#
+function brokerStop
+{
+  role=$1
+
+  if [ "$role" == "CB" ]
+  then
+    pidFile=$BROKER_PID_FILE
+    port=$BROKER_PORT
+  elif [ "$role" == "CM" ]
+  then
+    pidFile=$BROKER_PID_FILE_AUX
+    port=$CM_PORT
+  fi
+
+  if [ "$VALGRIND" == "" ]; then
+    kill $(cat $pidFile)
+    rm /tmp/orion_${port}.pid
+  else
+    curl localhost:${port}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
+    # Waiting for valgrind to terminate (sleep 10)
+    sleep 10
+  fi
+}
