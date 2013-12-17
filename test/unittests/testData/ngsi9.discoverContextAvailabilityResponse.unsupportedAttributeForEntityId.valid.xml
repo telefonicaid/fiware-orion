@@ -1,0 +1,6 @@
+<discoverContextAvailabilityResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>
+  </errorCode>
+</discoverContextAvailabilityResponse>

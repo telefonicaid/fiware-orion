@@ -1,0 +1,6 @@
+{
+  "errorCode" : {
+    "code" : "404",
+    "reasonPhrase" : "No context element found"
+  }
+}
