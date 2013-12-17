@@ -1,0 +1,7 @@
+{
+  "duration" : "PT1M",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "missing isDomain value for registration attribute"
+  }
+}

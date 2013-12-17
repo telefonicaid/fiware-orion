@@ -1,0 +1,7 @@
+<registerContextResponse>
+  <duration>PT1H</duration>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>
+  </errorCode>
+</registerContextResponse>
