@@ -1,0 +1,6 @@
+<registerContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Empty Context Registration List</reasonPhrase>
+  </errorCode>
+</registerContextResponse>

@@ -33,7 +33,7 @@
 #include "rest/ConnectionInfo.h"
 #include "xmlParse/xmlRequest.h"
 
-#include "testDataFromFile.h"
+#include "unittest.h"
 
 
 
@@ -80,21 +80,21 @@
 */
 TEST(RegisterContextRequest, xml_ok)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.ok.valid.xml";
-  ConnectionInfo  ci("", "POST", "1.1");
+  ParseData                parseData;
+  const char*              inFile  = "ngsi9.registerContextRequest.ok.valid.xml";
+  const char*              outFile = "ngsi9.registerContextRequestRendered.ok.valid.xml";
+  RegisterContextRequest*  rcrP    = &parseData.rcr.res;
+  ConnectionInfo           ci("", "POST", "1.1");
+  std::string              out;
   
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ("OK", result) << "this test should be OK";
 
-  RegisterContextRequest*  rcrP = &reqData.rcr.res;
-  std::string              out;
-  std::string              expected = "<registerContextRequest>\n  <contextRegistrationList>\n    <contextRegistration>\n      <entityIdList>\n        <entityId type=\"Room\" isPattern=\"false\">\n          <id>ConferenceRoom</id>\n        </entityId>\n        <entityId type=\"Room\" isPattern=\"false\">\n          <id>OfficeRoom</id>\n        </entityId>\n      </entityIdList>\n      <contextRegistrationAttributeList>\n        <contextRegistrationAttribute>\n          <name>temperature</name>\n          <type>degree</type>\n          <isDomain>false</isDomain>\n          <registrationMetadata>\n            <contextMetadata>\n              <name>ID</name>\n              <type>string</type>\n              <value>1110</value>\n            </contextMetadata>\n            <contextMetadata>\n              <name>cm2</name>\n              <type>string</type>\n              <value>XXX</value>\n            </contextMetadata>\n          </registrationMetadata>\n        </contextRegistrationAttribute>\n      </contextRegistrationAttributeList>\n      <registrationMetadata>\n        <contextMetadata>\n          <name>ID</name>\n          <type>string</type>\n          <value>2212</value>\n        </contextMetadata>\n        <contextMetadata>\n          <name>ID2</name>\n          <type>string</type>\n          <value>212</value>\n        </contextMetadata>\n      </registrationMetadata>\n      <providingApplication>http://localhost:1028/application</providingApplication>\n    </contextRegistration>\n  </contextRegistrationList>\n  <duration>PT1H</duration>\n</registerContextRequest>\n";
-
   out = rcrP->render(RegisterContext, XML, "");
-  EXPECT_EQ(expected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -105,19 +105,27 @@ TEST(RegisterContextRequest, xml_ok)
 */
 TEST(RegisterContextRequest, json_ok)
 {
-  ParseData       parseData;
-  const char*     fileName = "registerContextRequest_ok.json";
-  ConnectionInfo  ci("", "POST", "1.1");
-  JsonRequest*    reqP;
+  ParseData                parseData;
+  const char*              inFile   = "ngsi9.registerContextRequest.ok.valid.json";
+  const char*              outFile  = "ngsi9.registerContextRequestRendered.ok.valid.json";
+  RegisterContextRequest*  rcrP     = &parseData.rcr.res;
+  ConnectionInfo           ci("", "POST", "1.1");
+  JsonRequest*             reqP;
+  std::string              out;
 
   ci.inFormat      = JSON;
   ci.outFormat     = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", &reqP);
-  reqP->release(&parseData);
   EXPECT_EQ("OK", result) << "this test should be OK";
+
+  out = rcrP->render(RegisterContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  reqP->release(&parseData);
 }
 
 
@@ -128,15 +136,17 @@ TEST(RegisterContextRequest, json_ok)
 */
 TEST(RegisterContextRequest, noContextRegistrationList)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.noContextRegistration.invalid.xml";
-  const char*     expect   = "<registerContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty Context Registration List</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
+  ParseData       parseData;
+  const char*     inFile   = "ngsi9.registerContextRequest.noContextRegistration.invalid.xml";
+  const char*     outFile  = "ngsi9.registerContextResponse.noContextRegistration.valid.xml";
+  
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_STREQ(expect, result.c_str()) << "error in no context registration list test";
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -147,19 +157,20 @@ TEST(RegisterContextRequest, noContextRegistrationList)
 */
 TEST(RegisterContextRequest, json_noContextRegistration)
 {
-  ParseData       reqData;
-  const char*     fileName = "registerContextRequest_noContextRegistration.json";
-  const char*     expect   = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"Empty Context Registration List\"\n  }\n}\n";
+  ParseData       parseData;
+  const char*     inFile  = "ngsi9.registerContextRequest.noContextRegistration.invalid.json";
+  const char*     outFile = "ngsi9.registerContextResponse.noContextRegistration.valid.json";
 
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "error in no context registration list test";
+  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -170,15 +181,16 @@ TEST(RegisterContextRequest, json_noContextRegistration)
 */
 TEST(RegisterContextRequest, emptyContextRegistration)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.emptyContextRegistration.invalid.xml";
-  const char*     expect   = "<registerContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty Context Registration List</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
+  ParseData       parseData;
+  const char*     inFile  = "ngsi9.registerContextRequest.emptyContextRegistration.invalid.xml";
+  const char*     outFile = "ngsi9.registerContextResponse.emptyContextRegistration.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "error in empty context registration list test";
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -189,15 +201,16 @@ TEST(RegisterContextRequest, emptyContextRegistration)
 */
 TEST(RegisterContextRequest, noProvidingApplication)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.noProvidingApplication.invalid.xml";
-  const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>no providing application</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
+  ParseData       parseData;
+  const char*     inFile  = "ngsi9.registerContextRequest.noProvidingApplication.invalid.xml";
+  const char*     outFile = "ngsi9.registerContextResponse.noProvidingApplication.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "No Providing Application error";
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -208,18 +221,19 @@ TEST(RegisterContextRequest, noProvidingApplication)
 */
 TEST(RegisterContextRequest, json_noProvidingApplication)
 {
-  ParseData       reqData;
-  const char*     fileName = "registerContextRequest_noProvidingApplication.json";
-  const char*     expect   = "{\n  \"duration\" : \"PT1M\",\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"no providing application\"\n  }\n}\n";
+  ParseData       parseData;
+  const char*     inFile  = "ngsi9.registerContextRequest.noProvidingApplication.invalid.json";
+  const char*     outFile = "ngsi9.registerContextResponse.noProvidingApplication.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "No Providing Application error";
+  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -230,15 +244,16 @@ TEST(RegisterContextRequest, json_noProvidingApplication)
 */
 TEST(RegisterContextRequest, emptyProvidingApplication)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.emptyProvidingApplication.invalid.xml";
-  const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>no providing application</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
+  ParseData       parseData;
+  const char*     inFile  = "ngsi9.registerContextRequest.emptyProvidingApplication.invalid.xml";
+  const char*     outFile = "ngsi9.registerContextResponse.emptyProvidingApplication.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "Empty Providing Application error";
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -249,18 +264,19 @@ TEST(RegisterContextRequest, emptyProvidingApplication)
 */
 TEST(RegisterContextRequest, json_emptyProvidingApplication)
 {
-  ParseData       reqData;
-  const char*     fileName = "registerContextRequest_emptyProvidingApplication.json";
-  const char*     expect   = "{\n  \"duration\" : \"PT1M\",\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"no providing application\"\n  }\n}\n";
+  ParseData       parseData;
+  const char*     inFile  = "ngsi9.registerContextRequest.emptyProvidingApplication.invalid.json";
+  const char*     outFile = "ngsi9.registerContextResponse.emptyProvidingApplication.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "Empty Providing Application error";
+  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -271,13 +287,13 @@ TEST(RegisterContextRequest, json_emptyProvidingApplication)
 */
 TEST(RegisterContextRequest, noEntityIdList)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.noEntityIdList.valid.xml";
+  ParseData       parseData;
+  const char*     inFile = "ngsi9.registerContextRequest.noEntityIdList.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ("OK", result) << "No EntityId List error";
 }
 
@@ -289,15 +305,16 @@ TEST(RegisterContextRequest, noEntityIdList)
 */
 TEST(RegisterContextRequest, emptyEntityIdList)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.emptyEntityIdList.invalid.xml";
+  ParseData       parseData;
+  const char*     inFile  = "ngsi9.registerContextRequest.emptyEntityIdList.invalid.xml";
+  const char*     outFile = "ngsi9.registerContextResponse.emptyEntityIdList.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
-  std::string     expected = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty entityIdVector</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_EQ(expected, result);
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -308,14 +325,14 @@ TEST(RegisterContextRequest, emptyEntityIdList)
 */
 TEST(RegisterContextRequest, entityIdWithEmptyId)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.entityIdWithEmptyId.invalid.xml";
+  ParseData       parseData;
+  const char*     inFile = "ngsi9.registerContextRequest.entityIdWithEmptyId.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>empty entityId:id</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result) << "entityIdWithEmptyId error";
 }
 
@@ -327,14 +344,14 @@ TEST(RegisterContextRequest, entityIdWithEmptyId)
 */
 TEST(RegisterContextRequest, entityIdWithNoId)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.entityIdWithNoId.invalid.xml";
+  ParseData       parseData;
+  const char*     inFile = "ngsi9.registerContextRequest.entityIdWithNoId.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>empty entityId:id</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result) << "entityIdWithNoId error";
 }
 
@@ -346,14 +363,14 @@ TEST(RegisterContextRequest, entityIdWithNoId)
 */
 TEST(RegisterContextRequest, entityIdWithIsPatternTrue)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.entityIdWithIsPatternTrue.invalid.xml";
+  ParseData       parseData;
+  const char*     inFile = "ngsi9.registerContextRequest.entityIdWithIsPatternTrue.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>'isPattern' set to true for a registration</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result) << "entityIdWithIsPatternTrue error";
 }
 
@@ -365,17 +382,17 @@ TEST(RegisterContextRequest, entityIdWithIsPatternTrue)
 */
 TEST(RegisterContextRequest, json_entityIdWithIsPatternTrue)
 {
-  ParseData       reqData;
-  const char*     fileName = "registerContextRequest_entityIdWithIsPatternTrue.json";
+  ParseData       parseData;
+  const char*     inFile = "registerContextRequest_entityIdWithIsPatternTrue.json";
   const char*     expect   = "OK";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat   = JSON;
   ci.outFormat  = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result) << "entityIdWithIsPatternTrue error";
 }
 
@@ -387,14 +404,14 @@ TEST(RegisterContextRequest, json_entityIdWithIsPatternTrue)
 */
 TEST(RegisterContextRequest, present)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.ok.valid.xml";
+  ParseData       parseData;
+  const char*     inFile = "ngsi9.registerContextRequest.ok.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
   lmTraceLevelSet(LmtDump, true);
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ("OK", result) << "this test should be OK";
   lmTraceLevelSet(LmtDump, false);
 }
@@ -407,14 +424,14 @@ TEST(RegisterContextRequest, present)
 */
 TEST(RegisterContextRequest, invalidIsPatternString)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.isPattern.invalid.xml";
+  ParseData       parseData;
+  const char*     inFile = "ngsi9.registerContextRequest.isPattern.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result);
 }
 
@@ -426,17 +443,17 @@ TEST(RegisterContextRequest, invalidIsPatternString)
 */
 TEST(RegisterContextRequest, json_invalidIsPatternString)
 {
-  ParseData       reqData;
-  const char*     fileName = "registerContextRequest_invalidIsPatternString.json";
+  ParseData       parseData;
+  const char*     inFile = "registerContextRequest_invalidIsPatternString.json";
   const char*     expect   = "OK";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat   = JSON;
   ci.outFormat  = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result);
 }
 
@@ -448,14 +465,14 @@ TEST(RegisterContextRequest, json_invalidIsPatternString)
 */
 TEST(RegisterContextRequest, invalidAttributeName)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.entityIdAttribute.invalid.xml";
+  ParseData       parseData;
+  const char*     inFile = "ngsi9.registerContextRequest.entityIdAttribute.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result) << "error in invalidAttributeName";
 }
 
@@ -467,16 +484,16 @@ TEST(RegisterContextRequest, invalidAttributeName)
 */
 TEST(RegisterContextRequest, json_overwriteEntityIdType)
 {
-  ParseData       reqData;
-  const char*     fileName = "registerContextRequest_overwriteEntityIdType.json";
+  ParseData       parseData;
+  const char*     inFile = "registerContextRequest_overwriteEntityIdType.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ("OK", result) << "error at overwriting EntityIdType";
 }
 
@@ -488,14 +505,14 @@ TEST(RegisterContextRequest, json_overwriteEntityIdType)
 */
 TEST(RegisterContextRequest, durationError)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.duration.invalid.xml";
+  ParseData       parseData;
+  const char*     inFile = "ngsi9.registerContextRequest.duration.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>invalid duration</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>syntax error in duration string</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result) << "bad duration string was accepted as good";
 }
 
@@ -507,14 +524,14 @@ TEST(RegisterContextRequest, durationError)
 */
 TEST(RegisterContextRequest, emptyContextRegistrationAttributeName)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.emptyContextRegistrationAttributeName.invalid.xml";
+  ParseData       parseData;
+  const char*     inFile = "ngsi9.registerContextRequest.emptyContextRegistrationAttributeName.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing name for registration attribute</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result) << "empty Context Registration Attribute Name was accepted as good";
 }
 
@@ -526,14 +543,14 @@ TEST(RegisterContextRequest, emptyContextRegistrationAttributeName)
 */
 TEST(RegisterContextRequest, emptyContextRegistrationAttributeIsDomain)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.emptyContextRegistrationAttributeIsDomain.invalid.xml";
+  ParseData       parseData;
+  const char*     inFile = "ngsi9.registerContextRequest.emptyContextRegistrationAttributeIsDomain.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing isDomain value for registration attribute</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result) << "empty Context Registration Attribute IsDomain was accepted as good";
 }
 
@@ -545,14 +562,14 @@ TEST(RegisterContextRequest, emptyContextRegistrationAttributeIsDomain)
 */
 TEST(RegisterContextRequest, badContextRegistrationAttributeIsDomain)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.contextRegistrationAttributeIsDomain.invalid.xml";
+  ParseData       parseData;
+  const char*     inFile = "ngsi9.registerContextRequest.contextRegistrationAttributeIsDomain.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad isDomain value for registration attribute</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result) << "bad Context Registration Attribute IsDomain was accepted as good";
 }
 
@@ -564,17 +581,17 @@ TEST(RegisterContextRequest, badContextRegistrationAttributeIsDomain)
 */
 TEST(RegisterContextRequest, json_badContextRegistrationAttributeIsDomain)
 {
-  ParseData       reqData;
-  const char*     fileName = "registerContextRequest_badContextRegistrationAttributeIsDomain.json";
+  ParseData       parseData;
+  const char*     inFile = "registerContextRequest_badContextRegistrationAttributeIsDomain.json";
   const char*     expect   = "{\n  \"duration\" : \"PT1M\",\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"missing isDomain value for registration attribute\"\n  }\n}\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat   = JSON;
   ci.outFormat  = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result);
 }
 
@@ -586,14 +603,14 @@ TEST(RegisterContextRequest, json_badContextRegistrationAttributeIsDomain)
 */
 TEST(RegisterContextRequest, emptyContextMetadataName)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.emptyContextMetadataName.invalid.xml";
+  ParseData       parseData;
+  const char*     inFile = "ngsi9.registerContextRequest.emptyContextMetadataName.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing metadata name</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result) << "empty Context Registration Attribute Metadata Name was accepted as good";
 }
 
@@ -605,14 +622,14 @@ TEST(RegisterContextRequest, emptyContextMetadataName)
 */
 TEST(RegisterContextRequest, emptyContextMetadataValue)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.emptyContextMetadataValue.invalid.xml";
+  ParseData       parseData;
+  const char*     inFile = "ngsi9.registerContextRequest.emptyContextMetadataValue.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing metadata value</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result) << "empty Context Registration Attribute Metadata Value was accepted as good";
 }
 
@@ -624,14 +641,14 @@ TEST(RegisterContextRequest, emptyContextMetadataValue)
 */
 TEST(RegisterContextRequest, emptyRegistrationMetadataValue)
 {
-  ParseData       reqData;
-  const char*     fileName = "ngsi9.registerContextRequest.emptyRegistrationMetadataValue.invalid.xml";
+  ParseData       parseData;
+  const char*     inFile = "ngsi9.registerContextRequest.emptyRegistrationMetadataValue.invalid.xml";
   const char*     expect   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing metadata value</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result) << "empty Context Registration Metadata Value was accepted as good";
 }
 
@@ -643,17 +660,17 @@ TEST(RegisterContextRequest, emptyRegistrationMetadataValue)
 */
 TEST(RegisterContextRequest, json_reregistration)
 {
-  ParseData       reqData;
-  const char*     fileName = "registerContextRequest_reregistration.json";
+  ParseData       parseData;
+  const char*     inFile = "registerContextRequest_reregistration.json";
   const char*     expect   = "OK";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat   = JSON;
   ci.outFormat  = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
-  std::string result = jsonTreat(testBuf, &ci, &reqData, RegisterContext, "registerContextRequest", NULL);
+  std::string result = jsonTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_EQ(expect, result);
 }
 
