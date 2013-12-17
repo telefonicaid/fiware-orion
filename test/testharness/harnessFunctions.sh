@@ -180,6 +180,9 @@ function brokerStop
 #
 function accumulatorStop()
 {
+  kill $(curl localhost:${LISTENER_PORT}/pid -s -S)
+  sleep 1
+
   running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
 
   if [ $running_app -ne 0 ]
@@ -235,15 +238,4 @@ function accumulatorStart()
    nc -z localhost ${LISTENER_PORT} 
    port_not_ok=$?
   done
-}
-
-
-
-# ------------------------------------------------------------------------------
-#
-# accumulatorStop - 
-#
-function accumulatorStop()
-{
-  kill $(curl localhost:${LISTENER_PORT}/pid -s -S)
 }

@@ -28,7 +28,6 @@ source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB
-
 accumulatorStart
 
 --SHELL--
