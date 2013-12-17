@@ -447,10 +447,8 @@ then
     echo -n $testNoString $htest ...
 
     # In the case of harness test, we check that the test is implemented checking
-    # that the word VALGRIND apears in the file. The heuristic is that if the .test
-    # file includes that word, then there is conditional execution depending on if
-    # valgrind is used here or not.
-    grep VALGRIND $file > /dev/null 2>&1
+    # that the word VALGRIND_READY apears in the .test file (usually, in a commented line)
+    grep VALGRIND_READY $file > /dev/null 2>&1
     if [ "$?" -ne "0" ]
     then
       printNotImplementedString $htest
