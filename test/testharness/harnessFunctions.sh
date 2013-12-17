@@ -12,6 +12,17 @@ fi
 
 # ------------------------------------------------------------------------------
 #
+# harnessExit - 
+#
+function harnessExit()
+{
+  rm -f headers.out
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
 # dbInit - 
 #
 function dbInit()
@@ -159,4 +170,80 @@ function brokerStop
     # Waiting for valgrind to terminate (sleep 10)
     sleep 10
   fi
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# accumulatorStop - 
+#
+function accumulatorStop()
+{
+  running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
+
+  if [ $running_app -ne 0 ]
+  then
+    kill $(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | awk '{print $2}')
+    # Wait some time so the accumulator can finish properly
+    sleep 1
+    running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
+    if [ $running_app -ne 0 ]
+    then
+      # If the accumulator refuses to stop politely, kill the process by brute force
+      kill -9 $(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | awk '{print $2}')
+      sleep 1
+      running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
+
+      if [ $running_app -ne 0 ]
+      then
+        echo "Existing accumulator-server.py is inmortal, can not be killed!"
+        exit 1
+      fi
+    fi
+  fi
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# accumulatorStart - 
+#
+function accumulatorStart()
+{
+  accumulatorStop
+
+  accumulator-server.py ${LISTENER_PORT} /notify &
+  echo accumulator running as PID $$
+
+  # Wait until accumulator has started or we have waited a given maximum time
+  port_not_ok=1
+  typeset -i time
+  time=0
+
+  until [ $port_not_ok -eq 0 ]
+  do
+   if [ "$time" -eq "$MAXIMUM_WAIT" ]
+   then
+      echo "Unable to start listening application after waiting ${MAXIMUM_WAIT}"
+      exit 1
+   fi 
+   sleep 1
+
+   time=$time+1
+   nc -z localhost ${LISTENER_PORT} 
+   port_not_ok=$?
+  done
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# accumulatorStop - 
+#
+function accumulatorStop()
+{
+  kill $(curl localhost:${LISTENER_PORT}/pid -s -S)
 }
