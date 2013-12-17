@@ -27,7 +27,7 @@ dbInit CB
 dbInit CM
 
 brokerStart CB 0-255
-brokerStart CM 0-100
+brokerStart CM  230
 
 date > /tmp/pss
 ps aux | grep contextBroker >> /tmp/pss
