@@ -45,8 +45,9 @@ function localBrokerStart()
     CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t $traceLevels"
   elif [ "$role" == "CM" ]
   then
+    mkdir -p /tmp/configManager
     port=$CM_PORT
-    CB_START_CMD="contextBroker -logDir /tmp/configManager -ngsi9 -harakiri -port ${CM_PORT} -pidpath ${BROKER_PID_FILE_AUX} -db ${BROKER_DATABASE_NAME_AUX} -fwdPort ${BROKER_PORT} -t $traceLevels"
+    CB_START_CMD="contextBroker -logDir /tmp/configManager -ngsi9 -harakiri -port ${CM_PORT} -pidpath ${BROKER_PID_FILE_AUX} -db ${BROKER_DATABASE_AUX_NAME} -fwdPort ${BROKER_PORT} -t $traceLevels"
   fi
 
   if [ "$VALGRIND" == "" ]; then
@@ -126,8 +127,8 @@ function brokerStart()
     traceLevels=0-255
   fi
 
-  localBrokerStop CB
-  localBrokerStart CB $traceLevels
+  localBrokerStop $role
+  localBrokerStart $role $traceLevels
 }
 
 
