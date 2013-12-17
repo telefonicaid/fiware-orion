@@ -27,10 +27,8 @@ dbInit CB
 dbInit CM
 
 brokerStart CB 0-255
-brokerStart CM  230
+brokerStart CM 0-255
 
-date > /tmp/pss
-ps aux | grep contextBroker >> /tmp/pss
 --SHELL--
 # Do a NGSI10 request to check the operation is avoided
 (curl localhost:${CM_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
