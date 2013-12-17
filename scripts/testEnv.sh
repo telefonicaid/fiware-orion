@@ -24,6 +24,8 @@
 #
 #####
 
+export CONTEXTBROKER_TESTENV_SOURCED=YES
+
 # BROKER_PORT - the port/socket where contextBroker will listen for connections
 if [ -z "${BROKER_PORT}" ]; then
     BROKER_PORT=9999
