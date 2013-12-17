@@ -138,6 +138,12 @@ char            fwdHost[64];
 int             fwdPort;
 bool            ngsi9Only;
 bool            harakiri;
+// RBL
+char            localIpV6[64];
+
+// RBL
+#define  DUMMY_IP_V6       "DUMMY"
+
 
 
 
@@ -162,6 +168,8 @@ PaArgument paArgs[] =
   { "-fwdPort",     &fwdPort,      "FWD_PORT",     PaInt,    PaOpt, 0,              0,      65000, "port for forwarding NGSI9 regs"  },
   { "-ngsi9",       &ngsi9Only,    "CONFMAN",      PaBool,   PaOpt, false,          false,  true,  "run as Configuration Manager"    },
   { "-harakiri",    &harakiri,     "HARAKIRI",     PaBool,   PaHid, false,          false,  true,  "commits harakiri on request"     },
+  { "-ipv6",        localIpV6,     "LOCAL_IP_V6",  PaString, PaOpt, _i DUMMY_IP_V6, PaNL,   PaNL,  "If no dummy, ip v6 to receive new connections"   },
+
 
   PA_END_OF_ARGS
 };
@@ -602,6 +610,18 @@ int main(int argC, char* argV[])
   else
     restInit(localIp, port, restServiceV);
 
+  //RBL
+  if (strcmp(localIpV6, DUMMY_IP_V6) != 0)
+  {
+    LM_M(("IPv6 Listening on IP %s , port %d", localIpV6, port));
+    if (ngsi9Only)
+      restInit_v6(localIpV6, port, restServiceNgsi9V);
+    else
+      restInit_v6(localIpV6, port, restServiceV);
+      //restInit_v6("::", port, restServiceV);
+  }
+
+
   /* Set start time */
   startTime      = getCurrentTime();
   statisticsTime = startTime;
@@ -614,6 +634,13 @@ int main(int argC, char* argV[])
   {
     fprintf(stderr, "restStart: error %d\n", r);
     LM_X(1, ("restStart: error %d", r));
+  }
+
+  //RBL
+  if (strcmp(localIpV6, DUMMY_IP_V6) != 0)
+  {
+    if ((r = restStart_v6()) != 0)
+       LM_X(1, ("restStart_v6: error %d", r));
   }
 
   // Give the rest library the correct version string of this executable

@@ -38,6 +38,9 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 
+// RBL
+#include <netdb.h>
+
 
 
 /* ****************************************************************************
@@ -58,6 +61,11 @@ static char                      bindIp[15]    = "0.0.0.0";
 static RestService*              restServiceV  = NULL;
 static MHD_Daemon*               mhdDaemon     = NULL;
 static struct sockaddr_in        sad;
+// RBL
+static char                      bindIpV6[15]  = "::";
+static MHD_Daemon*               mhdDaemon_v6  = NULL;
+static struct sockaddr_in6       sad_v6;
+
 
 
 
@@ -445,6 +453,21 @@ void restInit(char* _bind, unsigned short _port, RestService* _restServiceV)
    savedResponse[0] = 0;
 }
 
+// RBL
+/* ****************************************************************************
+*
+* restInit_v6 -
+*/
+void restInit_v6(char* _bind, unsigned short _port, RestService* _restServiceV)
+{
+   strcpy(bindIpV6, _bind);
+
+   port          = _port;
+   restServiceV  = _restServiceV;
+
+   savedResponse[0] = 0;
+}
+
 
 
 /* ****************************************************************************
@@ -484,3 +507,47 @@ int restStart(void)
 
   return 0;
 }
+
+
+// RBL
+/* ****************************************************************************
+*
+* restStart_v6 -
+*/
+int restStart_v6(void)
+{
+  int ret;
+  if (port == 0)
+     LM_RE(1, ("V6 Please call restInit before starting the REST service"));
+
+
+  ret = inet_pton(AF_INET6, bindIpV6, &(sad_v6.sin6_addr.s6_addr));
+  if (ret != 1) {
+    LM_RE(1, ("V6 inet_pton fail for %s", bindIpV6));
+  }
+
+  sad_v6.sin6_family = AF_INET6;
+  sad_v6.sin6_port = htons(port);
+
+  LM_T(LmtHttpDaemon, ("Starting http daemon on IP %s port %d", bindIpV6, port));
+
+  mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6,
+                               htons(port),
+                               NULL,
+                               NULL,
+                               &connectionTreat,
+                               NULL,
+                               MHD_OPTION_NOTIFY_COMPLETED,
+                               requestCompleted,
+                               NULL,
+                               MHD_OPTION_CONNECTION_MEMORY_LIMIT,
+                               2 * PAYLOAD_SIZE,
+                               MHD_OPTION_SOCK_ADDR, (struct sockaddr*) &sad_v6,
+                               MHD_OPTION_END);
+
+  if (mhdDaemon_v6 == NULL)
+     LM_RE(1, ("MHD_start_daemon_v6 failed"));
+
+  return 0;
+}
+

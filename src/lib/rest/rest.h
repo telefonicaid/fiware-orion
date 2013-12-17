@@ -38,12 +38,25 @@
 */
 extern void restInit(char* bindIp, unsigned short port, RestService* restServiceV);
 
-
+//RBL
+/* ****************************************************************************
+*
+* restInit_v6 -
+*/
+extern void restInit_v6(char* bindIpV6, unsigned short port, RestService* restServiceV);
 
 /* ****************************************************************************
 *
 * restStart - 
 */
 extern int restStart(void);
+
+// RBL
+/* ****************************************************************************
+*
+* restStart_v6 -
+*/
+extern int restStart_v6(void);
+
 
 #endif

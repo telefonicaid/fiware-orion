@@ -26,6 +26,8 @@ SET (SOURCES
     RestService.cpp
     Verb.cpp
     clientSocketHttp.cpp
+    # RBL
+    clientSocketHttpV6.cpp
     orionReply.cpp
     OrionError.cpp
 )
@@ -39,6 +41,8 @@ SET (HEADERS
     RestService.h
     Verb.h
     clientSocketHttp.h
+    # RBL
+    clientSocketHttpV6.h
     orionReply.h
     OrionError.h
 )
