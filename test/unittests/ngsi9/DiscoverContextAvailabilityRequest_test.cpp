@@ -287,14 +287,15 @@ TEST(DiscoverContextAvailabilityRequest, invalidIsPatternValue_json)
 TEST(DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_xml)
 {
   ParseData       reqData;
-  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.unsupportedAttributeForEntityId.invalid.xml";
-  const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.unsupportedAttributeForEntityId.invalid.xml";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.unsupportedAttributeForEntityId.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-  EXPECT_EQ(expect, result) << "Unsupported Attribute For EntityId was NOT detected!";
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -328,14 +329,16 @@ TEST(DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_json)
 TEST(DiscoverContextAvailabilityRequest, entityIdIdAsAttribute_xml)
 {
   ParseData       reqData;
-  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.entityIdIdAsAttribute.invalid.xml";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.entityIdIdAsAttribute.invalid.xml";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.entityIdIdAsAttribute.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
-  std::string     expected = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-  EXPECT_EQ(expected, result);
+  EXPECT_STREQ(expectedBuf, result.c_str());
+
 }
 
 
@@ -511,14 +514,15 @@ TEST(DiscoverContextAvailabilityRequest, overrideEntityIdType_json)
 TEST(DiscoverContextAvailabilityRequest, overrideEntityIdIsPattern_xml)
 {
   ParseData       reqData;
-  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.EntityIdIsPattern.invalid.xml";
-  const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.EntityIdIsPattern.invalid.xml";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.EntityIdIsPattern.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-  EXPECT_EQ(expect, result) << "invalid 'isPattern' value";
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -530,18 +534,18 @@ TEST(DiscoverContextAvailabilityRequest, overrideEntityIdIsPattern_xml)
 TEST(DiscoverContextAvailabilityRequest, overrideEntityIdIsPattern_json)
 {
   ParseData       reqData;
-  const char*     inFile = "discoverContextAvailabilityRequest_overrideEntityIdIsPattern.json";
-  const char*     expect   = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"bad value for 'isPattern'\"\n  }\n}\n";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.overrideEntityIdIsPattern.invalid.json";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.overrideEntityIdIsPattern.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-
-  EXPECT_EQ(expect, result) << "invalid 'isPattern' value";
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -553,14 +557,15 @@ TEST(DiscoverContextAvailabilityRequest, overrideEntityIdIsPattern_json)
 TEST(DiscoverContextAvailabilityRequest, emptyEntityIdId_xml)
 {
   ParseData       reqData;
-  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.emptyEntityIdId.invalid.xml";
-  const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>empty entityId:id</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyEntityIdId.invalid.xml";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.emptyEntityIdId.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-  EXPECT_EQ(expect, result) << "empty EntityId id";
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -572,18 +577,18 @@ TEST(DiscoverContextAvailabilityRequest, emptyEntityIdId_xml)
 TEST(DiscoverContextAvailabilityRequest, emptyEntityIdId_json)
 {
   ParseData       reqData;
-  const char*     inFile = "discoverContextAvailabilityRequest_emptyEntityIdId.json";
-  const char*     expect   = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"empty entityId:id\"\n  }\n}\n";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyEntityIdId.valid.json";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.emptyEntityIdId.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-
-  EXPECT_EQ(expect, result) << "empty EntityId id";
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -595,14 +600,15 @@ TEST(DiscoverContextAvailabilityRequest, emptyEntityIdId_json)
 TEST(DiscoverContextAvailabilityRequest, noEntityIdId_xml)
 {
   ParseData       reqData;
-  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.noEntityIdId.invalid.xml";
-  const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>empty entityId:id</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.noEntityIdId.invalid.xml";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.noEntityIdId.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-  EXPECT_EQ(expect, result) << "No EntityId id";
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -614,18 +620,18 @@ TEST(DiscoverContextAvailabilityRequest, noEntityIdId_xml)
 TEST(DiscoverContextAvailabilityRequest, noEntityIdId_json)
 {
   ParseData       reqData;
-  const char*     inFile = "discoverContextAvailabilityRequest_noEntityIdId.json";
-  const char*     expect   = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"empty entityId:id\"\n  }\n}\n";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.noEntityIdId.invalid.json";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.noEntityIdId.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-
-  EXPECT_EQ(expect, result) << "No EntityId id";
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -721,14 +727,15 @@ TEST(DiscoverContextAvailabilityRequest, emptyAttributeExpression_json)
 TEST(DiscoverContextAvailabilityRequest, noScopeType_xml)
 {
   ParseData       reqData;
-  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.noScopeType.invalid.xml";
-  const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty type in restriction scope</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.noScopeType.invalid.xml";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.noScopeType.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-  EXPECT_EQ(expect, result) << "No Scope Type";
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -740,18 +747,18 @@ TEST(DiscoverContextAvailabilityRequest, noScopeType_xml)
 TEST(DiscoverContextAvailabilityRequest, noScopeType_json)
 {
   ParseData       reqData;
-  const char*     inFile = "discoverContextAvailabilityRequest_noScopeType.json";
-  const char*     expect   = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"Empty type in restriction scope\"\n  }\n}\n";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.noScopeType.invalid.json";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.noScopeType.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-
-  EXPECT_EQ(expect, result) << "No Scope Type";
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -763,14 +770,15 @@ TEST(DiscoverContextAvailabilityRequest, noScopeType_json)
 TEST(DiscoverContextAvailabilityRequest, noScopeValue_xml)
 {
   ParseData       reqData;
-  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.noScopeValue.invalid.xml";
-  const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty value in restriction scope</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.noScopeValue.invalid.xml";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.noScopeValue.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-  EXPECT_EQ(expect, result) << "No Scope Value";
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -782,18 +790,18 @@ TEST(DiscoverContextAvailabilityRequest, noScopeValue_xml)
 TEST(DiscoverContextAvailabilityRequest, noScopeValue_json)
 {
   ParseData       reqData;
-  const char*     inFile = "discoverContextAvailabilityRequest_noScopeValue.json";
-  const char*     expect   = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"Empty value in restriction scope\"\n  }\n}\n";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.noScopeValue.invalid.json";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.noScopeValue.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-
-  EXPECT_EQ(expect, result) << "No Scope Value";
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -805,14 +813,15 @@ TEST(DiscoverContextAvailabilityRequest, noScopeValue_json)
 TEST(DiscoverContextAvailabilityRequest, emptyScopeType_xml)
 {
   ParseData       reqData;
-  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.emptyScopeType.invalid.xml";
-  const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty type in restriction scope</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyScopeType.invalid.xml";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.emptyScopeType.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-  EXPECT_EQ(expect, result) << "Empty Scope Type";
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -824,18 +833,18 @@ TEST(DiscoverContextAvailabilityRequest, emptyScopeType_xml)
 TEST(DiscoverContextAvailabilityRequest, emptyScopeType_json)
 {
   ParseData       reqData;
-  const char*     inFile = "discoverContextAvailabilityRequest_emptyScopeType.json";
-  const char*     expect   = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"Empty type in restriction scope\"\n  }\n}\n";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyScopeType.invalid.json";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.emptyScopeType.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-
-  EXPECT_EQ(expect, result) << "Empty Scope Type";
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -847,14 +856,15 @@ TEST(DiscoverContextAvailabilityRequest, emptyScopeType_json)
 TEST(DiscoverContextAvailabilityRequest, emptyScopeValue_xml)
 {
   ParseData       reqData;
-  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.emptyScopeValue.invalid.xml";
-  const char*     expect   = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty value in restriction scope</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyScopeValue.invalid.xml";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.emptyScopeValue.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-  EXPECT_EQ(expect, result) << "Empty Scope Value";
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
@@ -866,8 +876,8 @@ TEST(DiscoverContextAvailabilityRequest, emptyScopeValue_xml)
 TEST(DiscoverContextAvailabilityRequest, emptyScopeValue_json)
 {
   ParseData       reqData;
-  const char*     inFile = "discoverContextAvailabilityRequest_emptyScopeValue.json";
-  const char*     expect   = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"Empty value in restriction scope\"\n  }\n}\n";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyScopeValue.invalid.json";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.emptyScopeValue.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
@@ -910,18 +920,16 @@ TEST(DiscoverContextAvailabilityRequest, parseError_json)
 TEST(DiscoverContextAvailabilityRequest, emptyAttributeName)
 {
   ParseData       reqData;
-  const char*     inFile = "discoverContextAvailabilityRequest_emptyAttributeName.json";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyAttributeName.invalid.json";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.emptyAttributeName.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     expected = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"empty attribute name\"\n  }\n}\n";
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-  EXPECT_EQ(expected, result);
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
-
-
-
