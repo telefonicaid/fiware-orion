@@ -71,13 +71,13 @@ function xsdGet()
 
   if [ "$prefix" = "ngsi9" ]
   then
-    echo $xsdDir/Ngsi9_Operations_v07.xsd
+    echo $xsdDir/Ngsi9_Operations.xsd
   elif [ "$prefix" == "ngsi10" ]
   then
-    echo $xsdDir/Ngsi10_Operations_v07.xsd
+    echo $xsdDir/Ngsi10_Operations.xsd
   elif [ "$prefix" == "ngsi" ]
   then
-    echo $xsdDir/Ngsi9_10_dataStructure_v07.xsd
+    echo $xsdDir/Ngsi9_10_dataStructures.xsd
   else
     echo "unknown file prefix: '"${prefix}"' for $xfile"
     exit 2
@@ -251,18 +251,18 @@ then
   stty $STTY_ORIG
   echo
 
-  \rm Ngsi10_Operations_v07.xsd Ngsi9_Operations_v07.xsd Ngsi9_10_dataStructure_v07.xsd 2> /dev/null
-  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-ware.eu/scmrepos/svn/iot/trunk/schemes/Ngsi10_Operations_v07.xsd
-  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-ware.eu/scmrepos/svn/iot/trunk/schemes/Ngsi9_Operations_v07.xsd
-  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-ware.eu/scmrepos/svn/iot/trunk/schemes/Ngsi9_10_dataStructure_v07.xsd
+  \rm Ngsi10_Operations.xsd Ngsi9_Operations.xsd Ngsi9_10_dataStructures.xsd 2> /dev/null
+  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-ware.eu/scmrepos/svn/iot/trunk/schemes/Ngsi10_Operations.xsd
+  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-ware.eu/scmrepos/svn/iot/trunk/schemes/Ngsi9_Operations.xsd
+  wget -q --no-check-certificate --user=$USER --password=$PASS https://forge.fi-ware.eu/scmrepos/svn/iot/trunk/schemes/Ngsi9_10_dataStructures.xsd
 
-  if [ ! -f Ngsi10_Operations_v07.xsd ] || [ ! -f Ngsi9_Operations_v07.xsd ] || [ ! -f Ngsi9_10_dataStructure_v07.xsd ]
+  if [ ! -f Ngsi10_Operations.xsd ] || [ ! -f Ngsi9_Operations.xsd ] || [ ! -f Ngsi9_10_dataStructures.xsd ]
   then
     echo $0: error: wget failed to download latest XSD files
     exit 4
   fi
 
-  mv Ngsi10_Operations_v07.xsd Ngsi9_Operations_v07.xsd Ngsi9_10_dataStructure_v07.xsd $xsdDir
+  mv Ngsi10_Operations.xsd Ngsi9_Operations.xsd Ngsi9_10_dataStructures.xsd $xsdDir
 
   vMsg "got XSD files"
 fi
@@ -273,7 +273,7 @@ fi
 #
 # XSD files there?
 #
-if [ ! -f $xsdDir/Ngsi10_Operations_v07.xsd ] || [ ! -f $xsdDir/Ngsi9_Operations_v07.xsd ] || [ ! -f $xsdDir/Ngsi9_10_dataStructure_v07.xsd ]
+if [ ! -f $xsdDir/Ngsi10_Operations.xsd ] || [ ! -f $xsdDir/Ngsi9_Operations.xsd ] || [ ! -f $xsdDir/Ngsi9_10_dataStructures.xsd ]
 then
   echo "$0: error: XSD files missing in $xsdDir"
   exit 5
