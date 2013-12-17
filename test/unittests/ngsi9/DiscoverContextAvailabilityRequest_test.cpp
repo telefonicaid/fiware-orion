@@ -884,10 +884,10 @@ TEST(DiscoverContextAvailabilityRequest, emptyScopeValue_json)
   ci.outFormat = JSON;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-
-  EXPECT_EQ(expect, result) << "Empty Scope Value";
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 
