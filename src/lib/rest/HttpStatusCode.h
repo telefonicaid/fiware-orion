@@ -53,4 +53,13 @@ typedef enum HttpStatusCode
   SccNotImplemented         = 501    // The given operation is not implemented
 } HttpStatusCode;
 
+
+
+/* ****************************************************************************
+*
+* httpStatusCodeString - 
+*/
+extern std::string httpStatusCodeString(HttpStatusCode code);
+
 #endif
+
