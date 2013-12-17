@@ -1,3 +1,23 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# fermin at tid dot es
+
 # ------------------------------------------------------------------------------
 #
 # harnessInit - 
@@ -7,6 +27,17 @@ then
   echo "scripts/testEnv.sh not sourced - I do it for you"
   source ../../scripts/testEnv.sh
 fi
+
+
+
+# ------------------------------------------------------------------------------
+#
+# harnessExit - 
+#
+function harnessExit()
+{
+  rm -f headers.out
+}
 
 
 
@@ -23,7 +54,7 @@ function dbInit()
     echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
   elif [ "$role" == "CM" ]
   then
-    echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME_AUX} --quiet
+    echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_AUX_NAME} --quiet
   fi
 }
 
@@ -42,11 +73,12 @@ function localBrokerStart()
   if [ "$role" == "CB" ]
   then
     port=$BROKER_PORT
-    CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t $traceLevels"
+    CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME}     -t $traceLevels"
   elif [ "$role" == "CM" ]
   then
+    mkdir -p /tmp/configManager
     port=$CM_PORT
-    CB_START_CMD="contextBroker -logDir /tmp/configManager -ngsi9 -harakiri -port ${CM_PORT} -pidpath ${BROKER_PID_FILE_AUX} -db ${BROKER_DATABASE_NAME_AUX} -fwdPort ${BROKER_PORT} -t $traceLevels"
+    CB_START_CMD="contextBroker -harakiri -port ${CM_PORT}     -pidpath ${BROKER_PID_FILE_AUX} -db ${BROKER_DATABASE_AUX_NAME} -t $traceLevels -fwdPort ${BROKER_PORT} -logDir /tmp/configManager -ngsi9 "
   fi
 
   if [ "$VALGRIND" == "" ]; then
@@ -126,6 +158,104 @@ function brokerStart()
     traceLevels=0-255
   fi
 
-  localBrokerStop CB
-  localBrokerStart CB $traceLevels
+  localBrokerStop $role
+  localBrokerStart $role $traceLevels
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# brokerStop - 
+#
+function brokerStop
+{
+  role=$1
+
+  if [ "$role" == "CB" ]
+  then
+    pidFile=$BROKER_PID_FILE
+    port=$BROKER_PORT
+  elif [ "$role" == "CM" ]
+  then
+    pidFile=$BROKER_PID_FILE_AUX
+    port=$CM_PORT
+  fi
+
+  if [ "$VALGRIND" == "" ]; then
+    kill $(cat $pidFile)
+    rm /tmp/orion_${port}.pid
+  else
+    curl localhost:${port}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
+    # Waiting for valgrind to terminate (sleep 10)
+    sleep 10
+  fi
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# accumulatorStop - 
+#
+function accumulatorStop()
+{
+  kill $(curl localhost:${LISTENER_PORT}/pid -s -S)
+  sleep 1
+
+  running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
+
+  if [ $running_app -ne 0 ]
+  then
+    kill $(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | awk '{print $2}')
+    # Wait some time so the accumulator can finish properly
+    sleep 1
+    running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
+    if [ $running_app -ne 0 ]
+    then
+      # If the accumulator refuses to stop politely, kill the process by brute force
+      kill -9 $(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | awk '{print $2}')
+      sleep 1
+      running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
+
+      if [ $running_app -ne 0 ]
+      then
+        echo "Existing accumulator-server.py is inmortal, can not be killed!"
+        exit 1
+      fi
+    fi
+  fi
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# accumulatorStart - 
+#
+function accumulatorStart()
+{
+  accumulatorStop
+
+  accumulator-server.py ${LISTENER_PORT} /notify &
+  echo accumulator running as PID $$
+
+  # Wait until accumulator has started or we have waited a given maximum time
+  port_not_ok=1
+  typeset -i time
+  time=0
+
+  until [ $port_not_ok -eq 0 ]
+  do
+   if [ "$time" -eq "$MAXIMUM_WAIT" ]
+   then
+      echo "Unable to start listening application after waiting ${MAXIMUM_WAIT}"
+      exit 1
+   fi 
+   sleep 1
+
+   time=$time+1
+   nc -z localhost ${LISTENER_PORT} 
+   port_not_ok=$?
+  done
 }

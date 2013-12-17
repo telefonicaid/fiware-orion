@@ -21,70 +21,13 @@
 --NAME--
 CM forwards PSB OK
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-contextBroker -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME}
-# Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-sleep 1
+dbInit CB
+dbInit CM
 
-
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
-
-# Test to see if we have a broker running on ${CM_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${CM_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${CM_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${CM_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${CM_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${CM_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
-
-mkdir /tmp/configManager
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_AUX_NAME} --quiet
-contextBroker -logDir /tmp/configManager -ngsi9 -port ${CM_PORT} -pidpath ${BROKER_PID_FILE_AUX} -db ${BROKER_DATABASE_AUX_NAME} -fwdPort ${BROKER_PORT}
-# Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-sleep 1
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${CM_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
+brokerStart CB 0-255
+brokerStart CM 0-255
 
 --SHELL--
 # Do a NGSI10 request to check the operation is avoided
@@ -92,13 +35,13 @@ fi
 <?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
   </entityIdList>
   <attributeList>
-        <attribute>pressure</attribute>
-        <attribute>lightstatus</attribute>
+    <attribute>pressure</attribute>
+    <attribute>lightstatus</attribute>
   </attributeList>
 </queryContextRequest>
 EOF
@@ -384,7 +327,7 @@ fi
 1
 OK
 --TEARDOWN--
-kill $(cat ${BROKER_PID_FILE})
-rm /tmp/orion_${BROKER_PORT}.pid
-kill $(cat ${BROKER_PID_FILE_AUX})
-rm /tmp/orion_${CM_PORT}.pid
+source harnessFunctions.sh
+
+brokerStop CB
+brokerStop CM
