@@ -1,0 +1,8 @@
+<registerContextResponse>
+  <duration>PT0R</duration>
+  <registrationId>000000000000000000000000</registrationId>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>syntax error in duration string</reasonPhrase>
+  </errorCode>
+</registerContextResponse>

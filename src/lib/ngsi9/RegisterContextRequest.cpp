@@ -51,9 +51,9 @@ std::string RegisterContextRequest::render(RequestType requestType, Format forma
 
   out += startTag(indent, xmlTag, "", format, false, false);
 
-  out += contextRegistrationVector.render(format, indent + "  ", commaAfterContextRegistrationVector);
-  out += duration.render(format,                  indent + "  ", commaAfterDuration);
-  out += registrationId.render(format,            indent + "  ", commaAfterRegistrationId);
+  out += contextRegistrationVector.render(format,       indent + "  ", commaAfterContextRegistrationVector);
+  out += duration.render(format,                        indent + "  ", commaAfterDuration);
+  out += registrationId.render(RegisterContext, format, indent + "  ", commaAfterRegistrationId);
 
   out += endTag(indent, xmlTag, format, false);
 
