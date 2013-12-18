@@ -61,6 +61,8 @@ std::string ContextRegistrationAttribute::render(Format format, std::string inde
   std::string jsonTag  = "registrationAttribute";
   std::string out      = "";
 
+  metadataVector.tagSet("metadata");
+
   //
   // About JSON commas:
   // The field isDomain is mandatory, so all field before that will

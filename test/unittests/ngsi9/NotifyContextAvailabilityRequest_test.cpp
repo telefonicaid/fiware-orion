@@ -44,10 +44,13 @@
 TEST(NotifyContextAvailabilityRequest, ok_xml)
 {
   ParseData       parseData;
-  const char*     fileName = "ngsi9.notifyContextAvailabilityRequest.ok.valid.xml";
+  const char*     inFile  = "ngsi9.notifyContextAvailabilityRequest.ok.valid.xml";
+  const char*     outFile = "ngsi9.notifyContextAvailabilityRequestRendered.ok.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
+  std::string     rendered;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   lmTraceLevelSet(LmtDump, true);
   std::string result = xmlTreat(testBuf, &ci, &parseData, NotifyContextAvailability, "notifyContextAvailabilityRequest", NULL);
@@ -56,10 +59,8 @@ TEST(NotifyContextAvailabilityRequest, ok_xml)
 
   NotifyContextAvailabilityRequest* ncarP = &parseData.ncar.res;
 
-  std::string     rendered = ncarP->render(NotifyContext, XML, "");
-  std::string     expected = "<notifyContextAvailabilityRequest>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n  <contextRegistrationResponseList>\n    <contextRegistrationResponse>\n      <contextRegistration>\n        <entityIdList>\n          <entityId type=\"Room\" isPattern=\"false\">\n            <id>ConferenceRoom</id>\n          </entityId>\n          <entityId type=\"Room\" isPattern=\"false\">\n            <id>OfficeRoom</id>\n          </entityId>\n        </entityIdList>\n        <contextRegistrationAttributeList>\n          <contextRegistrationAttribute>\n            <name>temperature</name>\n            <type>degree</type>\n            <isDomain>false</isDomain>\n            <registrationMetadata>\n              <contextMetadata>\n                <name>ID</name>\n                <type>string</type>\n                <value>1110</value>\n              </contextMetadata>\n            </registrationMetadata>\n          </contextRegistrationAttribute>\n        </contextRegistrationAttributeList>\n        <registrationMetadata>\n          <contextMetadata>\n            <name>ID</name>\n            <type>string</type>\n            <value>2212</value>\n          </contextMetadata>\n        </registrationMetadata>\n        <providingApplication>http://192.168.100.1:70/application\n\t\t\t\t</providingApplication>\n      </contextRegistration>\n    </contextRegistrationResponse>\n  </contextRegistrationResponseList>\n</notifyContextAvailabilityRequest>\n";
-
-  EXPECT_EQ(expected, rendered);
+  rendered = ncarP->render(NotifyContext, XML, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   ncarP->release();
 }

@@ -48,7 +48,7 @@ TEST(RegisterProviderRequest, xml_ok)
   ParseData       reqData;
   const char*     inFile1  = "ngsi9.registerProviderRequest.noRegistrationId.postponed.xml";
   const char*     inFile2  = "ngsi9.registerProviderRequest.ok.postponed.xml";
-  const char*     outFile1 = "ngsi9.registerProviderRequestRendered.noRegistrationId.valid.xml";
+  const char*     outFile1 = "ngsi9.registerProviderRequestRendered.noRegistrationId.postponed.xml";
   const char*     outFile2 = "ngsi9.registerProviderRequest.noMetdataName.valid.xml";
   const char*     outFile3 = "ngsi9.registerProviderRequest.predetectedError.valid.xml";
   const char*     outFile4 = "ngsi9.discoverContextAvailabilityResponse.ok.valid";

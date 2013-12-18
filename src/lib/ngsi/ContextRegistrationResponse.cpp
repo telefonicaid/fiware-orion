@@ -56,7 +56,7 @@ std::string ContextRegistrationResponse::render(Format format, std::string inden
 
   out += startTag(indent, xmlTag, jsonTag, format, false, false);
 
-  out += contextRegistration.render(format, indent + "  ", errorCodeRendered);
+  out += contextRegistration.render(format, indent + "  ", errorCodeRendered, false);
 
   if (errorCodeRendered)
      out += errorCode.render(format, indent + "  ", false);

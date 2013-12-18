@@ -69,7 +69,7 @@ std::string RegisterProviderRequest::render(Format format, std::string indent)
   out += metadataVector.render(format,       indent + "  ", commaAfterMetadataVector);
   out += duration.render(format,             indent + "  ", commaAfterDuration);
   out += providingApplication.render(format, indent + "  ", commaAfterProvidingApplication);
-  out += registrationId.render(format,       indent + "  ", commaAfterRegistrationId);
+  out += registrationId.render(RegisterContext, format,       indent + "  ", commaAfterRegistrationId);
   out += endTag(indent, xmlTag, format, false);
 
   return out;   
