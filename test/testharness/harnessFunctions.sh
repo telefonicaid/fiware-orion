@@ -1,11 +1,12 @@
+# FIXME P1 - This doesn't work if the test is in a subdirectory such as xmlParse
 # ------------------------------------------------------------------------------
 #
 # harnessInit - 
 #
-if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
-then
-  source ../../scripts/testEnv.sh
-fi
+# if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
+# then
+#   source ../../scripts/testEnv.sh
+# fi
 
 
 
@@ -264,17 +265,19 @@ function curlxml()
   contenttype=$3
   accept=$4
   
+  params="-s -S --dump-header headers.out "
+  
   if [ "$contenttype" == "" ]
   then
     contenttype="Content-Type: application/xml"
   fi
   
-  if [ "$contenttype" == "" ]
+  if [ "$accept" == "" ]
   then
-    accept="Accept: application/xml"
+    response=$(echo ${payload} | (curl localhost:${BROKER_PORT}${url} ${params} --header "${contenttype}" -d @- ))
+  else
+    response=$(echo ${payload} | (curl localhost:${BROKER_PORT}${url} ${params} --header "${contenttype}" --header "${accept}" -d @- ))
   fi
-  
-  response=$(echo ${payload} | (curl localhost:${BROKER_PORT}${url} -s -S --dump-header headers.out --header "${contenttype}" --header "${accept}" -d @- ))
   
   print_xml_with_headers
 }
