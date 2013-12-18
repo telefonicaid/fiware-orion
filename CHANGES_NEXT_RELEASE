@@ -9,7 +9,7 @@ o PR #168 kzangeli Wed dic 18 16:21:10 CET 2013
   - Fixed the check of RegisterProviderRequest which was incorrect.
     This fix improves error responses for ngsi9 convenience oprrations
 
-o PR #171 kzangeli Wed dic 19 00:25:37 CET 2013
+o PR #172 kzangeli Thu dec 19 00:45:30 CET 2013
   - Fixed a bug regarding the 'default' value of 'subscriptionId'.
     Before this PR, in case of an undefined subscriptionId, the string 'No SubscriptionId' was used.
     This doesn't follow the XSD and has been changed to '000000000000000000000000'.
