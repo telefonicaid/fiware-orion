@@ -250,6 +250,7 @@ function print_xml_with_headers()
 {
   cat headers.out
   echo $response | xmllint --format -
+  rm headers.out
 }
 
 
@@ -264,6 +265,7 @@ function curlxml()
   payload=$2
   contenttype=$3
   accept=$4
+  extraoptions=$5
   
   params="-s -S --dump-header headers.out "
   
@@ -274,10 +276,22 @@ function curlxml()
   
   if [ "$accept" == "" ]
   then
-    response=$(echo ${payload} | (curl localhost:${BROKER_PORT}${url} ${params} --header "${contenttype}" -d @- ))
+    response=$(echo ${payload} | (curl localhost:${BROKER_PORT}${url} ${params} --header "${contenttype}" $extraoptions -d @- ))
   else
-    response=$(echo ${payload} | (curl localhost:${BROKER_PORT}${url} ${params} --header "${contenttype}" --header "${accept}" -d @- ))
+    response=$(echo ${payload} | (curl localhost:${BROKER_PORT}${url} ${params} --header "${contenttype}" --header "${accept}" $extraoptions -d @- ))
   fi
   
+  print_xml_with_headers
+}
+
+function curlxmlNoPayload()
+{
+  url=$1
+  extraoptions=$2
+   
+  params="-s -S --dump-header headers.out "
+  
+  response=$(echo ${payload} | (curl localhost:${BROKER_PORT}${url} ${params} $extraoptions ))
+    
   print_xml_with_headers
 }
