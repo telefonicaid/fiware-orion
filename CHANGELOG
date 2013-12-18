@@ -1,7 +1,0 @@
-o PR #167 kzangeli   Wed dec 18 12:50:00 CET 2013
-  Found and fixed three bugs during the process:
-    - registerContextRequest rendering had no comma for JSON between ContextRegistrations
-    - registrationId mandatory for registerContextResponse
-    - ContextRegistrationAttribute had an incorrect tag for the metadata
-
-o 
