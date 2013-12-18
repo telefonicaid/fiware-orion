@@ -110,7 +110,7 @@ def ignore(root, file):
     # Particular cases of files that are also ignored
     if file == '.gitignore' or file == '.valgrindrc' or file == '.valgrindSuppressions' \
         or file == 'README.md' or file == 'LICENSE' or file == 'ContributionPolicy.txt' \
-        or file == 'compileInfo.h':
+        or file == 'CHANGES_NEXT_RELEASE' or file == 'compileInfo.h':
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
         or file == 'cmake2junit.xsl'):
