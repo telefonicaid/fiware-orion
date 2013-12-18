@@ -35,6 +35,7 @@ const char* requestType(RequestType rt)
   switch (rt)
   {
   case RegisterContext:                             return "RegisterContext";
+  case RegisterResponse:                            return "RegisterResponse";
   case DiscoverContextAvailability:                 return "DiscoverContextAvailability";
   case SubscribeContextAvailability:                return "SubscribeContextAvailability";
   case UpdateContextAvailabilitySubscription:       return "UpdateContextAvailabilitySubscription";
@@ -73,7 +74,6 @@ const char* requestType(RequestType rt)
   case ExitRequest:                                 return "Exit";
   case LeakRequest:                                 return "Leak";
   case InvalidRequest:                              return "InvalidRequest";
-  case RegisterResponse:                            return "RegisterResponse";
   }
 
   return "";

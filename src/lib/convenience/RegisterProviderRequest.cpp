@@ -69,7 +69,7 @@ std::string RegisterProviderRequest::render(Format format, std::string indent)
   out += metadataVector.render(format,       indent + "  ", commaAfterMetadataVector);
   out += duration.render(format,             indent + "  ", commaAfterDuration);
   out += providingApplication.render(format, indent + "  ", commaAfterProvidingApplication);
-  out += registrationId.render(format,       indent + "  ", commaAfterRegistrationId);
+  out += registrationId.render(RegisterContext, format,       indent + "  ", commaAfterRegistrationId);
   out += endTag(indent, xmlTag, format, false);
 
   return out;   
@@ -91,7 +91,10 @@ std::string RegisterProviderRequest::check(RequestType requestType, Format forma
       response.errorCode.code         = SccBadRequest;
       response.errorCode.reasonPhrase = predetectedError;
    }
-   else if ((res = metadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+   else if (((res = metadataVector.check(requestType, format, indent, "", counter))  != "OK") ||
+            ((res = duration.check(requestType, format, indent, "", 0))              != "OK") ||
+            ((res = providingApplication.check(requestType, format, indent, "", 0))  != "OK") ||
+            ((res = registrationId.check(requestType, format, indent, "", 0))        != "OK"))
    {
       response.errorCode.code = SccBadRequest;
       response.errorCode.reasonPhrase = res;

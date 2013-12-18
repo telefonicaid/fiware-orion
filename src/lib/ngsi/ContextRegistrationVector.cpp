@@ -61,7 +61,7 @@ std::string ContextRegistrationVector::render(Format format, std::string indent,
   out += startTag(indent, xmlTag, jsonTag, format, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
+    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1, true);
 
   out += endTag(indent, xmlTag, format, comma, comma);
 
