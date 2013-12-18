@@ -1,4 +1,5 @@
 {
+  "registrationId" : "000000000000000000000000",
   "errorCode" : {
     "code" : "400",
     "reasonPhrase" : "Empty Context Registration List"

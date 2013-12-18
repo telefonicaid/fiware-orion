@@ -45,6 +45,7 @@ std::string ContextRegistrationAttributeVector::render(Format format, std::strin
   if (vec.size() == 0)
     return "";
 
+  LM_M(("In ContextRegistrationAttributeVector::render"));
   out += startTag(indent, xmlTag, jsonTag, format, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
     out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);

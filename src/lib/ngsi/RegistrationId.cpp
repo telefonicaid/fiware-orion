@@ -102,10 +102,18 @@ void RegistrationId::present(std::string indent)
 *
 * RegistrationId::render - 
 */
-std::string RegistrationId::render(Format format, std::string indent, bool comma)
+std::string RegistrationId::render(RequestType requestType, Format format, std::string indent, bool comma)
 {
   if (string == "")
-    return "";
+  {
+     if (requestType == RegisterResponse) // registrationId is MANDATORY for RegisterContextResponse
+     {
+       string = "000000000000000000000000";
+       LM_W(("No registrationId - setting it to all zeroes"));
+     }
+     else
+       return "";
+  }
 
   return valueTag(indent, "registrationId", string, format, comma);
 }

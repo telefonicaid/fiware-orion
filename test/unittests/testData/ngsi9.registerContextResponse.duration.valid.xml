@@ -1,5 +1,6 @@
 <registerContextResponse>
-  <duration>invalid duration</duration>
+  <duration>PT0R</duration>
+  <registrationId>000000000000000000000000</registrationId>
   <errorCode>
     <code>400</code>
     <reasonPhrase>syntax error in duration string</reasonPhrase>

@@ -105,11 +105,14 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
   std::string  jsonTag                = "attribute";
   bool         commaAfterContextValue = metadataVector.size() != 0;
 
+  LM_M(("Setting metadataVector tag to 'metadata'"));
   metadataVector.tagSet("metadata");
 
+  //
   // About JSON commas:
   // contextValue is MANDATORY, so up to that field, all will wear the JSON comma
   // contextValue itself has a comma if metadataVector is rendered
+  //
   out += startTag(indent, xmlTag, jsonTag, format, false, false);
   out += valueTag(indent + "  ", "name",         name,  format, true);
   out += valueTag(indent + "  ", "type",         type,  format, true);

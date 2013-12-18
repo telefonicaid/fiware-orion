@@ -104,6 +104,8 @@ std::string ProvidingApplication::render(Format format, std::string indent, bool
   if (string == "")
     return "";
 
+  LM_M(("string: '%s'", string.c_str()));
+
   return valueTag(indent, "providingApplication", string, format, comma);
 }
 

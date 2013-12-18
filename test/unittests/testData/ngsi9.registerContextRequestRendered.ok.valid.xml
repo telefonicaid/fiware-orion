@@ -14,7 +14,7 @@
           <name>temperature</name>
           <type>degree</type>
           <isDomain>false</isDomain>
-          <registrationMetadata>
+          <metadata>
             <contextMetadata>
               <name>ID</name>
               <type>string</type>
@@ -25,7 +25,7 @@
               <type>string</type>
               <value>XXX</value>
             </contextMetadata>
-          </registrationMetadata>
+          </metadata>
         </contextRegistrationAttribute>
       </contextRegistrationAttributeList>
       <registrationMetadata>

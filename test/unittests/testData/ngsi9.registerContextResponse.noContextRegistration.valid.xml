@@ -1,4 +1,5 @@
 <registerContextResponse>
+  <registrationId>000000000000000000000000</registrationId>
   <errorCode>
     <code>400</code>
     <reasonPhrase>Empty Context Registration List</reasonPhrase>

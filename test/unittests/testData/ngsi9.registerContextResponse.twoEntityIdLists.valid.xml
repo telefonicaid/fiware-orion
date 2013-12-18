@@ -1,7 +1,8 @@
 <registerContextResponse>
+  <duration>PT1H</duration>
   <registrationId>000000000000000000000000</registrationId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Empty Context Registration List</reasonPhrase>
+    <reasonPhrase>Got an entityIdList when one was present already</reasonPhrase>
   </errorCode>
 </registerContextResponse>

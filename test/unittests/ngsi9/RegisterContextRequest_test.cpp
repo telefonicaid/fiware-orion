@@ -386,7 +386,7 @@ TEST(RegisterContextRequest, entityIdWithIsPatternTrue)
 TEST(RegisterContextRequest, json_entityIdWithIsPatternTrue)
 {
   ParseData       parseData;
-  const char*     inFile = "registerContextRequest_entityIdWithIsPatternTrue.json";
+  const char*     inFile = "ngsi9.registerContextRequest.entityIdWithIsPatternTrue.valid.json";
   const char*     expect   = "OK";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -448,7 +448,7 @@ TEST(RegisterContextRequest, invalidIsPatternString)
 TEST(RegisterContextRequest, json_invalidIsPatternString)
 {
   ParseData       parseData;
-  const char*     inFile = "registerContextRequest_invalidIsPatternString.json";
+  const char*     inFile = "ngsi9.registerContextRequest.invalidIsPatternString.invalid.json";
   const char*     expect = "OK";
   ConnectionInfo  ci("", "POST", "1.1");
 
@@ -490,7 +490,7 @@ TEST(RegisterContextRequest, invalidAttributeName)
 TEST(RegisterContextRequest, json_overwriteEntityIdType)
 {
   ParseData       parseData;
-  const char*     inFile = "registerContextRequest_overwriteEntityIdType.json";
+  const char*     inFile = "ngsi9.registerContextRequest.overwriteEntityIdType.invalid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
@@ -674,8 +674,8 @@ TEST(RegisterContextRequest, emptyRegistrationMetadataValue)
 TEST(RegisterContextRequest, json_reregistration)
 {
   ParseData       parseData;
-  const char*     inFile = "registerContextRequest_reregistration.json";
-  const char*     expect   = "OK";
+  const char*     inFile = "ngsi9.registerContextRequest.reregistration.valid.json";
+  const char*     expect = "OK";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat   = JSON;

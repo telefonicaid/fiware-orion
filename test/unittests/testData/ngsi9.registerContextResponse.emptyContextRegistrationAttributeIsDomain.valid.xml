@@ -1,5 +1,6 @@
 <registerContextResponse>
   <duration>PT1H</duration>
+  <registrationId>000000000000000000000000</registrationId>
   <errorCode>
     <code>400</code>
     <reasonPhrase>missing isDomain value for registration attribute</reasonPhrase>

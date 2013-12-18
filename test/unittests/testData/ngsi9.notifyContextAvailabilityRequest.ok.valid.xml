@@ -33,8 +33,7 @@
 						<value>2212</value>
 					</contextMetadata>					
 				</registrationMetadata>
-				<providingApplication>http://192.168.100.1:70/application
-				</providingApplication>
+				<providingApplication>http://192.168.100.1:70/application</providingApplication>
 			</contextRegistration>
 		</contextRegistrationResponse>
 	</contextRegistrationResponseList>

@@ -1,5 +1,6 @@
 <registerContextResponse>
   <duration>PT1H</duration>
+  <registrationId>000000000000000000000000</registrationId>
   <errorCode>
     <code>400</code>
     <reasonPhrase>'isPattern' set to true for a registration</reasonPhrase>
