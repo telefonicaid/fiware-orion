@@ -490,7 +490,7 @@ TEST(RegisterContextRequest, durationError)
 {
   ParseData       reqData;
   const char*     fileName = "ngsi9.registerContextRequest.duration.invalid.xml";
-  const char*     expect   = "<registerContextResponse>\n  <duration>invalid duration</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>syntax error in duration string</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
+  const char*     expect   = "<registerContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>syntax error in duration string</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";

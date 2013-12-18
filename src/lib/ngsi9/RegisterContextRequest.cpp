@@ -87,7 +87,7 @@ std::string RegisterContextRequest::check(RequestType requestType, Format format
            ((res = duration.check(RegisterContext, format, indent, predetectedError, counter))                  != "OK") ||
            ((res = registrationId.check(RegisterContext, format, indent, predetectedError, counter))            != "OK"))
   {
-    LM_E(("Some check method failed"));
+    LM_E(("Some check method failed: %s", res.c_str()));
     response.errorCode.code         = SccBadRequest;
     response.errorCode.reasonPhrase = res;
   }

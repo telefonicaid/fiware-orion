@@ -39,7 +39,7 @@
 TEST(RegisterContextResponse, constructors)
 {
   RegisterContextResponse* rcr1 = new RegisterContextResponse();
-  RegisterContextResponse  rcr2("REG_ID2", "PT1S");
+  RegisterContextResponse  rcr2("012301230123012301230123", "PT1S");
   RegisterContextRequest   rcr;
   RegisterContextResponse  rcr3(&rcr);
   ErrorCode                ec(SccBadRequest, "Reason", "Detail");
@@ -47,7 +47,7 @@ TEST(RegisterContextResponse, constructors)
   RegisterContextResponse  rcr5("012345678901234567890123", "PT1M");
 
   std::string              out;
-  std::string              expected1 = "<registerContextResponse>\n  <duration>PT1S</duration>\n  <registrationId>REG_ID2</registrationId>\n</registerContextResponse>\n";
+  std::string              expected1 = "<registerContextResponse>\n  <duration>PT1S</duration>\n  <registrationId>012301230123012301230123</registrationId>\n</registerContextResponse>\n";
   std::string              expected2 = "<registerContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad length (24 chars expected)</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   std::string              expected3 = "<registerContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Forced Error</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   std::string              expected4 = "<registerContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>syntax error in duration string</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
@@ -57,7 +57,7 @@ TEST(RegisterContextResponse, constructors)
   rcr1->release();
   delete rcr1;
 
-  EXPECT_EQ("REG_ID2", rcr2.registrationId.get());
+  EXPECT_EQ("012301230123012301230123", rcr2.registrationId.get());
   EXPECT_STREQ("", rcr3.registrationId.get().c_str());
   EXPECT_EQ("012345678901234567890123", rcr4.registrationId.get());
   EXPECT_EQ(SccBadRequest, rcr4.errorCode.code);
@@ -65,6 +65,7 @@ TEST(RegisterContextResponse, constructors)
   out = rcr2.render(RegisterContext, XML, "");
   EXPECT_EQ(expected1, out);
 
+  rcr2.registrationId.set("12345");
   out = rcr2.check(RegisterContext, XML, "", "", 0);
   EXPECT_EQ(expected2, out);
 
@@ -106,6 +107,7 @@ TEST(RegisterContextResponse, jsonRender)
 
   // 2. registrationId and duration
   rcr.duration.set("PT1S");
+  
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
   rendered = rcr.render(RegisterContext, JSON, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
