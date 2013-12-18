@@ -4,4 +4,8 @@ o PR #167 kzangeli   Wed dec 18 12:50:00 CET 2013
     - registrationId mandatory for registerContextResponse
     - ContextRegistrationAttribute had an incorrect tag for the metadata
 
-o 
+o PR #168 kzangeli Wed dic 18 16:21:10 CET 2013
+  - Duration no longer returned in response payload if the incoming duration was invalid
+  - Fixed the check of RegisterProviderRequest which was incorrect.
+    This fix improves error responses for ngsi9 convenience oprrations
+
