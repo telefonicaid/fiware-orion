@@ -105,7 +105,6 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
   std::string  jsonTag                = "attribute";
   bool         commaAfterContextValue = metadataVector.size() != 0;
 
-  LM_M(("Setting metadataVector tag to 'metadata'"));
   metadataVector.tagSet("metadata");
 
   //

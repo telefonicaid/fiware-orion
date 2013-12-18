@@ -49,7 +49,6 @@ std::string RegisterContextRequest::render(RequestType requestType, Format forma
   bool         commaAfterDuration                  = registrationIdRendered;
   bool         commaAfterContextRegistrationVector = registrationIdRendered || durationRendered;
 
-  LM_M(("In RegisterContextRequest::render"));
   out += startTag(indent, xmlTag, "", format, false, false);
 
   out += contextRegistrationVector.render(format,       indent + "  ", commaAfterContextRegistrationVector);

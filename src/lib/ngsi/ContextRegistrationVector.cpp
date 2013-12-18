@@ -60,7 +60,6 @@ std::string ContextRegistrationVector::render(Format format, std::string indent,
 
   out += startTag(indent, xmlTag, jsonTag, format, true, true);
 
-  LM_M(("In ContextRegistrationVector::render"));
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
     out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1, true);
 

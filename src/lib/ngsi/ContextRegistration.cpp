@@ -53,7 +53,6 @@ std::string ContextRegistration::render(Format format, std::string indent, bool 
   std::string out = "";
   std::string tag = "contextRegistration";
 
-  LM_M(("In ContextRegistration::render"));
   //
   // About JSON commas;
   // As providingApplication is MANDATORY and it is the last item in ContextRegistration,

@@ -64,8 +64,6 @@ std::string MetadataVector::render(Format format, std::string indent, bool comma
   if (vec.size() == 0)
     return "";
 
-  LM_M(("MetadataVector tag: '%s'", tag.c_str()));
-
   out += startTag(indent, tag, jsonTag, format, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
     out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
