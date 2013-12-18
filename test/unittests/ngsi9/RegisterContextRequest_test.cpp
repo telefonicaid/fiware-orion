@@ -512,7 +512,7 @@ TEST(RegisterContextRequest, durationError)
 {
   ParseData       parseData;
   const char*     inFile  = "ngsi9.registerContextRequest.duration.invalid.xml";
-  const char*     outFile = "ngsi9.registerContextResponse.duration.valid.xml";
+  const char*     outFile = "ngsi9.registerContextResponse.duration.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
