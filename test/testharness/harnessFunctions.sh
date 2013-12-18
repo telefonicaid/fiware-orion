@@ -284,6 +284,43 @@ function curlxml()
   print_xml_with_headers
 }
 
+
+
+# ------------------------------------------------------------------------------
+#
+# curlxmlCM - 
+#
+function curlxmlCM()
+{
+  url=$1
+  payload=$2
+  contenttype=$3
+  accept=$4
+  extraoptions=$5
+  
+  params="-s -S --dump-header headers.out "
+  
+  if [ "$contenttype" == "" ]
+  then
+    contenttype="Content-Type: application/xml"
+  fi
+  
+  if [ "$accept" == "" ]
+  then
+    response=$(echo ${payload} | (curl localhost:${CM_PORT}${url} ${params} --header "${contenttype}" $extraoptions -d @- ))
+  else
+    response=$(echo ${payload} | (curl localhost:${CM_PORT}${url} ${params} --header "${contenttype}" --header "${accept}" $extraoptions -d @- ))
+  fi
+  
+  print_xml_with_headers
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# curlxmlNoPayload - 
+#
 function curlxmlNoPayload()
 {
   url=$1
