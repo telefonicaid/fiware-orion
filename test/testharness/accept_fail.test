@@ -30,11 +30,12 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
+source harnessFunctions.sh
 
 # Note that curl by default uses "Accept: */*" so this step is testing that "no header" is interpreted as
 # "Accept: */*" according to HTTP RFC
-response=$((curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept:' -d @- ) <<EOF
-<?xml version="1.0"?>
+url='/NGSI10/queryContext'
+payload='<?xml version="1.0"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -42,23 +43,19 @@ response=$((curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --dump-heade
         </entityId>
   </entityIdList>
   <attributeList/>
-</queryContextRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+</queryContextRequest>'
+curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept:"
 echo "1: ++++++++++++++++++++"
 
 # This test will always fail
-response=$((curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: text/plain' -d @- ) <<EOF
-no meaningful payload (failing tests)
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+url="/NGSI10/queryContext"
+payload="no meaningful payload (failing tests)"
+curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain"
 echo "2: ++++++++++++++++++++"
 
 # This test that explicit "Accept: application/xml" is ok
-response=$((curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -66,15 +63,13 @@ response=$((curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --dump-heade
         </entityId>
   </entityIdList>
   <attributeList/>
-</queryContextRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+</queryContextRequest>'
+curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 echo "3: ++++++++++++++++++++"
 
 # This test uses a list in Accept which a valid type is found is ok
-response=$((curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: text/plain, application/xml' -d @-) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -82,15 +77,13 @@ response=$((curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --dump-heade
         </entityId>
   </entityIdList>
   <attributeList/>
-</queryContextRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+</queryContextRequest>'
+curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, application/xml"
 echo "4: ++++++++++++++++++++"
 
 # This test uses a list in Accept which a valid type is found is ok (with extra encoding after ";")
-response=$((curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: text/plain, application/xml; charset=UTF-8' -d @- ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -98,26 +91,20 @@ response=$((curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --dump-heade
         </entityId>
   </entityIdList>
   <attributeList/>
-</queryContextRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+</queryContextRequest>'
+curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, application/xml; charset=UTF-8"
 echo "5: ++++++++++++++++++++"
 
 # This test uses a list in Accept which no valid types
-response=$((curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: text/plain, image/jpeg' -d @- ) <<EOF
-no meaningful payload (failing tests)
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+url="/NGSI10/queryContext"
+payload='no meaningful payload (failing tests)'
+curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, image/jpeg"
 echo "6: ++++++++++++++++++++"
 
 # This test uses a list in Accept which no valid type (with extra encoding after ";")
-response=$((curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: text/plain, image/jpeg; charset=UTF-8' -d @- ) <<EOF
-no meaningful payload (failing tests)
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+url="/NGSI10/queryContext"
+payload='no meaningful payload (failing tests)'
+curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, image/jpeg; charset=UTF-8"
 echo "7: ++++++++++++++++++++"
 
 # FIXME P10: enable this test once the tested functionality gets implemented (including REGEXPECT)

@@ -23,138 +23,90 @@
 --NAME--
 Cross request payload error in XML
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source ../harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
-if [ "$VALGRIND" == "" ]; then
-  $CB_START_CMD
-  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-  sleep 1
-else
-  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
-  # Waiting for valgrind to start (sleep 10)
-  sleep 10s
-fi
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
+dbInit CB
+brokerStart CB
 
 --SHELL--
-print_headers () {
-  cat headers.out
-  echo $response | xmllint --format -
-}
-response=$((curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<discoverContextAvailabilityRequest/>
-EOF)
-print_headers
+source ../harnessFunctions.sh
+
+url='/NGSI9/registerContext'
+payload='<?xml version="1.0"?>
+<discoverContextAvailabilityRequest/>'
+curlxml ${url} "${payload}" "Content-Type: application/xml"
 echo "1: ++++++++++++++++++++"
 
-response=$((curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF)
-print_headers
+url='/NGSI9/discoverContextAvailability'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlxml ${url} "${payload}" "Content-Type: application/xml"
 echo "2: ++++++++++++++++++++"
 
-response=$((curl localhost:${BROKER_PORT}/NGSI9/subscribeContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF)
-print_headers
+url='/NGSI9/subscribeContextAvailability'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlxml ${url} "${payload}" "Content-Type: application/xml"
 echo "3: ++++++++++++++++++++"
 
-response=$((curl localhost:${BROKER_PORT}/NGSI9/updateContextAvailabilitySubscription -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF)
-print_headers
+url='/NGSI9/updateContextAvailabilitySubscription'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlxml ${url} "${payload}" "Content-Type: application/xml"
 echo "4: ++++++++++++++++++++"
 
-response=$((curl localhost:${BROKER_PORT}/NGSI9/unsubscribeContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF)
-print_headers
+url='/NGSI9/unsubscribeContextAvailability'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlxml ${url} "${payload}" "Content-Type: application/xml"
 echo "5: ++++++++++++++++++++"
 
-response=$((curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF)
-print_headers
+url='/NGSI10/queryContext'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlxml ${url} "${payload}" "Content-Type: application/xml"
 echo "6: ++++++++++++++++++++"
 
-response=$((curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF)
-print_headers
+url='/NGSI10/updateContext'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlxml ${url} "${payload}" "Content-Type: application/xml"
 echo "7: ++++++++++++++++++++"
 
-response=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF)
-print_headers
+url='/NGSI10/subscribeContext'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlxml ${url} "${payload}" "Content-Type: application/xml"
 echo "8: ++++++++++++++++++++"
 
-response=$((curl localhost:${BROKER_PORT}/NGSI10/updateContextSubscription -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF)
-print_headers
+url='/NGSI10/updateContextSubscription'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlxml ${url} "${payload}" "Content-Type: application/xml"
 echo "9: ++++++++++++++++++++"
 
-response=$((curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF)
-print_headers
+url='/NGSI10/unsubscribeContext'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlxml ${url} "${payload}" "Content-Type: application/xml"
 echo "10: ++++++++++++++++++++"
 
-response=$((curl localhost:${BROKER_PORT}/NGSI9/notSupportedRequest -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-  <registerContextRequest/>
-EOF)
-print_headers
+url='/NGSI9/notSupportedRequest'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlxml ${url} "${payload}" "Content-Type: application/xml"
 echo "11: ++++++++++++++++++++"
 
-response=$((curl localhost:${BROKER_PORT}/NGSI10/notSupportedRequest -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-  <registerContextRequest/>
-EOF)
-print_headers
+url='/NGSI10/notSupportedRequest'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlxml ${url} "${payload}" "Content-Type: application/xml"
 echo "12: ++++++++++++++++++++"
 
-response=$((curl localhost:${BROKER_PORT}/notSupportedRequest -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-  <registerContextRequest/>
-EOF)
-print_headers
+url='/notSupportedRequest'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlxml ${url} "${payload}" "Content-Type: application/xml"
 echo "13: ++++++++++++++++++++"
 
 --REGEXPECT--
@@ -345,11 +297,5 @@ Date: REGEX(.*)
 </orionError>
 13: ++++++++++++++++++++
 --TEARDOWN--
-if [ "$VALGRIND" == "" ]; then
-  kill $(cat ${BROKER_PID_FILE})
-  rm /tmp/orion_${BROKER_PORT}.pid
-else
-  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
-  # Waiting for valgrind to terminate (sleep 10)
-  sleep 10
-fi
+source harnessFunctions.sh
+brokerStop CB
