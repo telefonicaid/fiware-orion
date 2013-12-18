@@ -4,7 +4,6 @@
 #
 if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
 then
-  echo "scripts/testEnv.sh not sourced - I do it for you"
   source ../../scripts/testEnv.sh
 fi
 
@@ -238,4 +237,44 @@ function accumulatorStart()
    nc -z localhost ${LISTENER_PORT} 
    port_not_ok=$?
   done
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# print_with_headers - 
+#
+function print_xml_with_headers()
+{
+  cat headers.out
+  echo $response | xmllint --format -
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# curlxml - 
+#
+function curlxml()
+{
+  url=$1
+  payload=$2
+  contenttype=$3
+  accept=$4
+  
+  if [ "$contenttype" == "" ]
+  then
+    contenttype="Content-Type: application/xml"
+  fi
+  
+  if [ "$contenttype" == "" ]
+  then
+    accept="Accept: application/xml"
+  fi
+  
+  response=$(echo ${payload} | (curl localhost:${BROKER_PORT}${url} -s -S --dump-header headers.out --header "${contenttype}" --header "${accept}" -d @- ))
+  
+  print_xml_with_headers
 }
