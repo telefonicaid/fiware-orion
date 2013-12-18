@@ -91,7 +91,10 @@ std::string RegisterProviderRequest::check(RequestType requestType, Format forma
       response.errorCode.code         = SccBadRequest;
       response.errorCode.reasonPhrase = predetectedError;
    }
-   else if ((res = metadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+   else if (((res = metadataVector.check(requestType, format, indent, "", counter))  != "OK") ||
+            ((res = duration.check(requestType, format, indent, "", 0))              != "OK") ||
+            ((res = providingApplication.check(requestType, format, indent, "", 0))  != "OK") ||
+            ((res = registrationId.check(requestType, format, indent, "", 0))        != "OK"))
    {
       response.errorCode.code = SccBadRequest;
       response.errorCode.reasonPhrase = res;

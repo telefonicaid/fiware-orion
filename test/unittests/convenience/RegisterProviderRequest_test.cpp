@@ -46,45 +46,54 @@
 TEST(RegisterProviderRequest, xml_ok)
 {
   ParseData       reqData;
-  const char*     fileName  = "ngsi9.registerProviderRequest.noRegistrationId.postponed.xml";
+  const char*     inFile1  = "ngsi9.registerProviderRequest.noRegistrationId.postponed.xml";
+  const char*     inFile2  = "ngsi9.registerProviderRequest.ok.postponed.xml";
+  const char*     outFile1 = "ngsi9.registerProviderRequestRendered.noRegistrationId.postponed.xml";
+  const char*     outFile2 = "ngsi9.registerProviderRequest.noMetdataName.valid.xml";
+  const char*     outFile3 = "ngsi9.registerProviderRequest.predetectedError.valid.xml";
+  const char*     outFile4 = "ngsi9.discoverContextAvailabilityResponse.ok.valid";
+  std::string     result;
+  std::string     rendered;
+  std::string     checked;
   ConnectionInfo  ci("", "POST", "1.1");
 
-  ci.inFormat = XML;
-  ci.outFormat = XML;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  // 1. Normal registerProviderRequest
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile1)) << "Error getting test data from '" << inFile1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile1)) << "Error getting test data from '" << outFile1 << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, "registerProviderRequest", NULL);
+  result = xmlTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, "registerProviderRequest", NULL);
   EXPECT_EQ("OK", result) << "this test should be OK";
 
-  std::string expected = "<registerProviderRequest>\n  <registrationMetadata>\n    <contextMetadata>\n      <name>ID</name>\n      <type>string</type>\n      <value>1110</value>\n    </contextMetadata>\n    <contextMetadata>\n      <name>cm2</name>\n      <type>string</type>\n      <value>XXX</value>\n    </contextMetadata>\n  </registrationMetadata>\n  <duration>PT1S</duration>\n  <providingApplication>http://kz.tid.es/abc</providingApplication>\n</registerProviderRequest>\n";
+  rendered = reqData.rpr.res.render(XML, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
 
-  std::string rendered = reqData.rpr.res.render(XML, "");
-  EXPECT_EQ(expected, rendered);
 
-  // Destroying metadata to provoke an error
+  // 2. Destroying metadata to provoke an error
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
+  
   reqData.rpr.res.metadataVector.get(0)->name = "";
-  std::string error;
-  error = reqData.rpr.res.check(DiscoverContextAvailability, XML, "", "", 0);
-  EXPECT_EQ("<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing metadata name</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n", error);
+  checked = reqData.rpr.res.check(DiscoverContextAvailability, XML, "", "", 0);
+  EXPECT_STREQ(expectedBuf, checked.c_str());
 
-  // sending a 'predetected error' to the check function
-  error    = reqData.rpr.res.check(DiscoverContextAvailability, XML, "", "forced predetectedError", 0);
-  expected = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>forced predetectedError</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
-  EXPECT_EQ(expected, error);
+
+  // 3. sending a 'predetected error' to the check function
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile3)) << "Error getting test data from '" << outFile3 << "'";
+  
+  checked   = reqData.rpr.res.check(DiscoverContextAvailability, XML, "", "forced predetectedError", 0);
+  EXPECT_STREQ(expectedBuf, checked.c_str());
 
   // Just for coverage
   reqData.rpr.res.release();
   rprRelease(&reqData);
 
 
-  // Second file
-  fileName = "ngsi9.registerProviderRequest.ok.postponed.xml";
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  // 4. Second file
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile2)) << "Error getting test data from '" << inFile2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile4)) << "Error getting test data from '" << outFile4 << "'";
+
   result = xmlTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, "registerProviderRequest", NULL);
   EXPECT_EQ("OK", result);
   rendered = reqData.rpr.res.render(XML, "");
-  expected = "<registerProviderRequest>\n  <registrationMetadata>\n    <contextMetadata>\n      <name>ID</name>\n      <type>string</type>\n      <value>1110</value>\n    </contextMetadata>\n    <contextMetadata>\n      <name>cm2</name>\n      <type>string</type>\n      <value>XXX</value>\n    </contextMetadata>\n  </registrationMetadata>\n  <duration>PT1S</duration>\n  <providingApplication>http://kz.tid.es/abc</providingApplication>\n  <registrationId>001122334455667788991234</registrationId>\n</registerProviderRequest>\n";
-  EXPECT_EQ(expected, rendered);
-
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
 }
