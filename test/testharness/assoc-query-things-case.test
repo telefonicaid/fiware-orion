@@ -23,138 +23,102 @@
 --NAME--
 Associations Query Things case
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
-if [ "$VALGRIND" == "" ]; then
-  $CB_START_CMD
-  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-  sleep 1
-else
-  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
-  # Waiting for valgrind to start (sleep 10)
-  sleep 10s
-fi
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
+dbInit CB
+brokerStart CB
 
 --SHELL--
-response=$((curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- ) <<EOF
-<?xml version="1.0"?>
+source harnessFunctions.sh
+
+url="/NGSI9/registerContext"
+payload="<?xml version=\"1.0\"?>
 <registerContextRequest>
 <contextRegistrationList>
-		<contextRegistration>
-			<entityIdList>
-				<entityId type="TemperatureSensor" isPattern="false">
-					<id>Sensor5</id>			
-				</entityId>
-			</entityIdList>
-			<contextRegistrationAttributeList>
-				<contextRegistrationAttribute>
-					<name>measurement</name>
-					<isDomain>false</isDomain>
-				</contextRegistrationAttribute>
-			</contextRegistrationAttributeList>
-			<providingApplication>http://myHomeGateway22.org</providingApplication>
-		</contextRegistration>
-	</contextRegistrationList>
+    <contextRegistration>
+      <entityIdList>
+        <entityId type=\"TemperatureSensor\" isPattern=\"false\">
+          <id>Sensor5</id>      
+        </entityId>
+      </entityIdList>
+      <contextRegistrationAttributeList>
+        <contextRegistrationAttribute>
+          <name>measurement</name>
+          <isDomain>false</isDomain>
+        </contextRegistrationAttribute>
+      </contextRegistrationAttributeList>
+      <providingApplication>http://myHomeGateway22.org</providingApplication>
+    </contextRegistration>
+  </contextRegistrationList>
         <duration>PT1H</duration>
-	<registrationId></registrationId>
-</registerContextRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+  <registrationId></registrationId>
+</registerContextRequest>"
+curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+
 echo "1: ++++++++++++++++++++"
 
-response=$((curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/registerContext"
+payload="<?xml version=\"1.0\"?>
 <registerContextRequest>
 <contextRegistrationList>
-		<contextRegistration>
+    <contextRegistration>
                         <registrationMetadata>
-				<contextMetadata>
-					<name>association1</name>
-					<type>Association</type>
-					<value>
-						<entityAssociation>
-                                                        <sourceEntityId type="TemperatureSensor" isPattern="false">
-								<id>Sensor5</id>			
-							</sourceEntityId>
-                                                        <targetEntityId type="House" isPattern="false">
-								<id>house_3</id>			
-							</targetEntityId>
-						</entityAssociation>
-						<AttributeAssociationList>
-							<AttributeAssociation>
-        						<sourceAttribute>measurement</sourceAttribute>
-       							<targetAttribute>indoorTemperature</targetAttribute>
-							</AttributeAssociation>
-						</AttributeAssociationList>
-					</value>
-				</contextMetadata>			
+        <contextMetadata>
+          <name>association1</name>
+          <type>Association</type>
+          <value>
+            <entityAssociation>
+                                                        <sourceEntityId type=\"TemperatureSensor\" isPattern=\"false\">
+                <id>Sensor5</id>      
+              </sourceEntityId>
+                                                        <targetEntityId type=\"House\" isPattern=\"false\">
+                <id>house_3</id>      
+              </targetEntityId>
+            </entityAssociation>
+            <AttributeAssociationList>
+              <AttributeAssociation>
+                    <sourceAttribute>measurement</sourceAttribute>
+                    <targetAttribute>indoorTemperature</targetAttribute>
+              </AttributeAssociation>
+            </AttributeAssociationList>
+          </value>
+        </contextMetadata>      
                         </registrationMetadata>
-			<providingApplication>http://www.fi-ware.eu/NGSI/association</providingApplication>
-		</contextRegistration>
-	</contextRegistrationList>
+      <providingApplication>http://www.fi-ware.eu/NGSI/association</providingApplication>
+    </contextRegistration>
+  </contextRegistrationList>
         <duration>PT1H</duration>
-	<registrationId></registrationId>
-</registerContextRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+  <registrationId></registrationId>
+</registerContextRequest>"
+curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+
 echo "2: ++++++++++++++++++++"
 
-response=$((curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/discoverContextAvailability"
+payload="<?xml version=\"1.0\"?>
 <discoverContextAvailabilityRequest>
-	<entityIdList>
-		<entityId type="House" isPattern="false">
-			<id>house_3</id>			
-		</entityId>
-	</entityIdList>
-	<attributeList>
-		<attribute>indoorTemperature</attribute>
-	</attributeList>
-	<restriction>
-			<scope>
-				<operationScope>
-					<scopeType>Include Associations</scopeType>
-					<scopeValue>SOURCES</scopeValue>
-				</operationScope>			
-			</scope>
-	</restriction>
-</discoverContextAvailabilityRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+  <entityIdList>
+    <entityId type=\"House\" isPattern=\"false\">
+      <id>house_3</id>      
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>indoorTemperature</attribute>
+  </attributeList>
+  <restriction>
+      <scope>
+        <operationScope>
+          <scopeType>Include Associations</scopeType>
+          <scopeValue>SOURCES</scopeValue>
+        </operationScope>     
+      </scope>
+  </restriction>
+</discoverContextAvailabilityRequest>"
+curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+
 echo "3: ++++++++++++++++++++"
 
 --REGEXPECT--
-HTTP/1.1 100 Continue
-
 HTTP/1.1 200 OK
 Content-Length: 141
 Content-Type: application/xml
@@ -166,8 +130,6 @@ Date: REGEX(.*)
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 1: ++++++++++++++++++++
-HTTP/1.1 100 Continue
-
 HTTP/1.1 200 OK
 Content-Length: 141
 Content-Type: application/xml
@@ -179,10 +141,8 @@ Date: REGEX(.*)
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 2: ++++++++++++++++++++
-HTTP/1.1 100 Continue
-
 HTTP/1.1 200 OK
-Content-Length: 141
+Content-Length: 1877
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -237,11 +197,5 @@ Date: REGEX(.*)
 </discoverContextAvailabilityResponse>
 3: ++++++++++++++++++++
 --TEARDOWN--
-if [ "$VALGRIND" == "" ]; then
-  kill $(cat ${BROKER_PID_FILE})
-  rm /tmp/orion_${BROKER_PORT}.pid
-else
-  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
-  # Waiting for valgrind to terminate (sleep 10)
-  sleep 10
-fi
+source harnessFunctions.sh
+brokerStop CB
