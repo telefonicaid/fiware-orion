@@ -42,7 +42,7 @@ TEST(UpdateContextSubscriptionResponse, constructors)
   ErrorCode                          ec(SccBadRequest, "RP", "D");
   UpdateContextSubscriptionResponse  ucsr2(ec);
   std::string                        rendered;
-  std::string                        expected1 = "<updateContextSubscriptionResponse>\n  <subscribeResponse>\n    <subscriptionId>No Subscription ID</subscriptionId>\n  </subscribeResponse>\n</updateContextSubscriptionResponse>\n";
+  std::string                        expected1 = "<updateContextSubscriptionResponse>\n  <subscribeResponse>\n    <subscriptionId>000000000000000000000000</subscriptionId>\n  </subscribeResponse>\n</updateContextSubscriptionResponse>\n";
   std::string                        expected2 = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <subscriptionId>0</subscriptionId>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>RP</reasonPhrase>\n      <details>D</details>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
   
   rendered = ucsr1.render(UpdateContextSubscription, XML, "");

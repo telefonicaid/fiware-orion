@@ -69,7 +69,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::render(RequestType req
   out += attributeList.render(format,  indent + "  ", commaAfterAttributeList);
   out += duration.render(format,       indent + "  ", commaAfterDuration);
   out += restriction.render(format,    indent + "  ", restrictions, commaAfterRestriction);
-  out += subscriptionId.render(format, indent + "  ", commaAfterSubscriptionId);
+  out += subscriptionId.render(UpdateContextAvailabilitySubscription, format, indent + "  ", commaAfterSubscriptionId);
   out += endTag(indent, tag, format);
 
   return out;

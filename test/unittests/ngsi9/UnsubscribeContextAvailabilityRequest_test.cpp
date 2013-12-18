@@ -54,7 +54,7 @@ TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
   EXPECT_EQ("012345678901234567890123", ucar2.subscriptionId.get());
 
   std::string   out;
-  std::string   expected1 = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>Forced Error</reasonPhrase>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
+  std::string   expected1 = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>000000000000000000000000</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>Forced Error</reasonPhrase>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
   std::string   expected2 = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>1</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>bad length (24 chars expected)</reasonPhrase>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
   std::string   expected3 = "OK";
 

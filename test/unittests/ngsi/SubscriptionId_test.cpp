@@ -119,19 +119,19 @@ TEST(SubscriptionId, render)
 {
   SubscriptionId  sId;
   std::string     rendered;
-  std::string     expected1 = "<subscriptionId>No Subscription ID</subscriptionId>\n";
-  std::string     expected2 = "<subscriptionId>SID_123</subscriptionId>\n";
-  std::string     expected3 = "\"subscriptionId\" : \"SID_123\"\n";
+  std::string     expected1 = "<subscriptionId>000000000000000000000000</subscriptionId>\n";
+  std::string     expected2 = "<subscriptionId>012345012345012345012345</subscriptionId>\n";
+  std::string     expected3 = "\"subscriptionId\" : \"012345012345012345012345\"\n";
 
   sId.set("");
-  rendered = sId.render(XML, "");
+  rendered = sId.render(UnsubscribeContext, XML, ""); // subscriptionId is MANDATORY for RegisterContext 
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());
 
-  sId.set("SID_123");
-  rendered = sId.render(XML, "");
+  sId.set("012345012345012345012345");
+  rendered = sId.render(UnsubscribeContext, XML, "");
   EXPECT_STREQ(expected2.c_str(), rendered.c_str());
   
-  rendered = sId.render(JSON, "");
+  rendered = sId.render(UnsubscribeContext, JSON, "");
   EXPECT_STREQ(expected3.c_str(), rendered.c_str());
 
   sId.release(); // just to exercise the code

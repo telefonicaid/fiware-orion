@@ -145,15 +145,15 @@ TEST(restReply, restErrorReplyGet)
   std::string ucas2 = "/ngsi9/updateContextAvailabilitySubscription";
   std::string ucas3 = "/NGSI9/updateContextAvailabilitySubscription";
   std::string ucas4 = "updateContextAvailabilitySubscriptionRequest";
-  std::string ucasExpected  = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <errorCode>\n    <code>200</code>\n    <reasonPhrase>ok</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
-  std::string ucasExpected2 = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
+  std::string ucasExpected  = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>000000000000000000000000</subscriptionId>\n  <errorCode>\n    <code>200</code>\n    <reasonPhrase>ok</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
+  std::string ucasExpected2 = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>000000000000000000000000</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
   
   std::string ucar1 = "unsubscribeContextAvailability";
   std::string ucar2 = "/ngsi9/unsubscribeContextAvailability";
   std::string ucar3 = "/NGSI9/unsubscribeContextAvailability";
   std::string ucar4 = "unsubscribeContextAvailabilityRequest";
-  std::string ucarExpected  = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <statusCode>\n    <code>200</code>\n    <reasonPhrase>ok</reasonPhrase>\n    <details>detail</details>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
-  std::string ucarExpected2 = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
+  std::string ucarExpected  = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>000000000000000000000000</subscriptionId>\n  <statusCode>\n    <code>200</code>\n    <reasonPhrase>ok</reasonPhrase>\n    <details>detail</details>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
+  std::string ucarExpected2 = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>000000000000000000000000</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
   
   std::string ncar1 = "notifyContextAvailability";
   std::string ncar2 = "/ngsi9/notifyContextAvailability";

@@ -80,7 +80,7 @@ std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType re
 
   out += startTag(indent, tag, format, false);
 
-  out += subscriptionId.render(format, indent + "  ", errorCodeRendered || durationRendered);
+  out += subscriptionId.render(RtUpdateContextAvailabilitySubscriptionResponse, format, indent + "  ", errorCodeRendered || durationRendered);
   out += duration.render(format,       indent + "  ", errorCodeRendered);
 
   if (errorCodeRendered)

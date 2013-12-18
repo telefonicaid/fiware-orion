@@ -58,7 +58,7 @@ std::string NotifyContextAvailabilityRequest::render(RequestType requestType, Fo
   //  With an empty contextRegistrationResponseVector there would be no notification
   //
   out += startTag(indent, tag, format, false);
-  out += subscriptionId.render(format, indent + "  ", true);
+  out += subscriptionId.render(NotifyContextAvailability, format, indent + "  ", true);
   out += contextRegistrationResponseVector.render(format, indent  + "  ", false);
   out += endTag(indent, tag, format);
 

@@ -89,6 +89,13 @@ extern int noOfStatisticsRequests;
 extern int noOfInvalidRequests;
 extern int noOfRegisterResponses;
 
+extern int noOfRtSubscribeContextAvailabilityResponse;
+extern int noOfRtUpdateContextAvailabilitySubscriptionResponse;
+extern int noOfRtUnsubscribeContextAvailabilityResponse;
+extern int noOfRtUnsubscribeContextResponse;
+extern int noOfRtSubscribeResponse;
+extern int noOfRtSubscribeError;
+
 
 
 /* ****************************************************************************

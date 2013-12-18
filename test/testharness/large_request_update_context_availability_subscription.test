@@ -77,7 +77,7 @@ rm $BIGFILE
 --REGEXPECT--
 <?xml version="1.0"?>
 <updateContextAvailabilitySubscriptionResponse>
-  <subscriptionId>No Subscription ID</subscriptionId>
+  <subscriptionId>000000000000000000000000</subscriptionId>
   <errorCode>
     <code>413</code>
     <reasonPhrase>Payload Too Large</reasonPhrase>

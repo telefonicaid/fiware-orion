@@ -93,7 +93,7 @@ std::string SubscribeContextAvailabilityResponse::render(RequestType requestType
 
   out += startTag(indent, tag, format, false);
 
-  out += subscriptionId.render(format, indent + "  ", durationRendered || errorCodeRendered);
+  out += subscriptionId.render(RtSubscribeContextAvailabilityResponse, format, indent + "  ", durationRendered || errorCodeRendered);
   out += duration.render(format, indent + "  ", errorCodeRendered);
 
   if (errorCodeRendered)

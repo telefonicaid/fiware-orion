@@ -45,19 +45,22 @@ TEST(Request, requestType)
 {
   Req   req[] =
   {
-    { RegisterContext,                             "RegisterContext"                                        },
-    { DiscoverContextAvailability,                 "DiscoverContextAvailability"                            },
-    { SubscribeContextAvailability,                "SubscribeContextAvailability"                           },
-    { UpdateContextAvailabilitySubscription,       "UpdateContextAvailabilitySubscription"                  },
-    { UnsubscribeContextAvailability,              "UnsubscribeContextAvailability"                         },
-    { NotifyContextAvailability,                   "NotifyContextAvailability"                              },
+    { RegisterContext,                                 "RegisterContextRequest"                                 },
+    { DiscoverContextAvailability,                     "DiscoverContextAvailabilityRequest"                     },
+    { SubscribeContextAvailability,                    "SubscribeContextAvailabilityRequest"                    },
+    { RtSubscribeContextAvailabilityResponse,          "SubscribeContextAvailabilityResponse"                   },
+    { UpdateContextAvailabilitySubscription,           "UpdateContextAvailabilitySubscriptionRequest"           },
+    { RtUpdateContextAvailabilitySubscriptionResponse, "UpdateContextAvailabilitySubscriptionResponse"          },
+    { UnsubscribeContextAvailability,                  "UnsubscribeContextAvailabilityRequest"                  },
+    { RtUnsubscribeContextAvailabilityResponse,        "UnsubscribeContextAvailabilityResponse"                 },
+    { NotifyContextAvailability,                       "NotifyContextAvailabilityRequest"                       },
 
-    { QueryContext,                                "QueryContext"                                           },
-    { SubscribeContext,                            "SubscribeContext"                                       },
-    { UpdateContextSubscription,                   "UpdateContextSubscription"                              },
-    { UnsubscribeContext,                          "UnsubscribeContext"                                     },
-    { NotifyContext,                               "NotifyContext"                                          },
-    { UpdateContext,                               "UpdateContext"                                          },
+    { QueryContext,                                "QueryContextRequest"                                    },
+    { SubscribeContext,                            "SubscribeContextRequest"                                },
+    { UpdateContextSubscription,                   "UpdateContextSubscriptionRequest"                       },
+    { UnsubscribeContext,                          "UnsubscribeContextRequest"                              },
+    { NotifyContext,                               "NotifyContextRequest"                                   },
+    { UpdateContext,                               "UpdateContextRequest"                                   },
 
     { ContextEntitiesByEntityId,                   "ContextEntitiesByEntityId"                              },
     { ContextEntityAttributes,                     "ContextEntityAttributes"                                },
@@ -84,8 +87,11 @@ TEST(Request, requestType)
     { StatisticsRequest,                           "Statistics"                                             },
     { ExitRequest,                                 "Exit"                                                   },
     { LeakRequest,                                 "Leak"                                                   },
+    { RegisterResponse,                            "RegisterContextResponse"                                },
+
+    { RtSubscribeResponse,                         "SubscribeResponse"                                      },
+    { RtSubscribeError,                            "SubscribeError"                                         },
     { InvalidRequest,                              "InvalidRequest"                                         },
-    { RegisterResponse,                            "RegisterResponse"                                       }
   };
 
   for (unsigned int ix = 0; ix < sizeof(req) / sizeof(req[0]); ++ix)
@@ -93,6 +99,6 @@ TEST(Request, requestType)
     EXPECT_STREQ(req[ix].string, requestType(req[ix].rt));
   }
 
-  RequestType rt = (RequestType) (RegisterResponse + 1);
+  RequestType rt = (RequestType) (InvalidRequest + 1);
   EXPECT_STREQ("", requestType(rt));
 }
