@@ -97,64 +97,6 @@ done
 
 --SHELL--
 
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-  <registerContextRequest>
-    <contextRegistrationList>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Room" isPattern="false">
-            <id>ConferenceRoom</id>
-          </entityId>
-          <entityId type="Room" isPattern="false">
-            <id>OfficeRoom</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:1028/application</providingApplication>
-      </contextRegistration>
-    </contextRegistrationList>
-    <duration>PT1H</duration>
-    <registrationId></registrationId>
-  </registerContextRequest>
-EOF
-echo "1: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-  <registerContextRequest>
-    <contextRegistrationList>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Room" isPattern="false">
-            <id>ConferenceRoom2</id>
-          </entityId>
-          <entityId type="Room" isPattern="false">
-            <id>OfficeRoom2</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:1028/applicationReg2</providingApplication>
-      </contextRegistration>
-    </contextRegistrationList>
-    <duration>PT1H</duration>
-    <registrationId></registrationId>
-  </registerContextRequest>
-EOF
-echo "2: ++++++++++++++++++++"
-
 SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
@@ -181,7 +123,7 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "$SUB_OUT"
-echo "3: ++++++++++++++++++++"
+echo "1: ++++++++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
@@ -203,7 +145,10 @@ echo "3: ++++++++++++++++++++"
   <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
-echo "4: ++++++++++++++++++++"
+echo "2: ++++++++++++++++++++"
+
+# to avoid a race conditions in the order of notifications
+sleep 0.5s
 
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
@@ -221,6 +166,19 @@ echo "4: ++++++++++++++++++++"
                 </contextAttribute>
       </contextAttributeList>
     </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>
+EOF
+echo "3: ++++++++++++++++++++"
+
+# to avoid a race conditions in the order of notifications
+sleep 0.5s
+
+(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
         <contextElement>
           <entityId type="Room" isPattern="false">
                 <id>OfficeRoom2</id>
@@ -237,7 +195,10 @@ echo "4: ++++++++++++++++++++"
   <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
-echo "5: ++++++++++++++++++++"
+echo "4: ++++++++++++++++++++"
+
+# to avoid a race conditions in the order of notifications
+sleep 0.5s
 
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
@@ -259,7 +220,7 @@ echo "5: ++++++++++++++++++++"
   <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
-echo "6: ++++++++++++++++++++"
+echo "5: ++++++++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
@@ -267,7 +228,7 @@ echo "6: ++++++++++++++++++++"
   <subscriptionId>$SUB_ID</subscriptionId>
 </unsubscribeContextRequest>
 EOF
-echo "7: ++++++++++++++++++++"
+echo "6: ++++++++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
@@ -301,24 +262,12 @@ echo "7: ++++++++++++++++++++"
   <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
-echo "8: ++++++++++++++++++++"
+echo "7: ++++++++++++++++++++"
 
 #Get accumulated data
 curl localhost:${LISTENER_PORT}/dump -s -S
 
 --REGEXPECT--
-<?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
-1: ++++++++++++++++++++
-<?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
-2: ++++++++++++++++++++
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
@@ -326,7 +275,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-3: ++++++++++++++++++++
+1: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -334,6 +283,54 @@ curl localhost:${LISTENER_PORT}/dump -s -S
       <contextElement>
         <entityId type="Room" isPattern="false">
           <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+2: ++++++++++++++++++++
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+3: ++++++++++++++++++++
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom2</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
@@ -361,48 +358,6 @@ curl localhost:${LISTENER_PORT}/dump -s -S
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom2</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
-5: ++++++++++++++++++++
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
             <name>temperature</name>
             <type>degree</type>
             <contextValue/>
@@ -416,7 +371,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-6: ++++++++++++++++++++
+5: ++++++++++++++++++++
 <?xml version="1.0"?>
 <unsubscribeContextResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -425,7 +380,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </unsubscribeContextResponse>
-7: ++++++++++++++++++++
+6: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -467,7 +422,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-8: ++++++++++++++++++++
+7: ++++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 735
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
