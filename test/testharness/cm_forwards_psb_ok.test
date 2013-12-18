@@ -30,6 +30,8 @@ brokerStart CB 0-255
 brokerStart CM 0-255
 
 --SHELL--
+source harnessFunctions.sh
+
 # Do a NGSI10 request to check the operation is avoided
 (curl localhost:${CM_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -176,24 +178,19 @@ EOF
 echo "7: ++++++++++++++++++++"
 
 # Check that everything is ok at database layer
-mongo --quiet ${BROKER_DATABASE_NAME} << EOF
-db.registrations.count()
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} 'db.registrations.count()'
+echo $r
+mongoCmd ${BROKER_DATABASE_AUX_NAME} 'db.registrations.count()'
+echo $r
 
-mongo --quiet ${BROKER_DATABASE_AUX_NAME} << EOF
-db.registrations.count()
-EOF
-
-RESULT=$(mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.registrations.find({}, {_id: 1})
-EOF)
+mongoCmd ${BROKER_DATABASE_NAME} 'db.registrations.find({}, {_id: 1})'
+RESULT=$r
 # The next line is based in processing the following pattern:
 #   { "_id" : ObjectId("5213a9a1db818a34990755c3") }
 ID1=$(echo $RESULT | awk '{print $4}' | awk -F '"' '{print $2}')
 
-RESULT=$(mongo --quiet ${BROKER_DATABASE_AUX_NAME} <<EOF
-db.registrations.find({}, {fwdRegId: 1, _id: 0})
-EOF)
+mongoCmd ${BROKER_DATABASE_AUX_NAME} 'db.registrations.find({}, {fwdRegId: 1, _id: 0})'
+RESULT=$r
 # The next line is based in processing the following pattern:
 #   { "fwdRegId" : "5213a9a1db818a34990755c3" }
 ID2=$(echo $RESULT | awk '{print $4}' | awk -F '"' '{print $2}')

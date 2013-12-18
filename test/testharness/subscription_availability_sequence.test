@@ -96,6 +96,7 @@ until [ $port_not_ok -eq 0 ]; do
 done
 
 --SHELL--
+source harnessFunctions.sh
 
 (curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
@@ -147,9 +148,8 @@ SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -
 echo "$SUB_OUT"
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.casubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo $r
 
 echo "2: ++++++++++++++++++++"
 
@@ -179,9 +179,8 @@ echo "2: ++++++++++++++++++++"
 EOF
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.casubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo $r
 
 echo "3: ++++++++++++++++++++"
 
@@ -233,9 +232,8 @@ echo "4: ++++++++++++++++++++"
 EOF
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.casubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo $r
 
 echo "5: ++++++++++++++++++++"
 
@@ -291,9 +289,8 @@ echo "6: ++++++++++++++++++++"
 EOF
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.casubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo $r
 
 echo "7: ++++++++++++++++++++"
 

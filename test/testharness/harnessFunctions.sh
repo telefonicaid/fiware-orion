@@ -24,7 +24,7 @@
 #
 if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
 then
-  echo "scripts/testEnv.sh not sourced - I do it for you"
+  #echo "scripts/testEnv.sh not sourced - I do it for you"
   source ../../scripts/testEnv.sh
 fi
 
@@ -258,4 +258,21 @@ function accumulatorStart()
    nc -z localhost ${LISTENER_PORT} 
    port_not_ok=$?
   done
+}
+
+# ------------------------------------------------------------------------------
+#
+# mongoCmd - 
+#
+# This functions is needed due to some problems with jenkins that seems to avoid
+# the usage of 'mongo --quiet ...' directly. Thus, we need to use mongo without
+# --quiet, but we need to get rid of some preamble lines about mongo version and
+# connection information and a final 'bye' line
+#
+function mongoCmd()
+{
+
+  db=$1
+  cmd=$2
+  r=$(echo $cmd | mongo $db | tail -n 2 | head -n 1)
 }

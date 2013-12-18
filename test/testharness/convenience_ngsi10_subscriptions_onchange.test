@@ -96,6 +96,7 @@ until [ $port_not_ok -eq 0 ]; do
 done
 
 --SHELL--
+source harnessFunctions.sh
 
 (curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
@@ -183,9 +184,8 @@ echo "2: ++++++++++++++++++++"
 EOF
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.csubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo $r
 
 echo "3: ++++++++++++++++++++"
 
@@ -216,9 +216,8 @@ echo "3: ++++++++++++++++++++"
 EOF
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.csubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo $r
 
 echo "4: ++++++++++++++++++++"
 
@@ -232,9 +231,8 @@ echo "4: ++++++++++++++++++++"
 EOF
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.csubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo $r
 
 echo "5: ++++++++++++++++++++"
 
@@ -268,9 +266,8 @@ sleep 10
 EOF
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.csubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo $r
 
 echo "6: ++++++++++++++++++++"
 
@@ -326,9 +323,8 @@ sleep 10
 EOF
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.csubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo $r
 
 echo "8: ++++++++++++++++++++"
 
