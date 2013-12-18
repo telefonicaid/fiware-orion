@@ -119,6 +119,9 @@ done
 EOF
 echo "1: ++++++++++++++++++++"
 
+# to avoid a race conditions in the order of notifications
+sleep 0.5s
+
 #Subscribe for 5 seconds
 SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
