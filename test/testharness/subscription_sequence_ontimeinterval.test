@@ -96,6 +96,7 @@ until [ $port_not_ok -eq 0 ]; do
 done
 
 --SHELL--
+source harnessFunctions.sh
 
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
@@ -243,9 +244,8 @@ echo "7: ++++++++++++++++++++"
 sleep 4
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.csubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo $r
 
 (curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
