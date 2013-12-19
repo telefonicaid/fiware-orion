@@ -23,82 +23,51 @@
 --NAME--
 Empty payloads errors in JSON
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source ../harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
-if [ "$VALGRIND" == "" ]; then
-  $CB_START_CMD
-  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-  sleep 1
-else
-  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
-  # Waiting for valgrind to start (sleep 10)
-  sleep 10s
-fi
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
+dbInit CB
+brokerStart CB
 
 --SHELL--
-curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}" 
+source ../harnessFunctions.sh
+
+curljson "/NGSI9/registerContext" "{}"
 echo "1: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curljson "/NGSI9/discoverContextAvailability" "{}"
 echo "2: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI9/subscribeContextAvailability -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curljson "/NGSI9/subscribeContextAvailability" "{}"
 echo "3: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI9/updateContextAvailabilitySubscription -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}" 
+curljson "/NGSI9/updateContextAvailabilitySubscription" "{}"
 echo "4: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI9/unsubscribeContextAvailability -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curljson "/NGSI9/unsubscribeContextAvailability" "{}"
 echo "5: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curljson "/NGSI10/queryContext" "{}"
 echo "6: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curljson "/NGSI10/updateContext" "{}"
 echo "7: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curljson "/NGSI10/subscribeContext" "{}"
 echo "8: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI10/updateContextSubscription -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curljson "/NGSI10/updateContextSubscription" "{}"
 echo "9: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curljson "/NGSI10/unsubscribeContext" "{}"
 echo "10: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI9/notSupportedRequest -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curljson "/NGSI9/notSupportedRequest" "{}"
 echo "11: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/NGSI10/notSupportedRequest -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curljson "/NGSI10/notSupportedRequest" "{}"
 echo "12: ++++++++++++++++++++"
 
-curl localhost:${BROKER_PORT}/notSupportedRequest -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d "{}"
+curljson "/notSupportedRequest" "{}"
 echo "13: ++++++++++++++++++++"
 
 --REGEXPECT--
@@ -108,10 +77,10 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "errorCode" : {
-    "code" : "400",
-    "reasonPhrase" : "Empty Context Registration List"
-  }
+    "errorCode": {
+        "code": "400", 
+        "reasonPhrase": "Empty Context Registration List"
+    }
 }
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -120,10 +89,10 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "errorCode" : {
-    "code" : "404",
-    "reasonPhrase" : "No context element found"
-  }
+    "errorCode": {
+        "code": "404", 
+        "reasonPhrase": "No context element found"
+    }
 }
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -132,11 +101,11 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "subscriptionId" : "No Subscription ID",
-  "errorCode" : {
-    "code" : "400",
-    "reasonPhrase" : "No entities"
-  }
+    "errorCode": {
+        "code": "400", 
+        "reasonPhrase": "No entities"
+    }, 
+    "subscriptionId": "No Subscription ID"
 }
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -145,11 +114,11 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "subscriptionId" : "No Subscription ID",
-  "errorCode" : {
-    "code" : "400",
-    "reasonPhrase" : "No entities"
-  }
+    "errorCode": {
+        "code": "400", 
+        "reasonPhrase": "No entities"
+    }, 
+    "subscriptionId": "No Subscription ID"
 }
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -158,11 +127,11 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "subscriptionId" : "No Subscription ID",
-  "statusCode" : {
-    "code" : "404",
-    "reasonPhrase" : "Subscription Not Found"
-  }
+    "statusCode": {
+        "code": "404", 
+        "reasonPhrase": "Subscription Not Found"
+    }, 
+    "subscriptionId": "No Subscription ID"
 }
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -171,10 +140,10 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "errorCode" : {
-    "code" : "400",
-    "reasonPhrase" : "No entities"
-  }
+    "errorCode": {
+        "code": "400", 
+        "reasonPhrase": "No entities"
+    }
 }
 6: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -183,11 +152,11 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "errorCode" : {
-    "code" : "400",
-    "reasonPhrase" : "Bad request",
-    "details" : "empty update action type"
-  }
+    "errorCode": {
+        "code": "400", 
+        "details": "empty update action type", 
+        "reasonPhrase": "Bad request"
+    }
 }
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -196,13 +165,13 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "subscribeError" : {
-    "errorCode" : {
-      "code" : "400",
-      "reasonPhrase" : "invalid payload",
-      "details" : "No entities"
+    "subscribeError": {
+        "errorCode": {
+            "code": "400", 
+            "details": "No entities", 
+            "reasonPhrase": "invalid payload"
+        }
     }
-  }
 }
 8: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -211,13 +180,13 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "subscribeError" : {
-    "subscriptionId" : "000000000000000000000000",
-    "errorCode" : {
-      "code" : "404",
-      "reasonPhrase" : "Subscription Not Found"
+    "subscribeError": {
+        "errorCode": {
+            "code": "404", 
+            "reasonPhrase": "Subscription Not Found"
+        }, 
+        "subscriptionId": "000000000000000000000000"
     }
-  }
 }
 9: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -226,11 +195,11 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "subscriptionId" : "No Subscription ID",
-  "statusCode" : {
-    "code" : "404",
-    "reasonPhrase" : "Subscription Not Found"
-  }
+    "statusCode": {
+        "code": "404", 
+        "reasonPhrase": "Subscription Not Found"
+    }, 
+    "subscriptionId": "No Subscription ID"
 }
 10: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -238,10 +207,12 @@ Content-Length: 146
 Content-Type: application/json
 Date: REGEX(.*)
 
-"orionError" : {
-  "code" : "400",
-  "reasonPhrase" : "bad ngsi9 request",
-  "details" : "ngsi9 service '/NGSI9/notSupportedRequest' not found"
+{
+    "orionError" : {
+        "code": "400",
+        "reasonPhrase": "bad ngsi9 request",
+        "details": "ngsi10 service '/NGSI9/notSupportedRequest' not found"
+    }
 }
 11: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -249,10 +220,12 @@ Content-Length: 149
 Content-Type: application/json
 Date: REGEX(.*)
 
-"orionError" : {
-  "code" : "400",
-  "reasonPhrase" : "bad ngsi10 request",
-  "details" : "ngsi10 service '/NGSI10/notSupportedRequest' not found"
+{
+    "orionError" : {
+        "code": "400",
+        "reasonPhrase": "bad ngsi10 request",
+        "details": "ngsi10 service '/NGSI10/notSupportedRequest' not found"
+    }
 }
 12: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -260,18 +233,14 @@ Content-Length: 128
 Content-Type: application/json
 Date: REGEX(.*)
 
-"orionError" : {
-  "code" : "400",
-  "reasonPhrase" : "bad request",
-  "details" : "service '/notSupportedRequest' not found"
+{
+    "orionError" : {
+        "code": "400",
+        "reasonPhrase": "bad request",
+        "details": "service '/notSupportedRequest' not found"
+    }
 }
 13: ++++++++++++++++++++
 --TEARDOWN--
-if [ "$VALGRIND" == "" ]; then
-  kill $(cat ${BROKER_PID_FILE})
-  rm /tmp/orion_${BROKER_PORT}.pid
-else
-  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
-  # Waiting for valgrind to terminate (sleep 10)
-  sleep 10
-fi
+source ../harnessFunctions.sh
+brokerStop CB

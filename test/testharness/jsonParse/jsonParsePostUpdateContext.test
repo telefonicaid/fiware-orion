@@ -23,163 +23,136 @@
 --NAME--
 JSON Parse Post UpdateContext
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source ../harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
-if [ "$VALGRIND" == "" ]; then
-  $CB_START_CMD
-  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-  sleep 1
-else
-  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
-  # Waiting for valgrind to start (sleep 10)
-  sleep 10s
-fi
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
+dbInit CB
+brokerStart CB
 
 --SHELL--
+source ../harnessFunctions.sh
 echo "1: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
-{
-	"contextElements": {
-		"contextElement": {
-			"type": "Room",
-			"isPattern": "false",
-			"id": "ConferenceRoom",
-			"attributes": [
-				{
-					"name": "temperature",
-					"type": "degree",
-					"value": "20",
-					"metadatas": [
-						{
-							"name": "attributeValueIdentifier",
-							"type": "long",
-							"value": "1"
-						},
-						{
-							"name": "attributeValueIdentifier",
-							"type": "long",
-							"value": "2"
-						},
-						{
-							"name": "attributeValueIdentifier",
-							"type": "long",
-							"value": "3"
-						}
-					]
-				}
-			]
-		}
-	},
-	"updateAction": "APPEND"
-}
-EOF
-echo "2: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
-{
-  "contextRegistrations": [
-    {
-      "entities": [
+
+url="/NGSI10/updateContext"
+payload="{
+  \"contextElements\": {
+    \"contextElement\": {
+      \"type\": \"Room\",
+      \"isPattern\": \"false\",
+      \"id\": \"ConferenceRoom\",
+      \"attributes\": [
         {
-          "type": "Room",
-          "isPattern": "false",
-          "id": "ConferenceRoom"
+          \"name\": \"temperature\",
+          \"type\": \"degree\",
+          \"value\": \"20\",
+          \"metadatas\": [
+            {
+              \"name\": \"attributeValueIdentifier\",
+              \"type\": \"long\",
+              \"value\": \"1\"
+            },
+            {
+              \"name\": \"attributeValueIdentifier\",
+              \"type\": \"long\",
+              \"value\": \"2\"
+            },
+            {
+              \"name\": \"attributeValueIdentifier\",
+              \"type\": \"long\",
+              \"value\": \"3\"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  \"updateAction\": \"APPEND\"
+}"
+curljson ${url} "${payload}"
+
+echo "2: ***********************************"
+
+url="/NGSI9/registerContext"
+payload="{
+  \"contextRegistrations\": [
+    {
+      \"entities\": [
+        {
+          \"type\": \"Room\",
+          \"isPattern\": \"false\",
+          \"id\": \"ConferenceRoom\"
         },
         {
-          "type": "Room",
-          "isPattern": "false",
-          "id": "OfficeRoom"
+          \"type\": \"Room\",
+          \"isPattern\": \"false\",
+          \"id\": \"OfficeRoom\"
         }
       ],
-      "attributes": [
+      \"attributes\": [
         {
-          "name": "temperature",
-          "type": "degree",
-          "isDomain": "false",
-          "metadatas": [
+          \"name\": \"temperature\",
+          \"type\": \"degree\",
+          \"isDomain\": \"false\",
+          \"metadatas\": [
             {
-              "name": "ID",
-              "type": "string",
-              "value": "1110"
+              \"name\": \"ID\",
+              \"type\": \"string\",
+              \"value\": \"1110\"
             }
           ]
         }
       ],
-      "metadatas": [
+      \"metadatas\": [
         {
-          "name": "ID",
-          "type": "string",
-          "value": "2212"
+          \"name\": \"ID\",
+          \"type\": \"string\",
+          \"value\": \"2212\"
         }
       ],
-      "providingApplication": "http://192.168.100.1:70/application"
+      \"providingApplication\": \"http://192.168.100.1:70/application\"
     }
   ],
-  "duration": "PT1M"
-}
-EOF
+  \"duration\": \"PT1M\"
+}"
+curljson ${url} "${payload}"
+
 echo "3: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S -i --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
-{
-	"contextElements": {
-		"contextElement": {
-			"type": "Room",
-			"isPattern": "false",
-			"id": "ConferenceRoom",
-			"attributes": [
-				{
-					"name": "temperature",
-					"type": "degree",
-					"value": "20",
-					"metadatas": [
-						{
-							"name": "attributeValueIdentifier",
-							"type": "long",
-							"value": "1"
-						},
-						{
-							"name": "attributeValueIdentifier",
-							"type": "long",
-							"value": "2"
-						},
-						{
-							"name": "attributeValueIdentifier",
-							"type": "long",
-							"value": "3"
-						}
-					]
-				}
-			]
-		}
-	},
-	"updateAction": "UPDATE"
-}
-EOF
+url="/NGSI10/updateContext"
+payload="{
+  \"contextElements\": {
+    \"contextElement\": {
+      \"type\": \"Room\",
+      \"isPattern\": \"false\",
+      \"id\": \"ConferenceRoom\",
+      \"attributes\": [
+        {
+          \"name\": \"temperature\",
+          \"type\": \"degree\",
+          \"value\": \"20\",
+          \"metadatas\": [
+            {
+              \"name\": \"attributeValueIdentifier\",
+              \"type\": \"long\",
+              \"value\": \"1\"
+            },
+            {
+              \"name\": \"attributeValueIdentifier\",
+              \"type\": \"long\",
+              \"value\": \"2\"
+            },
+            {
+              \"name\": \"attributeValueIdentifier\",
+              \"type\": \"long\",
+              \"value\": \"3\"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  \"updateAction\": \"UPDATE\"
+}"
+curljson ${url} "${payload}"
+
 echo "4: ***********************************"
 --REGEXPECT--
 1: ***********************************
@@ -189,26 +162,26 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "ConferenceRoom",
-        "attributes" : [
-          {
-            "name" : "temperature",
-            "type" : "degree",
-            "contextValue" : ""
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "contextValue": "", 
+                        "name": "temperature", 
+                        "type": "degree"
+                    }
+                ], 
+                "id": "ConferenceRoom", 
+                "isPattern": "false", 
+                "type": "Room"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
 }
 2: ***********************************
 HTTP/1.1 200 OK
@@ -217,8 +190,8 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "duration" : "PT1M",
-  "registrationId" : "REGEX([0-9a-f]{24})"
+    "duration": "PT1M",
+    "registrationId": "REGEX([0-9a-f]{24})"
 }
 3: ***********************************
 HTTP/1.1 200 OK
@@ -227,34 +200,28 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "ConferenceRoom",
-        "attributes" : [
-          {
-            "name" : "temperature",
-            "type" : "degree",
-            "contextValue" : ""
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "contextValue": "", 
+                        "name": "temperature", 
+                        "type": "degree"
+                    }
+                ], 
+                "id": "ConferenceRoom", 
+                "isPattern": "false", 
+                "type": "Room"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
 }
 4: ***********************************
 --TEARDOWN--
-if [ "$VALGRIND" == "" ]; then
-  kill $(cat ${BROKER_PID_FILE})
-  rm /tmp/orion_${BROKER_PORT}.pid
-else
-  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
-  # Waiting for valgrind to terminate (sleep 10)
-  sleep 10
-fi
+source ../harnessFunctions.sh
+brokerStop CB
