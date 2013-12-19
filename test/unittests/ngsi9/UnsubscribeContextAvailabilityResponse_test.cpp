@@ -49,7 +49,7 @@ TEST(UnsubscribeContextAvailabilityResponse, constructorsAndRender)
   ErrorCode                               ec(SccBadRequest, "RP", "D");
   UnsubscribeContextAvailabilityResponse  ucar3(ec);
   std::string                             rendered;
-  std::string                             expected = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>RP</reasonPhrase>\n    <details>D</details>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
+  std::string                             expected = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>000000000000000000000000</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>RP</reasonPhrase>\n    <details>D</details>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
 ;
 
   EXPECT_EQ(0,                    ucar1.statusCode.code);

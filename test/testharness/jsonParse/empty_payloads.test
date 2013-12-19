@@ -118,7 +118,7 @@ echo "13: ++++++++++++++++++++"
 }
 2: ++++++++++++++++++++
 {
-  "subscriptionId" : "No Subscription ID",
+  "subscriptionId" : "000000000000000000000000",
   "errorCode" : {
     "code" : "400",
     "reasonPhrase" : "No entities"
@@ -126,7 +126,7 @@ echo "13: ++++++++++++++++++++"
 }
 3: ++++++++++++++++++++
 {
-  "subscriptionId" : "No Subscription ID",
+  "subscriptionId" : "000000000000000000000000",
   "errorCode" : {
     "code" : "400",
     "reasonPhrase" : "No entities"
@@ -134,7 +134,7 @@ echo "13: ++++++++++++++++++++"
 }
 4: ++++++++++++++++++++
 {
-  "subscriptionId" : "No Subscription ID",
+  "subscriptionId" : "000000000000000000000000",
   "statusCode" : {
     "code" : "404",
     "reasonPhrase" : "Subscription Not Found"
@@ -177,7 +177,7 @@ echo "13: ++++++++++++++++++++"
 }
 9: ++++++++++++++++++++
 {
-  "subscriptionId" : "No Subscription ID",
+  "subscriptionId" : "000000000000000000000000",
   "statusCode" : {
     "code" : "404",
     "reasonPhrase" : "Subscription Not Found"

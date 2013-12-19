@@ -42,7 +42,7 @@ std::string UnsubscribeContextRequest::render(RequestType requestType, Format fo
   std::string tag = "unsubscribeContextRequest";
 
   out += startTag(indent, tag, format, false);
-  out += subscriptionId.render(format, indent + "  ");
+  out += subscriptionId.render(UnsubscribeContext, format, indent + "  ");
   out += endTag(indent, tag, format);
 
   return out;

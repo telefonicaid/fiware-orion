@@ -67,7 +67,7 @@ std::string UpdateContextSubscriptionRequest::render(RequestType requestType, Fo
   out += startTag(indent, tag, format, false);
   out += duration.render(format, indent + "  ", commaAfterDuration);
   out += restriction.render(format, indent + "  ", restrictions, commaAfterRestriction);
-  out += subscriptionId.render(format, indent + "  ", commaAfterSubscriptionId);
+  out += subscriptionId.render(UpdateContextSubscription, format, indent + "  ", commaAfterSubscriptionId);
   out += notifyConditionVector.render(format, indent + "  ", commaAfterNotifyConditionVector);
   out += throttling.render(format, indent + "  ", commaAfterThrottling);
   out += endTag(indent, tag, format);

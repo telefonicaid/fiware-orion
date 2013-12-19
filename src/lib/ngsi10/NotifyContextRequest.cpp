@@ -49,7 +49,7 @@ std::string NotifyContextRequest::render(RequestType requestType, Format format,
   //   This doubt is taken care of by the variable 'contextElementResponseVectorRendered'
   //
   out += startTag(indent, tag, format, false);
-  out += subscriptionId.render(format, indent + "  ", true);
+  out += subscriptionId.render(NotifyContext, format, indent + "  ", true);
   out += originator.render(format, indent  + "  ", contextElementResponseVectorRendered);
   out += contextElementResponseVector.render(format, indent  + "  ", false);
   out += endTag(indent, tag, format);

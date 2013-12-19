@@ -1,5 +1,5 @@
 o PR #167 kzangeli   Wed dec 18 12:50:00 CET 2013
-  Found and fixed three bugs during the process:
+  - Found and fixed three bugs during the process:
     - registerContextRequest rendering had no comma for JSON between ContextRegistrations
     - registrationId mandatory for registerContextResponse
     - ContextRegistrationAttribute had an incorrect tag for the metadata
@@ -9,3 +9,13 @@ o PR #168 kzangeli Wed dic 18 16:21:10 CET 2013
   - Fixed the check of RegisterProviderRequest which was incorrect.
     This fix improves error responses for ngsi9 convenience oprrations
 
+o PR #172 kzangeli Thu dec 19 00:45:30 CET 2013
+  - Fixed a bug regarding the 'default' value of 'subscriptionId'.
+    Before this PR, in case of an undefined subscriptionId, the string 'No SubscriptionId' was used.
+    This doesn't follow the XSD and has been changed to '000000000000000000000000'.
+    This can happen e.g. if a subscription request fails and no new subscriptionId is generated but
+    as the XSD forces the response to contain a subscriptionId, the zeroed string is returned as
+    some kind of 'subscriptionId dummy'.
+
+    Perhaps the XSD/OMA Specification should be changed and the subscriptionId should be omitted
+    in these erroneous cases ... ?

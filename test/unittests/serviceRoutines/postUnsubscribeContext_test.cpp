@@ -55,7 +55,7 @@ TEST(postUnsubscribeContext, badSubscriptionId)
 {
   ConnectionInfo ci("/ngsi10/unsubscribeContext",  "POST", "1.1");
   const char*    fileName    = "ngsi10.unsubscribeContextRequest.subscriptionId.invalid.xml";
-  std::string    expected    = "<unsubscribeContextResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>Invalid Subscription Id: bad length (24 chars expected)</reasonPhrase>\n    <details>12345D</details>\n  </statusCode>\n</unsubscribeContextResponse>\n";
+  std::string    expected    = "<unsubscribeContextResponse>\n  <subscriptionId>000000000000000000000000</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>Invalid Subscription Id: bad length (24 chars expected)</reasonPhrase>\n    <details>12345D</details>\n  </statusCode>\n</unsubscribeContextResponse>\n";
   std::string    out;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
