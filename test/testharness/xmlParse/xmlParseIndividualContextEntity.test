@@ -33,7 +33,7 @@ source ../harnessFunctions.sh
 
 # 1. GET that fails
 echo "1: +++++++++++++++++++++++++++++"
-curlxmlNoPayload "/NGSI10/contextEntities/ENTITY_ID"
+curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID"
 
 # 2. POST that fails
 echo "2: +++++++++++++++++++++++++++++"
@@ -49,7 +49,7 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     </contextAttribute>
   </contextAttributeList>
 </appendContextElementRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 # 3. PUT that fails
 echo "3: +++++++++++++++++++++++++++++"
@@ -65,11 +65,11 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     </contextAttribute>
   </contextAttributeList>
 </updateContextElementRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml" "-X PUT"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml" "-X PUT"
 
 # 4. DELETE that fails
 echo "4: +++++++++++++++++++++++++++++"
-curlxmlNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
+curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
 
 # 5. Register an entity
 echo "5: +++++++++++++++++++++++++++++"
@@ -95,11 +95,11 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     </contextRegistrationList>
     <duration>PT1H</duration>
   </registerContextRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 # 6. GET that is OK
 echo "6: +++++++++++++++++++++++++++++"
-curlxmlNoPayload "/NGSI10/contextEntities/ENTITY_ID"
+curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID"
 
 # 7. POST that is OK
 echo "7: +++++++++++++++++++++++++++++"
@@ -115,7 +115,7 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     </contextAttribute>
   </contextAttributeList>
 </appendContextElementRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 # 8. PUT that is OK
 echo "8: +++++++++++++++++++++++++++++"
@@ -131,11 +131,11 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     </contextAttribute>
   </contextAttributeList>
 </updateContextElementRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml" "-X PUT"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml" "-X PUT"
 
 # 9. DELETE that is OK
 echo "9: +++++++++++++++++++++++++++++"
-curlxmlNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
+curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
 
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++

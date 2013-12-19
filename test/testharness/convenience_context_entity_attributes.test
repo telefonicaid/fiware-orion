@@ -32,7 +32,7 @@ brokerStart CB
 source harnessFunctions.sh
 
 echo "0: ++++++++++++++++++++"
-curlxmlNoPayload "/NGSI9/contextEntities/entity01/attributes"
+curlXmlNoPayload "/NGSI9/contextEntities/entity01/attributes"
 
 echo "1: ++++++++++++++++++++"
 url="/NGSI9/contextEntities/entity01/attributes"
@@ -53,10 +53,10 @@ payload="<?xml version=\"1.0\"?>
   <duration>PT1H</duration>
   <providingApplication>http://kz.tid.es/abc</providingApplication>
 </registerProviderRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "2: ++++++++++++++++++++"
-curlxmlNoPayload "/NGSI9/contextEntities/entity01/attributes"
+curlXmlNoPayload "/NGSI9/contextEntities/entity01/attributes"
 
 echo "3: ++++++++++++++++++++"
 killall contextBroker

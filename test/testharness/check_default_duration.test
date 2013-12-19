@@ -56,7 +56,7 @@ payload="<?xml version=\"1.0\"?>
     </contextRegistrationList>
     <registrationId></registrationId>
   </registerContextRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 REG_ID=$(echo "$response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
@@ -78,7 +78,7 @@ payload="<?xml version=\"1.0\"?>
       <attribute>pressure</attribute>
     </attributeList>
   </discoverContextAvailabilityRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 --REGEXPECT--
 HTTP/1.1 200 OK

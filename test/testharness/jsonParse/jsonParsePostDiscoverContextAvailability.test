@@ -73,7 +73,7 @@ payload="{
   ],
   \"duration\": \"PT1M\"
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "+++++ Registration 1 Done +++++++++++++++"
 
@@ -109,7 +109,7 @@ payload="{
     ]
   }
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "+++++ Discovery 1 Done +++++++++++++++"
 echo "+++++ Register 2: two attributes in vector +++++++++++++++"
@@ -163,7 +163,7 @@ payload="{
   ],
   \"duration\": \"PT1M\"
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "+++++ Registration 2 Done +++++++++++++++"
 
@@ -194,7 +194,7 @@ payload="{
     ]
   }
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "+++++ Discovery 2 Done +++++++++++++++"
 --REGEXPECT--

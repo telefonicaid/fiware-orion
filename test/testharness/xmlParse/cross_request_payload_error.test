@@ -34,79 +34,79 @@ source ../harnessFunctions.sh
 url='/NGSI9/registerContext'
 payload='<?xml version="1.0"?>
 <discoverContextAvailabilityRequest/>'
-curlxml ${url} "${payload}" "Content-Type: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "1: ++++++++++++++++++++"
 
 url='/NGSI9/discoverContextAvailability'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
-curlxml ${url} "${payload}" "Content-Type: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "2: ++++++++++++++++++++"
 
 url='/NGSI9/subscribeContextAvailability'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
-curlxml ${url} "${payload}" "Content-Type: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "3: ++++++++++++++++++++"
 
 url='/NGSI9/updateContextAvailabilitySubscription'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
-curlxml ${url} "${payload}" "Content-Type: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "4: ++++++++++++++++++++"
 
 url='/NGSI9/unsubscribeContextAvailability'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
-curlxml ${url} "${payload}" "Content-Type: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "5: ++++++++++++++++++++"
 
 url='/NGSI10/queryContext'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
-curlxml ${url} "${payload}" "Content-Type: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "6: ++++++++++++++++++++"
 
 url='/NGSI10/updateContext'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
-curlxml ${url} "${payload}" "Content-Type: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "7: ++++++++++++++++++++"
 
 url='/NGSI10/subscribeContext'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
-curlxml ${url} "${payload}" "Content-Type: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "8: ++++++++++++++++++++"
 
 url='/NGSI10/updateContextSubscription'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
-curlxml ${url} "${payload}" "Content-Type: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "9: ++++++++++++++++++++"
 
 url='/NGSI10/unsubscribeContext'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
-curlxml ${url} "${payload}" "Content-Type: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "10: ++++++++++++++++++++"
 
 url='/NGSI9/notSupportedRequest'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
-curlxml ${url} "${payload}" "Content-Type: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "11: ++++++++++++++++++++"
 
 url='/NGSI10/notSupportedRequest'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
-curlxml ${url} "${payload}" "Content-Type: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "12: ++++++++++++++++++++"
 
 url='/notSupportedRequest'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
-curlxml ${url} "${payload}" "Content-Type: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "13: ++++++++++++++++++++"
 
 --REGEXPECT--

@@ -44,7 +44,7 @@ payload="<?xml version="1.0"?>
   <reference>http://localhost:${LISTENER_PORT}/notify</reference>
   <throttling>PT5H</throttling>
 </subscribeContextRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "2: +++++++++++++++++++++++++++++"
 
 # Bad throttling syntax
@@ -60,7 +60,7 @@ payload="<?xml version="1.0"?>
   <reference>http://localhost:${LISTENER_PORT}/notify</reference>
   <throttling>PT5R</throttling>
 </subscribeContextRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "3: +++++++++++++++++++++++++++++"
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++

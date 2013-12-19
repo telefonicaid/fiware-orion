@@ -73,7 +73,7 @@ payload="{
   ],
   \"duration\": \"PT1M\"
 }"
-curljson ${url} "${payload}" "-X BAD_VERB"
+curlJson ${url} "${payload}" "-X BAD_VERB"
 
 echo "++++++++++++++++++++"
 --REGEXPECT--

@@ -50,7 +50,7 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
   <duration>PT1H</duration>
   <providingApplication>http://kz.tid.es/abc</providingApplication>
 </registerProviderRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 REG_ID=$(echo "$response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
@@ -65,7 +65,7 @@ payload="<?xml version=\"1.0\"?>
       </entityId>
     </entityIdList>
   </discoverContextAvailabilityRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 # Modify the first registration
 echo "3: ++++++++++++++++++++"
@@ -89,7 +89,7 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
   <providingApplication>http://kz.tid.es/abc2</providingApplication>
   <registrationId>$REG_ID</registrationId>
 </registerProviderRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "4: ++++++++++++++++++++"
 
@@ -103,21 +103,21 @@ payload="<?xml version=\"1.0\"?>
       </entityId>
     </entityIdList>
   </discoverContextAvailabilityRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "5: ++++++++++++++++++++"
 
 # Now try the GET method
-curlxmlNoPayload "/NGSI9/contextEntities/ENTITY_ID/attributes"
+curlXmlNoPayload "/NGSI9/contextEntities/ENTITY_ID/attributes"
 
 echo "6: ++++++++++++++++++++"
 
 # And a GET that fails
-curlxmlNoPayload "/NGSI9/contextEntities/ENTITY_ID2/attributes"
+curlXmlNoPayload "/NGSI9/contextEntities/ENTITY_ID2/attributes"
 echo "7: ++++++++++++++++++++"
 
 # DELETE and PUT should give errors
-curlxmlNoPayload "/NGSI9/contextEntities/ENTITY_ID/attributes" "-X DELETE"
+curlXmlNoPayload "/NGSI9/contextEntities/ENTITY_ID/attributes" "-X DELETE"
 
 echo "8: ++++++++++++++++++++"
 url="/NGSI9/contextEntities/ENTITY_ID/attributes"
@@ -138,7 +138,7 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
   <duration>PT2H</duration>
   <providingApplication>http://kz.tid.es/abc2</providingApplication>
 </registerProviderRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml" "-X PUT"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml" "-X PUT"
 
 echo "9: ++++++++++++++++++++"
 

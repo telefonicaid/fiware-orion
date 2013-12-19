@@ -81,7 +81,7 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml" "-X BAD_VERB"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml" "-X BAD_VERB"
 
 echo "++++++++++++++++++++"
 --REGEXPECT--

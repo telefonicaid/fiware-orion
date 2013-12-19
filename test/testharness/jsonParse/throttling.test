@@ -43,7 +43,7 @@ payload="{
   \"reference\" : \"http://localhost:${LISTENER_PORT}/notify\",
   \"throttling\" : \"PT5H\"
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "2: +++++++++++++++++++++++++++++"
 --REGEXPECT--

@@ -67,7 +67,7 @@ payload="{
   },
   \"updateAction\": \"APPEND\"
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "2: ***********************************"
 
@@ -113,7 +113,7 @@ payload="{
   ],
   \"duration\": \"PT1M\"
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "3: ***********************************"
 url="/NGSI10/updateContext"
@@ -151,7 +151,7 @@ payload="{
   },
   \"updateAction\": \"UPDATE\"
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "4: ***********************************"
 --REGEXPECT--

@@ -74,7 +74,7 @@ payload="{
   ],
   \"duration\": \"PT1M\"
 }"
-curljson "${url}" "${payload}"
+curlJson "${url}" "${payload}"
 
 echo "+++++ Registration Done +++++++++++++++"
 
@@ -110,7 +110,7 @@ payload="{
     ]
   }
 }"
-curljson ${url} "${payload}" "-X BAD_VERB"
+curlJson ${url} "${payload}" "-X BAD_VERB"
 
 echo "+++++ Discovery Done +++++++++++++++"
 --REGEXPECT--

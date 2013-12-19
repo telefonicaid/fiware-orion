@@ -66,7 +66,7 @@ payload="{
   },
   \"subscriptionId\" : \"012345678901234567890123\"
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "2: ***********************************"
 
@@ -106,7 +106,7 @@ payload="{
     ]
   }
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 SUB_ID=$(echo "$response" | grep subscriptionId | awk -F\" '{ print $4}')
 
@@ -147,7 +147,7 @@ payload="{
   },
   \"subscriptionId\" : \"${SUB_ID}\"
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "4: ***********************************"
 --REGEXPECT--

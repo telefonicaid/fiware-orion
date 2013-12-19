@@ -100,7 +100,7 @@ payload="{
     }
   ]
 }"
-curljson ${url} "${payload}" "-X GET"
+curlJson ${url} "${payload}" "-X GET"
 
 --REGEXPECT--
 1: ***********************************

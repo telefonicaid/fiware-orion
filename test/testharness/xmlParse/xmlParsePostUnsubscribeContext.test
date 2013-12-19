@@ -36,7 +36,7 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <unsubscribeContextRequest>
   <subscriptionId>012345678901234567890123</subscriptionId>
 </unsubscribeContextRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "2: ***********************************"
 
@@ -81,7 +81,7 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
   </notifyConditions>
   <throttling>P5Y</throttling>
 </subscribeContextRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 subscriptionId=$(echo "$response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
@@ -92,7 +92,7 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
   <subscriptionId>$subscriptionId</subscriptionId>
 </unsubscribeContextRequest>"
 
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "4: ***********************************"
 --REGEXPECT--

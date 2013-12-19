@@ -33,7 +33,7 @@ source harnessFunctions.sh
 
 echo "0: ++++++++++++++++++++"
 
-curlxmlNoPayload "/NGSI9/contextEntities/entity01"
+curlXmlNoPayload "/NGSI9/contextEntities/entity01"
 
 echo "1: ++++++++++++++++++++"
 
@@ -55,10 +55,10 @@ payload="<?xml version=\"1.0\"?>
   <duration>PT1H</duration>
   <providingApplication>http://kz.tid.es/abc</providingApplication>
 </registerProviderRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "2: ++++++++++++++++++++"
-curlxmlNoPayload "/NGSI9/contextEntities/entity01"
+curlXmlNoPayload "/NGSI9/contextEntities/entity01"
 
 echo "3: ++++++++++++++++++++"
 killall contextBroker

@@ -73,7 +73,7 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
 </notifyContextAvailabilityRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "2: ***********************************"
 url="/NGSI9/notifyContextAvailability"
@@ -118,7 +118,7 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
 </notifyContextAvailabilityRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "3: ***********************************"
 --REGEXPECT--

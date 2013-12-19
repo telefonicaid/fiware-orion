@@ -35,7 +35,7 @@ url="/NGSI10/unsubscribeContext"
 payload="{
   \"subscriptionId\": \"012345678901234567890123\"
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "2: ***********************************"
 url="/NGSI10/subscribeContext"
@@ -85,7 +85,7 @@ payload="{
   ],
   \"throttling\": \"P5Y\"
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 subscriptionId=$(echo "$response" | grep subscriptionId | awk -F\" '{ print $4 }')
 
@@ -94,7 +94,7 @@ url="/NGSI10/unsubscribeContext"
 payload="{
   \"subscriptionId\": \"$subscriptionId\"
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "4: ***********************************"
 --REGEXPECT--

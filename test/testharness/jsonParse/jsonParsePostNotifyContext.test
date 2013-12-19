@@ -99,7 +99,7 @@ payload="{
     }
   ]
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "2: ***********************************"
 --REGEXPECT--

@@ -53,7 +53,7 @@ payload="<?xml version=\"1.0\"?>
         <duration>PT1H</duration>
   <registrationId></registrationId>
 </registerContextRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "1: ++++++++++++++++++++"
 
@@ -89,7 +89,7 @@ payload="<registerContextRequest>
         <duration>PT1H</duration>
   <registrationId></registrationId>
 </registerContextRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "2: ++++++++++++++++++++"
 
@@ -113,7 +113,7 @@ payload="<?xml version=\"1.0\"?>
       </scope>
   </restriction>
 </discoverContextAvailabilityRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "3: ++++++++++++++++++++"
 

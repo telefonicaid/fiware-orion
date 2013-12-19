@@ -36,7 +36,7 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <unsubscribeContextAvailabilityRequest>
   <subscriptionId>012345678901234567890123</subscriptionId>
 </unsubscribeContextAvailabilityRequest>"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "2: ***********************************"
 --REGEXPECT--

@@ -265,9 +265,9 @@ function accumulatorStart()
 
 # ------------------------------------------------------------------------------
 #
-# print_xml_with_headers - 
+# printXmlWithHeaders - 
 #
-function print_xml_with_headers()
+function printXmlWithHeaders()
 {
   cat headers.out
   echo $response | xmllint --format -
@@ -278,9 +278,9 @@ function print_xml_with_headers()
 
 # ------------------------------------------------------------------------------
 #
-# print_json_with_headers - 
+# printJsonWithHeaders - 
 #
-function print_json_with_headers()
+function printJsonWithHeaders()
 {
   cat headers.out
   echo "${response}" | python -mjson.tool
@@ -291,9 +291,9 @@ function print_json_with_headers()
 
 # ------------------------------------------------------------------------------
 #
-# curlit - 
+# curlIt - 
 #
-function curlit()
+function curlIt()
 {
   url=$1
   payload=$2
@@ -312,9 +312,9 @@ function curlit()
 
 # ------------------------------------------------------------------------------
 #
-# curlxml - 
+# curlXml - 
 #
-function curlxml()
+function curlXml()
 {
   url=$1
   payload=$2
@@ -336,33 +336,33 @@ function curlxml()
     response=$(echo ${payload} | (curl localhost:${BROKER_PORT}${url} ${params} --header "${contenttype}" --header "${accept}" $extraoptions -d @- ))
   fi
   
-  print_xml_with_headers
+  printXmlWithHeaders
 }
 
 
 
 # ------------------------------------------------------------------------------
 #
-# curljson - 
+# curlJson - 
 #
-function curljson()
+function curlJson()
 {
   url=$1
   payload=$2
   extraoptions=$3
   
-  curlit "${url}" "${payload}" "Content-Type: application/json" "Accept: application/json" $extraoptions
+  curlIt "${url}" "${payload}" "Content-Type: application/json" "Accept: application/json" $extraoptions
   
-  print_json_with_headers
+  printJsonWithHeaders
 }
 
 
 
 # ------------------------------------------------------------------------------
 #
-# curlxmlCM - 
+# curlXmlCM - 
 #
-function curlxmlCM()
+function curlXmlCM()
 {
   url=$1
   payload=$2
@@ -384,7 +384,7 @@ function curlxmlCM()
     response=$(echo ${payload} | (curl localhost:${CM_PORT}${url} ${params} --header "${contenttype}" --header "${accept}" $extraoptions -d @- ))
   fi
   
-  print_xml_with_headers
+  printXmlWithHeaders
 }
 
 
@@ -404,16 +404,16 @@ function curlNoPayload()
   
   response=$(curl localhost:${BROKER_PORT}${url} ${params} $extraoptions --header "${contenttype}" --header "${accept}")
     
-  print_xml_with_headers
+  printXmlWithHeaders
 }
 
 
 
 # ------------------------------------------------------------------------------
 #
-# curlxmlNoPayload - 
+# curlXmlNoPayload - 
 #
-function curlxmlNoPayload()
+function curlXmlNoPayload()
 {
   url=$1
   extraoptions=$2
@@ -425,9 +425,9 @@ function curlxmlNoPayload()
 
 # ------------------------------------------------------------------------------
 #
-# curljsonNoPayload - 
+# curlJsonNoPayload - 
 #
-function curljsonNoPayload()
+function curlJsonNoPayload()
 {
   url=$1
   extraoptions=$2

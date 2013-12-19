@@ -31,43 +31,43 @@ brokerStart CB
 --SHELL--
 source ../harnessFunctions.sh
 
-curljson "/NGSI9/registerContext" "{}"
+curlJson "/NGSI9/registerContext" "{}"
 echo "1: ++++++++++++++++++++"
 
-curljson "/NGSI9/discoverContextAvailability" "{}"
+curlJson "/NGSI9/discoverContextAvailability" "{}"
 echo "2: ++++++++++++++++++++"
 
-curljson "/NGSI9/subscribeContextAvailability" "{}"
+curlJson "/NGSI9/subscribeContextAvailability" "{}"
 echo "3: ++++++++++++++++++++"
 
-curljson "/NGSI9/updateContextAvailabilitySubscription" "{}"
+curlJson "/NGSI9/updateContextAvailabilitySubscription" "{}"
 echo "4: ++++++++++++++++++++"
 
-curljson "/NGSI9/unsubscribeContextAvailability" "{}"
+curlJson "/NGSI9/unsubscribeContextAvailability" "{}"
 echo "5: ++++++++++++++++++++"
 
-curljson "/NGSI10/queryContext" "{}"
+curlJson "/NGSI10/queryContext" "{}"
 echo "6: ++++++++++++++++++++"
 
-curljson "/NGSI10/updateContext" "{}"
+curlJson "/NGSI10/updateContext" "{}"
 echo "7: ++++++++++++++++++++"
 
-curljson "/NGSI10/subscribeContext" "{}"
+curlJson "/NGSI10/subscribeContext" "{}"
 echo "8: ++++++++++++++++++++"
 
-curljson "/NGSI10/updateContextSubscription" "{}"
+curlJson "/NGSI10/updateContextSubscription" "{}"
 echo "9: ++++++++++++++++++++"
 
-curljson "/NGSI10/unsubscribeContext" "{}"
+curlJson "/NGSI10/unsubscribeContext" "{}"
 echo "10: ++++++++++++++++++++"
 
-curljson "/NGSI9/notSupportedRequest" "{}"
+curlJson "/NGSI9/notSupportedRequest" "{}"
 echo "11: ++++++++++++++++++++"
 
-curljson "/NGSI10/notSupportedRequest" "{}"
+curlJson "/NGSI10/notSupportedRequest" "{}"
 echo "12: ++++++++++++++++++++"
 
-curljson "/notSupportedRequest" "{}"
+curlJson "/notSupportedRequest" "{}"
 echo "13: ++++++++++++++++++++"
 
 --REGEXPECT--

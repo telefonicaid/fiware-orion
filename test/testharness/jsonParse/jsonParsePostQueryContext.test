@@ -64,7 +64,7 @@ payload="{
     ]
   }
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "2: ***********************************"
 url="/NGSI9/registerContext"
@@ -109,7 +109,7 @@ payload="{
   ],
   \"duration\": \"PT1M\"
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "3: ***********************************"
 url="/NGSI10/queryContext"
@@ -145,7 +145,7 @@ payload="{
     ]
   }
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "4: ***********************************"
 --REGEXPECT--

@@ -44,13 +44,13 @@ payload='<?xml version="1.0"?>
   </entityIdList>
   <attributeList/>
 </queryContextRequest>'
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept:"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept:"
 echo "1: ++++++++++++++++++++"
 
 # This test will always fail
 url="/NGSI10/queryContext"
 payload="no meaningful payload (failing tests)"
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain"
 echo "2: ++++++++++++++++++++"
 
 # This test that explicit "Accept: application/xml" is ok
@@ -64,7 +64,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </entityIdList>
   <attributeList/>
 </queryContextRequest>'
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 echo "3: ++++++++++++++++++++"
 
 # This test uses a list in Accept which a valid type is found is ok
@@ -78,7 +78,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </entityIdList>
   <attributeList/>
 </queryContextRequest>'
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, application/xml"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, application/xml"
 echo "4: ++++++++++++++++++++"
 
 # This test uses a list in Accept which a valid type is found is ok (with extra encoding after ";")
@@ -92,19 +92,19 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </entityIdList>
   <attributeList/>
 </queryContextRequest>'
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, application/xml; charset=UTF-8"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, application/xml; charset=UTF-8"
 echo "5: ++++++++++++++++++++"
 
 # This test uses a list in Accept which no valid types
 url="/NGSI10/queryContext"
 payload='no meaningful payload (failing tests)'
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, image/jpeg"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, image/jpeg"
 echo "6: ++++++++++++++++++++"
 
 # This test uses a list in Accept which no valid type (with extra encoding after ";")
 url="/NGSI10/queryContext"
 payload='no meaningful payload (failing tests)'
-curlxml ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, image/jpeg; charset=UTF-8"
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, image/jpeg; charset=UTF-8"
 echo "7: ++++++++++++++++++++"
 
 # FIXME P10: enable this test once the tested functionality gets implemented (including REGEXPECT)

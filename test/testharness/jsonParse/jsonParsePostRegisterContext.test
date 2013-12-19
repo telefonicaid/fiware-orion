@@ -73,7 +73,7 @@ payload="{
   ],
   \"duration\": \"PT1M\"
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "2: ***********************************"
 --REGEXPECT--

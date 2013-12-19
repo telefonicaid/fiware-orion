@@ -60,7 +60,7 @@ payload="{
   ],
   \"throttling\": \"P5Y\"
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "2: ***********************************"
 url="/NGSI10/subscribeContext"
@@ -110,7 +110,7 @@ payload="{
   ],
   \"throttling\": \"P5Y\"
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 SUB_ID=$(echo "$response" | grep subscriptionId | awk -F\" '{ print $4}')
 
@@ -144,7 +144,7 @@ payload="{
   ],
   \"throttling\": \"P4Y\"
 }"
-curljson ${url} "${payload}"
+curlJson ${url} "${payload}"
 
 echo "4: ***********************************"
 --REGEXPECT--
