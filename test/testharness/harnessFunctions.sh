@@ -269,8 +269,9 @@ function accumulatorStart()
 #
 function printXmlWithHeaders()
 {
+  text=$1
   cat headers.out
-  echo $response | xmllint --format -
+  echo "${text}" | xmllint --format -
   rm headers.out
 }
 
@@ -282,8 +283,9 @@ function printXmlWithHeaders()
 #
 function printJsonWithHeaders()
 {
+  text=$1
   cat headers.out
-  echo "${response}" | python -mjson.tool
+  echo "${text}" | python -mjson.tool
   rm headers.out
 }
 
@@ -293,19 +295,29 @@ function printJsonWithHeaders()
 #
 # curlIt - 
 #
+# URL: You also have to specify host, port
+# 
 function curlIt()
 {
-  url=$1
-  payload=$2
-  contenttype=$3
-  accept=$4
-  extraoptions=$5
+  encoding=$1
+  url=$2
+  payload=$3
+  contenttype=$4
+  accept=$5
+  extraoptions=$6
   
   params="-s -S --dump-header headers.out "
   
-  response=$(echo ${payload} | (curl localhost:${BROKER_PORT}${url} ${params} --header "${contenttype}" --header "${accept}" $extraoptions -d @- ))
+  response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" $extraoptions -d @- ))
   
-#   echo "\$(echo ${payload} | (curl localhost:${BROKER_PORT}${url} ${params} --header \"${contenttype}\" --header \"${accept}\" $extraoptions -d @- ))"
+  if [ "$encoding" == "XML" ]
+  then
+    printXmlWithHeaders "${response}"
+  elif [ "$encoding" == "JSON" ]
+  then
+    printJsonWithHeaders "${response}"
+  fi
+    
 }
 
 
@@ -314,29 +326,15 @@ function curlIt()
 #
 # curlXml - 
 #
+# Helper function.
+#
 function curlXml()
 {
   url=$1
   payload=$2
-  contenttype=$3
-  accept=$4
-  extraoptions=$5
+  extraoptions=$3
   
-  params="-s -S --dump-header headers.out "
-  
-  if [ "$contenttype" == "" ]
-  then
-    contenttype="Content-Type: application/xml"
-  fi
-  
-  if [ "$accept" == "" ]
-  then
-    response=$(echo ${payload} | (curl localhost:${BROKER_PORT}${url} ${params} --header "${contenttype}" $extraoptions -d @- ))
-  else
-    response=$(echo ${payload} | (curl localhost:${BROKER_PORT}${url} ${params} --header "${contenttype}" --header "${accept}" $extraoptions -d @- ))
-  fi
-  
-  printXmlWithHeaders
+  curlIt "XML" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/xml" "Accept: application/xml" $extraoptions
 }
 
 
@@ -345,46 +343,15 @@ function curlXml()
 #
 # curlJson - 
 #
+# Helper function.
+#
 function curlJson()
 {
   url=$1
   payload=$2
   extraoptions=$3
   
-  curlIt "${url}" "${payload}" "Content-Type: application/json" "Accept: application/json" $extraoptions
-  
-  printJsonWithHeaders
-}
-
-
-
-# ------------------------------------------------------------------------------
-#
-# curlXmlCM - 
-#
-function curlXmlCM()
-{
-  url=$1
-  payload=$2
-  contenttype=$3
-  accept=$4
-  extraoptions=$5
-  
-  params="-s -S --dump-header headers.out "
-  
-  if [ "$contenttype" == "" ]
-  then
-    contenttype="Content-Type: application/xml"
-  fi
-  
-  if [ "$accept" == "" ]
-  then
-    response=$(echo ${payload} | (curl localhost:${CM_PORT}${url} ${params} --header "${contenttype}" $extraoptions -d @- ))
-  else
-    response=$(echo ${payload} | (curl localhost:${CM_PORT}${url} ${params} --header "${contenttype}" --header "${accept}" $extraoptions -d @- ))
-  fi
-  
-  printXmlWithHeaders
+  curlIt "JSON" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/json" "Accept: application/json" $extraoptions
 }
 
 
@@ -395,16 +362,23 @@ function curlXmlCM()
 #
 function curlNoPayload()
 {
-  url=$1
-  extraoptions=$2
-  contenttype=$3
-  accept=$4
+  encoding=$1
+  url=$2
+  extraoptions=$3
+  contenttype=$4
+  accept=$5
    
   params="-s -S --dump-header headers.out "
   
   response=$(curl localhost:${BROKER_PORT}${url} ${params} $extraoptions --header "${contenttype}" --header "${accept}")
     
-  printXmlWithHeaders
+  if [ "$encoding" == "XML" ]
+  then
+    printXmlWithHeaders "${response}"
+  elif [ "$encoding" == "JSON" ]
+  then
+    printJsonWithHeaders "${response}"
+  fi
 }
 
 
@@ -413,12 +387,14 @@ function curlNoPayload()
 #
 # curlXmlNoPayload - 
 #
+# Helper function.
+#
 function curlXmlNoPayload()
 {
   url=$1
   extraoptions=$2
   
-  curlNoPayload $url $extraoptions "Content-Type: application/xml" "Accept: application/xml"
+  curlNoPayload "XML" $url $extraoptions "Content-Type: application/xml" "Accept: application/xml"
 }
 
 
@@ -427,12 +403,14 @@ function curlXmlNoPayload()
 #
 # curlJsonNoPayload - 
 #
+# Helper function.
+#
 function curlJsonNoPayload()
 {
   url=$1
   extraoptions=$2
   
-  curlNoPayload $url $extraoptions "Content-Type: application/json" "Accept: application/json"
+  curlNoPayload "JSON" $url $extraoptions "Content-Type: application/json" "Accept: application/json"
 }
 
 
