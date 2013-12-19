@@ -23,8 +23,7 @@
 # harnessInit - 
 #
 if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
-then
-  #echo "scripts/testEnv.sh not sourced - I do it for you"
+then  
   source ../../scripts/testEnv.sh
 fi
 
@@ -274,5 +273,5 @@ function mongoCmd()
 
   db=$1
   cmd=$2
-  r=$(echo $cmd | mongo $db | tail -n 2 | head -n 1)
+  echo $cmd | mongo $db | tail -n 2 | head -n 1
 }
