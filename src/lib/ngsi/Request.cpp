@@ -34,18 +34,19 @@ const char* requestType(RequestType rt)
 {
   switch (rt)
   {
-  case RegisterContext:                             return "RegisterContext";
-  case DiscoverContextAvailability:                 return "DiscoverContextAvailability";
-  case SubscribeContextAvailability:                return "SubscribeContextAvailability";
-  case UpdateContextAvailabilitySubscription:       return "UpdateContextAvailabilitySubscription";
-  case UnsubscribeContextAvailability:              return "UnsubscribeContextAvailability";
-  case NotifyContextAvailability:                   return "NotifyContextAvailability";
-  case QueryContext:                                return "QueryContext";
-  case SubscribeContext:                            return "SubscribeContext";
-  case UpdateContextSubscription:                   return "UpdateContextSubscription";
-  case UnsubscribeContext:                          return "UnsubscribeContext";
-  case NotifyContext:                               return "NotifyContext";
-  case UpdateContext:                               return "UpdateContext";
+  case RegisterContext:                             return "RegisterContextRequest";
+  case RegisterResponse:                            return "RegisterContextResponse";
+  case DiscoverContextAvailability:                 return "DiscoverContextAvailabilityRequest";
+  case SubscribeContextAvailability:                return "SubscribeContextAvailabilityRequest";
+  case UpdateContextAvailabilitySubscription:       return "UpdateContextAvailabilitySubscriptionRequest";
+  case UnsubscribeContextAvailability:              return "UnsubscribeContextAvailabilityRequest";
+  case NotifyContextAvailability:                   return "NotifyContextAvailabilityRequest";
+  case QueryContext:                                return "QueryContextRequest";
+  case SubscribeContext:                            return "SubscribeContextRequest";
+  case UpdateContextSubscription:                   return "UpdateContextSubscriptionRequest";
+  case UnsubscribeContext:                          return "UnsubscribeContextRequest";
+  case NotifyContext:                               return "NotifyContextRequest";
+  case UpdateContext:                               return "UpdateContextRequest";
 
   case ContextEntitiesByEntityId:                   return "ContextEntitiesByEntityId";
   case ContextEntityAttributes:                     return "ContextEntityAttributes";
@@ -73,7 +74,13 @@ const char* requestType(RequestType rt)
   case ExitRequest:                                 return "Exit";
   case LeakRequest:                                 return "Leak";
   case InvalidRequest:                              return "InvalidRequest";
-  case RegisterResponse:                            return "RegisterResponse";
+
+  case RtSubscribeContextAvailabilityResponse:           return "SubscribeContextAvailabilityResponse";
+  case RtUpdateContextAvailabilitySubscriptionResponse:  return "UpdateContextAvailabilitySubscriptionResponse";
+  case RtUnsubscribeContextAvailabilityResponse:         return "UnsubscribeContextAvailabilityResponse";
+  case RtUnsubscribeContextResponse:                     return "UnsubscribeContextResponse";
+  case RtSubscribeResponse:                              return "SubscribeResponse";
+  case RtSubscribeError:                                 return "SubscribeError";
   }
 
   return "";

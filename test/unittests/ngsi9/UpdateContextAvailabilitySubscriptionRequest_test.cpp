@@ -157,8 +157,8 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, response)
   std::string                                    check;
   std::string                                    expected1 = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n</updateContextAvailabilitySubscriptionResponse>\n";
   std::string                                    expected2 = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Reason</reasonPhrase>\n    <details>Detail</details>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
-  std::string                                    expected3 = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n  <duration>ddd</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>syntax error in duration string</reasonPhrase>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
-  std::string                                    expected4 = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n  <duration>ddd</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>predetected error</reasonPhrase>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
+  std::string                                    expected3 = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>syntax error in duration string</reasonPhrase>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
+  std::string                                    expected4 = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>predetected error</reasonPhrase>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
   
   EXPECT_EQ(ucas2.errorCode.code, SccBadRequest);
 

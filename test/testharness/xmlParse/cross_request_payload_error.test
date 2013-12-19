@@ -161,7 +161,7 @@ Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <updateContextAvailabilitySubscriptionResponse>
-  <subscriptionId>No Subscription ID</subscriptionId>
+  <subscriptionId>000000000000000000000000</subscriptionId>
   <errorCode>
     <code>400</code>
     <reasonPhrase>Invalid payload</reasonPhrase>
@@ -176,7 +176,7 @@ Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <unsubscribeContextAvailabilityResponse>
-  <subscriptionId>No Subscription ID</subscriptionId>
+  <subscriptionId>000000000000000000000000</subscriptionId>
   <statusCode>
     <code>400</code>
     <reasonPhrase>Invalid payload</reasonPhrase>
