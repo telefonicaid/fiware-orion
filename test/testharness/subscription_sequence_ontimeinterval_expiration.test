@@ -119,7 +119,7 @@ done
 EOF
 echo "1: ++++++++++++++++++++"
 
-# to avoid a race conditions in the order of notifications
+# to avoid a race condition in the order of notifications
 sleep 0.5s
 
 #Subscribe for 5 seconds

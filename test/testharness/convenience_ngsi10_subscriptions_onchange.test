@@ -185,7 +185,6 @@ EOF
 
 # Get notifications count
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
-echo $r
 
 echo "3: ++++++++++++++++++++"
 
@@ -217,7 +216,6 @@ EOF
 
 # Get notifications count
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
-echo $r
 
 echo "4: ++++++++++++++++++++"
 
@@ -232,7 +230,6 @@ EOF
 
 # Get notifications count
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
-echo $r
 
 echo "5: ++++++++++++++++++++"
 
@@ -267,7 +264,6 @@ EOF
 
 # Get notifications count
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
-echo $r
 
 echo "6: ++++++++++++++++++++"
 
@@ -324,7 +320,6 @@ EOF
 
 # Get notifications count
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
-echo $r
 
 echo "8: ++++++++++++++++++++"
 
