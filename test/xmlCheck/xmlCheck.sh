@@ -140,7 +140,7 @@ function harnessFiles()
 {
   harnessList=""
   TMP_DIR=$(mktemp -d /tmp/xmlCheck.XXXXX)
-  verboseMsg TMP_DIR: $TMP_DIR
+  vMsg TMP_DIR: $TMP_DIR
   for FILE in $(find $SRC_TOP/test/testharness -name *.test)
   do
     PREFIX=$(basename ${FILE%.*})
