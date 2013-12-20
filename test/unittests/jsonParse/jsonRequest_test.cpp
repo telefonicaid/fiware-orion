@@ -45,8 +45,7 @@ TEST(jsonRequest, jsonTreat)
    ci.outFormat = JSON;
 
    std::string  out;
-   std::string  expected1 = "\"orionError\" : {\n  \"code\" : \"400\",\n  \"reasonPhrase\" : \"no request treating object found\",\n  \"details\" : \"Sorry, no request treating object found for RequestType 'InvalidRequest'\"\n}\n";
-   std::string  expected2 = "\"orionError\" : {\n  \"code\" : \"400\",\n  \"reasonPhrase\" : \"Sorry, not implemented\"\n}\n";
+   std::string  expected1 = "{\n  \"orionError\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"no request treating object found\",\n    \"details\" : \"Sorry, no request treating object found for RequestType 'InvalidRequest'\"\n  }\n}\n";
 
    out  = jsonTreat("", &ci, &parseData, InvalidRequest, "no_payload", NULL);
    EXPECT_EQ(expected1, out);

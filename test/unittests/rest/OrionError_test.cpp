@@ -45,10 +45,10 @@ TEST(OrionError, all)
   std::string   expected2     = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad Request</reasonPhrase>\n  <details>no details</details>\n</orionError>\n";
   std::string   expected3     = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad Request 2</reasonPhrase>\n  <details>no details 2</details>\n</orionError>\n";
   std::string   expected4     = "<orionError>\n  <code>200</code>\n  <reasonPhrase>Good Request</reasonPhrase>\n</orionError>\n";
-  std::string   expected1json = "\"orionError\" : {\n  \"code\" : \"200\",\n  \"reasonPhrase\" : \"Good Request\",\n  \"details\" : \"no details 3\"\n}\n";
-  std::string   expected2json = "\"orionError\" : {\n  \"code\" : \"400\",\n  \"reasonPhrase\" : \"Bad Request\",\n  \"details\" : \"no details\"\n}\n";
-  std::string   expected3json = "\"orionError\" : {\n  \"code\" : \"400\",\n  \"reasonPhrase\" : \"Bad Request 2\",\n  \"details\" : \"no details 2\"\n}\n";
-  std::string   expected4json = "\"orionError\" : {\n  \"code\" : \"200\",\n  \"reasonPhrase\" : \"Good Request\"\n}\n";
+  std::string   expected1json = "{\n  \"orionError\" : {\n    \"code\" : \"200\",\n    \"reasonPhrase\" : \"Good Request\",\n    \"details\" : \"no details 3\"\n  }\n}\n";
+  std::string   expected2json = "{\n  \"orionError\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"Bad Request\",\n    \"details\" : \"no details\"\n  }\n}\n";
+  std::string   expected3json = "{\n  \"orionError\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"Bad Request 2\",\n    \"details\" : \"no details 2\"\n  }\n}\n";
+  std::string   expected4json = "{\n  \"orionError\" : {\n    \"code\" : \"200\",\n    \"reasonPhrase\" : \"Good Request\"\n  }\n}\n";
 
   EXPECT_EQ(SccNone, e0.code);
   EXPECT_EQ("",      e0.reasonPhrase);

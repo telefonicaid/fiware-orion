@@ -184,22 +184,28 @@ echo "13: ++++++++++++++++++++"
   }
 }
 10: ++++++++++++++++++++
-"orionError" : {
-  "code" : "400",
-  "reasonPhrase" : "bad ngsi9 request",
-  "details" : "ngsi9 service '/NGSI9/notSupportedRequest' not found"
+{
+  "orionError" : {
+    "code" : "400",
+    "reasonPhrase" : "bad ngsi9 request",
+    "details" : "ngsi9 service '/NGSI9/notSupportedRequest' not found"
+  }
 }
 11: ++++++++++++++++++++
-"orionError" : {
-  "code" : "400",
-  "reasonPhrase" : "bad ngsi10 request",
-  "details" : "ngsi10 service '/NGSI10/notSupportedRequest' not found"
+{
+  "orionError" : {
+    "code" : "400",
+    "reasonPhrase" : "bad ngsi10 request",
+    "details" : "ngsi10 service '/NGSI10/notSupportedRequest' not found"
+  }
 }
 12: ++++++++++++++++++++
-"orionError" : {
-  "code" : "400",
-  "reasonPhrase" : "bad request",
-  "details" : "service '/notSupportedRequest' not found"
+{
+  "orionError" : {
+    "code" : "400",
+    "reasonPhrase" : "bad request",
+    "details" : "service '/notSupportedRequest' not found"
+  }
 }
 13: ++++++++++++++++++++
 --TEARDOWN--
