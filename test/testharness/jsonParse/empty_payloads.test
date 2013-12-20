@@ -77,11 +77,11 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "registrationId" : "000000000000000000000000",
     "errorCode": {
         "code": "400", 
         "reasonPhrase": "Empty Context Registration List"
-    }
+    },
+    "registrationId" : "000000000000000000000000"
 }
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
