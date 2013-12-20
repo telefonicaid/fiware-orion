@@ -138,10 +138,8 @@ char            fwdHost[64];
 int             fwdPort;
 bool            ngsi9Only;
 bool            harakiri;
-// RBL
 char            localIpV6[64];
 
-// RBL
 #define  DUMMY_IP_V6       "DUMMY"
 
 
@@ -610,7 +608,6 @@ int main(int argC, char* argV[])
   else
     restInit(localIp, port, restServiceV);
 
-  //RBL
   if (strcmp(localIpV6, DUMMY_IP_V6) != 0)
   {
     LM_M(("IPv6 Listening on IP %s , port %d", localIpV6, port));
@@ -636,7 +633,6 @@ int main(int argC, char* argV[])
     LM_X(1, ("restStart: error %d", r));
   }
 
-  //RBL
   if (strcmp(localIpV6, DUMMY_IP_V6) != 0)
   {
     if ((r = restStart_v6()) != 0)

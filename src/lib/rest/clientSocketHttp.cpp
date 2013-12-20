@@ -42,16 +42,20 @@
 #include <string>
 #include <unistd.h>                             // close()
 
+#include "common/string.h"
+
 
 /* ****************************************************************************
 *
-* socketHttpConnect -
+* socketHttpConnectV4 -
 */
-int socketHttpConnect(std::string host, unsigned short port)
+int socketHttpConnectV4(std::string host, unsigned short port)
 {
   int                 fd;
   struct hostent*     hp;
   struct sockaddr_in  peer;
+
+  LM_VVV (("Connect to  IPv4: '%s'  port: '%d'", host.c_str(), port));
 
   if ((hp = gethostbyname(host.c_str())) == NULL)
      LM_RE(-1, ("gethostbyname('%s'): %s", host.c_str(), strerror(errno)));
@@ -74,6 +78,49 @@ int socketHttpConnect(std::string host, unsigned short port)
 
   return fd;
 }
+
+
+/* ****************************************************************************
+*
+* socketHttpConnectV6 -
+*/
+int socketHttpConnectV6 (std::string host, unsigned short port)
+{
+  int                 fd;
+  int status;
+  struct addrinfo hints;
+  struct addrinfo *peer;
+  char port_str[10];
+
+
+ LM_VVV (("Connect to  IPv6: '%s'  port: '%d'", host.c_str(), port));
+
+ memset(&hints, 0, sizeof(struct addrinfo));
+ hints.ai_family = AF_INET6; 
+ hints.ai_socktype = SOCK_STREAM;
+ hints.ai_protocol = 0;
+
+ snprintf (port_str, sizeof(port_str), "%d" , port);
+
+ if ((status = getaddrinfo(host.c_str(), port_str, &hints, &peer)) != 0) {
+     LM_RE(-1, ("getaddrinfo('%s'): %s", host.c_str(), strerror(errno)));
+}
+
+  if ((fd = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol)) == -1) {
+     LM_RE(-1, ("socket: %s", strerror(errno)));
+}
+
+  if (connect(fd, peer->ai_addr, peer->ai_addrlen) == -1)
+  {
+    freeaddrinfo(peer);
+    close(fd);
+    LM_E(("connect(%s, %d): %s", host.c_str(), port, strerror(errno)));
+    return -1;
+  }
+  freeaddrinfo(peer);
+  return fd;
+}
+
 
 /* ****************************************************************************
 *
@@ -139,7 +186,12 @@ std::string sendHttpSocket
 
   strncat(msg, "\n", sizeof(msg) - strlen(msg));
 
-  int fd = socketHttpConnect(ip, port); // Connecting to HTTP server
+  int fd;
+  if (isIPv6(ip))
+    fd = socketHttpConnectV6(ip, port); // Connecting to HTTP server wiht IPv6
+  else
+    fd = socketHttpConnectV4(ip, port); // Connecting to HTTP server wiht IPv4
+
   if (fd == -1)
     LM_RE("error", ("Unable to connect to HTTP server at %s:%d", ip.c_str(), port));
 
@@ -177,3 +229,5 @@ std::string sendHttpSocket
   close(fd);
   return result;
 }
+
+

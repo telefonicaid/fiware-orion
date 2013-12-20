@@ -28,9 +28,124 @@
 #include <vector>
 #include <stdio.h>
 
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "common/string.h"
 
 #define DEFAULT_HTTP_PORT 80
+
+/* ****************************************************************************
+*
+* checkGroupIPv6 -
+*/
+bool checkGroupIPv6(std::string in)
+{
+  // Can recieve for exemple:
+  // :, 2001:, db8:, 0DB8:
+
+  if (in.empty()) return false;
+
+  if (in == ":") return true;
+
+  if (in.length() > 5) return false;
+
+  bool resu;
+  for (uint i=0; i < in.length()-1 ; i++) 
+  {
+     if (((in[i] >= '0') && ( in[i] <= '9')) 
+          || ((in[i] >= 'a') && ( in[i] <= 'f'))
+          || ((in[i] >= 'A') && ( in[i] <= 'F')))
+     {
+       resu = true;
+     }
+     else 
+     {
+       resu = false;
+       break;
+     }
+  }
+  return resu;
+}
+
+
+/* ****************************************************************************
+*
+* isIPv6 -
+*/
+bool isIPv6(std::string in)
+{
+   // An IP v6 have between two and seven character ":"
+   //  ::
+   //  2001:0db8:85a3:08d3:1319:8a2e:0370:7334
+
+   size_t pos;
+   bool goodip = true;
+   std::string partip;
+   std::string resu;
+   std::string staux = in;
+   int cont = 0;
+
+   pos = staux.find(":");
+   while ((pos != std::string::npos) && (goodip))
+   {
+      cont ++;
+      partip = staux.substr(0, pos+1);
+      resu += partip;
+
+      goodip = checkGroupIPv6(partip);
+      partip = staux.substr(pos+1);
+      staux = partip;
+
+      pos = staux.find(":");
+   }
+
+   if ((goodip) && (cont > 1) && (cont < 8))
+   {
+      return true;
+   }
+   else
+   {
+      return false;
+   }
+
+}
+
+/* ****************************************************************************
+*
+* getIPv6Port -
+*/
+bool getIPv6Port(std::string in, std::string& outIp, std::string& outPort)
+{
+   size_t pos; 
+   std::string partip;
+   std::string resu;
+   std::string staux = in; 
+   
+   // Split IP and port
+   pos = staux.find(":");  
+   while (pos != std::string::npos)
+   {
+      partip = staux.substr(0, pos+1);
+      resu += partip;
+      partip = staux.substr(pos+1);
+      staux = partip;
+      pos = staux.find(":");
+   }
+
+
+   if (resu.empty())
+      return false;
+
+   outIp = resu.substr(0, resu.length() -1 );
+   outPort = staux;
+
+   if (isIPv6(resu))
+      return true;
+   else
+      return false;
+}
+
 
 /* ****************************************************************************
 *
@@ -130,6 +245,21 @@ bool parseUrl(std::string url, std::string& host, int& port, std::string& path)
     }
 
     /* Second: split third token for host and port */
+
+  std::string  auxIp;
+  std::string  auxPort;
+
+  // First we check if is IPv6
+  if (getIPv6Port(urlTokens[2], auxIp, auxPort))  
+  {
+    // IPv6
+    host = auxIp;
+    port = atoi(auxPort.c_str());
+    LM_VVV(("Parsed IPv6: '%s' and port: '%d'", host.c_str(), port));
+  }
+  else
+  {
+    // IPv4
     std::vector<std::string>  hostTokens;
     components = stringSplit(urlTokens[2], ':', hostTokens);
 
@@ -154,6 +284,7 @@ bool parseUrl(std::string url, std::string& host, int& port, std::string& path)
     else {
         port = DEFAULT_HTTP_PORT;
     }
+  }
 
     return true;
 

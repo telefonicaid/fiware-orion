@@ -65,6 +65,11 @@ TEST(commonString, parseUrl)
    std::string  url5 = "http://XXX:12:34";
    std::string  url6 = "http://XXX:1234/path";
    std::string  url7 = "http://XXX/path";
+   std::string  urlv61 = "http://20:12345:20:80";
+   std::string  urlv62 = "http://20:20:20:20:20:20:20:20:20:20";
+   std::string  urlv63 = "http://2001:DB8:2de::e13:80/path";
+   std::string  urlv64 = "http://:::80/path";
+
    std::string  host;
    int          port;
    std::string  path;
@@ -90,6 +95,23 @@ TEST(commonString, parseUrl)
    EXPECT_TRUE(r);
    EXPECT_STREQ("XXX", host.c_str());
    EXPECT_EQ(80, port); // DEFAULT_HTTP_PORT == 80
+   EXPECT_STREQ("/path", path.c_str());
+
+   r = parseUrl(urlv61, host, port, path);
+   EXPECT_FALSE(r);
+   r = parseUrl(urlv62, host, port, path);
+   EXPECT_FALSE(r);
+
+   r = parseUrl(urlv63, host, port, path);
+   EXPECT_TRUE(r);
+   EXPECT_STREQ("2001:DB8:2de::e13", host.c_str());
+   EXPECT_EQ(80, port); 
+   EXPECT_STREQ("/path", path.c_str());
+
+   r = parseUrl(urlv64, host, port, path);
+   EXPECT_TRUE(r);
+   EXPECT_STREQ("::", host.c_str());
+   EXPECT_EQ(80, port); 
    EXPECT_STREQ("/path", path.c_str());
 }
 

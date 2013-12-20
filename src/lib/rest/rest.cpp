@@ -38,7 +38,6 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 
-// RBL
 #include <netdb.h>
 
 
@@ -61,8 +60,7 @@ static char                      bindIp[15]    = "0.0.0.0";
 static RestService*              restServiceV  = NULL;
 static MHD_Daemon*               mhdDaemon     = NULL;
 static struct sockaddr_in        sad;
-// RBL
-static char                      bindIpV6[15]  = "::";
+static char                      bindIpV6[64]  = "::";
 static MHD_Daemon*               mhdDaemon_v6  = NULL;
 static struct sockaddr_in6       sad_v6;
 
@@ -453,7 +451,6 @@ void restInit(char* _bind, unsigned short _port, RestService* _restServiceV)
    savedResponse[0] = 0;
 }
 
-// RBL
 /* ****************************************************************************
 *
 * restInit_v6 -
@@ -509,7 +506,6 @@ int restStart(void)
 }
 
 
-// RBL
 /* ****************************************************************************
 *
 * restStart_v6 -

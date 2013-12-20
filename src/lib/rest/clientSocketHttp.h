@@ -33,12 +33,18 @@
 
 #define  TAM_BUF        8192
 
+/***************************************************************************
+*
+* socketHttpConnectV4 -
+*/
+extern int socketHttpConnectV4(std::string host, unsigned short port);
+
 
 /***************************************************************************
 *
-* socketHttpConnect - 
+* socketHttpConnectV6 -
 */
-extern int socketHttpConnect(std::string host, unsigned short port);
+extern int socketHttpConnectV6(std::string host, unsigned short port);
 
 
 
