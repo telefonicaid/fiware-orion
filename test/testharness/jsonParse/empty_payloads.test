@@ -204,36 +204,42 @@ Date: REGEX(.*)
 }
 10: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 146
+Content-Length: 160
 Content-Type: application/json
 Date: REGEX(.*)
 
-"orionError" : {
-  "code": "400",
-  "reasonPhrase": "bad ngsi9 request",
-  "details": "ngsi10 service '/NGSI9/notSupportedRequest' not found"
+{
+    "orionError": {
+        "code": "400",
+        "details": "ngsi9 service '/NGSI9/notSupportedRequest' not found",
+        "reasonPhrase": "bad ngsi9 request"
+    }
 }
 11: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 149
+Content-Length: 163
 Content-Type: application/json
 Date: REGEX(.*)
 
-"orionError" : {
-  "code": "400",
-  "reasonPhrase": "bad ngsi10 request",
-  "details": "ngsi10 service '/NGSI10/notSupportedRequest' not found"
+{
+    "orionError": {
+        "code": "400",
+        "details": "ngsi10 service '/NGSI10/notSupportedRequest' not found",
+        "reasonPhrase": "bad ngsi10 request"
+    }
 }
 12: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 128
+Content-Length: 142
 Content-Type: application/json
 Date: REGEX(.*)
 
-"orionError" : {
-  "code": "400",
-  "reasonPhrase": "bad request",
-  "details": "service '/notSupportedRequest' not found"
+{
+    "orionError": {
+        "code": "400",
+        "details": "service '/notSupportedRequest' not found",
+        "reasonPhrase": "bad request"
+    }
 }
 13: ++++++++++++++++++++
 --TEARDOWN--
