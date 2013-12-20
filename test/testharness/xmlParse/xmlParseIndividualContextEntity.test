@@ -23,53 +23,22 @@
 --NAME--
 broker version via REST
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source ../harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
-if [ "$VALGRIND" == "" ]; then
-  $CB_START_CMD
-  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-  sleep 1
-else
-  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
-  # Waiting for valgrind to start (sleep 10)
-  sleep 10s
-fi
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
+dbInit CB
+brokerStart CB
 
 --SHELL--
+source ../harnessFunctions.sh
+
 # 1. GET that fails
 echo "1: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format -)
+curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID"
 
 # 2. POST that fails
 echo "2: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/ENTITY_ID"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
@@ -79,13 +48,13 @@ echo "2: +++++++++++++++++++++++++++++"
       <contextValue>p23</contextValue>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+curlXml ${url} "${payload}"
 
 # 3. PUT that fails
 echo "3: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X PUT -d @- | xmllint --format -) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/ENTITY_ID"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
@@ -95,17 +64,17 @@ echo "3: +++++++++++++++++++++++++++++"
       <contextValue>10</contextValue>
     </contextAttribute>
   </contextAttributeList>
-</updateContextElementRequest>
-EOF
+</updateContextElementRequest>'
+curlXml ${url} "${payload}" "-X PUT"
 
 # 4. DELETE that fails
 echo "4: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X DELETE | xmllint --format -)
+curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
 
 # 5. Register an entity
 echo "5: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI9/registerContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -125,17 +94,17 @@ echo "5: +++++++++++++++++++++++++++++"
       </contextRegistration>
     </contextRegistrationList>
     <duration>PT1H</duration>
-  </registerContextRequest>
-EOF
+  </registerContextRequest>'
+curlXml ${url} "${payload}"
 
 # 6. GET that is OK
 echo "6: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format -)
+curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID"
 
 # 7. POST that is OK
 echo "7: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/ENTITY_ID"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
@@ -145,13 +114,13 @@ echo "7: +++++++++++++++++++++++++++++"
       <contextValue>p23</contextValue>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+curlXml ${url} "${payload}"
 
 # 8. PUT that is OK
 echo "8: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X PUT -d @- | xmllint --format -) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/ENTITY_ID"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
@@ -161,15 +130,20 @@ echo "8: +++++++++++++++++++++++++++++"
       <contextValue>10</contextValue>
     </contextAttribute>
   </contextAttributeList>
-</updateContextElementRequest>
-EOF
+</updateContextElementRequest>'
+curlXml ${url} "${payload}" "-X PUT"
 
 # 9. DELETE that is OK
 echo "9: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/ENTITY_ID -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X DELETE | xmllint --format -)
+curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
 
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 307
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
@@ -184,6 +158,11 @@ echo "9: +++++++++++++++++++++++++++++"
   </statusCode>
 </contextElementResponse>
 2: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 494
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -203,6 +182,11 @@ echo "9: +++++++++++++++++++++++++++++"
   </contextResponseList>
 </appendContextElementResponse>
 3: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 273
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextElementResponse>
   <errorCode>
@@ -212,18 +196,33 @@ echo "9: +++++++++++++++++++++++++++++"
   </errorCode>
 </updateContextElementResponse>
 4: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <statusCode>
   <code>200</code>
   <reasonPhrase>OK</reasonPhrase>
 </statusCode>
 5: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 6: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 464
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
@@ -244,6 +243,11 @@ echo "9: +++++++++++++++++++++++++++++"
   </statusCode>
 </contextElementResponse>
 7: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 494
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -263,6 +267,11 @@ echo "9: +++++++++++++++++++++++++++++"
   </contextResponseList>
 </appendContextElementResponse>
 8: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 273
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextElementResponse>
   <errorCode>
@@ -272,17 +281,17 @@ echo "9: +++++++++++++++++++++++++++++"
   </errorCode>
 </updateContextElementResponse>
 9: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <statusCode>
   <code>200</code>
   <reasonPhrase>OK</reasonPhrase>
 </statusCode>
 --TEARDOWN--
-if [ "$VALGRIND" == "" ]; then
-  kill $(cat ${BROKER_PID_FILE})
-  rm /tmp/orion_${BROKER_PORT}.pid
-else
-  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
-  # Waiting for valgrind to terminate (sleep 10)
-  sleep 10
-fi
+source ../harnessFunctions.sh
+brokerStop CB
+

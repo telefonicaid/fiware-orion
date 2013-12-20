@@ -23,117 +23,92 @@
 --NAME--
 XML Parse Post NotifyContext
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source ../harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
-if [ "$VALGRIND" == "" ]; then
-  $CB_START_CMD
-  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-  sleep 1
-else
-  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
-  # Waiting for valgrind to start (sleep 10)
-  sleep 10s
-fi
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
+dbInit CB
+brokerStart CB
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI10/notifyContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+source ../harnessFunctions.sh
+
+url="/NGSI10/notifyContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <notifyContextRequest>
-	<subscriptionId>012345678901234567890123</subscriptionId>
-	<originator>http://localhost/test</originator>
-	<contextResponseList>
-		<contextElementResponse>
-			<contextElement>
-				<entityId type="Room" isPattern="false">
-					<id>ConferenceRoom</id>					
-				</entityId>
-				<attributeDomainName></attributeDomainName>
-				<contextAttributeList>
-					<contextAttribute>
-						<name>temperature</name>
-						<type>Room</type>
-						<contextValue>10</contextValue>
-						<metadata>
-							<contextMetadata>
-								<name>ID</name>
-								<type>string</type>
-								<value>1110</value>
-							</contextMetadata>
-							<contextMetadata>
-								<name></name>
-								<type></type>
-								<value></value>
-							</contextMetadata>
-						</metadata>
-					</contextAttribute>
-					<contextAttribute>
-						<name>temperature</name>
-						<type>Room</type>
-						<contextValue>10</contextValue>
-						<metadata>
-							<contextMetadata>
-								<name>ID</name>
-								<type>string</type>
-								<value>1110</value>
-							</contextMetadata>
-							<contextMetadata>
-								<name></name>
-								<type></type>
-								<value></value>
-							</contextMetadata>
-						</metadata>
-					</contextAttribute>
-				</contextAttributeList>
-				<domainMetadata>
-					<contextMetadata>
-						<name></name>
-						<type></type>
-						<value></value>
-					</contextMetadata>
-					<contextMetadata>
-						<name></name>
-						<type></type>
-						<value></value>
-					</contextMetadata>
-				</domainMetadata>
-			</contextElement>
-			<statusCode>
-				<code>200</code>
-				<reasonPhrase>Ok</reasonPhrase>
-				<details>a</details>
-			</statusCode>
-		</contextElementResponse>
-	</contextResponseList>
-</notifyContextRequest>
-EOF
+  <subscriptionId>012345678901234567890123</subscriptionId>
+  <originator>http://localhost/test</originator>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>         
+        </entityId>
+        <attributeDomainName></attributeDomainName>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>Room</type>
+            <contextValue>10</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>ID</name>
+                <type>string</type>
+                <value>1110</value>
+              </contextMetadata>
+              <contextMetadata>
+                <name></name>
+                <type></type>
+                <value></value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>Room</type>
+            <contextValue>10</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>ID</name>
+                <type>string</type>
+                <value>1110</value>
+              </contextMetadata>
+              <contextMetadata>
+                <name></name>
+                <type></type>
+                <value></value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+        <domainMetadata>
+          <contextMetadata>
+            <name></name>
+            <type></type>
+            <value></value>
+          </contextMetadata>
+          <contextMetadata>
+            <name></name>
+            <type></type>
+            <value></value>
+          </contextMetadata>
+        </domainMetadata>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>Ok</reasonPhrase>
+        <details>a</details>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</notifyContextRequest>'
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+
 echo "++++++++++++++++++++"
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <notifyContextResponse>
   <responseCode>
@@ -143,11 +118,5 @@ echo "++++++++++++++++++++"
 </notifyContextResponse>
 ++++++++++++++++++++
 --TEARDOWN--
-if [ "$VALGRIND" == "" ]; then
-  kill $(cat ${BROKER_PID_FILE})
-  rm /tmp/orion_${BROKER_PORT}.pid
-else
-  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
-  # Waiting for valgrind to terminate (sleep 10)
-  sleep 10
-fi
+source ../harnessFunctions.sh
+brokerStop CB

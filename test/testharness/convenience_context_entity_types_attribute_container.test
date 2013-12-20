@@ -64,9 +64,11 @@ fi
 --SHELL--
 
 echo "0: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room/attributes -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
+response=$(curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room/attributes -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml')
+cat headers.out
+echo $response | xmllint --format -
 echo "1: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X POST -d @- | xmllint --format - ) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X POST -d @-) << EOF
 <?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -92,10 +94,14 @@ echo "1: ++++++++++++++++++++"
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 
 echo "2: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room/attributes -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
+response=$(curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room/attributes -s -S --dump-header headers.out --header 'Content-Type: application/xml' --header 'Accept: application/xml')
+cat headers.out
+echo $response | xmllint --format -
 echo "3: ++++++++++++++++++++"
 
 # DELETE is not allowed
@@ -104,6 +110,11 @@ echo 4: ++++++++++++++++++++
 killall contextBroker
 --REGEXPECT--
 0: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 199
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <errorCode>
@@ -112,12 +123,22 @@ killall contextBroker
   </errorCode>
 </discoverContextAvailabilityResponse>
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 902
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>

@@ -23,48 +23,18 @@
 --NAME--
 XML throttling
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source ../harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
-if [ "$VALGRIND" == "" ]; then
-  $CB_START_CMD
-  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-  sleep 1
-else
-  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
-  # Waiting for valgrind to start (sleep 10)
-  sleep 10s
-fi
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
+dbInit CB
+brokerStart CB
 
 --SHELL--
+source ../harnessFunctions.sh
+
 echo "1: +++++++++++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/ngsi10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
+
+url="/ngsi10/subscribeContext"
+payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">
@@ -73,14 +43,14 @@ echo "1: +++++++++++++++++++++++++++++"
   </entityIdList>
   <reference>http://localhost:${LISTENER_PORT}/notify</reference>
   <throttling>PT5H</throttling>
-</subscribeContextRequest>
-EOF
+</subscribeContextRequest>'
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "2: +++++++++++++++++++++++++++++"
 
 # Bad throttling syntax
 #INVALID_XML
-(curl localhost:${BROKER_PORT}/ngsi10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
+url="/ngsi10/subscribeContext"
+payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">
@@ -89,12 +59,16 @@ echo "2: +++++++++++++++++++++++++++++"
   </entityIdList>
   <reference>http://localhost:${LISTENER_PORT}/notify</reference>
   <throttling>PT5R</throttling>
-</subscribeContextRequest>
-EOF
-
+</subscribeContextRequest>'
+curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "3: +++++++++++++++++++++++++++++"
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 227
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
@@ -104,6 +78,11 @@ echo "3: +++++++++++++++++++++++++++++"
   </subscribeResponse>
 </subscribeContextResponse>
 2: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 260
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeError>
@@ -116,11 +95,5 @@ echo "3: +++++++++++++++++++++++++++++"
 </subscribeContextResponse>
 3: +++++++++++++++++++++++++++++
 --TEARDOWN--
-if [ "$VALGRIND" == "" ]; then
-  kill $(cat ${BROKER_PID_FILE})
-  rm /tmp/orion_${BROKER_PORT}.pid
-else
-  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
-  # Waiting for valgrind to terminate (sleep 10)
-  sleep 10
-fi
+source ../harnessFunctions.sh
+brokerStop CB

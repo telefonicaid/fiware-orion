@@ -22,10 +22,12 @@
 #
 # harnessInit - 
 #
-if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
-then  
-  source ../../scripts/testEnv.sh
-fi
+
+# FIXME P1 - This doesn't work if the test is in a subdirectory such as xmlParse
+# if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
+# then
+#   source ../../scripts/testEnv.sh
+# fi
 
 
 
@@ -259,6 +261,160 @@ function accumulatorStart()
   done
 }
 
+
+
+# ------------------------------------------------------------------------------
+#
+# printXmlWithHeaders - 
+#
+function printXmlWithHeaders()
+{
+  text=$1
+  cat headers.out
+  echo "${text}" | xmllint --format -
+  rm headers.out
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# printJsonWithHeaders - 
+#
+function printJsonWithHeaders()
+{
+  text=$1
+  cat headers.out
+  echo "${text}" | python -mjson.tool
+  rm headers.out
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# curlIt - 
+#
+# URL: You also have to specify host, port
+# 
+function curlIt()
+{
+  encoding=$1
+  url=$2
+  payload=$3
+  contenttype=$4
+  accept=$5
+  extraoptions=$6
+  
+  params="-s -S --dump-header headers.out --header \"Expect:\""
+  
+  response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" --header "Expect:" ${extraoptions} -d @- ))
+  
+  if [ "$encoding" == "XML" ]
+  then
+    printXmlWithHeaders "${response}"
+  elif [ "$encoding" == "JSON" ]
+  then
+    printJsonWithHeaders "${response}"
+  fi
+    
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# curlXml - 
+#
+# Helper function.
+#
+function curlXml()
+{
+  url=$1
+  payload=$2
+  extraoptions=$3
+  
+  curlIt "XML" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/xml" "Accept: application/xml" "${extraoptions}"
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# curlJson - 
+#
+# Helper function.
+#
+function curlJson()
+{
+  url=$1
+  payload=$2
+  extraoptions=$3
+  
+  curlIt "JSON" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/json" "Accept: application/json" $extraoptions
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# curlNoPayload - 
+#
+function curlNoPayload()
+{
+  encoding=$1
+  url=$2
+  extraoptions=$3
+  contenttype=$4
+  accept=$5
+   
+  params="-s -S --dump-header headers.out "
+  
+  response=$(curl localhost:${BROKER_PORT}${url} ${params} ${extraoptions} --header "${contenttype}" --header "${accept}")
+    
+  if [ "$encoding" == "XML" ]
+  then
+    printXmlWithHeaders "${response}"
+  elif [ "$encoding" == "JSON" ]
+  then
+    printJsonWithHeaders "${response}"
+  fi
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# curlXmlNoPayload - 
+#
+# Helper function.
+#
+function curlXmlNoPayload()
+{
+  url=$1
+  extraoptions=$2
+  
+  curlNoPayload "XML" $url "${extraoptions}" "Content-Type: application/xml" "Accept: application/xml"
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# curlJsonNoPayload - 
+#
+# Helper function.
+#
+function curlJsonNoPayload()
+{
+  url=$1
+  extraoptions=$2
+  
+  curlNoPayload "JSON" $url $extraoptions "Content-Type: application/json" "Accept: application/json"
+}
+
+
+
 # ------------------------------------------------------------------------------
 #
 # mongoCmd - 
@@ -275,3 +431,4 @@ function mongoCmd()
   cmd=$2
   echo $cmd | mongo $db | tail -n 2 | head -n 1
 }
+

@@ -23,113 +23,81 @@
 --NAME--
 JSON Parse Post NotifyContextAvailability
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source ../harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
-if [ "$VALGRIND" == "" ]; then
-  $CB_START_CMD
-  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-  sleep 1
-else
-  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
-  # Waiting for valgrind to start (sleep 10)
-  sleep 10s
-fi
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
+dbInit CB
+brokerStart CB
 
 --SHELL--
+source ../harnessFunctions.sh
 echo "1: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI9/notifyContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
-{
-	"subscriptionId": "012345678901234567890123",
-	"contextRegistrationResponses": [
-		{
-			"contextRegistration" : {
-				"entities": [
-					{
-						"type": "Room",
-						"isPattern": "false",
-						"id": "ConferenceRoom"
-					},
-					{
-						"type": "Room",
-						"isPattern": "false",
-						"id": "OfficeRoom"
-					}
-				],
-				"attributes": [
-					{
-						"name": "temperature",
-						"type": "degree",
-						"isDomain": "false",
-						"metadatas": [
-							{
-								"name": "ID",
-								"type": "string",
-								"value": "1110"
-							}
-						]
-					}
-				],
-				"metadatas": [
-					{
-						"name": "ID",
-						"type": "string",
-						"value": "2212"
-					}
-				],
-				"providingApplication": "http://192.168.100.1:70/application"
-			}
-		}
-	],
+url="/NGSI9/notifyContextAvailability"
+payload='{
+  "subscriptionId": "012345678901234567890123",
+  "contextRegistrationResponses": [
+    {
+      "contextRegistration" : {
+        "entities": [
+          {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "ConferenceRoom"
+          },
+          {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "OfficeRoom"
+          }
+        ],
+        "attributes": [
+          {
+            "name": "temperature",
+            "type": "degree",
+            "isDomain": "false",
+            "metadatas": [
+              {
+                "name": "ID",
+                "type": "string",
+                "value": "1110"
+              }
+            ]
+          }
+        ],
+        "metadatas": [
+          {
+            "name": "ID",
+            "type": "string",
+            "value": "2212"
+          }
+        ],
+        "providingApplication": "http://192.168.100.1:70/application"
+      }
+    }
+  ],
 
   "errorCode" : {
     "code" : "200",
     "reasonPhrase" : "OK",
     "details"      : "no details"
   }
-}
-EOF
+}'
+curlJson ${url} "${payload}"
+
 echo "2: ***********************************"
 --REGEXPECT--
 1: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
-  statusCode : {
-    "code": "200",
-    "reasonPhrase": "Ok"
-  }
+    "responseCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
 }
 2: ***********************************
 --TEARDOWN--
-if [ "$VALGRIND" == "" ]; then
-  kill $(cat ${BROKER_PID_FILE})
-  rm /tmp/orion_${BROKER_PORT}.pid
-else
-  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
-  # Waiting for valgrind to terminate (sleep 10)
-  sleep 10
-fi
+source ../harnessFunctions.sh
+brokerStop CB
