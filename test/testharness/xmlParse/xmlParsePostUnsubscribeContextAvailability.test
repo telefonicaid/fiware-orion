@@ -32,10 +32,10 @@ brokerStart CB
 source ../harnessFunctions.sh
 
 url="/NGSI9/unsubscribeContextAvailability"
-payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextAvailabilityRequest>
   <subscriptionId>012345678901234567890123</subscriptionId>
-</unsubscribeContextAvailabilityRequest>"
+</unsubscribeContextAvailabilityRequest>'
 curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "2: ***********************************"

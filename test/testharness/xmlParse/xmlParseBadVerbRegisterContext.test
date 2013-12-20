@@ -32,15 +32,15 @@ brokerStart CB
 source ../harnessFunctions.sh
 
 url="/ngsi10/subscribeContext"
-payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+payload='<?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
         <entityIdList>
-          <entityId type=\"Room\" isPattern=\"false\">
+          <entityId type="Room" isPattern="false">
             <id>ConferenceRoom</id>
           </entityId>
-          <entityId type=\"Room\" isPattern=\"false\">
+          <entityId type="Room" isPattern="false">
             <id>OfficeRoom</id>
           </entityId>
         </entityIdList>
@@ -80,13 +80,11 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>"
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml" "-X BAD_VERB"
+  </registerContextRequest>'
+curlXml ${url} "${payload}" "-X BAD_VERB"
 
 echo "++++++++++++++++++++"
 --REGEXPECT--
-HTTP/1.1 100 Continue
-
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
 Allow: POST

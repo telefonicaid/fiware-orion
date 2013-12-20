@@ -32,17 +32,17 @@ brokerStart CB
 source ../harnessFunctions.sh
 echo "1: +++++++++++++++++++++++++++++"
 url="/ngsi10/subscribeContext"
-payload="{
-  \"entities\" : [
+payload='{
+  "entities" : [
     {
-      \"type\" : \"Room\",
-      \"isPattern\" : \"false\",
-      \"id\" : \"OfficeRoom\"
+      "type" : "Room",
+      "isPattern" : "false",
+      "id" : "OfficeRoom"
     }
   ],
-  \"reference\" : \"http://localhost:${LISTENER_PORT}/notify\",
-  \"throttling\" : \"PT5H\"
-}"
+  "reference" : "http://localhost:${LISTENER_PORT}/notify",
+  "throttling" : "PT5H"
+}'
 curlJson ${url} "${payload}"
 
 echo "2: +++++++++++++++++++++++++++++"

@@ -32,15 +32,15 @@ brokerStart CB
 source harnessFunctions.sh
 
 url="/NGSI9/registerContext"
-payload="<?xml version=\"1.0\"?>
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
         <entityIdList>
-          <entityId type=\"Room\" isPattern=\"false\">
+          <entityId type="Room" isPattern="false">
             <id>ConferenceRoom</id>
           </entityId>
-          <entityId type=\"Room\" isPattern=\"false\">
+          <entityId type="Room" isPattern="false">
             <id>OfficeRoom</id>
           </entityId>
         </entityIdList>
@@ -55,21 +55,21 @@ payload="<?xml version=\"1.0\"?>
       </contextRegistration>
     </contextRegistrationList>
     <registrationId></registrationId>
-  </registerContextRequest>"
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+  </registerContextRequest>'
+curlXml${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 REG_ID=$(echo "$response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
 echo "++++++++++++++++++++"
 
 url="/NGSI9/discoverContextAvailability"
-payload="<?xml version=\"1.0\"?>
+payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
-      <entityId type=\"Room\" isPattern=\"false\">
+      <entityId type="Room" isPattern="false">
         <id>ConferenceRoom</id>
       </entityId>
-      <entityId type=\"Room\" isPattern=\"false\">
+      <entityId type="Room" isPattern="false">
         <id>OfficeRoom</id>
       </entityId>
     </entityIdList>
@@ -77,8 +77,8 @@ payload="<?xml version=\"1.0\"?>
       <attribute>temperature</attribute>
       <attribute>pressure</attribute>
     </attributeList>
-  </discoverContextAvailabilityRequest>"
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+  </discoverContextAvailabilityRequest>'
+curlXml${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 --REGEXPECT--
 HTTP/1.1 200 OK

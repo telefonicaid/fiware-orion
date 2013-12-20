@@ -34,7 +34,7 @@ source ../harnessFunctions.sh
 echo "1: ++++++++++++++++++++"
 # Make a registration using conv op /NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01
 url="/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01"
-payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
     <contextMetadata>
@@ -50,28 +50,28 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
   </metadata>
   <duration>PT1H</duration>
   <providingApplication>http://kz.tid.es/abc</providingApplication>
-</registerProviderRequest>"
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+</registerProviderRequest>'
+curlXml ${url} "${payload}"
 
 REG_ID=$(echo "$response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
 # Make a discovery to see that the registration went OK
 echo "2: ++++++++++++++++++++"
 url="/NGSI9/discoverContextAvailability"
-payload="<?xml version=\"1.0\"?>
+payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
-      <entityId type=\"\" isPattern=\"true\">
+      <entityId type="" isPattern="true">
         <id>ENTITY_ID</id>
       </entityId>
     </entityIdList>
-  </discoverContextAvailabilityRequest>"
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+  </discoverContextAvailabilityRequest>'
+curlXml ${url} "${payload}"
 
 # Modify the first registration
 echo "3: ++++++++++++++++++++"
 url="/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01"
-payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
     <contextMetadata>
@@ -87,23 +87,23 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
   </metadata>
   <duration>PT2H</duration>
   <providingApplication>http://kz.tid.es/abc2</providingApplication>
-  <registrationId>$REG_ID</registrationId>
-</registerProviderRequest>"
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+  <registrationId>'$REG_ID'</registrationId>
+</registerProviderRequest>'
+curlXml ${url} "${payload}"
 
 echo "4: ++++++++++++++++++++"
 
 # Now discover that very registration again to see the change
 url="/NGSI9/discoverContextAvailability"
-payload="<?xml version=\"1.0\"?>
+payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
-      <entityId type=\"\" isPattern=\"true\">
+      <entityId type="" isPattern="true">
         <id>ENTITY_ID</id>
       </entityId>
     </entityIdList>
-  </discoverContextAvailabilityRequest>"
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+  </discoverContextAvailabilityRequest>'
+curlXml ${url} "${payload}"
 
 echo "5: ++++++++++++++++++++"
 
@@ -123,7 +123,7 @@ curlXmlNoPayload "/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01" "-X 
 echo "8: ++++++++++++++++++++"
 
 url="/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01"
-payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
     <contextMetadata>
@@ -139,8 +139,8 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
   </metadata>
   <duration>PT2H</duration>
   <providingApplication>http://kz.tid.es/abc2</providingApplication>
-</registerProviderRequest>"
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml" "-X PUT"
+</registerProviderRequest>'
+curlXml ${url} "${payload}" "-X PUT"
 
 echo "9: ++++++++++++++++++++"
 

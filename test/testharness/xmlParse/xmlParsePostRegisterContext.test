@@ -32,15 +32,15 @@ brokerStart CB
 source ../harnessFunctions.sh
 
 url="/NGSI9/registerContext"
-payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+payload='<?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
         <entityIdList>
-          <entityId type=\"Room\" isPattern=\"false\">
+          <entityId type="Room" isPattern="false">
             <id>ConferenceRoom</id>
           </entityId>
-          <entityId type=\"Room\" isPattern=\"false\">
+          <entityId type="Room" isPattern="false">
             <id>OfficeRoom</id>
           </entityId>
         </entityIdList>
@@ -80,7 +80,7 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>"
+  </registerContextRequest>'
 curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "++++++++++++++++++++"

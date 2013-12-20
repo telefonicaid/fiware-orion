@@ -32,22 +32,22 @@ brokerStart CB
 source ../harnessFunctions.sh
 
 url="/NGSI10/unsubscribeContext"
-payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextRequest>
   <subscriptionId>012345678901234567890123</subscriptionId>
-</unsubscribeContextRequest>"
+</unsubscribeContextRequest>'
 curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "2: ***********************************"
 
 url="/NGSI10/subscribeContext"
-payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
   <entityIdList>
-  <entityId type=\"Room\" isPattern=\"false\">
+  <entityId type="Room" isPattern="false">
     <id>ConferenceRoom</id>   
   </entityId>
-  <entityId type=\"Room\" isPattern=\"false\">
+  <entityId type="Room" isPattern="false">
     <id>OfficeRoom</id>   
   </entityId>
   </entityIdList>
@@ -80,14 +80,14 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
   </notifyCondition>
   </notifyConditions>
   <throttling>P5Y</throttling>
-</subscribeContextRequest>"
+</subscribeContextRequest>'
 curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 subscriptionId=$(echo "$response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
 echo "3: ***********************************"
 url="/NGSI10/unsubscribeContext"
-payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextRequest>
   <subscriptionId>$subscriptionId</subscriptionId>
 </unsubscribeContextRequest>"

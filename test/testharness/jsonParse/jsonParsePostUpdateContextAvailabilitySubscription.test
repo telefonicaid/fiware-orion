@@ -32,121 +32,121 @@ brokerStart CB
 source ../harnessFunctions.sh
 echo "1: ***********************************"
 url="/NGSI9/updateContextAvailabilitySubscription"
-payload="{
-  \"entities\": [
+payload='{
+  "entities": [
     {
-      \"type\": \"Room\",
-      \"isPattern\": \"false\",
-      \"id\": \"ConferenceRoom\"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
     },
     {
-      \"type\": \"Room\",
-      \"isPattern\": \"false\",
-      \"id\": \"OfficeRoom\"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
     }
   ],
-  \"attributes\": [
-    \"temperature\",
-    \"occupancy\",
-    \"lightstatus\"
+  "attributes": [
+    "temperature",
+    "occupancy",
+    "lightstatus"
   ],
-  \"duration\": \"PT1M\",
-  \"restriction\": {
-    \"attributeExpression\" : \"AE\",
-    \"scopes\": [
+  "duration": "PT1M",
+  "restriction": {
+    "attributeExpression" : "AE",
+    "scopes": [
       {
-        \"type\" : \"st1\",
-        \"value\" : \"1\"
+        "type" : "st1",
+        "value" : "1"
       },
       {
-        \"type\" : \"st2\",
-        \"value\" : \"2\"
+        "type" : "st2",
+        "value" : "2"
       }
     ]
   },
-  \"subscriptionId\" : \"012345678901234567890123\"
-}"
+  "subscriptionId" : "012345678901234567890123"
+}'
 curlJson ${url} "${payload}"
 
 echo "2: ***********************************"
 
 url="/NGSI9/subscribeContextAvailability"
-payload="{
-  \"entities\": [
+payload='{
+  "entities": [
     {
-      \"type\": \"Room\",
-      \"isPattern\": \"false\",
-      \"id\": \"ConferenceRoom\"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
     },
     {
-      \"type\": \"Room\",
-      \"isPattern\": \"false\",
-      \"id\": \"OfficeRoom\"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
     }
   ],
-  \"attributes\": [
-    \"temperature\",
-    \"occupancy\",
-    \"lightstatus\"
+  "attributes": [
+    "temperature",
+    "occupancy",
+    "lightstatus"
   ],
-  \"reference\": \"http://10.1.1.1:80/test/interfaceNotification\",
-  \"duration\": \"PT1M\",
-  \"subscriptionId\": \"12458896\",
-  \"restriction\" : {
-    \"attributeExpression\" : \"ATTR_EXPR\",
-    \"scopes\" : [
+  "reference": "http://10.1.1.1:80/test/interfaceNotification",
+  "duration": "PT1M",
+  "subscriptionId": "12458896",
+  "restriction" : {
+    "attributeExpression" : "ATTR_EXPR",
+    "scopes" : [
       {
-        \"value\" : \"sv1\",
-        \"type\"  : \"st1\"
+        "value" : "sv1",
+        "type"  : "st1"
       },
       {
-        \"value\" : \"sv2\",
-        \"type\"  : \"st2\"
+        "value" : "sv2",
+        "type"  : "st2"
       }
     ]
   }
-}"
+}'
 curlJson ${url} "${payload}"
 
-SUB_ID=$(echo "$response" | grep subscriptionId | awk -F\" '{ print $4}')
+SUB_ID=$(echo "$response" | grep subscriptionId | awk -F" '{ print $4}')
 
 echo "3: ***********************************"
 
 url="/NGSI9/updateContextAvailabilitySubscription"
-payload="{
-  \"entities\": [
+payload='{
+  "entities": [
     {
-      \"type\": \"Room\",
-      \"isPattern\": \"false\",
-      \"id\": \"ConferenceRoom\"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
     },
     {
-      \"type\": \"Room\",
-      \"isPattern\": \"false\",
-      \"id\": \"OfficeRoom\"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
     }
   ],
-  \"attributes\": [
-    \"temperature\",
-    \"occupancy\",
-    \"lightstatus\"
+  "attributes": [
+    "temperature",
+    "occupancy",
+    "lightstatus"
   ],
-  \"duration\": \"PT1S\",
-  \"restriction\": {
-    \"attributeExpression\" : \"AE\",
-    \"scopes\": [
+  "duration": "PT1S",
+  "restriction": {
+    "attributeExpression" : "AE",
+    "scopes": [
       {
-        \"type\" : \"st1\",
-        \"value\" : \"1\"
+        "type" : "st1",
+        "value" : "1"
       },
       {
-        \"type\" : \"st2\",
-        \"value\" : \"2\"
+        "type" : "st2",
+        "value" : "2"
       }
     ]
   },
-  \"subscriptionId\" : \"${SUB_ID}\"
-}"
+  "subscriptionId" : "${SUB_ID}"
+}'
 curlJson ${url} "${payload}"
 
 echo "4: ***********************************"

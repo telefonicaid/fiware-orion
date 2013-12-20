@@ -36,15 +36,15 @@ curlXmlNoPayload "/NGSI9/contextEntityTypes/Room"
 
 echo "1: ++++++++++++++++++++"
 url="/NGSI9/registerContext"
-payload="<?xml version=\"1.0\"?>
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
         <entityIdList>
-          <entityId type=\"Room\" isPattern=\"false\">
+          <entityId type="Room" isPattern="false">
             <id>ConferenceRoom</id>
           </entityId>
-          <entityId type=\"Room\" isPattern=\"false\">
+          <entityId type="Room" isPattern="false">
             <id>OfficeRoom</id>
           </entityId>
         </entityIdList>
@@ -60,8 +60,8 @@ payload="<?xml version=\"1.0\"?>
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>"
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+  </registerContextRequest>'
+curlXml${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "2: ++++++++++++++++++++"
 curlXmlNoPayload "/NGSI9/contextEntityTypes/Room"

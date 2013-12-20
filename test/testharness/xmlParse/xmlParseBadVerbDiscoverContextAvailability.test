@@ -32,15 +32,15 @@ brokerStart CB
 source ../harnessFunctions.sh
 echo "+++++ Registration +++++"
 url="/NGSI9/registerContext"
-payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+payload='<?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
         <entityIdList>
-          <entityId type=\"Room\" isPattern=\"false\">
+          <entityId type="Room" isPattern="false">
             <id>ConferenceRoom2</id>
           </entityId>
-          <entityId type=\"Room\" isPattern=\"false\">
+          <entityId type="Room" isPattern="false">
             <id>OfficeRoom2</id>
           </entityId>
         </entityIdList>
@@ -80,20 +80,20 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>"
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+  </registerContextRequest>'
+curlXml ${url} "${payload}"
 
 echo "+++++ Registration Done +++++"
 
 echo "+++++ Discovery +++++"
 url="/NGSI9/discoverContextAvailability"
-payload="<?xml version=\"1.0\"?>
+payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
-      <entityId type=\"Room\" isPattern=\"false\">
+      <entityId type="Room" isPattern="false">
         <id>ConferenceRoom2</id>
       </entityId>
-      <entityId type=\"Room\" isPattern=\"false\">
+      <entityId type="Room" isPattern="false">
         <id>OfficeRoom2</id>
       </entityId>
     </entityIdList>
@@ -101,8 +101,8 @@ payload="<?xml version=\"1.0\"?>
       <attribute>temperature</attribute>
       <attribute>pressure</attribute>
     </attributeList>
-  </discoverContextAvailabilityRequest>"
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml" "-X BAD_VERB"
+  </discoverContextAvailabilityRequest>'
+curlXml ${url} "${payload}" "-X BAD_VERB"
 
 echo "+++++ Discovery Done +++++"
 

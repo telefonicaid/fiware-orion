@@ -36,7 +36,7 @@ curlXmlNoPayload "/NGSI9/contextEntities/entity01/attributes"
 
 echo "1: ++++++++++++++++++++"
 url="/NGSI9/contextEntities/entity01/attributes"
-payload="<?xml version=\"1.0\"?>
+payload='<?xml version="1.0"?>
 <registerProviderRequest>
   <metadata>
     <contextMetadata>
@@ -52,8 +52,8 @@ payload="<?xml version=\"1.0\"?>
   </metadata>
   <duration>PT1H</duration>
   <providingApplication>http://kz.tid.es/abc</providingApplication>
-</registerProviderRequest>"
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+</registerProviderRequest>'
+curlXml${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "2: ++++++++++++++++++++"
 curlXmlNoPayload "/NGSI9/contextEntities/entity01/attributes"

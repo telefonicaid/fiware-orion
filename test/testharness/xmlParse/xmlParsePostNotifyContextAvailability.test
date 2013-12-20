@@ -32,17 +32,17 @@ brokerStart CB
 source ../harnessFunctions.sh
 echo "1: ***********************************"
 url="/NGSI9/notifyContextAvailability"
-payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <notifyContextAvailabilityRequest>
   <subscriptionId>012345678901234567890123</subscriptionId>
   <contextRegistrationResponseList>
     <contextRegistrationResponse>
       <contextRegistration>
         <entityIdList>
-          <entityId type=\"Room\" isPattern=\"false\">
+          <entityId type="Room" isPattern="false">
             <id>ConferenceRoom</id>           
           </entityId>
-          <entityId type=\"Room\" isPattern=\"false\">
+          <entityId type="Room" isPattern="false">
             <id>OfficeRoom</id>           
           </entityId>
         </entityIdList>
@@ -72,22 +72,22 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
       </contextRegistration>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
-</notifyContextAvailabilityRequest>"
+</notifyContextAvailabilityRequest>'
 curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "2: ***********************************"
 url="/NGSI9/notifyContextAvailability"
-payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <notifyContextAvailabilityRequest>
   <subscriptionId>01234567890123456789012</subscriptionId>
   <contextRegistrationResponseList>
     <contextRegistrationResponse>
       <contextRegistration>
         <entityIdList>
-          <entityId type=\"Room\" isPattern=\"false\">
+          <entityId type="Room" isPattern="false">
             <id>ConferenceRoom</id>           
           </entityId>
-          <entityId type=\"Room\" isPattern=\"false\">
+          <entityId type="Room" isPattern="false">
             <id>OfficeRoom</id>           
           </entityId>
         </entityIdList>
@@ -117,7 +117,7 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
       </contextRegistration>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
-</notifyContextAvailabilityRequest>"
+</notifyContextAvailabilityRequest>'
 curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "3: ***********************************"

@@ -34,9 +34,9 @@ source ../harnessFunctions.sh
 echo "1: ***********************************"
 
 url="/NGSI9/unsubscribeContextAvailability"
-payload="{
-  \"subscriptionId\": \"012345678901234567890123\"
-}"
+payload='{
+  "subscriptionId": "012345678901234567890123"
+}'
 curlJson ${url} "${payload}"
 
 

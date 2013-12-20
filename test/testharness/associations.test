@@ -32,15 +32,15 @@ brokerStart CB
 source harnessFunctions.sh
 
 url="/NGSI9/registerContext"
-payload="<?xml version=\"1.0\"?>
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
         <entityIdList>
-          <entityId type=\"Room\" isPattern=\"false\">
+          <entityId type="Room" isPattern="false">
             <id>ConferenceRoom</id>
           </entityId>
-          <entityId type=\"Room\" isPattern=\"false\">
+          <entityId type="Room" isPattern="false">
             <id>OfficeRoom</id>
           </entityId>
         </entityIdList>
@@ -57,10 +57,10 @@ payload="<?xml version=\"1.0\"?>
             <type>Association</type>
             <value>
               <entityAssociation>
-                <sourceEntityId type=\"TemperatureSensor\" isPattern=\"false\">
+                <sourceEntityId type="TemperatureSensor" isPattern="false">
                   <id>Sensor5</id>   
                 </sourceEntityId>
-                <targetEntityId type=\"House\" isPattern=\"false\">
+                <targetEntityId type="House" isPattern="false">
                   <id>house_3</id>   
                 </targetEntityId>
               </entityAssociation>
@@ -78,8 +78,8 @@ payload="<?xml version=\"1.0\"?>
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>"
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+  </registerContextRequest>'
+curlXml${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "1: ++++++++++++++++++++"
 --REGEXPECT--

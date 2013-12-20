@@ -32,35 +32,35 @@ brokerStart CB
 source ../harnessFunctions.sh
 
 url="/NGSI9/registerContext"
-payload="{
-  \"contextRegistrations\": [
+payload='{
+  "contextRegistrations": [
     {
-      \"attributes\": [
+      "attributes": [
         {
-          \"name\": \"temperature\",
-          \"type\": \"degree\",
-          \"isDomain\": \"false\",
-          \"metadatas\": [
+          "name": "temperature",
+          "type": "degree",
+          "isDomain": "false",
+          "metadatas": [
             {
-              \"name\": \"ID\",
-              \"type\": \"string\",
-              \"value\": \"1110\"
+              "name": "ID",
+              "type": "string",
+              "value": "1110"
             }
           ]
         }
       ],
-      \"metadatas\": [
+      "metadatas": [
         {
-          \"name\": \"ID\",
-          \"type\": \"string\",
-          \"value\": \"2212\"
+          "name": "ID",
+          "type": "string",
+          "value": "2212"
         }
       ],
-      \"providingApplication\": \"http://192.168.100.1:70/application\"
+      "providingApplication": "http://192.168.100.1:70/application"
     }
   ],
-  \"duration\": \"PT1M\"
-}"
+  "duration": "PT1M"
+}'
 curlJson ${url} "${payload}"
 
 echo "++++++++++++++++++++"

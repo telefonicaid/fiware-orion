@@ -32,168 +32,168 @@ brokerStart CB
 source ../harnessFunctions.sh
 echo "+++++ Starting +++++++++++++++"
 url="/NGSI9/registerContext"
-payload="{
-  \"contextRegistrations\": [
+payload='{
+  "contextRegistrations": [
     {
-      \"entities\": [
+      "entities": [
         {
-          \"type\": \"Room\",
-          \"isPattern\": \"false\",
-          \"id\": \"ConferenceRoom\"
+          "type": "Room",
+          "isPattern": "false",
+          "id": "ConferenceRoom"
         },
         {
-          \"type\": \"Room\",
-          \"isPattern\": \"false\",
-          \"id\": \"OfficeRoom\"
+          "type": "Room",
+          "isPattern": "false",
+          "id": "OfficeRoom"
         }
       ],
-      \"attributes\": [
+      "attributes": [
         {
-          \"name\": \"temperature\",
-          \"type\": \"degree\",
-          \"isDomain\": \"false\",
-          \"metadatas\": [
+          "name": "temperature",
+          "type": "degree",
+          "isDomain": "false",
+          "metadatas": [
             {
-              \"name\": \"ID\",
-              \"type\": \"string\",
-              \"value\": \"1110\"
+              "name": "ID",
+              "type": "string",
+              "value": "1110"
             }
           ]
         }
       ],
-      \"metadatas\": [
+      "metadatas": [
         {
-          \"name\": \"ID\",
-          \"type\": \"string\",
-          \"value\": \"2212\"
+          "name": "ID",
+          "type": "string",
+          "value": "2212"
         }
       ],
-      \"providingApplication\": \"http://192.168.100.1:70/application\"
+      "providingApplication": "http://192.168.100.1:70/application"
     }
   ],
-  \"duration\": \"PT1M\"
-}"
+  "duration": "PT1M"
+}'
 curlJson ${url} "${payload}"
 
 echo "+++++ Registration 1 Done +++++++++++++++"
 
 url="/NGSI9/discoverContextAvailability"
-payload="{
-  \"entities\": [
+payload='{
+  "entities": [
     {
-      \"type\": \"Room\",
-      \"isPattern\": \"false\",
-      \"id\": \"ConferenceRoom\"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
     },
     {
-      \"type\": \"Room\",
-      \"isPattern\": \"false\",
-      \"id\": \"OfficeRoom\"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
     }
   ],
-  \"attributes\": [
-    \"temperature\",
-    \"pressure\"
+  "attributes": [
+    "temperature",
+    "pressure"
   ],
-  \"restriction\": {
-    \"attributeExpression\" : \"Attribute Expression\",
-    \"scopes\": [
+  "restriction": {
+    "attributeExpression" : "Attribute Expression",
+    "scopes": [
       {
-        \"type\" : \"st1\",
-        \"value\" : \"sv1\"
+        "type" : "st1",
+        "value" : "sv1"
       },
       {
-        \"type\" : \"st2\",
-        \"value\" : \"sv2\"
+        "type" : "st2",
+        "value" : "sv2"
       }
     ]
   }
-}"
+}'
 curlJson ${url} "${payload}"
 
 echo "+++++ Discovery 1 Done +++++++++++++++"
 echo "+++++ Register 2: two attributes in vector +++++++++++++++"
 
 url="/NGSI9/registerContext"
-payload="{
-  \"contextRegistrations\": [
+payload='{
+  "contextRegistrations": [
     {
-      \"entities\": [
+      "entities": [
         {
-          \"type\": \"Room\",
-          \"isPattern\": \"false\",
-          \"id\": \"BathRoom\"
+          "type": "Room",
+          "isPattern": "false",
+          "id": "BathRoom"
         }
       ],
-      \"attributes\": [
+      "attributes": [
         {
-          \"name\": \"temperature\",
-          \"type\": \"degree\",
-          \"isDomain\": \"false\",
-          \"metadatas\": [
+          "name": "temperature",
+          "type": "degree",
+          "isDomain": "false",
+          "metadatas": [
             {
-              \"name\": \"ID\",
-              \"type\": \"string\",
-              \"value\": \"1110\"
+              "name": "ID",
+              "type": "string",
+              "value": "1110"
             }
           ]
         },
         {
-          \"name\": \"pressure\",
-          \"type\": \"bar\",
-          \"isDomain\": \"false\",
-          \"metadatas\": [
+          "name": "pressure",
+          "type": "bar",
+          "isDomain": "false",
+          "metadatas": [
             {
-              \"name\": \"ID\",
-              \"type\": \"string\",
-              \"value\": \"1110\"
+              "name": "ID",
+              "type": "string",
+              "value": "1110"
             }
           ]
         }
       ],
-      \"metadatas\": [
+      "metadatas": [
         {
-          \"name\": \"ID\",
-          \"type\": \"string\",
-          \"value\": \"2212\"
+          "name": "ID",
+          "type": "string",
+          "value": "2212"
         }
       ],
-      \"providingApplication\": \"http://192.168.100.1:70/application\"
+      "providingApplication": "http://192.168.100.1:70/application"
     }
   ],
-  \"duration\": \"PT1M\"
-}"
+  "duration": "PT1M"
+}'
 curlJson ${url} "${payload}"
 
 echo "+++++ Registration 2 Done +++++++++++++++"
 
 url="/NGSI9/discoverContextAvailability"
-payload="{
-  \"entities\": [
+payload='{
+  "entities": [
     {
-      \"type\": \"Room\",
-      \"isPattern\": \"false\",
-      \"id\": \"BathRoom\"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "BathRoom"
     }
   ],
-  \"attributes\": [
-    \"temperature\",
-    \"pressure\"
+  "attributes": [
+    "temperature",
+    "pressure"
   ],
-  \"restriction\": {
-    \"attributeExpression\" : \"Attribute Expression\",
-    \"scopes\": [
+  "restriction": {
+    "attributeExpression" : "Attribute Expression",
+    "scopes": [
       {
-        \"type\" : \"st1\",
-        \"value\" : \"sv1\"
+        "type" : "st1",
+        "value" : "sv1"
       },
       {
-        \"type\" : \"st2\",
-        \"value\" : \"sv2\"
+        "type" : "st2",
+        "value" : "sv2"
       }
     ]
   }
-}"
+}'
 curlJson ${url} "${payload}"
 
 echo "+++++ Discovery 2 Done +++++++++++++++"

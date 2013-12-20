@@ -32,55 +32,55 @@ brokerStart CB
 source ../harnessFunctions.sh
 echo "1: ***********************************"
 url="/NGSI9/notifyContextAvailability"
-payload="{
-  \"subscriptionId\": \"012345678901234567890123\",
-  \"contextRegistrationResponses\": [
+payload='{
+  "subscriptionId": "012345678901234567890123",
+  "contextRegistrationResponses": [
     {
-      \"contextRegistration\" : {
-        \"entities\": [
+      "contextRegistration" : {
+        "entities": [
           {
-            \"type\": \"Room\",
-            \"isPattern\": \"false\",
-            \"id\": \"ConferenceRoom\"
+            "type": "Room",
+            "isPattern": "false",
+            "id": "ConferenceRoom"
           },
           {
-            \"type\": \"Room\",
-            \"isPattern\": \"false\",
-            \"id\": \"OfficeRoom\"
+            "type": "Room",
+            "isPattern": "false",
+            "id": "OfficeRoom"
           }
         ],
-        \"attributes\": [
+        "attributes": [
           {
-            \"name\": \"temperature\",
-            \"type\": \"degree\",
-            \"isDomain\": \"false\",
-            \"metadatas\": [
+            "name": "temperature",
+            "type": "degree",
+            "isDomain": "false",
+            "metadatas": [
               {
-                \"name\": \"ID\",
-                \"type\": \"string\",
-                \"value\": \"1110\"
+                "name": "ID",
+                "type": "string",
+                "value": "1110"
               }
             ]
           }
         ],
-        \"metadatas\": [
+        "metadatas": [
           {
-            \"name\": \"ID\",
-            \"type\": \"string\",
-            \"value\": \"2212\"
+            "name": "ID",
+            "type": "string",
+            "value": "2212"
           }
         ],
-        \"providingApplication\": \"http://192.168.100.1:70/application\"
+        "providingApplication": "http://192.168.100.1:70/application"
       }
     }
   ],
 
-  \"errorCode\" : {
-    \"code\" : \"200\",
-    \"reasonPhrase\" : \"OK\",
-    \"details\"      : \"no details\"
+  "errorCode" : {
+    "code" : "200",
+    "reasonPhrase" : "OK",
+    "details"      : "no details"
   }
-}"
+}'
 curlJson ${url} "${payload}"
 
 echo "2: ***********************************"

@@ -32,14 +32,14 @@ brokerStart CB
 source ../harnessFunctions.sh
 
 url="/NGSI10/notifyContext"
-payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <notifyContextRequest>
   <subscriptionId>012345678901234567890123</subscriptionId>
   <originator>http://localhost/test</originator>
   <contextResponseList>
     <contextElementResponse>
       <contextElement>
-        <entityId type=\"Room\" isPattern=\"false\">
+        <entityId type="Room" isPattern="false">
           <id>ConferenceRoom</id>         
         </entityId>
         <attributeDomainName></attributeDomainName>
@@ -99,7 +99,7 @@ payload="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
-</notifyContextRequest>"
+</notifyContextRequest>'
 curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "++++++++++++++++++++"

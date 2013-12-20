@@ -32,12 +32,12 @@ brokerStart CB
 source harnessFunctions.sh
 
 url="/NGSI9/registerContext"
-payload="<?xml version=\"1.0\"?>
+payload='<?xml version="1.0"?>
 <registerContextRequest>
 <contextRegistrationList>
     <contextRegistration>
       <entityIdList>
-        <entityId type=\"TemperatureSensor\" isPattern=\"false\">
+        <entityId type="TemperatureSensor" isPattern="false">
           <id>Sensor5</id>      
         </entityId>
       </entityIdList>
@@ -52,53 +52,53 @@ payload="<?xml version=\"1.0\"?>
   </contextRegistrationList>
         <duration>PT1H</duration>
   <registrationId></registrationId>
-</registerContextRequest>"
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+</registerContextRequest>'
+curlXml${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "1: ++++++++++++++++++++"
 
 url="/NGSI9/registerContext"
-payload="<?xml version=\"1.0\"?>
+payload='<?xml version="1.0"?>
 <registerContextRequest>
 <contextRegistrationList>
     <contextRegistration>
-                        <registrationMetadata>
+      <registrationMetadata>
         <contextMetadata>
           <name>association1</name>
           <type>Association</type>
           <value>
             <entityAssociation>
-                                                        <sourceEntityId type=\"TemperatureSensor\" isPattern=\"false\">
+              <sourceEntityId type="TemperatureSensor" isPattern="false">
                 <id>Sensor5</id>      
               </sourceEntityId>
-                                                        <targetEntityId type=\"House\" isPattern=\"false\">
+              <targetEntityId type="House" isPattern="false">
                 <id>house_3</id>      
               </targetEntityId>
             </entityAssociation>
             <AttributeAssociationList>
               <AttributeAssociation>
-                    <sourceAttribute>measurement</sourceAttribute>
-                    <targetAttribute>indoorTemperature</targetAttribute>
+                <sourceAttribute>measurement</sourceAttribute>
+                <targetAttribute>indoorTemperature</targetAttribute>
               </AttributeAssociation>
             </AttributeAssociationList>
           </value>
         </contextMetadata>      
-                        </registrationMetadata>
+      </registrationMetadata>
       <providingApplication>http://www.fi-ware.eu/NGSI/association</providingApplication>
     </contextRegistration>
   </contextRegistrationList>
-        <duration>PT1H</duration>
+  <duration>PT1H</duration>
   <registrationId></registrationId>
-</registerContextRequest>"
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+</registerContextRequest>'
+curlXml${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "2: ++++++++++++++++++++"
 
 url="/NGSI9/discoverContextAvailability"
-payload="<?xml version=\"1.0\"?>
+payload='<?xml version="1.0"?>
 <discoverContextAvailabilityRequest>
   <entityIdList>
-    <entityId type=\"House\" isPattern=\"false\">
+    <entityId type="House" isPattern="false">
       <id>house_3</id>      
     </entityId>
   </entityIdList>
@@ -113,8 +113,8 @@ payload="<?xml version=\"1.0\"?>
         </operationScope>     
       </scope>
   </restriction>
-</discoverContextAvailabilityRequest>"
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+</discoverContextAvailabilityRequest>'
+curlXml${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
 echo "3: ++++++++++++++++++++"
 

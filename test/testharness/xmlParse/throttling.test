@@ -34,32 +34,32 @@ source ../harnessFunctions.sh
 echo "1: +++++++++++++++++++++++++++++"
 
 url="/ngsi10/subscribeContext"
-payload="<?xml version="1.0"?>
+payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
-    <entityId type=\"Room\" isPattern=\"false\">
+    <entityId type="Room" isPattern="false">
       <id>OfficeRoom</id>
     </entityId>
   </entityIdList>
   <reference>http://localhost:${LISTENER_PORT}/notify</reference>
   <throttling>PT5H</throttling>
-</subscribeContextRequest>"
+</subscribeContextRequest>'
 curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "2: +++++++++++++++++++++++++++++"
 
 # Bad throttling syntax
 #INVALID_XML
 url="/ngsi10/subscribeContext"
-payload="<?xml version="1.0"?>
+payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
-    <entityId type=\"Room\" isPattern=\"false\">
+    <entityId type="Room" isPattern="false">
       <id>OfficeRoom</id>
     </entityId>
   </entityIdList>
   <reference>http://localhost:${LISTENER_PORT}/notify</reference>
   <throttling>PT5R</throttling>
-</subscribeContextRequest>"
+</subscribeContextRequest>'
 curlXml ${url} "${payload}" "Content-Type: application/xml"
 echo "3: +++++++++++++++++++++++++++++"
 --REGEXPECT--

@@ -32,119 +32,119 @@ brokerStart CB
 source ../harnessFunctions.sh
 echo "1: ***********************************"
 url="/NGSI10/queryContext"
-payload="{
-  \"entities\": [
+payload='{
+  "entities": [
     {
-      \"type\": \"Room\",
-      \"isPattern\": \"false\",
-      \"id\": \"ConferenceRoom\"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
     },
     {
-      \"type\": \"Room\",
-      \"isPattern\": \"false\",
-      \"id\": \"OfficeRoom\"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
     }
   ],
-  \"attributes\": [
-    \"temperature\",
-    \"occupancy\",
-    \"lightstatus\"
+  "attributes": [
+    "temperature",
+    "occupancy",
+    "lightstatus"
   ],
-  \"restriction\": {
-    \"attributeExpression\" : \"Attribute Expression\",
-    \"scopes\": [
+  "restriction": {
+    "attributeExpression" : "Attribute Expression",
+    "scopes": [
       {
-        \"type\" : \"st1\",
-        \"value\" : \"sv1\"
+        "type" : "st1",
+        "value" : "sv1"
       },
       {
-        \"type\" : \"st2\",
-        \"value\" : \"sv2\"
+        "type" : "st2",
+        "value" : "sv2"
       }
     ]
   }
-}"
+}'
 curlJson ${url} "${payload}"
 
 echo "2: ***********************************"
 url="/NGSI9/registerContext"
-payload="{
-  \"contextRegistrations\": [
+payload='{
+  "contextRegistrations": [
     {
-      \"entities\": [
+      "entities": [
         {
-          \"type\": \"Room\",
-          \"isPattern\": \"false\",
-          \"id\": \"ConferenceRoom\"
+          "type": "Room",
+          "isPattern": "false",
+          "id": "ConferenceRoom"
         },
         {
-          \"type\": \"Room\",
-          \"isPattern\": \"false\",
-          \"id\": \"OfficeRoom\"
+          "type": "Room",
+          "isPattern": "false",
+          "id": "OfficeRoom"
         }
       ],
-      \"attributes\": [
+      "attributes": [
         {
-          \"name\": \"temperature\",
-          \"type\": \"degree\",
-          \"isDomain\": \"false\",
-          \"metadatas\": [
+          "name": "temperature",
+          "type": "degree",
+          "isDomain": "false",
+          "metadatas": [
             {
-              \"name\": \"ID\",
-              \"type\": \"string\",
-              \"value\": \"1110\"
+              "name": "ID",
+              "type": "string",
+              "value": "1110"
             }
           ]
         }
       ],
-      \"metadatas\": [
+      "metadatas": [
         {
-          \"name\": \"ID\",
-          \"type\": \"string\",
-          \"value\": \"2212\"
+          "name": "ID",
+          "type": "string",
+          "value": "2212"
         }
       ],
-      \"providingApplication\": \"http://192.168.100.1:70/application\"
+      "providingApplication": "http://192.168.100.1:70/application"
     }
   ],
-  \"duration\": \"PT1M\"
-}"
+  "duration": "PT1M"
+}'
 curlJson ${url} "${payload}"
 
 echo "3: ***********************************"
 url="/NGSI10/queryContext"
-payload="{
-  \"entities\": [
+payload='{
+  "entities": [
     {
-      \"type\": \"Room\",
-      \"isPattern\": \"false\",
-      \"id\": \"ConferenceRoom\"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
     },
     {
-      \"type\": \"Room\",
-      \"isPattern\": \"false\",
-      \"id\": \"OfficeRoom\"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
     }
   ],
-  \"attributes\": [
-    \"temperature\",
-    \"occupancy\",
-    \"lightstatus\"
+  "attributes": [
+    "temperature",
+    "occupancy",
+    "lightstatus"
   ],
-  \"restriction\": {
-    \"attributeExpression\" : \"Attribute Expression\",
-    \"scopes\": [
+  "restriction": {
+    "attributeExpression" : "Attribute Expression",
+    "scopes": [
       {
-        \"type\" : \"st1\",
-        \"value\" : \"sv1\"
+        "type" : "st1",
+        "value" : "sv1"
       },
       {
-        \"type\" : \"st2\",
-        \"value\" : \"sv2\"
+        "type" : "st2",
+        "value" : "sv2"
       }
     ]
   }
-}"
+}'
 curlJson ${url} "${payload}"
 
 echo "4: ***********************************"

@@ -32,118 +32,118 @@ brokerStart CB
 source ../harnessFunctions.sh
 echo "1: ***********************************"
 url="/NGSI10/updateContextSubscription"
-payload="{
-  \"duration\": \"P5Y\",
-  \"restriction\": {
-    \"attributeExpression\" : \"AE\",
-    \"scopes\": [
+payload='{
+  "duration": "P5Y",
+  "restriction": {
+    "attributeExpression" : "AE",
+    "scopes": [
       {
-        \"type\" : \"t1\",
-        \"value\" : \"v1\"
+        "type" : "t1",
+        "value" : "v1"
       },
       {
-        \"type\" : \"t2\",
-        \"value\" : \"v2\"
+        "type" : "t2",
+        "value" : "v2"
       }
     ]
   },
-  \"subscriptionId\": \"9212ce4b0c214479be429e2b\",
-  \"notifyConditions\": [
+  "subscriptionId": "9212ce4b0c214479be429e2b",
+  "notifyConditions": [
     {
-      \"type\": \"ONCHANGE\",
-      \"condValues\": [
-        \"CondValue1\",
-        \"CondValue2\"
+      "type": "ONCHANGE",
+      "condValues": [
+        "CondValue1",
+        "CondValue2"
       ],
-      \"restriction\": \"restriction\"
+      "restriction": "restriction"
     }
   ],
-  \"throttling\": \"P5Y\"
-}"
+  "throttling": "P5Y"
+}'
 curlJson ${url} "${payload}"
 
 echo "2: ***********************************"
 url="/NGSI10/subscribeContext"
-payload="{
-  \"entities\": [
+payload='{
+  "entities": [
     {
-      \"type\": \"Room\",
-      \"isPattern\": \"false\",
-      \"id\": \"ConferenceRoom\"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
     },
     {
-      \"type\": \"Room\",
-      \"isPattern\": \"false\",
-      \"id\": \"OfficeRoom\"
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
     }
   ],
-  \"attributes\": [
-    \"temperature\",
-    \"occupancy\",
-    \"lightstatus\"
+  "attributes": [
+    "temperature",
+    "occupancy",
+    "lightstatus"
   ],
-  \"reference\": \"127.0.0.1\",
-  \"duration\": \"P5Y\",
-  \"restriction\": {
-    \"attributeExpression\": \"testRestriction\",
-    \"scopes\" : [
+  "reference": "127.0.0.1",
+  "duration": "P5Y",
+  "restriction": {
+    "attributeExpression": "testRestriction",
+    "scopes" : [
       {
-        \"type\" : \"t1\",
-        \"value\" : \"v1\"
+        "type" : "t1",
+        "value" : "v1"
       },
       {
-        \"type\" : \"t2\",
-        \"value\" : \"v2\"
+        "type" : "t2",
+        "value" : "v2"
       }
     ]
   },
-  \"notifyConditions\": [
+  "notifyConditions": [
     {
-      \"type\": \"ONCHANGE\",
-      \"condValues\": [
-        \"CondValue1\",
-        \"CondValue2\"
+      "type": "ONCHANGE",
+      "condValues": [
+        "CondValue1",
+        "CondValue2"
       ]
       ,
-      \"restriction\": \"restriction\"
+      "restriction": "restriction"
     }
   ],
-  \"throttling\": \"P5Y\"
-}"
+  "throttling": "P5Y"
+}'
 curlJson ${url} "${payload}"
 
-SUB_ID=$(echo "$response" | grep subscriptionId | awk -F\" '{ print $4}')
+SUB_ID=$(echo "$response" | grep subscriptionId | awk -F" '{ print $4}')
 
 echo "3: ***********************************"
 url="/NGSI10/updateContextSubscription"
-payload="{
-  \"duration\": \"P4Y\",
-  \"restriction\": {
-    \"attributeExpression\" : \"AE\",
-    \"scopes\": [
+payload='{
+  "duration": "P4Y",
+  "restriction": {
+    "attributeExpression" : "AE",
+    "scopes": [
       {
-        \"type\" : \"t1\",
-        \"value\" : \"v1\"
+        "type" : "t1",
+        "value" : "v1"
       },
       {
-        \"type\" : \"t2\",
-        \"value\" : \"v2\"
+        "type" : "t2",
+        "value" : "v2"
       }
     ]
   },
-  \"subscriptionId\": \"${SUB_ID}\",
-  \"notifyConditions\": [
+  "subscriptionId": "${SUB_ID}",
+  "notifyConditions": [
     {
-      \"type\": \"ONCHANGE\",
-      \"condValues\": [
-        \"CondValue1\",
-        \"CondValue2\"
+      "type": "ONCHANGE",
+      "condValues": [
+        "CondValue1",
+        "CondValue2"
       ],
-      \"restriction\": \"restriction\"
+      "restriction": "restriction"
     }
   ],
-  \"throttling\": \"P4Y\"
-}"
+  "throttling": "P4Y"
+}'
 curlJson ${url} "${payload}"
 
 echo "4: ***********************************"
