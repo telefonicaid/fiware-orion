@@ -155,7 +155,7 @@ Date: REGEX(.*)
 </subscribeContextAvailabilityResponse>
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 367
+Content-Length: 373
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -170,7 +170,7 @@ Date: REGEX(.*)
 </updateContextAvailabilitySubscriptionResponse>
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 348
+Content-Length: 354
 Content-Type: application/xml
 Date: REGEX(.*)
 
