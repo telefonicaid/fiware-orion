@@ -123,8 +123,6 @@ curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application
 echo "3: ***********************************"
 --REGEXPECT--
 1: ***********************************
-HTTP/1.1 100 Continue
-
 HTTP/1.1 200 OK
 Content-Length: 165
 Content-Type: application/xml
@@ -138,8 +136,6 @@ Date: REGEX(.*)
   </responseCode>
 </notifyContextAvailabilityResponse>
 2: ***********************************
-HTTP/1.1 100 Continue
-
 HTTP/1.1 200 OK
 Content-Length: 193
 Content-Type: application/xml

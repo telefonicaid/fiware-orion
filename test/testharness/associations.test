@@ -83,8 +83,6 @@ curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application
 
 echo "1: ++++++++++++++++++++"
 --REGEXPECT--
-HTTP/1.1 100 Continue
-
 HTTP/1.1 200 OK
 Content-Length: 141
 Content-Type: application/xml

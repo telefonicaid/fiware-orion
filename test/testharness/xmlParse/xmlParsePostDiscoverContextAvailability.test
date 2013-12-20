@@ -108,8 +108,6 @@ echo "+++++ Discovery Done +++++"
 
 --REGEXPECT--
 +++++ Registration +++++
-HTTP/1.1 100 Continue
-
 HTTP/1.1 200 OK
 Content-Length: 141
 Content-Type: application/xml
