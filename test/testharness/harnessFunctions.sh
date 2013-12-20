@@ -308,7 +308,7 @@ function curlIt()
   
   params="-s -S --dump-header headers.out --header \"Expect:\""
   
-  response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" $extraoptions -d @- ))
+  response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" ${extraoptions} -d @- ))
   
   if [ "$encoding" == "XML" ]
   then
@@ -334,7 +334,7 @@ function curlXml()
   payload=$2
   extraoptions=$3
   
-  curlIt "XML" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/xml" "Accept: application/xml" $extraoptions
+  curlIt "XML" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/xml" "Accept: application/xml" "${extraoptions}"
 }
 
 
@@ -370,7 +370,7 @@ function curlNoPayload()
    
   params="-s -S --dump-header headers.out "
   
-  response=$(curl localhost:${BROKER_PORT}${url} ${params} $extraoptions --header "${contenttype}" --header "${accept}")
+  response=$(curl localhost:${BROKER_PORT}${url} ${params} ${extraoptions} --header "${contenttype}" --header "${accept}")
     
   if [ "$encoding" == "XML" ]
   then
@@ -394,7 +394,7 @@ function curlXmlNoPayload()
   url=$1
   extraoptions=$2
   
-  curlNoPayload "XML" $url $extraoptions "Content-Type: application/xml" "Accept: application/xml"
+  curlNoPayload "XML" $url "${extraoptions}" "Content-Type: application/xml" "Accept: application/xml"
 }
 
 

@@ -32,7 +32,7 @@ brokerStart CB
 source ../harnessFunctions.sh
 
 # 1. GET that fails
-echo "1: +++++++++++++++++++++++++++++'
+echo "1: +++++++++++++++++++++++++++++"
 curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID"
 
 # 2. POST that fails
@@ -68,7 +68,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 curlXml ${url} "${payload}" "-X PUT"
 
 # 4. DELETE that fails
-echo "4: +++++++++++++++++++++++++++++'
+echo "4: +++++++++++++++++++++++++++++"
 curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
 
 # 5. Register an entity
@@ -98,7 +98,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 curlXml ${url} "${payload}"
 
 # 6. GET that is OK
-echo "6: +++++++++++++++++++++++++++++'
+echo "6: +++++++++++++++++++++++++++++"
 curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID"
 
 # 7. POST that is OK
@@ -134,7 +134,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 curlXml ${url} "${payload}" "-X PUT"
 
 # 9. DELETE that is OK
-echo "9: +++++++++++++++++++++++++++++'
+echo "9: +++++++++++++++++++++++++++++"
 curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
 
 --REGEXPECT--

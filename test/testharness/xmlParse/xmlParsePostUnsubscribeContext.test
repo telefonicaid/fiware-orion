@@ -89,8 +89,8 @@ echo "3: ***********************************"
 url="/NGSI10/unsubscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextRequest>
-  <subscriptionId>$subscriptionId</subscriptionId>
-</unsubscribeContextRequest>"
+  <subscriptionId>'$subscriptionId'</subscriptionId>
+</unsubscribeContextRequest>'
 
 curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 
