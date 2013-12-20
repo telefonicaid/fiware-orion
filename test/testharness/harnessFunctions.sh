@@ -308,7 +308,7 @@ function curlIt()
   
   params="-s -S --dump-header headers.out --header \"Expect:\""
   
-  response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" ${extraoptions} -d @- ))
+  response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" --header "Expect:" ${extraoptions} -d @- ))
   
   if [ "$encoding" == "XML" ]
   then
