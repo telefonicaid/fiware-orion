@@ -72,16 +72,16 @@ echo "13: ++++++++++++++++++++"
 
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 101
+Content-Length: 150
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "registrationId" : "000000000000000000000000",
     "errorCode": {
-        "code": "400", 
+        "code": "400",
         "reasonPhrase": "Empty Context Registration List"
-    }
+    },
+    "registrationId": "000000000000000000000000"
 }
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -91,47 +91,47 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "No context element found"
     }
 }
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 124
+Content-Length: 130
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
+        "code": "400",
         "reasonPhrase": "No entities"
-    }, 
+    },
     "subscriptionId": "000000000000000000000000"
 }
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 124
+Content-Length: 130
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
+        "code": "400",
         "reasonPhrase": "No entities"
-    }, 
+    },
     "subscriptionId": "000000000000000000000000"
 }
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 136
+Content-Length: 142
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "Subscription Not Found"
-    }, 
+    },
     "subscriptionId": "000000000000000000000000"
 }
 5: ++++++++++++++++++++
@@ -142,7 +142,7 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
+        "code": "400",
         "reasonPhrase": "No entities"
     }
 }
@@ -154,8 +154,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "empty update action type", 
+        "code": "400",
+        "details": "empty update action type",
         "reasonPhrase": "Bad request"
     }
 }
@@ -168,8 +168,8 @@ Date: REGEX(.*)
 {
     "subscribeError": {
         "errorCode": {
-            "code": "400", 
-            "details": "No entities", 
+            "code": "400",
+            "details": "No entities",
             "reasonPhrase": "invalid payload"
         }
     }
@@ -183,23 +183,23 @@ Date: REGEX(.*)
 {
     "subscribeError": {
         "errorCode": {
-            "code": "404", 
+            "code": "404",
             "reasonPhrase": "Subscription Not Found"
-        }, 
+        },
         "subscriptionId": "000000000000000000000000"
     }
 }
 9: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 136
+Content-Length: 142
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "Subscription Not Found"
-    }, 
+    },
     "subscriptionId": "000000000000000000000000"
 }
 10: ++++++++++++++++++++
@@ -208,12 +208,10 @@ Content-Length: 146
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "orionError" : {
-        "code": "400",
-        "reasonPhrase": "bad ngsi9 request",
-        "details": "ngsi10 service '/NGSI9/notSupportedRequest' not found"
-    }
+"orionError" : {
+  "code": "400",
+  "reasonPhrase": "bad ngsi9 request",
+  "details": "ngsi10 service '/NGSI9/notSupportedRequest' not found"
 }
 11: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -221,12 +219,10 @@ Content-Length: 149
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "orionError" : {
-        "code": "400",
-        "reasonPhrase": "bad ngsi10 request",
-        "details": "ngsi10 service '/NGSI10/notSupportedRequest' not found"
-    }
+"orionError" : {
+  "code": "400",
+  "reasonPhrase": "bad ngsi10 request",
+  "details": "ngsi10 service '/NGSI10/notSupportedRequest' not found"
 }
 12: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -234,12 +230,10 @@ Content-Length: 128
 Content-Type: application/json
 Date: REGEX(.*)
 
-{
-    "orionError" : {
-        "code": "400",
-        "reasonPhrase": "bad request",
-        "details": "service '/notSupportedRequest' not found"
-    }
+"orionError" : {
+  "code": "400",
+  "reasonPhrase": "bad request",
+  "details": "service '/notSupportedRequest' not found"
 }
 13: ++++++++++++++++++++
 --TEARDOWN--
