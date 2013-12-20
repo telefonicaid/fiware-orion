@@ -58,7 +58,8 @@ curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application
 echo "1: ++++++++++++++++++++"
 
 url="/NGSI9/registerContext"
-payload='<registerContextRequest>
+payload='<?xml version="1.0"?>
+<registerContextRequest>
 <contextRegistrationList>
     <contextRegistration>
       <registrationMetadata>

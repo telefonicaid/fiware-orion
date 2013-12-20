@@ -19,3 +19,6 @@ o PR #172 kzangeli Thu dec 19 00:45:30 CET 2013
 
     Perhaps the XSD/OMA Specification should be changed and the subscriptionId should be omitted
     in these erroneous cases ... ?
+
+o PR #175
+  - Fix JSON render in orionError responses (the top-level '{' and '}' were missing)
