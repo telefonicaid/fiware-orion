@@ -34,7 +34,7 @@ source harnessFunctions.sh
 
 # Note that curl by default uses "Accept: */*" so this step is testing that "no header" is interpreted as
 # "Accept: */*" according to HTTP RFC
-url='/NGSI10/queryContext'
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
   <entityIdList>
@@ -48,13 +48,13 @@ curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept:"
 echo "1: ++++++++++++++++++++"
 
 # This test will always fail
-url="/NGSI10/queryContext"
-payload='no meaningful payload (failing tests)"
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='no meaningful payload (failing tests)'
 curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain"
 echo "2: ++++++++++++++++++++"
 
 # This test that explicit "Accept: application/xml" is ok
-url="/NGSI10/queryContext"
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -68,7 +68,7 @@ curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: applic
 echo "3: ++++++++++++++++++++"
 
 # This test uses a list in Accept which a valid type is found is ok
-url="/NGSI10/queryContext"
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -82,7 +82,7 @@ curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: text/p
 echo "4: ++++++++++++++++++++"
 
 # This test uses a list in Accept which a valid type is found is ok (with extra encoding after ";")
-url="/NGSI10/queryContext"
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -96,13 +96,13 @@ curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: text/p
 echo "5: ++++++++++++++++++++"
 
 # This test uses a list in Accept which no valid types
-url="/NGSI10/queryContext"
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
 payload='no meaningful payload (failing tests)'
 curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, image/jpeg"
 echo "6: ++++++++++++++++++++"
 
 # This test uses a list in Accept which no valid type (with extra encoding after ";")
-url="/NGSI10/queryContext"
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
 payload='no meaningful payload (failing tests)'
 curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, image/jpeg; charset=UTF-8"
 echo "7: ++++++++++++++++++++"
