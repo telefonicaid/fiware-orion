@@ -112,7 +112,7 @@ payload='{
 }'
 curlJson ${url} "${payload}"
 
-SUB_ID=$(echo "$response" | grep subscriptionId | awk -F" '{ print $4}')
+SUB_ID=$(echo "$response" | grep subscriptionId | awk -F\" '{ print $4}')
 
 echo "3: ***********************************"
 url="/NGSI10/updateContextSubscription"
@@ -131,7 +131,7 @@ payload='{
       }
     ]
   },
-  "subscriptionId": "${SUB_ID}",
+  "subscriptionId": "'${SUB_ID}'",
   "notifyConditions": [
     {
       "type": "ONCHANGE",
@@ -184,8 +184,8 @@ Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "P4Y", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "duration": "P4Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
         "throttling": "P4Y"
     }
 }
