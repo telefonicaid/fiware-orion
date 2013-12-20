@@ -87,12 +87,12 @@ payload='{
 }'
 curlJson ${url} "${payload}"
 
-subscriptionId=$(echo "$response" | grep subscriptionId | awk -F" '{ print $4 }')
+subscriptionId=$(echo "$response" | grep subscriptionId | awk -F\" '{ print $4 }')
 
 echo "3: ***********************************"
 url="/NGSI10/unsubscribeContext"
 payload='{
-  "subscriptionId": "$subscriptionId"
+  "subscriptionId": "'${subscriptionId}'"
 }'
 curlJson ${url} "${payload}"
 
@@ -106,9 +106,9 @@ Date: REGEX(.*)
 
 {
     "statusCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "Subscription Not Found"
-    }, 
+    },
     "subscriptionId": "012345678901234567890123"
 }
 2: ***********************************
@@ -119,8 +119,8 @@ Date: REGEX(.*)
 
 {
     "subscribeResponse": {
-        "duration": "P5Y", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
         "throttling": "P5Y"
     }
 }
@@ -132,9 +132,9 @@ Date: REGEX(.*)
 
 {
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
-    }, 
+    },
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 4: ***********************************
