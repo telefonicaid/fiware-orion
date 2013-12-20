@@ -91,7 +91,7 @@ payload='{
   ],
   "reference": "http://10.1.1.1:80/test/interfaceNotification",
   "duration": "PT1M",
-  "subscriptionId": "12458896",
+  "subscriptionId": "124588961245889612458896",
   "restriction" : {
     "attributeExpression" : "ATTR_EXPR",
     "scopes" : [
@@ -108,7 +108,7 @@ payload='{
 }'
 curlJson ${url} "${payload}"
 
-SUB_ID=$(echo "$response" | grep subscriptionId | awk -F" '{ print $4}')
+SUB_ID=$(echo "$response" | grep subscriptionId | awk -F\" '{ print $4}')
 
 echo "3: ***********************************"
 
@@ -145,8 +145,9 @@ payload='{
       }
     ]
   },
-  "subscriptionId" : "${SUB_ID}"
+  "subscriptionId" : "'${SUB_ID}'"
 }'
+
 curlJson ${url} "${payload}"
 
 echo "4: ***********************************"
@@ -159,9 +160,9 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
+        "code": "404",
         "reasonPhrase": "Subscription Not Found"
-    }, 
+    },
     "subscriptionId": "012345678901234567890123"
 }
 2: ***********************************
