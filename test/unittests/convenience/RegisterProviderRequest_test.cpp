@@ -51,7 +51,7 @@ TEST(RegisterProviderRequest, xml_ok)
   const char*     outFile1 = "ngsi9.registerProviderRequestRendered.noRegistrationId.postponed.xml";
   const char*     outFile2 = "ngsi9.registerProviderRequest.noMetdataName.valid.xml";
   const char*     outFile3 = "ngsi9.registerProviderRequest.predetectedError.valid.xml";
-  const char*     outFile4 = "ngsi9.discoverContextAvailabilityResponse.ok.valid.xml";
+  const char*     outFile4 = "ngsi9.registerProviderRequestRendered.ok.postponed.xml";
   std::string     result;
   std::string     rendered;
   std::string     checked;
