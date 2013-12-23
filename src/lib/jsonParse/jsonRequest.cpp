@@ -49,6 +49,9 @@
 #include "jsonParse/jsonNotifyContextRequest.h"
 #include "jsonParse/jsonUpdateContextSubscriptionRequest.h"
 
+#include "jsonParse/jsonRegisterProviderRequest.h"
+#include "jsonParse/jsonUpdateContextElementRequest.h"
+
 #include "rest/restReply.h"
 
 
@@ -73,9 +76,33 @@ static JsonRequest jsonRequest[] =
   { SubscribeContext,                      "POST", "subscribeContextRequest",                       jsonScrParseVector,  jsonScrInit,  jsonScrCheck,   jsonScrPresent,  jsonScrRelease  },
   { NotifyContext,                         "POST", "notifyContextRequest",                          jsonNcrParseVector,  jsonNcrInit,  jsonNcrCheck,   jsonNcrPresent,  jsonNcrRelease  },
   { UnsubscribeContext,                    "POST", "unsubscribeContextRequest",                     jsonUncrParseVector, jsonUncrInit, jsonUncrCheck,  jsonUncrPresent, jsonUncrRelease },
-  { UpdateContextSubscription,             "POST", "updateContextSubscriptionRequest",              jsonUcsrParseVector, jsonUcsrInit, jsonUcsrCheck,  jsonUcsrPresent, jsonUcsrRelease }
-};
+  { UpdateContextSubscription,             "POST", "updateContextSubscriptionRequest",              jsonUcsrParseVector, jsonUcsrInit, jsonUcsrCheck,  jsonUcsrPresent, jsonUcsrRelease },
 
+  // Convenience
+  { ContextEntitiesByEntityId,             "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
+  { EntityByIdAttributeByName,             "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
+  { ContextEntityAttributes,               "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
+  { ContextEntityTypes,                    "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
+  { ContextEntityTypeAttributeContainer,   "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
+  { ContextEntityTypeAttribute,            "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
+
+  // Por hacer....
+  { UpdateContextElement,                  "POST", "updateContextElementRequest",                   jsonUcerParseVector, jsonUcerInit, jsonUcerCheck,  jsonUcerPresent, jsonUcerRelease }
+//  { IndividualContextEntity,               "PUT",  "updateContextElementRequest",                  ucerParseVector,  ucerInit,  ucerRelease,  ucerPresent,  ucerCheck  },
+//  { IndividualContextEntity,               "POST", "appendContextElementRequest",                  acerParseVector,  acerInit,  acerRelease,  acerPresent,  acerCheck  },
+
+//  { IndividualContextEntityAttribute,      "POST", "updateContextAttributeRequest",                upcarParseVector, upcarInit, upcarRelease, upcarPresent, upcarCheck },
+//  { AttributeValueInstance,                "PUT",  "updateContextAttributeRequest",                upcarParseVector, upcarInit, upcarRelease, upcarPresent, upcarCheck },
+//  { IndividualContextEntityAttributes,     "POST", "appendContextElementRequest",                  acerParseVector,  acerInit,  acerRelease,  acerPresent,  acerCheck  },
+//  { IndividualContextEntityAttributes,     "PUT",  "updateContextElementRequest",                  ucerParseVector,  ucerInit,  ucerRelease,  ucerPresent,  ucerCheck  },
+//  { AppendContextElement,                  "POST", "appendContextElementRequest",                  acerParseVector,  acerInit,  acerRelease,  acerPresent,  acerCheck  },
+//  { UpdateContextAttribute,                "POST", "updateContextAttributeRequest",                upcarParseVector, upcarInit, upcarRelease, upcarPresent, upcarCheck },
+
+//  { SubscribeContext,                      "POST", "subscribeContextRequest",                      scrParseVector,   scrInit,   scrRelease,   scrPresent,   scrCheck   },
+//  { Ngsi10SubscriptionsConvOp,             "PUT",  "updateContextSubscriptionRequest",             ucsrParseVector,  ucsrInit,  ucsrRelease,  ucsrPresent,  ucsrCheck  },
+//  { Ngsi9SubscriptionsConvOp,              "POST", "subscribeContextAvailabilityRequest",          scarParseVector,  scarInit,  scarRelease,  scarPresent,  scarCheck  },
+//  { Ngsi9SubscriptionsConvOp,              "PUT",  "updateContextvailabilitySubscriptionRequest",  ucasParseVector,  ucasInit,  ucasRelease,  ucasPresent,  ucasCheck  },
+};
 
 
 /* ****************************************************************************
