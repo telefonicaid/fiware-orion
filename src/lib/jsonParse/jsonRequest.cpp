@@ -81,9 +81,7 @@ static JsonRequest jsonRequest[] =
   // Convenience
   { ContextEntitiesByEntityId,             "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
   { EntityByIdAttributeByName,             "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
-  { ContextEntityAttributes,               "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
   { ContextEntityTypes,                    "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
-  { ContextEntityTypeAttributeContainer,   "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
   { ContextEntityTypeAttribute,            "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
 
   // Por hacer....
