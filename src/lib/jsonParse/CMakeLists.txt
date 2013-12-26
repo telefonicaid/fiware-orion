@@ -41,6 +41,8 @@ SET (SOURCES
     
     jsonRegisterProviderRequest.cpp
     jsonUpdateContextElementRequest.cpp
+    jsonAppendContextElementRequest.cpp
+    jsonUpdateContextAttributeRequest.cpp
 )
 
 SET (HEADERS
@@ -65,6 +67,8 @@ SET (HEADERS
     
     jsonRegisterProviderRequest.h
     jsonUpdateContextElementRequest.h
+    jsonAppendContextElementRequest.h
+    jsonUpdateContextAttributeRequest.h
 )
 
 
