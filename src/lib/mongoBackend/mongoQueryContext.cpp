@@ -53,7 +53,7 @@ HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResp
 
     std::string err;
     if (!entitiesQuery(requestP->entityIdVector, requestP->attributeList, &(responseP->contextElementResponseVector), &err, true)) {
-        responseP->errorCode.fill(SccReceiverInternalError, "Database Error", err);
+        responseP->errorCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err);
         LM_SRE(SccOk,(responseP->errorCode.details.c_str()));
     }
 

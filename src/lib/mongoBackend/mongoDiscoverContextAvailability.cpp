@@ -153,7 +153,7 @@ static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAva
     MetadataVector mdV;
     std::string err;
     if (!associationsQuery(requestP->entityIdVector, requestP->attributeList, scope, &mdV, &err)) {
-        responseP->errorCode.fill(SccReceiverInternalError, "Database Error", err);
+        responseP->errorCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err);
         LM_RE(SccOk,(responseP->errorCode.details.c_str()));
     }
 
@@ -185,7 +185,7 @@ static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAva
 
         ContextRegistrationResponseVector crrV;
         if (!registrationsQuery(enV, attrL, &crrV, &err)) {
-            responseP->errorCode.fill(SccReceiverInternalError, "Database Error", err);
+            responseP->errorCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err);
             LM_RE(SccOk,(responseP->errorCode.details.c_str()));
         }
 
@@ -211,7 +211,7 @@ static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAva
 static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP) {
     std::string err;
     if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err)) {
-        responseP->errorCode.fill(SccReceiverInternalError, "Database Error", err);
+        responseP->errorCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err);
         LM_RE(SccOk,(responseP->errorCode.details.c_str()));
     }
 
