@@ -56,7 +56,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
       OID id = OID(requestP->subscriptionId.get());
       sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << id));
       if (sub.isEmpty()) {
-          responseP->errorCode.fill(SccContextElementNotFound, "Subscription Not Found");
+          responseP->errorCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound));
           LM_SR(SccOk);
       }
   }
@@ -65,7 +65,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
       // FIXME: this checking should be done at parsing stage, without progressing to
       // mongoBackend. By the moment we can live this here, but we should remove in the future
       // (old issue #95)
-      responseP->errorCode.fill(SccContextElementNotFound, "Subscription Not Found");
+      responseP->errorCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound));
       LM_SR(SccOk);
   }
   catch( const DBException &e ) {

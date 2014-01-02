@@ -218,7 +218,7 @@ static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAva
     if (responseP->responseVector.size() == 0) {
         /* If the responseV is empty, we haven't found any entity and have to fill the status code part in the
          * response */
-        responseP->errorCode.fill(SccContextElementNotFound, "No context element registrations found", "");
+        responseP->errorCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound), "");
         return SccOk;
     }
 

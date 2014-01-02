@@ -66,7 +66,7 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
         OID id = OID(requestP->registrationId.get());
         BSONObj reg = connection->findOne(getRegistrationsCollectionName(), BSON("_id" << id));
         if (reg.isEmpty()) {
-            responseP->errorCode.fill(SccContextElementNotFound, "Registration Not Found");
+            responseP->errorCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound));
             responseP->registrationId = requestP->registrationId;
             ++noOfRegistrationUpdateErrors;
             LM_SR(SccOk);
@@ -79,7 +79,7 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
         /* This happens when OID format is wrong */
         // FIXME: this checking should be done at parsing stage, without progressing to
         // mongoBackend. By the moment we can live this here, but we should remove in the future
-        responseP->errorCode.fill(SccContextElementNotFound, "Registration Not Found");
+        responseP->errorCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound));
         responseP->registrationId = requestP->registrationId;
         ++noOfRegistrationUpdateErrors;
         LM_SR(SccOk);
