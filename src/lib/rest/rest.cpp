@@ -331,7 +331,7 @@ static int connectionTreat
       {
           /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
           ciP->httpStatusCode = SccUnsupportedMediaType;
-          restReply(ciP, "Unsupported Media Type", "Content-Type header not used, default application/octet-stream is not supported");
+          restReply(ciP, httpStatusCodeString(SccUnsupportedMediaType), "Content-Type header not used, default application/octet-stream is not supported");
           return MHD_YES;
       }
 
@@ -339,7 +339,7 @@ static int connectionTreat
       {
           /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
           ciP->httpStatusCode = SccUnsupportedMediaType;
-          restReply(ciP, "Unsupported Media Type", "not supported content type: " + ciP->httpHeaders.contentType);
+          restReply(ciP, httpStatusCodeString(SccUnsupportedMediaType), "not supported content type: " + ciP->httpHeaders.contentType);
           return MHD_YES;
       }
     }
