@@ -390,7 +390,7 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
     catch( const DBException &e ) {
         responseP->errorCode.fill(
             SccReceiverInternalError,
-            "Database Error",
+            httpStatusCodeString(SccReceiverInternalError),
             std::string("collection: ") + getRegistrationsCollectionName() +
                 " - upsert update(): " + regDoc.toString() +
                 " - exception: " + e.what()

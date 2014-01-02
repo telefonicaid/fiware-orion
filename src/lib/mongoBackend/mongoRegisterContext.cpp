@@ -87,7 +87,7 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
     catch( const DBException &e ) {
         responseP->errorCode.fill(
             SccReceiverInternalError,
-           "Database Error",
+           httpStatusCodeString(SccReceiverInternalError),
             std::string("collection: ") + getRegistrationsCollectionName() +
                " - findOne() _id: " + requestP->registrationId.get() +
                " - exception: " + e.what()

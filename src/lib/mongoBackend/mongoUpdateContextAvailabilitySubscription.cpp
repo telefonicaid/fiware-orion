@@ -71,7 +71,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
   catch( const DBException &e ) {
       responseP->errorCode.fill(
           SccReceiverInternalError,
-         "Database Error",
+          httpStatusCodeString(SccReceiverInternalError),
           std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
              " - findOne() _id: " + requestP->subscriptionId.get() +
              " - exception: " + e.what()
@@ -151,7 +151,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
   catch( const DBException &e ) {
       responseP->errorCode.fill(
           SccReceiverInternalError,
-          "Database Error",
+          httpStatusCodeString(SccReceiverInternalError),
           std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
               " - update() _id: " + requestP->subscriptionId.get().c_str() +
               " - update() doc: " + update.toString() +

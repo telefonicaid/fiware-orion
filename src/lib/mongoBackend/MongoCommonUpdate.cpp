@@ -576,7 +576,7 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
         if (actualUpdate) {
             std::string err;
             if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, &err)) {
-                cerP->statusCode.fill(SccReceiverInternalError, "Database Error", err );
+                cerP->statusCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err );
                 responseP->contextElementResponseVector.push_back(cerP);
                 LM_RE(false, (err.c_str()));
             }
@@ -731,7 +731,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     }
     catch( const DBException &e ) {
         buildGeneralErrorReponse(ceP, NULL, responseP, SccReceiverInternalError,
-                           "Database Error",
+                           httpStatusCodeString(SccReceiverInternalError),
                            std::string("collection: ") + getEntitiesCollectionName() +
                               " - query(): " + query.toString() +
                               " - exception: " + e.what());
@@ -795,7 +795,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         catch( const DBException &e ) {
             cerP->statusCode.fill(
                 SccReceiverInternalError,
-                "Database Error",
+                httpStatusCodeString(SccReceiverInternalError),
                 std::string("collection: ") + getEntitiesCollectionName() +
                     " - update() query: " + query.toString() +
                     " - update() doc: " + updatedEntity.toString() +
@@ -867,7 +867,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                     std::string err;
                     if (!addTriggeredSubscriptions(en.id, en.type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err)) {
-                        cerP->statusCode.fill(SccReceiverInternalError, "Database Error", err );
+                        cerP->statusCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err );
                         responseP->contextElementResponseVector.push_back(cerP);
                         LM_RVE((err.c_str()));
                     }
