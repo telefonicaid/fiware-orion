@@ -518,7 +518,7 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
                  * been found. In this case, we interrupt the processing an early return with
                  * a error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter,
-                                      "Not Found Attribute in UPDATE",
+                                      httpStatusCodeString(SccInvalidParameter),
                                       std::string("action: UPDATE") +
                                           // FIXME: use toString once EntityID and ContextAttribute becomes objects
                                           " - entity: (" + entityId + ", " + entityType + ")" +
@@ -538,7 +538,7 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
                  * we interrupt the processing an early return with
                  * a error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter,
-                                      "It is not allowed to APPEND an attribute with ID when another with the same name is in place or viceversa",
+                                      httpStatusCodeString(SccInvalidParameter),
                                       std::string("action: APPEND") +
                                           // FIXME: use toString once EntityID and ContextAttribute becomes objects
                                           " - entity: (" + entityId + ", " + entityType + ")" +
@@ -556,7 +556,7 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
                  * been found. In this case, we interrupt the processing an early return with
                  * a error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter,
-                                      "Not Found Attribute in DELETE",
+                                      httpStatusCodeString(SccInvalidParameter),
                                       std::string("action: DELETE") +
                                       // FIXME: use toString once EntityID and ContextAttribute becomes objects
                                          " - entity: (" + entityId + ", " + entityType + ")" +
@@ -698,7 +698,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 ca->name = ceP->contextAttributeVector.get(ix)->name;
                 ca->type = ceP->contextAttributeVector.get(ix)->type;
                 buildGeneralErrorReponse(ceP, ca, responseP, SccInvalidParameter,
-                                   "Empty Attribute in UPDATE or APPEND",
+                                   httpStatusCodeString(SccInvalidParameter),
                                    std::string("action: ") + action +
                                       // FIXME: use toString once EntityID and ContextAttribute becomes objects
                                       " - entity: (" + en.id + ", " + en.type + ", " + en.isPattern + ")" +
@@ -857,7 +857,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
             std::string errReason, errDetail;
             if (!createEntity(en, ceP->contextAttributeVector, &errReason, &errDetail)) {
-                cerP->statusCode.fill(SccInvalidParameter, errReason, errDetail);
+                cerP->statusCode.fill(SccInvalidParameter, httpStatusCodeString(SccInvalidParameter), errDetail);
             }
             else {
                 cerP->statusCode.fill(SccOk, "OK");
