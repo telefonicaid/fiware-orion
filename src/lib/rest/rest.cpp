@@ -414,7 +414,7 @@ static int connectionTreat
       char detail[256];
 
       snprintf(detail, sizeof(detail), "payload size: %d", ciP->httpHeaders.contentLength);
-      std::string out = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, "Payload Too Large", detail);
+      std::string out = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, httpStatusCodeString(SccRequestEntityTooLarge), detail);
       restReply(ciP, out);
     }
     else
