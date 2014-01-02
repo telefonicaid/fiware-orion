@@ -795,7 +795,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoEntity)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("No context element registrations found", res.errorCode.reasonPhrase);
+    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
     EXPECT_EQ(0,res.responseVector.size());
 
@@ -843,7 +843,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoAttribute)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("No context element registrations found", res.errorCode.reasonPhrase);
+    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
     EXPECT_EQ(0,res.responseVector.size());
 
@@ -1597,7 +1597,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternFail)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("No context element registrations found", res.errorCode.reasonPhrase);
+    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
     EXPECT_EQ(0,res.responseVector.size());
 
@@ -2027,7 +2027,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
-    EXPECT_EQ("Database Error", res.errorCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.registrations "
               "- query(): { $or: [ { contextRegistration.entities: { $in: [ { id: \"E3\", type: \"T3\" }, { type: \"T3\", id: \"E3\" } ] } }, { contextRegistration.entities.id: { $in: {} } } ], expiration: { $gt: 1360232700 } } "
               "- exception: boom!!", res.errorCode.details);
@@ -2073,7 +2073,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDBQueryAssociationFail)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
-    EXPECT_EQ("Database Error", res.errorCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.associations "
               "- query(): { srcEnt: { $in: [ { id: \"E1\", type: \"T1\" } ] }, attrs.src: { $in: [ \"A4\" ] } } "
               "- exception: boom!!", res.errorCode.details);

@@ -54,7 +54,7 @@ static RestService rs[] =
 TEST(getIndividualContextEntityAttributes, notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity11/attributes",  "GET", "1.1");
-  std::string    expected = "<contextElementResponse>\n  <contextElement>\n    <entityId type=\"\" isPattern=\"false\">\n      <id>entity11</id>\n    </entityId>\n  </contextElement>\n  <statusCode>\n    <code>404</code>\n    <reasonPhrase>Entity Not Found</reasonPhrase>\n    <details>entity11</details>\n  </statusCode>\n</contextElementResponse>\n";
+  std::string    expected = "<contextElementResponse>\n  <contextElement>\n    <entityId type=\"\" isPattern=\"false\">\n      <id>entity11</id>\n    </entityId>\n  </contextElement>\n  <statusCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n    <details>entity11</details>\n  </statusCode>\n</contextElementResponse>\n";
 
   std::string    out;
 

@@ -719,7 +719,7 @@ TEST(mongoQueryContextRequest, query1Ent0AttrFail)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("No context elements found", res.errorCode.reasonPhrase);
+    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
     EXPECT_EQ(0,res.contextElementResponseVector.size());
 
@@ -758,7 +758,7 @@ TEST(mongoQueryContextRequest, query1Ent1AttrFail)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("No context elements found", res.errorCode.reasonPhrase);
+    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
     EXPECT_EQ(0,res.contextElementResponseVector.size());
 
@@ -798,7 +798,7 @@ TEST(mongoQueryContextRequest, query1EntWA0AttrFail)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("No context elements found", res.errorCode.reasonPhrase);
+    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
     EXPECT_EQ(0,res.contextElementResponseVector.size());
 
@@ -1385,7 +1385,7 @@ TEST(mongoQueryContextRequest, queryPatternFail)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("No context elements found", res.errorCode.reasonPhrase);
+    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
     EXPECT_EQ(0,res.contextElementResponseVector.size());
 
@@ -1695,7 +1695,7 @@ TEST(mongoQueryContextRequest, mongoDbQueryFail)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
-    EXPECT_EQ("Database Error", res.errorCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.entities - "
               "query(): { $or: [ { _id: { $in: [ { id: \"E1\", type: \"T1\" } ] } } ] } - "
               "exception: boom!!", res.errorCode.details);

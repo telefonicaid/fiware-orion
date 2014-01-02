@@ -516,7 +516,7 @@ TEST(mongoRegisterContext_update, updateNotFound)
     EXPECT_EQ(0, res.duration.get().size());
     EXPECT_EQ("51307b66f481db11bf860003", res.registrationId.get());
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("Registration Not Found", res.errorCode.reasonPhrase);
+    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
@@ -653,7 +653,7 @@ TEST(mongoRegisterContext_update, updateWrongIdString)
     EXPECT_EQ(0, res.duration.get().size());
     EXPECT_EQ("51307b66f481db11bf861111", res.registrationId.get());
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("Registration Not Found", res.errorCode.reasonPhrase);
+    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
@@ -839,7 +839,7 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_TRUE(res.registrationId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
-    EXPECT_EQ("Database Error", res.errorCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.registrations "
               "- findOne() _id: 51307b66f481db11bf860001 "
               "- exception: boom!!", res.errorCode.details);

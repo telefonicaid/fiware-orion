@@ -59,7 +59,7 @@ static RestService rs[] =
 TEST(postDiscoverContextAvailability, notFound)
 {
   ConnectionInfo ci("/ngsi9/discoverContextAvailability",  "POST", "1.1");
-  std::string    expected    = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element registrations found</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
+  std::string    expected    = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
   const char*    fileName    = "ngsi9.discoverContextAvailabilityRequest.entityIdIdNotFound.valid.xml";
   std::string    out;
 

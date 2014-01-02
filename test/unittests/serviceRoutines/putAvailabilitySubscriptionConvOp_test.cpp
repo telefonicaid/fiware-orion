@@ -71,8 +71,8 @@ TEST(putAvailabilitySubscriptionConvOp, put)
   ConnectionInfo ci6("/ngsi9/contextAvailabilitySubscriptions/012345678901234567890123",  "XVERB",   "1.1");
   std::string    expectedStart1 = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>";
   std::string    expected2      = "";
-  std::string    expected3      = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>111222333444555666777888</subscriptionId>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Subscription Not Found</reasonPhrase>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
-  std::string    expected4      = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>111222333444555666777888</subscriptionId>\n  <statusCode>\n    <code>404</code>\n    <reasonPhrase>Subscription Not Found</reasonPhrase>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
+  std::string    expected3      = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>111222333444555666777888</subscriptionId>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
+  std::string    expected4      = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>111222333444555666777888</subscriptionId>\n  <statusCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
   std::string    expected5      = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>000000000000000000000000</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unmatching subscriptionId URI/payload</reasonPhrase>\n    <details>111222333444555666777881</details>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
   std::string    expected6      = "";
   const char*    fileName1      = "ngsi9.subscribeContextAvailabilityRequest.ok.valid.xml";
