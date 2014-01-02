@@ -685,7 +685,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
     /* Not supporting isPattern = true currently */
     if (isTrue(en.isPattern)) {
-        buildGeneralErrorReponse(ceP, NULL, responseP, SccNotImplemented, "Not Implemented");
+        buildGeneralErrorReponse(ceP, NULL, responseP, SccNotImplemented, httpStatusCodeString(SccNotImplemented));
         return;
     }
 

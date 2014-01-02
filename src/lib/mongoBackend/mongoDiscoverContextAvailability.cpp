@@ -146,7 +146,7 @@ static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAva
 
     if (scope == SCOPE_VALUE_ASSOC_ALL) {
         LM_W(("%s scope not supported", SCOPE_VALUE_ASSOC_ALL));
-        responseP->errorCode.fill(SccNotImplemented, "Not supported scope", SCOPE_VALUE_ASSOC_ALL);
+        responseP->errorCode.fill(SccNotImplemented, httpStatusCodeString(SccNotImplemented), SCOPE_VALUE_ASSOC_ALL);
         return SccOk;
     }
 
