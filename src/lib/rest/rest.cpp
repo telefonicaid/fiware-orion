@@ -283,7 +283,7 @@ static int connectionTreat
   if (((ciP != NULL) && (ciP->httpHeaders.contentLength == 0)) && (ciP->method == "POST" || ciP->method == "PUT"))
   {
     LM_W(("Zero/No Content-Length in PUT/POST request"));
-    std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, "bad request", "Zero/No Content-Length in PUT/POST request");
+    std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, httpStatusCodeString(SccLengthRequired), "Zero/No Content-Length in PUT/POST request");
     ciP->httpStatusCode = SccLengthRequired;
     restReply(ciP, errorMsg);
     LM_RE(MHD_YES, ("Zero/No Content-Length in PUT/POST request"));
