@@ -2709,7 +2709,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, subscriptionNotFound)
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_TRUE(res.subscriptionId.isEmpty());
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("Subscription Not Found", res.errorCode.reasonPhrase);
+    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
@@ -2758,7 +2758,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbFindOneFail)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.subscriptionId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
-    EXPECT_EQ("Database Error", res.errorCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.casubs "
               "- findOne() _id: 51307b66f481db11bf860010 "
               "- exception: boom!!", res.errorCode.details);
@@ -2819,7 +2819,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbUpdateFail)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.subscriptionId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
-    EXPECT_EQ("Database Error", res.errorCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.casubs "
               "- update() _id: 51307b66f481db11bf860010 "
               "- update() doc: { entities: [ { id: \"E5\", type: \"T5\", isPattern: \"false\" } ], attrs: {}, expiration: 1360250700, reference: \"http://notify1.me\", format: \"XML\" } "

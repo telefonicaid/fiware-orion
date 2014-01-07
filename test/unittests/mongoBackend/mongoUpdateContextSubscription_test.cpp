@@ -571,7 +571,7 @@ TEST(mongoUpdateContextSubscription, subscriptionNotFound)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.subscriptionId.isEmpty());
     EXPECT_EQ(SccContextElementNotFound, res.subscribeError.errorCode.code);
-    EXPECT_EQ("Subscription Not Found", res.subscribeError.errorCode.reasonPhrase);
+    EXPECT_EQ("No context element found", res.subscribeError.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
     /* Release connection */
@@ -7396,7 +7396,7 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.subscribeError.subscriptionId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.subscribeError.errorCode.code);
-    EXPECT_EQ("Database Error", res.subscribeError.errorCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.subscribeError.errorCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.csubs "
               "- findOne() _id: 51307b66f481db11bf860001 "
               "- exception: boom!!", res.subscribeError.errorCode.details);
@@ -7463,7 +7463,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.subscribeError.subscriptionId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.subscribeError.errorCode.code);
-    EXPECT_EQ("Database Error", res.subscribeError.errorCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.subscribeError.errorCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.csubs "
               "- update() _id: 51307b66f481db11bf860001 "
               "- update() doc: { entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: {}, reference: \"http://notify1.me\", expiration: 1360250700, conditions: {}, lastNotification: 15000000, format: \"XML\" } "

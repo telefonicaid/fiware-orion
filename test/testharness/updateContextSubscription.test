@@ -97,7 +97,7 @@ EOF
     <subscriptionId>012345678901234567890123</subscriptionId>
     <errorCode>
       <code>404</code>
-      <reasonPhrase>Subscription Not Found</reasonPhrase>
+      <reasonPhrase>No context element found</reasonPhrase>
     </errorCode>
   </subscribeError>
 </updateContextSubscriptionResponse>

@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "common/string.h"
 #include "common/tag.h"
+#include "rest/HttpStatusCode.h"
 #include "ngsi10/QueryContextResponse.h"
 
 
@@ -78,7 +79,7 @@ std::string QueryContextResponse::render(RequestType requestType, Format format,
   {
     if (contextElementResponseVector.size() == 0)
     {
-      errorCode.fill(SccContextElementNotFound, "No context element found", "");
+      errorCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound), "");
       out += errorCode.render(format, indent + "  ");
     }
     else 

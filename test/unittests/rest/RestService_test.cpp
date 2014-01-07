@@ -121,7 +121,7 @@ TEST(RestService, noSuchServiceAndNotFound)
 {
   ConnectionInfo ci("/ngsi9/discoverContextAvailability",  "POST", "1.1");
   std::string    expected    = "{\n  \"registrationId\" : \"0\",\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"bad request\",\n    \"details\" : \"Service not recognized\"\n  }\n}\n";
-  std::string    expected2   = "{\n  \"errorCode\" : {\n    \"code\" : \"404\",\n    \"reasonPhrase\" : \"No context element registrations found\"\n  }\n}\n";
+  std::string    expected2   = "{\n  \"errorCode\" : {\n    \"code\" : \"404\",\n    \"reasonPhrase\" : \"No context element found\"\n  }\n}\n";
   const char*    fileName    = "ngsi9.discoverContextAvailabilityRequest.ok.valid.json";
   std::string    out;
 

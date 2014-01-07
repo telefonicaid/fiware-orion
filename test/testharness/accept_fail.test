@@ -189,7 +189,7 @@ echo "7: ++++++++++++++++++++"
 
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 156
+Content-Length: 155
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -197,7 +197,7 @@ Date: REGEX(.*)
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 1: ++++++++++++++++++++
@@ -214,7 +214,7 @@ Date: REGEX(.*)
 </orionError>
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 156
+Content-Length: 155
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -222,12 +222,12 @@ Date: REGEX(.*)
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 156
+Content-Length: 155
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -235,12 +235,12 @@ Date: REGEX(.*)
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 156
+Content-Length: 155
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -248,7 +248,7 @@ Date: REGEX(.*)
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 5: ++++++++++++++++++++

@@ -283,7 +283,7 @@ static int connectionTreat
   if (((ciP != NULL) && (ciP->httpHeaders.contentLength == 0)) && (ciP->method == "POST" || ciP->method == "PUT"))
   {
     LM_W(("Zero/No Content-Length in PUT/POST request"));
-    std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, "bad request", "Zero/No Content-Length in PUT/POST request");
+    std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, httpStatusCodeString(SccLengthRequired), "Zero/No Content-Length in PUT/POST request");
     ciP->httpStatusCode = SccLengthRequired;
     restReply(ciP, errorMsg);
     LM_RE(MHD_YES, ("Zero/No Content-Length in PUT/POST request"));
@@ -331,7 +331,7 @@ static int connectionTreat
       {
           /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
           ciP->httpStatusCode = SccUnsupportedMediaType;
-          restReply(ciP, "Unsupported Media Type", "Content-Type header not used, default application/octet-stream is not supported");
+          restReply(ciP, httpStatusCodeString(SccUnsupportedMediaType), "Content-Type header not used, default application/octet-stream is not supported");
           return MHD_YES;
       }
 
@@ -339,7 +339,7 @@ static int connectionTreat
       {
           /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
           ciP->httpStatusCode = SccUnsupportedMediaType;
-          restReply(ciP, "Unsupported Media Type", "not supported content type: " + ciP->httpHeaders.contentType);
+          restReply(ciP, httpStatusCodeString(SccUnsupportedMediaType), "not supported content type: " + ciP->httpHeaders.contentType);
           return MHD_YES;
       }
     }
@@ -414,7 +414,7 @@ static int connectionTreat
       char detail[256];
 
       snprintf(detail, sizeof(detail), "payload size: %d", ciP->httpHeaders.contentLength);
-      std::string out = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, "Payload Too Large", detail);
+      std::string out = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, httpStatusCodeString(SccRequestEntityTooLarge), detail);
       restReply(ciP, out);
     }
     else

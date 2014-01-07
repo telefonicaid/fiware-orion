@@ -518,7 +518,7 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
                  * been found. In this case, we interrupt the processing an early return with
                  * a error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter,
-                                      "Not Found Attribute in UPDATE",
+                                      httpStatusCodeString(SccInvalidParameter),
                                       std::string("action: UPDATE") +
                                           // FIXME: use toString once EntityID and ContextAttribute becomes objects
                                           " - entity: (" + entityId + ", " + entityType + ")" +
@@ -538,7 +538,7 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
                  * we interrupt the processing an early return with
                  * a error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter,
-                                      "It is not allowed to APPEND an attribute with ID when another with the same name is in place or viceversa",
+                                      httpStatusCodeString(SccInvalidParameter),
                                       std::string("action: APPEND") +
                                           // FIXME: use toString once EntityID and ContextAttribute becomes objects
                                           " - entity: (" + entityId + ", " + entityType + ")" +
@@ -556,7 +556,7 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
                  * been found. In this case, we interrupt the processing an early return with
                  * a error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter,
-                                      "Not Found Attribute in DELETE",
+                                      httpStatusCodeString(SccInvalidParameter),
                                       std::string("action: DELETE") +
                                       // FIXME: use toString once EntityID and ContextAttribute becomes objects
                                          " - entity: (" + entityId + ", " + entityType + ")" +
@@ -576,7 +576,7 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
         if (actualUpdate) {
             std::string err;
             if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, &err)) {
-                cerP->statusCode.fill(SccReceiverInternalError, "Database Error", err );
+                cerP->statusCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err );
                 responseP->contextElementResponseVector.push_back(cerP);
                 LM_RE(false, (err.c_str()));
             }
@@ -607,16 +607,15 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
 * createEntity -
 *
 */
-static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string* errReason, std::string* errDetail) {
+static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string* errDetail) {
 
     DBClientConnection* connection = getMongoConnection();
 
     LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName()));
 
     if (!legalIdUsage(attrsV)) {
-        *errReason = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden";
         // FIXME: use toString once EntityID and ContextAttribute becomes objects
-        *errDetail = "entity: (" + e.id + ", " + e.type + ")";
+        *errDetail = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: (" + e.id + ", " + e.type + ")";
         return false;
     }
 
@@ -659,8 +658,7 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
         connection->insert(getEntitiesCollectionName(), insertedDoc);
     }
     catch( const DBException &e ) {
-        *errReason = "Database Error";
-        *errDetail = std::string("collection: ") + getEntitiesCollectionName() +
+        *errDetail = std::string("Database Error: collection: ") + getEntitiesCollectionName() +
                 " - insert(): " + insertedDoc.toString() +
                 " - exception: " + e.what();
 
@@ -668,7 +666,6 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
     }
 
     return true;
-
 }
 
 /* ****************************************************************************
@@ -685,7 +682,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
     /* Not supporting isPattern = true currently */
     if (isTrue(en.isPattern)) {
-        buildGeneralErrorReponse(ceP, NULL, responseP, SccNotImplemented, "Not Implemented");
+        buildGeneralErrorReponse(ceP, NULL, responseP, SccNotImplemented, httpStatusCodeString(SccNotImplemented));
         return;
     }
 
@@ -698,7 +695,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 ca->name = ceP->contextAttributeVector.get(ix)->name;
                 ca->type = ceP->contextAttributeVector.get(ix)->type;
                 buildGeneralErrorReponse(ceP, ca, responseP, SccInvalidParameter,
-                                   "Empty Attribute in UPDATE or APPEND",
+                                   httpStatusCodeString(SccInvalidParameter),
                                    std::string("action: ") + action +
                                       // FIXME: use toString once EntityID and ContextAttribute becomes objects
                                       " - entity: (" + en.id + ", " + en.type + ", " + en.isPattern + ")" +
@@ -731,7 +728,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     }
     catch( const DBException &e ) {
         buildGeneralErrorReponse(ceP, NULL, responseP, SccReceiverInternalError,
-                           "Database Error",
+                           httpStatusCodeString(SccReceiverInternalError),
                            std::string("collection: ") + getEntitiesCollectionName() +
                               " - query(): " + query.toString() +
                               " - exception: " + e.what());
@@ -795,7 +792,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         catch( const DBException &e ) {
             cerP->statusCode.fill(
                 SccReceiverInternalError,
-                "Database Error",
+                httpStatusCodeString(SccReceiverInternalError),
                 std::string("collection: ") + getEntitiesCollectionName() +
                     " - update() query: " + query.toString() +
                     " - update() doc: " + updatedEntity.toString() +
@@ -856,8 +853,8 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             }
 
             std::string errReason, errDetail;
-            if (!createEntity(en, ceP->contextAttributeVector, &errReason, &errDetail)) {
-                cerP->statusCode.fill(SccInvalidParameter, errReason, errDetail);
+            if (!createEntity(en, ceP->contextAttributeVector, &errDetail)) {
+                cerP->statusCode.fill(SccInvalidParameter, httpStatusCodeString(SccInvalidParameter), errDetail);
             }
             else {
                 cerP->statusCode.fill(SccOk, "OK");
@@ -867,7 +864,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                     std::string err;
                     if (!addTriggeredSubscriptions(en.id, en.type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err)) {
-                        cerP->statusCode.fill(SccReceiverInternalError, "Database Error", err );
+                        cerP->statusCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err );
                         responseP->contextElementResponseVector.push_back(cerP);
                         LM_RVE((err.c_str()));
                     }

@@ -140,7 +140,7 @@ curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 307
+Content-Length: 315
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -153,7 +153,7 @@ Date: REGEX(.*)
   </contextElement>
   <statusCode>
     <code>404</code>
-    <reasonPhrase>Entity Not Found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
     <details>ENTITY_ID</details>
   </statusCode>
 </contextElementResponse>
@@ -183,7 +183,7 @@ Date: REGEX(.*)
 </appendContextElementResponse>
 3: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 273
+Content-Length: 284
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -191,7 +191,7 @@ Date: REGEX(.*)
 <updateContextElementResponse>
   <errorCode>
     <code>472</code>
-    <reasonPhrase>Not Found Attribute in UPDATE</reasonPhrase>
+    <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
     <details>action: UPDATE - entity: (ENTITY_ID, ) - offending attribute: temperature</details>
   </errorCode>
 </updateContextElementResponse>
@@ -268,7 +268,7 @@ Date: REGEX(.*)
 </appendContextElementResponse>
 8: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 273
+Content-Length: 284
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -276,7 +276,7 @@ Date: REGEX(.*)
 <updateContextElementResponse>
   <errorCode>
     <code>472</code>
-    <reasonPhrase>Not Found Attribute in UPDATE</reasonPhrase>
+    <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
     <details>action: UPDATE - entity: (ENTITY_ID, ) - offending attribute: temperature</details>
   </errorCode>
 </updateContextElementResponse>

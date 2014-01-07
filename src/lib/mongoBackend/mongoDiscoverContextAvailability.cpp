@@ -146,14 +146,14 @@ static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAva
 
     if (scope == SCOPE_VALUE_ASSOC_ALL) {
         LM_W(("%s scope not supported", SCOPE_VALUE_ASSOC_ALL));
-        responseP->errorCode.fill(SccNotImplemented, "Not supported scope", SCOPE_VALUE_ASSOC_ALL);
+        responseP->errorCode.fill(SccNotImplemented, httpStatusCodeString(SccNotImplemented), std::string("Not supported scope: '") + SCOPE_VALUE_ASSOC_ALL + "'");
         return SccOk;
     }
 
     MetadataVector mdV;
     std::string err;
     if (!associationsQuery(requestP->entityIdVector, requestP->attributeList, scope, &mdV, &err)) {
-        responseP->errorCode.fill(SccReceiverInternalError, "Database Error", err);
+        responseP->errorCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), std::string("Database error: ") + err);
         LM_RE(SccOk,(responseP->errorCode.details.c_str()));
     }
 
@@ -185,7 +185,7 @@ static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAva
 
         ContextRegistrationResponseVector crrV;
         if (!registrationsQuery(enV, attrL, &crrV, &err)) {
-            responseP->errorCode.fill(SccReceiverInternalError, "Database Error", err);
+            responseP->errorCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err);
             LM_RE(SccOk,(responseP->errorCode.details.c_str()));
         }
 
@@ -211,14 +211,14 @@ static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAva
 static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP) {
     std::string err;
     if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err)) {
-        responseP->errorCode.fill(SccReceiverInternalError, "Database Error", err);
+        responseP->errorCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err);
         LM_RE(SccOk,(responseP->errorCode.details.c_str()));
     }
 
     if (responseP->responseVector.size() == 0) {
         /* If the responseV is empty, we haven't found any entity and have to fill the status code part in the
          * response */
-        responseP->errorCode.fill(SccContextElementNotFound, "No context element registrations found", "");
+        responseP->errorCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound), "");
         return SccOk;
     }
 

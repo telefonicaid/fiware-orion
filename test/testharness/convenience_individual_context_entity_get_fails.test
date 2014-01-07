@@ -78,7 +78,7 @@ echo "+++++ 1. get an entity +++++"
   </contextElement>
   <statusCode>
     <code>404</code>
-    <reasonPhrase>Entity Not Found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
     <details>entity01</details>
   </statusCode>
 </contextElementResponse>

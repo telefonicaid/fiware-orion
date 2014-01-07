@@ -2888,7 +2888,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_TRUE(res.registrationId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
-    EXPECT_EQ("Database Error", res.errorCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
 
     /* We split the response into to string, to ease comparison, given that the contect of ObjectId is
      * random. ObjectId is 24 characters long.*/
@@ -3056,7 +3056,7 @@ TEST(mongoRegisterContextRequest, AssociationsDbFail)
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_TRUE(res.registrationId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
-    EXPECT_EQ("Database Error", res.errorCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
     EXPECT_EQ("boom!!", res.errorCode.details);
 
     /* Release mock */

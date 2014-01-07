@@ -56,7 +56,7 @@ static RestService rs[] =
 TEST(getNgsi10ContextEntityTypesAttribute, notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntityTypes/entity11/attributes/Attribute11",  "GET", "1.1");
-  std::string    expected = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context elements found</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  std::string    expected = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
   std::string    out;
 
   setupDatabase();

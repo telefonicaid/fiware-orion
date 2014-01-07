@@ -59,7 +59,7 @@ TEST(postQueryContext, notFound)
   setupDatabase();
 
   ConnectionInfo ci("/ngsi10/queryContext",  "POST", "1.1");
-  std::string    expected      = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context elements found</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  std::string    expected      = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
   const char*    fileName      = "ngsi10.queryContextRequest.entityIdNotFound.valid.xml";
   std::string    out;
 

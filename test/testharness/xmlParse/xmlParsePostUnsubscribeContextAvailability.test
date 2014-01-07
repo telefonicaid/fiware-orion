@@ -41,7 +41,7 @@ curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application
 echo "2: ***********************************"
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 251
+Content-Length: 253
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -50,9 +50,10 @@ Date: REGEX(.*)
   <subscriptionId>012345678901234567890123</subscriptionId>
   <statusCode>
     <code>404</code>
-    <reasonPhrase>Subscription Not Found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </statusCode>
 </unsubscribeContextAvailabilityResponse>
+2: ***********************************
 --TEARDOWN--
 source ../harnessFunctions.sh
 brokerStop CB

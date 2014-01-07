@@ -22,6 +22,9 @@
 *
 * Author: developer
 */
+
+#include "HttpStatusCode.h"
+
 std::string httpStatusCodeString(HttpStatusCode code)
 {
   switch (code)
@@ -44,5 +47,6 @@ std::string httpStatusCodeString(HttpStatusCode code)
   case SccAttributeListRequired:             return "Attribute List required by the receiver";
   case SccReceiverInternalError:             return "Internal Server Error";
   case SccNotImplemented:                    return "Not Implemented";
+  default:                                   return "Undefined";
   }
 }
