@@ -330,7 +330,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
   <statusCode>
     <code>404</code>
-    <reasonPhrase>Subscription Not Found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </statusCode>
 </unsubscribeContextAvailabilityResponse>
 9: ++++++++++++++++++++

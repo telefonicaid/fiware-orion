@@ -147,7 +147,8 @@ killall contextBroker
   <registrationId>012301230123012301230123</registrationId>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>Registration Not Found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>registration id: '012301230123012301230123'</details>
   </errorCode>
 </registerContextResponse>
 3: ++++++++++++++++++++

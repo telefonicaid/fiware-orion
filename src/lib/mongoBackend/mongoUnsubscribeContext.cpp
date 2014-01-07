@@ -59,7 +59,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
                            requestP->subscriptionId.get().c_str()));
         sub = connection->findOne(getSubscribeContextCollectionName(), BSON("_id" << id));
         if (sub.isEmpty()) {
-            responseP->statusCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound));
+            responseP->statusCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound), std::string("subscriptionId: '") + requestP->subscriptionId.get() + "'");
             LM_SR(SccOk);
         }
     }

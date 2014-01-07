@@ -146,14 +146,14 @@ static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAva
 
     if (scope == SCOPE_VALUE_ASSOC_ALL) {
         LM_W(("%s scope not supported", SCOPE_VALUE_ASSOC_ALL));
-        responseP->errorCode.fill(SccNotImplemented, httpStatusCodeString(SccNotImplemented), SCOPE_VALUE_ASSOC_ALL);
+        responseP->errorCode.fill(SccNotImplemented, httpStatusCodeString(SccNotImplemented), std::string("Not supported scope: '") + SCOPE_VALUE_ASSOC_ALL + "'");
         return SccOk;
     }
 
     MetadataVector mdV;
     std::string err;
     if (!associationsQuery(requestP->entityIdVector, requestP->attributeList, scope, &mdV, &err)) {
-        responseP->errorCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err);
+        responseP->errorCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), std::string("Database error: ") + err);
         LM_RE(SccOk,(responseP->errorCode.details.c_str()));
     }
 

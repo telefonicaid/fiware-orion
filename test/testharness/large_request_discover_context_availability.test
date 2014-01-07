@@ -79,7 +79,7 @@ rm $BIGFILE
 <discoverContextAvailabilityResponse>
   <errorCode>
     <code>413</code>
-    <reasonPhrase>Payload Too Large</reasonPhrase>
+    <reasonPhrase>Request Entity Too Large</reasonPhrase>
     <details>payload size: 1500000</details>
   </errorCode>
 </discoverContextAvailabilityResponse>

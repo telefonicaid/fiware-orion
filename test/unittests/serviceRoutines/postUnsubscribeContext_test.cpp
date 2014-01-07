@@ -79,7 +79,7 @@ TEST(postUnsubscribeContext, notFound)
 {
   ConnectionInfo ci("/ngsi10/unsubscribeContext",  "POST", "1.1");
   const char*    fileName    = "ngsi10.unsubscribeContextRequest.subscriptionId.valid.xml";
-  std::string    expected    = "<unsubscribeContextResponse>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n  <statusCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </statusCode>\n</unsubscribeContextResponse>\n";
+  std::string    expected    = "<unsubscribeContextResponse>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n  <statusCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n    <details>subscriptionId: '012345678901234567890123'</details>\n  </statusCode>\n</unsubscribeContextResponse>\n";
   std::string    out;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";

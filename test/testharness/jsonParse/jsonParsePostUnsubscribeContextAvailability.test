@@ -44,14 +44,14 @@ echo "2: ***********************************"
 --REGEXPECT--
 1: ***********************************
 HTTP/1.1 200 OK
-Content-Length: 142
+Content-Length: 144
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
         "code": "404", 
-        "reasonPhrase": "Subscription Not Found"
+        "reasonPhrase": "No context element found"
     }, 
     "subscriptionId": "012345678901234567890123"
 }

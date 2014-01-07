@@ -607,16 +607,15 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
 * createEntity -
 *
 */
-static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string* errReason, std::string* errDetail) {
+static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string* errDetail) {
 
     DBClientConnection* connection = getMongoConnection();
 
     LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName()));
 
     if (!legalIdUsage(attrsV)) {
-        *errReason = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden";
         // FIXME: use toString once EntityID and ContextAttribute becomes objects
-        *errDetail = "entity: (" + e.id + ", " + e.type + ")";
+        *errDetail = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: (" + e.id + ", " + e.type + ")";
         return false;
     }
 
@@ -659,8 +658,7 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
         connection->insert(getEntitiesCollectionName(), insertedDoc);
     }
     catch( const DBException &e ) {
-        *errReason = "Database Error";
-        *errDetail = std::string("collection: ") + getEntitiesCollectionName() +
+        *errDetail = std::string("Database Error: collection: ") + getEntitiesCollectionName() +
                 " - insert(): " + insertedDoc.toString() +
                 " - exception: " + e.what();
 
@@ -668,7 +666,6 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
     }
 
     return true;
-
 }
 
 /* ****************************************************************************
@@ -856,7 +853,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             }
 
             std::string errReason, errDetail;
-            if (!createEntity(en, ceP->contextAttributeVector, &errReason, &errDetail)) {
+            if (!createEntity(en, ceP->contextAttributeVector, &errDetail)) {
                 cerP->statusCode.fill(SccInvalidParameter, httpStatusCodeString(SccInvalidParameter), errDetail);
             }
             else {

@@ -72,7 +72,7 @@ curl localhost:${BROKER_PORT}/ngsi9/registerContext --header "Content-Length: 0"
   <registrationId>0</registrationId>
   <errorCode>
     <code>411</code>
-    <reasonPhrase>bad request</reasonPhrase>
+    <reasonPhrase>Length Required</reasonPhrase>
     <details>Zero/No Content-Length in PUT/POST request</details>
   </errorCode>
 </registerContextResponse>
