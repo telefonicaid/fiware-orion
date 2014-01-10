@@ -72,17 +72,17 @@ std::string formatedAnswer
       answer  = std::string("<")   + header + ">\n";
       answer += std::string("  <") + tag1   + ">" + value1 + "</" + tag1 + ">\n";
       answer += std::string("  <") + tag2   + ">" + value2 + "</" + tag2 + ">\n";
-      answer += std::string("</")  + header + ">";
+      answer += std::string("</")  + header + ">\n";
    }
    else if (format == JSON)
    {
       answer  = std::string("{\n");
       answer += std::string("  \"") + header + "\":\n";
       answer += std::string("  {\n");
-      answer += std::string("  \"") + tag1   + "\": \"" + value1 + "\",\n";
-      answer += std::string("  \"") + tag2   + "\": \"" + value2 + "\"\n";
+      answer += std::string("    \"") + tag1   + "\": \"" + value1 + "\",\n";
+      answer += std::string("    \"") + tag2   + "\": \"" + value2 + "\"\n";
       answer += std::string("  }\n");
-      answer += std::string("}");
+      answer += std::string("}\n");
    }
    else
       answer = header + ": " + tag1 + "=" + value1 + ", " + tag2 + "=" + value2;

@@ -1,0 +1,6 @@
+<appendContextElementResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>missing attribute name</reasonPhrase>
+  </errorCode>
+</appendContextElementResponse>

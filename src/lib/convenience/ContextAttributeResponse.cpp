@@ -60,23 +60,33 @@ std::string ContextAttributeResponse::render(Format format, std::string indent)
 */
 std::string ContextAttributeResponse::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
-   ContextAttributeResponse  response;
-   std::string               res;
+   std::string  res;
 
    if (predetectedError != "")
    {
-     response.statusCode.code         = SccBadRequest;
-     response.statusCode.reasonPhrase = predetectedError;
+     statusCode.code         = SccBadRequest;
+     statusCode.reasonPhrase = predetectedError;
    }
    else if ((res = contextAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
    {
-     response.statusCode.code         = SccBadRequest;
-     response.statusCode.reasonPhrase = res;
+     LM_E(("contextAttributeVector::check flags an error: '%s'", res.c_str()));
+     statusCode.code         = SccBadRequest;
+     statusCode.reasonPhrase = res;
+
+     //
+     // If this ContextAttributeResponse is part of an IndividualContextEntity, the complete rendered 
+     // response is not desired, just the string returned from the check method
+     //
+     if (requestType == IndividualContextEntity)
+       return res;
    }
    else 
       return "OK";
 
-   return response.render(format, indent);
+   res = render(format, indent);
+   LM_M(("rendered response for requestType %d: '%s'", requestType, res.c_str()));
+
+   return render(format, indent);
 }
 
 

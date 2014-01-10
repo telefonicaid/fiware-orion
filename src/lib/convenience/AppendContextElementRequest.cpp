@@ -102,7 +102,7 @@ std::string AppendContextElementRequest::check(RequestType requestType, Format f
    else
      return "OK";
    
-   return response.render(format, indent);
+   return response.render(requestType, format, indent);
 }
 
 

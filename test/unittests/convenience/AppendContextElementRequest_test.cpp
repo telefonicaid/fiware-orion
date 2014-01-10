@@ -32,6 +32,8 @@
 #include "ngsi/ContextElement.h"
 #include "ngsi/Metadata.h"
 
+#include "unittest.h"
+
 
 
 /* ****************************************************************************
@@ -44,13 +46,19 @@ TEST(AppendContextElementRequest, render)
    std::string                  out;
    ContextAttribute             ca("caName", "caType", "121");
    Metadata                     md("mdName", "mdType", "122");
-   std::string                  expected = "<appendContextElementRequest>\n  <attributeDomainName>ADN</attributeDomainName>\n  <contextAttributeList>\n    <contextAttribute>\n      <name>caName</name>\n      <type>caType</type>\n      <contextValue>121</contextValue>\n    </contextAttribute>\n  </contextAttributeList>\n</appendContextElementRequest>\n";
+   const char*                  outfile = "ngsi10.appendContextElementRequest.adn.valid.xml";
+
+   utInit();
 
    acer.attributeDomainName.set("ADN");
    acer.contextAttributeVector.push_back(&ca);
    
    out = acer.render(XML, "");
-   EXPECT_STREQ(expected.c_str(), out.c_str());
+
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+   EXPECT_STREQ(expectedBuf, out.c_str());
+
+   utExit();
 }
 
 
@@ -65,10 +73,11 @@ TEST(AppendContextElementRequest, check)
    std::string                  out;
    ContextAttribute             ca("caName", "caType", "121");
    Metadata                     md("mdName", "mdType", "122");
-   std::string                  expected1 = "OK";
-   std::string                  expected2 = "<appendContextElementResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Error is predetected</reasonPhrase>\n  </errorCode>\n</appendContextElementResponse>\n";
-   std::string                  expected3 = "<appendContextElementResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing attribute name</reasonPhrase>\n  </errorCode>\n</appendContextElementResponse>\n";
-   std::string                  expected4 = "<appendContextElementResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>missing metadata name</reasonPhrase>\n  </errorCode>\n</appendContextElementResponse>\n";
+   const char*                  outfile1 = "ngsi10.appendContextElementResponse.predetectedError.valid.xml";
+   const char*                  outfile2 = "ngsi10.appendContextElementResponse.missingAttributeName.invalid.xml";
+   const char*                  outfile3 = "ngsi10.appendContextElementResponse.missingMetadataName.invalid.xml";
+
+   utInit();
 
    acer.attributeDomainName.set("ADN");
    acer.contextAttributeVector.push_back(&ca);
@@ -76,29 +85,38 @@ TEST(AppendContextElementRequest, check)
 
    // 1. ok
    out = acer.check(AppendContextElement, XML, "", "", 0);
-   EXPECT_STREQ(expected1.c_str(), out.c_str());
+   EXPECT_STREQ("OK", out.c_str());
 
-   // 2. Predetected error
+
+   // 2. Predetected error 
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
    out = acer.check(AppendContextElement, XML, "", "Error is predetected", 0);
-   EXPECT_STREQ(expected2.c_str(), out.c_str());
+   EXPECT_STREQ(expectedBuf, out.c_str());
    
+
    // 3. bad ContextAttribute
-   ContextAttribute             ca2("", "caType", "121");
+   ContextAttribute  ca2("", "caType", "121");
 
    acer.contextAttributeVector.push_back(&ca2);
    out = acer.check(AppendContextElement, XML, "", "", 0);
-   EXPECT_STREQ(expected3.c_str(), out.c_str());
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";   
+   EXPECT_STREQ(expectedBuf, out.c_str());
    ca2.name = "ca2Name";
 
+
    // 4. Bad domainMetadata
-   Metadata                     md2("", "mdType", "122");
+   Metadata  md2("", "mdType", "122");
 
    acer.domainMetadataVector.push_back(&md2);
    out = acer.check(AppendContextElement, XML, "", "", 0);
-   EXPECT_STREQ(expected4.c_str(), out.c_str());
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";   
+   EXPECT_STREQ(expectedBuf, out.c_str());
+
 
    // 5. Bad attributeDomainName
    // FIXME P3: AttributeDomainName::check always returns "OK"
+
+   utExit();
 }
 
 
