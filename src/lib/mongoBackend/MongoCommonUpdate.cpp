@@ -71,7 +71,11 @@ static bool checkAndUpdate (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
 
     newAttr->append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
     newAttr->append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
-    newAttr->append(ENT_ATTRS_CREATION_DATE, attr.getIntField(ENT_ATTRS_CREATION_DATE));
+    /* The hasField() check is needed to preserve compabilility with entities that were created
+     * in database by a CB instance previous to the support of creation and modification dates */
+    if (attr.hasField(ENT_ATTRS_CREATION_DATE)) {
+        newAttr->append(ENT_ATTRS_CREATION_DATE, attr.getIntField(ENT_ATTRS_CREATION_DATE));
+    }
     if (STR_FIELD(attr, ENT_ATTRS_ID) != "") {
         newAttr->append(ENT_ATTRS_ID, STR_FIELD(attr, ENT_ATTRS_ID));
     }
@@ -98,7 +102,11 @@ static bool checkAndUpdate (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
         newAttr->append(ENT_ATTRS_MODIFICATION_DATE, getCurrentTime());
     }
     else {
-        newAttr->append(ENT_ATTRS_MODIFICATION_DATE, attr.getIntField(ENT_ATTRS_MODIFICATION_DATE));
+        /* The hasField() check is needed to preserve compabilility with entities that were created
+         * in database by a CB instance previous to the support of creation and modification dates */
+        if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE)) {
+            newAttr->append(ENT_ATTRS_MODIFICATION_DATE, attr.getIntField(ENT_ATTRS_MODIFICATION_DATE));
+        }
     }
 
     return updated;
@@ -122,8 +130,14 @@ static bool checkAndDelete (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
         newAttr->append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
         newAttr->append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
         newAttr->append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
-        newAttr->append(ENT_ATTRS_CREATION_DATE, attr.getIntField(ENT_ATTRS_CREATION_DATE));
-        newAttr->append(ENT_ATTRS_MODIFICATION_DATE, attr.getIntField(ENT_ATTRS_MODIFICATION_DATE));
+        /* The hasField() check is needed to preserve compabilility with entities that were created
+         * in database by a CB instance previous to the support of creation and modification dates */
+        if (attr.hasField(ENT_ATTRS_CREATION_DATE)) {
+            newAttr->append(ENT_ATTRS_CREATION_DATE, attr.getIntField(ENT_ATTRS_CREATION_DATE));
+        }
+        if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE)) {
+            newAttr->append(ENT_ATTRS_MODIFICATION_DATE, attr.getIntField(ENT_ATTRS_MODIFICATION_DATE));
+        }
         string id = STR_FIELD(attr, ENT_ATTRS_ID);
         if (id != "") {
             newAttr->append(ENT_ATTRS_ID, STR_FIELD(attr, ENT_ATTRS_ID));
