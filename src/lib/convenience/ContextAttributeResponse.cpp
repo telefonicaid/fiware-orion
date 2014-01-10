@@ -84,7 +84,6 @@ std::string ContextAttributeResponse::check(RequestType requestType, Format form
       return "OK";
 
    res = render(format, indent);
-   LM_M(("rendered response for requestType %d: '%s'", requestType, res.c_str()));
 
    return render(format, indent);
 }

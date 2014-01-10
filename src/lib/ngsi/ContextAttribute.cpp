@@ -131,10 +131,7 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
 std::string ContextAttribute::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
   if ((name == "") || (name == "not in use"))
-  {
-    LM_M(("Returning 'missing attribute name'"));
     return "missing attribute name";
-  }
 
   if (requestType != UpdateContext) // FIXME: this is just to make harness test work
   {
