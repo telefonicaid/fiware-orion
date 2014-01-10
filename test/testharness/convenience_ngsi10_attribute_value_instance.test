@@ -159,7 +159,7 @@ killall contextBroker
 <?xml version="1.0"?>
 <statusCode>
   <code>404</code>
-  <reasonPhrase>Entity Not Found</reasonPhrase>
+  <reasonPhrase>No context element found</reasonPhrase>
   <details>E01</details>
 </statusCode>
 1: ++++++++++++++++++++
