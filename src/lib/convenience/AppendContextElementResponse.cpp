@@ -39,7 +39,7 @@
 *
 * AppendContextElementResponse::render - 
 */
-std::string AppendContextElementResponse::render(Format format, std::string indent)
+std::string AppendContextElementResponse::render(RequestType requestType, Format format, std::string indent)
 {
   std::string tag = "appendContextElementResponse";
   std::string out = "";
@@ -68,19 +68,13 @@ std::string AppendContextElementResponse::check(RequestType requestType, Format 
   std::string res;
   
   if (predetectedError != "")
-  {
-    errorCode.code         = SccBadRequest;
-    errorCode.reasonPhrase = predetectedError;
-  }
+    errorCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), predetectedError); 
   else if ((res = contextResponseVector.check(requestType, format, indent, "", counter)) != "OK")
-  {
-    errorCode.code         = SccBadRequest;
-    errorCode.reasonPhrase = res;
-  }
+    errorCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), res);
   else
     return "OK";
 
-  return render(format, indent);
+  return render(requestType, format, indent);
 }
 
 

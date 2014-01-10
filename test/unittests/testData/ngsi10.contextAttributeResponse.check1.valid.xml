@@ -1,0 +1,13 @@
+<contextAttributeResponse>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>caName</name>
+      <type>caType</type>
+      <contextValue>caValue</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+  <statusCode>
+    <code>400</code>
+    <reasonPhrase>PRE ERROR</reasonPhrase>
+  </statusCode>
+</contextAttributeResponse>

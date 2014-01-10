@@ -1,0 +1,8 @@
+<unsubscribeContextResponse>
+  <subscriptionId>0</subscriptionId>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>ok</reasonPhrase>
+    <details>detail</details>
+  </statusCode>
+</unsubscribeContextResponse>

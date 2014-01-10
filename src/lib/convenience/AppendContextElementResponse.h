@@ -48,7 +48,7 @@ typedef struct AppendContextElementResponse
   ContextAttributeResponseVector   contextResponseVector;   // Optional, but mandatory if success
   ErrorCode                        errorCode;               // Optional, but mandatory if failure
 
-  std::string render(Format format, std::string indent);
+  std::string render(RequestType requestType, Format format, std::string indent);
   std::string check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void        present(void);
   void        release(void);

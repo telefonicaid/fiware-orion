@@ -203,7 +203,7 @@ Date: REGEX(.*)
 1: ++++++++++++++++++++
 HTTP/1.1 406 Not Acceptable
 Connection: close
-Content-Length: 159
+Content-Length: 160
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -254,7 +254,7 @@ Date: REGEX(.*)
 5: ++++++++++++++++++++
 HTTP/1.1 406 Not Acceptable
 Connection: close
-Content-Length: 171
+Content-Length: 172
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -266,7 +266,7 @@ Date: REGEX(.*)
 6: ++++++++++++++++++++
 HTTP/1.1 406 Not Acceptable
 Connection: close
-Content-Length: 186
+Content-Length: 187
 Content-Type: application/xml
 Date: REGEX(.*)
 
