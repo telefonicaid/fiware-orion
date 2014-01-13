@@ -149,6 +149,7 @@ std::string sendHttpSocket
   if (sz >= MSG_SIZE)
     LM_RE("Msg too large", ("A message got too large (%d bytes - max size is %d). The contextBroker must be recompiled!!!", sz, sizeof(msg)));
 
+  LM_T(LmtClientOutputPayload, ("Sending to HTTP server:\n%s", msg));
   nb = send(fd, msg, sz, 0);
   if (nb == -1)
     LM_RE("error", ("error sending to HTTP server: %s", strerror(errno)));
@@ -165,7 +166,7 @@ std::string sendHttpSocket
       else
       {
           memcpy(response, buffer, nb);
-          LM_V5(("Received from HTTP server:\n%s", response));
+          LM_T(LmtClientInputPayload, ("Received from HTTP server:\n%s", response));
       }
 
       if (strlen(response) > 0)
