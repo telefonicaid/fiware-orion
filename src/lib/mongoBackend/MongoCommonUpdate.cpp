@@ -71,7 +71,7 @@ static bool checkAndUpdate (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
 
     newAttr->append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
     newAttr->append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
-    /* The hasField() check is needed to preserve compabilility with entities that were created
+    /* The hasField() check is needed to preserve compatibility with entities that were created
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_CREATION_DATE)) {
         newAttr->append(ENT_ATTRS_CREATION_DATE, attr.getIntField(ENT_ATTRS_CREATION_DATE));
@@ -102,7 +102,7 @@ static bool checkAndUpdate (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
         newAttr->append(ENT_ATTRS_MODIFICATION_DATE, getCurrentTime());
     }
     else {
-        /* The hasField() check is needed to preserve compabilility with entities that were created
+        /* The hasField() check is needed to preserve compatibility with entities that were created
          * in database by a CB instance previous to the support of creation and modification dates */
         if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE)) {
             newAttr->append(ENT_ATTRS_MODIFICATION_DATE, attr.getIntField(ENT_ATTRS_MODIFICATION_DATE));
@@ -130,7 +130,7 @@ static bool checkAndDelete (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
         newAttr->append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
         newAttr->append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
         newAttr->append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
-        /* The hasField() check is needed to preserve compabilility with entities that were created
+        /* The hasField() check is needed to preserve compatibility with entities that were created
          * in database by a CB instance previous to the support of creation and modification dates */
         if (attr.hasField(ENT_ATTRS_CREATION_DATE)) {
             newAttr->append(ENT_ATTRS_CREATION_DATE, attr.getIntField(ENT_ATTRS_CREATION_DATE));
@@ -630,9 +630,9 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
     }
 
     if (!entityModified) {
-        /* In this case, the wasn't a fail, but ceP was not set. We need to do it ourselves, as the fucntion caller will
-         * do a continue without doing it. FIXME P5: this is ugly, it should be improve to the the ceP for the "happy case"
-         * in just one place in the code */
+        /* In this case, there wasn't any failure, but ceP was not set. We need to do it ourselves, as the function caller will
+         * do a 'continue' without setting it. */
+        //FIXME P5: this is ugly, it should be improve to set ceP in a common place for the "happy case"
         cerP->statusCode.fill(SccOk, "OK");
         responseP->contextElementResponseVector.push_back(cerP);
     }
@@ -660,50 +660,38 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
     int now = getCurrentTime();
     BSONArrayBuilder attrsToAdd;
     for (unsigned int ix = 0; ix < attrsV.size(); ++ix) {
-        std::string attrId = attrsV.get(ix)->getId();
-        // FIXME P6: I don't like this approach, it is not DRY. It would be better to create the
-        // base attribute, then append the last item (id) only in the case it is used)
+        std::string attrId = attrsV.get(ix)->getId();        
+
+        BSONObjBuilder bsonAttr;
+        bsonAttr.appendElements(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
+                                     ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
+                                     ENT_ATTRS_VALUE << attrsV.get(ix)->value <<
+                                     ENT_ATTRS_CREATION_DATE << now <<
+                                     ENT_ATTRS_MODIFICATION_DATE << now));
         if (attrId.length() == 0) {
-            attrsToAdd.append(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
-                                   ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
-                                   ENT_ATTRS_VALUE << attrsV.get(ix)->value <<
-                                   ENT_ATTRS_CREATION_DATE << now <<
-                                   ENT_ATTRS_MODIFICATION_DATE << now));
             LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
                             attrsV.get(ix)->name.c_str(),
                             attrsV.get(ix)->type.c_str(),
                             attrsV.get(ix)->value.c_str()));
         }
         else {
-            attrsToAdd.append(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
-                                   ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
-                                   ENT_ATTRS_VALUE << attrsV.get(ix)->value <<
-                                   ENT_ATTRS_ID << attrId <<
-                                   ENT_ATTRS_CREATION_DATE << now <<
-                                   ENT_ATTRS_MODIFICATION_DATE << now));
+            bsonAttr.append(ENT_ATTRS_ID, attrId);
             LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s, id: %s}",
                             attrsV.get(ix)->name.c_str(),
                             attrsV.get(ix)->type.c_str(),
                             attrsV.get(ix)->value.c_str(),
                             attrId.c_str()));
         }
+        attrsToAdd.append(bsonAttr.obj());
 
     }
-    BSONObj insertedDoc;
-    // FIXME P6: similarly to the previous FIXME, most of insertedDoc could be factoried in both branches
-    // in "if" clause
-    if (e.type == "") {
-        insertedDoc = BSON("_id" << BSON(ENT_ENTITY_ID << e.id) <<
-                           ENT_ATTRS << attrsToAdd.arr() <<
-                           ENT_CREATION_DATE << now <<
-                           ENT_MODIFICATION_DATE << now);
-    }
-    else {
-        insertedDoc = BSON("_id" << BSON(ENT_ENTITY_ID << e.id << ENT_ENTITY_TYPE << e.type) <<
-                           ENT_ATTRS << attrsToAdd.arr() <<
-                           ENT_CREATION_DATE << now <<
-                           ENT_MODIFICATION_DATE << now);
-    }
+
+    BSONObj bsonId = e.type == "" ? BSON(ENT_ENTITY_ID << e.id) : BSON(ENT_ENTITY_ID << e.id << ENT_ENTITY_TYPE << e.type);
+    BSONObj insertedDoc = BSON("_id" << bsonId <<
+                               ENT_ATTRS << attrsToAdd.arr() <<
+                               ENT_CREATION_DATE << now <<
+                               ENT_MODIFICATION_DATE << now);
+
     try {
         LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getEntitiesCollectionName(), insertedDoc.toString().c_str()));
         connection->insert(getEntitiesCollectionName(), insertedDoc);
