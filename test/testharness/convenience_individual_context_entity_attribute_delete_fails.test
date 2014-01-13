@@ -71,7 +71,7 @@ echo "+++++ 1. delete an entity +++++"
 <?xml version="1.0"?>
 <statusCode>
   <code>404</code>
-  <reasonPhrase>Entity Not Found</reasonPhrase>
+  <reasonPhrase>No context element found</reasonPhrase>
   <details>entity01</details>
 </statusCode>
 --TEARDOWN--

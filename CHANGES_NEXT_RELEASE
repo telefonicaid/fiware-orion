@@ -1,3 +1,7 @@
+o PR #182 fermin     Mon jan 13 12:17:00 CET 2014
+  - Add: creDate also for attributes
+  - Fix: setting modDate for entities and attributes at creation time
+
 o PR #167 kzangeli   Wed dec 18 12:50:00 CET 2013
   - Found and fixed three bugs during the process:
     - registerContextRequest rendering had no comma for JSON between ContextRegistrations

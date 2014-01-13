@@ -71,6 +71,11 @@ static bool checkAndUpdate (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
 
     newAttr->append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
     newAttr->append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
+    /* The hasField() check is needed to preserve compatibility with entities that were created
+     * in database by a CB instance previous to the support of creation and modification dates */
+    if (attr.hasField(ENT_ATTRS_CREATION_DATE)) {
+        newAttr->append(ENT_ATTRS_CREATION_DATE, attr.getIntField(ENT_ATTRS_CREATION_DATE));
+    }
     if (STR_FIELD(attr, ENT_ATTRS_ID) != "") {
         newAttr->append(ENT_ATTRS_ID, STR_FIELD(attr, ENT_ATTRS_ID));
     }
@@ -97,6 +102,8 @@ static bool checkAndUpdate (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
         newAttr->append(ENT_ATTRS_MODIFICATION_DATE, getCurrentTime());
     }
     else {
+        /* The hasField() check is needed to preserve compatibility with entities that were created
+         * in database by a CB instance previous to the support of creation and modification dates */
         if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE)) {
             newAttr->append(ENT_ATTRS_MODIFICATION_DATE, attr.getIntField(ENT_ATTRS_MODIFICATION_DATE));
         }
@@ -123,6 +130,14 @@ static bool checkAndDelete (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
         newAttr->append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
         newAttr->append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
         newAttr->append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
+        /* The hasField() check is needed to preserve compatibility with entities that were created
+         * in database by a CB instance previous to the support of creation and modification dates */
+        if (attr.hasField(ENT_ATTRS_CREATION_DATE)) {
+            newAttr->append(ENT_ATTRS_CREATION_DATE, attr.getIntField(ENT_ATTRS_CREATION_DATE));
+        }
+        if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE)) {
+            newAttr->append(ENT_ATTRS_MODIFICATION_DATE, attr.getIntField(ENT_ATTRS_MODIFICATION_DATE));
+        }
         string id = STR_FIELD(attr, ENT_ATTRS_ID);
         if (id != "") {
             newAttr->append(ENT_ATTRS_ID, STR_FIELD(attr, ENT_ATTRS_ID));
@@ -173,22 +188,24 @@ static bool updateAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
 *
 * appendAttribute -
 *
+* In the case of "actual append", it always return true
+* In the case of "append as update", it returns true in the case of actual update,
+* false othewise (i.e. when the new value equals to the existing one)
+*
 */
-static void appendAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute* caP) {
+static bool appendAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute* caP) {
 
     /* In the current version (and until we close old issue 33)
      * APPEND with existing attribute equals to UPDATE */
     BSONArrayBuilder newAttrsBuilder;
     bool updated = false;
+    bool actualUpdate = false;
     for( BSONObj::iterator i = attrs->begin(); i.more(); ) {
 
         BSONObjBuilder newAttr;
-        /* We need to use some bool variable to match the checkAndUpdate() signature, but in
-         * appendAttribute() we don't use this information */
-        bool actualUpdate;
-        if (checkAndUpdate(&newAttr, i.next().embeddedObject(), *caP, &actualUpdate) && !updated) {
-            updated = true;
-        }
+        bool attrActualUpdate;
+        updated = checkAndUpdate(&newAttr, i.next().embeddedObject(), *caP, &attrActualUpdate) || updated;
+        actualUpdate = attrActualUpdate || actualUpdate;
         newAttrsBuilder.append(newAttr.obj());
     }
 
@@ -201,10 +218,19 @@ static void appendAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
         if (caP->getId() != "") {
             newAttr.append(ENT_ATTRS_ID, caP->getId());
         }
-        newAttr.append(ENT_ATTRS_MODIFICATION_DATE, getCurrentTime());
+        int now = getCurrentTime();
+        newAttr.append(ENT_ATTRS_CREATION_DATE, now);
+        newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
         newAttrsBuilder.append(newAttr.obj());
+
+        *newAttrs = newAttrsBuilder.arr();
+        return true;
     }
-    *newAttrs = newAttrsBuilder.arr();
+    else {
+        *newAttrs = newAttrsBuilder.arr();
+        return actualUpdate;
+    }
+
 
 }
 
@@ -470,14 +496,14 @@ static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::
 * buildGeneralErrorReponse -
 *
 */
-static void buildGeneralErrorReponse(ContextElement* ceP, ContextAttribute* ca, UpdateContextResponse* responseP, HttpStatusCode code, std::string reasonPhrase, std::string details = "") {
+static void buildGeneralErrorReponse(ContextElement* ceP, ContextAttribute* ca, UpdateContextResponse* responseP, HttpStatusCode code, std::string details = "") {
 
     ContextElementResponse* cerP = new ContextElementResponse();
     cerP->contextElement.entityId = ceP->entityId;
     if (ca != NULL) {
         cerP->contextElement.contextAttributeVector.push_back(ca);
     }
-    cerP->statusCode.fill(code, reasonPhrase, details);
+    cerP->statusCode.fill(code, httpStatusCodeString(code), details);
     responseP->contextElementResponseVector.push_back(cerP);
 
 }
@@ -486,13 +512,15 @@ static void buildGeneralErrorReponse(ContextElement* ceP, ContextAttribute* ca, 
 *
 * processContextAttributeVector -
 *
-* Returns true if processing was ok, false otherwise
+* Returns true if entity was actually modified, false otherwise (including fail cases)
 *
 */
 static bool processContextAttributeVector (ContextElement* ceP, std::string action, std::map<string, BSONObj*>* subsToNotify, BSONObj* attrs, BSONObj* newAttrs, ContextElementResponse* cerP, UpdateContextResponse* responseP) {
 
     std::string entityId = cerP->contextElement.entityId.id;
     std::string entityType = cerP->contextElement.entityId.type;
+
+    bool entityModified = false;
 
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
 
@@ -511,7 +539,8 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
         bool actualUpdate = true;
         if (strcasecmp(action.c_str(), "update") == 0) {
             if (updateAttribute(attrs, newAttrs, ceP->contextAttributeVector.get(ix), &actualUpdate)) {
-                *attrs = *newAttrs;
+                entityModified = actualUpdate || entityModified;
+                *attrs = *newAttrs;                
             }
             else {
                 /* If updateAttribute() returns false, then that particular attribute has not
@@ -530,7 +559,7 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
         }
         else if (strcasecmp(action.c_str(), "append") == 0) {
             if (legalIdUsage(attrs, ceP->contextAttributeVector.get(ix))) {
-                appendAttribute(attrs, newAttrs, ceP->contextAttributeVector.get(ix));
+                entityModified = appendAttribute(attrs, newAttrs, ceP->contextAttributeVector.get(ix)) || entityModified;
                 *attrs = *newAttrs;
             }
             else {
@@ -549,6 +578,7 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
         }
         else if (strcasecmp(action.c_str(), "delete") == 0) {
             if (deleteAttribute(attrs, newAttrs, ceP->contextAttributeVector.get(ix))) {
+                entityModified = true;
                 *attrs = *newAttrs;
             }
             else {
@@ -599,7 +629,15 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
 
     }
 
-    return true;
+    if (!entityModified) {
+        /* In this case, there wasn't any failure, but ceP was not set. We need to do it ourselves, as the function caller will
+         * do a 'continue' without setting it. */
+        //FIXME P5: this is ugly, it should be improve to set ceP in a common place for the "happy case"
+        cerP->statusCode.fill(SccOk, "OK");
+        responseP->contextElementResponseVector.push_back(cerP);
+    }
+
+    return entityModified;
 }
 
 /* ****************************************************************************
@@ -619,40 +657,41 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
         return false;
     }
 
+    int now = getCurrentTime();
     BSONArrayBuilder attrsToAdd;
     for (unsigned int ix = 0; ix < attrsV.size(); ++ix) {
-        std::string attrId = attrsV.get(ix)->getId();
-        // FIXME P6: I don't like this approach, it is not DRY. It would be better to create the
-        // base attribute, then append the last item (id) only in the case it is used)
+        std::string attrId = attrsV.get(ix)->getId();        
+
+        BSONObjBuilder bsonAttr;
+        bsonAttr.appendElements(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
+                                     ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
+                                     ENT_ATTRS_VALUE << attrsV.get(ix)->value <<
+                                     ENT_ATTRS_CREATION_DATE << now <<
+                                     ENT_ATTRS_MODIFICATION_DATE << now));
         if (attrId.length() == 0) {
-            attrsToAdd.append(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
-                                   ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
-                                   ENT_ATTRS_VALUE << attrsV.get(ix)->value));
             LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
                             attrsV.get(ix)->name.c_str(),
                             attrsV.get(ix)->type.c_str(),
                             attrsV.get(ix)->value.c_str()));
         }
         else {
-            attrsToAdd.append(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
-                                    ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
-                                    ENT_ATTRS_VALUE << attrsV.get(ix)->value <<
-                                    ENT_ATTRS_ID << attrId));
+            bsonAttr.append(ENT_ATTRS_ID, attrId);
             LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s, id: %s}",
                             attrsV.get(ix)->name.c_str(),
                             attrsV.get(ix)->type.c_str(),
                             attrsV.get(ix)->value.c_str(),
                             attrId.c_str()));
         }
+        attrsToAdd.append(bsonAttr.obj());
 
     }
-    BSONObj insertedDoc;
-    if (e.type == "") {
-        insertedDoc = BSON("_id" << BSON(ENT_ENTITY_ID << e.id) << ENT_ATTRS << attrsToAdd.arr() << ENT_CREATION_DATE << getCurrentTime());
-    }
-    else {
-        insertedDoc = BSON("_id" << BSON(ENT_ENTITY_ID << e.id << ENT_ENTITY_TYPE << e.type) << ENT_ATTRS << attrsToAdd.arr() << ENT_CREATION_DATE << getCurrentTime());
-    }
+
+    BSONObj bsonId = e.type == "" ? BSON(ENT_ENTITY_ID << e.id) : BSON(ENT_ENTITY_ID << e.id << ENT_ENTITY_TYPE << e.type);
+    BSONObj insertedDoc = BSON("_id" << bsonId <<
+                               ENT_ATTRS << attrsToAdd.arr() <<
+                               ENT_CREATION_DATE << now <<
+                               ENT_MODIFICATION_DATE << now);
+
     try {
         LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getEntitiesCollectionName(), insertedDoc.toString().c_str()));
         connection->insert(getEntitiesCollectionName(), insertedDoc);
@@ -682,7 +721,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
     /* Not supporting isPattern = true currently */
     if (isTrue(en.isPattern)) {
-        buildGeneralErrorReponse(ceP, NULL, responseP, SccNotImplemented, httpStatusCodeString(SccNotImplemented));
+        buildGeneralErrorReponse(ceP, NULL, responseP, SccNotImplemented);
         return;
     }
 
@@ -694,8 +733,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 ContextAttribute* ca = new ContextAttribute();
                 ca->name = ceP->contextAttributeVector.get(ix)->name;
                 ca->type = ceP->contextAttributeVector.get(ix)->type;
-                buildGeneralErrorReponse(ceP, ca, responseP, SccInvalidParameter,
-                                   httpStatusCodeString(SccInvalidParameter),
+                buildGeneralErrorReponse(ceP, ca, responseP, SccInvalidParameter,                                   
                                    std::string("action: ") + action +
                                       // FIXME: use toString once EntityID and ContextAttribute becomes objects
                                       " - entity: (" + en.id + ", " + en.type + ", " + en.isPattern + ")" +
@@ -727,8 +765,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         }
     }
     catch( const DBException &e ) {
-        buildGeneralErrorReponse(ceP, NULL, responseP, SccReceiverInternalError,
-                           httpStatusCodeString(SccReceiverInternalError),
+        buildGeneralErrorReponse(ceP, NULL, responseP, SccReceiverInternalError,                           
                            std::string("collection: ") + getEntitiesCollectionName() +
                               " - query(): " + query.toString() +
                               " - exception: " + e.what());
@@ -763,16 +800,17 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         std::map<string, BSONObj*> subsToNotify;
 
         if (!processContextAttributeVector(ceP, action, &subsToNotify, &attrs, &newAttrs, cerP, responseP)) {
-            /* Something was wrong processing attributes on this entity, continue with next one */
+            /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
             continue;
         }
 
         /* Now that newAttrs containts the final status of the attributes after processing the whole
          * list of attributes in the ContextElement, update entity attributes in database */
         BSONObjBuilder updatedEntityBuilder;
-        updatedEntityBuilder.appendArray(ENT_ATTRS, attrs);        
+        updatedEntityBuilder.appendArray(ENT_ATTRS, attrs);
         updatedEntityBuilder.append(ENT_MODIFICATION_DATE, getCurrentTime());
-        BSONObj updatedEntity = updatedEntityBuilder.obj();
+        /* We use $set to avoid losing the creation date field */
+        BSONObj updatedEntity = BSON("$set" << updatedEntityBuilder.obj());
         /* Note that the query that we build for updating is slighty different than the query used
          * for selecting the entities to process. In particular, the "no type" branch in the if
          * sentence selects precisely the entity with no type, using the {$exists: false} clause */
@@ -829,11 +867,12 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     }
 
     /* If the entity didn't already exist, we create it. Note that alternatively, we could do a count()
-     * before the query() to check this and early return. However this would add a sencond interaction with MongoDB */
+     * before the query() to check this. However this would add a second interaction with MongoDB */
     if (!atLeastOneResult) {
 
         if (strcasecmp(action.c_str(), "append") != 0) {
-            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, "Entity Not Found", en.id);
+            /* Only APPEND can create entities, thus error is returned in UPDATE or DELETE cases */
+            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, en.id);
         }
         else {            
 
@@ -857,7 +896,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 cerP->statusCode.fill(SccInvalidParameter, httpStatusCodeString(SccInvalidParameter), errDetail);
             }
             else {
-                cerP->statusCode.fill(SccOk, "OK");
+                cerP->statusCode.fill(SccOk, httpStatusCodeString(SccOk));
 
                 /* Successful creation: send potential notifications */
                 std::map<string, BSONObj*> subsToNotify;

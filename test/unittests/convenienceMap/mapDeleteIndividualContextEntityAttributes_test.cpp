@@ -87,7 +87,7 @@ TEST(mapDeleteIndividualContextEntityAttributes, notFound)
   ms = mapDeleteIndividualContextEntityAttributes(id, &sc);
 
   EXPECT_EQ(SccContextElementNotFound, sc.code);
-  EXPECT_STREQ("Entity Not Found", sc.reasonPhrase.c_str());
+  EXPECT_STREQ("No context element found", sc.reasonPhrase.c_str());
   EXPECT_STREQ("XXX", sc.details.c_str());
 }
 
