@@ -89,7 +89,6 @@ int socketHttpConnect(std::string host, unsigned short port)
 *
 */
 #define MSG_SIZE (8 * 1024 * 1024)
-char msg[MSG_SIZE];
 std::string sendHttpSocket
 (
    std::string     ip,
@@ -101,6 +100,7 @@ std::string sendHttpSocket
    bool            waitForResponse
 )
 {
+  char         msg[MSG_SIZE];
   char         buffer[TAM_BUF];
   char         response[TAM_BUF];;
   std::string  result;
