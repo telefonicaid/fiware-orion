@@ -65,9 +65,9 @@ TEST(putAttributeValueInstance, notFound)
   ConnectionInfo ci1("/ngsi10/contextEntities/E1/attributes/A1/left",  "PUT", "1.1");
   ConnectionInfo ci2("/ngsi10/contextEntities/E1/attributes/A1/right",  "PUT", "1.1");
   ConnectionInfo ci3("/ngsi10/contextEntities/E1/attributes/A1/left",  "PUT", "1.1");
-  std::string    expected1   = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>Entity Not Found</reasonPhrase>\n  <details>E1</details>\n</statusCode>\n";
+  std::string    expected1   = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>No context element found</reasonPhrase>\n  <details>E1</details>\n</statusCode>\n";
   std::string    expected2  = "<statusCode>\n  <code>400</code>\n  <reasonPhrase>unmatching metadata ID value URI/payload</reasonPhrase>\n  <details>right vs left</details>\n</statusCode>\n";
-  std::string    expected3  = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>Entity Not Found</reasonPhrase>\n  <details>E1</details>\n</statusCode>\n";
+  std::string    expected3  = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>No context element found</reasonPhrase>\n  <details>E1</details>\n</statusCode>\n";
   const char*    fileName   = "ngsi10.putAttributeValueInstance.A1-left.ok.postponed.xml";
   const char*    fileName2  = "ngsi10.putAttributeValueInstance.noIdMetadata.postponed.xml";
   std::string    out;

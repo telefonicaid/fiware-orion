@@ -54,7 +54,7 @@ static RestService rs[] =
 TEST(putIndividualContextEntityAttributes, notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity101/attributes",  "PUT", "1.1");
-  std::string    expected    = "<updateContextElementResponse>\n  <contextResponseList>\n    <contextAttributeResponse>\n      <statusCode>\n        <code>404</code>\n        <reasonPhrase>Entity Not Found</reasonPhrase>\n        <details>entity101</details>\n      </statusCode>\n    </contextAttributeResponse>\n  </contextResponseList>\n</updateContextElementResponse>\n";
+  std::string    expected    = "<updateContextElementResponse>\n  <contextResponseList>\n    <contextAttributeResponse>\n      <statusCode>\n        <code>404</code>\n        <reasonPhrase>No context element found</reasonPhrase>\n        <details>entity101</details>\n      </statusCode>\n    </contextAttributeResponse>\n  </contextResponseList>\n</updateContextElementResponse>\n";
   const char*    fileName    = "ngsi10.updateContextElementRequest.valid.xml";
   std::string    out;
 

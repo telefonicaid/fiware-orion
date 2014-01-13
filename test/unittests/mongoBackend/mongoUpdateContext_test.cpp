@@ -4395,7 +4395,7 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
-    EXPECT_EQ("Entity Not Found", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("E4", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
@@ -4656,14 +4656,16 @@ TEST(mongoUpdateContextRequest, createEntity)
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4" << "_id.type" << "T4"));
     EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T4", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
+    EXPECT_TRUE(ent.hasField("creDate"));
+    EXPECT_TRUE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
+    EXPECT_TRUE(a1.hasField("creDate"));
+    EXPECT_TRUE(a1.hasField("modDate"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
@@ -4844,7 +4846,8 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4" << "_id.type" << "T4"));
     EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T4", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
+    EXPECT_TRUE(ent.hasField("creDate"));
+    EXPECT_TRUE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
@@ -4852,7 +4855,8 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_STREQ("ID1", C_STR_FIELD(a1, "id"));
-    EXPECT_FALSE(a1.hasField("modDate"));
+    EXPECT_TRUE(a1.hasField("creDate"));
+    EXPECT_TRUE(a1.hasField("modDate"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
@@ -5909,14 +5913,16 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E5" << "_id.type" << "T5"));
     EXPECT_STREQ("E5", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T5", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
+    EXPECT_TRUE(ent.hasField("creDate"));
+    EXPECT_TRUE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     a3 = getAttr(attrs, "A3", "TA3");
     EXPECT_STREQ("A3", C_STR_FIELD(a3, "name"));
     EXPECT_STREQ("TA3",C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("new_val13", C_STR_FIELD(a3, "value"));
-    EXPECT_FALSE(a3.hasField("modDate"));
+    EXPECT_TRUE(a3.hasField("creDate"));
+    EXPECT_TRUE(a3.hasField("modDate"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
@@ -8166,7 +8172,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     EXPECT_EQ("Internal Server Error", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("collection: unittest.entities "
               "- update() query: { _id.id: \"E1\", _id.type: \"T1\" } "
-              "- update() doc: { attrs: [ { name: \"A1\", type: \"TA1\", value: \"new_val\", modDate: 1360232700 }, { name: \"A2\", type: \"TA2\" } ], modDate: 1360232700 } "
+              "- update() doc: { $set: { attrs: [ { name: \"A1\", type: \"TA1\", value: \"new_val\", modDate: 1360232700 }, { name: \"A2\", type: \"TA2\" } ], modDate: 1360232700 } } "
               "- exception: boom!!", RES_CER_STATUS(0).details);
 
     /* Release mocks */
