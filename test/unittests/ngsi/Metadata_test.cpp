@@ -57,7 +57,7 @@ TEST(Metadata, constructor)
 */
 TEST(Metadata, render)
 {
-  std::string  rendered;
+  std::string  out;
   Metadata     m1;
   Metadata     m2("Name", "Integer", "19");
   Metadata     m3("Name", "Association", "27");
@@ -69,29 +69,29 @@ TEST(Metadata, render)
   const char*  outfile5 = "ngsi.metdata.render3.middle.xml";
   const char*  outfile6 = "ngsi.metdata.render3.middle.json";
 
-  std::string  expected1xml  = "<contextMetadata>\n  <name></name>\n  <type></type>\n  <value></value>\n</contextMetadata>\n";
-  std::string  expected1json = "{\n  \"name\" : \"\",\n  \"type\" : \"\",\n  \"value\" : \"\"\n}\n";
-  std::string  expected2xml  = "<contextMetadata>\n  <name>Name</name>\n  <type>Integer</type>\n  <value>19</value>\n</contextMetadata>\n";
-  std::string  expected2json = "{\n  \"name\" : \"Name\",\n  \"type\" : \"Integer\",\n  \"value\" : \"19\"\n}\n";
-  std::string  expected3xml  = "<contextMetadata>\n  <name>Name</name>\n  <type>Association</type>\n  <value>\n    <entityAssociation>\n      <sourceEntityId type=\"\" isPattern=\"\">\n        <id></id>\n      </sourceEntityId>\n      <targetEntityId type=\"\" isPattern=\"\">\n        <id></id>\n      </targetEntityId>\n    </entityAssociation>\n</value>\n</contextMetadata>\n";
-  std::string  expected3json = "{\n  \"name\" : \"Name\",\n  \"type\" : \"Association\",\n  \"value\" : \n    {\n      \"source\" : {\n        \"type\" : \"\",\n        \"isPattern\" : \"\",\n        \"id\" : \"\"\n      },\n      \"target\" : {\n        \"type\" : \"\",\n        \"isPattern\" : \"\",\n        \"id\" : \"\"\n      }\n    }\n\n}\n";
-
   utInit();
 
-  rendered = m1.render(XML, "");
-  EXPECT_STREQ(expected1xml.c_str(), rendered.c_str());
-  rendered = m1.render(JSON, "");
-  EXPECT_STREQ(expected1json.c_str(), rendered.c_str());
+  out = m1.render(XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+  out = m1.render(JSON, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  rendered = m2.render(XML, "");
-  EXPECT_STREQ(expected2xml.c_str(), rendered.c_str());
-  rendered = m2.render(JSON, "");
-  EXPECT_STREQ(expected2json.c_str(), rendered.c_str());
 
-  rendered = m3.render(XML, "");
-  EXPECT_STREQ(expected3xml.c_str(), rendered.c_str());
-  rendered = m3.render(JSON, "");
-  EXPECT_STREQ(expected3json.c_str(), rendered.c_str());
+  out = m2.render(XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+  out = m2.render(JSON, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  out = m3.render(XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile5)) << "Error getting test data from '" << outfile5 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+  out = m3.render(JSON, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile6)) << "Error getting test data from '" << outfile6 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }
@@ -108,25 +108,21 @@ TEST(Metadata, check)
   Metadata     m2("Name", "Type", "");
   Metadata     m3("Name", "Association", "XXX");
   Metadata     m4("Name", "Type", "Value");
-  std::string  expected1 = "missing metadata name";
-  std::string  expected2 = "missing metadata value";
-  std::string  expected3 = "";
-  std::string  expected4 = "OK";
   std::string  checked;
 
   utInit();
 
   checked = m1.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected1.c_str(), checked.c_str());
+  EXPECT_STREQ("missing metadata name", checked.c_str());
 
   checked = m2.check(RegisterContext, JSON, "", "", 0);
-  EXPECT_STREQ(expected2.c_str(), checked.c_str());
+  EXPECT_STREQ("missing metadata value", checked.c_str());
 
   checked = m3.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected3.c_str(), checked.c_str());
+  EXPECT_STREQ("", checked.c_str());
   
   checked = m4.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected4.c_str(), checked.c_str());
+  EXPECT_STREQ("OK", checked.c_str());
 
   utExit();
 }

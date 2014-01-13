@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ProvidingApplication.h"
+
+#include "unittest.h"
 
 
 
@@ -39,15 +39,25 @@ TEST(ProvidingApplication, render)
 {
   ProvidingApplication  pa;
   std::string           out;
-  std::string           expected1xml  = "<providingApplication>PA</providingApplication>\n";
-  std::string           expected1json = "\"providingApplication\" : \"PA\"\n";
+  const char*           outfile1 = "ngsi.providingApplication.render.middle.xml";
+  const char*           outfile2 = "ngsi.providingApplication.render.middle.json";
+
+  utInit();
 
   out = pa.render(XML, "", false);
   EXPECT_STREQ("", out.c_str());
 
   pa.set("PA");
+
   out = pa.render(XML, "", false);
-  EXPECT_STREQ(expected1xml.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  out = pa.render(JSON, "", false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -60,10 +70,13 @@ TEST(ProvidingApplication, present)
 {
   ProvidingApplication  pa;
 
-  pa.present("");
+  utInit();
 
+  pa.present("");
   pa.set("PA");
   pa.present("");
+
+  utExit();
 }
 
 
@@ -76,6 +89,10 @@ TEST(ProvidingApplication, c_str)
 {
   ProvidingApplication  pa;
 
+  utInit();
+
   pa.set("PA");
   EXPECT_STREQ("PA", pa.c_str());
+
+  utExit();
 }
