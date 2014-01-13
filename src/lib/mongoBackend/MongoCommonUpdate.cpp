@@ -199,15 +199,15 @@ static bool appendAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
      * APPEND with existing attribute equals to UPDATE */
     BSONArrayBuilder newAttrsBuilder;
     bool updated = false;
-    bool actualUpdate;
+    bool actualUpdate = false;
     for( BSONObj::iterator i = attrs->begin(); i.more(); ) {
 
         BSONObjBuilder newAttr;
-        /* We need to use some bool variable to match the checkAndUpdate() signature, but in
-         * appendAttribute() we don't use this information */        
-        if (checkAndUpdate(&newAttr, i.next().embeddedObject(), *caP, &actualUpdate) && !updated) {
+        bool attrActualUpdate;
+        if (checkAndUpdate(&newAttr, i.next().embeddedObject(), *caP, &attrActualUpdate) && !updated) {
             updated = true;
         }
+        actualUpdate = attrActualUpdate || actualUpdate;
         newAttrsBuilder.append(newAttr.obj());
     }
 
