@@ -1,4 +1,4 @@
-o PR xx - x
+o PR #182 fermin     Mon jan 13 12:17:00 CET 2014
   - Add: creDate also for attributes
   - Fix: setting modDate for entities and attributes at creation time
 
