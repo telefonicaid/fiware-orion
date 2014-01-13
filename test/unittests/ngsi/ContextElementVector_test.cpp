@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextElementVector.h"
+
+#include "unittest.h"
 
 
 
@@ -41,7 +41,7 @@ TEST(ContextElementVector, render)
   EntityId              eId("E_ID", "E_TYPE");
   std::string           rendered;
   ContextElementVector  ceV;
-  std::string           expected = "<contextElementList>\n  <contextElement>\n    <entityId type=\"E_TYPE\" isPattern=\"\">\n      <id>E_ID</id>\n    </entityId>\n  </contextElement>\n</contextElementList>\n";
+  const char*           outfile = "ngsi.contextElementVector.render.middle.xml";
 
   rendered = ceV.render(XML, "", false);
   EXPECT_STREQ("", rendered.c_str());
@@ -50,7 +50,8 @@ TEST(ContextElementVector, render)
   ceV.push_back(ceP);
 
   rendered = ceV.render(XML, "", false);
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   ceV.release();
 }

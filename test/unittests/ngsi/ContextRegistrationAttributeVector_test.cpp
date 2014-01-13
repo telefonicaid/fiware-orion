@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextRegistrationAttributeVector.h"
+
+#include "unittest.h"
 
 
 
@@ -41,10 +41,12 @@ TEST(ContextRegistrationAttributeVector, render)
   ContextRegistrationAttribute       cra("name", "type", "false");
   ContextRegistrationAttribute       cra2("name2", "type2", "true");
   std::string                        out;
-  std::string                        expected1xml  = "<contextRegistrationAttributeList>\n  <contextRegistrationAttribute>\n    <name>name</name>\n    <type>type</type>\n    <isDomain>false</isDomain>\n  </contextRegistrationAttribute>\n</contextRegistrationAttributeList>\n";
-  std::string                        expected1json = "\"attributes\" : [\n  {\n    \"name\" : \"name\",\n    \"type\" : \"type\",\n    \"isDomain\" : \"false\"\n  }\n]\n";
-  std::string                        expected2xml  = "<contextRegistrationAttributeList>\n  <contextRegistrationAttribute>\n    <name>name</name>\n    <type>type</type>\n    <isDomain>false</isDomain>\n  </contextRegistrationAttribute>\n  <contextRegistrationAttribute>\n    <name>name2</name>\n    <type>type2</type>\n    <isDomain>true</isDomain>\n  </contextRegistrationAttribute>\n</contextRegistrationAttributeList>\n";
-  std::string                        expected2json = "\"attributes\" : [\n  {\n    \"name\" : \"name\",\n    \"type\" : \"type\",\n    \"isDomain\" : \"false\"\n  },\n  {\n    \"name\" : \"name2\",\n    \"type\" : \"type2\",\n    \"isDomain\" : \"true\"\n  }\n]\n";
+  const char*                        outfile1 = "ngsi.contextRegistrationAttributeVector.render1.middle.xml";
+  const char*                        outfile2 = "ngsi.contextRegistrationAttributeVector.render1.middle.json";
+  const char*                        outfile3 = "ngsi.contextRegistrationAttributeVector.render2.middle.xml";
+  const char*                        outfile4 = "ngsi.contextRegistrationAttributeVector.render2.middle.json";
+
+  utInit();
 
   out = crav.render(XML, "");
   EXPECT_STREQ("", out.c_str());
@@ -54,13 +56,19 @@ TEST(ContextRegistrationAttributeVector, render)
 
   crav.push_back(&cra);
   out = crav.render(XML, "");
-  EXPECT_STREQ(expected1xml.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = crav.render(JSON, "");
-  EXPECT_STREQ(expected1json.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   crav.push_back(&cra2);
   out = crav.render(XML, "");
-  EXPECT_STREQ(expected2xml.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = crav.render(JSON, "");
-  EXPECT_STREQ(expected2json.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }

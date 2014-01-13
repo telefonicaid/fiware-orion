@@ -22,9 +22,9 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "ngsi/Metadata.h"
+
+#include "unittest.h"
 
 
 
@@ -34,13 +34,17 @@
 */
 TEST(Metadata, constructor)
 {
-   Metadata m1;
-   Metadata m2("n2", "t2", "v2");
-   Metadata m3(&m2);
+  Metadata m1;
+  Metadata m2("n2", "t2", "v2");
+  Metadata m3(&m2);
 
-   EXPECT_EQ("", m1.name);
-   EXPECT_EQ("n2", m2.name);
-   EXPECT_EQ("n2", m3.name);
+  utInit();
+
+  EXPECT_EQ("", m1.name);
+  EXPECT_EQ("n2", m2.name);
+  EXPECT_EQ("n2", m3.name);
+
+  utExit();
 }
 
 
@@ -57,12 +61,22 @@ TEST(Metadata, render)
   Metadata     m1;
   Metadata     m2("Name", "Integer", "19");
   Metadata     m3("Name", "Association", "27");
+
+  const char*  outfile1 = "ngsi.metdata.render1.middle.xml";
+  const char*  outfile2 = "ngsi.metdata.render1.middle.json";
+  const char*  outfile3 = "ngsi.metdata.render2.middle.xml";
+  const char*  outfile4 = "ngsi.metdata.render2.middle.json";
+  const char*  outfile5 = "ngsi.metdata.render3.middle.xml";
+  const char*  outfile6 = "ngsi.metdata.render3.middle.json";
+
   std::string  expected1xml  = "<contextMetadata>\n  <name></name>\n  <type></type>\n  <value></value>\n</contextMetadata>\n";
   std::string  expected1json = "{\n  \"name\" : \"\",\n  \"type\" : \"\",\n  \"value\" : \"\"\n}\n";
   std::string  expected2xml  = "<contextMetadata>\n  <name>Name</name>\n  <type>Integer</type>\n  <value>19</value>\n</contextMetadata>\n";
   std::string  expected2json = "{\n  \"name\" : \"Name\",\n  \"type\" : \"Integer\",\n  \"value\" : \"19\"\n}\n";
   std::string  expected3xml  = "<contextMetadata>\n  <name>Name</name>\n  <type>Association</type>\n  <value>\n    <entityAssociation>\n      <sourceEntityId type=\"\" isPattern=\"\">\n        <id></id>\n      </sourceEntityId>\n      <targetEntityId type=\"\" isPattern=\"\">\n        <id></id>\n      </targetEntityId>\n    </entityAssociation>\n</value>\n</contextMetadata>\n";
   std::string  expected3json = "{\n  \"name\" : \"Name\",\n  \"type\" : \"Association\",\n  \"value\" : \n    {\n      \"source\" : {\n        \"type\" : \"\",\n        \"isPattern\" : \"\",\n        \"id\" : \"\"\n      },\n      \"target\" : {\n        \"type\" : \"\",\n        \"isPattern\" : \"\",\n        \"id\" : \"\"\n      }\n    }\n\n}\n";
+
+  utInit();
 
   rendered = m1.render(XML, "");
   EXPECT_STREQ(expected1xml.c_str(), rendered.c_str());
@@ -78,6 +92,8 @@ TEST(Metadata, render)
   EXPECT_STREQ(expected3xml.c_str(), rendered.c_str());
   rendered = m3.render(JSON, "");
   EXPECT_STREQ(expected3json.c_str(), rendered.c_str());
+
+  utExit();
 }
 
 
@@ -98,6 +114,8 @@ TEST(Metadata, check)
   std::string  expected4 = "OK";
   std::string  checked;
 
+  utInit();
+
   checked = m1.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ(expected1.c_str(), checked.c_str());
 
@@ -109,6 +127,8 @@ TEST(Metadata, check)
   
   checked = m4.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ(expected4.c_str(), checked.c_str());
+
+  utExit();
 }
 
 
@@ -121,7 +141,10 @@ TEST(Metadata, present)
 {
   Metadata     m4("Name", "Type", "Value");
 
-  m4.present("Test", 0, "");
+  utInit();
 
+  m4.present("Test", 0, "");
   m4.release();
+
+  utExit();
 }

@@ -22,11 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "ngsi/AttributeDomainName.h"
+
+#include "unittest.h"
 
 
 
@@ -38,6 +39,10 @@ TEST(AttributeDomainName, ok)
 {
   AttributeDomainName adn;
   std::string         out;
+  const char*         outfile1 = "ngsi10.attributeDomainName.ok.middle.xml";
+  const char*         outfile2 = "ngsi10.attributeDomainName.ok.valid.json";
+
+  utInit();
 
   EXPECT_TRUE(adn.isEmpty());
   
@@ -47,10 +52,12 @@ TEST(AttributeDomainName, ok)
   EXPECT_STREQ("ADN", adn.c_str());
 
   out = adn.render(XML, "");
-  EXPECT_STREQ("<attributeDomainName>ADN</attributeDomainName>\n", out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = adn.render(JSON, "");
-  EXPECT_STREQ("\"attributeDomainName\" : \"ADN\"\n", out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Just to exercise the code
   adn.present("");
@@ -58,4 +65,6 @@ TEST(AttributeDomainName, ok)
   adn.present("");
   out = adn.render(JSON, "");
   EXPECT_STREQ("", out.c_str());
+
+  utExit();
 }

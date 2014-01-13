@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextAttributeVector.h"
+
+#include "unittest.h"
 
 
 
@@ -39,6 +39,8 @@ TEST(ContextAttribute, checkOne)
 {
   ContextAttribute  ca;
   std::string       res;
+
+  utInit();
 
   ca.name = "";
   res     = ca.check(RegisterContext, XML, "", "", 0);
@@ -53,6 +55,8 @@ TEST(ContextAttribute, checkOne)
   ca.value = "Algun valor cualquiera";
   res     = ca.check(RegisterContext, XML, "", "", 0);
   EXPECT_TRUE(res == "OK");
+
+  utExit();
 }
 
 
@@ -68,6 +72,8 @@ TEST(ContextAttribute, checkVector)
   ContextAttribute        ca1;
   std::string             res;
 
+  utInit();
+
   ca0.name  = "Algo, lo que sea!";
   ca0.value = "Algo, lo que sea!";
   ca1.name  = "Algo, lo que sea!";
@@ -78,6 +84,8 @@ TEST(ContextAttribute, checkVector)
 
   res     = caVector.check(RegisterContext, XML, "", "", 0);
   EXPECT_TRUE(res == "OK");
+
+  utExit();
 }
 
 
@@ -90,14 +98,20 @@ TEST(ContextAttribute, render)
 {
   ContextAttribute  ca("NAME", "TYPE", "VALUE");
   std::string       out;
-  std::string       xml  = "<contextAttribute>\n  <name>NAME</name>\n  <type>TYPE</type>\n  <contextValue>VALUE</contextValue>\n</contextAttribute>\n";
-  std::string       json = "{\n  \"name\" : \"NAME\",\n  \"type\" : \"TYPE\",\n  \"contextValue\" : \"VALUE\"\n}\n";
+  const char*       outfile1 = "ngsi.contextAttribute.render.middle.xml";
+  const char*       outfile2 = "ngsi.contextAttribute.render.middle.json";
+
+  utInit();
 
   out = ca.render(XML, "");
-  EXPECT_STREQ(xml.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = ca.render(JSON, "");
-  EXPECT_STREQ(json.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -111,7 +125,11 @@ TEST(ContextAttribute, present)
   // Just to exercise all the code ..
   ContextAttribute  ca("NAME", "TYPE", "VALUE");
 
+  utInit();
+
   ca.present("", 0);
+
+  utExit();
 }
 
 
@@ -126,9 +144,13 @@ TEST(ContextAttribute, copyMetadatas)
   Metadata          m1("m1", "int", "2");
   Metadata          m2("m2", "string", "sss");
 
+  utInit();
+
   ca.metadataVector.push_back(&m1);
   ca.metadataVector.push_back(&m2);
 
   ContextAttribute ca2(&ca);
   EXPECT_EQ(2, ca2.metadataVector.size());
+
+  utExit();
 }

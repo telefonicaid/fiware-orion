@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextRegistrationAttribute.h"
+
+#include "unittest.h"
 
 
 
@@ -39,12 +39,18 @@ TEST(ContextRegistrationAttribute, render)
 {
   ContextRegistrationAttribute  cra("name", "type", "false");
   std::string                   out;
-  std::string                   expected1xml  = "<contextRegistrationAttribute>\n  <name>name</name>\n  <type>type</type>\n  <isDomain>false</isDomain>\n</contextRegistrationAttribute>\n";
-  std::string                   expected1json = "{\n  \"name\" : \"name\",\n  \"type\" : \"type\",\n  \"isDomain\" : \"false\"\n}\n";
+  const char*                   outfile1 = "ngsi.contextRegistrationAttribute.render.middle.xml";
+  const char*                   outfile2 = "ngsi.contextRegistrationAttribute.render.middle.json";
+
+  utInit();
 
   out = cra.render(XML, "");
-  EXPECT_STREQ(expected1xml.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = cra.render(JSON, "");
-  EXPECT_STREQ(expected1json.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
