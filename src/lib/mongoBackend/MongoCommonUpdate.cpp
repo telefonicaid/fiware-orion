@@ -204,9 +204,7 @@ static bool appendAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
 
         BSONObjBuilder newAttr;
         bool attrActualUpdate;
-        if (checkAndUpdate(&newAttr, i.next().embeddedObject(), *caP, &attrActualUpdate) && !updated) {
-            updated = true;
-        }
+        updated = checkAndUpdate(&newAttr, i.next().embeddedObject(), *caP, &attrActualUpdate) || updated;
         actualUpdate = attrActualUpdate || actualUpdate;
         newAttrsBuilder.append(newAttr.obj());
     }
