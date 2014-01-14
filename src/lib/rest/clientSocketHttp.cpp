@@ -140,7 +140,7 @@ std::string sendHttpSocket
     strncat(preContent, headers, sizeof(preContent) - strlen(preContent));
 
     /* Choose the right buffer (static or dynamic) to use */
-    if (content.length() + strlen(preContent) +1 > MAX_DYN_MSG_SIZE) {
+    if (content.length() + strlen(preContent) + 1 > MAX_DYN_MSG_SIZE) {
         LM_RE("error", ("content is too large"));
     }
     else if (content.length() + strlen(preContent) + 1 > MAX_STA_MSG_SIZE) {
@@ -153,10 +153,8 @@ std::string sendHttpSocket
     }
 
     /* The above checking should ensure that the three parts fit, so we are using
-     * strcat() instead of strncat() */
-    strcat(msg, preContent);
-    strcat(msg, "\n");
-    strcat(msg, content.c_str());
+     * sprint() instead of snprintf() */
+    sprintf(msg, "%s\n%s", preContent, content.c_str());
   }
 
   strncat(msg, "\n", sizeof(msg) - strlen(msg));
