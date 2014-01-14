@@ -140,24 +140,23 @@ std::string sendHttpSocket
     strncat(preContent, headers, sizeof(preContent) - strlen(preContent));
 
     /* Choose the right buffer (static or dynamic) to use */
-    int bz;
-    if (content.length() + strlen(preContent) > MAX_DYN_MSG_SIZE-1) {
+    if (content.length() + strlen(preContent) +1 > MAX_DYN_MSG_SIZE) {
         LM_RE("error", ("content is too large"));
     }
-    else if (content.length() + strlen(preContent) > MAX_STA_MSG_SIZE-1) {
+    else if (content.length() + strlen(preContent) + 1 > MAX_STA_MSG_SIZE) {
         msgDynamic = (char*) calloc(sizeof(char), content.length() + 1);
         msg = msgDynamic;
-        bz = content.length() + 1;
     }
     else {
         msg = msgStatic;
         memset(msg, 0, MAX_STA_MSG_SIZE);
-        bz = MAX_STA_MSG_SIZE;
     }
 
-    strncat(msg, preContent, bz - strlen(msg));
-    strncat(msg, "\n", bz - strlen(msg));
-    strncat(msg, content.c_str(), bz - strlen(msg));
+    /* The above checking should ensure that the three parts fit, so we are using
+     * strcat() instead of strncat() */
+    strcat(msg, preContent);
+    strcat(msg, "\n");
+    strcat(msg, content.c_str());
   }
 
   strncat(msg, "\n", sizeof(msg) - strlen(msg));
@@ -172,11 +171,6 @@ std::string sendHttpSocket
 
   int nb;
   int sz = strlen(msg);
-
-#if 0
-  if (sz >= MSG_SIZE)
-    LM_RE("Msg too large", ("A message got too large (%d bytes - max size is %d). The contextBroker must be recompiled!!!", sz, sizeof(msg)));
-#endif
 
   LM_T(LmtClientOutputPayload, ("Sending to HTTP server %d bytes:\n%s", sz, msg));
   nb = send(fd, msg, sz, 0);
