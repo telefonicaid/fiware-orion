@@ -92,7 +92,7 @@ std::string formatedAnswer
 
 
 
-char savedResponse[2 * 1024 * 1024];
+__thread char savedResponse[2 * 1024 * 1024];
 static int replyIx = 0;
 /* ****************************************************************************
 *
