@@ -87,8 +87,11 @@ int socketHttpConnect(std::string host, unsigned short port)
 * arguments or (even better) and exception. To be solved in the future in a hardening
 * period.
 *
+* Note, we are using an hybrid approach, consisting in an static thread-local buffer of
+* small size that cope with the most of notifications to avoid expensive
+* calloc/free syscalls if the notification payload is not very large.
+*
 */
-#define MSG_SIZE (8 * 1024 * 1024)
 std::string sendHttpSocket
 (
    std::string     ip,
@@ -99,24 +102,27 @@ std::string sendHttpSocket
    std::string     content,
    bool            waitForResponse
 )
-{
-  char         msg[MSG_SIZE];
+{  
   char         buffer[TAM_BUF];
-  char         response[TAM_BUF];;
+  char         response[TAM_BUF];
+  char         preContent[TAM_BUF];
+  char         msgStatic[MAX_STA_MSG_SIZE];
+
   std::string  result;
+  char*        msgDynamic = NULL;
+  char*        msg;
 
   // Buffers clear 
   memset(buffer, 0, TAM_BUF);
   memset(response, 0, TAM_BUF);
-  memset(msg, 0, MSG_SIZE);
-
+  memset(preContent, 0, TAM_BUF);
 
   if (port == 0)        LM_RE("error", ("port is ZERO"));
   if (ip.empty())       LM_RE("error", ("ip is empty"));
   if (verb.empty())     LM_RE("error", ("verb is empty"));
-  if (resource.empty()) LM_RE("error", ("resource is empty"));
+  if (resource.empty()) LM_RE("error", ("resource is empty"));  
 
-  snprintf(msg, sizeof(msg),
+  snprintf(preContent, sizeof(preContent),
            "%s %s HTTP/1.1\n"
            "User-Agent: orion/%s\n"
            "Host: %s:%d\n"
@@ -125,31 +131,54 @@ std::string sendHttpSocket
 
   if ((!content_type.empty()) && (!content.empty()))
   {
-    char   rest[512];
 
-    sprintf(rest,
+    char   headers[512];
+    sprintf(headers,
             "Content-Type: %s\n"
             "Content-Length: %zu\n",
             content_type.c_str(), content.length() + 1);
+    strncat(preContent, headers, sizeof(preContent) - strlen(preContent));
 
-    strncat(msg, rest, sizeof(msg) - strlen(msg));
-    strncat(msg, "\n", sizeof(msg) - strlen(msg));
-    strncat(msg, content.c_str(), sizeof(msg) - strlen(msg));
+    /* Choose the right buffer (static or dynamic) to use */
+    int bz;
+    if (content.length() + strlen(preContent) > MAX_DYN_MSG_SIZE-1) {
+        LM_RE("error", ("content is too large"));
+    }
+    else if (content.length() + strlen(preContent) > MAX_STA_MSG_SIZE-1) {
+        msgDynamic = (char*) calloc(sizeof(char), content.length() + 1);
+        msg = msgDynamic;
+        bz = content.length() + 1;
+    }
+    else {
+        msg = msgStatic;
+        memset(msg, 0, MAX_STA_MSG_SIZE);
+        bz = MAX_STA_MSG_SIZE;
+    }
+
+    strncat(msg, preContent, bz - strlen(msg));
+    strncat(msg, "\n", bz - strlen(msg));
+    strncat(msg, content.c_str(), bz - strlen(msg));
   }
 
   strncat(msg, "\n", sizeof(msg) - strlen(msg));
 
   int fd = socketHttpConnect(ip, port); // Connecting to HTTP server
+  if (msgDynamic != NULL) {
+      free (msgDynamic);
+  }
+
   if (fd == -1)
     LM_RE("error", ("Unable to connect to HTTP server at %s:%d", ip.c_str(), port));
 
-  int sz = strlen(msg);
   int nb;
+  int sz = strlen(msg);
 
+#if 0
   if (sz >= MSG_SIZE)
     LM_RE("Msg too large", ("A message got too large (%d bytes - max size is %d). The contextBroker must be recompiled!!!", sz, sizeof(msg)));
+#endif
 
-  LM_T(LmtClientOutputPayload, ("Sending to HTTP server:\n%s", msg));
+  LM_T(LmtClientOutputPayload, ("Sending to HTTP server %d bytes:\n%s", sz, msg));
   nb = send(fd, msg, sz, 0);
   if (nb == -1)
     LM_RE("error", ("error sending to HTTP server: %s", strerror(errno)));
