@@ -26,7 +26,7 @@
 
 #include <string>
 
-#define NOTIFICATION_WAIT_MODE true
+#define NOTIFICATION_WAIT_MODE false
 
 typedef struct SenderThreadParams {
     std::string    ip;

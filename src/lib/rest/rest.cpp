@@ -103,7 +103,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 
 
 
-extern __thread char savedResponse[2 * 1024 * 1024];
+extern char savedResponse[2 * 1024 * 1024];
 /* ****************************************************************************
 *
 * requestCompleted - 

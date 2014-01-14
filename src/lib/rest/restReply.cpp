@@ -90,9 +90,7 @@ std::string formatedAnswer
    return answer;
 }
 
-
-
-__thread char savedResponse[2 * 1024 * 1024];
+char savedResponse[2 * 1024 * 1024];
 static int replyIx = 0;
 /* ****************************************************************************
 *
