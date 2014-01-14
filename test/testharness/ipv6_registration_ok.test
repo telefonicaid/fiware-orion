@@ -41,7 +41,7 @@ if [ $running_broker -ne 0 ]; then
 fi
 
 echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255  -ipv6 ::"
+CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255  -ipv6"
 if [ "$VALGRIND" == "" ]; then
   $CB_START_CMD
   # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
@@ -60,7 +60,7 @@ if [ $running_broker -ne 1 ]; then
 fi
 
 --SHELL--
-REG_OUT=$((curl ::1:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+REG_OUT=$((curl :::${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -103,7 +103,7 @@ if [ "$VALGRIND" == "" ]; then
   kill $(cat ${BROKER_PID_FILE})
   rm /tmp/orion_${BROKER_PORT}.pid
 else
-  curl ::1:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
+  curl :::${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
   # Waiting for valgrind to terminate (sleep 10)
   sleep 10
 fi
