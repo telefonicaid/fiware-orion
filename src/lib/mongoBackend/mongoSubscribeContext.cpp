@@ -114,7 +114,7 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
     catch( const DBException &e ) {
         responseP->subscribeError.errorCode.fill(
             SccReceiverInternalError,
-            "Database Error",
+            httpStatusCodeString(SccReceiverInternalError),
             std::string("collection: ") + getSubscribeContextCollectionName() +
                 " - insert(): " + subDoc.toString() +
                 " - exception: " + e.what()

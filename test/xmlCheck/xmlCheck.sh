@@ -140,13 +140,14 @@ function harnessFiles()
 {
   harnessList=""
   TMP_DIR=$(mktemp -d /tmp/xmlCheck.XXXXX)
+  vMsg TMP_DIR: $TMP_DIR
   for FILE in $(find $SRC_TOP/test/testharness -name *.test)
   do
     PREFIX=$(basename ${FILE%.*})
     $SRC_TOP/test/xmlCheck/xmlExtractor.py $FILE $TMP_DIR $PREFIX
   done
 
-  for FILE in $(find $TMP_DIR - name ngsi*.valid.xml)
+  for FILE in $(find $TMP_DIR -name ngsi*.valid.xml)
   do
     grep '\$' $FILE
     if [ "$?" != "0" ]

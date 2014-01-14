@@ -1,0 +1,8 @@
+<registerContextResponse>
+  <duration>PT1H</duration>
+  <registrationId>000000000000000000000000</registrationId>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Got an entityIdList when one was present already</reasonPhrase>
+  </errorCode>
+</registerContextResponse>

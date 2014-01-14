@@ -18,6 +18,8 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Convenience NGSI10 Context Entity Types Attribute
 --SHELL-INIT--
@@ -152,7 +154,7 @@ killall contextBroker
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 2: ++++++++++++++++++++
@@ -315,7 +317,7 @@ killall contextBroker
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 8: ++++++++++++++++++++

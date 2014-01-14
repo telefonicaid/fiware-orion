@@ -18,6 +18,8 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 statistics
 --SHELL-INIT--
@@ -66,7 +68,7 @@ curl localhost:${BROKER_PORT}/statistics | xmllint --format -
 <orion>
   <xmlRequests>1</xmlRequests>
   <statisticsRequests>1</statisticsRequests>
-  <uptime_in_secs>1</uptime_in_secs>
+  <uptime_in_secs>REGEX(\d+)</uptime_in_secs>
   <measuring_interval_in_secs>REGEX(\d+)</measuring_interval_in_secs>
 </orion>
 --TEARDOWN--

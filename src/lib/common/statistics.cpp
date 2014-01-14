@@ -90,6 +90,14 @@ int noOfStatisticsRequests                   = -1;
 int noOfInvalidRequests                      = -1;
 int noOfRegisterResponses                    = -1;
 
+int noOfRtSubscribeContextAvailabilityResponse           = -1;
+int noOfRtUpdateContextAvailabilitySubscriptionResponse  = -1;
+int noOfRtUnsubscribeContextAvailabilityResponse         = -1;
+int noOfRtUnsubscribeContextResponse                     = -1;
+int noOfRtSubscribeResponse                              = -1;
+int noOfRtSubscribeError                                 = -1;
+
+
 
 
 /* ****************************************************************************
@@ -145,5 +153,12 @@ void statisticsUpdate(RequestType request, Format inFormat)
 
    case InvalidRequest:                             ++noOfInvalidRequests; break;
    case RegisterResponse:                           ++noOfRegisterResponses; break;
+
+   case RtSubscribeContextAvailabilityResponse:           ++noOfRtSubscribeContextAvailabilityResponse; break;
+   case RtUpdateContextAvailabilitySubscriptionResponse:  ++noOfRtUpdateContextAvailabilitySubscriptionResponse; break;
+   case RtUnsubscribeContextAvailabilityResponse:         ++noOfRtUnsubscribeContextAvailabilityResponse; break;
+   case RtUnsubscribeContextResponse:                     ++noOfRtUnsubscribeContextResponse; break;
+   case RtSubscribeResponse:                              ++noOfRtSubscribeResponse; break;
+   case RtSubscribeError:                                 ++noOfRtSubscribeError; break;
    }
 }

@@ -1,0 +1,6 @@
+<discoverContextAvailabilityResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>empty entityId:id</reasonPhrase>
+  </errorCode>
+</discoverContextAvailabilityResponse>

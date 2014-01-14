@@ -18,6 +18,8 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Convenience Entity By Id Attribute By Name
 --SHELL-INIT--
@@ -96,7 +98,7 @@ killall contextBroker
 <discoverContextAvailabilityResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context element registrations found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </discoverContextAvailabilityResponse>
 1: ++++++++++++++++++++

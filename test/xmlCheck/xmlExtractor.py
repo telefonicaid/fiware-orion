@@ -127,7 +127,16 @@ with open (file, 'r') as f:
 
         else:
             # Search mode is off: accumulate each line until the ending tag is found
-            buffer.append(line)
+            # Note we remove any trailing "'", that may occur in the case of using variables
+            # to store XMLs, typically:
+            # 
+            # payload = '<?xml .... =?>
+            #            <root>
+            #            ...
+            #            </root>'
+            #
+            line = line.rstrip("'\n")
+            buffer.append(line + "\n")
 
             if re.search('<\/'+ root_element + '>', line):              
                 # We use some tokens in the filename to help xmlCheck.sh script

@@ -18,6 +18,8 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Missing Content-Type header
 --SHELL-INIT--
@@ -129,7 +131,7 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 --TEARDOWN--

@@ -18,111 +18,19 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Subscription sequence ONCHANGE
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
-if [ "$VALGRIND" == "" ]; then
-  $CB_START_CMD
-  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-  sleep 1
-else
-  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
-  # Waiting for valgrind to start (sleep 10)
-  sleep 10s
-fi
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
-
-# Test to see if we have the listening application running on ${LISTENER_PORT} if so kill it!
-running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
-if [ $running_app -ne 0 ]; then
-  kill $(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | awk '{print $2}')
-  # Wait some time so the accumulator can finish properly
-  sleep 1
-  running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
-  if [ $running_app -ne 0 ]; then
-    # If the accumulator refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | awk '{print $2}')
-    sleep 1
-    running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
-    if [ $running_app -ne 0 ]; then
-      echo "Existing accumulator-server.py is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
-
-accumulator-server.py ${LISTENER_PORT} /notify &
-# Wait until accumulator has started or we have waited a given maximum time
-port_not_ok=1
-time=0
-until [ $port_not_ok -eq 0 ]; do
-   if [ $time -eq ${MAXIMUM_WAIT} ]; then
-      echo "Unable to start listening application after waiting ${MAXIMUM_WAIT}"
-      exit 1
-   fi 
-   sleep 1
-   time=$[$time+1]
-   nc -z localhost ${LISTENER_PORT} 
-   port_not_ok=$?
-done
+dbInit CB
+brokerStart CB
+accumulatorStart
 
 --SHELL--
-
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-  <registerContextRequest>
-    <contextRegistrationList>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Room" isPattern="false">
-            <id>ConferenceRoom</id>
-          </entityId>
-          <entityId type="Room" isPattern="false">
-            <id>OfficeRoom</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:1028</providingApplication>
-      </contextRegistration>
-    </contextRegistrationList>
-    <duration>PT1H</duration>
-    <registrationId></registrationId>
-  </registerContextRequest>
-EOF
-echo "1: ++++++++++++++++++++"
+source harnessFunctions.sh
 
 SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/contextSubscriptions -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
@@ -152,7 +60,7 @@ EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "$SUB_OUT"
 echo SUB_ID: $SUB_ID > /tmp/SUB_ID
-echo "2: ++++++++++++++++++++"
+echo "1: ++++++++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
@@ -181,11 +89,9 @@ echo "2: ++++++++++++++++++++"
 EOF
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.csubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
-echo "3: ++++++++++++++++++++"
+echo "2: ++++++++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
@@ -214,11 +120,9 @@ echo "3: ++++++++++++++++++++"
 EOF
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.csubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
-echo "4: ++++++++++++++++++++"
+echo "3: ++++++++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI10/contextSubscriptions/${SUB_ID} -X PUT -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
 <?xml version="1.0"?>
@@ -230,11 +134,9 @@ echo "4: ++++++++++++++++++++"
 EOF
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.csubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
-echo "5: ++++++++++++++++++++"
+echo "4: ++++++++++++++++++++"
 
 #Wait sleep >6s to reset the throttling interval
 sleep 10
@@ -266,11 +168,9 @@ sleep 10
 EOF
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.csubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
-echo "6: ++++++++++++++++++++"
+echo "5: ++++++++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
@@ -297,7 +197,7 @@ echo "6: ++++++++++++++++++++"
   <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
-echo "7: ++++++++++++++++++++"
+echo "6: ++++++++++++++++++++"
 
 #Wait sleep >6s to reset the throttling interval
 sleep 10
@@ -324,11 +224,9 @@ sleep 10
 EOF
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.csubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
-echo "8: ++++++++++++++++++++"
+echo "7: ++++++++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
@@ -350,10 +248,10 @@ echo "8: ++++++++++++++++++++"
   <updateAction>UPDATE</updateAction>
 </updateContextRequest>
 EOF
-echo "9: ++++++++++++++++++++"
+echo "8: ++++++++++++++++++++"
 echo SUB_ID: ${SUB_ID} >> /tmp/SUB_ID
 curl localhost:${BROKER_PORT}/NGSI10/contextSubscriptions/${SUB_ID} -X DELETE -s -S | xmllint --format -
-echo "10: ++++++++++++++++++++"
+echo "9: ++++++++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
@@ -367,7 +265,7 @@ echo "10: ++++++++++++++++++++"
             <contextAttribute>
           <name>temperature</name>
                   <type>degree</type>
-                  <contextValue>t39</contextValue>
+                  <contextValue>t59</contextValue>
                 </contextAttribute>
       </contextAttributeList>
     </contextElement>
@@ -375,18 +273,12 @@ echo "10: ++++++++++++++++++++"
   <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
-echo "11: ++++++++++++++++++++"
+echo "10: ++++++++++++++++++++"
 
 #Get accumulated data
 curl localhost:${LISTENER_PORT}/dump -s -S 
 
 --REGEXPECT--
-<?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
-1: ++++++++++++++++++++
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
@@ -394,7 +286,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-2: ++++++++++++++++++++
+1: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -424,7 +316,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   </contextResponseList>
 </updateContextResponse>
 { "count" : 1 }
-3: ++++++++++++++++++++
+2: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -454,7 +346,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   </contextResponseList>
 </updateContextResponse>
 { "count" : 2 }
-4: ++++++++++++++++++++
+3: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextSubscriptionResponse>
   <subscribeResponse>
@@ -464,7 +356,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   </subscribeResponse>
 </updateContextSubscriptionResponse>
 { "count" : 2 }
-5: ++++++++++++++++++++
+4: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -494,7 +386,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   </contextResponseList>
 </updateContextResponse>
 { "count" : 3 }
-6: ++++++++++++++++++++
+5: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -523,7 +415,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-7: ++++++++++++++++++++
+6: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -548,7 +440,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   </contextResponseList>
 </updateContextResponse>
 { "count" : 4 }
-8: ++++++++++++++++++++
+7: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -572,7 +464,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-9: ++++++++++++++++++++
+8: ++++++++++++++++++++
 <?xml version="1.0"?>
 <unsubscribeContextResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -581,7 +473,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </unsubscribeContextResponse>
-10: ++++++++++++++++++++
+9: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -605,7 +497,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-11: ++++++++++++++++++++
+10: ++++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 738
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -754,12 +646,7 @@ Content-Type: application/xml
 
 =======================================
 --TEARDOWN--
-if [ "$VALGRIND" == "" ]; then
-  kill $(cat ${BROKER_PID_FILE})
-  rm /tmp/orion_${BROKER_PORT}.pid
-else
-  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
-  # Waiting for valgrind to terminate (sleep 10)
-  sleep 10
-fi
-kill $(curl localhost:${LISTENER_PORT}/pid -s -S)
+source harnessFunctions.sh
+
+brokerStop CB
+accumulatorStop

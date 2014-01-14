@@ -66,7 +66,7 @@ static RestService rs[] =
 TEST(getContextEntityTypeAttribute, nothingFound)
 {
   ConnectionInfo ci("/ngsi9/contextEntityTypes/TYPE_123/attributes/temperature",  "GET", "1.1");
-  std::string    expected = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element registrations found</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
+  std::string    expected = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
 
   std::string    out;
 

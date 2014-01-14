@@ -59,7 +59,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
                            requestP->subscriptionId.get().c_str()));
         sub = connection->findOne(getSubscribeContextCollectionName(), BSON("_id" << id));
         if (sub.isEmpty()) {
-            responseP->statusCode.fill(SccContextElementNotFound, "Subscription Not Found");
+            responseP->statusCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound), std::string("subscriptionId: '") + requestP->subscriptionId.get() + "'");
             LM_SR(SccOk);
         }
     }
@@ -68,13 +68,13 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
         // FIXME: this checking should be done at parsing stage, without progressing to
         // mongoBackend. By the moment we can live this here, but we should remove in the future
         // (old issue #95)
-        responseP->statusCode.fill(SccContextElementNotFound, "Subscription Not Found");
+        responseP->statusCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound));
         LM_SR(SccOk);
     }
     catch( const DBException &e ) {
         responseP->statusCode.fill(
             SccReceiverInternalError,
-           "Database Error",
+            httpStatusCodeString(SccReceiverInternalError),
             std::string("collection: ") + getSubscribeContextCollectionName() +
                " - findOne() _id: " + requestP->subscriptionId.get() +
                " - exception: " + e.what()
@@ -93,7 +93,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     catch( const DBException &e ) {
         responseP->statusCode.fill(
             SccReceiverInternalError,
-            "Database Error",
+            httpStatusCodeString(SccReceiverInternalError),
             std::string("collection: ") + getSubscribeContextCollectionName() +
                 " - remove() _id: " + requestP->subscriptionId.get().c_str() +
                 " - exception: " + e.what()

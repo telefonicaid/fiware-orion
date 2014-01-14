@@ -18,6 +18,8 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Convenience NGSI9 Context Entity Type Attribute Container
 --SHELL-INIT--
@@ -62,10 +64,12 @@ fi
 --SHELL--
 
 echo "0: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room/attributes/temperature -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
+response=$(curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room/attributes/temperature -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' --dump-header headers.out | xmllint --format - )
+cat headers.out
+echo $response | xmllint --format -
 
 echo "1: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -X POST -d @- | xmllint --format - ) << EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' --header 'Expect:' --dump-header headers.out -X POST -d @- | xmllint --format - ) << EOF
 <?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -96,10 +100,14 @@ echo "1: ++++++++++++++++++++"
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 
 echo "2: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room/attributes/temperature -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
+response=$(curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room/attributes/temperature -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' --dump-header headers.out)
+cat headers.out
+echo $response | xmllint --format -
 
 # DELETE is not allowed
 echo "3: ++++++++++++++++++++"
@@ -130,20 +138,35 @@ echo 5: ++++++++++++++++++++
 killall contextBroker
 --REGEXPECT--
 0: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 185
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context element registrations found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </discoverContextAvailabilityResponse>
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 902
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>

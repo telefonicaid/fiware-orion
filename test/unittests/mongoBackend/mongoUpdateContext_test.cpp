@@ -3510,7 +3510,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->value.size());
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(1).code);
-    EXPECT_EQ("Not Found Attribute in DELETE", RES_CER_STATUS(1).reasonPhrase);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ("action: DELETE - entity: (E1, T1bis) - offending attribute: A2", RES_CER_STATUS(1).details);
 
     /* Context Element response # 3 */
@@ -3697,7 +3697,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->value.size());
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(1).code);
-    EXPECT_EQ("Not Found Attribute in DELETE", RES_CER_STATUS(1).reasonPhrase);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ("action: DELETE - entity: (E1, T1bis) - offending attribute: A2", RES_CER_STATUS(1).details);
 
     /* Context Element response # 3 */
@@ -4395,7 +4395,7 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
-    EXPECT_EQ("Entity Not Found", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("E4", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
@@ -4656,14 +4656,16 @@ TEST(mongoUpdateContextRequest, createEntity)
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4" << "_id.type" << "T4"));
     EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T4", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
+    EXPECT_TRUE(ent.hasField("creDate"));
+    EXPECT_TRUE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
+    EXPECT_TRUE(a1.hasField("creDate"));
+    EXPECT_TRUE(a1.hasField("modDate"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
@@ -4844,7 +4846,8 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E4" << "_id.type" << "T4"));
     EXPECT_STREQ("E4", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T4", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
+    EXPECT_TRUE(ent.hasField("creDate"));
+    EXPECT_TRUE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
@@ -4852,7 +4855,8 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_STREQ("ID1", C_STR_FIELD(a1, "id"));
-    EXPECT_FALSE(a1.hasField("modDate"));
+    EXPECT_TRUE(a1.hasField("creDate"));
+    EXPECT_TRUE(a1.hasField("modDate"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
@@ -4949,8 +4953,8 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
     ASSERT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
-    EXPECT_EQ("Attributes with same name with ID and not ID at the same time in the same entity are forbidden", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("entity: (E4, T4)", RES_CER_STATUS(0).details);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: (E4, T4)", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -5119,7 +5123,7 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
-    EXPECT_EQ("Empty Attribute in UPDATE or APPEND", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("action: UPDATE - entity: (E1, T1, false) - offending attribute: A1", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
@@ -5290,7 +5294,7 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
-    EXPECT_EQ("Empty Attribute in UPDATE or APPEND", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("action: APPEND - entity: (E1, T1, false) - offending attribute: A8", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
@@ -5461,7 +5465,7 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
-    EXPECT_EQ("Not Found Attribute in UPDATE", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("action: UPDATE - entity: (E1, T1) - offending attribute: A8", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
@@ -5631,7 +5635,7 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
-    EXPECT_EQ("Not Found Attribute in DELETE", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("action: DELETE - entity: (E1, T1) - offending attribute: A8", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
@@ -5909,14 +5913,16 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E5" << "_id.type" << "T5"));
     EXPECT_STREQ("E5", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T5", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
+    EXPECT_TRUE(ent.hasField("creDate"));
+    EXPECT_TRUE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     a3 = getAttr(attrs, "A3", "TA3");
     EXPECT_STREQ("A3", C_STR_FIELD(a3, "name"));
     EXPECT_STREQ("TA3",C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("new_val13", C_STR_FIELD(a3, "value"));
-    EXPECT_FALSE(a3.hasField("modDate"));
+    EXPECT_TRUE(a3.hasField("creDate"));
+    EXPECT_TRUE(a3.hasField("modDate"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
@@ -7088,7 +7094,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
     EXPECT_EQ("IDX", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
-    EXPECT_EQ("It is not allowed to APPEND an attribute with ID when another with the same name is in place or viceversa", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("action: APPEND - entity: (E10, T10) - offending attribute: A1", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
@@ -7303,7 +7309,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
     ASSERT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
-    EXPECT_EQ("It is not allowed to APPEND an attribute with ID when another with the same name is in place or viceversa", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("action: APPEND - entity: (E10, T10) - offending attribute: A1", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
@@ -8163,10 +8169,10 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccReceiverInternalError, RES_CER_STATUS(0).code);
-    EXPECT_EQ("Database Error", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("Internal Server Error", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("collection: unittest.entities "
               "- update() query: { _id.id: \"E1\", _id.type: \"T1\" } "
-              "- update() doc: { attrs: [ { name: \"A1\", type: \"TA1\", value: \"new_val\", modDate: 1360232700 }, { name: \"A2\", type: \"TA2\" } ], modDate: 1360232700 } "
+              "- update() doc: { $set: { attrs: [ { name: \"A1\", type: \"TA1\", value: \"new_val\", modDate: 1360232700 }, { name: \"A2\", type: \"TA2\" } ], modDate: 1360232700 } } "
               "- exception: boom!!", RES_CER_STATUS(0).details);
 
     /* Release mocks */
@@ -8225,7 +8231,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
     EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     EXPECT_EQ(0, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ(SccReceiverInternalError, RES_CER_STATUS(0).code);
-    EXPECT_EQ("Database Error", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("Internal Server Error", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("collection: unittest.entities "
               "- query(): { _id.id: \"E1\", _id.type: \"T1\" } "
               "- exception: boom!!", RES_CER_STATUS(0).details);

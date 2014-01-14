@@ -124,13 +124,24 @@ void SubscriptionId::present(std::string indent)
 *
 * SubscriptionId::render - 
 */
-std::string SubscriptionId::render(Format format, std::string indent, bool comma)
+std::string SubscriptionId::render(RequestType container, Format format, std::string indent, bool comma)
 {
   std::string xString = string;
   
-  // FIXME P9 this violates the XSD and must be fixed
   if (xString == "")
-    xString = std::string("No Subscription ID");
+  {
+    if ((container == RtSubscribeContextAvailabilityResponse)     || (container == RtUpdateContextAvailabilitySubscriptionResponse) ||
+        (container == RtUnsubscribeContextAvailabilityResponse)   || (container == NotifyContextAvailability)                       ||
+        (container == UpdateContextSubscription)                  || (container == UnsubscribeContext)                              ||
+        (container == RtUnsubscribeContextResponse)               || (container == NotifyContext)                                   ||
+        (container == RtSubscribeResponse)                        || (container == RtSubscribeError))
+    {
+      // subscriptionId is Mandatory
+      xString = "000000000000000000000000";
+    }
+    else
+      return ""; // subscriptionId is Optional
+  }
 
   return valueTag(indent, "subscriptionId", xString, format, comma);
 }

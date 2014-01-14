@@ -18,53 +18,24 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Accept header fail
+
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
-if [ "$VALGRIND" == "" ]; then
-  $CB_START_CMD
-  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-  sleep 1
-else
-  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
-  # Waiting for valgrind to start (sleep 10)
-  sleep 10s
-fi
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
+dbInit CB
+brokerStart CB
 
 --SHELL--
+source harnessFunctions.sh
 
 # Note that curl by default uses "Accept: */*" so this step is testing that "no header" is interpreted as
 # "Accept: */*" according to HTTP RFC
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept:' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='<?xml version="1.0"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -72,19 +43,19 @@ fi
         </entityId>
   </entityIdList>
   <attributeList/>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept:"
 echo "1: ++++++++++++++++++++"
 
 # This test will always fail
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: text/plain' -d @- | xmllint --format -) <<EOF
-no meaningful payload (failing tests)
-EOF
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='no meaningful payload (failing tests)'
+curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain"
 echo "2: ++++++++++++++++++++"
 
 # This test that explicit "Accept: application/xml" is ok
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -92,13 +63,13 @@ echo "2: ++++++++++++++++++++"
         </entityId>
   </entityIdList>
   <attributeList/>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
 echo "3: ++++++++++++++++++++"
 
 # This test uses a list in Accept which a valid type is found is ok
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: text/plain, application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -106,13 +77,13 @@ echo "3: ++++++++++++++++++++"
         </entityId>
   </entityIdList>
   <attributeList/>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, application/xml"
 echo "4: ++++++++++++++++++++"
 
 # This test uses a list in Accept which a valid type is found is ok (with extra encoding after ";")
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: text/plain, application/xml; charset=UTF-8' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -120,20 +91,20 @@ echo "4: ++++++++++++++++++++"
         </entityId>
   </entityIdList>
   <attributeList/>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, application/xml; charset=UTF-8"
 echo "5: ++++++++++++++++++++"
 
 # This test uses a list in Accept which no valid types
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: text/plain, image/jpeg' -d @- | xmllint --format -) <<EOF
-no meaningful payload (failing tests)
-EOF
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='no meaningful payload (failing tests)'
+curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, image/jpeg"
 echo "6: ++++++++++++++++++++"
 
 # This test uses a list in Accept which no valid type (with extra encoding after ";")
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: text/plain, image/jpeg; charset=UTF-8' -d @- | xmllint --format -) <<EOF
-no meaningful payload (failing tests)
-EOF
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='no meaningful payload (failing tests)'
+curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, image/jpeg; charset=UTF-8"
 echo "7: ++++++++++++++++++++"
 
 # FIXME P10: enable this test once the tested functionality gets implemented (including REGEXPECT)
@@ -217,50 +188,88 @@ echo "7: ++++++++++++++++++++"
 #echo "12: ++++++++++++++++++++"
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 1: ++++++++++++++++++++
+HTTP/1.1 406 Not Acceptable
+Connection: close
+Content-Length: 160
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <orionError>
   <reason>Not Acceptable</reason>
   <detail>aceptable types: application/xml but Accept header in request was: 'text/plain'</detail>
 </orionError>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 5: ++++++++++++++++++++
+HTTP/1.1 406 Not Acceptable
+Connection: close
+Content-Length: 172
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <orionError>
   <reason>Not Acceptable</reason>
   <detail>aceptable types: application/xml but Accept header in request was: 'text/plain, image/jpeg'</detail>
 </orionError>
 6: ++++++++++++++++++++
+HTTP/1.1 406 Not Acceptable
+Connection: close
+Content-Length: 187
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <orionError>
   <reason>Not Acceptable</reason>
@@ -268,11 +277,5 @@ echo "7: ++++++++++++++++++++"
 </orionError>
 7: ++++++++++++++++++++
 --TEARDOWN--
-if [ "$VALGRIND" == "" ]; then
-  kill $(cat ${BROKER_PID_FILE})
-  rm /tmp/orion_${BROKER_PORT}.pid
-else
-  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
-  # Waiting for valgrind to terminate (sleep 10)
-  sleep 10
-fi
+source harnessFunctions.sh
+brokerStop CB

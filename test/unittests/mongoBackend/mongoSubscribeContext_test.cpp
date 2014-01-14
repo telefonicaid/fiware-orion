@@ -7664,7 +7664,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("0", res.subscribeError.subscriptionId.get());
     EXPECT_EQ(SccReceiverInternalError, res.subscribeError.errorCode.code);
-    EXPECT_EQ("Database Error", res.subscribeError.errorCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.subscribeError.errorCode.reasonPhrase);
 
     std::string s1 = res.subscribeError.errorCode.details.substr(0, 56);
     std::string s2 = res.subscribeError.errorCode.details.substr(56+24, res.subscribeError.errorCode.details.size()-56-24);

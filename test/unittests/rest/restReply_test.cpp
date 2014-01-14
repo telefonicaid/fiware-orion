@@ -42,18 +42,20 @@
 */
 TEST(restReply, formatedAnswer)
 {
-  std::string     expected  = "<statusCode>\n  <code>200</code>\n  <reasonPhrase>OK</reasonPhrase>\n</statusCode>";
-  std::string     expected2 = "{\n  \"statusCode\":\n  {\n  \"code\": \"200\",\n  \"reasonPhrase\": \"OK\"\n  }\n}";
+  const char*     outfile1 = "ngsi.restReply.statusCode.valid.xml";
+  const char*     outfile2 = "ngsi.restReply.statusCode.valid.json";
   std::string     expected3 = "statusCode: code=200, reasonPhrase=OK";
   std::string     out;
 
   utInit();
 
   out = formatedAnswer(XML, "statusCode", "code", "200", "reasonPhrase", "OK");
-  EXPECT_EQ(expected, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = formatedAnswer(JSON, "statusCode", "code", "200", "reasonPhrase", "OK");
-  EXPECT_EQ(expected2, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = formatedAnswer(NOFORMAT, "statusCode", "code", "200", "reasonPhrase", "OK");
   EXPECT_EQ(expected3, out);
@@ -120,321 +122,346 @@ TEST(restReply, json)
 */
 TEST(restReply, restErrorReplyGet)
 {
+  const char* rcrOutfile01   = "ngsi9.restReply.registerContext01.ok.valid.xml";
+  const char* rcrOutfile02   = "ngsi9.restReply.registerContext02.ok.valid.xml";
+  const char* dcarOutfile01  = "ngsi9.restReply.discovery01.ok.valid.xml";
+  const char* dcarOutfile02  = "ngsi9.restReply.discovery02.ok.valid.xml";
+  const char* scarOutfile01  = "ngsi9.restReply.subscribeContextAvailability01.ok.valid.xml";
+  const char* scarOutfile02  = "ngsi9.restReply.subscribeContextAvailability02.ok.valid.xml";
+  const char* ucasOutfile01  = "ngsi9.restReply.updateContextAvailabilitySubscription01.ok.valid.xml";
+  const char* ucasOutfile02  = "ngsi9.restReply.updateContextAvailabilitySubscription02.ok.valid.xml";
+  const char* ucarOutfile01  = "ngsi9.restReply.unsubscribeContextAvailability01.ok.valid.xml";
+  const char* ucarOutfile02  = "ngsi9.restReply.unsubscribeContextAvailability02.ok.valid.xml";
+  const char* ncarOutfile01  = "ngsi9.restReply.notifyContextAvailabilityRequest01.ok.valid.xml";
+  const char* ncarOutfile02  = "ngsi9.restReply.notifyContextAvailabilityRequest02.ok.valid.xml";
+  const char* qcrOutfile01   = "ngsi10.restReply.queryContextResponse01.ok.valid.xml";
+  const char* qcrOutfile02   = "ngsi10.restReply.queryContextResponse02.ok.valid.xml";
+  const char* scrOutfile01   = "ngsi10.restReply.subscribeContextResponse01.ok.valid.xml";
+  const char* scrOutfile02   = "ngsi10.restReply.subscribeContextResponse02.ok.valid.xml";
+  const char* ucsOutfile01   = "ngsi10.restReply.updateContextSubscriptionResponse01.ok.valid.xml";
+  const char* ucsOutfile02   = "ngsi10.restReply.updateContextSubscriptionResponse02.ok.valid.xml";
+  const char* uscrOutfile01  = "ngsi10.restReply.unsubscribeContextResponse01.ok.valid.xml";
+  const char* uscrOutfile02  = "ngsi10.restReply.unsubscribeContextResponse02.ok.valid.xml";
+  const char* ucrOutfile01   = "ngsi10.restReply.updateContextResponse01.ok.valid.xml";
+  const char* ucrOutfile02   = "ngsi10.restReply.updateContextResponse02.ok.valid.xml";
+  const char* ncrOutfile01   = "ngsi10.restReply.notifyContextResponse01.ok.valid.xml";
+  const char* ncrOutfile02   = "ngsi10.restReply.notifyContextResponse02.ok.valid.xml";
+
   std::string rcr1 = "registerContext";
   std::string rcr2 = "/ngsi9/registerContext";
   std::string rcr3 = "/NGSI9/registerContext";
   std::string rcr4 = "registerContextRequest";
-  std::string rcrExpected  = "<registerContextResponse>\n  <registrationId>0</registrationId>\n</registerContextResponse>\n";
-  std::string rcrExpected2 = "<registerContextResponse>\n  <registrationId>0</registrationId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</registerContextResponse>\n";
 
   std::string dcar1 = "discoverContextAvailability";
   std::string dcar2 = "/ngsi9/discoverContextAvailability";
   std::string dcar3 = "/NGSI9/discoverContextAvailability";
   std::string dcar4 = "discoverContextAvailabilityRequest";
-  std::string dcarExpected  = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>200</code>\n    <reasonPhrase>ok</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
-  std::string dcarExpected2 = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
 
   std::string scar1 = "subscribeContextAvailability";
   std::string scar2 = "/ngsi9/subscribeContextAvailability";
   std::string scar3 = "/NGSI9/subscribeContextAvailability";
   std::string scar4 = "subscribeContextAvailabilityRequest";
-  std::string scarExpected  = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>0</subscriptionId>\n  <errorCode>\n    <code>200</code>\n    <reasonPhrase>ok</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</subscribeContextAvailabilityResponse>\n";
-  std::string scarExpected2 = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>0</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</subscribeContextAvailabilityResponse>\n";
 
   std::string ucas1 = "updateContextAvailabilitySubscription";
   std::string ucas2 = "/ngsi9/updateContextAvailabilitySubscription";
   std::string ucas3 = "/NGSI9/updateContextAvailabilitySubscription";
   std::string ucas4 = "updateContextAvailabilitySubscriptionRequest";
-  std::string ucasExpected  = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <errorCode>\n    <code>200</code>\n    <reasonPhrase>ok</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
-  std::string ucasExpected2 = "<updateContextAvailabilitySubscriptionResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</updateContextAvailabilitySubscriptionResponse>\n";
   
   std::string ucar1 = "unsubscribeContextAvailability";
   std::string ucar2 = "/ngsi9/unsubscribeContextAvailability";
   std::string ucar3 = "/NGSI9/unsubscribeContextAvailability";
   std::string ucar4 = "unsubscribeContextAvailabilityRequest";
-  std::string ucarExpected  = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <statusCode>\n    <code>200</code>\n    <reasonPhrase>ok</reasonPhrase>\n    <details>detail</details>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
-  std::string ucarExpected2 = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
   
   std::string ncar1 = "notifyContextAvailability";
   std::string ncar2 = "/ngsi9/notifyContextAvailability";
   std::string ncar3 = "/NGSI9/notifyContextAvailability";
   std::string ncar4 = "notifyContextAvailabilityRequest";
-  std::string ncarExpected  = "<notifyContextAvailabilityResponse>\n  <responseCode>\n    <code>200</code>\n    <reasonPhrase>ok</reasonPhrase>\n    <details>detail</details>\n  </responseCode>\n</notifyContextAvailabilityResponse>\n";
-  std::string ncarExpected2 = "<notifyContextAvailabilityResponse>\n  <responseCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </responseCode>\n</notifyContextAvailabilityResponse>\n";
   
   std::string qcr1 = "queryContext";
   std::string qcr2 = "/ngsi10/queryContext";
   std::string qcr3 = "/NGSI10/queryContext";
   std::string qcr4 = "queryContextRequest";
-  std::string qcrExpected  = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
-  std::string qcrExpected2 = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</queryContextResponse>\n";
   
   std::string scr1 = "subscribeContext";
   std::string scr2 = "/ngsi10/subscribeContext";
   std::string scr3 = "/NGSI10/subscribeContext";
   std::string scr4 = "subscribeContextRequest";
-  std::string scrExpected  = "<subscribeContextResponse>\n  <subscribeError>\n    <errorCode>\n      <code>200</code>\n      <reasonPhrase>ok</reasonPhrase>\n      <details>detail</details>\n    </errorCode>\n  </subscribeError>\n</subscribeContextResponse>\n";
-  std::string scrExpected2 = "<subscribeContextResponse>\n  <subscribeError>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>Bad Request</reasonPhrase>\n      <details>detail</details>\n    </errorCode>\n  </subscribeError>\n</subscribeContextResponse>\n";
   
   std::string ucs1 = "updateContextSubscription";
   std::string ucs2 = "/ngsi10/updateContextSubscription";
   std::string ucs3 = "/NGSI10/updateContextSubscription";
   std::string ucs4 = "updateContextSubscriptionRequest";
-  std::string ucsExpected  = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <subscriptionId>0</subscriptionId>\n    <errorCode>\n      <code>200</code>\n      <reasonPhrase>ok</reasonPhrase>\n      <details>detail</details>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
-  std::string ucsExpected2 = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <subscriptionId>0</subscriptionId>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>Bad Request</reasonPhrase>\n      <details>detail</details>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
   
   std::string uscr1 = "unsubscribeContext";
   std::string uscr2 = "/ngsi10/unsubscribeContext";
   std::string uscr3 = "/NGSI10/unsubscribeContext";
   std::string uscr4 = "unsubscribeContextRequest";
-  std::string uscrExpected  = "<unsubscribeContextResponse>\n  <subscriptionId>0</subscriptionId>\n  <statusCode>\n    <code>200</code>\n    <reasonPhrase>ok</reasonPhrase>\n    <details>detail</details>\n  </statusCode>\n</unsubscribeContextResponse>\n";
-  std::string uscrExpected2 = "<unsubscribeContextResponse>\n  <subscriptionId>0</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </statusCode>\n</unsubscribeContextResponse>\n";
   
   std::string ucr1 = "updateContext";
   std::string ucr2 = "/ngsi10/updateContext";
   std::string ucr3 = "/NGSI10/updateContext";
   std::string ucr4 = "updateContextRequest";
-  std::string ucrExpected  = "<updateContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</updateContextResponse>\n";
-  std::string ucrExpected2 = "<updateContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</updateContextResponse>\n";
   
   std::string ncr1 = "notifyContext";
   std::string ncr2 = "/ngsi10/notifyContext";
   std::string ncr3 = "/NGSI10/notifyContext";
   std::string ncr4 = "notifyContextRequest";
-  std::string ncrExpected  = "<notifyContextResponse>\n  <responseCode>\n    <code>200</code>\n    <reasonPhrase>ok</reasonPhrase>\n    <details>detail</details>\n  </responseCode>\n</notifyContextResponse>\n";
-  std::string ncrExpected2 = "<notifyContextResponse>\n  <responseCode>\n    <code>400</code>\n    <reasonPhrase>Bad Request</reasonPhrase>\n    <details>detail</details>\n  </responseCode>\n</notifyContextResponse>\n";
   
   std::string     out;
   ConnectionInfo  ci("/ngsi/test", "POST", "1.1");
   
   utInit();
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), rcrOutfile01)) << "Error getting test data from '" << rcrOutfile01 << "'";
   out = restErrorReplyGet(&ci, XML, "", rcr1, 200, "ok", "detail");
-  EXPECT_EQ(rcrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", rcr2, 200, "ok", "detail");
-  EXPECT_EQ(rcrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", rcr3, 200, "ok", "detail");
-  EXPECT_EQ(rcrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", rcr4, 200, "ok", "detail");
-  EXPECT_EQ(rcrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), rcrOutfile02)) << "Error getting test data from '" << rcrOutfile02 << "'";
   out = restErrorReplyGet(&ci, XML, "", rcr1, 400, "Bad Request", "detail");
-  EXPECT_EQ(rcrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", rcr2, 400, "Bad Request", "detail");
-  EXPECT_EQ(rcrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", rcr3, 400, "Bad Request", "detail");
-  EXPECT_EQ(rcrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", rcr4, 400, "Bad Request", "detail");
-  EXPECT_EQ(rcrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), dcarOutfile01)) << "Error getting test data from '" << dcarOutfile01 << "'";
   out = restErrorReplyGet(&ci, XML, "", dcar1, 200, "ok", "detail");
-  EXPECT_EQ(dcarExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", dcar2, 200, "ok", "detail");
-  EXPECT_EQ(dcarExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", dcar3, 200, "ok", "detail");
-  EXPECT_EQ(dcarExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", dcar4, 200, "ok", "detail");
-  EXPECT_EQ(dcarExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), dcarOutfile02)) << "Error getting test data from '" << dcarOutfile02 << "'";
   out = restErrorReplyGet(&ci, XML, "", dcar1, 400, "Bad Request", "detail");
-  EXPECT_EQ(dcarExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", dcar2, 400, "Bad Request", "detail");
-  EXPECT_EQ(dcarExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", dcar3, 400, "Bad Request", "detail");
-  EXPECT_EQ(dcarExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", dcar4, 400, "Bad Request", "detail");
-  EXPECT_EQ(dcarExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), scarOutfile01)) << "Error getting test data from '" << scarOutfile01 << "'";
   out = restErrorReplyGet(&ci, XML, "", scar1, 200, "ok", "detail");
-  EXPECT_EQ(scarExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", scar2, 200, "ok", "detail");
-  EXPECT_EQ(scarExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", scar3, 200, "ok", "detail");
-  EXPECT_EQ(scarExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", scar4, 200, "ok", "detail");
-  EXPECT_EQ(scarExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), scarOutfile02)) << "Error getting test data from '" << scarOutfile02 << "'";
   out = restErrorReplyGet(&ci, XML, "", scar1, 400, "Bad Request", "detail");
-  EXPECT_EQ(scarExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", scar2, 400, "Bad Request", "detail");
-  EXPECT_EQ(scarExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", scar3, 400, "Bad Request", "detail");
-  EXPECT_EQ(scarExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", scar4, 400, "Bad Request", "detail");
-  EXPECT_EQ(scarExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucasOutfile01)) << "Error getting test data from '" << ucasOutfile01 << "'";
   out = restErrorReplyGet(&ci, XML, "", ucas1, 200, "ok", "detail");
-  EXPECT_EQ(ucasExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucas2, 200, "ok", "detail");
-  EXPECT_EQ(ucasExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucas3, 200, "ok", "detail");
-  EXPECT_EQ(ucasExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucas4, 200, "ok", "detail");
-  EXPECT_EQ(ucasExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucasOutfile02)) << "Error getting test data from '" << ucasOutfile02 << "'";
   out = restErrorReplyGet(&ci, XML, "", ucas1, 400, "Bad Request", "detail");
-  EXPECT_EQ(ucasExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucas2, 400, "Bad Request", "detail");
-  EXPECT_EQ(ucasExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucas3, 400, "Bad Request", "detail");
-  EXPECT_EQ(ucasExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucas4, 400, "Bad Request", "detail");
-  EXPECT_EQ(ucasExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucarOutfile01)) << "Error getting test data from '" << ucarOutfile01 << "'";
   out = restErrorReplyGet(&ci, XML, "", ucar1, 200, "ok", "detail");
-  EXPECT_EQ(ucarExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucar2, 200, "ok", "detail");
-  EXPECT_EQ(ucarExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucar3, 200, "ok", "detail");
-  EXPECT_EQ(ucarExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucar4, 200, "ok", "detail");
-  EXPECT_EQ(ucarExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucarOutfile02)) << "Error getting test data from '" << ucarOutfile02 << "'";
   out = restErrorReplyGet(&ci, XML, "", ucar1, 400, "Bad Request", "detail");
-  EXPECT_EQ(ucarExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucar2, 400, "Bad Request", "detail");
-  EXPECT_EQ(ucarExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucar3, 400, "Bad Request", "detail");
-  EXPECT_EQ(ucarExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucar4, 400, "Bad Request", "detail");
-  EXPECT_EQ(ucarExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ncarOutfile01)) << "Error getting test data from '" << ncarOutfile01 << "'";
   out = restErrorReplyGet(&ci, XML, "", ncar1, 200, "ok", "detail");
-  EXPECT_EQ(ncarExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ncar2, 200, "ok", "detail");
-  EXPECT_EQ(ncarExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ncar3, 200, "ok", "detail");
-  EXPECT_EQ(ncarExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ncar4, 200, "ok", "detail");
-  EXPECT_EQ(ncarExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ncarOutfile02)) << "Error getting test data from '" << ncarOutfile02 << "'";
   out = restErrorReplyGet(&ci, XML, "", ncar1, 400, "Bad Request", "detail");
-  EXPECT_EQ(ncarExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ncar2, 400, "Bad Request", "detail");
-  EXPECT_EQ(ncarExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ncar3, 400, "Bad Request", "detail");
-  EXPECT_EQ(ncarExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ncar4, 400, "Bad Request", "detail");
-  EXPECT_EQ(ncarExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), qcrOutfile01)) << "Error getting test data from '" << qcrOutfile01 << "'";
   out = restErrorReplyGet(&ci, XML, "", qcr1, 200, "ok", "detail");
-  EXPECT_EQ(qcrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", qcr2, 200, "ok", "detail");
-  EXPECT_EQ(qcrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", qcr3, 200, "ok", "detail");
-  EXPECT_EQ(qcrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", qcr4, 200, "ok", "detail");
-  EXPECT_EQ(qcrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), qcrOutfile02)) << "Error getting test data from '" << qcrOutfile02 << "'";
   out = restErrorReplyGet(&ci, XML, "", qcr1, 400, "Bad Request", "detail");
-  EXPECT_EQ(qcrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", qcr2, 400, "Bad Request", "detail");
-  EXPECT_EQ(qcrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", qcr3, 400, "Bad Request", "detail");
-  EXPECT_EQ(qcrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", qcr4, 400, "Bad Request", "detail");
-  EXPECT_EQ(qcrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), scrOutfile01)) << "Error getting test data from '" << scrOutfile01 << "'";
   out = restErrorReplyGet(&ci, XML, "", scr1, 200, "ok", "detail");
-  EXPECT_EQ(scrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", scr2, 200, "ok", "detail");
-  EXPECT_EQ(scrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", scr3, 200, "ok", "detail");
-  EXPECT_EQ(scrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", scr4, 200, "ok", "detail");
-  EXPECT_EQ(scrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), scrOutfile02)) << "Error getting test data from '" << scrOutfile02 << "'";
   out = restErrorReplyGet(&ci, XML, "", scr1, 400, "Bad Request", "detail");
-  EXPECT_EQ(scrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", scr2, 400, "Bad Request", "detail");
-  EXPECT_EQ(scrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", scr3, 400, "Bad Request", "detail");
-  EXPECT_EQ(scrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", scr4, 400, "Bad Request", "detail");
-  EXPECT_EQ(scrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucsOutfile01)) << "Error getting test data from '" << ucsOutfile01 << "'";
   out = restErrorReplyGet(&ci, XML, "", ucs1, 200, "ok", "detail");
-  EXPECT_EQ(ucsExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucs2, 200, "ok", "detail");
-  EXPECT_EQ(ucsExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucs3, 200, "ok", "detail");
-  EXPECT_EQ(ucsExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucs4, 200, "ok", "detail");
-  EXPECT_EQ(ucsExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucsOutfile02)) << "Error getting test data from '" << ucsOutfile02 << "'";
   out = restErrorReplyGet(&ci, XML, "", ucs1, 400, "Bad Request", "detail");
-  EXPECT_EQ(ucsExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucs2, 400, "Bad Request", "detail");
-  EXPECT_EQ(ucsExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucs3, 400, "Bad Request", "detail");
-  EXPECT_EQ(ucsExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucs4, 400, "Bad Request", "detail");
-  EXPECT_EQ(ucsExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), uscrOutfile01)) << "Error getting test data from '" << uscrOutfile01 << "'";
   out = restErrorReplyGet(&ci, XML, "", uscr1, 200, "ok", "detail");
-  EXPECT_EQ(uscrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", uscr2, 200, "ok", "detail");
-  EXPECT_EQ(uscrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", uscr3, 200, "ok", "detail");
-  EXPECT_EQ(uscrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", uscr4, 200, "ok", "detail");
-  EXPECT_EQ(uscrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), uscrOutfile02)) << "Error getting test data from '" << uscrOutfile02 << "'";
   out = restErrorReplyGet(&ci, XML, "", uscr1, 400, "Bad Request", "detail");
-  EXPECT_EQ(uscrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", uscr2, 400, "Bad Request", "detail");
-  EXPECT_EQ(uscrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", uscr3, 400, "Bad Request", "detail");
-  EXPECT_EQ(uscrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", uscr4, 400, "Bad Request", "detail");
-  EXPECT_EQ(uscrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucrOutfile01)) << "Error getting test data from '" << ucrOutfile01 << "'";
   out = restErrorReplyGet(&ci, XML, "", ucr1, 200, "ok", "detail");
-  EXPECT_EQ(ucrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucr2, 200, "ok", "detail");
-  EXPECT_EQ(ucrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucr3, 200, "ok", "detail");
-  EXPECT_EQ(ucrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucr4, 200, "ok", "detail");
-  EXPECT_EQ(ucrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucrOutfile02)) << "Error getting test data from '" << ucrOutfile02 << "'";
   out = restErrorReplyGet(&ci, XML, "", ucr1, 400, "Bad Request", "detail");
-  EXPECT_EQ(ucrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucr2, 400, "Bad Request", "detail");
-  EXPECT_EQ(ucrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucr3, 400, "Bad Request", "detail");
-  EXPECT_EQ(ucrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucr4, 400, "Bad Request", "detail");
-  EXPECT_EQ(ucrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ncrOutfile01)) << "Error getting test data from '" << ncrOutfile01 << "'";
   out = restErrorReplyGet(&ci, XML, "", ncr1, 200, "ok", "detail");
-  EXPECT_EQ(ncrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ncr2, 200, "ok", "detail");
-  EXPECT_EQ(ncrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ncr3, 200, "ok", "detail");
-  EXPECT_EQ(ncrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ncr4, 200, "ok", "detail");
-  EXPECT_EQ(ncrExpected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ncrOutfile02)) << "Error getting test data from '" << ncrOutfile02 << "'";
   out = restErrorReplyGet(&ci, XML, "", ncr1, 400, "Bad Request", "detail");
-  EXPECT_EQ(ncrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ncr2, 400, "Bad Request", "detail");
-  EXPECT_EQ(ncrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ncr3, 400, "Bad Request", "detail");
-  EXPECT_EQ(ncrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ncr4, 400, "Bad Request", "detail");
-  EXPECT_EQ(ncrExpected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

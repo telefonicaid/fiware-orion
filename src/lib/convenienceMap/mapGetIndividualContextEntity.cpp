@@ -31,6 +31,7 @@
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
+#include "rest/HttpStatusCode.h"
 
 
 
@@ -54,7 +55,7 @@ HttpStatusCode mapGetIndividualContextEntity(std::string entityId, ContextElemen
    if ((ms != SccOk) || (qcResponse.contextElementResponseVector.size() == 0))
    {
      // Here I fill in statusCode for the response
-     response->statusCode.fill(SccContextElementNotFound, "Entity Not Found", entityId);
+     response->statusCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound), entityId);
      LM_RE(ms, ("entityId '%s' not found", entityId.c_str()));
    }
 

@@ -18,6 +18,8 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Convenience Individual Context Entity Attribute - DELETE FAILS
 
@@ -69,7 +71,7 @@ echo "+++++ 1. delete an entity +++++"
 <?xml version="1.0"?>
 <statusCode>
   <code>404</code>
-  <reasonPhrase>Entity Not Found</reasonPhrase>
+  <reasonPhrase>No context element found</reasonPhrase>
   <details>entity01</details>
 </statusCode>
 --TEARDOWN--

@@ -64,7 +64,7 @@ static RestService rs[] =
 TEST(getContextEntityTypes, nothingFound)
 {
   ConnectionInfo ci("/ngsi9/contextEntityTypes/TYPE_123",  "GET", "1.1");
-  std::string    expected = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element registrations found</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
+  std::string    expected = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
 
   // Cleaning database before starting the test, as it may cause a "false positive" otherwise (it happened in Jenkins)
   setupDatabase();

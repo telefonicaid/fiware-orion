@@ -18,6 +18,8 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Query SEQ
 --SHELL-INIT--
@@ -435,7 +437,7 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 1: ++++++++++++++++++++
@@ -443,7 +445,7 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 2: ++++++++++++++++++++
@@ -457,7 +459,7 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 4: ++++++++++++++++++++
@@ -465,7 +467,7 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 5: ++++++++++++++++++++
@@ -473,7 +475,7 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 6: ++++++++++++++++++++
@@ -481,7 +483,7 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 7: ++++++++++++++++++++
@@ -489,7 +491,7 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 8: ++++++++++++++++++++
@@ -497,7 +499,7 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 9: ++++++++++++++++++++
@@ -505,7 +507,7 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 10: ++++++++++++++++++++
@@ -513,7 +515,7 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 11: ++++++++++++++++++++
@@ -521,7 +523,7 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 12: ++++++++++++++++++++
@@ -668,7 +670,7 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 17: ++++++++++++++++++++
@@ -682,7 +684,7 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 19: ++++++++++++++++++++

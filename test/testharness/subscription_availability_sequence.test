@@ -18,82 +18,19 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Subscription availability sequence
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
-if [ "$VALGRIND" == "" ]; then
-  $CB_START_CMD
-  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-  sleep 1
-else
-  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
-  # Waiting for valgrind to start (sleep 10)
-  sleep 10s
-fi
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
-
-# Test to see if we have the listening application running on ${LISTENER_PORT} if so kill it!
-running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
-if [ $running_app -ne 0 ]; then
-  kill $(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | awk '{print $2}')
-  # Wait some time so the accumulator can finish properly
-  sleep 1
-  running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
-  if [ $running_app -ne 0 ]; then
-    # If the accumulator refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | awk '{print $2}')
-    sleep 1
-    running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
-    if [ $running_app -ne 0 ]; then
-      echo "Existing accumulator-server.py is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
-
-accumulator-server.py ${LISTENER_PORT} /notify on &
-# Wait until accumulator has started or we have waited a given maximum time
-port_not_ok=1
-time=0
-until [ $port_not_ok -eq 0 ]; do
-   if [ $time -eq ${MAXIMUM_WAIT} ]; then
-      echo "Unable to start listening application after waiting ${MAXIMUM_WAIT}"
-      exit 1
-   fi 
-   sleep 1
-   time=$[$time+1]
-   nc -z localhost ${LISTENER_PORT} 
-   port_not_ok=$?
-done
+dbInit CB
+brokerStart CB
+accumulatorStart
 
 --SHELL--
+source harnessFunctions.sh
 
 (curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
@@ -145,9 +82,7 @@ SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -
 echo "$SUB_OUT"
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.casubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "2: ++++++++++++++++++++"
 
@@ -177,9 +112,7 @@ echo "2: ++++++++++++++++++++"
 EOF
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.casubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "3: ++++++++++++++++++++"
 
@@ -231,9 +164,7 @@ echo "4: ++++++++++++++++++++"
 EOF
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.casubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "5: ++++++++++++++++++++"
 
@@ -289,9 +220,7 @@ echo "6: ++++++++++++++++++++"
 EOF
 
 # Get notifications count
-mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.casubs.findOne({_id: ObjectId("$SUB_ID")}, {_id: 0, count: 1})
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "7: ++++++++++++++++++++"
 
@@ -401,7 +330,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
   <statusCode>
     <code>404</code>
-    <reasonPhrase>Subscription Not Found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </statusCode>
 </unsubscribeContextAvailabilityResponse>
 9: ++++++++++++++++++++
@@ -536,12 +465,7 @@ Content-Type: application/xml
 
 =======================================
 --TEARDOWN--
-if [ "$VALGRIND" == "" ]; then
-  kill $(cat ${BROKER_PID_FILE})
-  rm /tmp/orion_${BROKER_PORT}.pid
-else
-  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
-  # Waiting for valgrind to terminate (sleep 10)
-  sleep 10
-fi
-kill $(curl localhost:${LISTENER_PORT}/pid -s -S)
+source harnessFunctions.sh
+
+brokerStop CB
+accumulatorStop

@@ -18,6 +18,8 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 NGSI10 Convenience PUT Attribute Value Instance
 --SHELL-INIT--
@@ -157,7 +159,7 @@ killall contextBroker
 <?xml version="1.0"?>
 <statusCode>
   <code>404</code>
-  <reasonPhrase>Entity Not Found</reasonPhrase>
+  <reasonPhrase>No context element found</reasonPhrase>
   <details>E01</details>
 </statusCode>
 1: ++++++++++++++++++++
@@ -240,7 +242,7 @@ Date: REGEX(.*)
 <?xml version="1.0"?>
 <statusCode>
   <code>472</code>
-  <reasonPhrase>Not Found Attribute in DELETE</reasonPhrase>
+  <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
   <details>action: DELETE - entity: (E01, ) - offending attribute: A1</details>
 </statusCode>
 8: ++++++++++++++++++++

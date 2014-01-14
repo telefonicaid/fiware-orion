@@ -1,0 +1,8 @@
+<subscribeContextAvailabilityResponse>
+  <subscriptionId>0</subscriptionId>
+  <errorCode>
+    <code>200</code>
+    <reasonPhrase>ok</reasonPhrase>
+    <details>detail</details>
+  </errorCode>
+</subscribeContextAvailabilityResponse>

@@ -18,6 +18,8 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Convenience NGSI9 Context Entity Type Attribute Container
 --SHELL-INIT--
@@ -145,7 +147,8 @@ killall contextBroker
   <registrationId>012301230123012301230123</registrationId>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>Registration Not Found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>registration id: '012301230123012301230123'</details>
   </errorCode>
 </registerContextResponse>
 3: ++++++++++++++++++++

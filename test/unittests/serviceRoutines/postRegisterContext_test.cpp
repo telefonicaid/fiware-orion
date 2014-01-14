@@ -56,14 +56,14 @@ TEST(postRegisterContext, ok)
   ConnectionInfo ci("/ngsi9/registerContext",  "POST", "1.1");
   ConnectionInfo ci2("/ngsi9/registerContext",  "POST", "1.1");
   std::string    expectedStart   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <registrationId>";
-  std::string    expected2       = "<registerContextResponse>\n  <registrationId>012345678901234567890123</registrationId>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Registration Not Found</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
+  std::string    expected2       = "<registerContextResponse>\n  <registrationId>012345678901234567890123</registrationId>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n    <details>registration id: '012345678901234567890123'</details>\n  </errorCode>\n</registerContextResponse>\n";
   const char*    fileName        = "ngsi9.registerContextRequest.ok.valid.xml";
   const char*    fileName2       = "ngsi9.registerContextRequest.update.valid.xml";
   std::string    out;
 
   // Avoid forwarding of messages
-  extern int fwdPort;
-  int saved = fwdPort;
+  extern int     fwdPort;
+  int            saved = fwdPort;
   fwdPort = 0;
 
   utInit();

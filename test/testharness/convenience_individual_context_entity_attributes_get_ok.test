@@ -18,6 +18,8 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Convenience Individual Context Entity - GET OK
 
@@ -107,7 +109,7 @@ echo "+++++ 2. lookup the entity +++++"
   </contextElement>
   <statusCode>
     <code>404</code>
-    <reasonPhrase>Entity Not Found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
     <details>entity01</details>
   </statusCode>
 </contextElementResponse>

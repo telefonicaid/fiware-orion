@@ -18,6 +18,8 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Update SEQ
 --SHELL-INIT--
@@ -801,7 +803,7 @@ EOF
       </contextElement>
       <statusCode>
         <code>472</code>
-        <reasonPhrase>Empty Attribute in UPDATE or APPEND</reasonPhrase>
+        <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
         <details>action: APPEND - entity: (OfficeRoom, Room, false) - offending attribute: pressure</details>
       </statusCode>
     </contextElementResponse>
@@ -826,7 +828,7 @@ EOF
       </contextElement>
       <statusCode>
         <code>472</code>
-        <reasonPhrase>Empty Attribute in UPDATE or APPEND</reasonPhrase>
+        <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
         <details>action: UPDATE - entity: (OfficeRoom, Room, false) - offending attribute: pressure</details>
       </statusCode>
     </contextElementResponse>
@@ -875,7 +877,7 @@ EOF
       </contextElement>
       <statusCode>
         <code>472</code>
-        <reasonPhrase>Not Found Attribute in DELETE</reasonPhrase>
+        <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
         <details>action: DELETE - entity: (OfficeRoom, Room) - offending attribute: pressure</details>
       </statusCode>
     </contextElementResponse>
@@ -900,7 +902,7 @@ EOF
       </contextElement>
       <statusCode>
         <code>472</code>
-        <reasonPhrase>Not Found Attribute in DELETE</reasonPhrase>
+        <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
         <details>action: DELETE - entity: (OfficeRoom, Room) - offending attribute: pressure</details>
       </statusCode>
     </contextElementResponse>
@@ -925,7 +927,7 @@ EOF
       </contextElement>
       <statusCode>
         <code>472</code>
-        <reasonPhrase>Not Found Attribute in UPDATE</reasonPhrase>
+        <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
         <details>action: UPDATE - entity: (OfficeRoom, Room) - offending attribute: pressure</details>
       </statusCode>
     </contextElementResponse>
@@ -950,7 +952,7 @@ EOF
       </contextElement>
       <statusCode>
         <code>472</code>
-        <reasonPhrase>Not Found Attribute in UPDATE</reasonPhrase>
+        <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
         <details>action: UPDATE - entity: (OfficeRoom, Room) - offending attribute: pressure</details>
       </statusCode>
     </contextElementResponse>
@@ -1022,7 +1024,7 @@ EOF
       </contextElement>
       <statusCode>
         <code>472</code>
-        <reasonPhrase>Not Found Attribute in UPDATE</reasonPhrase>
+        <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
         <details>action: UPDATE - entity: (OfficeRoom, Room) - offending attribute: lightstatus</details>
       </statusCode>
     </contextElementResponse>

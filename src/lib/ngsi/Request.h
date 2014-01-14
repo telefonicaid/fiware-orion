@@ -40,14 +40,18 @@ typedef enum RequestType
   RegisterContext = 1,
   DiscoverContextAvailability,
   SubscribeContextAvailability,
+  RtSubscribeContextAvailabilityResponse,
   UpdateContextAvailabilitySubscription,
+  RtUpdateContextAvailabilitySubscriptionResponse,
   UnsubscribeContextAvailability,
+  RtUnsubscribeContextAvailabilityResponse,
   NotifyContextAvailability,
 
   QueryContext = 11,
   SubscribeContext,
   UpdateContextSubscription,
   UnsubscribeContext,
+  RtUnsubscribeContextResponse,
   NotifyContext,
   UpdateContext,
 
@@ -78,8 +82,10 @@ typedef enum RequestType
   LeakRequest,
   StatisticsRequest,
 
+  RegisterResponse,
+  RtSubscribeResponse,
+  RtSubscribeError,
   InvalidRequest,
-  RegisterResponse
 } RequestType;
 
 

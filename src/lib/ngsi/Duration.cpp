@@ -43,7 +43,9 @@
 */
 Duration::Duration()
 {
-    seconds = 0;
+  seconds = 0;
+  valid   = false;
+  used    = false;
 }
 
 /* ****************************************************************************
@@ -56,8 +58,13 @@ std::string Duration::check(RequestType requestType, Format format, std::string 
     return "OK";
 
   if (parse() == -1)
-     return "syntax error in duration string";
+  {
+    valid = false;
+    LM_E(("syntax error in duration string"));
+    return "syntax error in duration string";
+  }
 
+  valid = true;
   return "OK";
 }
 
@@ -70,6 +77,7 @@ std::string Duration::check(RequestType requestType, Format format, std::string 
 void Duration::set(std::string value)
 {
   string = value;
+  parse(); // just to flag valid/invalid
 }
 
 
@@ -103,6 +111,9 @@ bool Duration::isEmpty(void)
 int Duration::parse(void)
 {
   seconds = parse8601(string);
+
+  valid = (seconds == -1)? false : true;
+
   return seconds;
 }
 
@@ -115,7 +126,7 @@ void Duration::present(std::string indent)
   if (string != "")
     PRINTF("%sDuration: %s\n", indent.c_str(), string.c_str());
   else
-     PRINTF("%sNo Duration\n", indent.c_str());
+    PRINTF("%sNo Duration\n", indent.c_str());
 }
 
 
@@ -127,6 +138,9 @@ void Duration::present(std::string indent)
 std::string Duration::render(Format format, std::string indent, bool comma)
 {
   if (string == "")
+    return "";
+
+  if (valid == false)
     return "";
 
   return valueTag(indent, "duration", string, format, comma);

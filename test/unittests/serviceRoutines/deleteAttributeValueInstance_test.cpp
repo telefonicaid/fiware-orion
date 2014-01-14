@@ -63,7 +63,7 @@ static RestService rs[] =
 TEST(deleteAttributeValueInstance, notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/E1/attributes/A1/left",  "DELETE", "1.1");
-  std::string    expected    = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>Entity Not Found</reasonPhrase>\n  <details>E1</details>\n</statusCode>\n";
+  std::string    expected    = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>No context element found</reasonPhrase>\n  <details>E1</details>\n</statusCode>\n";
   std::string    out;
 
   utInit();

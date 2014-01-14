@@ -21,90 +21,37 @@
 --NAME--
 CM forwards PSB OK
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-contextBroker -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME}
-# Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-sleep 1
+dbInit CB
+dbInit CM
 
-
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
-
-# Test to see if we have a broker running on ${CM_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${CM_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${CM_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${CM_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${CM_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${CM_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
-
-mkdir /tmp/configManager
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_AUX_NAME} --quiet
-contextBroker -logDir /tmp/configManager -ngsi9 -port ${CM_PORT} -pidpath ${BROKER_PID_FILE_AUX} -db ${BROKER_DATABASE_AUX_NAME} -fwdPort ${BROKER_PORT}
-# Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-sleep 1
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${CM_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
+brokerStart CB 0-255
+brokerStart CM 0-255
 
 --SHELL--
+source harnessFunctions.sh
+
 # Do a NGSI10 request to check the operation is avoided
-(curl localhost:${CM_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+response=$((curl localhost:${CM_PORT}/NGSI10/queryContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- ) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
   </entityIdList>
   <attributeList>
-        <attribute>pressure</attribute>
-        <attribute>lightstatus</attribute>
+    <attribute>pressure</attribute>
+    <attribute>lightstatus</attribute>
   </attributeList>
 </queryContextRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "1: ++++++++++++++++++++"
 # Do initial registration in the CM
-REG_OUT=$((curl localhost:${CM_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+response=$((curl localhost:${CM_PORT}/NGSI9/registerContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- ) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -131,12 +78,13 @@ REG_OUT=$((curl localhost:${CM_PORT}/NGSI9/registerContext -s -S --header 'Conte
     <registrationId></registrationId>
   </registerContextRequest>
 EOF)
-REG_ID=$(echo "$REG_OUT" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$REG_OUT"
+REG_ID=$(echo "$response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
+cat headers.out
+echo $response | xmllint --format -
 echo "2: ++++++++++++++++++++"
 
 # Check the registration in CM 
-(curl localhost:${CM_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+response=$((curl localhost:${CM_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- ) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -152,11 +100,13 @@ echo "2: ++++++++++++++++++++"
       <attribute>pressure</attribute>
     </attributeList>
   </discoverContextAvailabilityRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "3: ++++++++++++++++++++"
 
 # Check the registration in PSB
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- ) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -172,11 +122,13 @@ echo "3: ++++++++++++++++++++"
       <attribute>pressure</attribute>
     </attributeList>
   </discoverContextAvailabilityRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "4: ++++++++++++++++++++"
 
 # Update registration in CM
-(curl localhost:${CM_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+response=$((curl localhost:${CM_PORT}/NGSI9/registerContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- ) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -199,11 +151,13 @@ echo "4: ++++++++++++++++++++"
     <duration>PT5H</duration>
     <registrationId>$REG_ID</registrationId>
   </registerContextRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "5: ++++++++++++++++++++"
 
 # Check the registration in CM
-(curl localhost:${CM_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+response=$((curl localhost:${CM_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- ) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -214,11 +168,13 @@ echo "5: ++++++++++++++++++++"
     <attributeList>
     </attributeList>
   </discoverContextAvailabilityRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "6: ++++++++++++++++++++"
 
 # Check the registration in PSB
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+response=$((curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- ) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -229,28 +185,21 @@ echo "6: ++++++++++++++++++++"
     <attributeList>
     </attributeList>
   </discoverContextAvailabilityRequest>
-EOF
+EOF)
+cat headers.out
+echo $response | xmllint --format -
 echo "7: ++++++++++++++++++++"
 
 # Check that everything is ok at database layer
-mongo --quiet ${BROKER_DATABASE_NAME} << EOF
-db.registrations.count()
-EOF
+mongoCmd ${BROKER_DATABASE_NAME} 'db.registrations.count()'
+mongoCmd ${BROKER_DATABASE_AUX_NAME} 'db.registrations.count()'
 
-mongo --quiet ${BROKER_DATABASE_AUX_NAME} << EOF
-db.registrations.count()
-EOF
-
-RESULT=$(mongo --quiet ${BROKER_DATABASE_NAME} <<EOF
-db.registrations.find({}, {_id: 1})
-EOF)
+RESULT=$(mongoCmd ${BROKER_DATABASE_NAME} 'db.registrations.find({}, {_id: 1})')
 # The next line is based in processing the following pattern:
 #   { "_id" : ObjectId("5213a9a1db818a34990755c3") }
 ID1=$(echo $RESULT | awk '{print $4}' | awk -F '"' '{print $2}')
 
-RESULT=$(mongo --quiet ${BROKER_DATABASE_AUX_NAME} <<EOF
-db.registrations.find({}, {fwdRegId: 1, _id: 0})
-EOF)
+RESULT=$(mongoCmd ${BROKER_DATABASE_AUX_NAME} 'db.registrations.find({}, {fwdRegId: 1, _id: 0})')
 # The next line is based in processing the following pattern:
 #   { "fwdRegId" : "5213a9a1db818a34990755c3" }
 ID2=$(echo $RESULT | awk '{print $4}' | awk -F '"' '{print $2}')
@@ -263,6 +212,11 @@ else
 fi
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <orionError>
   <code>400</code>
@@ -270,12 +224,22 @@ fi
   <details>service '/NGSI10/queryContext' not found</details>
 </orionError>
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 902
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -302,6 +266,11 @@ fi
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 902
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -328,12 +297,22 @@ fi
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT5H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 774
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -357,6 +336,11 @@ fi
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 774
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -384,7 +368,7 @@ fi
 1
 OK
 --TEARDOWN--
-kill $(cat ${BROKER_PID_FILE})
-rm /tmp/orion_${BROKER_PORT}.pid
-kill $(cat ${BROKER_PID_FILE_AUX})
-rm /tmp/orion_${CM_PORT}.pid
+source harnessFunctions.sh
+
+brokerStop CB
+brokerStop CM

@@ -18,6 +18,8 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Large request error for /NGSI10/queryContext
 --SHELL-INIT--
@@ -77,7 +79,7 @@ rm $BIGFILE
 <queryContextResponse>
   <errorCode>
     <code>413</code>
-    <reasonPhrase>Payload Too Large</reasonPhrase>
+    <reasonPhrase>Request Entity Too Large</reasonPhrase>
     <details>payload size: 1500000</details>
   </errorCode>
 </queryContextResponse>

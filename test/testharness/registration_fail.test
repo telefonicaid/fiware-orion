@@ -18,6 +18,8 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Registration fail
 --SHELL-INIT--
@@ -105,12 +107,12 @@ echo "++++++++++++++++++++"
   </registerContextRequest>
 EOF
 
---EXPECT--
+--REGEXPECT--
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context element registrations found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </discoverContextAvailabilityResponse>
 ++++++++++++++++++++
@@ -119,7 +121,8 @@ EOF
   <registrationId>51307b66f481db11bf860001</registrationId>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>Registration Not Found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>registration id: '51307b66f481db11bf860001'</details>
   </errorCode>
 </registerContextResponse>
 --TEARDOWN--

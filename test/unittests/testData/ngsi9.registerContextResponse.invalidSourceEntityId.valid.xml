@@ -1,0 +1,8 @@
+<registerContextResponse>
+  <duration>PT1H</duration>
+  <registrationId>000000000000000000000000</registrationId>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>
+  </errorCode>
+</registerContextResponse>

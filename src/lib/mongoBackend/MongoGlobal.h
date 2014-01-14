@@ -69,6 +69,7 @@ using namespace mongo;
 #define ENT_ATTRS_TYPE               "type"
 #define ENT_ATTRS_VALUE              "value"
 #define ENT_ATTRS_ID                 "id"
+#define ENT_ATTRS_CREATION_DATE      "creDate"
 #define ENT_ATTRS_MODIFICATION_DATE  "modDate"
 #define ENT_CREATION_DATE            "creDate"
 #define ENT_MODIFICATION_DATE        "modDate"

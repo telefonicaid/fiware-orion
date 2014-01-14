@@ -37,11 +37,17 @@
 *
 * Duration - 
 */
-typedef struct Duration
+class Duration
 {
+public:
   std::string   string;
-  unsigned int  seconds; 
+  int           seconds; 
 
+private:
+  bool          used;
+  bool          valid;
+
+public:
   Duration();
   void          set(std::string value);
   std::string   get(void);
@@ -51,6 +57,6 @@ typedef struct Duration
   int           parse(void);
   void          present(std::string indent);
   void          release(void);
-} Duration;
+};
 
 #endif

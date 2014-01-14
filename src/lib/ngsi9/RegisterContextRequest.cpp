@@ -51,9 +51,9 @@ std::string RegisterContextRequest::render(RequestType requestType, Format forma
 
   out += startTag(indent, xmlTag, "", format, false, false);
 
-  out += contextRegistrationVector.render(format, indent + "  ", commaAfterContextRegistrationVector);
-  out += duration.render(format,                  indent + "  ", commaAfterDuration);
-  out += registrationId.render(format,            indent + "  ", commaAfterRegistrationId);
+  out += contextRegistrationVector.render(format,       indent + "  ", commaAfterContextRegistrationVector);
+  out += duration.render(format,                        indent + "  ", commaAfterDuration);
+  out += registrationId.render(RegisterContext, format, indent + "  ", commaAfterRegistrationId);
 
   out += endTag(indent, xmlTag, format, false);
 
@@ -87,7 +87,7 @@ std::string RegisterContextRequest::check(RequestType requestType, Format format
            ((res = duration.check(RegisterContext, format, indent, predetectedError, counter))                  != "OK") ||
            ((res = registrationId.check(RegisterContext, format, indent, predetectedError, counter))            != "OK"))
   {
-    LM_E(("Some check method failed"));
+    LM_E(("Some check method failed: %s", res.c_str()));
     response.errorCode.code         = SccBadRequest;
     response.errorCode.reasonPhrase = res;
   }

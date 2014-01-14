@@ -104,7 +104,7 @@ make debug DESTDIR=$RPM_BUILD_ROOT BUILD_ARCH=%{build_arch}
 #make install DESTDIR=$RPM_BUILD_ROOT
 make install_debug DESTDIR=$RPM_BUILD_ROOT
 # rpmbuild seems to do the strip step automatically. However, this would fail after chmod, so we "manually" do
-# it as part of our %install script
+# it as part of our install script
 strip $RPM_BUILD_ROOT/usr/bin/contextBroker
 chmod 555 $RPM_BUILD_ROOT/usr/bin/contextBroker
 mkdir -p $RPM_BUILD_ROOT/var/%{name}
@@ -112,7 +112,7 @@ mkdir -p $RPM_BUILD_ROOT/etc/init.d
 mkdir -p $RPM_BUILD_ROOT/etc/profile.d
 mkdir -p $RPM_BUILD_ROOT/usr/share/contextBroker/tests
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/contextBroker
-cp -r test/testharness/*.test $RPM_BUILD_ROOT/usr/share/contextBroker/tests
+cp -r test/testharness/* $RPM_BUILD_ROOT/usr/share/contextBroker/tests
 cp LICENSE $RPM_BUILD_ROOT/usr/share/doc/contextBroker
 cp scripts/testEnv.sh scripts/testHarness.sh scripts/testDiff.py $RPM_BUILD_ROOT/usr/share/contextBroker/tests 
 cp scripts/accumulator-server.py $RPM_BUILD_ROOT/usr/share/contextBroker/tests 

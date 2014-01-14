@@ -70,8 +70,8 @@ TEST(putSubscriptionConvOp, put)
   ConnectionInfo ci2("/ngsi10/contextSubscriptions/111222333444555666777888",  "PUT",    "1.1");
   ConnectionInfo ci3("/ngsi10/contextSubscriptions/111222333444555666777881",  "PUT",    "1.1");
   ConnectionInfo ci4("/ngsi10/contextSubscriptions/012345678901234567890123",  "XVERB",  "1.1");
-  std::string    expected1      = "<unsubscribeContextResponse>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n  <statusCode>\n    <code>404</code>\n    <reasonPhrase>Subscription Not Found</reasonPhrase>\n  </statusCode>\n</unsubscribeContextResponse>\n";
-  std::string    expected2      = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <subscriptionId>111222333444555666777888</subscriptionId>\n    <errorCode>\n      <code>404</code>\n      <reasonPhrase>Subscription Not Found</reasonPhrase>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
+  std::string    expected1      = "<unsubscribeContextResponse>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n  <statusCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n    <details>subscriptionId: '012345678901234567890123'</details>\n  </statusCode>\n</unsubscribeContextResponse>\n";
+  std::string    expected2      = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <subscriptionId>111222333444555666777888</subscriptionId>\n    <errorCode>\n      <code>404</code>\n      <reasonPhrase>No context element found</reasonPhrase>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
   std::string    expected3      = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <subscriptionId>0</subscriptionId>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>unmatching subscriptionId URI/payload</reasonPhrase>\n      <details>111222333444555666777881</details>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
   std::string    expected4      = "";
   const char*    fileName       = "ngsi10.updateContextSubscriptionRequest.subscriptionNotFound.valid.xml";

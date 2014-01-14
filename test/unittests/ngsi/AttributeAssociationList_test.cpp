@@ -22,11 +22,11 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "ngsi/Association.h"
+
+#include "unittest.h"
 
 
 
@@ -39,7 +39,9 @@ TEST(AttributeAssociationList, ok)
   AttributeAssociationList aal;
   AttributeAssociation     aa;
   std::string              out;
-  std::string              expected = "<AttributeAssociationList>\n  <AttributeAssociation>\n    <sourceAttribute>Source</sourceAttribute>\n    <targetAttribute>Target</targetAttribute>\n  </AttributeAssociation>\n</AttributeAssociationList>\n";
+  const char*              outfile = "ngsi.attributeAssociationList.ok.valid.xml";
+
+  utInit();
 
   out = aal.render(XML, "", false);
   EXPECT_STREQ("", out.c_str());
@@ -51,7 +53,8 @@ TEST(AttributeAssociationList, ok)
   ASSERT_EQ(1, aal.size());
 
   out = aal.render(XML, "", false);
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   AttributeAssociation* aa1;
 
@@ -61,6 +64,8 @@ TEST(AttributeAssociationList, ok)
 
   // Just to exercise the code ...
   aal.present("");
+
+  utExit();
 }
 
 
