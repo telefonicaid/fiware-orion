@@ -111,6 +111,28 @@ vMsg
 
 # -----------------------------------------------------------------------------
 #
+# SRC_TOP - getting the TOP directory
+#
+dir=$(dirname $0)
+SRC_TOP1=${PWD}/${dir}/../..   # if called with a relative path
+SRC_TOP2=${dir}/../..          # if called via $PATH or with an absolute path
+if [ -d ${SRC_TOP1} ]
+then
+  SRC_TOP=${SRC_TOP1}
+else
+  SRC_TOP=${SRC_TOP2}
+fi
+
+cd $SRC_TOP
+SRC_TOP=$(pwd)
+cd - > /dev/null
+vMsg Git repo home: $SRC_TOP
+cd test/valgrind
+
+
+
+# -----------------------------------------------------------------------------
+#
 # add - 
 #
 # We need this function because the regular '+' can not process correctly
@@ -230,11 +252,18 @@ function processResult()
 #
 function printTestLinePrefix()
 {
+  if [ "$dryrun" == "off" ]
+  then
+    name="Test "
+  else
+    name=""
+  fi
+
   if [ $testNo -lt 10 ]
   then
-    testNoString=" Test 0"${testNo}"/"${noOfTests}": "
+    testNoString=" "${name}" 0"${testNo}"/"${noOfTests}": "
   else
-    testNoString="Test "${testNo}"/"${noOfTests}": "
+    testNoString=${name}${testNo}"/"${noOfTests}": "
   fi
 }
 
@@ -266,7 +295,7 @@ function setNumberOfTests()
 
   if [ "$runPure" -eq "1" ]
   then
-    for vtest in $(ls ${TEST_FILTER}.vtest)
+    for vtest in $(ls ${TEST_FILTER}.vtest 2> /dev/null)
     do
       noOfTests=$noOfTests+1
     done
@@ -364,7 +393,7 @@ then
   then
     fileList="leakTest.xtest"
   else
-    fileList=$(ls ${TEST_FILTER}.vtest)
+    fileList=$(ls ${TEST_FILTER}.vtest 2> /dev/null)
   fi
 
   for vtest in $fileList
@@ -494,5 +523,9 @@ then
 fi
 
 
-echo "Great, all valgrind tests ran without any memory leakage"
+if [ "$dryrun" == "off" ]
+then
+  echo "Great, all valgrind tests ran without any memory leakage"
+fi
+
 exit 0
