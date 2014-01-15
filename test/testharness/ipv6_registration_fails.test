@@ -19,13 +19,13 @@
 # fermin at tid dot es
 
 --NAME--
-IPv6 Registration OK
+IPv6 Registration fails 
 
 --SHELL-INIT--
 source harnessFunctions.sh
 
 dbInit CB
-brokerStart CB_IPV6
+brokerStart CB
 
 --SHELL--
 source harnessFunctions.sh
@@ -62,14 +62,10 @@ echo "$REG_OUT"
 echo "++++++++++++++++++++"
 
 --REGEXPECT--
-<?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
+
 ++++++++++++++++++++
 --TEARDOWN--
 source harnessFunctions.sh
 
-brokerStop CB_IPV6
+brokerStop CB
 

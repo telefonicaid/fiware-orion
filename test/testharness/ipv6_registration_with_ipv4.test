@@ -19,7 +19,7 @@
 # fermin at tid dot es
 
 --NAME--
-IPv6 Registration OK
+IPv6 Registration with IPv4 
 
 --SHELL-INIT--
 source harnessFunctions.sh
@@ -30,7 +30,7 @@ brokerStart CB_IPV6
 --SHELL--
 source harnessFunctions.sh
 
-REG_OUT=$((curl :::${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+REG_OUT=$((curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -71,5 +71,5 @@ echo "++++++++++++++++++++"
 --TEARDOWN--
 source harnessFunctions.sh
 
-brokerStop CB_IPV6
+brokerStop CB
 
