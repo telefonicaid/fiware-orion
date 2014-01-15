@@ -266,7 +266,7 @@ function setNumberOfTests()
 
   if [ "$runPure" -eq "1" ]
   then
-    for vtest in $(ls $TEST_FILTER)
+    for vtest in $(ls ${TEST_FILTER}.vtest)
     do
       noOfTests=$noOfTests+1
     done
@@ -345,7 +345,6 @@ else
 fi
 
 date > /tmp/valgrindTestSuiteLog
-TEST_FILTER=${TEST_FILTER:-"*.vtest"}
 
 typeset -i noOfTests
 noOfTests=0
@@ -365,7 +364,7 @@ then
   then
     fileList="leakTest.xtest"
   else
-    fileList=$(ls $TEST_FILTER)
+    fileList=$(ls ${TEST_FILTER}.vtest)
   fi
 
   for vtest in $fileList
