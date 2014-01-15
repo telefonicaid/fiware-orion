@@ -69,5 +69,6 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
     car.statusCode.fill(&cerP->statusCode);
   }
 
+  request.release();
   return car.render(ciP->outFormat, "");
 }

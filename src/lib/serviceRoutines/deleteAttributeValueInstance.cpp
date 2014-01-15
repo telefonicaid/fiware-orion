@@ -82,5 +82,6 @@ std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, st
   else
      statusCode.fill(SccReceiverInternalError, "Internal Error", "More than one response from deleteAttributeValueInstance::mongoUpdateContext");
 
+  request.release();
   return statusCode.render(ciP->outFormat, "", false);
 }

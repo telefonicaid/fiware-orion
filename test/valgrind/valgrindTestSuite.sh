@@ -70,7 +70,7 @@ function vMsg()
 #
 verbose=off
 mode=all
-filter=""
+TEST_FILTER=${TEST_FILTER:-"*"}
 dryrun=off
 leakTest=off
 
@@ -274,7 +274,7 @@ function setNumberOfTests()
 
   if [ "$runHarness" -eq "1" ]
   then
-    for file in $(find ../testharness -name \*.test)
+    for file in $(find ../testharness -name ${TEST_FILTER}.test)
     do
       noOfTests=$noOfTests+1
     done
@@ -430,15 +430,13 @@ fi
 
 if [ "$runHarness" -eq "1" ]
 then
-  #FIXME P2: make TEST_FILTER work for harness case
-
   if [ "$BROKER_PORT" == "" ]
   then
     echo "$0: please source the test script (scripts/testEnv.sh)"
     exit 1
   fi
 
-  for file in $(find ../testharness -name \*.test | sort)
+  for file in $(find ../testharness -name ${TEST_FILTER}.test | sort)
   do
     htest=$(basename $file | awk -F '.' '{print $1}')
     directory=$(dirname $file)
