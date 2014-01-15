@@ -71,8 +71,6 @@ echo "3: ++++++++++++++++++++"
 # DELETE is not allowed
 curlXmlNoPayload "/NGSI9/contextEntityTypes/Room" "-X DELETE"
 
-echo 4: ++++++++++++++++++++
-killall contextBroker
 --REGEXPECT--
 0: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -135,7 +133,6 @@ Content-Length: 0
 Allow: POST, GET
 Date: REGEX(.*)
 
-4: ++++++++++++++++++++
 --TEARDOWN--
 source harnessFunctions.sh
 brokerStop CB
