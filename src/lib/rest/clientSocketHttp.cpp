@@ -112,18 +112,19 @@ std::string sendHttpSocket
   char*        msgDynamic = NULL;
   char*        msg = msgStatic;   // by default, use the static buffer
 
-  // Buffers clear 
-  memset(buffer, 0, TAM_BUF);
-  memset(response, 0, TAM_BUF);
-  memset(preContent, 0, TAM_BUF);
-  memset(msg, 0, MAX_STA_MSG_SIZE);
-
+  // Preconditions check
   if (port == 0)        LM_RE("error", ("port is ZERO"));
   if (ip.empty())       LM_RE("error", ("ip is empty"));
   if (verb.empty())     LM_RE("error", ("verb is empty"));
   if (resource.empty()) LM_RE("error", ("resource is empty"));
   if ((content_type.empty()) && (!content.empty())) LM_RE("error", ("Content-Type is empty but there is actual content"));
   if ((!content_type.empty()) && (content.empty())) LM_RE("error", ("there is actual content but Content-Type is empty"));
+
+  // Buffers clear
+  memset(buffer, 0, TAM_BUF);
+  memset(response, 0, TAM_BUF);
+  memset(preContent, 0, TAM_BUF);
+  memset(msg, 0, MAX_STA_MSG_SIZE);
 
   snprintf(preContent, sizeof(preContent),
            "%s %s HTTP/1.1\n"
@@ -147,16 +148,17 @@ std::string sendHttpSocket
      *    + 1, for the \n at the end of the message
      *    + 1, for the \0 by the trailing character in C strings
      */
-    if (content.length() + strlen(preContent) + 3 > MAX_DYN_MSG_SIZE) {
-        LM_RE("error", ("HTTP request to send is too large: %s bytes", content.length() + strlen(preContent)));
+    int neededSize = content.length() + strlen(preContent) + 3;
+    if (neededSize > MAX_DYN_MSG_SIZE) {
+        LM_RE("error", ("HTTP request to send is too large: %d bytes", content.length() + strlen(preContent)));
     }
-    else if (content.length() + strlen(preContent) + 3 > MAX_STA_MSG_SIZE) {
-        msgDynamic = (char*) calloc(sizeof(char), content.length() + 1);
+    else if (neededSize > MAX_STA_MSG_SIZE) {
+        msgDynamic = (char*) calloc(sizeof(char), neededSize);
         if (msgDynamic == NULL) {
-            LM_RE("error", ("dyncamic memory allocation fail"));
+            LM_RE("error", ("dynamic memory allocation failure"));
         }
         msg = msgDynamic;
-        LM_T(LmtClientOutputPayload, ("Using dynamic buffer to send HTTP request"));
+        LM_T(LmtClientOutputPayload, ("Using dynamic buffer to send HTTP request: %d bytes", neededSize));
     }
     else {                
         LM_T(LmtClientOutputPayload, ("Using static buffer to send HTTP request"));
