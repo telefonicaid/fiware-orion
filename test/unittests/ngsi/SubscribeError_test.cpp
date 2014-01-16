@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/SubscribeError.h"
+
+#include "unittest.h"
 
 
 
@@ -38,22 +38,37 @@
 TEST(SubscribeError, render)
 {
   SubscribeError  se;
-  std::string     rendered;
-  std::string     expected1xml  = "<subscribeError>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>reason</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</subscribeError>\n";
-  std::string     expected2xml  = "<subscribeError>\n  <subscriptionId>SUB_123</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>reason</reasonPhrase>\n    <details>detail</details>\n  </errorCode>\n</subscribeError>\n";
-  std::string     expected1json = "\"subscribeError\" : {\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"reason\",\n    \"details\" : \"detail\"\n  }\n}\n";
+  std::string     out;
+  const char*     outfile1 = "ngsi.subscribeError.render1.middle.xml";
+  const char*     outfile2 = "ngsi.subscribeError.render1.middle.json";
+  const char*     outfile3 = "ngsi.subscribeError.render2.middle.xml";
+  const char*     outfile4 = "ngsi.subscribeError.render2.middle.json";
+
+  utInit();
 
   se.subscriptionId.set("SUB_123");
   se.errorCode.fill(SccBadRequest, "reason", "detail");
 
-  rendered = se.render(RegisterContext, XML, "");
-  EXPECT_STREQ(expected1xml.c_str(), rendered.c_str());
-  rendered = se.render(RegisterContext, JSON, "");
-  EXPECT_STREQ(expected1json.c_str(), rendered.c_str());
+  out = se.render(RegisterContext, XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  rendered = se.render(SubscribeContext, XML, "");
-  EXPECT_STREQ(expected2xml.c_str(), rendered.c_str());
+  out = se.render(RegisterContext, JSON, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+
+  out = se.render(SubscribeContext, XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  out = se.render(SubscribeContext, JSON, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
+
 
 
 /* ****************************************************************************
@@ -64,8 +79,11 @@ TEST(SubscribeError, check)
 {
   SubscribeError  se;
   std::string     checked;
-  std::string     expected = "OK";
+
+  utInit();
 
   checked = se.check(SubscribeContext, XML, "", "", 0);
-  EXPECT_STREQ(expected.c_str(), checked.c_str());
+  EXPECT_STREQ("OK", checked.c_str());
+
+  utExit();
 }
