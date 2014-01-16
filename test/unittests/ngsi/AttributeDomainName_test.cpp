@@ -40,7 +40,7 @@ TEST(AttributeDomainName, ok)
   AttributeDomainName adn;
   std::string         out;
   const char*         outfile1 = "ngsi10.attributeDomainName.ok.middle.xml";
-  const char*         outfile2 = "ngsi10.attributeDomainName.ok.valid.json";
+  const char*         outfile2 = "ngsi10.attributeDomainName.ok.middle.json";
 
   utInit();
 

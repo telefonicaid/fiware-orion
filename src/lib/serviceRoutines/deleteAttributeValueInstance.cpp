@@ -51,15 +51,15 @@ std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, st
   std::string                     valueId       = compV[5];
   ContextAttribute*               attributeP    = new ContextAttribute(attributeName, "", "false");
   Metadata*                       mP            = new Metadata("ID", "", valueId);
-  ContextElement                  ce;
+  ContextElement*                 ceP           = new ContextElement();
 
   attributeP->metadataVector.push_back(mP);
   
-  ce.entityId.fill(entityId, "", "false");
-  ce.attributeDomainName.set("");
-  ce.contextAttributeVector.push_back(attributeP);
+  ceP->entityId.fill(entityId, "", "false");
+  ceP->attributeDomainName.set("");
+  ceP->contextAttributeVector.push_back(attributeP);
 
-  request.contextElementVector.push_back(&ce);
+  request.contextElementVector.push_back(ceP);
   request.updateActionType.set("DELETE");
 
   response.errorCode.code = NO_ERROR_CODE;
