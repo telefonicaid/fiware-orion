@@ -103,16 +103,10 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   for (unsigned int ix = 0; serviceV[ix].treat != NULL; ++ix)
   {
     if ((serviceV[ix].components != 0) && (serviceV[ix].components != components))
-    {
-      LM_T(LmtRestCompare, ("Sorry, bad number of components (%d != %d)", components, serviceV[ix].components));
       continue;
-    }
 
     if ((ciP->method != serviceV[ix].verb) && (serviceV[ix].verb != "*"))
-    {
-      LM_T(LmtRestCompare, ("Sorry, bad verb: %s != %s", ciP->method.c_str(), serviceV[ix].verb.c_str()));
       continue;
-    }
 
     strncpy(ciP->payloadWord, serviceV[ix].payloadWord.c_str(), sizeof(ciP->payloadWord));
     bool match = true;
