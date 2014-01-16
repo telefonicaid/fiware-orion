@@ -110,17 +110,20 @@ std::string sendHttpSocket
 
   std::string  result;
   char*        msgDynamic = NULL;
-  char*        msg;
+  char*        msg = msgStatic;   // by default, use the static buffer
 
   // Buffers clear 
   memset(buffer, 0, TAM_BUF);
   memset(response, 0, TAM_BUF);
   memset(preContent, 0, TAM_BUF);
+  memset(msg, 0, MAX_STA_MSG_SIZE);
 
   if (port == 0)        LM_RE("error", ("port is ZERO"));
   if (ip.empty())       LM_RE("error", ("ip is empty"));
   if (verb.empty())     LM_RE("error", ("verb is empty"));
-  if (resource.empty()) LM_RE("error", ("resource is empty"));  
+  if (resource.empty()) LM_RE("error", ("resource is empty"));
+  if ((content_type.empty()) && (!content.empty())) LM_RE("error", ("Content-Type is empty but there is actual content"));
+  if ((!content_type.empty()) && (content.empty())) LM_RE("error", ("there is actual content but Content-Type is empty"));
 
   snprintf(preContent, sizeof(preContent),
            "%s %s HTTP/1.1\n"
@@ -129,7 +132,7 @@ std::string sendHttpSocket
            "Accept: application/xml, application/json\n",
            verb.c_str(), resource.c_str(), versionGet(), ip.c_str(), (int) port);
 
-  if ((!content_type.empty()) && (!content.empty()))
+  if (!content.empty())
   {
 
     char   headers[512];
@@ -139,33 +142,42 @@ std::string sendHttpSocket
             content_type.c_str(), content.length() + 1);
     strncat(preContent, headers, sizeof(preContent) - strlen(preContent));
 
-    /* Choose the right buffer (static or dynamic) to use */
-    if (content.length() + strlen(preContent) + 1 > MAX_DYN_MSG_SIZE) {
+    /* Choose the right buffer (static or dynamic) to use. Note we are using +3 due to:
+     *    + 1, for the \n between preContent and content
+     *    + 1, for the \n at the end of the message
+     *    + 1, for the \0 by the trailing character in C strings
+     */
+    if (content.length() + strlen(preContent) + 3 > MAX_DYN_MSG_SIZE) {
         LM_RE("error", ("HTTP request to send is too large: %s bytes", content.length() + strlen(preContent)));
     }
-    else if (content.length() + strlen(preContent) + 1 > MAX_STA_MSG_SIZE) {
+    else if (content.length() + strlen(preContent) + 3 > MAX_STA_MSG_SIZE) {
         msgDynamic = (char*) calloc(sizeof(char), content.length() + 1);
+        if (msgDynamic == NULL) {
+            LM_RE("error", ("dyncamic memory allocation fail"));
+        }
         msg = msgDynamic;
         LM_T(LmtClientOutputPayload, ("Using dynamic buffer to send HTTP request"));
     }
-    else {
-        msg = msgStatic;
-        memset(msg, 0, MAX_STA_MSG_SIZE);
+    else {                
         LM_T(LmtClientOutputPayload, ("Using static buffer to send HTTP request"));
     }
 
     /* The above checking should ensure that the three parts fit, so we are using
      * sprint() instead of snprintf() */
     sprintf(msg, "%s\n%s", preContent, content.c_str());
+
+  }
+  else
+  {
+    /* In the case of no-content we assume that MAX_STA_MSG_SIZE is enough to send the message */
+    LM_T(LmtClientOutputPayload, ("Using static buffer to send HTTP request (empty content)"));
+    sprintf(msg, "%s\n", preContent);
   }
 
-  strncat(msg, "\n", sizeof(msg) - strlen(msg));
+  /* We add a final newline (I guess that HTTP protocol needs it) */
+  strcat(msg, "\n");
 
   int fd = socketHttpConnect(ip, port); // Connecting to HTTP server
-  if (msgDynamic != NULL) {
-      free (msgDynamic);
-  }
-
   if (fd == -1)
     LM_RE("error", ("Unable to connect to HTTP server at %s:%d", ip.c_str(), port));
 
@@ -175,6 +187,10 @@ std::string sendHttpSocket
   LM_T(LmtClientOutputPayload, ("Sending to HTTP server %d bytes", sz));
   LM_T(LmtClientOutputPayload, ("Sending to HTTP server payload:\n%s", msg));
   nb = send(fd, msg, sz, 0);
+  if (msgDynamic != NULL) {
+      free (msgDynamic);
+  }
+
   if (nb == -1)
     LM_RE("error", ("error sending to HTTP server: %s", strerror(errno)));
   else if (nb != sz)
