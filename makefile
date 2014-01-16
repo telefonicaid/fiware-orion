@@ -375,7 +375,7 @@ coverage_functional_test: install_coverage
 
 valgrind:
 	@echo For detailed info: tail -f /tmp/valgrindTestSuiteLog
-	(cd test/valgrind; ./valgrindTestSuite.sh)
+	test/valgrind/valgrindTestSuite.sh
 
 files_compliance:
 	scripts/check_files_compliance.py .

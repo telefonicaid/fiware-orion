@@ -38,7 +38,7 @@ TEST(ErrorCode, render)
   ErrorCode    e2(200, "REASON", "DETAILS");
   std::string  out;
   const char*  outfile1 = "ngsi.errorCode.render1.valid.xml";
-  const char*  outfile2 = "ngsi.errorCode.render1.valid.json";
+  const char*  outfile2 = "ngsi.errorCode.render1.middle.json";
   const char*  outfile3 = "ngsi.errorCode.render2.valid.xml";
 
   utInit();
