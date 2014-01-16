@@ -22,10 +22,10 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "ngsi/Scope.h"
 #include "ngsi/ScopeVector.h"
+
+#include "unittest.h"
 
 
 
@@ -37,21 +37,25 @@ TEST(ScopeVector, renderAndRelease)
 {
   Scope*         s = new Scope("Type", "Value");
   ScopeVector    sV;
-  std::string    expected1 = "";
-  std::string    expected2 = "<scope>\n  <operationScope>\n    <type>Type</type>\n    <value>Value</value>\n  </operationScope>\n</scope>\n";
-  std::string    rendered;
+  const char*    outfile = "ngsi.scopeVector.render.middle.xml";
+  std::string    out;
 
-  rendered = sV.render(XML, "", false);
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  utInit();
+
+  out = sV.render(XML, "", false);
+  EXPECT_STREQ("", out.c_str());
 
   sV.push_back(s);
 
-  rendered = sV.render(XML, "", false);
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  out = sV.render(XML, "", false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ(sV.size(), 1);
   sV.release();
   EXPECT_EQ(sV.size(), 0);
+
+  utExit();
 }
 
 
@@ -69,6 +73,8 @@ TEST(ScopeVector, check)
   std::string    expected2 = "Empty type in restriction scope";
   std::string    rendered;
   
+  utInit();
+
   sV.push_back(s1);
   rendered = sV.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ(expected1.c_str(), rendered.c_str());
@@ -76,6 +82,8 @@ TEST(ScopeVector, check)
   sV.push_back(s2);
   rendered = sV.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ(expected2.c_str(), rendered.c_str());  
+
+  utExit();
 }
 
 
@@ -89,8 +97,12 @@ TEST(ScopeVector, present)
   ScopeVector   sV;
   Scope         scope("Type", "Value");
 
+  utInit();
+
   sV.push_back(&scope);
   sV.present("");
+
+  utExit();
 }
 
 
@@ -107,6 +119,8 @@ TEST(ScopeVector, getAndSize)
   Scope         scope2("Type", "Value2");
   Scope*        scopeP;
 
+  utInit();
+
   sV.push_back(&scope0);
   sV.push_back(&scope1);
   sV.push_back(&scope2);
@@ -121,4 +135,6 @@ TEST(ScopeVector, getAndSize)
 
   scopeP = sV.get(2);
   EXPECT_STREQ("Value2", scopeP->value.c_str());
+
+  utExit();
 }

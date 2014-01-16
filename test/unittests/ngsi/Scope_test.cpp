@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/Scope.h"
+
+#include "unittest.h"
 
 
 
@@ -38,17 +38,23 @@
 TEST(Scope, render)
 {
   Scope        scope("Type", "Value");
-  std::string  rendered;
-  std::string  expected1xml  = "<operationScope>\n  <type>Type</type>\n  <value>Value</value>\n</operationScope>\n";
-  std::string  expected1json = "{\n  \"type\" : \"Type\",\n  \"value\" : \"Value\"\n}\n";
+  std::string  out;
+  const char*  outfile1 = "ngsi.scope.render.middle.xml";
+  const char*  outfile2 = "ngsi.scope.render.middle.json";
 
-  rendered = scope.render(XML, "", false);
-  EXPECT_STREQ(expected1xml.c_str(), rendered.c_str());
+  utInit();
 
-  rendered = scope.render(JSON, "", false);
-  EXPECT_STREQ(expected1json.c_str(), rendered.c_str());
+  out = scope.render(XML, "", false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  out = scope.render(JSON, "", false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   scope.release();
+
+  utExit();
 }
 
 
@@ -69,6 +75,8 @@ TEST(Scope, check)
   std::string  expected2 = "Empty value in restriction scope";
   std::string  expected3 = "OK";
   
+  utInit();
+
   checked = scope.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ(checked.c_str(), expected.c_str());
 
@@ -80,6 +88,8 @@ TEST(Scope, check)
 
   checked = scope3.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ(checked.c_str(), expected3.c_str());
+
+  utExit();
 }
 
 
@@ -92,6 +102,10 @@ TEST(Scope, present)
 {
   Scope   scope("Type", "Value");
 
+  utInit();
+
   scope.present("", -1);
   scope.present("", 0);
+
+  utExit();
 }

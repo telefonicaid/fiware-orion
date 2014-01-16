@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/NotifyConditionVector.h"
+
+#include "unittest.h"
 
 
 
@@ -39,26 +39,31 @@ TEST(NotifyConditionVector, render)
 {
   NotifyCondition*       ncP = new NotifyCondition();
   NotifyConditionVector  ncV;
-  std::string            rendered;
-  std::string            expected1 = "";
-  std::string            expected2 = "<notifyConditions>\n  <notifyCondition>\n    <type>Type</type>\n  </notifyCondition>\n</notifyConditions>\n";
-  std::string            expected3 = "\"notifyConditions\" : [\n  {\n    \"type\" : \"Type\"\n  }\n]\n";
+  std::string            out;
+  const char*            outfile1 = "ngsi.notifyConditionVector.render.middle.xml";
+  const char*            outfile2 = "ngsi.notifyConditionVector.render.middle.json";
   
-  rendered = ncV.render(XML, "", false);
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  utInit();
+
+  out = ncV.render(XML, "", false);
+  EXPECT_STREQ("", out.c_str());
 
   ncP->type = "Type";
   ncV.push_back(ncP);
 
-  rendered = ncV.render(XML, "", false);
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
-  rendered = ncV.render(JSON, "", false);
-  EXPECT_STREQ(expected3.c_str(), rendered.c_str());
+  out = ncV.render(XML, "", false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+  out = ncV.render(JSON, "", false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ncV.release();
 
-  rendered = ncV.render(XML, "", false);
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  out = ncV.render(XML, "", false);
+  EXPECT_STREQ("", out.c_str());
+
+  utExit();
 }
 
 
@@ -72,12 +77,13 @@ TEST(NotifyConditionVector, check)
   NotifyCondition        nc;
   NotifyConditionVector  ncV;
   std::string            checked;
-  std::string            expected1 = "OK";
   std::string            expected2 = "invalid notify condition type: 'Type'";
   std::string            expected3 = "empty type for NotifyCondition";
   
+  utInit();
+
   checked = ncV.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected1.c_str(), checked.c_str());
+  EXPECT_STREQ("OK", checked.c_str());
 
   nc.type = "Type";
   ncV.push_back(&nc);
@@ -88,6 +94,8 @@ TEST(NotifyConditionVector, check)
   nc.type = "";
   checked = ncV.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ(expected3.c_str(), checked.c_str());
+
+  utExit();
 }
 
 
@@ -101,10 +109,14 @@ TEST(NotifyConditionVector, present)
   NotifyCondition        nc;
   NotifyConditionVector  ncV;
   
+  utInit();
+
   nc.type = "Type";
   ncV.push_back(&nc);
 
   ncV.present("");
+
+  utExit();
 }
 
 
@@ -120,6 +132,8 @@ TEST(NotifyConditionVector, get)
   NotifyCondition        nc2;
   NotifyConditionVector  ncV;
   NotifyCondition*       ncP;
+
+  utInit();
 
   nc0.type = "Type0";
   nc1.type = "Type1";
@@ -139,6 +153,6 @@ TEST(NotifyConditionVector, get)
   EXPECT_STREQ("Type2", ncP->type.c_str());
 
   EXPECT_EQ(3, ncV.size());
+
+  utExit();
 }
-
-

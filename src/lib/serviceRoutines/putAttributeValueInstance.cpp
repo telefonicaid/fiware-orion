@@ -54,7 +54,7 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   UpdateContextAttributeRequest*  upcarP        = &parseDataP->upcar.res;
   ContextAttribute*               attributeP    = new ContextAttribute(attributeName, "", "false");
   bool                            idFound       = false;
-  ContextElement                  ce;
+  ContextElement*                 ceP           = new ContextElement();
 
   //
   // Any metadata ID in the payload?
@@ -90,10 +90,10 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   }
 
   // Filling the rest of the structure for mongoUpdateContext
-  ce.entityId.fill(entityId, "", "false");
-  ce.attributeDomainName.set("");
-  ce.contextAttributeVector.push_back(attributeP);
-  request.contextElementVector.push_back(&ce);
+  ceP->entityId.fill(entityId, "", "false");
+  ceP->attributeDomainName.set("");
+  ceP->contextAttributeVector.push_back(attributeP);
+  request.contextElementVector.push_back(ceP);
   request.updateActionType.set("UPDATE");
 
   response.errorCode.code = NO_ERROR_CODE;
@@ -116,5 +116,6 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   else
     statusCode.fill(SccReceiverInternalError, "Internal Error", "More than one response from putAttributeValueInstance::mongoUpdateContext");
 
+  request.release();
   return statusCode.render(ciP->outFormat, "", false);
 }
