@@ -1,0 +1,7 @@
+<contextRegistrationAttributeList>
+  <contextRegistrationAttribute>
+    <name>name</name>
+    <type>type</type>
+    <isDomain>false</isDomain>
+  </contextRegistrationAttribute>
+</contextRegistrationAttributeList>

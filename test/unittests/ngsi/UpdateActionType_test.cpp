@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/UpdateActionType.h"
+
+#include "unittest.h"
 
 
 
@@ -39,12 +39,16 @@ TEST(UpdateActionType, setGetIsEmptyAndParse)
 {
   UpdateActionType  t;
 
+  utInit();
+
   t.set("Append");
   EXPECT_STREQ("Append", t.get().c_str());
   EXPECT_FALSE(t.isEmpty());
 
   t.set("");
   EXPECT_TRUE(t.isEmpty());
+
+  utExit();
 }
 
 
@@ -61,6 +65,8 @@ TEST(UpdateActionType, check)
   std::string        expected2 = "OK";
   std::string        expected3 = "invalid update action type: 'APPEND2'";
   std::string        expected4 = "empty update action type";
+
+  utInit();
 
   uat.set("Append");
   checked = uat.check(UpdateContext, XML, "", "", 0);
@@ -85,6 +91,8 @@ TEST(UpdateActionType, check)
   uat.set("");
   checked = uat.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ(expected4.c_str(), checked.c_str());
+
+  utExit();
 }
 
 
@@ -96,21 +104,26 @@ TEST(UpdateActionType, check)
 TEST(UpdateActionType, render)
 {
   UpdateActionType  uat;
-  std::string       rendered;
-  std::string       expected1 = "";
-  std::string       expected2 = "<updateAction>Update</updateAction>\n";
-  std::string       expected3 = "\"updateAction\" : \"Update\"\n";
+  std::string       out;
+  const char*       outfile1 = "ngsi.updateActionType.render.middle.xml";
+  const char*       outfile2 = "ngsi.updateActionType.render.middle.json";
+
+  utInit();
 
   uat.set("");
-  rendered = uat.render(XML, "");
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  out = uat.render(XML, "");
+  EXPECT_STREQ("", out.c_str());
 
   uat.set("Update");
-  rendered = uat.render(XML, "");
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  out = uat.render(XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  rendered = uat.render(JSON, "");
-  EXPECT_STREQ(expected3.c_str(), rendered.c_str());
+  out = uat.render(JSON, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -123,9 +136,13 @@ TEST(UpdateActionType, present)
 {
   UpdateActionType   uat;
 
+  utInit();
+
   uat.set("Append");
   uat.present("");
 
   uat.set("");
   uat.present("");
+
+  utExit();
 }
