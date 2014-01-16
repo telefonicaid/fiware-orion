@@ -141,15 +141,17 @@ std::string sendHttpSocket
 
     /* Choose the right buffer (static or dynamic) to use */
     if (content.length() + strlen(preContent) + 1 > MAX_DYN_MSG_SIZE) {
-        LM_RE("error", ("content is too large"));
+        LM_RE("error", ("HTTP request to send is too large: %s bytes", content.length() + strlen(preContent)));
     }
     else if (content.length() + strlen(preContent) + 1 > MAX_STA_MSG_SIZE) {
         msgDynamic = (char*) calloc(sizeof(char), content.length() + 1);
         msg = msgDynamic;
+        LM_T(LmtClientOutputPayload, ("Using dynamic buffer to send HTTP request"));
     }
     else {
         msg = msgStatic;
         memset(msg, 0, MAX_STA_MSG_SIZE);
+        LM_T(LmtClientOutputPayload, ("Using static buffer to send HTTP request"));
     }
 
     /* The above checking should ensure that the three parts fit, so we are using
@@ -170,7 +172,8 @@ std::string sendHttpSocket
   int nb;
   int sz = strlen(msg);
 
-  LM_T(LmtClientOutputPayload, ("Sending to HTTP server %d bytes:\n%s", sz, msg));
+  LM_T(LmtClientOutputPayload, ("Sending to HTTP server %d bytes", sz));
+  LM_T(LmtClientOutputPayload, ("Sending to HTTP server payload:\n%s", msg));
   nb = send(fd, msg, sz, 0);
   if (nb == -1)
     LM_RE("error", ("error sending to HTTP server: %s", strerror(errno)));
@@ -193,8 +196,10 @@ std::string sendHttpSocket
       if (strlen(response) > 0)
           result = response;
   }
-  else
+  else {
+     LM_T(LmtClientInputPayload, ("not waiting for response"));
      result = "";
+  }
 
   close(fd);
   return result;
