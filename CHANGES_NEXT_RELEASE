@@ -1,3 +1,6 @@
+o PR #185 fermin     Thu jan 16 17:34:00 CET 2014
+  - Fix race condition HTTP client code, affecting mainly to notification sending code (closes #13)
+
 o PR #182 fermin     Mon jan 13 12:17:00 CET 2014
   - Add: creDate also for attributes
   - Fix: setting modDate for entities and attributes at creation time
