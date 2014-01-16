@@ -419,7 +419,7 @@ static int connectionTreat
     }
     else
     {
-      LM_T(LmtInPayload, ("Calling restService '%s' with payload: '%s'", ciP->url.c_str(), ciP->payload));
+      LM_T(LmtServiceInputPayload, ("Calling restService '%s' with payload: '%s'", ciP->url.c_str(), ciP->payload));
       if (ciP->fractioned == true)
         LM_T(LmtRest, ("Received entire payload of fractioned message (%d bytes)", ciP->httpHeaders.contentLength));
       restService(ciP, restServiceV);

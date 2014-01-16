@@ -432,3 +432,46 @@ function mongoCmd()
   echo $cmd | mongo $db | tail -n 2 | head -n 1
 }
 
+# ------------------------------------------------------------------------------
+#
+# dbInsertEntity -
+#
+# Insert a crafted entity which and "inflated" attribute. The database is pased
+# as first argument and the id of the entity as second. The size of the "inflated"
+# attribute is the third argument x 10.
+#
+function dbInsertEntity()
+{
+  db=$1
+  entId=$2
+  size=$3
+
+  # This is a JavaScript code that generates a string variable which length is the
+  # one in the argument x 10
+  jsCode="s = \"\"; for (var i = 0; i < $size ; i++) { s += \"0123456789\"; }"
+
+  ent="entity = \"$entId\""
+
+  doc='doc = {
+    "_id": {
+        "id": entity,
+        "type": "T"
+    },
+    "attrs": [
+        {
+            "name": "A",
+            "type": "TA",
+            "value": s,
+            "creDate" : 1389376081,
+            "modDate" : 1389376081
+        },
+    ],
+    "creDate": 1389376081,
+    "modDate": 1389376081
+  }'
+
+  cmd='db.entities.insert(doc)'
+
+  echo "$jsCode ; $ent ; $doc ; $cmd" | mongo $db
+}
+
