@@ -30,31 +30,22 @@
 
 #include "rest/RestService.h"
 
-
+// RBL
+#define  MAX_LEN_IP_V4   16 
+#define  MAX_LEN_IP_V6   64
 
 /* ****************************************************************************
 *
 * restInit - 
 */
-extern void restInit(char* bindIp, unsigned short port, RestService* restServiceV);
+extern void restInit(char* bindIp, unsigned short port, RestService* restServiceV, bool use_v6 = false);
 
-/* ****************************************************************************
-*
-* restInit_v6 -
-*/
-extern void restInit_v6(char* bindIpV6, unsigned short port, RestService* restServiceV);
 
 /* ****************************************************************************
 *
 * restStart - 
 */
-extern int restStart(void);
-
-/* ****************************************************************************
-*
-* restStart_v6 -
-*/
-extern int restStart_v6(void);
+extern int restStart(bool use_v6 = false);
 
 
 #endif

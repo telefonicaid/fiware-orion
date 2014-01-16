@@ -100,15 +100,7 @@ bool isIPv6(std::string in)
       pos = staux.find(":");
    }
 
-   if ((goodip) && (cont > 1) && (cont < 8))
-   {
-      return true;
-   }
-   else
-   {
-      return false;
-   }
-
+   return ((goodip) && (cont > 1) && (cont < 8));
 }
 
 /* ****************************************************************************
@@ -246,45 +238,45 @@ bool parseUrl(std::string url, std::string& host, int& port, std::string& path)
 
     /* Second: split third token for host and port */
 
-  std::string  auxIp;
-  std::string  auxPort;
+    std::string  auxIp;
+    std::string  auxPort;
 
-  // First we check if is IPv6
-  if (getIPv6Port(urlTokens[2], auxIp, auxPort))  
-  {
-    // IPv6
-    host = auxIp;
-    port = atoi(auxPort.c_str());
-    LM_VVV(("Parsed IPv6: '%s' and port: '%d'", host.c_str(), port));
-  }
-  else
-  {
-    // IPv4
-    std::vector<std::string>  hostTokens;
-    components = stringSplit(urlTokens[2], ':', hostTokens);
-
-    /* some.host.com:8080
-     *              ^
-     *              |
-     * ------------- ----
-     *   0             1  position in urlTokens vector
-     * 1            2     components
-     */
-
-    /* Sanity check */
-    if (components > 2) {
-        return false;
+    // First we check if is IPv6
+    if (getIPv6Port(urlTokens[2], auxIp, auxPort))  
+    {
+      // IPv6
+      host = auxIp;
+      port = atoi(auxPort.c_str());
+      LM_VVV(("Parsed IPv6: '%s' and port: '%d'", host.c_str(), port));
     }
+    else
+    {
+      // IPv4
+      std::vector<std::string>  hostTokens;
+      components = stringSplit(urlTokens[2], ':', hostTokens);
 
-    host = hostTokens[0];
+      /* some.host.com:8080
+       *              ^
+       *              |
+       * ------------- ----
+       *   0             1  position in urlTokens vector
+       * 1            2     components
+       */
 
-    if (components == 2) {
-        port = atoi(hostTokens[1].c_str());
-    }
-    else {
+      /* Sanity check */
+      if (components > 2) {
+          return false;
+      }
+
+      host = hostTokens[0];
+
+      if (components == 2) {
+          port = atoi(hostTokens[1].c_str());
+      }
+      else {
         port = DEFAULT_HTTP_PORT;
+      }
     }
-  }
 
     return true;
 

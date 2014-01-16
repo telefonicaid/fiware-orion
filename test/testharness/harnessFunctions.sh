@@ -69,16 +69,18 @@ function localBrokerStart()
 {
   role=$1
   traceLevels=$2
+  ipVersion=$3
+  IPv6Option=""
 
+  if [ "$ipVersion" == "IPV6" ]
+  then
+    IPv6Option="-ipv6" 
+  fi
 
   if [ "$role" == "CB" ]
   then
     port=$BROKER_PORT
-    CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME}     -t $traceLevels"
-  elif [ "$role" == "CB_IPV6" ]
-  then
-    port=$BROKER_PORT
-    CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME}     -t $traceLevels -ipv6"
+    CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME}     -t $traceLevels $IPv6Option"
   elif [ "$role" == "CM" ]
   then
     mkdir -p /tmp/configManager
@@ -117,9 +119,6 @@ function localBrokerStop
   if [ "$role" == "CB" ]
   then
     port=$BROKER_PORT
-  elif [ "$role" == "CB_IPV6" ]
-  then
-    port=$BROKER_PORT
   else
     port=CM_PORT
   fi
@@ -154,6 +153,7 @@ function brokerStart()
 {
   role=$1
   traceLevels=$2
+  ipVersion=$3
 
   if [ "$role" == "" ]
   then
@@ -166,8 +166,13 @@ function brokerStart()
     traceLevels=0-255
   fi
 
+  if [ "$ipVersion" == "" ]
+  then
+    ipVersion=IPV4
+  fi
+
   localBrokerStop $role
-  localBrokerStart $role $traceLevels
+  localBrokerStart $role $traceLevels $ipVersion
 }
 
 
@@ -181,10 +186,6 @@ function brokerStop
   role=$1
 
   if [ "$role" == "CB" ]
-  then
-    pidFile=$BROKER_PID_FILE
-    port=$BROKER_PORT
-  elif [ "$role" == "CB_IPV6" ]
   then
     pidFile=$BROKER_PID_FILE
     port=$BROKER_PORT
@@ -242,47 +243,21 @@ function accumulatorStop()
 
 # ------------------------------------------------------------------------------
 #
-# accumulatorStop_ipv6 -
-#
-function accumulatorStop_ipv6()
-{
-  kill $(curl :::${LISTENER_PORT}/pid -s -S)
-  sleep 1
-
-  running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
-
-  if [ $running_app -ne 0 ]
-  then
-    kill $(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | awk '{print $2}')
-    # Wait some time so the accumulator can finish properly
-    sleep 1
-    running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
-    if [ $running_app -ne 0 ]
-    then
-      # If the accumulator refuses to stop politely, kill the process by brute force
-      kill -9 $(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | awk '{print $2}')
-      sleep 1
-      running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
-
-      if [ $running_app -ne 0 ]
-      then
-        echo "Existing accumulator-server.py is inmortal, can not be killed!"
-        exit 1
-      fi
-    fi
-  fi
-}
-
-
-# ------------------------------------------------------------------------------
-#
 # accumulatorStart - 
 #
 function accumulatorStart()
 {
   accumulatorStop
 
-  accumulator-server.py ${LISTENER_PORT} /notify &
+  ipVersion=$1
+  IPv6Host=""
+
+  if [ "$ipVersion" == "IPV6" ]
+  then
+    IPv6Host="::"
+  fi
+
+  accumulator-server.py ${LISTENER_PORT} /notify $IPv6Host &
   echo accumulator running as PID $$
 
   # Wait until accumulator has started or we have waited a given maximum time
@@ -301,39 +276,6 @@ function accumulatorStart()
 
    time=$time+1
    nc -z localhost ${LISTENER_PORT} 
-   port_not_ok=$?
-  done
-}
-
-
-
-# ------------------------------------------------------------------------------
-#
-# accumulatorStart -
-#
-function accumulatorStart_ipv6()
-{
-  accumulatorStop_ipv6
-
-  accumulator-server.py ${LISTENER_PORT} /notify :: &
-  echo accumulator running as PID $$
-
-  # Wait until accumulator has started or we have waited a given maximum time
-  port_not_ok=1
-  typeset -i time
-  time=0
-
-  until [ $port_not_ok -eq 0 ]
-  do
-   if [ "$time" -eq "$MAXIMUM_WAIT" ]
-   then
-      echo "Unable to start listening application after waiting ${MAXIMUM_WAIT}"
-      exit 1
-   fi
-   sleep 1
-
-   time=$time+1
-   nc -z :: ${LISTENER_PORT}
    port_not_ok=$?
   done
 }

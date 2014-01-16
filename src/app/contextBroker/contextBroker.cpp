@@ -127,7 +127,8 @@
 * Option variables
 */
 bool            fg;
-char            localIp[15];
+// RBL
+char            localIp[MAX_LEN_IP_V4];
 int             port;
 char            dbHost[64];
 char            dbName[64];
@@ -139,7 +140,7 @@ int             fwdPort;
 bool            ngsi9Only;
 bool            harakiri;
 bool            useIpV6;
-char            localIpV6[64];
+char            localIpV6[MAX_LEN_IP_V6];
 
 #define  LOCAL_IP_V6  "::"
 
@@ -167,7 +168,7 @@ PaArgument paArgs[] =
   { "-fwdPort",     &fwdPort,      "FWD_PORT",     PaInt,    PaOpt, 0,              0,      65000, "port for forwarding NGSI9 regs"  },
   { "-ngsi9",       &ngsi9Only,    "CONFMAN",      PaBool,   PaOpt, false,          false,  true,  "run as Configuration Manager"    },
   { "-ipv6",        &useIpV6,      "USEIPV6",      PaBool,   PaOpt, false,          false,  true,  "use ip v6"                       },
-  { "-ipv6host",    localIpV6,     "LOCALIPV6",    PaString, PaOpt, _i LOCAL_IP_V6, PaNL,   PaNL,  "IPv6 to receive new connections" },
+  { "-ipv6host",    localIpV6,     "LOCALIPV6",    PaString, PaOpt, _i LOCAL_IP_V6, PaNL,   PaNL,  "local ip v6 to receive new connections" },
   { "-harakiri",    &harakiri,     "HARAKIRI",     PaBool,   PaHid, false,          false,  true,  "commits harakiri on request"     },
 
 
@@ -614,9 +615,9 @@ int main(int argC, char* argV[])
   {
     LM_M(("IPv6 Listening on IP %s , port %d", localIpV6, port));
     if (ngsi9Only)
-      restInit_v6(localIpV6, port, restServiceNgsi9V);
+      restInit(localIpV6, port, restServiceNgsi9V, true);
     else
-      restInit_v6(localIpV6, port, restServiceV);
+      restInit(localIpV6, port, restServiceV, true);
   }
 
 
@@ -636,7 +637,7 @@ int main(int argC, char* argV[])
 
   if (useIpV6)
   {
-    if ((r = restStart_v6()) != 0)
+    if ((r = restStart(true)) != 0)
        LM_X(1, ("restStart_v6: error %d", r));
   }
 

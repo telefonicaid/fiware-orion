@@ -47,5 +47,5 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-fwdPort' <port for forwarding NGSI9 regs>]
                       [option '-ngsi9' (run as Configuration Manager)]
                       [option '-ipv6' (use ip v6)]
-                      [option '-ipv6host' <IPv6 to receive new connections>]
+                      [option '-ipv6host' <local ip v6 to receive new connections>]
                      
