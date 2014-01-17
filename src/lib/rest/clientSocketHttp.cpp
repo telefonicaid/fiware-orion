@@ -151,9 +151,7 @@ std::string sendHttpSocket
 
   strncat(msg, "\n", sizeof(msg) - strlen(msg));
 
-  int fd;
-
-  fd = socketHttpConnect(ip, port);
+  int fd = socketHttpConnect(ip, port); // Connecting to HTTP server
 
   if (fd == -1)
     LM_RE("error", ("Unable to connect to HTTP server at %s:%d", ip.c_str(), port));

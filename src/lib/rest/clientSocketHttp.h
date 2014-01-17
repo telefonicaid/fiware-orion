@@ -30,22 +30,13 @@
 
 #include "ConnectionInfo.h"
 
-
 #define  TAM_BUF        8192
 
 /***************************************************************************
 *
-* socketHttpConnectV4 -
+* socketHttpConnect -
 */
-extern int socketHttpConnectV4(std::string host, unsigned short port);
-
-
-/***************************************************************************
-*
-* socketHttpConnectV6 -
-*/
-extern int socketHttpConnectV6(std::string host, unsigned short port);
-
+extern int socketHttpConnect(std::string host, unsigned short port);
 
 
 /* ****************************************************************************
