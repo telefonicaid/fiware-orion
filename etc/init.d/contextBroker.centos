@@ -86,7 +86,7 @@ broker_start()
     if [ -x /usr/bin/${NAME} ]; then
         su $BROKER_USER -c "/usr/bin/${NAME} ${BROKER_OPTS} > /dev/null 2>&1"
         PID=$(cat ${BROKER_PID_FILE})
-        if [ -z PID ]; then
+        if [ -z "${PID}" ]; then
             printf "%s\n" "Fail"
             exit 1
         else
