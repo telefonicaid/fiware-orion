@@ -64,12 +64,14 @@ Scope::Scope(std::string _type, std::string _value)
 */
 std::string Scope::render(Format format, std::string indent, bool notLastInVector)
 {
-  std::string out = "";
-  std::string tag = "operationScope";
+  std::string out      = "";
+  std::string tag      = "operationScope";
+  const char* tTag     = (format == XML)? "scopeType" : "type";
+  const char* vTag     = (format == XML)? "scopeValue" : "value";
 
   out += startTag(indent, tag, tag, format, false, false);
-  out += valueTag(indent + "  ", "type", type, format, true);
-  out += valueTag(indent + "  ", "value", value, format);
+  out += valueTag(indent + "  ", tTag, type, format, true);
+  out += valueTag(indent + "  ", vTag, value, format);
   out += endTag(indent, tag, format, notLastInVector);
 
   return out;

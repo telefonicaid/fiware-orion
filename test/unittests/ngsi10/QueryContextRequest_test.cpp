@@ -90,11 +90,12 @@ TEST(QueryContextRequest, ok_xml)
   
   qcrP->present(""); // No output
 
-  std::string rendered;
-  std::string expected = "<queryContextRequest>\n  <entityIdList>\n    <entityId type=\"Room\" isPattern=\"false\">\n      <id>ConferenceRoom</id>\n    </entityId>\n    <entityId type=\"Room\" isPattern=\"false\">\n      <id>OfficeRoom</id>\n    </entityId>\n  </entityIdList>\n  <attributeList>\n    <attribute>temperature</attribute>\n    <attribute>occupancy</attribute>\n    <attribute>lightstatus</attribute>\n  </attributeList>\n  <restriction>\n    <attributeExpression>Attribute Expression</attributeExpression>\n    <scope>\n      <operationScope>\n        <type>st1</type>\n        <value>sv1</value>\n      </operationScope>\n      <operationScope>\n        <type>st2</type>\n        <value>sv2</value>\n      </operationScope>\n    </scope>\n  </restriction>\n</queryContextRequest>\n";
+  std::string  out;
+  const char*  outfile = "ngsi10.queryContextRequest.ok2.valid.xml";
 
-  rendered = qcrP->render(QueryContext, XML, "");
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  out = qcrP->render(QueryContext, XML, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   qcrP->release();
 }

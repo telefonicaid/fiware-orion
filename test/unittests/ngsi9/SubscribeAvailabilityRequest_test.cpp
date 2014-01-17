@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -33,7 +31,7 @@
 #include "rest/ConnectionInfo.h"
 #include "xmlParse/xmlRequest.h"
 
-#include "testDataFromFile.h"
+#include "unittest.h"
 
 
 
@@ -66,11 +64,12 @@
 TEST(SubscribeContextAvailabilityRequest, xml_ok)
 {
   ParseData       reqData;
-  const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.subscriptionIdNot24Chars.invalid.xml";
+  const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.subscriptionIdNot24Chars.invalid.xml";
+  const char*     outfile = "ngsi9.subscribeContextAvailabilityRequest.subscriptionIdNot24Chars2.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
   
   
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   lmTraceLevelSet(LmtDump, true);
   std::string result = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
@@ -79,10 +78,10 @@ TEST(SubscribeContextAvailabilityRequest, xml_ok)
 
   SubscribeContextAvailabilityRequest*  scarP = &reqData.scar.res;
   std::string                           out;
-  std::string                           expected = "<subscribeContextAvailabilityRequest>\n  <entityIdList>\n    <entityId type=\"Room\" isPattern=\"false\">\n      <id>ConferenceRoom</id>\n    </entityId>\n    <entityId type=\"Room\" isPattern=\"false\">\n      <id>OfficeRoom</id>\n    </entityId>\n  </entityIdList>\n  <attributeList>\n    <attribute>temperature</attribute>\n    <attribute>occupancy</attribute>\n    <attribute>lightstatus</attribute>\n  </attributeList>\n  <reference>http://10.1.1.1:80/test/interfaceNotification\n\t</reference>\n  <duration>PT1M</duration>\n  <restriction>\n    <attributeExpression>ATTR_EXPR</attributeExpression>\n    <scope>\n      <operationScope>\n        <type>st1</type>\n        <value>st1</value>\n      </operationScope>\n    </scope>\n  </restriction>\n  <subscriptionId>12458896</subscriptionId>\n</subscribeContextAvailabilityRequest>\n";
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   out = scarP->render(SubscribeContextAvailability, XML, "");
-  EXPECT_EQ(expected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -94,13 +93,13 @@ TEST(SubscribeContextAvailabilityRequest, xml_ok)
 TEST(SubscribeContextAvailabilityRequest, json_ok)
 {
   ParseData       reqData;
-  const char*     fileName = "subscribeContextAvailabilityRequest_ok.json";
+  const char*     infile = "subscribeContextAvailabilityRequest_ok.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat      = JSON;
   ci.outFormat     = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   lmTraceLevelSet(LmtDump, true);
   std::string result = jsonTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
@@ -117,11 +116,11 @@ TEST(SubscribeContextAvailabilityRequest, json_ok)
 TEST(SubscribeContextAvailabilityRequest, xml_badIsPattern)
 {
   ParseData       reqData;
-  const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.isPattern.invalid.xml";
+  const char*     infile = "ngsi9.subscribeContextAvailabilityRequest.isPattern.invalid.xml";
   std::string     expected = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>000000000000000000000000</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </errorCode>\n</subscribeContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
   
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
   EXPECT_EQ(expected, result) << "this test should be BADISPATTERN";
@@ -136,13 +135,13 @@ TEST(SubscribeContextAvailabilityRequest, xml_badIsPattern)
 TEST(SubscribeContextAvailabilityRequest, json_badIsPattern)
 {
   ParseData       reqData;
-  const char*     fileName = "subscribeContextAvailabilityRequest_badIsPattern.json";
+  const char*     infile = "subscribeContextAvailabilityRequest_badIsPattern.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat      = JSON;
   ci.outFormat     = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
   EXPECT_EQ("OK", result) << "this test should NOT be OK";
@@ -157,11 +156,11 @@ TEST(SubscribeContextAvailabilityRequest, json_badIsPattern)
 TEST(SubscribeContextAvailabilityRequest, xml_badEntityId)
 {
   ParseData       reqData;
-  const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.entityId.invalid.xml";
+  const char*     infile = "ngsi9.subscribeContextAvailabilityRequest.entityId.invalid.xml";
   std::string     expected = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>000000000000000000000000</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</subscribeContextAvailabilityResponse>\n";
   ConnectionInfo  ci("", "POST", "1.1");
   
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
   EXPECT_EQ(expected, result);
@@ -176,14 +175,14 @@ TEST(SubscribeContextAvailabilityRequest, xml_badEntityId)
 TEST(SubscribeContextAvailabilityRequest, xml_noEntityId)
 {
   ParseData       reqData;
-  const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.noEntity.invalid.xml";
+  const char*     infile = "ngsi9.subscribeContextAvailabilityRequest.noEntity.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
   std::string     expected = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>000000000000000000000000</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>No entities</reasonPhrase>\n  </errorCode>\n</subscribeContextAvailabilityResponse>\n";
 
   ci.inFormat      = XML;
   ci.outFormat     = XML;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
   EXPECT_EQ(expected, result);
@@ -198,14 +197,14 @@ TEST(SubscribeContextAvailabilityRequest, xml_noEntityId)
 TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
 {
   ParseData       reqData;
-  const char*     fileName = "subscribeContextAvailabilityRequest_noEntityId.json";
+  const char*     infile = "subscribeContextAvailabilityRequest_noEntityId.json";
   ConnectionInfo  ci("", "POST", "1.1");
   std::string     expected = "{\n  \"subscriptionId\" : \"000000000000000000000000\",\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"No entities\"\n  }\n}\n";
 
   ci.inFormat      = JSON;
   ci.outFormat     = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
   EXPECT_EQ(expected, result);
@@ -220,13 +219,13 @@ TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
 TEST(SubscribeContextAvailabilityRequest, xml_entityIdTypeAsBothFieldAndAttribute)
 {
   ParseData       reqData;
-  const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.entityIdTypeAsBothFieldAndAttribute.invalid.xml";
+  const char*     infile = "ngsi9.subscribeContextAvailabilityRequest.entityIdTypeAsBothFieldAndAttribute.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat      = XML;
   ci.outFormat     = XML;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
   EXPECT_EQ("OK", result) << "this test should NOT be OK";
@@ -241,13 +240,13 @@ TEST(SubscribeContextAvailabilityRequest, xml_entityIdTypeAsBothFieldAndAttribut
 TEST(SubscribeContextAvailabilityRequest, xml_entityIdIsPatternAsBothFieldAndAttribute)
 {
   ParseData       reqData;
-  const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.entityIdIsPatternAsBothFieldAndAttribute.invalid.xml";
+  const char*     infile = "ngsi9.subscribeContextAvailabilityRequest.entityIdIsPatternAsBothFieldAndAttribute.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat      = XML;
   ci.outFormat     = XML;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
   EXPECT_EQ("OK", result) << "this test should NOT be OK";
@@ -262,14 +261,14 @@ TEST(SubscribeContextAvailabilityRequest, xml_entityIdIsPatternAsBothFieldAndAtt
 TEST(SubscribeContextAvailabilityRequest, xml_noReference)
 {
   ParseData       reqData;
-  const char*     fileName = "ngsi9.subscribeContextAvailabilityRequest.noReference.invalid.xml";
+  const char*     infile = "ngsi9.subscribeContextAvailabilityRequest.noReference.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
   std::string     expected = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>000000000000000000000000</subscriptionId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty Reference</reasonPhrase>\n  </errorCode>\n</subscribeContextAvailabilityResponse>\n";
 
   ci.inFormat      = XML;
   ci.outFormat     = XML;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
   EXPECT_EQ(expected, result);
@@ -284,14 +283,14 @@ TEST(SubscribeContextAvailabilityRequest, xml_noReference)
 TEST(SubscribeContextAvailabilityRequest, json_badDuration)
 {
   ParseData       reqData;
-  const char*     fileName = "subscribeContextAvailabilityRequest_badDuration.json";
+  const char*     infile = "subscribeContextAvailabilityRequest_badDuration.json";
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     expected = "{\n  \"subscriptionId\" : \"000000000000000000000000\",\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"syntax error in duration string\"\n  }\n}\n";
 
   ci.inFormat      = JSON;
   ci.outFormat     = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
   EXPECT_EQ(expected, result) << "this test should NOT be OK";
