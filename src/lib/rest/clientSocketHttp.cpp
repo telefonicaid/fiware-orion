@@ -47,44 +47,9 @@
 
 /* ****************************************************************************
 *
-* socketHttpConnectV4 -
+* socketHttpConnect -
 */
-int socketHttpConnectV4(std::string host, unsigned short port)
-{
-  int                 fd;
-  struct hostent*     hp;
-  struct sockaddr_in  peer;
-
-  LM_VVV (("Connect to  IPv4: '%s'  port: '%d'", host.c_str(), port));
-
-  if ((hp = gethostbyname(host.c_str())) == NULL)
-     LM_RE(-1, ("gethostbyname('%s'): %s", host.c_str(), strerror(errno)));
-
-  if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-     LM_RE(-1, ("socket: %s", strerror(errno)));
-
-  memset((char*) &peer, 0, sizeof(peer));
-
-  peer.sin_family      = AF_INET;
-  peer.sin_addr.s_addr = ((struct in_addr*) (hp->h_addr))->s_addr;
-  peer.sin_port        = htons(port);
-
-  if (connect(fd, (struct sockaddr*) &peer, sizeof(peer)) == -1)
-  {
-    close(fd);
-    LM_E(("connect(%s, %d): %s", host.c_str(), port, strerror(errno)));
-    return -1;
-  }
-
-  return fd;
-}
-
-
-/* ****************************************************************************
-*
-* socketHttpConnectV6 -
-*/
-int socketHttpConnectV6 (std::string host, unsigned short port)
+int socketHttpConnect (std::string host, unsigned short port)
 {
   int                 fd;
   int status;
@@ -93,10 +58,10 @@ int socketHttpConnectV6 (std::string host, unsigned short port)
   char port_str[10];
 
 
- LM_VVV (("Connect to  IPv6: '%s'  port: '%d'", host.c_str(), port));
+ LM_VVV (("Generic Connect to: '%s'  port: '%d'", host.c_str(), port));
 
  memset(&hints, 0, sizeof(struct addrinfo));
- hints.ai_family = AF_INET6; 
+ hints.ai_family = AF_UNSPEC;    // Allow IPv4 or IPv6
  hints.ai_socktype = SOCK_STREAM;
  hints.ai_protocol = 0;
 
@@ -187,10 +152,8 @@ std::string sendHttpSocket
   strncat(msg, "\n", sizeof(msg) - strlen(msg));
 
   int fd;
-  if (isIPv6(ip))
-    fd = socketHttpConnectV6(ip, port); // Connecting to HTTP server wiht IPv6
-  else
-    fd = socketHttpConnectV4(ip, port); // Connecting to HTTP server wiht IPv4
+
+  fd = socketHttpConnect(ip, port);
 
   if (fd == -1)
     LM_RE("error", ("Unable to connect to HTTP server at %s:%d", ip.c_str(), port));
