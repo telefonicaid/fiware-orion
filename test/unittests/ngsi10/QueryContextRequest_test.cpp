@@ -73,25 +73,23 @@ TEST(QueryContextRequest, ok_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.ok.valid.xml";
+  const char*     infile = "ngsi10.queryContextRequest.ok.valid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   lmTraceLevelSet(LmtDump, true);
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   lmTraceLevelSet(LmtDump, false);
 
-  EXPECT_EQ("OK", result) << "this test should be OK";
+  EXPECT_EQ("OK", out) << "this test should be OK";
 
   //
   // With the data obtained, render, present and release methods are exercised
   //
   QueryContextRequest*  qcrP = &reqData.qcr.res;
+  const char*  outfile = "ngsi10.queryContextRequest.ok2.valid.xml";
   
   qcrP->present(""); // No output
-
-  std::string  out;
-  const char*  outfile = "ngsi10.queryContextRequest.ok2.valid.xml";
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   out = qcrP->render(QueryContext, XML, "");
@@ -108,20 +106,20 @@ TEST(QueryContextRequest, ok_json)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName     = "queryContextRequest_ok.json";  
-  const char*     expectedFile = "ngsi10.queryContextRequest_ok.expected.valid.json";
+  const char*     infile  = "ngsi10.queryContextRequest_ok.valid.json";
+  const char*     outfile = "ngsi10.queryContextRequest_ok.expected.valid.json";
   std::string     rendered;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
   lmTraceLevelSet(LmtDump, true);
-  std::string result = jsonTreat(testBuf, &ci, &parseData, QueryContext, "queryContextRequest", NULL);
+  std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, "queryContextRequest", NULL);
   lmTraceLevelSet(LmtDump, false);
 
-  EXPECT_EQ("OK", result) << "this test should be OK";
+  EXPECT_EQ("OK", out) << "this test should be OK";
 
 
   //
@@ -132,7 +130,7 @@ TEST(QueryContextRequest, ok_json)
   qcrP->present(""); // No output
 
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), expectedFile)) << "Error getting test data from '" << expectedFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   rendered = qcrP->render(QueryContext, JSON, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
@@ -150,13 +148,14 @@ TEST(QueryContextRequest, entityIdIdAsAttribute_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.entityIdIdAsAttribute.invalid.xml";
-  std::string     expected = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  const char*     infile   = "ngsi10.queryContextRequest.entityIdIdAsAttribute.invalid.xml";
+  const char*     outfile  = "ngsi10.queryContextResponse.entityIdIdAsAttribute.valid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expected, result);
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -169,13 +168,14 @@ TEST(QueryContextRequest, badIsPattern_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.isPattern.invalid.xml";
-  const char*     expected = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  const char*     infile  = "ngsi10.queryContextRequest.isPattern.invalid.xml";
+  const char*     outfile = "ngsi10.queryContextResponse.isPattern.valid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_STREQ(expected, result.c_str());
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -188,15 +188,16 @@ TEST(QueryContextRequest, badIsPattern_json)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_badIsPattern.json";
-  const char*     expected = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"bad value for 'isPattern'\"\n  }\n}\n";
+  const char*     infile  = "ngsi10.queryContextRequest.badIsPattern.invalid.json";
+  const char*     outfile = "ngsi10.queryContextResponse.badIsPattern.valid.json";
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
-  std::string result = jsonTreat(testBuf, &ci, &parseData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expected, result);
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -209,15 +210,16 @@ TEST(QueryContextRequest, emptyAttribute_json)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_emptyAttribute.json";
-  const char*     expected = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"Empty attribute name\"\n  }\n}\n";
+  const char*     infile  = "ngsi10.queryContextRequest.emptyAttribute.valid.json";
+  const char*     outfile = "ngsi10.queryContextResponse.emptyAttribute.valid.json";
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
-  std::string result = jsonTreat(testBuf, &ci, &parseData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expected, result);
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -230,15 +232,16 @@ TEST(QueryContextRequest, emptyAttributeExpression_json)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "queryContextRequest_emptyAttributeExpression.json";
-  const char*     expected = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"Empty attribute expression\"\n  }\n}\n";
+  const char*     infile  = "ngsi10.queryContextRequest.emptyAttributeExpression.invalid.json";
+  const char*     outfile = "ngsi10.queryContextResponse.emptyAttributeExpression.valid.json";
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
-  std::string result = jsonTreat(testBuf, &ci, &parseData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expected, result);
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -251,13 +254,14 @@ TEST(QueryContextRequest, unsupportedEntityIdAttribute_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.attributeUnknown.invalid.xml";
-  const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  const char*     infile  = "ngsi10.queryContextRequest.attributeUnknown.invalid.xml";
+  const char*     outfile = "ngsi10.queryContextResponse.attributeUnknown.valid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "unsupportedEntityIdAttribute";
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -270,12 +274,12 @@ TEST(QueryContextRequest, entityIdType_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.entityIdTypeAsField.invalid.xml";
+  const char*     infile = "ngsi10.queryContextRequest.entityIdTypeAsField.invalid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ("OK", result) << "entityIdType";
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_EQ("OK", out);
 }
 
 
@@ -288,12 +292,12 @@ TEST(QueryContextRequest, entityIdIsPattern_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.entityIdIsPatternAsField.invalid.xml";
+  const char*     infile = "ngsi10.queryContextRequest.entityIdIsPatternAsField.invalid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ("OK", result) << "entityIdIsPattern";
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_EQ("OK", out);
 }
 
 
@@ -306,12 +310,12 @@ TEST(QueryContextRequest, overwriteEntityIdType_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.typeAsField.invalid.xml";
+  const char*     infile = "ngsi10.queryContextRequest.typeAsField.invalid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ("OK", result) << "overwriteEntityIdType";
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_EQ("OK", out);
 }
 
 
@@ -324,12 +328,12 @@ TEST(QueryContextRequest, overwriteEntityIdIsPattern_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.isPatternAsField.invalid.xml";
+  const char*     infile = "ngsi10.queryContextRequest.isPatternAsField.invalid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ("OK", result) << "overwriteEntityIdIsPattern";
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_EQ("OK", out);
 }
 
 
@@ -342,13 +346,14 @@ TEST(QueryContextRequest, noEntityList_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.noEntityList.invalid.xml";
-  const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>No entities</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  const char*     infile  = "ngsi10.queryContextRequest.noEntityList.invalid.xml";
+  const char*     outfile = "ngsi10.queryContextResponse.noEntityList.valid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "noEntityList";
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -361,13 +366,14 @@ TEST(QueryContextRequest, emptyEntityList_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.emptyEntityList.invalid.xml";
-  const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>No entities</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  const char*     infile  = "ngsi10.queryContextRequest.emptyEntityList.invalid.xml";
+  const char*     outfile = "ngsi10.queryContextResponse.emptyEntityList.valid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "emptyEntityList";
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -380,13 +386,14 @@ TEST(QueryContextRequest, emptyEntityIdId_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.emptyEntityIdId.invalid.xml";
-  const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>empty entityId:id</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  const char*     infile  = "ngsi10.queryContextRequest.emptyEntityIdId.invalid.xml";
+  const char*     outfile = "ngsi10.queryContextResponse.emptyEntityIdId.valid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "emptyEntityIdId";
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -399,13 +406,13 @@ TEST(QueryContextRequest, noAttributeExpression_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.noAttributeExpression.invalid.xml";
-  const char*     expect   = "OK";
+  const char*     infile = "ngsi10.queryContextRequest.noAttributeExpression.invalid.xml";
+  const char*     expect = "OK";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expect, result);
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_EQ(expect, out);
 }
 
 
@@ -418,13 +425,13 @@ TEST(QueryContextRequest, emptyAttributeExpression_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.emptyAttributeExpression.invalid.xml";
-  const char*     expect   = "OK";
+  const char*     infile = "ngsi10.queryContextRequest.emptyAttributeExpression.invalid.xml";
+  const char*     expect = "OK";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expect, result);
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_EQ(expect, out);
 }
 
 
@@ -437,13 +444,14 @@ TEST(QueryContextRequest, emptyScopeType_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.emptyScopeType.invalid.xml";
-  const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty type in restriction scope</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  const char*     infile  = "ngsi10.queryContextRequest.emptyScopeType.invalid.xml";
+  const char*     outfile = "ngsi10.queryContextResponse.emptyScopeType.valid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "emptyScopeType";
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -456,13 +464,14 @@ TEST(QueryContextRequest, emptyScopeValue_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.emptyScopeValue.invalid.xml";
-  const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty value in restriction scope</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  const char*     infile  = "ngsi10.queryContextRequest.emptyScopeValue.invalid.xml";
+  const char*     outfile = "ngsi10.queryContextResponse.emptyScopeValue.valid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "emptyScopeValue";
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -475,13 +484,14 @@ TEST(QueryContextRequest, noScopeType_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.noScopeType.invalid.xml";
-  const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty type in restriction scope</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  const char*     infile  = "ngsi10.queryContextRequest.noScopeType.invalid.xml";
+  const char*     outfile = "ngsi10.queryContextResponse.noScopeType.valid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "noScopeType";
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -494,13 +504,14 @@ TEST(QueryContextRequest, noScopeValue_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.noScopeValue.invalid.xml";
-  const char*     expect   = "<queryContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Empty value in restriction scope</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  const char*     infile  = "ngsi10.queryContextRequest.noScopeValue.invalid.xml";
+  const char*     outfile = "ngsi10.queryContextResponse.noScopeValue.valid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ(expect, result) << "noScopeValue";
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -513,15 +524,15 @@ TEST(QueryContextRequest, noRestriction_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.queryContextRequest.noRestriction.valid.xml";
+  const char*     infile = "ngsi10.queryContextRequest.noRestriction.valid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   lmTraceLevelSet(LmtDump, true);
-  std::string result = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
+  std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   lmTraceLevelSet(LmtDump, false);
 
-  EXPECT_EQ("OK", result) << "noRestriction";
+  EXPECT_EQ("OK", out);
 }
 
 
@@ -535,16 +546,18 @@ TEST(QueryContextRequest, fill)
   QueryContextRequest q0;
   QueryContextRequest q1;
   std::string         out;
-  std::string         expected0 = "<queryContextRequest>\n  <entityIdList>\n    <entityId type=\"\" isPattern=\"true\">\n      <id></id>\n    </entityId>\n  </entityIdList>\n</queryContextRequest>\n";
-  std::string         expected1 = "<queryContextRequest>\n  <entityIdList>\n    <entityId type=\"ETYPE\" isPattern=\"true\">\n      <id>EID</id>\n    </entityId>\n  </entityIdList>\n  <attributeList>\n    <attribute>Attribute</attribute>\n  </attributeList>\n</queryContextRequest>\n";
+  const char*         outfile1  = "ngsi10.queryContextRequest.fill1.valid.xml";
+  const char*         outfile2  = "ngsi10.queryContextRequest.fill2.valid.xml";
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   q0.fill("", "", "");
   q0.restrictions = 0;
   out = q0.render(QueryContext, XML, "");
-  EXPECT_EQ(expected0, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   q1.fill("EID", "ETYPE", "Attribute");
   q1.restrictions = 0;
   out = q1.render(QueryContext, XML, "");
-  EXPECT_EQ(expected1, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
