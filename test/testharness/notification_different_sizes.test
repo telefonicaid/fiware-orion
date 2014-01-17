@@ -222,5 +222,6 @@ REGEX(.*) Sending to HTTP server 21878 bytes
 REGEX(.*) Sending to HTTP server 8100880 bytes
 --TEARDOWN--
 source harnessFunctions.sh
+cp /tmp/contextBrokerLog /tmp/contextBrokerLog.notification_different_sizes
 brokerStop CB
 accumulatorStop
