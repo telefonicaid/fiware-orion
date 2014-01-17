@@ -26,6 +26,8 @@
 
 #include <string>
 
+#define NOTIFICATION_WAIT_MODE false
+
 typedef struct SenderThreadParams {
     std::string    ip;
     unsigned short port;

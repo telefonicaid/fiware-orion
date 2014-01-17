@@ -39,7 +39,7 @@ TEST(AttributeExpression, ok)
 {
    AttributeExpression ae;
    const char*         outfile1 = "ngsi10.attributeExpression.ok.middle.xml";
-   const char*         outfile2 = "ngsi10.attributeExpression.ok.valid.json";
+   const char*         outfile2 = "ngsi10.attributeExpression.ok.middle.json";
    std::string         out;
 
    utInit();

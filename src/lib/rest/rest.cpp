@@ -83,8 +83,8 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
 
 
-  if ((headerP->connection != "") && (headerP->connection != "close"))
-     LM_W(("connection '%s' - currently not supported, sorry ..."));
+  if ((strcasecmp(key.c_str(), "connection") == 0) && (headerP->connection != "") && (headerP->connection != "close"))
+     LM_W(("connection '%s' - currently not supported, sorry ...", headerP->connection.c_str()));
 
   /* Note that the strategy to "fix" the Content-Type is to replace the ";" with 0
    * to "deactivate" this part of the string in the checking done at connectionTreat() */
@@ -419,7 +419,7 @@ static int connectionTreat
     }
     else
     {
-      LM_T(LmtInPayload, ("Calling restService '%s' with payload: '%s'", ciP->url.c_str(), ciP->payload));
+      LM_T(LmtServiceInputPayload, ("Calling restService '%s' with payload: '%s'", ciP->url.c_str(), ciP->payload));
       if (ciP->fractioned == true)
         LM_T(LmtRest, ("Received entire payload of fractioned message (%d bytes)", ciP->httpHeaders.contentLength));
       restService(ciP, restServiceV);

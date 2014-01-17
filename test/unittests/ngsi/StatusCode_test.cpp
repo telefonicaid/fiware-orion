@@ -46,7 +46,7 @@ TEST(StatusCode, render)
   const char*   outfile1  = "ngsi.statusCode.render1.valid.xml";
   const char*   outfile2  = "ngsi.statusCode.render2.valid.xml";
   const char*   outfile3  = "ngsi.statusCode.render3.valid.xml";
-  const char*   outfile4  = "ngsi.statusCode.render4.valid.json";
+  const char*   outfile4  = "ngsi.statusCode.render4.middle.json";
 
   utInit();
 

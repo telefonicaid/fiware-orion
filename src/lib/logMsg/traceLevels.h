@@ -51,10 +51,7 @@ typedef enum TraceLevels
 
   /* Parser (40-59) */
   LmtParse    = 40,
-  LmtInPayload,
-  LmtOutPayload,
   LmtParsedPayload,
-
   LmtPresent,
   LmtNew,
   LmtTreat,
@@ -83,8 +80,14 @@ typedef enum TraceLevels
   /* Notifications (160-179) */
   LmtNotifier = 160,
 
-  /* Others (>=180) */
-  LmtCm = 180,
+  /* Input/Output payloads (180-199) */
+  LmtServiceInputPayload = 180,
+  LmtServiceOutPayload,
+  LmtClientInputPayload,
+  LmtClientOutputPayload,
+
+  /* Others (>=200) */
+  LmtCm = 200,
   LmtIotaXmlReg,
   LmtIotaXmlObs,
 } TraceLevels;
