@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -34,7 +32,7 @@
 #include "xmlParse/xmlRequest.h"
 #include "xmlParse/xmlParse.h"
 
-#include "testDataFromFile.h"
+#include "unittest.h"
 
 
 
@@ -60,15 +58,13 @@ TEST(SubscribeContextRequest, ok_xml)
   // With the data obtained, render, present and release methods are exercised
   //
   SubscribeContextRequest*  scrP = &reqData.scr.res;
-  
+  const char*               outfile = "ngsi10.subscribeContextRequest.rendered.valid.xml";
+
   scrP->present(""); // No output
 
-  std::string rendered;
-
-   std::string expected = "<subscribeContextRequest>\n  <entityIdList>\n    <entityId type=\"Room\" isPattern=\"false\">\n      <id>ConferenceRoom</id>\n    </entityId>\n    <entityId type=\"Room\" isPattern=\"false\">\n      <id>OfficeRoom</id>\n    </entityId>\n  </entityIdList>\n  <attributeList>\n    <attribute>temperature</attribute>\n    <attribute>lightstatus</attribute>\n  </attributeList>\n  <reference>http://127.0.0.1:1028</reference>\n  <duration>P5Y</duration>\n  <restriction>\n    <attributeExpression>testRestriction</attributeExpression>\n    <scope>\n      <operationScope>\n        <scopeType>scope1</scopeType>\n        <scopeValue>sval1</scopeValue>\n      </operationScope>\n      <operationScope>\n        <scopeType>scope2</scopeType>\n        <scopeValue>sval2</scopeValue>\n      </operationScope>\n    </scope>\n  </restriction>\n  <notifyConditions>\n    <notifyCondition>\n      <type>ONCHANGE</type>\n      <condValueList>\n        <condValue>temperature</condValue>\n        <condValue>lightstatus</condValue>\n      </condValueList>\n      <restriction>restriction</restriction>\n    </notifyCondition>\n  </notifyConditions>\n  <throttling>P5Y</throttling>\n</subscribeContextRequest>\n";
-
-  rendered = scrP->render(SubscribeContext, XML, "");
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  std::string out = scrP->render(SubscribeContext, XML, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   scrP->release();
 }
@@ -83,9 +79,9 @@ TEST(SubscribeContextRequest, ok_json)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "subscribeContextRequest_ok.json";
+  const char*     infile = "ngsi10.subscribeContextRequest.ok.valid.json";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
@@ -99,16 +95,14 @@ TEST(SubscribeContextRequest, ok_json)
   //
   // With the data obtained, render, present and release methods are exercised
   //
-  SubscribeContextRequest*  scrP = &parseData.scr.res;
+  SubscribeContextRequest*  scrP    = &parseData.scr.res;
+  const char*               outfile = "ngsi10.subscribeContextRequest_ok.expected.valid.json";
   
   scrP->present(""); // No output
 
-  std::string rendered;
-  const char* expectedFile = "ngsi10.subscribeContextRequest_ok.expected.valid.json";
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), expectedFile)) << "Error getting test data from '" << expectedFile << "'";
-  rendered = scrP->render(SubscribeContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  std::string out = scrP->render(SubscribeContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   scrP->release();
 }
@@ -123,18 +117,19 @@ TEST(SubscribeContextRequest, invalidDuration_xml)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.subscribeContextRequest.duration.invalid.xml";
-  const char*     expected = "<subscribeContextResponse>\n  <subscribeError>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>invalid payload</reasonPhrase>\n      <details>syntax error in duration string</details>\n    </errorCode>\n  </subscribeError>\n</subscribeContextResponse>\n";
+  const char*     infile  = "ngsi10.subscribeContextRequest.duration.invalid.xml";
+  const char*     outfile = "ngsi10.subscribeContextResponse.invalidDuration.valid.xml";
   XmlRequest*     reqP;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   lmTraceLevelSet(LmtDump, true);
-  std::string result = xmlTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", &reqP);
+  std::string out = xmlTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", &reqP);
   lmTraceLevelSet(LmtDump, false);
 
   reqP->release(&parseData);
-  EXPECT_STREQ(expected, result.c_str());
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -147,16 +142,17 @@ TEST(SubscribeContextRequest, badIsPattern_json)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "subscribeContextRequest_badIsPattern.json";
-  const char*     expected = "{\n  \"subscribeError\" : {\n    \"errorCode\" : {\n      \"code\" : \"400\",\n      \"reasonPhrase\" : \"invalid payload\",\n      \"details\" : \"bad value for 'isPattern'\"\n    }\n  }\n}\n";
+  const char*     infile  = "ngsi10.subscribeContextRequest.badIsPattern.invalid.json";
+  const char*     outfile = "ngsi10.subscribeContextResponse.badIsPattern.valid.json";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
-  std::string result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
-  EXPECT_EQ(expected, result);
+  std::string out = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -169,16 +165,21 @@ TEST(SubscribeContextRequest, invalidDuration_json)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "subscribeContextRequest_invalidDuration.json";
-  const char*     expected = "{\n  \"subscribeError\" : {\n    \"errorCode\" : {\n      \"code\" : \"400\",\n      \"reasonPhrase\" : \"invalid payload\",\n      \"details\" : \"syntax error in duration string\"\n    }\n  }\n}\n";
+  const char*     infile  = "ngsi10.subscribeContextRequest.duration.invalid.json";
+  const char*     outfile = "ngsi10.subscribeContextResponse.durationInvalid.valid.json";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
-  std::string result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
-  EXPECT_EQ(expected, result);
+  std::string out = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -193,11 +194,11 @@ TEST(SubscribeContextRequest, invalidEntityIdAttribute_xml)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.subscribeContextRequest.entityIdAttribute.invalid.xml";
+  const char*     infile = "ngsi10.subscribeContextRequest.entityIdAttribute.invalid.xml";
   const char*     expected = "OK";
   XmlRequest*     reqP;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   std::string result = xmlTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", &reqP);
 

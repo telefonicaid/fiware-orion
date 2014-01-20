@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -34,7 +32,8 @@
 #include "xmlParse/xmlRequest.h"
 #include "xmlParse/xmlParse.h"
 #include "serviceRoutines/postQueryContext.h"
-#include "testDataFromFile.h"
+
+#include "unittest.h"
 
 
 
@@ -75,6 +74,8 @@ TEST(QueryContextRequest, ok_xml)
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile = "ngsi10.queryContextRequest.ok.valid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   lmTraceLevelSet(LmtDump, true);
@@ -96,6 +97,8 @@ TEST(QueryContextRequest, ok_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   qcrP->release();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -109,6 +112,8 @@ TEST(QueryContextRequest, ok_json)
   const char*     infile  = "ngsi10.queryContextRequest_ok.valid.json";
   const char*     outfile = "ngsi10.queryContextRequest_ok.expected.valid.json";
   std::string     rendered;
+
+  utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
@@ -129,13 +134,14 @@ TEST(QueryContextRequest, ok_json)
   
   qcrP->present(""); // No output
 
-
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   rendered = qcrP->render(QueryContext, JSON, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   qcrP->present("");
   qcrP->release();
+
+  utExit();
 }
 
 
@@ -151,11 +157,15 @@ TEST(QueryContextRequest, entityIdIdAsAttribute_xml)
   const char*     infile   = "ngsi10.queryContextRequest.entityIdIdAsAttribute.invalid.xml";
   const char*     outfile  = "ngsi10.queryContextResponse.entityIdIdAsAttribute.valid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -171,11 +181,15 @@ TEST(QueryContextRequest, badIsPattern_xml)
   const char*     infile  = "ngsi10.queryContextRequest.isPattern.invalid.xml";
   const char*     outfile = "ngsi10.queryContextResponse.isPattern.valid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -191,6 +205,8 @@ TEST(QueryContextRequest, badIsPattern_json)
   const char*     infile  = "ngsi10.queryContextRequest.badIsPattern.invalid.json";
   const char*     outfile = "ngsi10.queryContextResponse.badIsPattern.valid.json";
 
+  utInit();
+
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
@@ -198,6 +214,8 @@ TEST(QueryContextRequest, badIsPattern_json)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, "queryContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -213,6 +231,8 @@ TEST(QueryContextRequest, emptyAttribute_json)
   const char*     infile  = "ngsi10.queryContextRequest.emptyAttribute.valid.json";
   const char*     outfile = "ngsi10.queryContextResponse.emptyAttribute.valid.json";
 
+  utInit();
+
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
@@ -220,6 +240,8 @@ TEST(QueryContextRequest, emptyAttribute_json)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, "queryContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -235,6 +257,8 @@ TEST(QueryContextRequest, emptyAttributeExpression_json)
   const char*     infile  = "ngsi10.queryContextRequest.emptyAttributeExpression.invalid.json";
   const char*     outfile = "ngsi10.queryContextResponse.emptyAttributeExpression.valid.json";
 
+  utInit();
+
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
@@ -242,6 +266,8 @@ TEST(QueryContextRequest, emptyAttributeExpression_json)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   std::string out = jsonTreat(testBuf, &ci, &parseData, QueryContext, "queryContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -257,11 +283,15 @@ TEST(QueryContextRequest, unsupportedEntityIdAttribute_xml)
   const char*     infile  = "ngsi10.queryContextRequest.attributeUnknown.invalid.xml";
   const char*     outfile = "ngsi10.queryContextResponse.attributeUnknown.valid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -276,10 +306,14 @@ TEST(QueryContextRequest, entityIdType_xml)
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile = "ngsi10.queryContextRequest.entityIdTypeAsField.invalid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_EQ("OK", out);
+
+  utExit();
 }
 
 
@@ -294,10 +328,14 @@ TEST(QueryContextRequest, entityIdIsPattern_xml)
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile = "ngsi10.queryContextRequest.entityIdIsPatternAsField.invalid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_EQ("OK", out);
+
+  utExit();
 }
 
 
@@ -312,10 +350,14 @@ TEST(QueryContextRequest, overwriteEntityIdType_xml)
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile = "ngsi10.queryContextRequest.typeAsField.invalid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_EQ("OK", out);
+
+  utExit();
 }
 
 
@@ -330,10 +372,14 @@ TEST(QueryContextRequest, overwriteEntityIdIsPattern_xml)
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile = "ngsi10.queryContextRequest.isPatternAsField.invalid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_EQ("OK", out);
+
+  utExit();
 }
 
 
@@ -349,11 +395,15 @@ TEST(QueryContextRequest, noEntityList_xml)
   const char*     infile  = "ngsi10.queryContextRequest.noEntityList.invalid.xml";
   const char*     outfile = "ngsi10.queryContextResponse.noEntityList.valid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -369,11 +419,15 @@ TEST(QueryContextRequest, emptyEntityList_xml)
   const char*     infile  = "ngsi10.queryContextRequest.emptyEntityList.invalid.xml";
   const char*     outfile = "ngsi10.queryContextResponse.emptyEntityList.valid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -389,11 +443,15 @@ TEST(QueryContextRequest, emptyEntityIdId_xml)
   const char*     infile  = "ngsi10.queryContextRequest.emptyEntityIdId.invalid.xml";
   const char*     outfile = "ngsi10.queryContextResponse.emptyEntityIdId.valid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -409,10 +467,14 @@ TEST(QueryContextRequest, noAttributeExpression_xml)
   const char*     infile = "ngsi10.queryContextRequest.noAttributeExpression.invalid.xml";
   const char*     expect = "OK";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_EQ(expect, out);
+
+  utExit();
 }
 
 
@@ -428,10 +490,14 @@ TEST(QueryContextRequest, emptyAttributeExpression_xml)
   const char*     infile = "ngsi10.queryContextRequest.emptyAttributeExpression.invalid.xml";
   const char*     expect = "OK";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_EQ(expect, out);
+
+  utExit();
 }
 
 
@@ -447,11 +513,15 @@ TEST(QueryContextRequest, emptyScopeType_xml)
   const char*     infile  = "ngsi10.queryContextRequest.emptyScopeType.invalid.xml";
   const char*     outfile = "ngsi10.queryContextResponse.emptyScopeType.valid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -467,11 +537,15 @@ TEST(QueryContextRequest, emptyScopeValue_xml)
   const char*     infile  = "ngsi10.queryContextRequest.emptyScopeValue.invalid.xml";
   const char*     outfile = "ngsi10.queryContextResponse.emptyScopeValue.valid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -487,11 +561,15 @@ TEST(QueryContextRequest, noScopeType_xml)
   const char*     infile  = "ngsi10.queryContextRequest.noScopeType.invalid.xml";
   const char*     outfile = "ngsi10.queryContextResponse.noScopeType.valid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -507,11 +585,15 @@ TEST(QueryContextRequest, noScopeValue_xml)
   const char*     infile  = "ngsi10.queryContextRequest.noScopeValue.invalid.xml";
   const char*     outfile = "ngsi10.queryContextResponse.noScopeValue.valid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -526,6 +608,8 @@ TEST(QueryContextRequest, noRestriction_xml)
   ConnectionInfo  ci("", "POST", "1.1");
   const char*     infile = "ngsi10.queryContextRequest.noRestriction.valid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   lmTraceLevelSet(LmtDump, true);
@@ -533,6 +617,8 @@ TEST(QueryContextRequest, noRestriction_xml)
   lmTraceLevelSet(LmtDump, false);
 
   EXPECT_EQ("OK", out);
+
+  utExit();
 }
 
 
@@ -549,6 +635,8 @@ TEST(QueryContextRequest, fill)
   const char*         outfile1  = "ngsi10.queryContextRequest.fill1.valid.xml";
   const char*         outfile2  = "ngsi10.queryContextRequest.fill2.valid.xml";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   q0.fill("", "", "");
   q0.restrictions = 0;
@@ -560,4 +648,6 @@ TEST(QueryContextRequest, fill)
   q1.restrictions = 0;
   out = q1.render(QueryContext, XML, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }

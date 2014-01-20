@@ -1,0 +1,10 @@
+<updateContextSubscriptionResponse>
+  <subscribeError>
+    <subscriptionId>0</subscriptionId>
+    <errorCode>
+      <code>400</code>
+      <reasonPhrase>RP</reasonPhrase>
+      <details>D</details>
+    </errorCode>
+  </subscribeError>
+</updateContextSubscriptionResponse>

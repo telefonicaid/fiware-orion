@@ -91,7 +91,7 @@ TEST(DiscoverContextAvailabilityRequest, ok_xml)
 TEST(DiscoverContextAvailabilityRequest, ok_json)
 {
   ParseData       reqData;
-  const char*     inFile = "discoverContextAvailabilityRequest_ok.json";
+  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.ok2.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
@@ -132,7 +132,7 @@ TEST(DiscoverContextAvailabilityRequest, okNoRestrictions_xml)
 TEST(DiscoverContextAvailabilityRequest, okNoRestrictions_json)
 {
   ParseData       reqData; 
-  const char*     inFile = "discoverContextAvailabilityRequest_okNoRestrictions.json";
+  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.noRestrictions.ok.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
@@ -307,7 +307,7 @@ TEST(DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_xml)
 TEST(DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_json)
 {
   ParseData       reqData;
-  const char*     inFile = "discoverContextAvailabilityRequest_unsupportedAttributeForEntityId.json";
+  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.unsupportedAttributeForEntityId.invalid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
@@ -345,12 +345,12 @@ TEST(DiscoverContextAvailabilityRequest, entityIdIdAsAttribute_xml)
 
 /* ****************************************************************************
 *
-* entityIdIdAsAttribute_json - 
+* twoEntityIdIds_json - 
 */
-TEST(DiscoverContextAvailabilityRequest, entityIdIdAsAttribute_json)
+TEST(DiscoverContextAvailabilityRequest, twoEntityIdIds_json)
 {
   ParseData       reqData;
-  const char*     inFile = "discoverContextAvailabilityRequest_entityIdIdAsAttribute.json";
+  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.twoEntityIds.invalid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
@@ -385,12 +385,12 @@ TEST(DiscoverContextAvailabilityRequest, entityIdType_xml)
 
 /* ****************************************************************************
 *
-* entityIdType_json - 
+* entityIdTwoTypes_json - 
 */
-TEST(DiscoverContextAvailabilityRequest, entityIdType_json)
+TEST(DiscoverContextAvailabilityRequest, entityIdTwoTypes_json)
 {
   ParseData       reqData;
-  const char*     inFile = "discoverContextAvailabilityRequest_entityIdType.json";
+  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.entityIdTwoTypes.invalid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
@@ -425,34 +425,12 @@ TEST(DiscoverContextAvailabilityRequest, entityIdIsPattern_xml)
 
 /* ****************************************************************************
 *
-* entityIdIsPattern_json - 
+* entityIdTwoIsPatterns_json - 
 */
-TEST(DiscoverContextAvailabilityRequest, entityIdIsPattern_json)
+TEST(DiscoverContextAvailabilityRequest, entityIdTwoIsPatterns_json)
 {
   ParseData       reqData;
-  const char*     inFile = "discoverContextAvailabilityRequest_entityIdIsPattern.json";
-  ConnectionInfo  ci("", "POST", "1.1");
-
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-
-  std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
-
-  EXPECT_EQ("OK", result) << "invalid 'isPattern' value";
-}
-
-
-
-/* ****************************************************************************
-*
-* overrideEntityIdId_json - 
-*/
-TEST(DiscoverContextAvailabilityRequest, overrideEntityIdId_json)
-{
-  ParseData       reqData;
-  const char*     inFile = "discoverContextAvailabilityRequest_overrideEntityIdId.json";
+  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.entityIdTwoIsPatterns.invalid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
@@ -487,12 +465,12 @@ TEST(DiscoverContextAvailabilityRequest, overrideEntityIdType_xml)
 
 /* ****************************************************************************
 *
-* overrideEntityIdType_json - 
+* twoEntityIdTypes_json - 
 */
-TEST(DiscoverContextAvailabilityRequest, overrideEntityIdType_json)
+TEST(DiscoverContextAvailabilityRequest, twoEntityIdTypes_json)
 {
   ParseData       reqData;
-  const char*     inFile = "discoverContextAvailabilityRequest_overrideEntityIdType.json";
+  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.twoEntityIdTypes.invalid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
