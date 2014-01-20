@@ -159,10 +159,6 @@ std::string sendHttpSocket
         }
         msg = msgDynamic;
         what = (char*) "dynamic";
-        LM_T(LmtClientOutputPayload, ("Using dynamic buffer to send HTTP request: %d bytes", neededSize));
-    }
-    else {                
-        LM_T(LmtClientOutputPayload, ("Using static buffer to send HTTP request"));
     }
 
     /* The above checking should ensure that the three parts fit, so we are using
