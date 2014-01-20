@@ -90,8 +90,6 @@ std::string formatedAnswer
    return answer;
 }
 
-
-
 char savedResponse[2 * 1024 * 1024];
 static int replyIx = 0;
 /* ****************************************************************************
@@ -104,8 +102,8 @@ int restReply(ConnectionInfo* ciP, std::string answer)
   MHD_Response*  response;
 
   ++replyIx;
-  LM_T(LmtOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answer.length(), ciP->httpStatusCode));
-  LM_T(LmtOutPayload, ("Response payload: '%s'", answer.c_str()));
+  LM_T(LmtServiceOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answer.length(), ciP->httpStatusCode));
+  LM_T(LmtServiceOutPayload, ("Response payload: '%s'", answer.c_str()));
 
   if (answer == "")
     response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_NO, MHD_NO);

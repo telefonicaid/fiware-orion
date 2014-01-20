@@ -22,13 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/RestrictionString.h"
 
+#include "unittest.h"
 
 
 /* ****************************************************************************
@@ -38,21 +37,22 @@
 TEST(RestrictionString, check)
 {
   RestrictionString   restrictionString;
-  std::string  checked;
-  std::string  expected1 = "OK";
-  std::string  expected2 = "OK";
-  std::string  expected3 = "OK";
+  std::string         checked;
+
+  utInit();
 
   checked = restrictionString.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected1.c_str(), checked.c_str());
+  EXPECT_STREQ("OK", checked.c_str());
 
   restrictionString.string = "String";
 
   checked = restrictionString.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected2.c_str(), checked.c_str());
+  EXPECT_STREQ("OK", checked.c_str());
 
   checked = restrictionString.check(RegisterContext, JSON, "", "", 0);
-  EXPECT_STREQ(expected3.c_str(), checked.c_str());
+  EXPECT_STREQ("OK", checked.c_str());
+
+  utExit();
 }
 
 
@@ -65,6 +65,8 @@ TEST(RestrictionString, isEmptySetAndGet)
 {
   RestrictionString   restrictionString;
 
+  utInit();
+
   restrictionString.string = "";
   EXPECT_TRUE(restrictionString.isEmpty());
 
@@ -72,6 +74,8 @@ TEST(RestrictionString, isEmptySetAndGet)
   EXPECT_FALSE(restrictionString.isEmpty());
 
   EXPECT_STREQ("STR", restrictionString.get().c_str());
+
+  utExit();
 }
 
 
@@ -83,21 +87,26 @@ TEST(RestrictionString, isEmptySetAndGet)
 TEST(RestrictionString, render)
 {
   RestrictionString   restrictionString;
-  std::string  rendered;
-  std::string  expected1 = "";
-  std::string  expected2 = "<restriction>String</restriction>\n";
-  std::string  expected3 = "\"restriction\" : \"String\"\n";
+  std::string         out;
+  const char*         outfile1 = "ngsi.restrictionString.render.middle.xml";
+  const char*         outfile2 = "ngsi.restrictionString.render.middle.json";
 
-  rendered = restrictionString.render(XML, "", false);
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  utInit();
+
+  out = restrictionString.render(XML, "", false);
+  EXPECT_STREQ("", out.c_str());
 
   restrictionString.string = "String";
 
-  rendered = restrictionString.render(XML, "", false);
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  out = restrictionString.render(XML, "", false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  rendered = restrictionString.render(JSON, "", false);
-  EXPECT_STREQ(expected3.c_str(), rendered.c_str());
+  out = restrictionString.render(JSON, "", false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -110,11 +119,15 @@ TEST(RestrictionString, present)
 {
   RestrictionString   restrictionString;
 
+  utInit();
+
   restrictionString.set("");
   restrictionString.present("");
 
   restrictionString.set("STR");
   restrictionString.present("");
+
+  utExit();
 }
 
 
@@ -127,6 +140,10 @@ TEST(RestrictionString, c_str)
 {
   RestrictionString   restrictionString;
 
+  utInit();
+
   restrictionString.set("STR");
   EXPECT_STREQ("STR", restrictionString.c_str());
+
+  utExit();
 }

@@ -22,11 +22,11 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "ngsi/ConditionValueList.h"
+
+#include "unittest.h"
 
 
 
@@ -38,23 +38,26 @@ TEST(ConditionValueList, ok)
 {
   ConditionValueList cvList;
   std::string        out;
-  std::string        expected1 = "<condValueList>\n  <condValue>cv1</condValue>\n</condValueList>\n";
-  std::string        expected2 = "\"condValueList\" : [\n  \"cv1\"\n]\n";
-  std::string        expected3 = "\"condValueList\" : [\n  \"cv1\",\n  \"cv2\"\n]\n";
+  const char*        outfile1 = "ngsi.conditionValueList.ok1.middle.xml";
+  const char*        outfile2 = "ngsi.conditionValueList.ok2.middle.json";
+  const char*        outfile3 = "ngsi.conditionValueList.ok3.middle.json";
 
   out = cvList.render(XML, "", false);
   EXPECT_STREQ("", out.c_str());
 
   cvList.push_back("cv1");
   out = cvList.render(XML, "", false);
-  EXPECT_STREQ(expected1.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = cvList.render(JSON, "", false);
-  EXPECT_STREQ(expected2.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   cvList.push_back("cv2");
   out = cvList.render(JSON, "", false);
-  EXPECT_STREQ(expected3.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = cvList.check(SubscribeContext, XML, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());

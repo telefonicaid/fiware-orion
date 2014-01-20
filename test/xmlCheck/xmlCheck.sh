@@ -349,7 +349,8 @@ xmlFilesFound=$(find $SRC_TOP/test -name "*.xml" | wc -l)
 xmlFilesValid=$(find $SRC_TOP/test -name "ngsi*.valid.xml" | wc -l)
 xmlFilesInvalid=$(find $SRC_TOP/test -name "ngsi*.invalid.xml" | wc -l)
 xmlFilesPostponed=$(find $SRC_TOP/test -name "ngsi*.postponed.xml" | wc -l)
-xmlFilesBadName=$(expr $xmlFilesFound - $xmlFilesValid - $xmlFilesInvalid - $xmlFilesPostponed)
+xmlFilesMiddle=$(find $SRC_TOP/test -name "ngsi*.middle.xml" | wc -l)
+xmlFilesBadName=$(expr $xmlFilesFound - $xmlFilesValid - $xmlFilesInvalid - $xmlFilesPostponed - $xmlFilesMiddle)
 xmlFilesProcessed=0
 xmlFilesOK=0
 xmlFilesErrors=0
@@ -507,12 +508,13 @@ echo
 echo "${xmlFilesInvalid} documents were not tested as they on purpose don't follow the XSD"
 xmlDocsPostponed=$xmlFilesPostponed+$xmlPartsPostponed
 echo "${xmlDocsPostponed} documents were not tested as they still have no XSD"
+echo "${xmlFilesMiddle} documents were not tested as they don't start the way the XSD states (middle)"
 
 if [ "$xmlFilesBadName" != 0 ]
 then
   echo
   echo "WARNING: $xmlFilesBadName XML files do not conform to the naming convention"  
-  for xfile in $(find $SRC_TOP/test -name "*.xml" | grep -v "ngsi9.*.valid.xml" | grep -v "ngsi9.*.invalid.xml" | grep -v "ngsi9.*.postponed.xml" | grep -v "ngsi10.*.valid.xml" | grep -v "ngsi10.*.invalid.xml" | grep -v "ngsi10.*.postponed.xml")
+  for xfile in $(find $SRC_TOP/test -name "*.xml" | grep -v "ngsi9.*.valid.xml" | grep -v "ngsi9.*.invalid.xml" | grep -v "ngsi9.*.postponed.xml" | grep -v "ngsi10.*.valid.xml" | grep -v "ngsi10.*.invalid.xml" | grep -v "ngsi10.*.postponed.xml" | grep -v "ngsi.*.xml" | grep -v "ngsi*.*.middle.xml")
   do
     echo "  o $xfile"
   done

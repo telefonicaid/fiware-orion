@@ -22,11 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "ngsi/AttributeExpression.h"
+
+#include "unittest.h"
 
 
 
@@ -37,6 +38,11 @@
 TEST(AttributeExpression, ok)
 {
    AttributeExpression ae;
+   const char*         outfile1 = "ngsi10.attributeExpression.ok.middle.xml";
+   const char*         outfile2 = "ngsi10.attributeExpression.ok.middle.json";
+   std::string         out;
+
+   utInit();
 
    ae.set("AE");
    EXPECT_STREQ("AE", ae.get().c_str());
@@ -45,8 +51,15 @@ TEST(AttributeExpression, ok)
    EXPECT_STREQ("", ae.render(XML, "", false).c_str());
 
    ae.set("AE");
-   EXPECT_STREQ("<attributeExpression>AE</attributeExpression>\n", ae.render(XML, "", false).c_str());
-   EXPECT_STREQ("\"attributeExpression\" : \"AE\"\n", ae.render(JSON, "", false).c_str());
+   out = ae.render(XML, "", false);
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+   EXPECT_STREQ(expectedBuf, out.c_str());
+
+   out = ae.render(JSON, "", false);
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+   EXPECT_STREQ(expectedBuf, out.c_str());
 
    EXPECT_STREQ("AE", ae.c_str());
+
+   utExit();
 }

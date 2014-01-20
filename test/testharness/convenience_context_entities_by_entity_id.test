@@ -60,9 +60,6 @@ curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application
 echo "2: ++++++++++++++++++++"
 curlXmlNoPayload "/NGSI9/contextEntities/entity01"
 
-echo "3: ++++++++++++++++++++"
-killall contextBroker
-
 --REGEXPECT--
 0: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -109,7 +106,6 @@ Date: REGEX(.*)
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
-3: ++++++++++++++++++++
 --TEARDOWN--
 source harnessFunctions.sh
 brokerStop CB

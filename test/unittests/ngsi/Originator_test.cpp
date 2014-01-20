@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/Originator.h"
+
+#include "unittest.h"
 
 
 
@@ -39,20 +39,21 @@ TEST(Originator, check)
 {
   Originator   originator;
   std::string  checked;
-  std::string  expected1 = "OK";
-  std::string  expected2 = "OK";
-  std::string  expected3 = "OK";
+
+  utInit();
 
   checked = originator.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected1.c_str(), checked.c_str());
+  EXPECT_STREQ("OK", checked.c_str());
 
   originator.string = "String";
 
   checked = originator.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected2.c_str(), checked.c_str());
+  EXPECT_STREQ("OK", checked.c_str());
 
   checked = originator.check(RegisterContext, JSON, "", "", 0);
-  EXPECT_STREQ(expected3.c_str(), checked.c_str());
+  EXPECT_STREQ("OK", checked.c_str());
+
+  utExit();
 }
 
 
@@ -65,6 +66,8 @@ TEST(Originator, isEmptySetAndGet)
 {
   Originator   originator;
 
+  utInit();
+
   originator.string = "";
   EXPECT_TRUE(originator.isEmpty());
 
@@ -72,6 +75,8 @@ TEST(Originator, isEmptySetAndGet)
   EXPECT_FALSE(originator.isEmpty());
 
   EXPECT_STREQ("STR", originator.get().c_str());
+
+  utExit();
 }
 
 
@@ -83,21 +88,26 @@ TEST(Originator, isEmptySetAndGet)
 TEST(Originator, render)
 {
   Originator   originator;
-  std::string  rendered;
-  std::string  expected1 = "";
-  std::string  expected2 = "<originator>String</originator>\n";
-  std::string  expected3 = "\"originator\" : \"String\"\n";
+  std::string  out;
+  const char*  outfile1 = "ngsi.originator.render.middle.xml";
+  const char*  outfile2 = "ngsi.originator.render.middle.json";
 
-  rendered = originator.render(XML, "");
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  utInit();
+
+  out = originator.render(XML, "");
+  EXPECT_STREQ("", out.c_str());
 
   originator.string = "String";
 
-  rendered = originator.render(XML, "");
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  out = originator.render(XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  rendered = originator.render(JSON, "");
-  EXPECT_STREQ(expected3.c_str(), rendered.c_str());
+  out = originator.render(JSON, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -110,11 +120,15 @@ TEST(Originator, present)
 {
   Originator   originator;
 
+  utInit();
+
   originator.set("");
   originator.present("");
 
   originator.set("STR");
   originator.present("");
+
+  utExit();
 }
 
 
@@ -127,6 +141,10 @@ TEST(Originator, c_str)
 {
   Originator   originator;
 
+  utInit();
+
   originator.set("STR");
   EXPECT_STREQ("STR", originator.c_str());
+
+  utExit();
 }

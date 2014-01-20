@@ -28,6 +28,8 @@
 #include "logMsg/traceLevels.h"
 #include "ngsi/AttributeList.h"
 
+#include "unittest.h"
+
 
 
 /* ****************************************************************************
@@ -38,19 +40,29 @@ TEST(AttributeList, ok)
 {
   AttributeList  al;
   std::string    out;
+  const char*    outfile1 = "ngsi.attributeList.ok.middle.xml";
+  const char*    outfile2 = "ngsi.attributeList.ok.middle.json";
   
+  utInit();
+
   out = al.render(XML, "");
   EXPECT_STREQ("", out.c_str());
 
   al.push_back("a1");
   al.push_back("a2");
   out = al.render(XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+  
   EXPECT_STREQ("<attributeList>\n  <attribute>a1</attribute>\n  <attribute>a2</attribute>\n</attributeList>\n", out.c_str());
 
   out = al.render(JSON, "");
-  EXPECT_STREQ("\"attributeList\" : {\n  \"attribute\" : \"a1\",\n  \"attribute\" : \"a2\"\n}\n", out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   al.push_back("");
   out = al.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ("empty attribute name", out.c_str());
+
+  utExit();
 }

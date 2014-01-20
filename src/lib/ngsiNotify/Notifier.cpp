@@ -77,7 +77,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, std::string u
     std::string content_type = (format == XML ? "application/xml" : "application/json");
 
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, "POST", path, content_type, payload, false);
+    sendHttpSocket(host, port, "POST", path, content_type, payload, NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
@@ -126,7 +126,7 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
 
     /* Send the message (no wait for response, in a separated thread to avoid blocking response)*/
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, "POST", path, content_type, payload, false);
+    sendHttpSocket(host, port, "POST", path, content_type, payload, NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD

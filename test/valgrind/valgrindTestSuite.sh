@@ -70,7 +70,7 @@ function vMsg()
 #
 verbose=off
 mode=all
-filter=""
+TEST_FILTER=${TEST_FILTER:-"*"}
 dryrun=off
 leakTest=off
 
@@ -106,6 +106,28 @@ vMsg "dryrun: $dryrun"
 vMsg "leakTest: $leakTest"
 vMsg
 
+
+
+
+# -----------------------------------------------------------------------------
+#
+# SRC_TOP - getting the TOP directory
+#
+dir=$(dirname $0)
+SRC_TOP1=${PWD}/${dir}/../..   # if called with a relative path
+SRC_TOP2=${dir}/../..          # if called via $PATH or with an absolute path
+if [ -d ${SRC_TOP1} ]
+then
+  SRC_TOP=${SRC_TOP1}
+else
+  SRC_TOP=${SRC_TOP2}
+fi
+
+cd $SRC_TOP
+SRC_TOP=$(pwd)
+cd - > /dev/null
+vMsg Git repo home: $SRC_TOP
+cd test/valgrind
 
 
 
@@ -230,11 +252,18 @@ function processResult()
 #
 function printTestLinePrefix()
 {
+  if [ "$dryrun" == "off" ]
+  then
+    name="Test "
+  else
+    name=""
+  fi
+
   if [ $testNo -lt 10 ]
   then
-    testNoString=" Test 0"${testNo}"/"${noOfTests}": "
+    testNoString=" "${name}" 0"${testNo}"/"${noOfTests}": "
   else
-    testNoString="Test "${testNo}"/"${noOfTests}": "
+    testNoString=${name}${testNo}"/"${noOfTests}": "
   fi
 }
 
@@ -266,7 +295,7 @@ function setNumberOfTests()
 
   if [ "$runPure" -eq "1" ]
   then
-    for vtest in $(ls $TEST_FILTER)
+    for vtest in $(ls ${TEST_FILTER}.vtest 2> /dev/null)
     do
       noOfTests=$noOfTests+1
     done
@@ -274,7 +303,7 @@ function setNumberOfTests()
 
   if [ "$runHarness" -eq "1" ]
   then
-    for file in $(find ../testharness -name \*.test)
+    for file in $(find ../testharness -name ${TEST_FILTER}.test)
     do
       noOfTests=$noOfTests+1
     done
@@ -345,7 +374,6 @@ else
 fi
 
 date > /tmp/valgrindTestSuiteLog
-TEST_FILTER=${TEST_FILTER:-"*.vtest"}
 
 typeset -i noOfTests
 noOfTests=0
@@ -365,7 +393,7 @@ then
   then
     fileList="leakTest.xtest"
   else
-    fileList=$(ls $TEST_FILTER)
+    fileList=$(ls ${TEST_FILTER}.vtest 2> /dev/null)
   fi
 
   for vtest in $fileList
@@ -430,15 +458,13 @@ fi
 
 if [ "$runHarness" -eq "1" ]
 then
-  #FIXME P2: make TEST_FILTER work for harness case
-
   if [ "$BROKER_PORT" == "" ]
   then
     echo "$0: please source the test script (scripts/testEnv.sh)"
     exit 1
   fi
 
-  for file in $(find ../testharness -name \*.test | sort)
+  for file in $(find ../testharness -name ${TEST_FILTER}.test | sort)
   do
     htest=$(basename $file | awk -F '.' '{print $1}')
     directory=$(dirname $file)
@@ -497,5 +523,9 @@ then
 fi
 
 
-echo "Great, all valgrind tests ran without any memory leakage"
+if [ "$dryrun" == "off" ]
+then
+  echo "Great, all valgrind tests ran without any memory leakage"
+fi
+
 exit 0
