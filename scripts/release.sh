@@ -165,6 +165,7 @@ then
     git add src/app/contextBroker/version.h
     git add test/testharness/version.test
     git add test/testharness/version_via_rest.test
+    git add CHANGES_NEXT_RELEASE
     git commit -m "Step: $currentVersion -> $NEW_VERSION"
     git push origin develop
     # We do the tag only and merge to master only in the case of  non "dev" release
