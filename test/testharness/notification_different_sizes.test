@@ -29,10 +29,9 @@ dbInit CB
 brokerStart CB
 accumulatorStart
 
-# Taking into account that the notification size depends on (but it is not exaclty equal) to
-# the document size, which in sequence depends on (but it is not exactly equal) to
-# the size of the "inflated" attrribute, the third parameter has been determined
-# empirically
+# Taking into account that the notification size depends on (but is not exactly equal to)
+# the document size, which in sequence depends on (but it is not exactly equal to)
+# the size of the "inflated" attribute, the third parameter has been determined empirically
 dbInsertEntity testharness E1 1900
 dbInsertEntity testharness E2 2100
 dbInsertEntity testharness E3 810000
@@ -63,7 +62,8 @@ payload='<?xml version="1.0"?>
   </notifyConditions>
 </subscribeContextRequest>'
 curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
-echo "++++++++++++++++++++"
+echo "1: ++++++++++++++++++++"
+sleep 1
 
 # Passing the static buffer limit (~21 KB)
 payload='<?xml version="1.0"?>
@@ -86,7 +86,8 @@ payload='<?xml version="1.0"?>
   </notifyConditions>
 </subscribeContextRequest>'
 curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
-echo "++++++++++++++++++++"
+sleep 1
+echo "2: ++++++++++++++++++++"
 
 # Close to the dynamic buffer limit (~7.9 MB)
 payload='<?xml version="1.0"?>
@@ -109,7 +110,8 @@ payload='<?xml version="1.0"?>
   </notifyConditions>
 </subscribeContextRequest>'
 curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
-echo "++++++++++++++++++++"
+sleep 1
+echo "3: ++++++++++++++++++++"
 
 # Passing the dynamic buffer limit, causing an error (~8.1 MB)
 payload='<?xml version="1.0"?>
@@ -132,7 +134,7 @@ payload='<?xml version="1.0"?>
   </notifyConditions>
 </subscribeContextRequest>'
 curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
-echo "++++++++++++++++++++"
+echo "4: ++++++++++++++++++++"
 
 # The number of notifications has to be 4 (the last one was not sent)
 echo "** Notifications sent:"
@@ -140,11 +142,11 @@ curl localhost:9997/number -s -S
 
 # The log has to show exactly 1 case of static buffer usage
 echo "** Static buffer usages:"
-grep "Using static buffer to send HTTP request" /tmp/contextBrokerLog | wc -l
+grep "Sending to HTTP server: sending static message of" /tmp/contextBrokerLog | wc -l
 
 # The log has to show exactly 2 cases of dynamic buffer usage
 echo "** Dynamic buffer usages:"
-grep "Using dynamic buffer to send HTTP request" /tmp/contextBrokerLog | wc -l
+grep "Sending to HTTP server: sending dynamic message of" /tmp/contextBrokerLog | wc -l
 
 # The log has to show exactly 1 error about notification too large
 echo "** Too large errors:"
@@ -153,7 +155,7 @@ grep "HTTP request to send is too large" /tmp/contextBrokerLog | wc -l
 # Notification sizes. Note that if don't use the cut, some character in the log line prologue
 # breaks the test harness: @, :, [, ], ~, /, (, ), etc.
 echo "** Notification sizes:"
-grep "Sending to HTTP server" /tmp/contextBrokerLog | cut -c 80-
+grep "Sending to HTTP server" /tmp/contextBrokerLog | cut -c 93-
 
 --REGEXPECT--
 HTTP/1.1 200 OK
@@ -168,7 +170,7 @@ Date: REGEX(.*)
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-++++++++++++++++++++
+1: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 192
 Content-Type: application/xml
@@ -181,7 +183,7 @@ Date: REGEX(.*)
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-++++++++++++++++++++
+2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 192
 Content-Type: application/xml
@@ -194,7 +196,7 @@ Date: REGEX(.*)
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-++++++++++++++++++++
+3: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 192
 Content-Type: application/xml
@@ -207,7 +209,7 @@ Date: REGEX(.*)
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-++++++++++++++++++++
+4: ++++++++++++++++++++
 ** Notifications sent:
 3
 ** Static buffer usages:
@@ -217,9 +219,9 @@ Date: REGEX(.*)
 ** Too large errors:
 1
 ** Notification sizes:
-REGEX(.*) Sending to HTTP server 19878 bytes
-REGEX(.*) Sending to HTTP server 21878 bytes
-REGEX(.*) Sending to HTTP server 8100880 bytes
+Sending to HTTP server: sending static message of 19878 bytes to HTTP server
+Sending to HTTP server: sending dynamic message of 21878 bytes to HTTP server
+Sending to HTTP server: sending dynamic message of 8100880 bytes to HTTP server
 --TEARDOWN--
 source harnessFunctions.sh
 cp /tmp/contextBrokerLog /tmp/contextBrokerLog.notification_different_sizes

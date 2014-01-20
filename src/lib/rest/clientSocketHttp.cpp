@@ -107,10 +107,10 @@ std::string sendHttpSocket
   char         response[TAM_BUF];
   char         preContent[TAM_BUF];
   char         msgStatic[MAX_STA_MSG_SIZE];
-
-  std::string  result;
+  char*        what       = (char*) "static";
   char*        msgDynamic = NULL;
-  char*        msg = msgStatic;   // by default, use the static buffer
+  char*        msg        = msgStatic;   // by default, use the static buffer
+  std::string  result;
 
   // Preconditions check
   if (port == 0)        LM_RE("error", ("port is ZERO"));
@@ -158,6 +158,7 @@ std::string sendHttpSocket
             LM_RE("error", ("dynamic memory allocation failure"));
         }
         msg = msgDynamic;
+        what = (char*) "dynamic";
         LM_T(LmtClientOutputPayload, ("Using dynamic buffer to send HTTP request: %d bytes", neededSize));
     }
     else {                
@@ -167,7 +168,6 @@ std::string sendHttpSocket
     /* The above checking should ensure that the three parts fit, so we are using
      * sprint() instead of snprintf() */
     sprintf(msg, "%s\n%s", preContent, content.c_str());
-
   }
   else
   {
@@ -186,7 +186,7 @@ std::string sendHttpSocket
   int nb;
   int sz = strlen(msg);
 
-  LM_T(LmtClientOutputPayload, ("Sending to HTTP server %d bytes", sz));
+  LM_T(LmtClientOutputPayload, ("Sending to HTTP server: sending %s message of %d bytes to HTTP server", what, sz));
   LM_T(LmtClientOutputPayload, ("Sending to HTTP server payload:\n%s", msg));
   nb = send(fd, msg, sz, 0);
   if (msgDynamic != NULL) {
