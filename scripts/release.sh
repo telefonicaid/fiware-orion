@@ -151,6 +151,10 @@ mv /tmp/version.test           test/testharness/version.test
 mv /tmp/version.h              src/app/contextBroker/version.h
 
 
+# Clean the inter-release changes file
+rm -rf CHANGES_NEXT_RELEASE
+touch CHANGES_NEXT_RELEASE
+
 #
 # Do the git stuff only if we are in develop branch
 #
