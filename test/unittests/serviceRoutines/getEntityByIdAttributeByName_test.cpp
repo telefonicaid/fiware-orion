@@ -22,19 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/getEntityByIdAttributeByName.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "commonMocks.h"
-
-using ::testing::_;
-using ::testing::Throw;
-using ::testing::Return;
+#include "unittest.h"
 
 
 
@@ -58,19 +52,16 @@ static RestService rs[] =
 TEST(getEntityByIdAttributeByName, notFound)
 {
   ConnectionInfo ci("/ngsi9/contextEntities/entitya1/attributes/temperature",  "GET", "1.1");
-  std::string    expected = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
-
+  const char*    outfile = "ngsi9.discoverContextAvailabilityResponse.notFound.valid.xml";
   std::string    out;
 
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
+  utInit();
 
   ci.outFormat = XML;
   out          = restService(&ci, rs);
 
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  delete timerMock;
+  utExit();
 }

@@ -50,6 +50,8 @@ TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
   SubscriptionId                        subId("012345678901234567890123");
   UnsubscribeContextAvailabilityRequest ucar2(subId);
 
+  utInit();
+
   EXPECT_EQ("", ucar1.subscriptionId.get());
   EXPECT_EQ("012345678901234567890123", ucar2.subscriptionId.get());
 
@@ -68,6 +70,8 @@ TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
 
   out = ucar2.check(UnsubscribeContextAvailability, XML, "", "", 0);
   EXPECT_EQ("OK", out);
+
+  utExit();
 }
 
 
@@ -84,6 +88,8 @@ TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_xml)
   const char*     outfile = "ngsi9.unsubscribeContextAvailabilityResponse.invalidSubscriptionId2.valid.xml";
   std::string     out;
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
@@ -95,6 +101,8 @@ TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_xml)
   UnsubscribeContextAvailabilityRequest*  ucarP = &reqData.ucar.res;
   
   ucarP->release();
+
+  utExit();
 }
 
 
@@ -110,6 +118,8 @@ TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_json)
   const char*     infile  = "ngsi9.unsubscribeContextAvailabilityRequest.badSubscriptionId.invalid.json";
   const char*     outfile = "ngsi9.unsubscribeContextAvailabilityResponse.badSubscriptionId.valid.json";
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   
@@ -124,4 +134,6 @@ TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_json)
   UnsubscribeContextAvailabilityRequest*  ucarP = &reqData.ucar.res;
 
   ucarP->release();
+
+  utExit();
 }

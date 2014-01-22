@@ -1,0 +1,12 @@
+<contextElementResponse>
+  <contextElement>
+    <entityId type="" isPattern="false">
+      <id>entity11</id>
+    </entityId>
+  </contextElement>
+  <statusCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>entity11</details>
+  </statusCode>
+</contextElementResponse>

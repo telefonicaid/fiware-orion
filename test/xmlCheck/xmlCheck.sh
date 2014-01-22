@@ -350,7 +350,8 @@ xmlFilesValid=$(find $SRC_TOP/test -name "ngsi*.valid.xml" | wc -l)
 xmlFilesInvalid=$(find $SRC_TOP/test -name "ngsi*.invalid.xml" | wc -l)
 xmlFilesPostponed=$(find $SRC_TOP/test -name "ngsi*.postponed.xml" | wc -l)
 xmlFilesMiddle=$(find $SRC_TOP/test -name "ngsi*.middle.xml" | wc -l)
-xmlFilesBadName=$(expr $xmlFilesFound - $xmlFilesValid - $xmlFilesInvalid - $xmlFilesPostponed - $xmlFilesMiddle)
+xmlFilesOrion=$(find $SRC_TOP/test -name "orion.*.xml" | wc -l)
+xmlFilesBadName=$(expr $xmlFilesFound - $xmlFilesValid - $xmlFilesInvalid - $xmlFilesPostponed - $xmlFilesMiddle - $xmlFilesOrion)
 xmlFilesProcessed=0
 xmlFilesOK=0
 xmlFilesErrors=0
@@ -514,7 +515,7 @@ if [ "$xmlFilesBadName" != 0 ]
 then
   echo
   echo "WARNING: $xmlFilesBadName XML files do not conform to the naming convention"  
-  for xfile in $(find $SRC_TOP/test -name "*.xml" | grep -v "ngsi9.*.valid.xml" | grep -v "ngsi9.*.invalid.xml" | grep -v "ngsi9.*.postponed.xml" | grep -v "ngsi10.*.valid.xml" | grep -v "ngsi10.*.invalid.xml" | grep -v "ngsi10.*.postponed.xml" | grep -v "ngsi.*.xml" | grep -v "ngsi*.*.middle.xml")
+  for xfile in $(find $SRC_TOP/test -name "*.xml" | grep -v "ngsi9.*.valid.xml" | grep -v "ngsi9.*.invalid.xml" | grep -v "ngsi9.*.postponed.xml" | grep -v "ngsi10.*.valid.xml" | grep -v "ngsi10.*.invalid.xml" | grep -v "ngsi10.*.postponed.xml" | grep -v "ngsi.*.xml" | grep -v "*.*.middle.xml" | grep -v "orion.*")
   do
     echo "  o $xfile"
   done
