@@ -139,8 +139,8 @@ TEST(NotifyContextAvailabilityRequest, check)
 {
   NotifyContextAvailabilityRequest  ncr;
   std::string                       out;
-  const char*                       outfile1 = "ngsi9.notifyContextAvailabilityResponse.predetectedError.valid.json";
-  const char*                       outfile2 = "ngsi9.notifyContextAvailabilityResponse.invalidSubscriptionId.valid.json";
+  const char*                       outfile1 = "ngsi9.notifyContextAvailabilityResponse.predetectedError.valid.xml";
+  const char*                       outfile2 = "ngsi9.notifyContextAvailabilityResponse.invalidSubscriptionId.valid.xml";
 
   utInit();
 

@@ -38,8 +38,8 @@ TEST(UpdateContextResponse, constructors)
   ErrorCode              ec(SccBadRequest, "RP", "D");
   UpdateContextResponse  ucr2(ec);
   std::string            out;
-  const char*            outfile1 = "ngsi10.updateContextResponse.constructors.render1.valid.json";
-  const char*            outfile2 = "ngsi10.updateContextResponse.constructors.render2.valid.json";
+  const char*            outfile1 = "ngsi10.updateContextResponse.constructors.render1.valid.xml";
+  const char*            outfile2 = "ngsi10.updateContextResponse.constructors.render2.valid.xml";
 
   utInit();
 
