@@ -1,6 +1,6 @@
 <updateContextSubscriptionResponse>
   <subscribeError>
-    <subscriptionId>0</subscriptionId>
+    <subscriptionId>000000000000000000000000</subscriptionId>
     <errorCode>
       <code>400</code>
       <reasonPhrase>RP</reasonPhrase>

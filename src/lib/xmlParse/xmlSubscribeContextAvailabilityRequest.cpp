@@ -31,6 +31,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/wsStrip.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/Metadata.h"
@@ -84,9 +85,12 @@ static int entityIdId(xml_node<>* node, ParseData* reqDataP)
 */
 static int reference(xml_node<>* node, ParseData* reqDataP)
 {
-  LM_T(LmtParse, ("Got a reference: '%s'", node->value()));
+  std::string  ref      = node->value();
+  char*        stripped = wsStrip((char*) ref.c_str());
 
-  reqDataP->scar.res.reference.set(node->value());
+  LM_T(LmtParse, ("Got a reference: '%s'", stripped));
+
+  reqDataP->scar.res.reference.set(stripped);
   return 0;
 }
 
@@ -191,20 +195,6 @@ static int duration(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* subscriptionId - 
-*/
-static int subscriptionId(xml_node<>* node, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a subscriptionId: '%s'", node->value()));
-
-  reqDataP->scar.res.subscriptionId.set(node->value());
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
 * scarInit - 
 */
 void scarInit(ParseData* reqDataP)
@@ -282,8 +272,6 @@ XmlNode scarParseVector[] =
   { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope",            operationScope       },
   { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeType",  scopeType            },
   { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeValue", scopeValue           },
-
-  { "/subscribeContextAvailabilityRequest/subscriptionId",                              subscriptionId       },
 
   { "LAST", NULL }
 };

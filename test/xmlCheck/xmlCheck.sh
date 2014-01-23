@@ -511,16 +511,22 @@ xmlDocsPostponed=$xmlFilesPostponed+$xmlPartsPostponed
 echo "${xmlDocsPostponed} documents were not tested as they still have no XSD"
 echo "${xmlFilesMiddle} documents were not tested as they don't start the way the XSD states (middle)"
 
+
 if [ "$xmlFilesBadName" != 0 ]
 then
   echo
-  echo "WARNING: $xmlFilesBadName XML files do not conform to the naming convention"  
-  for xfile in $(find $SRC_TOP/test -name "*.xml" | grep -v "ngsi9.*.valid.xml" | grep -v "ngsi9.*.invalid.xml" | grep -v "ngsi9.*.postponed.xml" | grep -v "ngsi10.*.valid.xml" | grep -v "ngsi10.*.invalid.xml" | grep -v "ngsi10.*.postponed.xml" | grep -v "ngsi.*.xml" | grep -v "*.*.middle.xml" | grep -v "orion.*")
-  do
-    echo "  o $xfile"
-  done
+  xmlFilesBadName=$(find $SRC_TOP/test -name "*.xml" | grep -v "ngsi*.valid.xml" | grep -v "ngsi*.invalid.xml" | grep -v "ngsi*.postponed.xml" | grep -v "ngsi*.middle.xml" | grep -v "orion.*.xml" | wc -l)
+  if [ "$xmlFilesBadName" != "0" ]
+  then
+    echo "WARNING: $xmlFilesBadName XML files do not conform to the naming convention"  
+    for xfile in    $(find $SRC_TOP/test -name "*.xml" | grep -v "ngsi*.valid.xml" | grep -v "ngsi*.invalid.xml" | grep -v "ngsi*.postponed.xml" | grep -v "ngsi*.middle.xml" | grep -v "orion.*.xml")
+    do
+      echo "  o $xfile"
+    done
+  fi
   exitCode=8
 fi
+
 
 if [ "$xmlPartsUnknown" != 0 ]
 then
@@ -533,6 +539,8 @@ then
   exitCode=9
 fi
 
+
+
 # ------------------------------------------------------------------------------
 #
 # Keep?
@@ -540,6 +548,11 @@ fi
 if [ "$keep" == "off" ]
 then
   rm -rf $TMP_DIR
+fi
+
+if [ "$exitCode" != "0" ]
+then
+  echo exiting with error code $exitCode
 fi
 
 exit $exitCode

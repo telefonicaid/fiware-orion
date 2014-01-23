@@ -3,8 +3,8 @@
     <subscriptionId>000000000000000000000000</subscriptionId>
     <errorCode>
       <code>400</code>
-      <reasonPhrase>Bad Request</reasonPhrase>
-      <details>detail</details>
+      <reasonPhrase>unmatching subscriptionId URI/payload</reasonPhrase>
+      <details>111222333444555666777881</details>
     </errorCode>
   </subscribeError>
 </updateContextSubscriptionResponse>

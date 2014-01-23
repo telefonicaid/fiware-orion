@@ -22,15 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/postUnsubscribeContextAvailability.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "testDataFromFile.h"
+#include "unittest.h"
 
 
 
@@ -54,11 +52,14 @@ static RestService rs[] =
 TEST(postUnsubscribeContextAvailability, badSubscriptionId)
 {
   ConnectionInfo ci("/ngsi9/unsubscribeContextAvailability",  "POST", "1.1");
-  std::string    expected    = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>112233445566778899001234</subscriptionId>\n  <statusCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
-  const char*    fileName    = "ngsi9.unsubscribeContextAvailabilityRequest.subscriptionIdNotFound.valid.xml";
+  const char*    infile    = "ngsi9.unsubscribeContextAvailabilityRequest.subscriptionIdNotFound.valid.xml";
+  const char*    outfile   = "ngsi9.unsubscribeContextAvailabilityResponse.subscriptionIdNotFound.valid.xml";
   std::string    out;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   ci.outFormat    = XML;
   ci.inFormat     = XML;
@@ -66,5 +67,7 @@ TEST(postUnsubscribeContextAvailability, badSubscriptionId)
   ci.payloadSize  = strlen(testBuf);
   out             = restService(&ci, rs);
 
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }

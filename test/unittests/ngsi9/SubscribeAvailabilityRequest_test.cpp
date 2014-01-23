@@ -64,7 +64,7 @@
 TEST(SubscribeContextAvailabilityRequest, xml_ok)
 {
   ParseData       reqData;
-  const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.subscriptionIdNot24Chars.invalid.xml";
+  const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.ok.valid.xml";
   const char*     outfile = "ngsi9.subscribeContextAvailabilityRequest.subscriptionIdNot24Chars2.invalid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
   

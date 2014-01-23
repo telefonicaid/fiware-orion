@@ -55,17 +55,20 @@ SubscribeContextAvailabilityRequest::SubscribeContextAvailabilityRequest()
 */
 std::string SubscribeContextAvailabilityRequest::render(RequestType requestType, Format format, std::string indent)
 {
-  std::string out      = "";
-  std::string tag      = "subscribeContextAvailabilityRequest";
-  std::string indent2  = indent + "  ";
+  std::string out                      = "";
+  std::string tag                      = "subscribeContextAvailabilityRequest";
+  std::string indent2                  = indent + "  ";
+  bool        commaAfterEntityIdVector = (restrictions > 0) || !duration.isEmpty() || !reference.isEmpty() || (attributeList.size() != 0);
+  bool        commaAfterAttributeList  = (restrictions > 0) || !duration.isEmpty() || !reference.isEmpty();
+  bool        commaAfterReference      = (restrictions > 0) || !duration.isEmpty();
+  bool        commaAfterDuration       = restrictions > 0;
 
   out += startTag(indent, tag, format, false);
-  out += entityIdVector.render(format, indent2);
-  out += attributeList.render(format, indent2);
-  out += reference.render(format, indent2, true); // FIXME P9: durationRendered || restrictionRendered || subscriptionIdRendered
-  out += duration.render(format, indent2, true);  // FIXME P9: restrictionRendered || subscriptionIdRendered
+  out += entityIdVector.render(format, indent2, commaAfterEntityIdVector);
+  out += attributeList.render(format, indent2, commaAfterAttributeList);
+  out += reference.render(format, indent2, commaAfterReference); // FIXME P9: durationRendered || restrictionRendered
+  out += duration.render(format, indent2, commaAfterDuration);  // FIXME P9: restrictionRendered
   out += restriction.render(format, indent2);
-  out += subscriptionId.render(SubscribeContextAvailability, format, indent2);
   out += endTag(indent, tag, format);
 
   return out;
@@ -128,5 +131,4 @@ void SubscribeContextAvailabilityRequest::present(std::string indent)
    reference.present(indent);
    duration.present(indent);
    restriction.present(indent);   
-   subscriptionId.present(indent);
 }

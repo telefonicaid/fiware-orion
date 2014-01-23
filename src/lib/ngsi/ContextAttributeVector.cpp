@@ -31,6 +31,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/ContextAttributeVector.h"
+#include "ngsi/Request.h"
 
 
 
@@ -49,15 +50,16 @@ ContextAttributeVector::ContextAttributeVector()
 *
 * ContextAttributeVector::render - 
 */
-std::string ContextAttributeVector::render(RequestType requestType, Format format, std::string indent, bool comma)
+std::string ContextAttributeVector::render(RequestType request, Format format, std::string indent, bool comma)
 {
   std::string out      = "";
   std::string xmlTag   = "contextAttributeList";
   std::string jsonTag  = "attributes";
 
+  LM_M(("request: '%s'", requestType(request)));
   if (vec.size() == 0)
   {
-    if ((requestType == IndividualContextEntityAttribute) || (requestType == AttributeValueInstance))
+     if ((request == IndividualContextEntityAttribute) || (request == AttributeValueInstance))
       return indent + "<contextAttributeList></contextAttributeList>\n";
 
     return "";
