@@ -107,7 +107,6 @@ std::string Reference::render(Format format, std::string indent, bool comma)
   if (string == "")
     return "";
 
-  LM_M(("Reference: '%s'", string.c_str()));
   return valueTag(indent, "reference", string, format, comma);
 }
 

@@ -45,7 +45,6 @@ std::string ContextAttributeResponse::render(RequestType request, Format format,
   std::string tag = "contextAttributeResponse";
   std::string out = "";
 
-  LM_M(("requestType: %s", requestType(request)));
   out += startTag(indent, tag, format);
   out += contextAttributeVector.render(request, format, indent + "  ");
   out += statusCode.render(format, indent + "  ");

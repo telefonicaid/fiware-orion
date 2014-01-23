@@ -56,7 +56,6 @@ std::string ContextAttributeVector::render(RequestType request, Format format, s
   std::string xmlTag   = "contextAttributeList";
   std::string jsonTag  = "attributes";
 
-  LM_M(("request: '%s'", requestType(request)));
   if (vec.size() == 0)
   {
      if ((request == IndividualContextEntityAttribute) || (request == AttributeValueInstance))
