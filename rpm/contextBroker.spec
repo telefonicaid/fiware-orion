@@ -161,6 +161,19 @@ Using these interfaces, clients can do several operations:
 %files -n %{name}-fiware
 
 %changelog
+* Mon Jan 20 2014 Fermin Galan <fermin@tid.es> 0.9.1-1 (FIWARE-3.3.1-1)
+- Added:  tracelevels for input/output for notifications and registrations forwarding
+- Added:  creDate attribute now also for attributes in mongodb
+- Fixed:  race-condition in HTTP client code, affecting mainly the sending of notifications (closes issue #13)
+- Fixed:  modDate is now set for entities and attributes at creation time
+- Fixed:  added the missing comma for the ContextRegistration vector at rendering registerContextRequest
+- Fixed:  registrationId is now mandatory for registerContextResponse
+- Fixed:  correct rendering of ContextRegistrationAttribute (its metadata    XML tag    was incorrect)
+- Fixed:  duration no longer returned in response payloads if the incoming duration was invalid
+- Fixed:  better RegisterProviderRequest validity check. This fix improves the error responses for ngsi9 convenience operations
+- Fixed:  bug regarding the 'default' value of 'subscriptionId'. Before this PR, in the case of an undefined subscriptionId, the string 'No SubscriptionId' was used.
+- Fixed:  orionError responses now correctly rendered (the top-level '{' and '}' were missing)
+
 * Mon Dec 16 2013 Fermin Galan <fermin@tid.es> 0.9.0-1 (FIWARE-3.2.3-1)
 - Complete JSON support for NGSI9/10 standard operations
 - Decoupled NGSI9 and NGSI10 functionality

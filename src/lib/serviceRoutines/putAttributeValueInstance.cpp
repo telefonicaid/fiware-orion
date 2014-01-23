@@ -52,9 +52,7 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   std::string                     attributeName = compV[4];
   std::string                     valueId       = compV[5];
   UpdateContextAttributeRequest*  upcarP        = &parseDataP->upcar.res;
-  ContextAttribute*               attributeP    = new ContextAttribute(attributeName, "", "false");
   bool                            idFound       = false;
-  ContextElement*                 ceP           = new ContextElement();
 
   //
   // Any metadata ID in the payload?
@@ -78,6 +76,10 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
         idFound = true;
     }
   }
+
+
+  ContextAttribute*               attributeP    = new ContextAttribute(attributeName, "", "false");
+  ContextElement*                 ceP           = new ContextElement();
 
   // Copy the metadata vector of the input payload
   attributeP->metadataVector.fill(upcarP->metadataVector);
