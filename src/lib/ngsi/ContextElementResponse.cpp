@@ -36,14 +36,14 @@
 *
 * ContextElementResponse::render - 
 */
-std::string ContextElementResponse::render(Format format, std::string indent, bool comma)
+std::string ContextElementResponse::render(RequestType requestType, Format format, std::string indent, bool comma)
 {
   std::string xmlTag   = "contextElementResponse";
   std::string jsonTag  = "contextElement";
   std::string out      = "";
 
   out += startTag(indent, xmlTag, jsonTag, format, false, false);
-  out += contextElement.render(format, indent + "  ", true);
+  out += contextElement.render(requestType, format, indent + "  ", true);
   out += statusCode.render(format, indent + "  ", false);
   out += endTag(indent, xmlTag, format, comma, false);
 

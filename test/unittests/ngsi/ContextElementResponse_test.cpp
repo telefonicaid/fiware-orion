@@ -80,11 +80,11 @@ TEST(ContextElementResponse, render)
 
    cer.statusCode.fill(SccOk, "reason", "details");
 
-   out = cer.render(XML, "");
+   out = cer.render(UpdateContextElement, XML, "");
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
 
-   out = cer.render(JSON, "");
+   out = cer.render(UpdateContextElement, JSON, "");
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
 

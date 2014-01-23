@@ -52,7 +52,7 @@ TEST(UpdateContextElementResponse, render)
   car.contextAttributeVector.push_back(&ca);
   car.statusCode.fill(SccOk, httpStatusCodeString(SccOk), "details");
 
-  out = ucer.render(XML, "");
+  out = ucer.render(UpdateContext, XML, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }

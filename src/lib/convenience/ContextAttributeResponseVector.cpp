@@ -36,7 +36,7 @@
 *
 * ContextAttributeResponseVector::render - 
 */
-std::string ContextAttributeResponseVector::render(Format format, std::string indent)
+std::string ContextAttributeResponseVector::render(RequestType requestType, Format format, std::string indent)
 {
   std::string out = "";
   std::string tag = "contextResponseList";
@@ -46,7 +46,7 @@ std::string ContextAttributeResponseVector::render(Format format, std::string in
 
   out += startTag(indent, tag, format);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ");
+    out += vec[ix]->render(requestType, format, indent + "  ");
   out += endTag(indent, tag, format);
 
   return out;

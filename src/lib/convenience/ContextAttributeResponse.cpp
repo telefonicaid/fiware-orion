@@ -32,6 +32,7 @@
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/StatusCode.h"
 #include "convenience/ContextAttributeResponse.h"
+#include "ngsi/Request.h"
 
 
 
@@ -39,13 +40,14 @@
 *
 * render - 
 */
-std::string ContextAttributeResponse::render(Format format, std::string indent)
+std::string ContextAttributeResponse::render(RequestType request, Format format, std::string indent)
 {
   std::string tag = "contextAttributeResponse";
   std::string out = "";
 
+  LM_M(("requestType: %s", requestType(request)));
   out += startTag(indent, tag, format);
-  out += contextAttributeVector.render(format, indent + "  ");
+  out += contextAttributeVector.render(request, format, indent + "  ");
   out += statusCode.render(format, indent + "  ");
   out += endTag(indent, tag, format);
 
@@ -83,9 +85,7 @@ std::string ContextAttributeResponse::check(RequestType requestType, Format form
    else 
       return "OK";
 
-   res = render(format, indent);
-
-   return render(format, indent);
+   return render(requestType, format, indent);
 }
 
 

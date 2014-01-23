@@ -49,7 +49,7 @@ std::string AppendContextElementResponse::render(RequestType requestType, Format
   if ((errorCode.code != NO_ERROR_CODE) && (errorCode.code != SccOk))
     out += errorCode.render(format, indent + "  ");
   else
-    out += contextResponseVector.render(format, indent + "  ");
+    out += contextResponseVector.render(requestType, format, indent + "  ");
 
   out += endTag(indent, tag, format);
 

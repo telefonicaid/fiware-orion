@@ -78,11 +78,11 @@ TEST(ContextElement, Check)
   const char*  outfile2 = "ngsi.contextelement.check.middle.json";
   std::string  out;
 
-  out = ce2.render(XML, "", false);
+  out = ce2.render(UpdateContextElement, XML, "", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = ce2.render(JSON, "", false);
+  out = ce2.render(UpdateContextElement, JSON, "", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

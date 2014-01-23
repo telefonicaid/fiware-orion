@@ -73,7 +73,7 @@ TEST(ContextElementResponseVector, render)
 
   utInit();
 
-  out = cerv.render(XML, "");
+  out = cerv.render(UpdateContextElement, XML, "");
   EXPECT_STREQ("", out.c_str());
 
   cer.contextElement.entityId.id         = "ID";
@@ -82,7 +82,7 @@ TEST(ContextElementResponseVector, render)
   cer.statusCode.fill(SccOk, "reason", "details");
 
   cerv.push_back(&cer);
-  out = cerv.render(XML, "");
+  out = cerv.render(UpdateContextElement, XML, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

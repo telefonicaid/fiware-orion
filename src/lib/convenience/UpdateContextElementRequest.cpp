@@ -39,14 +39,14 @@
 *
 * render - 
 */
-std::string UpdateContextElementRequest::render(Format format, std::string indent)
+std::string UpdateContextElementRequest::render(RequestType requestType, Format format, std::string indent)
 {
   std::string tag = "updateContextElementRequest";
   std::string out = "";
 
   out += startTag(indent, tag, format);
   out += attributeDomainName.render(format, indent + "  ");
-  out += contextAttributeVector.render(format, indent + "  ");
+  out += contextAttributeVector.render(requestType, format, indent + "  ");
   out += endTag(indent, tag, format);
 
   return out;
@@ -87,7 +87,7 @@ std::string UpdateContextElementRequest::check(RequestType requestType, Format f
    else
      return "OK";
    
-   return response.render(format, indent);
+   return response.render(requestType, format, indent);
 }
 
 

@@ -42,7 +42,7 @@ typedef struct ContextAttributeVector
 
   ContextAttributeVector();
 
-  std::string        render(Format format, std::string indent, bool comma = false);
+  std::string        render(RequestType requestType, Format format, std::string indent, bool comma = false);
   std::string        check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void               present(std::string indent);
   void               push_back(ContextAttribute* item);

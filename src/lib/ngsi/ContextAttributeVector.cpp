@@ -49,14 +49,19 @@ ContextAttributeVector::ContextAttributeVector()
 *
 * ContextAttributeVector::render - 
 */
-std::string ContextAttributeVector::render(Format format, std::string indent, bool comma)
+std::string ContextAttributeVector::render(RequestType requestType, Format format, std::string indent, bool comma)
 {
   std::string out      = "";
   std::string xmlTag   = "contextAttributeList";
   std::string jsonTag  = "attributes";
 
   if (vec.size() == 0)
+  {
+    if ((requestType == IndividualContextEntityAttribute) || (requestType == AttributeValueInstance))
+      return indent + "<contextAttributeList></contextAttributeList>\n";
+
     return "";
+  }
 
   out += startTag(indent, xmlTag, jsonTag, format, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)

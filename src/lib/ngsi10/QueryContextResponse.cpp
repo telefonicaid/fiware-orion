@@ -83,7 +83,7 @@ std::string QueryContextResponse::render(RequestType requestType, Format format,
       out += errorCode.render(format, indent + "  ");
     }
     else 
-      out += contextElementResponseVector.render(format, indent + "  ");
+      out += contextElementResponseVector.render(QueryContext, format, indent + "  ");
   }
   else
      out += errorCode.render(format, indent + "  ");
