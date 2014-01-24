@@ -22,9 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
 #include "logMsg/logMsg.h"
+
 #include "rest/OrionError.h"
+
+#include "unittest.h"
+
 
 
 /* ****************************************************************************
@@ -41,14 +44,14 @@ TEST(OrionError, all)
   OrionError    e3(sc);
   OrionError    e4(SccOk, "Good Request");
   std::string   out;
-  std::string   expected1     = "<orionError>\n  <code>200</code>\n  <reasonPhrase>Good Request</reasonPhrase>\n  <details>no details 3</details>\n</orionError>\n";
-  std::string   expected2     = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad Request</reasonPhrase>\n  <details>no details</details>\n</orionError>\n";
-  std::string   expected3     = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad Request 2</reasonPhrase>\n  <details>no details 2</details>\n</orionError>\n";
-  std::string   expected4     = "<orionError>\n  <code>200</code>\n  <reasonPhrase>Good Request</reasonPhrase>\n</orionError>\n";
-  std::string   expected1json = "{\n  \"orionError\" : {\n    \"code\" : \"200\",\n    \"reasonPhrase\" : \"Good Request\",\n    \"details\" : \"no details 3\"\n  }\n}\n";
-  std::string   expected2json = "{\n  \"orionError\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"Bad Request\",\n    \"details\" : \"no details\"\n  }\n}\n";
-  std::string   expected3json = "{\n  \"orionError\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"Bad Request 2\",\n    \"details\" : \"no details 2\"\n  }\n}\n";
-  std::string   expected4json = "{\n  \"orionError\" : {\n    \"code\" : \"200\",\n    \"reasonPhrase\" : \"Good Request\"\n  }\n}\n";
+  const char*   outfile1 = "orion.orionError.all1.valid.xml";
+  const char*   outfile2 = "orion.orionError.all1.valid.json";
+  const char*   outfile3 = "orion.orionError.all2.valid.xml";
+  const char*   outfile4 = "orion.orionError.all2.valid.json";
+  const char*   outfile5 = "orion.orionError.all3.valid.xml";
+  const char*   outfile6 = "orion.orionError.all3.valid.json";
+  const char*   outfile7 = "orion.orionError.all4.valid.xml";
+  const char*   outfile8 = "orion.orionError.all4.valid.json";
 
   EXPECT_EQ(SccNone, e0.code);
   EXPECT_EQ("",      e0.reasonPhrase);
@@ -71,26 +74,34 @@ TEST(OrionError, all)
   EXPECT_EQ("",             e4.details);
 
   out = e1.render(XML, "");
-  EXPECT_EQ(expected1, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = e2.render(XML, "");
-  EXPECT_EQ(expected2, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = e3.render(XML, "");
-  EXPECT_EQ(expected3, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile5)) << "Error getting test data from '" << outfile5 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = e4.render(XML, "");
-  EXPECT_EQ(expected4, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile7)) << "Error getting test data from '" << outfile7 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = e1.render(JSON, "");
-  EXPECT_EQ(expected1json, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = e2.render(JSON, "");
-  EXPECT_EQ(expected2json, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = e3.render(JSON, "");
-  EXPECT_EQ(expected3json, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile6)) << "Error getting test data from '" << outfile6 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = e4.render(JSON, "");
-  EXPECT_EQ(expected4json, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile8)) << "Error getting test data from '" << outfile8 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }

@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 
 #include "common/globals.h"
@@ -32,12 +30,7 @@
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "testDataFromFile.h"
-
-#include "commonMocks.h"
-
-using ::testing::Throw;
-using ::testing::Return;
+#include "unittest.h"
 
 
 
@@ -61,16 +54,14 @@ static RestService rs[] =
 TEST(postIndividualContextEntity, ok)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity11",  "POST", "1.1");  
-  std::string    expected      = "<appendContextElementResponse>\n  <contextResponseList>\n    <contextAttributeResponse>\n      <contextAttributeList>\n        <contextAttribute>\n          <name>pressure</name>\n          <type>clima</type>\n          <contextValue></contextValue>\n        </contextAttribute>\n      </contextAttributeList>\n      <statusCode>\n        <code>200</code>\n        <reasonPhrase>OK</reasonPhrase>\n      </statusCode>\n    </contextAttributeResponse>\n  </contextResponseList>\n</appendContextElementResponse>\n";
-  const char*    fileName      = "ngsi10.appendContextElementRequest.ok.valid.xml";
+  const char*    outfile = "ngsi10.appendContextElementResponse.postIndividualContextEntity.valid.xml";
+  const char*    infile      = "ngsi10.appendContextElementRequest.ok.valid.xml";
   std::string    out;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  utInit();
 
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   ci.outFormat    = XML;
   ci.inFormat     = XML;
@@ -78,8 +69,7 @@ TEST(postIndividualContextEntity, ok)
   ci.payloadSize  = strlen(testBuf);
   out             = restService(&ci, rs);
 
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  delete timerMock;
-  setTimer(NULL);
+  utExit();
 }

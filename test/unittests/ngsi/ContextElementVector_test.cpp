@@ -43,13 +43,13 @@ TEST(ContextElementVector, render)
   ContextElementVector  ceV;
   const char*           outfile = "ngsi.contextElementVector.render.middle.xml";
 
-  rendered = ceV.render(XML, "", false);
+  rendered = ceV.render(UpdateContextElement, XML, "", false);
   EXPECT_STREQ("", rendered.c_str());
 
   ceP->entityId = eId;
   ceV.push_back(ceP);
 
-  rendered = ceV.render(XML, "", false);
+  rendered = ceV.render(UpdateContextElement, XML, "", false);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 

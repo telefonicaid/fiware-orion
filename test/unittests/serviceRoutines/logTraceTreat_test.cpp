@@ -22,11 +22,11 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "serviceRoutines/logTraceTreat.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
+
+#include "unittest.h"
 
 
 
@@ -55,15 +55,19 @@ static RestService rs[] =
 TEST(logTraceTreat, get)
 {
   ConnectionInfo ci("/log/traceLevel",  "GET", "1.1");
-  std::string    expected  = "<orion>\n  <log>\n    <tracelevels>empty</tracelevels>\n  </log>\n</orion>\n";
+  const char*    outfile = "orion.logTrace.empty.valid.xml";
   std::string    out;
+
+  utInit();
 
   lmTraceSet(NULL);
 
   ci.outFormat = XML;
   out          = restService(&ci, rs);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  utExit();
 }
 
 
@@ -74,25 +78,32 @@ TEST(logTraceTreat, get)
 */
 TEST(logTraceTreat, put)
 {
-  ConnectionInfo ci1("/log/traceLevel/0-19,21-200",  "PUT", "1.1");
-  ConnectionInfo ci2("/log/traceLevel/aaa",  "PUT", "1.1");
-  ConnectionInfo ci3("/log/traceLevel",  "GET", "1.1");
-  std::string    expected1  = "<orion>\n  <log>\n    <tracelevels>0-19,21-200</tracelevels>\n  </log>\n</orion>\n";
-  std::string    expected2  = "<orion>\n  <log>\n    <tracelevels>poorly formatted trace level string</tracelevels>\n  </log>\n</orion>\n";
-  std::string    expected3  = "<orion>\n  <log>\n    <tracelevels>0-19, 21-200</tracelevels>\n  </log>\n</orion>\n";
-  std::string    out;
+  ConnectionInfo  ci1("/log/traceLevel/0-19,21-200",  "PUT", "1.1");
+  ConnectionInfo  ci2("/log/traceLevel/aaa",  "PUT", "1.1");
+  ConnectionInfo  ci3("/log/traceLevel",  "GET", "1.1");
+  const char*     outfile1 = "orion.logTrace.spanOfLevels.valid.xml";
+  const char*     outfile2 = "orion.logTrace.invalidLevels.valid.xml";
+  const char*     outfile3 = "orion.logTrace.get.valid.xml";
+  std::string     out;
+
+  utInit();
 
   ci1.outFormat = XML;
   out          = restService(&ci1, rs);
-  EXPECT_STREQ(expected1.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci2.outFormat = XML;
   out          = restService(&ci2, rs);
-  EXPECT_STREQ(expected2.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci3.outFormat = XML;
   out          = restService(&ci3, rs);
-  EXPECT_STREQ(expected3.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -103,14 +114,18 @@ TEST(logTraceTreat, put)
 */
 TEST(logTraceTreat, post)
 {
-  ConnectionInfo ci("/log/traceLevel/20",  "POST", "1.1");
-  std::string    expected  = "<orion>\n  <log>\n    <bad URL/Verb>POST log/traceLevel/20</bad URL/Verb>\n  </log>\n</orion>\n";
-  std::string    out;
+  ConnectionInfo  ci("/log/traceLevel/20",  "POST", "1.1");
+  const char*     outfile = "orion.logTrace.post20.valid.xml";
+  std::string     out;
+
+  utInit();
 
   ci.outFormat = XML;
   out          = restService(&ci, rs);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  utExit();
 }
 
 
@@ -121,25 +136,39 @@ TEST(logTraceTreat, post)
 */
 TEST(logTraceTreat, deleteIndividual)
 {
-  ConnectionInfo ci1("/log/traceLevel/161",  "DELETE", "1.1");
-  ConnectionInfo ci2("/log/traceLevel/aaa",  "DELETE", "1.1");
-  ConnectionInfo ci3("/log/traceLevel",  "GET", "1.1");
-  std::string    expected1  = "<orion>\n  <log>\n    <tracelevels removed>161</tracelevels removed>\n  </log>\n</orion>\n";
-  std::string    expected2  = "<orion>\n  <log>\n    <tracelevels>poorly formatted trace level string</tracelevels>\n  </log>\n</orion>\n";
-  std::string    expected3  = "<orion>\n  <log>\n    <tracelevels>0-19, 21-160, 162-200</tracelevels>\n  </log>\n</orion>\n";
-  std::string    out;
+  ConnectionInfo  ci0("/log/traceLevel/0-255",  "PUT",  "1.1");
+  ConnectionInfo  ci1("/log/traceLevel/161",  "DELETE", "1.1");
+  ConnectionInfo  ci2("/log/traceLevel/aaa",  "DELETE", "1.1");
+  ConnectionInfo  ci3("/log/traceLevel",  "GET", "1.1");
+  const char*     outfile0 = "orion.logTrace.allLevelsSet.valid.xml";
+  const char*     outfile1 = "orion.logTrace.deleteOk.valid.xml";
+  const char*     outfile2 = "orion.logTrace.invalidDelete.valid.xml";
+  const char*     outfile3 = "orion.logTrace.deleteIndividual4.valid.xml";
+  std::string     out;
+
+  utInit();
+
+  ci1.outFormat = XML;
+  out          = restService(&ci0, rs);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile0)) << "Error getting test data from '" << outfile0 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci1.outFormat = XML;
   out          = restService(&ci1, rs);
-  EXPECT_STREQ(expected1.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci2.outFormat = XML;
   out          = restService(&ci2, rs);
-  EXPECT_STREQ(expected2.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci3.outFormat = XML;
   out          = restService(&ci3, rs);
-  EXPECT_STREQ(expected3.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -152,15 +181,21 @@ TEST(logTraceTreat, deleteAll)
 {
   ConnectionInfo ci1("/log/traceLevel",  "DELETE", "1.1");
   ConnectionInfo ci2("/log/traceLevel",  "GET", "1.1");
-  std::string    expected1  = "<orion>\n  <log>\n    <tracelevels>all trace levels off</tracelevels>\n  </log>\n</orion>\n";
-  std::string    expected2  = "<orion>\n  <log>\n    <tracelevels>empty</tracelevels>\n  </log>\n</orion>\n";
+  const char*    outfile1 = "orion.logTrace.allLevelsOff.valid.xml";
+  const char*    outfile2 = "orion.logTrace.empty.valid.xml";
   std::string    out;
+
+  utInit();
 
   ci1.outFormat = XML;
   out           = restService(&ci1, rs);
-  EXPECT_STREQ(expected1.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci2.outFormat = XML;
   out           = restService(&ci2, rs);
-  EXPECT_STREQ(expected2.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }

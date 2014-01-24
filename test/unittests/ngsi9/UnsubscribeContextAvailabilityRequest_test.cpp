@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -38,6 +36,8 @@
 #include "ngsi/SubscriptionId.h"
 #include "ngsi9/UnsubscribeContextAvailabilityRequest.h"
 
+#include "unittest.h"
+
 
 
 /* ****************************************************************************
@@ -50,23 +50,28 @@ TEST(UnsubscribeContextAvailabilityRequest, constructorAndCheck)
   SubscriptionId                        subId("012345678901234567890123");
   UnsubscribeContextAvailabilityRequest ucar2(subId);
 
+  utInit();
+
   EXPECT_EQ("", ucar1.subscriptionId.get());
   EXPECT_EQ("012345678901234567890123", ucar2.subscriptionId.get());
 
   std::string   out;
-  std::string   expected1 = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>000000000000000000000000</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>Forced Error</reasonPhrase>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
-  std::string   expected2 = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>1</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>bad length (24 chars expected)</reasonPhrase>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
-  std::string   expected3 = "OK";
+  const char*   outfile1 = "ngsi9.unsubscribeContextAvailabilityResponse.forcedError.valid.xml";
+  const char*   outfile2 = "ngsi9.unsubscribeContextAvailabilityResponse.invalidSubscriptionId.valid.xml";
 
   out = ucar1.check(UnsubscribeContextAvailability, XML, "", "Forced Error", 0);
-  EXPECT_EQ(expected1, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucar1.subscriptionId.set("1");
   out = ucar1.check(UnsubscribeContextAvailability, XML, "", "", 0);
-  EXPECT_EQ(expected2, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = ucar2.check(UnsubscribeContextAvailability, XML, "", "", 0);
-  EXPECT_EQ(expected3, out);
+  EXPECT_EQ("OK", out);
+
+  utExit();
 }
 
 
@@ -79,21 +84,25 @@ TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi9.unsubscribeContextAvailabilityRequest.subscriptionId.invalid.xml";
-  std::string     rendered;
-  std::string     expected = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>12345</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>bad length (24 chars expected)</reasonPhrase>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
+  const char*     infile  = "ngsi9.unsubscribeContextAvailabilityRequest.subscriptionId.invalid.xml";
+  const char*     outfile = "ngsi9.unsubscribeContextAvailabilityResponse.invalidSubscriptionId2.valid.xml";
+  std::string     out;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   lmTraceLevelSet(LmtDump, true);
-  std::string result = xmlTreat(testBuf, &ci, &reqData, UnsubscribeContextAvailability, "unsubscribeContextAvailabilityRequest", NULL);
+  out = xmlTreat(testBuf, &ci, &reqData, UnsubscribeContextAvailability, "unsubscribeContextAvailabilityRequest", NULL);
   lmTraceLevelSet(LmtDump, false);
-
-  EXPECT_STREQ(expected.c_str(), result.c_str());
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   UnsubscribeContextAvailabilityRequest*  ucarP = &reqData.ucar.res;
   
   ucarP->release();
+
+  utExit();
 }
 
 
@@ -106,20 +115,25 @@ TEST(UnsubscribeContextAvailabilityRequest, badSubscriptionId_json)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "unsubscribeContextAvailabilityRequest_badSubscriptionId.json";
-  std::string     expected = "{\n  \"subscriptionId\" : \"12345\",\n  \"statusCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"bad length (24 chars expected)\"\n  }\n}\n";
+  const char*     infile  = "ngsi9.unsubscribeContextAvailabilityRequest.badSubscriptionId.invalid.json";
+  const char*     outfile = "ngsi9.unsubscribeContextAvailabilityResponse.badSubscriptionId.valid.json";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
   lmTraceLevelSet(LmtDump, true);
-  std::string result = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContextAvailability, "unsubscribeContextAvailabilityRequest", NULL);
-  EXPECT_EQ(expected, result);
+  std::string out = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContextAvailability, "unsubscribeContextAvailabilityRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   lmTraceLevelSet(LmtDump, false);
 
   UnsubscribeContextAvailabilityRequest*  ucarP = &reqData.ucar.res;
 
   ucarP->release();
+
+  utExit();
 }

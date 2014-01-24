@@ -51,7 +51,7 @@ TEST(AppendContextElementRequest, render)
    acer.attributeDomainName.set("ADN");
    acer.contextAttributeVector.push_back(&ca);
    
-   out = acer.render(XML, "");
+   out = acer.render(UpdateContext, XML, "");
 
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());

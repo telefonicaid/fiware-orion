@@ -50,14 +50,14 @@ TEST(ContextAttributeResponseVector, render)
 
   // 1. empty vector
   car.statusCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), "Empty Vector");
-  out = carV.render(XML, "");
+  out = carV.render(ContextEntityAttributes, XML, "");
   EXPECT_STREQ("", out.c_str());
 
   // 2. normal case
   car.contextAttributeVector.push_back(&ca);
   carV.push_back(&car);
 
-  out = carV.render(XML, "");
+  out = carV.render(ContextEntityAttributes, XML, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }

@@ -1,0 +1,8 @@
+<contextAttributeResponse>
+  <contextAttributeList></contextAttributeList>
+  <statusCode>
+    <code>404</code>
+    <reasonPhrase>The ContextElement requested is not found</reasonPhrase>
+    <details>E1-A1</details>
+  </statusCode>
+</contextAttributeResponse>

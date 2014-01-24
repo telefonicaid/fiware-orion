@@ -146,19 +146,19 @@ TEST(NotifyContextRequest, json_badIsPattern)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     infile = "notifyContextRequest_badIsPattern.json";
+  const char*     infile   = "ngsi10.notifyContextRequest.badIsPattern.invalid.json";
+  const char*     outfile  = "ngsi10.notifyContextResponse.badIsPattern.valid.json";
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
-  std::string result   = jsonTreat(testBuf, &ci, &reqData, NotifyContext, "notifyContextRequest", NULL);
-  std::string expected = "{\n  \"responseCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"bad value for 'isPattern'\"\n  }\n}\n";
-
-  EXPECT_EQ(expected, result);
+  std::string out = jsonTreat(testBuf, &ci, &reqData, NotifyContext, "notifyContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }
@@ -173,15 +173,16 @@ TEST(NotifyContextRequest, xml_invalidEntityIdAttribute)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     infile = "ngsi10.notifyContextRequest.entityIdAttribute.invalid.xml";
-  std::string     expected = "<notifyContextResponse>\n  <responseCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </responseCode>\n</notifyContextResponse>\n";
+  const char*     infile  = "ngsi10.notifyContextRequest.entityIdAttribute.invalid.xml";
+  const char*     outfile = "ngsi10.notifyContextResponse.entityIdAttribute.valid.xml";
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  std::string result = xmlTreat(testBuf, &ci, &reqData, NotifyContext, "notifyContextRequest", NULL);
-  EXPECT_EQ(expected, result);
+  std::string out = xmlTreat(testBuf, &ci, &reqData, NotifyContext, "notifyContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }
@@ -195,13 +196,14 @@ TEST(NotifyContextRequest, xml_invalidEntityIdAttribute)
 TEST(NotifyContextRequest, predetectedError)
 {
   NotifyContextRequest ncr;
-  std::string          expected = "<notifyContextResponse>\n  <responseCode>\n    <code>400</code>\n    <reasonPhrase>predetected error</reasonPhrase>\n  </responseCode>\n</notifyContextResponse>\n";
+  const char*          outfile = "ngsi10.notifyContextResponse.predetectedError.valid.xml";
   std::string          out;
 
   utInit();
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   out = ncr.check(NotifyContext, XML, "", "predetected error", 0);
-  EXPECT_EQ(expected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

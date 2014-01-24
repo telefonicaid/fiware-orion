@@ -229,14 +229,14 @@ Date: REGEX(.*)
 </subscribeContextResponse>
 8: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 365
+Content-Length: 388
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <updateContextSubscriptionResponse>
   <subscribeError>
-    <subscriptionId>0</subscriptionId>
+    <subscriptionId>000000000000000000000000</subscriptionId>
     <errorCode>
       <code>400</code>
       <reasonPhrase>Invalid payload</reasonPhrase>
@@ -297,5 +297,5 @@ Date: REGEX(.*)
 </orionError>
 13: ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
+source ../harnessFunctions.sh
 brokerStop CB

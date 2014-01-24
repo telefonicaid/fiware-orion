@@ -129,6 +129,7 @@ echo "9: ++++++++++++++++++++"
 1: ++++++++++++++++++++
 <?xml version="1.0"?>
 <contextAttributeResponse>
+  <contextAttributeList/>
   <statusCode>
     <code>404</code>
     <reasonPhrase>The ContextElement requested is not found</reasonPhrase>
@@ -218,6 +219,7 @@ Date: REGEX(.*)
 9: ++++++++++++++++++++
 <?xml version="1.0"?>
 <contextAttributeResponse>
+  <contextAttributeList/>
   <statusCode>
     <code>404</code>
     <reasonPhrase>The ContextElement requested is not found</reasonPhrase>

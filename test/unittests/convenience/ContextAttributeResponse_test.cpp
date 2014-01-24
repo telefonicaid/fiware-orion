@@ -49,7 +49,7 @@ TEST(ContextAttributeResponse, render)
   car.contextAttributeVector.push_back(&ca);
   car.statusCode.fill(SccOk, "OK"); 
 
-  out = car.render(XML, "");
+  out = car.render(ContextEntityAttributes, XML, "");
 
   utExit();
 }

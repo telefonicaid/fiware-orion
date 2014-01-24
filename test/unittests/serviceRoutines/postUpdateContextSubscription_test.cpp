@@ -22,15 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/postUpdateContextSubscription.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "testDataFromFile.h"
+#include "unittest.h"
 
 
 
@@ -54,12 +52,14 @@ static RestService rs[] =
 TEST(postUpdateContextSubscription, notFound)
 {
   ConnectionInfo ci("/ngsi10/updateContextSubscription",  "POST", "1.1");
-  std::string    expected    = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <subscriptionId>111222333444555666777888</subscriptionId>\n    <errorCode>\n      <code>404</code>\n      <reasonPhrase>No context element found</reasonPhrase>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
-
-  const char*    fileName    = "ngsi10.updateContextSubscriptionRequest.subscriptionNotFound.valid.xml";
+  const char*    infile    = "ngsi10.updateContextSubscriptionRequest.subscriptionNotFound.valid.xml";
+  const char*    outfile   = "ngsi10.updateContextSubscriptionResponse.subscriptionNotFound.valid.xml";
   std::string    out;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   ci.outFormat    = XML;
   ci.inFormat     = XML;
@@ -67,5 +67,7 @@ TEST(postUpdateContextSubscription, notFound)
   ci.payloadSize  = strlen(testBuf);
   out             = restService(&ci, rs);
 
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }

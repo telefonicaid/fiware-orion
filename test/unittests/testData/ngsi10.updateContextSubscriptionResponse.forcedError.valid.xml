@@ -1,0 +1,9 @@
+<updateContextSubscriptionResponse>
+  <subscribeError>
+    <subscriptionId>12345</subscriptionId>
+    <errorCode>
+      <code>400</code>
+      <reasonPhrase>FORCED ERROR</reasonPhrase>
+    </errorCode>
+  </subscribeError>
+</updateContextSubscriptionResponse>

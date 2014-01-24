@@ -1,0 +1,8 @@
+<unsubscribeContextResponse>
+  <subscriptionId>000000000000000000000000</subscriptionId>
+  <statusCode>
+    <code>400</code>
+    <reasonPhrase>Invalid Subscription Id: bad length (24 chars expected)</reasonPhrase>
+    <details>12345D</details>
+  </statusCode>
+</unsubscribeContextResponse>

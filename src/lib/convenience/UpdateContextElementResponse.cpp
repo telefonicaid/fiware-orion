@@ -37,7 +37,7 @@
 *
 * render - 
 */
-std::string UpdateContextElementResponse::render(Format format, std::string indent)
+std::string UpdateContextElementResponse::render(RequestType requestType, Format format, std::string indent)
 {
    std::string tag = "updateContextElementResponse";
    std::string out = "";
@@ -47,7 +47,7 @@ std::string UpdateContextElementResponse::render(Format format, std::string inde
    if ((errorCode.code != NO_ERROR_CODE) && (errorCode.code != SccOk))
      out += errorCode.render(format, indent + "  ");
    else
-     out += contextResponseVector.render(format, indent + "  ");
+     out += contextResponseVector.render(requestType, format, indent + "  ");
 
    out += endTag(indent, tag, format);
 
@@ -71,7 +71,7 @@ std::string UpdateContextElementResponse::check(RequestType requestType, Format 
   else
     return "OK";
 
-  return render(format, indent);
+  return render(requestType, format, indent);
 }
 
 

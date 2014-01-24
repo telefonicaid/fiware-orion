@@ -1,0 +1,11 @@
+<updateContextElementResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <statusCode>
+        <code>404</code>
+        <reasonPhrase>No context element found</reasonPhrase>
+        <details>entity101</details>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</updateContextElementResponse>

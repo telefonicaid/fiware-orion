@@ -37,7 +37,7 @@
 *
 * ContextElement::render - 
 */
-std::string ContextElement::render(Format format, std::string indent, bool comma)
+std::string ContextElement::render(RequestType requestType, Format format, std::string indent, bool comma)
 {
   std::string  out                              = "";
   std::string  xmlTag                           = "contextElement";
@@ -55,7 +55,7 @@ std::string ContextElement::render(Format format, std::string indent, bool comma
 
   out += entityId.render(format,               indent + "  ", commaAfterEntityId, false);
   out += attributeDomainName.render(format,    indent + "  ", commaAfterAttributeDomainName);
-  out += contextAttributeVector.render(format, indent + "  ", commaAfterContextAttributeVector);
+  out += contextAttributeVector.render(requestType, format, indent + "  ", commaAfterContextAttributeVector);
   out += domainMetadataVector.render(format,   indent + "  ", commaAfterDomainMetadataVector);
 
   out += endTag(indent, xmlTag, format, comma, false);

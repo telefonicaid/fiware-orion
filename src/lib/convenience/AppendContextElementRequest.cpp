@@ -49,14 +49,14 @@ AppendContextElementRequest::AppendContextElementRequest()
 *
 * render - 
 */
-std::string AppendContextElementRequest::render(Format format, std::string indent)
+std::string AppendContextElementRequest::render(RequestType requestType, Format format, std::string indent)
 {
   std::string tag = "appendContextElementRequest";
   std::string out = "";
 
   out += startTag(indent, tag, format);
   out += attributeDomainName.render(format, indent + "  ");
-  out += contextAttributeVector.render(format, indent + "  ");
+  out += contextAttributeVector.render(requestType, format, indent + "  ");
   out += domainMetadataVector.render(format, indent + "  ");
   out += endTag(indent, tag, format);
 

@@ -44,11 +44,11 @@ TEST(ContextAttributeVector, render)
 
   utInit();
 
-  out = cav.render(XML, "");
+  out = cav.render(UpdateContextAttribute, XML, "");
   EXPECT_STREQ("", out.c_str());
 
   cav.push_back(&ca);
-  out = cav.render(XML, "");
+  out = cav.render(UpdateContextAttribute, XML, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

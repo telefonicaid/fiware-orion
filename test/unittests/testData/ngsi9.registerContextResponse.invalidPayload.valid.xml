@@ -1,0 +1,8 @@
+<registerContextResponse>
+  <registrationId>0</registrationId>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Invalid payload</reasonPhrase>
+    <details>Expected 'discovery' payload, got 'registerContextRequest'</details>
+  </errorCode>
+</registerContextResponse>

@@ -70,5 +70,5 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   }
 
   request.release();
-  return car.render(ciP->outFormat, "");
+  return car.render(AttributeValueInstance, ciP->outFormat, "");
 }

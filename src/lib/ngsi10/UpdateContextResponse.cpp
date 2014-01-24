@@ -92,7 +92,7 @@ std::string UpdateContextResponse::render(RequestType requestType, Format format
       out += errorCode.render(format, indent + "  ");
     }
     else
-      out += contextElementResponseVector.render(format, indent + "  ");
+      out += contextElementResponseVector.render(UpdateContext, format, indent + "  ");
   }
   
   out += endTag(indent, tag, format);

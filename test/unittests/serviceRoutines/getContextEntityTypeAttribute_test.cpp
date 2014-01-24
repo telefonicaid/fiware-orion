@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/postRegisterContext.h"
@@ -33,13 +31,7 @@
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "testDataFromFile.h"
-#include "testInit.h"
-#include "commonMocks.h"
-
-using ::testing::_;
-using ::testing::Throw;
-using ::testing::Return;
+#include "unittest.h"
 
 
 
@@ -66,22 +58,17 @@ static RestService rs[] =
 TEST(getContextEntityTypeAttribute, nothingFound)
 {
   ConnectionInfo ci("/ngsi9/contextEntityTypes/TYPE_123/attributes/temperature",  "GET", "1.1");
-  std::string    expected = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
-
+  const char*    outfile = "ngsi9.discoverContextAvailabilityResponse.notFound.valid.xml";
   std::string    out;
 
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  setupDatabase();
+  utInit();
 
   ci.outFormat = XML;
   out          = restService(&ci, rs);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_STREQ(expected.c_str(), out.c_str());
-
-  delete timerMock;
+  utExit();
 }
 
 
@@ -95,21 +82,14 @@ TEST(getContextEntityTypeAttribute, somethingFound)
   ConnectionInfo ci1("/ngsi9/registerContext",                                 "POST", "1.1");
   ConnectionInfo ci2("/ngsi9/contextEntityTypes/Room/attributes/temperature",  "GET",  "1.1");
   const char*    registerXmlFile = "ngsi9.registerContextRequest.ok.valid.xml";
-  std::string    expectedStart   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <registrationId>";
-  std::string    expected2       = "<discoverContextAvailabilityResponse>\n  <contextRegistrationResponseList>\n    <contextRegistrationResponse>\n      <contextRegistration>\n        <entityIdList>\n          <entityId type=\"Room\" isPattern=\"false\">\n            <id>ConferenceRoom</id>\n          </entityId>\n          <entityId type=\"Room\" isPattern=\"false\">\n            <id>OfficeRoom</id>\n          </entityId>\n        </entityIdList>\n        <contextRegistrationAttributeList>\n          <contextRegistrationAttribute>\n            <name>temperature</name>\n            <type>degree</type>\n            <isDomain>false</isDomain>\n          </contextRegistrationAttribute>\n        </contextRegistrationAttributeList>\n        <providingApplication>http://localhost:1028/application</providingApplication>\n      </contextRegistration>\n    </contextRegistrationResponse>\n  </contextRegistrationResponseList>\n</discoverContextAvailabilityResponse>\n";
-
+  const char*    outfile1        = "ngsi9.registerContextResponse.ok.middle.xml";
+  const char*    outfile2        = "ngsi9.discoverContextAvailabilityResponse.ok.valid.xml";
   std::string    out;
 
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
+  utInit();
   // Avoid forwarding of messages
   extern int fwdPort;
   int saved = fwdPort;
-
-  setupDatabase();
-
 
   //
   // 1. Register entities so we have something to find:
@@ -123,11 +103,18 @@ TEST(getContextEntityTypeAttribute, somethingFound)
   ci1.payload      = testBuf;
   ci1.payloadSize  = strlen(testBuf);
   out              = restService(&ci1, rs);
-  LM_M(("OUT: '%s'", out.c_str()));
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
 
   char* outStart  = (char*) out.c_str();
-  outStart[expectedStart.length()] = 0;
-  EXPECT_EQ(expectedStart, outStart);
+
+  // Remove last char in expectedBuf
+  expectedBuf[strlen(expectedBuf) - 1] = 0;
+
+  // Shorten 'out' to be of same length as expectedBuf
+  outStart[strlen(expectedBuf)]    = 0;
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
 
   //
   // Now discover
@@ -135,10 +122,11 @@ TEST(getContextEntityTypeAttribute, somethingFound)
   ci2.outFormat = XML;
   out           = restService(&ci2, rs);
 
-  EXPECT_EQ(expected2, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Putting old value back
   fwdPort = saved;
 
-  delete timerMock;
+  utExit();
 }

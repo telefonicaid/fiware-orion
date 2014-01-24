@@ -1,0 +1,6 @@
+<queryContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Empty value in restriction scope</reasonPhrase>
+  </errorCode>
+</queryContextResponse>

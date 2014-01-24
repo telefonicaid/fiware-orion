@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/getNgsi10ContextEntityTypes.h"
@@ -31,7 +29,7 @@
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "testInit.h"
+#include "unittest.h"
 
 
 
@@ -56,13 +54,16 @@ static RestService rs[] =
 TEST(getNgsi10ContextEntityTypes, notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntityTypes/entity11",  "GET", "1.1");
-  std::string    expected = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  const char*    outfile = "ngsi10.queryContextResponse.getNgsi10ContextEntityTypes.valid.xml";
   std::string    out;
 
-  setupDatabase();
+  utInit();
 
   ci.outFormat = XML;
   out          = restService(&ci, rs);
 
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
