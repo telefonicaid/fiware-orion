@@ -42,7 +42,7 @@ TEST(UnsubscribeContextResponse, constructorsAndRender)
   ErrorCode                   ec(SccBadRequest, "RP", "D");
   UnsubscribeContextResponse  uncr3(ec);
   std::string                 out;
-  const char*                 outfile = "ngsi10.unsubscribeContextResponse.constructorsAndRender.ok,valid.xml";
+  const char*                 outfile = "ngsi10.unsubscribeContextResponse.constructorsAndRender.ok.valid.xml";
 
   utInit();
 
