@@ -86,8 +86,6 @@ TEST(UpdateContextRequest, ok_xml)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2;
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  // Cannot use UpdateContext here ... [ UpdateActionType.cpp: if (requestType == UpdateContext)
-  // FIXME P2: this is just to make harness test work ]
   upcrP->updateActionType.set("invalid");
   out  = upcrP->check(RegisterContext, XML, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3;

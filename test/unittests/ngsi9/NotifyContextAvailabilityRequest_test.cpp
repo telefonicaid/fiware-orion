@@ -144,7 +144,6 @@ TEST(NotifyContextAvailabilityRequest, check)
 
   utInit();
 
-  // check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
   out = ncr.check(NotifyContextAvailability, XML, "", "", 0);
   EXPECT_EQ("OK", out);
 
