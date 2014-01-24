@@ -351,7 +351,7 @@ xmlFilesInvalid=$(find $SRC_TOP/test -name "ngsi*.invalid.xml" | wc -l)
 xmlFilesPostponed=$(find $SRC_TOP/test -name "ngsi*.postponed.xml" | wc -l)
 xmlFilesMiddle=$(find $SRC_TOP/test -name "ngsi*.middle.xml" | wc -l)
 xmlFilesOrion=$(find $SRC_TOP/test -name "orion.*.xml" | wc -l)
-xmlFilesBadName=$(expr $xmlFilesFound - $xmlFilesValid - $xmlFilesInvalid - $xmlFilesPostponed - $xmlFilesMiddle - $xmlFilesOrion)
+xmlFilesBadName=$(find $SRC_TOP/test -name "*.xml" | grep -v "ngsi*.valid.xml" | grep -v "ngsi*.invalid.xml" | grep -v "ngsi*.postponed.xml" | grep -v "ngsi*.middle.xml" | grep -v "orion.*.xml" | wc -l)
 xmlFilesProcessed=0
 xmlFilesOK=0
 xmlFilesErrors=0
@@ -515,7 +515,6 @@ echo "${xmlFilesMiddle} documents were not tested as they don't start the way th
 if [ "$xmlFilesBadName" != 0 ]
 then
   echo
-  xmlFilesBadName=$(find $SRC_TOP/test -name "*.xml" | grep -v "ngsi*.valid.xml" | grep -v "ngsi*.invalid.xml" | grep -v "ngsi*.postponed.xml" | grep -v "ngsi*.middle.xml" | grep -v "orion.*.xml" | wc -l)
   if [ "$xmlFilesBadName" != "0" ]
   then
     echo "WARNING: $xmlFilesBadName XML files do not conform to the naming convention"  
