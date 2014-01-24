@@ -58,8 +58,6 @@ TEST(NotifyCondition, render)
   NotifyCondition  nc;
   const char*      outfile1 = "ngsi.notifyCondition.render.middle.xml";
   const char*      outfile2 = "ngsi.notifyCondition.render.middle.json";
-  std::string      expected1xml  = "<notifyCondition>\n  <type></type>\n</notifyCondition>\n";
-  std::string      expected1json = "{\n  \"type\" : \"\"\n}\n";
   std::string      out;
 
   utInit();
@@ -102,18 +100,16 @@ TEST(NotifyCondition, present)
 TEST(NotifyCondition, check)
 {
   NotifyCondition  nc;
-  std::string      expected1 = "empty type for NotifyCondition";
-  std::string      expected2 = "invalid notify condition type: 'XXX'";
   std::string      checked;
 
   utInit();
 
   checked = nc.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected1.c_str(), checked.c_str());
+  EXPECT_STREQ("empty type for NotifyCondition", checked.c_str());
   
   nc.type = "XXX";
   checked = nc.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected2.c_str(), checked.c_str());
+  EXPECT_STREQ("invalid notify condition type: 'XXX'", checked.c_str());
 
   nc.release();
 

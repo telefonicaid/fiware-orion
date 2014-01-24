@@ -47,7 +47,7 @@ std::string UpdateContextElementResponse::render(RequestType requestType, Format
    if ((errorCode.code != NO_ERROR_CODE) && (errorCode.code != SccOk))
      out += errorCode.render(format, indent + "  ");
    else
-     out += contextResponseVector.render(requestType, format, indent + "  ");
+     out += contextAttributeResponseVector.render(requestType, format, indent + "  ");
 
    out += endTag(indent, tag, format);
 
@@ -66,7 +66,7 @@ std::string UpdateContextElementResponse::check(RequestType requestType, Format 
   
   if (predetectedError != "")
     errorCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), predetectedError);
-  else if ((res = contextResponseVector.check(requestType, format, indent, "", counter)) != "OK")
+  else if ((res = contextAttributeResponseVector.check(requestType, format, indent, "", counter)) != "OK")
     errorCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), res);
   else
     return "OK";
@@ -82,6 +82,6 @@ std::string UpdateContextElementResponse::check(RequestType requestType, Format 
 */
 void UpdateContextElementResponse::release(void)
 {
-  contextResponseVector.release();
+  contextAttributeResponseVector.release();
   errorCode.release();
 }
