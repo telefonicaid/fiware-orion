@@ -36,17 +36,22 @@
 *
 * ContextAttributeResponseVector::render - 
 */
-std::string ContextAttributeResponseVector::render(RequestType requestType, Format format, std::string indent)
+std::string ContextAttributeResponseVector::render(RequestType request, Format format, std::string indent)
 {
   std::string out = "";
   std::string tag = "contextResponseList";
 
   if (vec.size() == 0)
+  {
+    if (request == IndividualContextEntityAttributes)
+      return indent + "<contextAttributeList></contextAttributeList>\n";
+
     return "";
+  }
 
   out += startTag(indent, tag, format);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(requestType, format, indent + "  ");
+    out += vec[ix]->render(request, format, indent + "  ");
   out += endTag(indent, tag, format);
 
   return out;
@@ -58,13 +63,13 @@ std::string ContextAttributeResponseVector::render(RequestType requestType, Form
 *
 * ContextAttributeResponseVector::check - 
 */
-std::string ContextAttributeResponseVector::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ContextAttributeResponseVector::check(RequestType request, Format format, std::string indent, std::string predetectedError, int counter)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
      std::string res;
 
-     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+     if ((res = vec[ix]->check(request, format, indent, predetectedError, counter)) != "OK")
        return res;
   }
 

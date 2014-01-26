@@ -65,9 +65,8 @@ TEST(postContextEntityTypeAttribute, ok)
   fwdPort = 0;
 
   ConnectionInfo ci("/ngsi9/contextEntityTypes/TYPE_123/attributes/temperature",  "POST", "1.1");
-  std::string    expectedStart = "<registerContextResponse>\n  <duration>PT1S</duration>\n  <registrationId>";
-  const char*    infile      = "ngsi9.registerProviderRequest.noRegistrationId.postponed.xml";
-  const char*    outfile     = "ngsi9.registerContextResponse.noRegistrationId.middle.xml";
+  const char*    infile     = "ngsi9.registerProviderRequest.noRegistrationId.postponed.xml";
+  const char*    outfile    = "ngsi9.registerContextResponse.noRegistrationId.middle.xml";
   std::string    out;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";

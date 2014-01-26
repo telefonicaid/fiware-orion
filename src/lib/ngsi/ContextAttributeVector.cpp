@@ -58,7 +58,7 @@ std::string ContextAttributeVector::render(RequestType request, Format format, s
 
   if (vec.size() == 0)
   {
-     if ((request == IndividualContextEntityAttribute) || (request == AttributeValueInstance))
+     if ((request == IndividualContextEntityAttribute) || (request == AttributeValueInstance) || (request == IndividualContextEntityAttributes))
       return indent + "<contextAttributeList></contextAttributeList>\n";
 
     return "";

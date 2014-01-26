@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/SubscriptionId.h"
+
+#include "unittest.h"
 
 
 
@@ -40,8 +40,12 @@ TEST(SubscriptionId, constructors)
   SubscriptionId s1;
   SubscriptionId s2("subId");
 
+  utInit();
+
   EXPECT_EQ("", s1.string);
   EXPECT_EQ("subId", s2.string);
+
+  utExit();
 }
 
 
@@ -54,21 +58,22 @@ TEST(SubscriptionId, check)
 {
   SubscriptionId  sId;
   std::string     checked;
-  std::string     expected1 = "bad length (24 chars expected)";
-  std::string     expected2 = "invalid char in ID string";
-  std::string     expected3 = "OK";
+
+  utInit();
 
   sId.set("SUB_123");
   checked = sId.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected1.c_str(), checked.c_str());
+  EXPECT_STREQ("bad length (24 chars expected)", checked.c_str());
 
   sId.set("SUB_12345678901234567890");
   checked = sId.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected2.c_str(), checked.c_str());
+  EXPECT_STREQ("invalid char in ID string", checked.c_str());
 
   sId.set("012345678901234567890123");
   checked = sId.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected3.c_str(), checked.c_str());
+  EXPECT_STREQ("OK", checked.c_str());
+
+  utExit();
 }
 
 
@@ -81,7 +86,8 @@ TEST(SubscriptionId, setGetAndIsEmpty)
 {
   SubscriptionId  sId;
   std::string     out;
-  std::string     expected = "OK";
+
+  utInit();
 
   sId.set("SUB_123");
   out = sId.get();
@@ -90,6 +96,8 @@ TEST(SubscriptionId, setGetAndIsEmpty)
   EXPECT_FALSE(sId.isEmpty());
   sId.set("");
   EXPECT_TRUE(sId.isEmpty());
+
+  utExit();
 }
 
 
@@ -102,11 +110,15 @@ TEST(SubscriptionId, present)
 {
   SubscriptionId  sId;
 
+  utInit();
+
   sId.set("SUB_123");
   sId.present("");
 
   sId.set("");
   sId.present("");
+
+  utExit();
 }
 
 
@@ -118,21 +130,28 @@ TEST(SubscriptionId, present)
 TEST(SubscriptionId, render)
 {
   SubscriptionId  sId;
-  std::string     rendered;
-  std::string     expected1 = "<subscriptionId>000000000000000000000000</subscriptionId>\n";
-  std::string     expected2 = "<subscriptionId>012345012345012345012345</subscriptionId>\n";
-  std::string     expected3 = "\"subscriptionId\" : \"012345012345012345012345\"\n";
+  std::string     out;
+  const char*     outfile1 = "ngsi.subscriptionId.render1.middle.xml";
+  const char*     outfile2 = "ngsi.subscriptionId.render2.middle.xml";
+  const char*     outfile3 = "ngsi.subscriptionId.render2.middle.json";
+
+  utInit();
 
   sId.set("");
-  rendered = sId.render(UnsubscribeContext, XML, ""); // subscriptionId is MANDATORY for RegisterContext 
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  out = sId.render(UnsubscribeContext, XML, ""); // subscriptionId is MANDATORY for RegisterContext 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   sId.set("012345012345012345012345");
-  rendered = sId.render(UnsubscribeContext, XML, "");
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  out = sId.render(UnsubscribeContext, XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
   
-  rendered = sId.render(UnsubscribeContext, JSON, "");
-  EXPECT_STREQ(expected3.c_str(), rendered.c_str());
+  out = sId.render(UnsubscribeContext, JSON, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   sId.release(); // just to exercise the code
+
+  utExit();
 }

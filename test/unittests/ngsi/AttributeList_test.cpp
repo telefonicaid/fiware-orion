@@ -22,10 +22,9 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "ngsi/AttributeList.h"
 
 #include "unittest.h"
@@ -54,8 +53,6 @@ TEST(AttributeList, ok)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
   
-  EXPECT_STREQ("<attributeList>\n  <attribute>a1</attribute>\n  <attribute>a2</attribute>\n</attributeList>\n", out.c_str());
-
   out = al.render(JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
