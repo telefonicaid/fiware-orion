@@ -22,14 +22,22 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 
 #include "unittest.h"
+
+
+
+
+/* ****************************************************************************
+*
+* EMPTY_JSON - 
+*/
+#define EMPTY_JSON "{\n}\n"
+
 
 
 /* ****************************************************************************
@@ -40,18 +48,24 @@ TEST(DiscoverContextAvailabilityResponse, render)
 {
   DiscoverContextAvailabilityResponse  dcar1;
   std::string                          out;
-  std::string                          expected1 = "<discoverContextAvailabilityResponse>\n</discoverContextAvailabilityResponse>\n";
+  const char*                          outfile1 = "ngsi9.discoverContextAvailabilityResponse.empty.invalid.xml";
+  const char*                          outfile2 = "ngsi9.discoverContextAvailabilityResponse.error.valid.xml";
   ErrorCode                            ec(SccBadRequest, "Reason", "Detail");
   DiscoverContextAvailabilityResponse  dcar2(ec);
-  std::string                          expected2 = "<discoverContextAvailabilityResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Reason</reasonPhrase>\n    <details>Detail</details>\n  </errorCode>\n</discoverContextAvailabilityResponse>\n";
 
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   out = dcar1.render(DiscoverContextAvailability, XML, "");
-  EXPECT_EQ(expected1, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   EXPECT_EQ(NO_ERROR_CODE, dcar1.errorCode.code);
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   out = dcar2.render(DiscoverContextAvailability, XML, "");
-  EXPECT_EQ(expected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   EXPECT_EQ(SccBadRequest, dcar2.errorCode.code);
+
+  utExit();
 }
 
 
@@ -108,7 +122,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
   dcarP->release();
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
-  EXPECT_STREQ("{\n}\n", rendered.c_str());
+  EXPECT_STREQ(EMPTY_JSON, rendered.c_str());
   free(dcarP);
 
 
@@ -140,7 +154,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
   dcarP->release();
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
-  EXPECT_STREQ("{\n}\n", rendered.c_str());
+  EXPECT_STREQ(EMPTY_JSON, rendered.c_str());
 
 
 
@@ -170,7 +184,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
   dcarP->release();
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
-  EXPECT_STREQ("{\n}\n", rendered.c_str());
+  EXPECT_STREQ(EMPTY_JSON, rendered.c_str());
 
 
 
@@ -201,7 +215,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
   dcarP->release();
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
-  EXPECT_STREQ("{\n}\n", rendered.c_str());
+  EXPECT_STREQ(EMPTY_JSON, rendered.c_str());
 
 
 
@@ -232,7 +246,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
   dcarP->release();
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
-  EXPECT_STREQ("{\n}\n", rendered.c_str());
+  EXPECT_STREQ(EMPTY_JSON, rendered.c_str());
 
 
 
@@ -261,7 +275,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
   dcarP->release();
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
-  EXPECT_STREQ("{\n}\n", rendered.c_str());
+  EXPECT_STREQ(EMPTY_JSON, rendered.c_str());
 
 
 
@@ -291,7 +305,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
   dcarP->release();
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
-  EXPECT_STREQ("{\n}\n", rendered.c_str());
+  EXPECT_STREQ(EMPTY_JSON, rendered.c_str());
 
 
 
@@ -334,7 +348,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
   dcarP->release();
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
-  EXPECT_STREQ("{\n}\n", rendered.c_str());
+  EXPECT_STREQ(EMPTY_JSON, rendered.c_str());
 
 
 
@@ -354,7 +368,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
   dcarP->release();
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
-  EXPECT_STREQ("{\n}\n", rendered.c_str());
+  EXPECT_STREQ(EMPTY_JSON, rendered.c_str());
 
 
 
@@ -367,7 +381,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
   dcarP->release();
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
-  EXPECT_STREQ("{\n}\n", rendered.c_str());
+  EXPECT_STREQ(EMPTY_JSON, rendered.c_str());
 
 
 
@@ -380,7 +394,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
   dcarP->release();
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
-  EXPECT_STREQ("{\n}\n", rendered.c_str());
+  EXPECT_STREQ(EMPTY_JSON, rendered.c_str());
 
 
   // 20. Two ContextRegistrationResponses
@@ -404,7 +418,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
   dcarP->release();
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
-  EXPECT_STREQ("{\n}\n", rendered.c_str());
+  EXPECT_STREQ(EMPTY_JSON, rendered.c_str());
 
   free(dcarP);
 

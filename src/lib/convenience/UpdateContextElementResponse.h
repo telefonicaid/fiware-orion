@@ -45,10 +45,10 @@
 */
 typedef struct UpdateContextElementResponse
 {
-  ContextAttributeResponseVector   contextResponseVector;      // Optional, but mandatory if success
-  ErrorCode                        errorCode;                  // Optional, but mandatory if failure
+  ContextAttributeResponseVector   contextAttributeResponseVector; // Optional, but mandatory if success
+  ErrorCode                        errorCode;                      // Optional, but mandatory if failure
 
-  std::string render(Format format, std::string indent);
+  std::string render(RequestType requestType, Format format, std::string indent);
   std::string check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void        present();
   void        release();

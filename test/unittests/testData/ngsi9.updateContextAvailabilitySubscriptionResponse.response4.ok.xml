@@ -1,0 +1,7 @@
+<updateContextAvailabilitySubscriptionResponse>
+  <subscriptionId>012345678901234567890123</subscriptionId>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>predetected error</reasonPhrase>
+  </errorCode>
+</updateContextAvailabilitySubscriptionResponse>

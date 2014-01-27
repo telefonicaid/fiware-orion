@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -68,21 +66,21 @@ TEST(xmlUpdateContextRequest, ok)
 TEST(xmlUpdateContextRequest, invalidEntityIdAttribute)
 {
   ConnectionInfo  ci("/ngsi10/updateContext", "POST", "1.1");
-  const char*     fileName = "ngsi10.entityIdAttribute.invalid.xml";
+  const char*     infile  = "ngsi10.entityIdAttribute.invalid.xml";
+  const char*     outfile = "ngsi10.updateContextResponse.badRequest.valid.xml";
   ParseData       parseData;
-  std::string     expected  = "<updateContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad request</reasonPhrase>\n    <details>unsupported attribute for EntityId</details>\n  </errorCode>\n</updateContextResponse>\n";
-  std::string     expected2 = "unsupported attribute for EntityId";
   std::string     out;
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   ci.inFormat  = XML;
   ci.outFormat = XML;
   out  = xmlTreat(testBuf, &ci, &parseData, UpdateContext, "updateContextRequest", NULL);
-  EXPECT_EQ(expected, out);
-  EXPECT_EQ(expected2, parseData.errorString);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_EQ("unsupported attribute for EntityId", parseData.errorString);
 
   utExit();
 }

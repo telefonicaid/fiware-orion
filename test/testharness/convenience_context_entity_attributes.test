@@ -58,13 +58,10 @@ curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application
 echo "2: ++++++++++++++++++++"
 curlXmlNoPayload "/NGSI9/contextEntities/entity01/attributes"
 
-echo "3: ++++++++++++++++++++"
-killall contextBroker
-
 --REGEXPECT--
 0: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 199
+Content-Length: 185
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -72,7 +69,7 @@ Date: REGEX(.*)
 <discoverContextAvailabilityResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context element registrations found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </discoverContextAvailabilityResponse>
 1: ++++++++++++++++++++
@@ -107,7 +104,6 @@ Date: REGEX(.*)
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
-3: ++++++++++++++++++++
 --TEARDOWN--
 source harnessFunctions.sh
 brokerStop CB

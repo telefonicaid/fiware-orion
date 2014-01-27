@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextElementResponseVector.h"
+
+#include "unittest.h"
 
 
 
@@ -41,6 +41,8 @@ TEST(ContextElementResponseVector, check)
   ContextElementResponse        cer;
   std::string                   out;
 
+  utInit();
+
   out = cerv.check(UpdateContext, XML, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
@@ -52,6 +54,8 @@ TEST(ContextElementResponseVector, check)
   cerv.push_back(&cer);
   out = cerv.check(UpdateContext, XML, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
+
+  utExit();
 }
 
 
@@ -65,9 +69,11 @@ TEST(ContextElementResponseVector, render)
   ContextElementResponseVector  cerv;
   ContextElementResponse        cer;
   std::string                   out;
-  std::string                   expected = "<contextResponseList>\n  <contextElementResponse>\n    <contextElement>\n      <entityId type=\"Type\" isPattern=\"false\">\n        <id>ID</id>\n      </entityId>\n    </contextElement>\n    <statusCode>\n      <code>200</code>\n      <reasonPhrase>reason</reasonPhrase>\n      <details>details</details>\n    </statusCode>\n  </contextElementResponse>\n</contextResponseList>\n";
+  const char*                   outfile = "ngsi.contextElementResponseVector.render.middle.xml";
 
-  out = cerv.render(XML, "");
+  utInit();
+
+  out = cerv.render(UpdateContextElement, XML, "");
   EXPECT_STREQ("", out.c_str());
 
   cer.contextElement.entityId.id         = "ID";
@@ -76,8 +82,11 @@ TEST(ContextElementResponseVector, render)
   cer.statusCode.fill(SccOk, "reason", "details");
 
   cerv.push_back(&cer);
-  out = cerv.render(XML, "");
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  out = cerv.render(UpdateContextElement, XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -90,15 +99,18 @@ TEST(ContextElementResponseVector, render)
 */
 TEST(ContextElementResponseVector, present)
 {
-   ContextElementResponseVector  cerv;
-   ContextElementResponse        cer;
+  ContextElementResponseVector  cerv;
+  ContextElementResponse        cer;
 
-   cer.contextElement.entityId.id         = "ID";
-   cer.contextElement.entityId.type       = "Type";
-   cer.contextElement.entityId.isPattern  = "false";
-   cer.statusCode.fill(SccOk, "reason", "details");
-   cerv.push_back(&cer);
+  utInit();
 
-   cerv.present("");
+  cer.contextElement.entityId.id         = "ID";
+  cer.contextElement.entityId.type       = "Type";
+  cer.contextElement.entityId.isPattern  = "false";
+  cer.statusCode.fill(SccOk, "reason", "details");
+  cerv.push_back(&cer);
+
+  cerv.present("");
+
+  utExit();
 }
-

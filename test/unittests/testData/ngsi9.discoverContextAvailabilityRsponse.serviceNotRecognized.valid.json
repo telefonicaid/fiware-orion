@@ -1,0 +1,8 @@
+{
+  "registrationId" : "0",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "bad request",
+    "details" : "Service not recognized"
+  }
+}

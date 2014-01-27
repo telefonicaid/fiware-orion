@@ -83,8 +83,8 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
 
 
-  if ((headerP->connection != "") && (headerP->connection != "close"))
-     LM_W(("connection '%s' - currently not supported, sorry ..."));
+  if ((strcasecmp(key.c_str(), "connection") == 0) && (headerP->connection != "") && (headerP->connection != "close"))
+     LM_W(("connection '%s' - currently not supported, sorry ...", headerP->connection.c_str()));
 
   /* Note that the strategy to "fix" the Content-Type is to replace the ";" with 0
    * to "deactivate" this part of the string in the checking done at connectionTreat() */
@@ -283,7 +283,7 @@ static int connectionTreat
   if (((ciP != NULL) && (ciP->httpHeaders.contentLength == 0)) && (ciP->method == "POST" || ciP->method == "PUT"))
   {
     LM_W(("Zero/No Content-Length in PUT/POST request"));
-    std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, "bad request", "Zero/No Content-Length in PUT/POST request");
+    std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, httpStatusCodeString(SccLengthRequired), "Zero/No Content-Length in PUT/POST request");
     ciP->httpStatusCode = SccLengthRequired;
     restReply(ciP, errorMsg);
     LM_RE(MHD_YES, ("Zero/No Content-Length in PUT/POST request"));
@@ -331,7 +331,7 @@ static int connectionTreat
       {
           /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
           ciP->httpStatusCode = SccUnsupportedMediaType;
-          restReply(ciP, "Unsupported Media Type", "Content-Type header not used, default application/octet-stream is not supported");
+          restReply(ciP, httpStatusCodeString(SccUnsupportedMediaType), "Content-Type header not used, default application/octet-stream is not supported");
           return MHD_YES;
       }
 
@@ -339,7 +339,7 @@ static int connectionTreat
       {
           /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
           ciP->httpStatusCode = SccUnsupportedMediaType;
-          restReply(ciP, "Unsupported Media Type", "not supported content type: " + ciP->httpHeaders.contentType);
+          restReply(ciP, httpStatusCodeString(SccUnsupportedMediaType), "not supported content type: " + ciP->httpHeaders.contentType);
           return MHD_YES;
       }
     }
@@ -414,12 +414,12 @@ static int connectionTreat
       char detail[256];
 
       snprintf(detail, sizeof(detail), "payload size: %d", ciP->httpHeaders.contentLength);
-      std::string out = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, "Payload Too Large", detail);
+      std::string out = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, httpStatusCodeString(SccRequestEntityTooLarge), detail);
       restReply(ciP, out);
     }
     else
     {
-      LM_T(LmtInPayload, ("Calling restService '%s' with payload: '%s'", ciP->url.c_str(), ciP->payload));
+      LM_T(LmtServiceInputPayload, ("Calling restService '%s' with payload: '%s'", ciP->url.c_str(), ciP->payload));
       if (ciP->fractioned == true)
         LM_T(LmtRest, ("Received entire payload of fractioned message (%d bytes)", ciP->httpHeaders.contentLength));
       restService(ciP, restServiceV);

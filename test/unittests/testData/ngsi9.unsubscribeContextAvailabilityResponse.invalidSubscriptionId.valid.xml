@@ -1,0 +1,7 @@
+<unsubscribeContextAvailabilityResponse>
+  <subscriptionId>1</subscriptionId>
+  <statusCode>
+    <code>400</code>
+    <reasonPhrase>bad length (24 chars expected)</reasonPhrase>
+  </statusCode>
+</unsubscribeContextAvailabilityResponse>

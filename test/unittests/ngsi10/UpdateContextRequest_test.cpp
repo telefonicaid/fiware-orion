@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -33,6 +31,8 @@
 #include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
 #include "xmlParse/xmlParse.h"
+
+#include "unittest.h"
 
 
 
@@ -54,9 +54,11 @@ TEST(UpdateContextRequest, ok_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.updateContext.valid.xml";
+  const char*     infile = "ngsi10.updateContext.valid.xml";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   lmTraceLevelSet(LmtDump, true);
   std::string result = xmlTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
@@ -71,23 +73,27 @@ TEST(UpdateContextRequest, ok_xml)
   
   upcrP->present(""); // No output
 
-  std::string rendered;
-  std::string checked;
-  std::string expected = "<updateContextRequest>\n  <contextElementList>\n    <contextElement>\n      <entityId type=\"Room\" isPattern=\"false\">\n        <id>ConferenceRoom</id>\n      </entityId>\n      <contextAttributeList>\n        <contextAttribute>\n          <name>temperature</name>\n          <type>degree</type>\n          <contextValue>c23</contextValue>\n          <metadata>\n            <contextMetadata>\n              <name>attributeValueIdentifier1</name>\n              <type>long</type>\n              <value>1</value>\n            </contextMetadata>\n            <contextMetadata>\n              <name>attributeValueIdentifier2</name>\n              <type>long</type>\n              <value>2</value>\n            </contextMetadata>\n            <contextMetadata>\n              <name>attributeValueIdentifier3</name>\n              <type>long</type>\n              <value>3</value>\n            </contextMetadata>\n          </metadata>\n        </contextAttribute>\n        <contextAttribute>\n          <name>lightstatus</name>\n          <type>light</type>\n          <contextValue>d23</contextValue>\n          <metadata>\n            <contextMetadata>\n              <name>attributeValueIdentifier1</name>\n              <type>long</type>\n              <value>1</value>\n            </contextMetadata>\n            <contextMetadata>\n              <name>attributeValueIdentifier2</name>\n              <type>long</type>\n              <value>2</value>\n            </contextMetadata>\n            <contextMetadata>\n              <name>attributeValueIdentifier3</name>\n              <type>long</type>\n              <value>3</value>\n            </contextMetadata>\n          </metadata>\n        </contextAttribute>\n      </contextAttributeList>\n    </contextElement>\n  </contextElementList>\n  <updateAction>APPEND</updateAction>\n</updateContextRequest>\n";
-  std::string expected2 = "<updateContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad request</reasonPhrase>\n    <details>FORCED ERROR</details>\n  </errorCode>\n</updateContextResponse>\n";
-  std::string expected3 = "<updateContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Bad request</reasonPhrase>\n    <details>invalid update action type: 'invalid'</details>\n  </errorCode>\n</updateContextResponse>\n";
+  std::string out;
+  const char* outfile1 = "ngsi10.updateContextRequest.rendered1.valid.xml";
+  const char* outfile2 = "ngsi10.updateContextRequest.checked.valid.xml";
+  const char* outfile3 = "ngsi10.updateContextRequest.badUpdateActionType.invalid.xml";
 
-  rendered = upcrP->render(UpdateContext, XML, "");
-  EXPECT_EQ(expected, rendered);
+  out = upcrP->render(UpdateContext, XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1;
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  checked  = upcrP->check(UpdateContext, XML, "", "FORCED ERROR", 0);
-  EXPECT_STREQ(expected2.c_str(), checked.c_str());
+  out  = upcrP->check(UpdateContext, XML, "", "FORCED ERROR", 0);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2;
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   upcrP->updateActionType.set("invalid");
-  checked  = upcrP->check(RegisterContext, XML, "", "", 0); // Cannot use UpdateContext here ... [ UpdateActionType.cpp: if (requestType == UpdateContext) // FIXME: this is just to make harness test work ]
-  EXPECT_STREQ(expected3.c_str(), checked.c_str());
+  out  = upcrP->check(RegisterContext, XML, "", "", 0);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3;
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   upcrP->release();
+
+  utExit();
 }
 
 
@@ -100,9 +106,11 @@ TEST(UpdateContextRequest, ok_json)
 {
    ParseData       reqData;
    ConnectionInfo  ci("", "POST", "1.1");
-   const char*     fileName = "updateContext_ok.json";
+   const char*     infile = "ngsi10.updateContext.ok.valid.json";
 
-   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+   utInit();
+
+   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
    ci.inFormat  = JSON;
    ci.outFormat = JSON;
@@ -120,6 +128,8 @@ TEST(UpdateContextRequest, ok_json)
 
    upcrP->present(""); // No output
    upcrP->release();
+
+   utExit();
 }
 
 
@@ -132,16 +142,21 @@ TEST(UpdateContextRequest, badIsPattern_json)
 {
    ParseData       parseData;
    ConnectionInfo  ci("", "POST", "1.1");
-   const char*     fileName = "updateContext_badIsPattern.json";
-   std::string     expected = "{\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"Bad request\",\n    \"details\" : \"bad value for 'isPattern'\"\n  }\n}\n";
+   const char*     infile  = "ngsi10.updateContextRequest.badIsPattern.invalid.json";
+   const char*     outfile = "ngsi10.updateContextResponse.badIsPattern.invalid.json";
    JsonRequest*    reqP;
+
+   utInit();
 
    ci.inFormat  = JSON;
    ci.outFormat = JSON;
 
-   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile;
 
-   std::string result = jsonTreat(testBuf, &ci, &parseData, UpdateContext, "updateContextRequest", &reqP);
+   std::string out = jsonTreat(testBuf, &ci, &parseData, UpdateContext, "updateContextRequest", &reqP);
+   EXPECT_STREQ(expectedBuf, out.c_str());
    reqP->release(&parseData);
-   EXPECT_EQ(expected, result);
+
+   utExit();
 }

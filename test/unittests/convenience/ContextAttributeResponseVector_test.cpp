@@ -32,6 +32,8 @@
 #include "convenience/ContextAttributeResponse.h"
 #include "ngsi/ContextAttribute.h"
 
+#include "unittest.h"
+
 
 
 /* ****************************************************************************
@@ -44,18 +46,20 @@ TEST(ContextAttributeResponseVector, render)
   ContextAttribute                ca("caName", "caType", "caValue");
   ContextAttributeResponse        car;  
   std::string                     out;
-  std::string                     expected = "<contextResponseList>\n  <contextAttributeResponse>\n    <contextAttributeList>\n      <contextAttribute>\n        <name>caName</name>\n        <type>caType</type>\n        <contextValue>caValue</contextValue>\n      </contextAttribute>\n    </contextAttributeList>\n    <statusCode>\n      <code>0</code>\n      <reasonPhrase></reasonPhrase>\n    </statusCode>\n  </contextAttributeResponse>\n</contextResponseList>\n";
+  const char*                     outfile = "ngsi10.contextResponseList.render.invalid.xml";
 
   // 1. empty vector
-  out = carV.render(XML, "");
+  car.statusCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), "Empty Vector");
+  out = carV.render(ContextEntityAttributes, XML, "");
   EXPECT_STREQ("", out.c_str());
 
   // 2. normal case
   car.contextAttributeVector.push_back(&ca);
   carV.push_back(&car);
 
-  out = carV.render(XML, "");
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  out = carV.render(ContextEntityAttributes, XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 
@@ -70,19 +74,19 @@ TEST(ContextAttributeResponseVector, check)
   ContextAttribute                ca("caName", "caType", "caValue");
   ContextAttributeResponse        car;  
   std::string                     out;
-  std::string                     expected1 = "OK";
-  std::string                     expected2 = "<contextAttributeResponse>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>PRE ERROR</reasonPhrase>\n  </statusCode>\n</contextAttributeResponse>\n";
-  std::string                     expected3 = "<contextAttributeResponse>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>missing attribute name</reasonPhrase>\n  </statusCode>\n</contextAttributeResponse>\n";
+  const char*                     outfile1 = "ngsi10.contextAttributeResponse.check1.valid.xml";
+  const char*                     outfile2 = "ngsi10.contextAttributeResponse.check2.valid.xml";
 
   // 1. ok
   car.contextAttributeVector.push_back(&ca);
   carV.push_back(&car);
   out = carV.check(UpdateContextAttribute, XML, "", "", 0);
-  EXPECT_STREQ(expected1.c_str(), out.c_str());
+  EXPECT_STREQ("OK", out.c_str());
 
   // 2. Predetected Error
   out = carV.check(UpdateContextAttribute, XML, "", "PRE ERROR", 0);
-  EXPECT_STREQ(expected2.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   // 3. Bad ContextAttribute
@@ -90,7 +94,8 @@ TEST(ContextAttributeResponseVector, check)
 
   car.contextAttributeVector.push_back(&ca2);
   out = carV.check(UpdateContextAttribute, XML, "", "", 0);
-  EXPECT_STREQ(expected3.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 }
 
 

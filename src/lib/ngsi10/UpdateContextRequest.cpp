@@ -60,7 +60,7 @@ std::string UpdateContextRequest::render(RequestType requestType, Format format,
   // Both fields are MANDATORY, so, comma after "contextElementVector"
   //
   out += startTag(indent, tag, format, false);
-  out += contextElementVector.render(format, indent + "  ", true);
+  out += contextElementVector.render(UpdateContext, format, indent + "  ", true);
   out += updateActionType.render(format, indent + "  ", false);
   out += endTag(indent, tag, format, false);
 

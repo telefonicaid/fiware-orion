@@ -38,7 +38,7 @@
 *
 * ContextElementResponseVector::render - 
 */
-std::string ContextElementResponseVector::render(Format format, std::string indent, bool comma)
+std::string ContextElementResponseVector::render(RequestType requestType, Format format, std::string indent, bool comma)
 {
   std::string xmlTag   = "contextResponseList";
   std::string jsonTag  = "contextResponses";
@@ -50,7 +50,7 @@ std::string ContextElementResponseVector::render(Format format, std::string inde
   out += startTag(indent, xmlTag, jsonTag, format, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ", ix < (vec.size() - 1));
+    out += vec[ix]->render(requestType, format, indent + "  ", ix < (vec.size() - 1));
 
   out += endTag(indent, xmlTag, format, comma, true);
 

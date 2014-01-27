@@ -71,12 +71,10 @@ echo "3: ++++++++++++++++++++"
 # DELETE is not allowed
 curlXmlNoPayload "/NGSI9/contextEntityTypes/Room" "-X DELETE"
 
-echo 4: ++++++++++++++++++++
-killall contextBroker
 --REGEXPECT--
 0: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 199
+Content-Length: 185
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -84,7 +82,7 @@ Date: REGEX(.*)
 <discoverContextAvailabilityResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context element registrations found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </discoverContextAvailabilityResponse>
 1: ++++++++++++++++++++
@@ -135,7 +133,6 @@ Content-Length: 0
 Allow: POST, GET
 Date: REGEX(.*)
 
-4: ++++++++++++++++++++
 --TEARDOWN--
 source harnessFunctions.sh
 brokerStop CB

@@ -97,7 +97,7 @@ curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application
 echo "4: ***********************************"
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 227
+Content-Length: 295
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -106,7 +106,8 @@ Date: REGEX(.*)
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
   <statusCode>
     <code>404</code>
-    <reasonPhrase>Subscription Not Found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>subscriptionId: '012345678901234567890123'</details>
   </statusCode>
 </unsubscribeContextResponse>
 2: ***********************************

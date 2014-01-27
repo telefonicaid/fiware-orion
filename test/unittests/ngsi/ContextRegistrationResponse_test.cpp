@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextRegistrationResponse.h"
+
+#include "unittest.h"
 
 
 
@@ -39,22 +39,30 @@ TEST(ContextRegistrationResponse, render)
 {
   ContextRegistrationResponse  crr;
   std::string                  rendered;
-  std::string                  expected1xml  = "<contextRegistrationResponse>\n  <contextRegistration>\n  </contextRegistration>\n</contextRegistrationResponse>\n";
-  std::string                  expected1json = "{\n  \"contextRegistration\" : {\n  }\n}\n";
-  std::string                  expected2xml  = "<contextRegistrationResponse>\n  <contextRegistration>\n  </contextRegistration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase></reasonPhrase>\n  </errorCode>\n</contextRegistrationResponse>\n";
-  std::string                  expected2json = "{\n  \"contextRegistration\" : {\n  },\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"\"\n  }\n}\n";
+  const char*                  outfile1 = "ngsi.contextRegistrationResponse.renderOk.middle.xml";
+  const char*                  outfile2 = "ngsi.contextRegistrationResponse.renderOk.middle.json";
+  const char*                  outfile3 = "ngsi.contextRegistrationResponse.renderError.middle.xml";
+  const char*                  outfile4 = "ngsi.contextRegistrationResponse.renderError.middle.json";
+
+  utInit();
 
   crr.errorCode.code = NO_ERROR_CODE;
   rendered = crr.render(XML, "");
-  EXPECT_STREQ(expected1xml.c_str(), rendered.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
   rendered = crr.render(JSON, "");
-  EXPECT_STREQ(expected1json.c_str(), rendered.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   crr.errorCode.code = 400;
   rendered = crr.render(XML, "");
-  EXPECT_STREQ(expected2xml.c_str(), rendered.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
   rendered = crr.render(JSON, "");
-  EXPECT_STREQ(expected2json.c_str(), rendered.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+  utExit();
 }
 
 
@@ -69,8 +77,12 @@ TEST(ContextRegistrationResponse, check)
   std::string                  checked;
   std::string                  expected = "no providing application";
 
+  utInit();
+
   checked = crr.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ(expected.c_str(), checked.c_str());
+
+  utExit();
 }
 
 
@@ -83,5 +95,9 @@ TEST(ContextRegistrationResponse, present)
 {
   ContextRegistrationResponse  crr;
 
+  utInit();
+
   crr.present("");
+
+  utExit();
 }

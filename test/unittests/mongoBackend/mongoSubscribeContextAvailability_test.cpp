@@ -2607,7 +2607,7 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_TRUE(res.subscriptionId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
-    EXPECT_EQ("Database Error", res.errorCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
     std::string s1 = res.errorCode.details.substr(0, 57);
     std::string s2 = res.errorCode.details.substr(57+24, res.errorCode.details.size()-57-24);
     EXPECT_EQ("collection: unittest.casubs "

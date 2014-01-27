@@ -22,10 +22,10 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "serviceRoutines/badNgsi9Request.h"
 #include "rest/RestService.h"
+
+#include "unittest.h"
 
 
 
@@ -48,8 +48,14 @@ static RestService rs[] =
 TEST(badNgsi9Request, ok)
 {
   ConnectionInfo ci("/ngsi9/badbadbad",  "GET", "1.1");
-  std::string    out = restService(&ci, rs);
-  std::string    expected = "<orionError>\n  <code>400</code>\n  <reasonPhrase>bad ngsi9 request</reasonPhrase>\n  <details>ngsi9 service '/ngsi9/badbadbad' not found</details>\n</orionError>\n";
+  std::string    out;  
+  const char*    outfile = "orion.badNgsi9Request.valid.xml";
 
-  EXPECT_EQ(expected, out);
+  utInit();
+
+  out = restService(&ci, rs);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }

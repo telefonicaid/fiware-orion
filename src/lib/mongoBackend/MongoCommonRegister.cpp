@@ -368,11 +368,11 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
 
         std::string err;
         if (!processAssociations(cr->registrationMetadataVector, &err)) {
-            responseP->errorCode.fill(SccReceiverInternalError, "Database Error", err );
+            responseP->errorCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err );
             LM_RE(SccOk, (err.c_str()));
         }
         if (!addTriggeredSubscriptions(*cr, &subsToNotify, &err)) {
-            responseP->errorCode.fill(SccReceiverInternalError, "Database Error", err );
+            responseP->errorCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err );
             LM_RE(SccOk, (err.c_str()));
         }
 
@@ -390,7 +390,7 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
     catch( const DBException &e ) {
         responseP->errorCode.fill(
             SccReceiverInternalError,
-            "Database Error",
+            httpStatusCodeString(SccReceiverInternalError),
             std::string("collection: ") + getRegistrationsCollectionName() +
                 " - upsert update(): " + regDoc.toString() +
                 " - exception: " + e.what()

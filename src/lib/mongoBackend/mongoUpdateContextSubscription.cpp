@@ -57,7 +57,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
 
       sub = connection->findOne(getSubscribeContextCollectionName(), BSON("_id" << id));
       if (sub.isEmpty()) {
-          responseP->subscribeError.errorCode.fill(SccContextElementNotFound, "Subscription Not Found");
+          responseP->subscribeError.errorCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound));
           LM_SR(SccOk);
       }
   }
@@ -66,13 +66,13 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
       // FIXME: this checking should be done at parsing stage, without progressing to
       // mongoBackend. By the moment we can live this here, but we should remove in the future
       // (old issue #95)
-      responseP->subscribeError.errorCode.fill(SccContextElementNotFound, "Subscription Not Found");
+      responseP->subscribeError.errorCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound));
       LM_SR(SccOk);
   }
   catch( const DBException &e ) {
       responseP->subscribeError.errorCode.fill(
           SccReceiverInternalError,
-         "Database Error",
+          httpStatusCodeString(SccReceiverInternalError),
           std::string("collection: ") + getSubscribeContextCollectionName() +
              " - findOne() _id: " + requestP->subscriptionId.get() +
              " - exception: " + e.what()
@@ -184,7 +184,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
   catch( const DBException &e ) {
       responseP->subscribeError.errorCode.fill(
           SccReceiverInternalError,
-          "Database Error",
+          httpStatusCodeString(SccReceiverInternalError),
           std::string("collection: ") + getSubscribeContextCollectionName() +
               " - update() _id: " + requestP->subscriptionId.get().c_str() +
               " - update() doc: " + update.toString() +

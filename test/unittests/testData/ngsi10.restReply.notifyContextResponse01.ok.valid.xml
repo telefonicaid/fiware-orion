@@ -1,0 +1,7 @@
+<notifyContextResponse>
+  <responseCode>
+    <code>200</code>
+    <reasonPhrase>ok</reasonPhrase>
+    <details>detail</details>
+  </responseCode>
+</notifyContextResponse>

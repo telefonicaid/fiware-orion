@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -74,9 +72,7 @@ TEST(RestService, payloadParse)
 {
   ConnectionInfo  ci("/ngsi9/registerContext", "POST", "1.1");
   ParseData       parseData;
-  const char*     fileName1  = "ngsi9.registerContext.ok.valid.json";
-  std::string     expected1  = "OK";
-  std::string     expected2  = "Bad inFormat";
+  const char*     infile1  = "ngsi9.registerContext.ok.valid.json";
   std::string     out;
 
   utInit();
@@ -84,7 +80,7 @@ TEST(RestService, payloadParse)
   //
   // 1. JSON
   //
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName1)) << "Error getting test data from '" << fileName1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
 
   ci.inFormat     = JSON;
   ci.outFormat    = JSON;
@@ -92,13 +88,13 @@ TEST(RestService, payloadParse)
   ci.payloadSize  = strlen(testBuf);
 
   out = payloadParse(&ci, &parseData, &rs[0], NULL, NULL);
-  EXPECT_EQ(expected1, out);
+  EXPECT_EQ("OK", out);
 
 
   //
   // 2. NOFORMAT
   //
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName1)) << "Error getting test data from '" << fileName1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
 
   ci.inFormat     = NOFORMAT;
   ci.outFormat    = JSON;
@@ -106,7 +102,7 @@ TEST(RestService, payloadParse)
   ci.payloadSize  = strlen(ci.payload);
 
   out = payloadParse(&ci, &parseData, &rs[0], NULL, NULL);  // Call restService?
-  EXPECT_EQ(expected2, out);
+  EXPECT_EQ("Bad inFormat", out);
 
   utExit();
 }
@@ -120,30 +116,32 @@ TEST(RestService, payloadParse)
 TEST(RestService, noSuchServiceAndNotFound)
 {
   ConnectionInfo ci("/ngsi9/discoverContextAvailability",  "POST", "1.1");
-  std::string    expected    = "{\n  \"registrationId\" : \"0\",\n  \"errorCode\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"bad request\",\n    \"details\" : \"Service not recognized\"\n  }\n}\n";
-  std::string    expected2   = "{\n  \"errorCode\" : {\n    \"code\" : \"404\",\n    \"reasonPhrase\" : \"No context element registrations found\"\n  }\n}\n";
-  const char*    fileName    = "ngsi9.discoverContextAvailabilityRequest.ok.valid.json";
+  const char*    infile    = "ngsi9.discoverContextAvailabilityRequest.ok.valid.json";
+  const char*    outfile1  = "ngsi9.discoverContextAvailabilityRsponse.serviceNotRecognized.valid.json";
+  const char*    outfile2  = "ngsi9.discoverContextAvailabilityRsponse.notFound.valid.json";
   std::string    out;
 
   utInit();
 
   // No such service
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   ci.outFormat    = JSON;
   ci.inFormat     = JSON;
   ci.payload      = testBuf;
   ci.payloadSize  = strlen(testBuf);
   out             = restService(&ci, rs);
-  EXPECT_EQ(expected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Not found
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   ci.outFormat    = JSON;
   ci.inFormat     = JSON;
   ci.payload      = testBuf;
   ci.payloadSize  = strlen(testBuf);
   out             = restService(&ci, rs2);
-  EXPECT_EQ(expected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

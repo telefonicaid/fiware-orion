@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextAttributeVector.h"
+
+#include "unittest.h"
 
 
 
@@ -40,18 +40,24 @@ TEST(ContextAttributeVector, render)
   ContextAttributeVector  cav;
   ContextAttribute        ca("Name", "Type", "Value");
   std::string             out;
-  std::string             expected = "<contextAttributeList>\n  <contextAttribute>\n    <name>Name</name>\n    <type>Type</type>\n    <contextValue>Value</contextValue>\n  </contextAttribute>\n</contextAttributeList>\n";
+  const char*             outfile = "ngsi.contextAttributeList.render.middle.xml";
 
-  out = cav.render(XML, "");
+  utInit();
+
+  out = cav.render(UpdateContextAttribute, XML, "");
   EXPECT_STREQ("", out.c_str());
 
   cav.push_back(&ca);
-  out = cav.render(XML, "");
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  out = cav.render(UpdateContextAttribute, XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Just to exercise the code ...
   cav.present("");
+
+  utExit();
 }
+
 
 
 /* ****************************************************************************

@@ -32,6 +32,7 @@
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/StatusCode.h"
 #include "convenience/ContextAttributeResponse.h"
+#include "ngsi/Request.h"
 
 
 
@@ -39,13 +40,13 @@
 *
 * render - 
 */
-std::string ContextAttributeResponse::render(Format format, std::string indent)
+std::string ContextAttributeResponse::render(RequestType request, Format format, std::string indent)
 {
   std::string tag = "contextAttributeResponse";
   std::string out = "";
 
   out += startTag(indent, tag, format);
-  out += contextAttributeVector.render(format, indent + "  ");
+  out += contextAttributeVector.render(request, format, indent + "  ");
   out += statusCode.render(format, indent + "  ");
   out += endTag(indent, tag, format);
 
@@ -60,23 +61,30 @@ std::string ContextAttributeResponse::render(Format format, std::string indent)
 */
 std::string ContextAttributeResponse::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
-   ContextAttributeResponse  response;
-   std::string               res;
+   std::string  res;
 
    if (predetectedError != "")
    {
-     response.statusCode.code         = SccBadRequest;
-     response.statusCode.reasonPhrase = predetectedError;
+     statusCode.code         = SccBadRequest;
+     statusCode.reasonPhrase = predetectedError;
    }
    else if ((res = contextAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
    {
-     response.statusCode.code         = SccBadRequest;
-     response.statusCode.reasonPhrase = res;
+     LM_E(("contextAttributeVector::check flags an error: '%s'", res.c_str()));
+     statusCode.code         = SccBadRequest;
+     statusCode.reasonPhrase = res;
+
+     //
+     // If this ContextAttributeResponse is part of an IndividualContextEntity, the complete rendered 
+     // response is not desired, just the string returned from the check method
+     //
+     if (requestType == IndividualContextEntity)
+       return res;
    }
    else 
       return "OK";
 
-   return response.render(format, indent);
+   return render(requestType, format, indent);
 }
 
 

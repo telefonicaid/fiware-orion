@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextRegistrationVector.h"
+
+#include "unittest.h"
 
 
 
@@ -40,12 +40,17 @@ TEST(ContextRegistrationVector, render)
   ContextRegistrationVector  crv;
   ContextRegistration        cr;
   std::string                out;
-  std::string                expected = "<contextRegistrationList>\n  <contextRegistration>\n  </contextRegistration>\n</contextRegistrationList>\n";
+  const char*                outfile = "ngsi.contextRegistrationVector.render.middle.xml";
+
+  utInit();
 
   out = crv.render(XML, "", false);
   EXPECT_STREQ("", out.c_str());
 
   crv.push_back(&cr);
   out = crv.render(XML, "", false);
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }

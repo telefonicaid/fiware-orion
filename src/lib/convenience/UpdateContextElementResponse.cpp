@@ -37,7 +37,7 @@
 *
 * render - 
 */
-std::string UpdateContextElementResponse::render(Format format, std::string indent)
+std::string UpdateContextElementResponse::render(RequestType requestType, Format format, std::string indent)
 {
    std::string tag = "updateContextElementResponse";
    std::string out = "";
@@ -47,7 +47,7 @@ std::string UpdateContextElementResponse::render(Format format, std::string inde
    if ((errorCode.code != NO_ERROR_CODE) && (errorCode.code != SccOk))
      out += errorCode.render(format, indent + "  ");
    else
-     out += contextResponseVector.render(format, indent + "  ");
+     out += contextAttributeResponseVector.render(requestType, format, indent + "  ");
 
    out += endTag(indent, tag, format);
 
@@ -65,19 +65,13 @@ std::string UpdateContextElementResponse::check(RequestType requestType, Format 
   std::string res;
   
   if (predetectedError != "")
-  {
-    errorCode.code         = SccBadRequest;
-    errorCode.reasonPhrase = predetectedError;
-  }
-  else if ((res = contextResponseVector.check(requestType, format, indent, "", counter)) != "OK")
-  {
-    errorCode.code         = SccBadRequest;
-    errorCode.reasonPhrase = res;
-  }
+    errorCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), predetectedError);
+  else if ((res = contextAttributeResponseVector.check(requestType, format, indent, "", counter)) != "OK")
+    errorCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), res);
   else
     return "OK";
 
-  return render(format, indent);
+  return render(requestType, format, indent);
 }
 
 
@@ -88,6 +82,6 @@ std::string UpdateContextElementResponse::check(RequestType requestType, Format 
 */
 void UpdateContextElementResponse::release(void)
 {
-  contextResponseVector.release();
+  contextAttributeResponseVector.release();
   errorCode.release();
 }

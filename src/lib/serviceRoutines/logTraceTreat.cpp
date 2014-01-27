@@ -31,6 +31,7 @@
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/orionReply.h"
+#include "rest/OrionError.h"
 #include "serviceRoutines/logTraceTreat.h"
 
 
@@ -87,7 +88,10 @@ std::string logTraceTreat(ConnectionInfo* ciP, int components, std::vector<std::
     out = orionReply(ciP, "tracelevels", compV[2]);
   }
   else
-    out = orionReply(ciP, "bad URL/Verb", ciP->method + " " + path);
+  {
+    OrionError error(SccBadRequest, httpStatusCodeString(SccBadRequest), std::string("bad URL/Verb: ") + ciP->method + " " + path);
+    out = error.render(ciP->outFormat, "");
+  }
 
   return out;
 }

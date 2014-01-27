@@ -22,10 +22,10 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "serviceRoutines/badVerbAllFour.h"
 #include "rest/RestService.h"
+
+#include "unittest.h"
 
 
 
@@ -53,22 +53,26 @@ TEST(badVerbAllFour, error)
   ConnectionInfo ci2("/ngsi10/contextEntities",      "PUST", "1.1");
   ConnectionInfo ci3("/ngsi10/",                     "PUST", "1.1");
   ConnectionInfo ci4("/ngsi10/1/2/3/4",              "PUST", "1.1");
-  std::string    expected  = "";  // Bad verb gives no payload, only HTTP headers
-  std::string    expected3 = "<orionError>\n  <code>400</code>\n  <reasonPhrase>bad request</reasonPhrase>\n  <details>Service not recognized</details>\n</orionError>\n";
+  const char*    outfile = "orion.serviceNotRecognized.valid.xml";
   std::string    out;
 
+  utInit();
+
   out = restService(&ci1, rs);
-  EXPECT_EQ(expected, out);
+  EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci1.httpHeader[0]);
   EXPECT_EQ("POST, GET, PUT, DELETE", ci1.httpHeaderValue[0]);
 
   out = restService(&ci2, rs);
-  EXPECT_EQ(expected, out);
+  EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci2.httpHeader[0]);
   EXPECT_EQ("POST, GET, PUT, DELETE", ci2.httpHeaderValue[0]);
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   out = restService(&ci3, rs);
-  EXPECT_EQ(expected3, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   out = restService(&ci4, rs);
-  EXPECT_EQ(expected3, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }

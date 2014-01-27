@@ -151,14 +151,14 @@ echo "4: ***********************************"
 --REGEXPECT--
 1: ***********************************
 HTTP/1.1 200 OK
-Content-Length: 95
+Content-Length: 94
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
-        "reasonPhrase": "No context elements found"
+        "code": "404",
+        "reasonPhrase": "No context element found"
     }
 }
 2: ***********************************
@@ -173,14 +173,14 @@ Date: REGEX(.*)
 }
 3: ***********************************
 HTTP/1.1 200 OK
-Content-Length: 95
+Content-Length: 94
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "404", 
-        "reasonPhrase": "No context elements found"
+        "code": "404",
+        "reasonPhrase": "No context element found"
     }
 }
 4: ***********************************

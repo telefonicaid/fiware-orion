@@ -1,0 +1,10 @@
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="ETYPE" isPattern="true">
+      <id>EID</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>Attribute</attribute>
+  </attributeList>
+</queryContextRequest>

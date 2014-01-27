@@ -230,7 +230,7 @@ Date: REGEX(.*)
 </discoverContextAvailabilityResponse>
 6: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 199
+Content-Length: 185
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -238,7 +238,7 @@ Date: REGEX(.*)
 <discoverContextAvailabilityResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context element registrations found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </discoverContextAvailabilityResponse>
 7: ++++++++++++++++++++
@@ -255,5 +255,5 @@ Date: REGEX(.*)
 
 9: ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
+source ../harnessFunctions.sh
 brokerStop CB

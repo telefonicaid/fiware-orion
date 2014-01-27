@@ -1,0 +1,6 @@
+<notifyContextAvailabilityResponse>
+  <responseCode>
+    <code>400</code>
+    <reasonPhrase>bad length (24 chars expected)</reasonPhrase>
+  </responseCode>
+</notifyContextAvailabilityResponse>

@@ -22,12 +22,11 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
+
 #include "unittest.h"
 
 
@@ -41,15 +40,21 @@ TEST(UpdateContextSubscriptionResponse, constructors)
   UpdateContextSubscriptionResponse  ucsr1;
   ErrorCode                          ec(SccBadRequest, "RP", "D");
   UpdateContextSubscriptionResponse  ucsr2(ec);
-  std::string                        rendered;
-  std::string                        expected1 = "<updateContextSubscriptionResponse>\n  <subscribeResponse>\n    <subscriptionId>000000000000000000000000</subscriptionId>\n  </subscribeResponse>\n</updateContextSubscriptionResponse>\n";
-  std::string                        expected2 = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <subscriptionId>0</subscriptionId>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>RP</reasonPhrase>\n      <details>D</details>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
+  std::string                        out;
+  const char*                        outfile1 = "ngsi10.updateContextSubscriptionResponse.empty.valid.xml";
+  const char*                        outfile2 = "ngsi10.updateContextSubscriptionResponse.badRequest.valid.xml";
   
-  rendered = ucsr1.render(UpdateContextSubscription, XML, "");
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  utInit();
 
-  rendered = ucsr2.render(UpdateContextSubscription, XML, "");
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  out = ucsr1.render(UpdateContextSubscription, XML, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  out = ucsr2.render(UpdateContextSubscription, XML, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -67,7 +72,7 @@ TEST(UpdateContextSubscriptionResponse, json_render)
   const char*                         filename5  = "ngsi10.updateContextSubscriptionResponse.jsonRender5.valid.json";
   const char*                         filename6  = "ngsi10.updateContextSubscriptionResponse.jsonRender6.valid.json";
   UpdateContextSubscriptionResponse*  ucsrP;
-  std::string                         rendered;
+  std::string                         out;
 
   utInit();
 
@@ -85,8 +90,8 @@ TEST(UpdateContextSubscriptionResponse, json_render)
   ucsrP->subscribeError.errorCode.fill(SccBadRequest, "Bad Request", "details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = ucsrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = ucsrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
 
@@ -95,8 +100,8 @@ TEST(UpdateContextSubscriptionResponse, json_render)
   ucsrP->subscribeError.subscriptionId.set("012345678901234567890123");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = ucsrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = ucsrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucsrP->subscribeError.errorCode.fill(NO_ERROR_CODE, "", "");
 
@@ -106,8 +111,8 @@ TEST(UpdateContextSubscriptionResponse, json_render)
   ucsrP->subscribeResponse.subscriptionId.set("012345678901234567890123");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  rendered = ucsrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = ucsrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
 
@@ -115,8 +120,8 @@ TEST(UpdateContextSubscriptionResponse, json_render)
   ucsrP->subscribeResponse.throttling.set("PT1M");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
-  rendered = ucsrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = ucsrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
 
@@ -125,8 +130,8 @@ TEST(UpdateContextSubscriptionResponse, json_render)
   ucsrP->subscribeResponse.duration.set("PT1H");
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename5)) << "Error getting test data from '" << filename5 << "'";
-  rendered = ucsrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = ucsrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
 
@@ -134,8 +139,8 @@ TEST(UpdateContextSubscriptionResponse, json_render)
   ucsrP->subscribeResponse.throttling.set("PT1M");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename6)) << "Error getting test data from '" << filename6 << "'";
-  rendered = ucsrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = ucsrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

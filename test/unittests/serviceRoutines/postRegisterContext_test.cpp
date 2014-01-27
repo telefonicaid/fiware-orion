@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/postRegisterContext.h"
@@ -55,20 +53,21 @@ TEST(postRegisterContext, ok)
 {
   ConnectionInfo ci("/ngsi9/registerContext",  "POST", "1.1");
   ConnectionInfo ci2("/ngsi9/registerContext",  "POST", "1.1");
-  std::string    expectedStart   = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <registrationId>";
-  std::string    expected2       = "<registerContextResponse>\n  <registrationId>012345678901234567890123</registrationId>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Registration Not Found</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
-  const char*    fileName        = "ngsi9.registerContextRequest.ok.valid.xml";
-  const char*    fileName2       = "ngsi9.registerContextRequest.update.valid.xml";
+  const char*    infile1   = "ngsi9.registerContextRequest.ok.valid.xml";
+  const char*    infile2   = "ngsi9.registerContextRequest.update.valid.xml";
+  const char*    outfile1  = "ngsi9.registerContextResponse.postRegisterContext1.middle.xml";
+  const char*    outfile2  = "ngsi9.registerContextResponse.postRegisterContext2.valid.xml";
   std::string    out;
 
   // Avoid forwarding of messages
-  extern int fwdPort;
-  int saved = fwdPort;
+  extern int     fwdPort;
+  int            saved = fwdPort;
   fwdPort = 0;
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   ci.outFormat    = XML;
   ci.inFormat     = XML;
   ci.payload      = testBuf;
@@ -76,16 +75,23 @@ TEST(postRegisterContext, ok)
   out             = restService(&ci, rs);
 
   char* outStart  = (char*) out.c_str();
-  outStart[expectedStart.length()] = 0;
-  EXPECT_STREQ(expectedStart.c_str(), outStart);
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName2)) << "Error getting test data from '" << fileName2 << "'";
+  // Remove last char in expectedBuf
+  expectedBuf[strlen(expectedBuf) - 1] = 0;
+
+  // Shorten'out' to be of same length as expectedBuf
+  outStart[strlen(expectedBuf)]    = 0;
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   ci2.outFormat    = XML;
   ci2.inFormat     = XML;
   ci2.payload      = testBuf;
   ci2.payloadSize  = strlen(testBuf);
   out              = restService(&ci2, rs);
-  EXPECT_EQ(expected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Putting old value back
   fwdPort = saved;

@@ -112,7 +112,7 @@ exitValue=0
 #
 # Actual work
 #
-for FILE in $(find $SRC_TOP/test/ -name "*.json" | grep -v '\.invalid\.json'$)
+for FILE in $(find $SRC_TOP/test/ -name "*.json" | grep -v '\.invalid\.json'$ | grep -v '\.middle\.json'$)
 do
   if [ "$filter" != "" ]
   then

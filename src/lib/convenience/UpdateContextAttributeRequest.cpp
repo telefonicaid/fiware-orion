@@ -42,6 +42,7 @@
 */
 UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 {
+  metadataVector.tagSet("metadata");
 }
 
 
@@ -52,7 +53,7 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 */
 std::string UpdateContextAttributeRequest::render(Format format, std::string indent)
 {
-  std::string tag = "updateContexAttributeRequest";
+  std::string tag = "updateContextAttributeRequest";
   std::string out = "";
   std::string indent2 = indent + "  ";
 

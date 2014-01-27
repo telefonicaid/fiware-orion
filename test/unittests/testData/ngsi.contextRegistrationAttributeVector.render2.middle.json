@@ -1,0 +1,12 @@
+"attributes" : [
+  {
+    "name" : "name",
+    "type" : "type",
+    "isDomain" : "false"
+  },
+  {
+    "name" : "name2",
+    "type" : "type2",
+    "isDomain" : "true"
+  }
+]

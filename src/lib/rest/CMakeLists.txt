@@ -28,6 +28,7 @@ SET (SOURCES
     clientSocketHttp.cpp
     orionReply.cpp
     OrionError.cpp
+    HttpStatusCode.cpp
 )
 
 SET (HEADERS
@@ -41,6 +42,7 @@ SET (HEADERS
     clientSocketHttp.h
     orionReply.h
     OrionError.h
+    HttpStatusCode.h
 )
 
 

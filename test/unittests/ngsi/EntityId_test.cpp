@@ -22,9 +22,9 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "ngsi/EntityId.h"
+
+#include "unittest.h"
 
 
 
@@ -35,19 +35,24 @@
 TEST(EntityId, render)
 {
   EntityId     eId;
-  std::string  json;
-  std::string  xml;
-  std::string  jsonExpected = "\"type\" : \"\",\n\"isPattern\" : \"\",\n\"id\" : \"\"\n";
-  std::string  xmlExpected  = "<eId type=\"\" isPattern=\"\">\n  <id></id>\n</eId>\n";
+  std::string  out;
+  const char*  outfile1 = "ngsi.entityId.render.middle.xml";
+  const char*  outfile2 = "ngsi.entityId.render.middle.json";
+
+  utInit();
 
   eId.tagSet("eId");
   EXPECT_STREQ("eId", eId.tag.c_str());
-  
-  json = eId.render(JSON, "");
-  EXPECT_STREQ(jsonExpected.c_str(), json.c_str());
 
-  xml = eId.render(XML, "");
-  EXPECT_STREQ(xmlExpected.c_str(), xml.c_str());
+  out = eId.render(XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  out = eId.render(JSON, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -60,7 +65,11 @@ TEST(EntityId, present)
 {
   EntityId     eId;
 
+  utInit();
+
   eId.tagSet("entityId");
   eId.present("", -1);
   eId.present("", 0);
+
+  utExit();
 }

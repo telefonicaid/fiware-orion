@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -31,22 +29,27 @@
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 
+#include "unittest.h"
+
 
 
 /* ****************************************************************************
 *
-* - 
+* jsonTreat - 
 */
 TEST(jsonRequest, jsonTreat)
 {
    ConnectionInfo  ci("/ngsi9/registerContext", "POST", "1.1");
    ParseData       parseData;
-   
+   std::string     out;
+   const char*     outfile1 = "orion.jsonRequest.jsonTreat.valid.json";
+
+   utInit();
+
    ci.outFormat = JSON;
-
-   std::string  out;
-   std::string  expected1 = "{\n  \"orionError\" : {\n    \"code\" : \"400\",\n    \"reasonPhrase\" : \"no request treating object found\",\n    \"details\" : \"Sorry, no request treating object found for RequestType 'InvalidRequest'\"\n  }\n}\n";
-
    out  = jsonTreat("", &ci, &parseData, InvalidRequest, "no_payload", NULL);
-   EXPECT_EQ(expected1, out);
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+   EXPECT_STREQ(expectedBuf, out.c_str());
+
+   utExit();
 }
