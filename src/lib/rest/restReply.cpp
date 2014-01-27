@@ -234,7 +234,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string in
 
    if (tag == "registerContextResponse")
    {
-      RegisterContextResponse rcr("0", errorCode);
+      RegisterContextResponse rcr("000000000000000000000000", errorCode);
       reply =  rcr.render(RegisterContext, format, indent);
    }
    else if (tag == "discoverContextAvailabilityResponse")
@@ -244,7 +244,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string in
    }
    else if (tag == "subscribeContextAvailabilityResponse")
    {
-      SubscribeContextAvailabilityResponse scar("0", errorCode);
+      SubscribeContextAvailabilityResponse scar("000000000000000000000000", errorCode);
       reply =  scar.render(SubscribeContextAvailability, format, indent);
    }
    else if (tag == "updateContextAvailabilitySubscriptionResponse")

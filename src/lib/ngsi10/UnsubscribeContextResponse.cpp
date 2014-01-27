@@ -49,7 +49,7 @@ UnsubscribeContextResponse::UnsubscribeContextResponse()
 UnsubscribeContextResponse::UnsubscribeContextResponse(StatusCode& _statusCode)
 {
    statusCode.fill(&_statusCode);
-   subscriptionId.set("0");
+   subscriptionId.set("000000000000000000000000");
 }
 
 

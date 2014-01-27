@@ -47,7 +47,7 @@ UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse() {
 * UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse -
 */
 UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse(StatusCode& errorCode) {
-   subscribeError.subscriptionId.set("0");
+   subscribeError.subscriptionId.set("000000000000000000000000");
    subscribeError.errorCode.fill(&errorCode);
    subscribeError.errorCode.tagSet("errorCode");
 }
