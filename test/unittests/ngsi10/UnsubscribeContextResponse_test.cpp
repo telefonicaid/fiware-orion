@@ -24,7 +24,6 @@
 */
 #include "ngsi10/UnsubscribeContextResponse.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
 
 #include "unittest.h"
 
@@ -39,7 +38,7 @@ TEST(UnsubscribeContextResponse, constructorsAndRender)
   UnsubscribeContextResponse  uncr1;
   StatusCode                  sc(SccOk, "RP", "D");
   UnsubscribeContextResponse  uncr2(sc);
-  ErrorCode                   ec(SccBadRequest, "RP", "D");
+  StatusCode                  ec(SccBadRequest, "RP", "D");
   UnsubscribeContextResponse  uncr3(ec);
   std::string                 out;
   const char*                 outfile = "ngsi10.unsubscribeContextResponse.constructorsAndRender.ok.valid.xml";

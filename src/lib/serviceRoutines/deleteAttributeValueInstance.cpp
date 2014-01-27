@@ -62,7 +62,7 @@ std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, st
   request.contextElementVector.push_back(ceP);
   request.updateActionType.set("DELETE");
 
-  response.errorCode.code = NO_ERROR_CODE;
+  response.errorCode.code = SccNone;
   mongoUpdateContext(&request, &response);
   
   StatusCode statusCode;
@@ -72,7 +72,7 @@ std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, st
   {
      ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
 
-    if (response.errorCode.code != NO_ERROR_CODE)
+    if (response.errorCode.code != SccNone)
       statusCode.fill(&response.errorCode);
     else if (cerP->statusCode.code != SccNone)
        statusCode.fill(&cerP->statusCode);

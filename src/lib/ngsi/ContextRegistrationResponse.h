@@ -28,7 +28,7 @@
 #include <string>
 
 #include "ngsi/ContextRegistration.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 #include "ngsi/Request.h"
 
 
@@ -40,7 +40,7 @@
 typedef struct ContextRegistrationResponse
 {
   ContextRegistration   contextRegistration;    // Mandatory
-  ErrorCode             errorCode;              // Optional
+  StatusCode            errorCode;              // Optional
 
   ContextRegistrationResponse();
 

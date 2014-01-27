@@ -26,7 +26,7 @@
 
 #include "common/Format.h"
 #include "common/tag.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 #include "ngsi/ContextRegistrationResponse.h"
 #include "ngsi/Request.h"
 
@@ -38,7 +38,7 @@
 */
 ContextRegistrationResponse::ContextRegistrationResponse()
 {
-  errorCode.code = NO_ERROR_CODE;
+  errorCode.tagSet("errorCode");
 }
 
 
@@ -52,7 +52,7 @@ std::string ContextRegistrationResponse::render(Format format, std::string inden
   std::string  xmlTag            = "contextRegistrationResponse";
   std::string  jsonTag           = "contextRegistration";
   std::string  out               = "";
-  bool         errorCodeRendered = errorCode.code != NO_ERROR_CODE;
+  bool         errorCodeRendered = errorCode.code != SccNone;
 
   out += startTag(indent, xmlTag, jsonTag, format, false, false);
 

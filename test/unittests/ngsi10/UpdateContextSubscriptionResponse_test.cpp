@@ -38,7 +38,7 @@
 TEST(UpdateContextSubscriptionResponse, constructors)
 {
   UpdateContextSubscriptionResponse  ucsr1;
-  ErrorCode                          ec(SccBadRequest, "RP", "D");
+  StatusCode                         ec(SccBadRequest, "RP", "D");
   UpdateContextSubscriptionResponse  ucsr2(ec);
   std::string                        out;
   const char*                        outfile1 = "ngsi10.updateContextSubscriptionResponse.empty.valid.xml";
@@ -103,7 +103,7 @@ TEST(UpdateContextSubscriptionResponse, json_render)
   out = ucsrP->render(QueryContext, JSON, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ucsrP->subscribeError.errorCode.fill(NO_ERROR_CODE, "", "");
+  ucsrP->subscribeError.errorCode.fill(SccNone, "", "");
 
 
 

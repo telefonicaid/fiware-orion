@@ -31,7 +31,6 @@
 #include "common/tag.h"
 #include "common/globals.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
 #include "ngsi9/NotifyContextAvailabilityResponse.h"
 #include "rest/HttpStatusCode.h"
 
@@ -55,17 +54,6 @@ NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse()
 NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse(StatusCode& sc)
 {
    responseCode = sc;
-}
-
-
-
-/* ****************************************************************************
-*
-* NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse -
-*/
-NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse(ErrorCode& ec)
-{
-   responseCode.fill(&ec);
 }
 
 

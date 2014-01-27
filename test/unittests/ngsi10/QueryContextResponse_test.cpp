@@ -36,8 +36,8 @@
 */
 TEST(QueryContextResponse, ok_xml)
 {
-  ErrorCode*            ecP = new ErrorCode(SccOk, "Reason", "Detail");
-  ErrorCode             ec(SccOk, "Reason2", "Detail2");
+  StatusCode*           ecP = new StatusCode(SccOk, "Reason", "Detail");
+  StatusCode            ec(SccOk, "Reason2", "Detail2");
   QueryContextResponse  qcr1;
   QueryContextResponse  qcr2(ec);
   std::string           out;

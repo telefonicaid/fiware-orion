@@ -31,7 +31,6 @@
 
 #include "ngsi/ParseData.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
 
@@ -225,7 +224,7 @@ TEST(NotifyContextResponse, Constructor)
   ncr.present("");
   ncr.release();
 
-  ErrorCode ec(SccOk, "3", "4");
+  StatusCode ec(SccOk, "3", "4");
   NotifyContextResponse ncr2(ec);
   EXPECT_EQ(SccOk, ncr2.responseCode.code);
 

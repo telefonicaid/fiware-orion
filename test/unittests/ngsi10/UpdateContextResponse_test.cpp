@@ -35,7 +35,7 @@
 TEST(UpdateContextResponse, constructors)
 {
   UpdateContextResponse  ucr1;
-  ErrorCode              ec(SccBadRequest, "RP", "D");
+  StatusCode             ec(SccBadRequest, "RP", "D");
   UpdateContextResponse  ucr2(ec);
   std::string            out;
   const char*            outfile1 = "ngsi10.updateContextResponse.constructors.render1.valid.xml";

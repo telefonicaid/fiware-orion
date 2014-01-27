@@ -46,11 +46,11 @@ UnsubscribeContextAvailabilityResponse::UnsubscribeContextAvailabilityResponse()
 *
 * UnsubscribeContextAvailabilityResponse::UnsubscribeContextAvailabilityResponse - 
 */
-UnsubscribeContextAvailabilityResponse::UnsubscribeContextAvailabilityResponse(ErrorCode& errorCode)
+UnsubscribeContextAvailabilityResponse::UnsubscribeContextAvailabilityResponse(StatusCode& sc)
 {
-   subscriptionId.set("");
+  subscriptionId.set("");
 
-   statusCode.fill(&errorCode);
+  statusCode.fill(&sc);
 }
 
 /* ****************************************************************************
@@ -77,7 +77,7 @@ UnsubscribeContextAvailabilityResponse::~UnsubscribeContextAvailabilityResponse(
 */
 std::string UnsubscribeContextAvailabilityResponse::render(RequestType requestType, Format format, std::string indent)
 {
-  std::string out     = "";
+  std::string out = "";
   std::string tag = "unsubscribeContextAvailabilityResponse";
 
   out += startTag(indent, tag, format, false);

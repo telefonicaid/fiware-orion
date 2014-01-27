@@ -1,4 +1,4 @@
 <statusCode>
-  <code>0</code>
-  <reasonPhrase></reasonPhrase>
+  <code>500</code>
+  <reasonPhrase> - ZERO code set to 500</reasonPhrase>
 </statusCode>

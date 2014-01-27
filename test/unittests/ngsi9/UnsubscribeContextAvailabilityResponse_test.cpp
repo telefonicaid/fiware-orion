@@ -24,7 +24,6 @@
 */
 #include "ngsi9/UnsubscribeContextAvailabilityResponse.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
 
 #include "unittest.h"
 
@@ -44,7 +43,7 @@ TEST(UnsubscribeContextAvailabilityResponse, constructorsAndRender)
   subscriptionId.set("111122223333444455556666");
 
   UnsubscribeContextAvailabilityResponse  ucar2(subscriptionId);
-  ErrorCode                               ec(SccBadRequest, "RP", "D");
+  StatusCode                              ec(SccBadRequest, "RP", "D");
   UnsubscribeContextAvailabilityResponse  ucar3(ec);
   std::string                             out;
   const char*                             outfile = "ngsi9.unsubscribeContextAvailabilityResponse.constructorsAndRender.valid.xml";

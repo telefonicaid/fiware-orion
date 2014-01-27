@@ -30,7 +30,6 @@
 
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
 
 
 
@@ -44,7 +43,6 @@ typedef struct NotifyContextResponse
 
   NotifyContextResponse();
   NotifyContextResponse(StatusCode& sc);
-  NotifyContextResponse(ErrorCode& ec);
 
   std::string   render(RequestType requestType, Format format, std::string indent);
   void          present(std::string indent);
