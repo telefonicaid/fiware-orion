@@ -79,12 +79,11 @@ static void prepareDatabase(std::string id, std::string type)
 */
 TEST(mapDeleteIndividualContextEntityAttribute, notFound)
 {
-  HttpStatusCode  ms;
   StatusCode      sc;
 
   prepareDatabase("ID", "NAME");
 
-  ms = mapDeleteIndividualContextEntityAttribute("ID2", "NAME2", &sc);
+  mapDeleteIndividualContextEntityAttribute("ID2", "NAME2", &sc);
 
   EXPECT_EQ(SccContextElementNotFound, sc.code);
   EXPECT_STREQ("No context element found", sc.reasonPhrase.c_str());
@@ -106,7 +105,6 @@ TEST(mapDeleteIndividualContextEntityAttribute, ok)
 
   prepareDatabase("ID", "TYPE");
 
-  HttpStatusCode ms;
   StatusCode     sc;
 
   TimerMock* timerMock = new TimerMock();
@@ -116,7 +114,7 @@ TEST(mapDeleteIndividualContextEntityAttribute, ok)
 
   LM_M(("-------------------------------------------------"));
   LM_M(("getTimer: %p", getTimer()));
-  ms = mapDeleteIndividualContextEntityAttribute(id, name, &sc);
+  mapDeleteIndividualContextEntityAttribute(id, name, &sc);
   LM_M(("getTimer: %p", getTimer()));
 
   EXPECT_EQ(SccOk, sc.code);
