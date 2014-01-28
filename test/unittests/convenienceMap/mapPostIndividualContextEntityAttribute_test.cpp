@@ -94,6 +94,13 @@ TEST(mapPostIndividualContextEntityAttribute, notFoundThenFound)
 
   ms = mapPostIndividualContextEntityAttribute("MPICE2", "A9", &request, &response);
   EXPECT_EQ(SccOk, ms);
+
   // FIXME P9: Why is there a 200 OK here?
+  //           Why not?
+  //
+  //           POST /ngsi10/contextEntities/*/attributes/* :
+  //           This operation allows adding new value instances, possibly including metadata, for the attribute represented by the resource.
+  //           The request body is an instance of updateContextAttributeRequest; the response body is an instance of StatusCode.
+  //
   EXPECT_EQ(200, response.code);
 }
