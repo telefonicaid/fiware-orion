@@ -26,7 +26,7 @@
 
 #include "common/Format.h"
 #include "common/tag.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 #include "ngsi/Request.h"
 #include "ngsi/SubscribeError.h"
 
@@ -38,6 +38,7 @@
 */
 SubscribeError::SubscribeError()
 {
+  errorCode.tagSet("errorCode");
 }
 
 

@@ -166,7 +166,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, json_invalidIsPattern)
 TEST(UpdateContextAvailabilitySubscriptionRequest, response)
 {
   UpdateContextAvailabilitySubscriptionResponse  ucas;
-  ErrorCode                                      ec(SccBadRequest, "Reason", "Detail");
+  StatusCode                                     ec(SccBadRequest, "Reason", "Detail");
   UpdateContextAvailabilitySubscriptionResponse  ucas2(ec);
   std::string                                    out;
   const char*                                    outfile1 = "ngsi9.updateContextAvailabilitySubscriptionResponse.response1.ok.xml";
@@ -192,7 +192,7 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, response)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
   
-  ucas.errorCode.fill(NO_ERROR_CODE, "", "");
+  ucas.errorCode.fill(SccNone, "", "");
   ucas.duration.set("ddd");
   out = ucas.check(UpdateContextAvailabilitySubscription, XML, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";

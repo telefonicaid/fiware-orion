@@ -35,7 +35,7 @@
 TEST(SubscribeContextResponse, constructorsAndRender)
 {
   SubscribeContextResponse  scr1;
-  ErrorCode                 ec(SccOk, "RP", "D");
+  StatusCode                ec(SccOk, "RP", "D");
   SubscribeContextResponse  scr2(ec);
   std::string               out;
   const char*               outfile = "ngsi10.subscribeContextResponse.ok.valid.xml";
@@ -99,7 +99,7 @@ TEST(SubscribeContextResponse, json_render)
   out = scrP->render(SubscribeContext, JSON, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  scrP->subscribeError.errorCode.fill(NO_ERROR_CODE, "", "");
+  scrP->subscribeError.errorCode.fill(SccNone, "", "");
 
 
 

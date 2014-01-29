@@ -26,7 +26,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
 
 #include "unittest.h"
 
@@ -81,7 +80,7 @@ TEST(StatusCode, fill)
 {
   StatusCode    sc;
   StatusCode    sc2(SccOk, "Reason", "Details");
-  ErrorCode     ec(SccBadRequest, "Bad request", "Very bad request :-)");
+  StatusCode    ec(SccBadRequest, "Bad request", "Very bad request :-)");
   std::string   out;
 
   utInit();

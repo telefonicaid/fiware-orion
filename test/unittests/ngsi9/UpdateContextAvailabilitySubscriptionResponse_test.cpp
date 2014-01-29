@@ -71,7 +71,7 @@ TEST(UpdateContextAvailabilitySubscriptionResponse, jsonRender)
 
 
   // 3. +subscriptionId +duration -errorCode
-  ucasP->errorCode.fill(NO_ERROR_CODE, "", "");
+  ucasP->errorCode.fill(SccNone, "", "");
   ucasP->duration.set("PT1H");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
