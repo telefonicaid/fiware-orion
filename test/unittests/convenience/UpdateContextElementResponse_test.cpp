@@ -37,9 +37,9 @@
 
 /* ****************************************************************************
 *
-* render - 
+* render_xml - 
 */
-TEST(UpdateContextElementResponse, render)
+TEST(UpdateContextElementResponse, render_xml)
 {
   UpdateContextElementResponse    ucer;
   ContextAttributeResponse        car;
@@ -61,9 +61,33 @@ TEST(UpdateContextElementResponse, render)
 
 /* ****************************************************************************
 *
-* check - 
+* render_json - 
 */
-TEST(UpdateContextElementResponse, check)
+TEST(UpdateContextElementResponse, render_json)
+{
+  UpdateContextElementResponse    ucer;
+  ContextAttributeResponse        car;
+  ContextAttribute                ca("caName", "caType", "caValue");
+  std::string                     out;
+  const char*                     outfile = "ngsi10.updateContextElementResponse.ok.postponed.json";
+
+  // Just the normal case
+  ucer.contextAttributeResponseVector.push_back(&car);
+  car.contextAttributeVector.push_back(&ca);
+  car.statusCode.fill(SccOk, httpStatusCodeString(SccOk), "details");
+
+  out = ucer.render(UpdateContext, JSON, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* check_xml - 
+*/
+TEST(UpdateContextElementResponse, check_xml)
 {
   UpdateContextElementResponse  ucer;
   ContextAttributeResponse      car;
@@ -87,5 +111,38 @@ TEST(UpdateContextElementResponse, check)
   // 3. OK
   ca.name = "NAME";
   out = ucer.check(IndividualContextEntity, XML, "", "", 0);
+  EXPECT_EQ("OK", out);
+}
+
+
+
+/* ****************************************************************************
+*
+* check_json - 
+*/
+TEST(UpdateContextElementResponse, check_json)
+{
+  UpdateContextElementResponse  ucer;
+  ContextAttributeResponse      car;
+  ContextAttribute              ca("", "TYPE", "VALUE"); // empty name, thus provoking error
+  std::string                   out;
+  const char*                   outfile1 = "ngsi10.updateContextElementResponse.check1.postponed.json";
+  const char*                   outfile2 = "ngsi10.updateContextElementResponse.check2.postponed.json";
+
+  // 1. predetected error
+  out = ucer.check(IndividualContextEntity, JSON, "", "PRE ERR", 0);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  // 2. bad contextAttributeResponseVector
+  car.contextAttributeVector.push_back(&ca);
+  ucer.contextAttributeResponseVector.push_back(&car);
+  out = ucer.check(IndividualContextEntity, JSON, "", "", 0);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  // 3. OK
+  ca.name = "NAME";
+  out = ucer.check(IndividualContextEntity, JSON, "", "", 0);
   EXPECT_EQ("OK", out);
 }
