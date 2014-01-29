@@ -56,11 +56,11 @@
 * Globals
 */
 static unsigned short            port          = 0;
-static char                      bindIp[MAX_LEN_IP_V4]    = "0.0.0.0";
+static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
 static RestService*              restServiceV  = NULL;
 static MHD_Daemon*               mhdDaemon     = NULL;
 static struct sockaddr_in        sad;
-static char                      bindIpV6[MAX_LEN_IP_V6]  = "::";
+static char                      bindIpV6[MAX_LEN_IP]  = "::";
 static MHD_Daemon*               mhdDaemon_v6  = NULL;
 static struct sockaddr_in6       sad_v6;
 
@@ -434,23 +434,21 @@ static int connectionTreat
 }
 
 
-
-// RBL
 /* ****************************************************************************
 *
 * restInit - 
 */
-void restInit(char* _bind, unsigned short _port, RestService* _restServiceV, bool use_v6 )
+void restInit(char* _bind, unsigned short _port, RestService* _restServiceV, bool useIpV6 )
 {
-   if (use_v6)
+   if (useIpV6)
    {
-     memset (bindIpV6, 0, MAX_LEN_IP_V6);
-     strncpy (bindIpV6, _bind, MAX_LEN_IP_V6 - 1);
+     memset (bindIpV6, 0, MAX_LEN_IP);
+     strncpy (bindIpV6, _bind, MAX_LEN_IP - 1);
    }
    else
    {
-     memset (bindIp, 0, MAX_LEN_IP_V4);
-     strncpy (bindIp, _bind, MAX_LEN_IP_V4 - 1);
+     memset (bindIp, 0, MAX_LEN_IP);
+     strncpy (bindIp, _bind, MAX_LEN_IP - 1);
    }
 
    port          = _port;
@@ -464,14 +462,14 @@ void restInit(char* _bind, unsigned short _port, RestService* _restServiceV, boo
 *
 * restStart - 
 */
-int restStart(bool use_v6)
+int restStart(bool useIpV6)
 {
   int ret;
 
   if (port == 0)
      LM_RE(1, ("Please call restInit before starting the REST service"));
 
-  if (!use_v6)
+  if (!useIpV6)
   { 
     // Code for IPv4 stack
     ret = inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr));
@@ -487,7 +485,7 @@ int restStart(bool use_v6)
                                htons(port),
                                NULL,
                                NULL,
-                               &connectionTreat,
+                               connectionTreat,
                                NULL,
                                MHD_OPTION_NOTIFY_COMPLETED,
                                requestCompleted,
@@ -518,7 +516,7 @@ int restStart(bool use_v6)
                                htons(port),
                                NULL,
                                NULL,
-                               &connectionTreat,
+                               connectionTreat,
                                NULL,
                                MHD_OPTION_NOTIFY_COMPLETED,
                                requestCompleted,

@@ -41,7 +41,7 @@
 */
 bool checkGroupIPv6(std::string in)
 {
-  // Can recieve for exemple:
+  // Can receive for example:
   // :, 2001:, db8:, 0DB8:
 
   if (in.empty()) return false;
@@ -50,16 +50,10 @@ bool checkGroupIPv6(std::string in)
 
   if (in.length() > 5) return false;
 
-  bool resu;
-  for (uint i=0; i < in.length()-1 ; i++) 
+  bool resu = true;
+  for (uint i=0; i < in.length() - 1 ; i++) 
   {
-     if (((in[i] >= '0') && ( in[i] <= '9')) 
-          || ((in[i] >= 'a') && ( in[i] <= 'f'))
-          || ((in[i] >= 'A') && ( in[i] <= 'F')))
-     {
-       resu = true;
-     }
-     else 
+     if (isxdigit(in[i]) == false)
      {
        resu = false;
        break;
@@ -80,27 +74,28 @@ bool isIPv6(std::string in)
    //  2001:0db8:85a3:08d3:1319:8a2e:0370:7334
 
    size_t pos;
-   bool goodip = true;
    std::string partip;
    std::string resu;
    std::string staux = in;
    int cont = 0;
 
    pos = staux.find(":");
-   while ((pos != std::string::npos) && (goodip))
+   while (pos != std::string::npos)
    {
-      cont ++;
+      cont++;
       partip = staux.substr(0, pos+1);
       resu += partip;
 
-      goodip = checkGroupIPv6(partip);
+      if (checkGroupIPv6(partip)== false)
+         return false;
+
       partip = staux.substr(pos+1);
       staux = partip;
 
       pos = staux.find(":");
    }
 
-   return ((goodip) && (cont > 1) && (cont < 8));
+   return ((cont > 1) && (cont < 8));
 }
 
 /* ****************************************************************************
@@ -132,10 +127,7 @@ bool getIPv6Port(std::string in, std::string& outIp, std::string& outPort)
    outIp = resu.substr(0, resu.length() -1 );
    outPort = staux;
 
-   if (isIPv6(resu))
-      return true;
-   else
-      return false;
+   return isIPv6(resu);
 }
 
 
@@ -241,7 +233,7 @@ bool parseUrl(std::string url, std::string& host, int& port, std::string& path)
     std::string  auxIp;
     std::string  auxPort;
 
-    // First we check if is IPv6
+    // First we check if it is IPv6
     if (getIPv6Port(urlTokens[2], auxIp, auxPort))  
     {
       // IPv6

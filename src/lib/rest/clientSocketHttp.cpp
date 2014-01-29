@@ -49,23 +49,23 @@
 *
 * socketHttpConnect -
 */
-int socketHttpConnect (std::string host, unsigned short port)
+int socketHttpConnect(std::string host, unsigned short port)
 {
   int                 fd;
-  int status;
-  struct addrinfo hints;
-  struct addrinfo *peer;
-  char port_str[10];
+  int                 status;
+  struct addrinfo     hints;
+  struct addrinfo*    peer;
+  char                port_str[10];
 
 
- LM_VVV (("Generic Connect to: '%s'  port: '%d'", host.c_str(), port));
+ LM_VVV(("Generic Connect to: '%s'  port: '%d'", host.c_str(), port));
 
  memset(&hints, 0, sizeof(struct addrinfo));
  hints.ai_family = AF_UNSPEC;    // Allow IPv4 or IPv6
  hints.ai_socktype = SOCK_STREAM;
  hints.ai_protocol = 0;
 
- snprintf (port_str, sizeof(port_str), "%d" , port);
+ snprintf(port_str, sizeof(port_str), "%d" , port);
 
  if ((status = getaddrinfo(host.c_str(), port_str, &hints, &peer)) != 0) {
      LM_RE(-1, ("getaddrinfo('%s'): %s", host.c_str(), strerror(errno)));

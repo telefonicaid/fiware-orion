@@ -30,9 +30,7 @@
 
 #include "rest/RestService.h"
 
-// RBL
-#define  MAX_LEN_IP_V4   16 
-#define  MAX_LEN_IP_V6   64
+#define  MAX_LEN_IP   64
 
 /* ****************************************************************************
 *
