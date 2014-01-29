@@ -607,18 +607,18 @@ int main(int argC, char* argV[])
   if (!ngsi9Only)
      recoverOntimeIntervalThreads();
 
-  memset (bindAddressV4, 0, MAX_LEN_IP);
-  memset (bindAddressV6, 0, MAX_LEN_IP);
+  memset(bindAddressV4, 0, MAX_LEN_IP);
+  memset(bindAddressV6, 0, MAX_LEN_IP);
 
   if (isIPv6(std::string(bindAddress)))
   { 
-    strncpy (bindAddressV4, LOCAL_IP_V4, MAX_LEN_IP - 1);
-    strncpy (bindAddressV6, bindAddress, MAX_LEN_IP - 1);
+    strncpy(bindAddressV4, LOCAL_IP_V4, MAX_LEN_IP - 1);
+    strncpy(bindAddressV6, bindAddress, MAX_LEN_IP - 1);
   }
   else
   {
-    strncpy (bindAddressV4, bindAddress, MAX_LEN_IP - 1);
-    strncpy (bindAddressV6, LOCAL_IP_V6, MAX_LEN_IP - 1);
+    strncpy(bindAddressV4, bindAddress, MAX_LEN_IP - 1);
+    strncpy(bindAddressV6, LOCAL_IP_V6, MAX_LEN_IP - 1);
   }
   LM_M(("LocalIpV4 '%s'", bindAddressV4));
   LM_M(("LocalIpV6 '%s'", bindAddressV6));

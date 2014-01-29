@@ -442,13 +442,13 @@ void restInit(char* _bind, unsigned short _port, RestService* _restServiceV, boo
 {
    if (useIpV6)
    {
-     memset (bindIpV6, 0, MAX_LEN_IP);
-     strncpy (bindIpV6, _bind, MAX_LEN_IP - 1);
+     memset(bindIpV6, 0, MAX_LEN_IP);
+     strncpy(bindIpV6, _bind, MAX_LEN_IP - 1);
    }
    else
    {
-     memset (bindIp, 0, MAX_LEN_IP);
-     strncpy (bindIp, _bind, MAX_LEN_IP - 1);
+     memset(bindIp, 0, MAX_LEN_IP);
+     strncpy(bindIp, _bind, MAX_LEN_IP - 1);
    }
 
    port          = _port;
