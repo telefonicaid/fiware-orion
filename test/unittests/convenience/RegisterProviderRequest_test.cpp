@@ -34,6 +34,8 @@
 #include "rest/ConnectionInfo.h"
 #include "xmlParse/xmlRequest.h"
 #include "xmlParse/xmlRegisterProviderRequest.h"
+#include "jsonParse/jsonRequest.h"
+#include "jsonParse/jsonRegisterProviderRequest.h"
 
 #include "testDataFromFile.h"
 
@@ -95,5 +97,66 @@ TEST(RegisterProviderRequest, xml_ok)
   result = xmlTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, "registerProviderRequest", NULL);
   EXPECT_EQ("OK", result);
   rendered = reqData.rpr.res.render(XML, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* json_ok -
+*/
+TEST(RegisterProviderRequest, json_ok)
+{
+  ParseData       reqData;
+  const char*     inFile1  = "ngsi9.registerProviderRequest.noRegistrationId.postponed.json";
+  const char*     inFile2  = "ngsi9.registerProviderRequest.ok.postponed.json";
+  const char*     outFile1 = "ngsi9.registerProviderRequestRendered.noRegistrationId.postponed.json";
+  const char*     outFile2 = "ngsi9.registerProviderRequest.noMetdataName.valid.json";
+  const char*     outFile3 = "ngsi9.registerProviderRequest.predetectedError.valid.json";
+  const char*     outFile4 = "ngsi9.registerProviderRequestRendered.ok.postponed.json";
+  std::string     result;
+  std::string     rendered;
+  std::string     checked;
+  ConnectionInfo  ci("", "POST", "1.1");
+
+
+  // 1. Normal registerProviderRequest
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile1)) << "Error getting test data from '" << inFile1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile1)) << "Error getting test data from '" << outFile1 << "'";
+
+  result = jsonTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, "registerProviderRequest", NULL);
+  EXPECT_EQ("OK", result) << "this test should be OK";
+
+  rendered = reqData.rpr.res.render(JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+
+  // 2. Destroying metadata to provoke an error
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
+
+  reqData.rpr.res.metadataVector.get(0)->name = "";
+  checked = reqData.rpr.res.check(DiscoverContextAvailability, JSON, "", "", 0);
+  EXPECT_STREQ(expectedBuf, checked.c_str());
+
+
+  // 3. sending a 'predetected error' to the check function
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile3)) << "Error getting test data from '" << outFile3 << "'";
+
+  checked   = reqData.rpr.res.check(DiscoverContextAvailability, JSON, "", "forced predetectedError", 0);
+  EXPECT_STREQ(expectedBuf, checked.c_str());
+
+  // Just for coverage
+  reqData.rpr.res.release();
+  rprRelease(&reqData);
+
+
+  // 4. Second file
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile2)) << "Error getting test data from '" << inFile2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile4)) << "Error getting test data from '" << outFile4 << "'";
+
+  result = jsonTreat(testBuf, &ci, &reqData, ContextEntitiesByEntityId, "registerProviderRequest", NULL);
+  EXPECT_EQ("OK", result);
+  rendered = reqData.rpr.res.render(JSON, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 }
