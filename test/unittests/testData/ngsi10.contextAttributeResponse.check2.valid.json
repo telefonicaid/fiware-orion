@@ -1,0 +1,18 @@
+{
+  "attributes" : [
+    {
+      "name" : "caName",
+      "type" : "caType",
+      "contextValue" : "caValue"
+    },
+    {
+      "name" : "",
+      "type" : "caType",
+      "contextValue" : "caValue"
+    }
+  ],
+  "statusCode" : {
+    "code" : "400",
+    "reasonPhrase" : "missing attribute name"
+  }
+}
