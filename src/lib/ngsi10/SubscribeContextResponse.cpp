@@ -45,7 +45,7 @@ SubscribeContextResponse::~SubscribeContextResponse() {
 SubscribeContextResponse::SubscribeContextResponse()
 {
    subscribeError.errorCode.tagSet("errorCode");
-   subscribeError.subscriptionId.set("0");
+   subscribeError.subscriptionId.set("000000000000000000000000");
 }
 
 /* ****************************************************************************
@@ -54,7 +54,7 @@ SubscribeContextResponse::SubscribeContextResponse()
 */
 SubscribeContextResponse::SubscribeContextResponse(StatusCode& errorCode)
 {
-   subscribeError.subscriptionId.set("0");
+   subscribeError.subscriptionId.set("000000000000000000000000");
    subscribeError.errorCode.fill(&errorCode);
    subscribeError.errorCode.tagSet("errorCode");
 }

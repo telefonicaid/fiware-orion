@@ -42,8 +42,8 @@ TEST(SubscribeContextResponse, constructorsAndRender)
 
   utInit();
 
-  EXPECT_STREQ("0", scr1.subscribeError.subscriptionId.get().c_str());
-  EXPECT_STREQ("0", scr2.subscribeError.subscriptionId.get().c_str());
+  EXPECT_STREQ("000000000000000000000000", scr1.subscribeError.subscriptionId.get().c_str());
+  EXPECT_STREQ("000000000000000000000000", scr2.subscribeError.subscriptionId.get().c_str());
   EXPECT_STREQ("RP", scr2.subscribeError.errorCode.reasonPhrase.c_str());
 
   out = scr2.render(SubscribeContext, XML, "");

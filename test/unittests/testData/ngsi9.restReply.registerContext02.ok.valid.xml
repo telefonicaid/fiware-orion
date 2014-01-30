@@ -1,5 +1,5 @@
 <registerContextResponse>
-  <registrationId>0</registrationId>
+  <registrationId>000000000000000000000000</registrationId>
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
