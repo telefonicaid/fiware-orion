@@ -21,19 +21,25 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-IPv6 Subscription sequence ONCHANGE
+IPv6 Feature Disabled 
 
 --SHELL-INIT--
 source harnessFunctions.sh
 
 dbInit CB
-brokerStart CB 0-255 IPV6
+brokerStart CB
+accumulatorStart
 accumulatorStart IPV6
 
 --SHELL--
 source harnessFunctions.sh
 
-SUB_OUT=$((curl :::${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+echo "1: ++++++++++++++++++++"
+curl :::${BROKER_PORT}/version  2>resu_ipv6_version_fails.stderr
+cat resu_ipv6_version_fails.stderr
+
+echo "2: ++++++++++++++++++++"
+SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -45,7 +51,7 @@ SUB_OUT=$((curl :::${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Conten
         <attribute>temperature</attribute>
         <attribute>lightstatus</attribute>
   </attributeList>
-  <reference>http://:::${LISTENER_PORT}/notify</reference>
+  <reference>http://:::${LISTENER_PORT_V6}/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
         <notifyCondition>
@@ -60,9 +66,9 @@ SUB_OUT=$((curl :::${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Conten
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "$SUB_OUT"
-echo "1: ++++++++++++++++++++"
 
-(curl :::${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+echo "3: ++++++++++++++++++++"
+(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -91,12 +97,19 @@ EOF
 # Get notifications count
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
-echo "2: ++++++++++++++++++++"
-
+echo "4: ++++++++++++++++++++"
 #Get accumulated data
-curl :::${LISTENER_PORT}/dump -s -S 
+curl :::${LISTENER_PORT_V6}/number -s -S 
+
+echo "5: ++++++++++++++++++++"
+#Get accumulated data
+curl localhost:${LISTENER_PORT}/number -s -S
 
 --REGEXPECT--
+1: ++++++++++++++++++++
+
+curl: (7) couldn't connect to host
+2: ++++++++++++++++++++
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
@@ -104,7 +117,7 @@ curl :::${LISTENER_PORT}/dump -s -S
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-1: ++++++++++++++++++++
+3: ++++++++++++++++++++
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -134,42 +147,15 @@ curl :::${LISTENER_PORT}/dump -s -S
   </contextResponseList>
 </updateContextResponse>
 { "count" : 1 }
-2: ++++++++++++++++++++
-POST http:///notify
-Content-Length: 738
-User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: :::REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/xml
-
-<notifyContextRequest>
-  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-  <originator>localhost</originator>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue>L23</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</notifyContextRequest>
-
-=======================================
+4: ++++++++++++++++++++
+1
+5: ++++++++++++++++++++
+0
 --TEARDOWN--
 source harnessFunctions.sh
 
+rm resu_ipv6_version_fails.stderr
+
 brokerStop CB
 accumulatorStop
+accumulatorStop IPV6
