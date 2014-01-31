@@ -620,8 +620,8 @@ int main(int argC, char* argV[])
     strncpy(bindAddressV4, bindAddress, MAX_LEN_IP - 1);
     strncpy(bindAddressV6, LOCAL_IP_V6, MAX_LEN_IP - 1);
   }
-  LM_M(("LocalIpV4 '%s'", bindAddressV4));
-  LM_M(("LocalIpV6 '%s'", bindAddressV6));
+  LM_V(("LocalIpV4 '%s'", bindAddressV4));
+  LM_V(("LocalIpV6 '%s'", bindAddressV6));
 
   RestService* rsP = ngsi9Only? restServiceNgsi9V : restServiceV;
   restInit(bindAddressV4, port, rsP);
