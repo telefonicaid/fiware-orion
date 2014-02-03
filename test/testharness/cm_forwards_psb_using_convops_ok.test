@@ -191,7 +191,7 @@ Date: REGEX(.*)
 <?xml version="1.0"?>
 <orionError>
   <code>400</code>
-  <reasonPhrase>bad request</reasonPhrase>
+  <reasonPhrase>Bad Request</reasonPhrase>
   <details>service '/NGSI10/queryContext' not found</details>
 </orionError>
 1: ++++++++++++++++++++

@@ -111,7 +111,7 @@ echo "13: ++++++++++++++++++++"
 
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 319
+Content-Length: 315
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -120,13 +120,13 @@ Date: REGEX(.*)
   <registrationId>000000000000000000000000</registrationId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Invalid payload</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Expected 'registerContextRequest' payload, got 'discoverContextAvailabilityRequest'</details>
   </errorCode>
 </registerContextResponse>
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 283
+Content-Length: 279
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -134,13 +134,13 @@ Date: REGEX(.*)
 <discoverContextAvailabilityResponse>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Invalid payload</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Expected 'discoverContextAvailabilityRequest' payload, got 'registerContextRequest'</details>
   </errorCode>
 </discoverContextAvailabilityResponse>
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 346
+Content-Length: 342
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -149,13 +149,13 @@ Date: REGEX(.*)
   <subscriptionId>000000000000000000000000</subscriptionId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Invalid payload</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Expected 'subscribeContextAvailabilityRequest' payload, got 'registerContextRequest'</details>
   </errorCode>
 </subscribeContextAvailabilityResponse>
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 373
+Content-Length: 369
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -164,13 +164,13 @@ Date: REGEX(.*)
   <subscriptionId>000000000000000000000000</subscriptionId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Invalid payload</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Expected 'updateContextAvailabilitySubscriptionRequest' payload, got 'registerContextRequest'</details>
   </errorCode>
 </updateContextAvailabilitySubscriptionResponse>
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 354
+Content-Length: 350
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -179,13 +179,13 @@ Date: REGEX(.*)
   <subscriptionId>000000000000000000000000</subscriptionId>
   <statusCode>
     <code>400</code>
-    <reasonPhrase>Invalid payload</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Expected 'unsubscribeContextAvailabilityRequest' payload, got 'registerContextRequest'</details>
   </statusCode>
 </unsubscribeContextAvailabilityResponse>
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 238
+Content-Length: 234
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -193,13 +193,13 @@ Date: REGEX(.*)
 <queryContextResponse>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Invalid payload</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Expected 'queryContextRequest' payload, got 'registerContextRequest'</details>
   </errorCode>
 </queryContextResponse>
 6: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 241
+Content-Length: 237
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -207,13 +207,13 @@ Date: REGEX(.*)
 <updateContextResponse>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Invalid payload</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Expected 'updateContextRequest' payload, got 'registerContextRequest'</details>
   </errorCode>
 </updateContextResponse>
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 299
+Content-Length: 295
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -222,14 +222,14 @@ Date: REGEX(.*)
   <subscribeError>
     <errorCode>
       <code>400</code>
-      <reasonPhrase>Invalid payload</reasonPhrase>
+      <reasonPhrase>Bad Request</reasonPhrase>
       <details>Expected 'subscribeContextRequest' payload, got 'registerContextRequest'</details>
     </errorCode>
   </subscribeError>
 </subscribeContextResponse>
 8: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 388
+Content-Length: 384
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -239,14 +239,14 @@ Date: REGEX(.*)
     <subscriptionId>000000000000000000000000</subscriptionId>
     <errorCode>
       <code>400</code>
-      <reasonPhrase>Invalid payload</reasonPhrase>
+      <reasonPhrase>Bad Request</reasonPhrase>
       <details>Expected 'updateContextSubscriptionRequest' payload, got 'registerContextRequest'</details>
     </errorCode>
   </subscribeError>
 </updateContextSubscriptionResponse>
 9: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 318
+Content-Length: 314
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -255,32 +255,32 @@ Date: REGEX(.*)
   <subscriptionId>000000000000000000000000</subscriptionId>
   <statusCode>
     <code>400</code>
-    <reasonPhrase>Invalid payload</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Expected 'unsubscribeContextRequest' payload, got 'registerContextRequest'</details>
   </statusCode>
 </unsubscribeContextResponse>
 10: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 169
+Content-Length: 163
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <orionError>
   <code>400</code>
-  <reasonPhrase>bad ngsi9 request</reasonPhrase>
+  <reasonPhrase>Bad Request</reasonPhrase>
   <details>ngsi9 service '/NGSI9/notSupportedRequest' not found</details>
 </orionError>
 11: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 172
+Content-Length: 165
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <orionError>
   <code>400</code>
-  <reasonPhrase>bad ngsi10 request</reasonPhrase>
+  <reasonPhrase>Bad Request</reasonPhrase>
   <details>ngsi10 service '/NGSI10/notSupportedRequest' not found</details>
 </orionError>
 12: ++++++++++++++++++++
@@ -292,7 +292,7 @@ Date: REGEX(.*)
 <?xml version="1.0"?>
 <orionError>
   <code>400</code>
-  <reasonPhrase>bad request</reasonPhrase>
+  <reasonPhrase>Bad Request</reasonPhrase>
   <details>service '/notSupportedRequest' not found</details>
 </orionError>
 13: ++++++++++++++++++++
