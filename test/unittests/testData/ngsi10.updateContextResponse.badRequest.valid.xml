@@ -1,7 +1,7 @@
 <updateContextResponse>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Bad request</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>unsupported attribute for EntityId</details>
   </errorCode>
 </updateContextResponse>

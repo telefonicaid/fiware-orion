@@ -1,7 +1,7 @@
 <notifyContextResponse>
   <responseCode>
     <code>200</code>
-    <reasonPhrase>ok</reasonPhrase>
+    <reasonPhrase>OK</reasonPhrase>
     <details>detail</details>
   </responseCode>
 </notifyContextResponse>

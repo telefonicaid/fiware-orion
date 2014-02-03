@@ -42,7 +42,7 @@
 StatusCode::StatusCode()
 {
   code         = SccNone;
-  reasonPhrase = "";
+  reasonPhrase = "Ununitialized";
   details      = "";
   tag          = "statusCode";
 }
@@ -53,14 +53,27 @@ StatusCode::StatusCode()
 *
 * StatusCode::StatusCode - 
 */
-StatusCode::StatusCode(HttpStatusCode _code, std::string _reasonPhrase, std::string _details, std::string _tag)
+StatusCode::StatusCode(std::string _tag)
+{
+  code         = SccNone;
+  reasonPhrase = "Ununitialized";
+  details      = "";
+  tag          = _tag;
+}
+
+
+
+/* ****************************************************************************
+*
+* StatusCode::StatusCode - 
+*/
+StatusCode::StatusCode(HttpStatusCode _code, std::string _details, std::string _tag)
 {
   code          = _code;
-  reasonPhrase  = _reasonPhrase;
+  reasonPhrase  = httpStatusCodeString(code);
   details       = _details;
   tag           = _tag;
 }
-
 
 
 /* ****************************************************************************
@@ -73,8 +86,8 @@ std::string StatusCode::render(Format format, std::string indent, bool comma)
 
   if (code == SccNone)
   {
-    code          = SccReceiverInternalError;
-    reasonPhrase += " - ZERO code set to 500";
+    fill(SccReceiverInternalError, "");
+    details += " - ZERO code set to 500";
   }
 
   out += startTag(indent, tag, format);
@@ -95,10 +108,10 @@ std::string StatusCode::render(Format format, std::string indent, bool comma)
 *
 * StatusCode::fill - 
 */
-void StatusCode::fill(HttpStatusCode _code, std::string _reasonPhrase, std::string _details)
+void StatusCode::fill(HttpStatusCode _code, std::string _details)
 {
    code          = _code;
-   reasonPhrase  = _reasonPhrase;
+   reasonPhrase  = httpStatusCodeString(code);
    details       = _details;
 }
 
@@ -110,9 +123,7 @@ void StatusCode::fill(HttpStatusCode _code, std::string _reasonPhrase, std::stri
 */
 void StatusCode::fill(StatusCode* scP)
 {
-   code          = scP->code;
-   reasonPhrase  = scP->reasonPhrase;
-   details       = scP->details;
+   fill(scP->code, scP->details);
 }
 
 

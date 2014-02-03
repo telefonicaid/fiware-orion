@@ -1,7 +1,7 @@
 <discoverContextAvailabilityResponse>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Reason</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Detail</details>
   </errorCode>
 </discoverContextAvailabilityResponse>

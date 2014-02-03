@@ -47,7 +47,7 @@ TEST(SubscribeError, render)
   utInit();
 
   se.subscriptionId.set("SUB_123");
-  se.errorCode.fill(SccBadRequest, "reason", "detail");
+  se.errorCode.fill(SccBadRequest, "detail");
 
   out = se.render(RegisterContext, XML, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";

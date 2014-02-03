@@ -1,5 +1,5 @@
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Password requested</details>
+  <details>Service not recognized: ngsi9</details>
 </orionError>

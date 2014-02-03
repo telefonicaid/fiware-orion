@@ -46,7 +46,7 @@ TEST(ContextRegistrationResponse, render)
 
   utInit();
 
-  crr.errorCode.code = SccNone;
+  crr.errorCode.fill(SccNone);
   rendered = crr.render(XML, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
@@ -54,7 +54,7 @@ TEST(ContextRegistrationResponse, render)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
-  crr.errorCode.code = SccBadRequest;
+  crr.errorCode.fill(SccBadRequest);
   rendered = crr.render(XML, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());

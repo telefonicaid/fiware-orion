@@ -285,9 +285,9 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -457,9 +457,9 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -629,9 +629,9 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(3, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -827,9 +827,9 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(3, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -1028,9 +1028,9 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -1214,9 +1214,9 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -1392,9 +1392,9 @@ TEST(mongoUpdateContextRequest, update1EntNAttrSameName)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -1576,9 +1576,9 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -1768,9 +1768,9 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -1944,9 +1944,9 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -2120,9 +2120,9 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(3, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -2332,9 +2332,9 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(3, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -2548,9 +2548,9 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -2744,9 +2744,9 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -2937,9 +2937,9 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -3150,9 +3150,9 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -3316,9 +3316,9 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -3482,9 +3482,9 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(3, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -3669,9 +3669,9 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(3, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -3860,9 +3860,9 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -4038,9 +4038,9 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -4211,9 +4211,9 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -4384,9 +4384,9 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -4551,9 +4551,9 @@ TEST(mongoUpdateContextRequest, createEntity)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -4738,9 +4738,9 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -4931,9 +4931,9 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -5108,9 +5108,9 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -5279,9 +5279,9 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */      
@@ -5450,9 +5450,9 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -5620,9 +5620,9 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -5795,9 +5795,9 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response #1 */
@@ -5993,9 +5993,9 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -6166,9 +6166,9 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -6388,9 +6388,9 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -6612,9 +6612,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -6840,9 +6840,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -7076,9 +7076,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -7294,9 +7294,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -7511,9 +7511,9 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -7727,9 +7727,9 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(0,  res.errorCode.code);
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0,  res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -7944,7 +7944,7 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
@@ -8155,7 +8155,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
@@ -8221,7 +8221,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());

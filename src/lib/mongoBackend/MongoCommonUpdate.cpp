@@ -503,7 +503,7 @@ static void buildGeneralErrorReponse(ContextElement* ceP, ContextAttribute* ca, 
     if (ca != NULL) {
         cerP->contextElement.contextAttributeVector.push_back(ca);
     }
-    cerP->statusCode.fill(code, httpStatusCodeString(code), details);
+    cerP->statusCode.fill(code, details);
     responseP->contextElementResponseVector.push_back(cerP);
 
 }
@@ -546,12 +546,12 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
                 /* If updateAttribute() returns false, then that particular attribute has not
                  * been found. In this case, we interrupt the processing an early return with
                  * a error StatusCode */
-                cerP->statusCode.fill(SccInvalidParameter,
-                                      httpStatusCodeString(SccInvalidParameter),
+                cerP->statusCode.fill(SccInvalidParameter, 
                                       std::string("action: UPDATE") +
-                                          // FIXME: use toString once EntityID and ContextAttribute becomes objects
-                                          " - entity: (" + entityId + ", " + entityType + ")" +
-                                          " - offending attribute: " + ceP->contextAttributeVector.get(ix)->name);
+                                      // FIXME: use toString once EntityID and ContextAttribute becomes objects
+                                      " - entity: (" + entityId + ", " + entityType + ")" +
+                                      " - offending attribute: " + ceP->contextAttributeVector.get(ix)->name);
+
                 responseP->contextElementResponseVector.push_back(cerP);
                 return false;
 
@@ -567,11 +567,11 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
                  * we interrupt the processing an early return with
                  * a error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter,
-                                      httpStatusCodeString(SccInvalidParameter),
                                       std::string("action: APPEND") +
-                                          // FIXME: use toString once EntityID and ContextAttribute becomes objects
-                                          " - entity: (" + entityId + ", " + entityType + ")" +
-                                          " - offending attribute: " + ceP->contextAttributeVector.get(ix)->name);
+                                      // FIXME: use toString once EntityID and ContextAttribute becomes objects
+                                      " - entity: (" + entityId + ", " + entityType + ")" +
+                                      " - offending attribute: " + ceP->contextAttributeVector.get(ix)->name);
+
                 responseP->contextElementResponseVector.push_back(cerP);
                 return false;
             }
@@ -586,11 +586,11 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
                  * been found. In this case, we interrupt the processing an early return with
                  * a error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter,
-                                      httpStatusCodeString(SccInvalidParameter),
                                       std::string("action: DELETE") +
                                       // FIXME: use toString once EntityID and ContextAttribute becomes objects
-                                         " - entity: (" + entityId + ", " + entityType + ")" +
-                                         " - offending attribute: " + ceP->contextAttributeVector.get(ix)->name);
+                                      " - entity: (" + entityId + ", " + entityType + ")" +
+                                      " - offending attribute: " + ceP->contextAttributeVector.get(ix)->name);
+
                 responseP->contextElementResponseVector.push_back(cerP);
                 return false;
 
@@ -606,7 +606,7 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
         if (actualUpdate) {
             std::string err;
             if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, &err)) {
-                cerP->statusCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err );
+                cerP->statusCode.fill(SccReceiverInternalError, err);
                 responseP->contextElementResponseVector.push_back(cerP);
                 LM_RE(false, (err.c_str()));
             }
@@ -633,7 +633,7 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
         /* In this case, there wasn't any failure, but ceP was not set. We need to do it ourselves, as the function caller will
          * do a 'continue' without setting it. */
         //FIXME P5: this is ugly, it should be improve to set ceP in a common place for the "happy case"
-        cerP->statusCode.fill(SccOk, "OK");
+        cerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(cerP);
     }
 
@@ -828,13 +828,12 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             connection->update(getEntitiesCollectionName(), query, updatedEntity);
         }
         catch( const DBException &e ) {
-            cerP->statusCode.fill(
-                SccReceiverInternalError,
-                httpStatusCodeString(SccReceiverInternalError),
-                std::string("collection: ") + getEntitiesCollectionName() +
-                    " - update() query: " + query.toString() +
-                    " - update() doc: " + updatedEntity.toString() +
-                    " - exception: " + e.what());
+            cerP->statusCode.fill(SccReceiverInternalError,
+               std::string("collection: ") + getEntitiesCollectionName() +
+               " - update() query: " + query.toString() +
+               " - update() doc: " + updatedEntity.toString() +
+               " - exception: " + e.what());
+
             responseP->contextElementResponseVector.push_back(cerP);
             return;
         }
@@ -861,7 +860,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
         /* To finish with this entity processing, add the corresponding ContextElementResponse to
          * the global response */
-        cerP->statusCode.fill(SccOk, "OK");
+        cerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(cerP);
 
     }
@@ -893,17 +892,17 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
             std::string errReason, errDetail;
             if (!createEntity(en, ceP->contextAttributeVector, &errDetail)) {
-                cerP->statusCode.fill(SccInvalidParameter, httpStatusCodeString(SccInvalidParameter), errDetail);
+               cerP->statusCode.fill(SccInvalidParameter, errDetail);
             }
             else {
-                cerP->statusCode.fill(SccOk, httpStatusCodeString(SccOk));
+               cerP->statusCode.fill(SccOk);
 
                 /* Successful creation: send potential notifications */
                 std::map<string, BSONObj*> subsToNotify;
                 for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                     std::string err;
                     if (!addTriggeredSubscriptions(en.id, en.type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err)) {
-                        cerP->statusCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err );
+                        cerP->statusCode.fill(SccReceiverInternalError, err);
                         responseP->contextElementResponseVector.push_back(cerP);
                         LM_RVE((err.c_str()));
                     }

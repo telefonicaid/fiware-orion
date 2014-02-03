@@ -2,7 +2,7 @@
   <subscriptionId>012345678901234567890123</subscriptionId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Reason</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Detail</details>
   </errorCode>
 </updateContextAvailabilitySubscriptionResponse>

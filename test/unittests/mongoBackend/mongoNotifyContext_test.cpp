@@ -188,7 +188,7 @@ TEST(mongoNotifyContextRequest, Ent1Attr1)
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca("A1", "TA1", "new_val");
     cer.contextElement.contextAttributeVector.push_back(&ca);
-    cer.statusCode.fill(SccOk, "OK");
+    cer.statusCode.fill(SccOk, "");
     req.contextElementResponseVector.push_back(&cer);
 
     /* Prepare mock */
@@ -349,7 +349,7 @@ TEST(mongoNotifyContextRequest, Ent1AttrN)
     ContextAttribute ca2("A2", "TA2", "new_val2");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.statusCode.fill(SccOk, "OK");
+    cer.statusCode.fill(SccOk);
     req.contextElementResponseVector.push_back(&cer);
 
     /* Prepare mock */
@@ -508,12 +508,12 @@ TEST(mongoNotifyContextRequest, EntNAttr1)
     cer1.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "new_val");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.statusCode.fill(SccOk, "OK");
+    cer1.statusCode.fill(SccOk);
     req.contextElementResponseVector.push_back(&cer1);
     cer2.contextElement.entityId.fill("E2", "T2", "false");
     ContextAttribute ca2("A3", "TA3", "new_val2");
     cer2.contextElement.contextAttributeVector.push_back(&ca2);
-    cer2.statusCode.fill(SccOk, "OK");
+    cer2.statusCode.fill(SccOk);
     req.contextElementResponseVector.push_back(&cer2);
 
     /* Prepare mock */
@@ -674,14 +674,14 @@ TEST(mongoNotifyContextRequest, EntNAttrN)
     ContextAttribute ca2("A2", "TA2", "new_val2");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
     cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.statusCode.fill(SccOk, "OK");
+    cer1.statusCode.fill(SccOk);
     req.contextElementResponseVector.push_back(&cer1);
     cer2.contextElement.entityId.fill("E2", "T2", "false");
     ContextAttribute ca3("A3", "TA3", "new_val3");
     ContextAttribute ca4("A4", "TA4", "new_val4");
     cer2.contextElement.contextAttributeVector.push_back(&ca3);
     cer2.contextElement.contextAttributeVector.push_back(&ca4);
-    cer2.statusCode.fill(SccOk, "OK");
+    cer2.statusCode.fill(SccOk);
     req.contextElementResponseVector.push_back(&cer2);
 
     /* Prepare mock */
@@ -840,7 +840,7 @@ TEST(mongoNotifyContextRequest, createEntity)
     cer.contextElement.entityId.fill("E10", "T10", "false");
     ContextAttribute ca("A1", "TA1", "new_val");
     cer.contextElement.contextAttributeVector.push_back(&ca);
-    cer.statusCode.fill(SccOk, "OK");
+    cer.statusCode.fill(SccOk);
     req.contextElementResponseVector.push_back(&cer);
 
     /* Prepare mock */
