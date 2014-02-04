@@ -101,6 +101,8 @@ int restReply(ConnectionInfo* ciP, std::string answer)
   int            ret;
   MHD_Response*  response;
 
+  LM_M(("--------------------------- In restReply -----------------------------------------"));
+
   ++replyIx;
   LM_T(LmtServiceOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answer.length(), ciP->httpStatusCode));
   LM_T(LmtServiceOutPayload, ("Response payload: '%s'", answer.c_str()));
@@ -132,6 +134,9 @@ int restReply(ConnectionInfo* ciP, std::string answer)
 
   if (ret != MHD_YES)
   {
+    LM_M(("MHD_queue_response failed - saving it"));
+    LM_M(("ciP at %p", ciP));
+
     if (strlen(answer.c_str()) > sizeof(savedResponse))
     {
        std::string errorAnswer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccReceiverInternalError, "Exceeding maximum size of response (2Mb)");

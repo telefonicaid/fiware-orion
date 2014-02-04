@@ -103,41 +103,6 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 
 
 
-extern char savedResponse[2 * 1024 * 1024];
-/* ****************************************************************************
-*
-* requestCompleted - 
-*/
-static void requestCompleted
-(
-  void*                       cls,
-  MHD_Connection*             connection,
-  void**                      con_cls,
-  MHD_RequestTerminationCode  toe
-)
-{
-  ConnectionInfo* ciP = (ConnectionInfo*) *con_cls;
-
-  if (ciP == NULL)
-    return;
-
-  LM_T(LmtHttpRequest, ("Request Completed. Read %d bytes of %d", ciP->payloadSize, ciP->httpHeaders.contentLength));
-
-  if (savedResponse[0] != 0)
-  {
-     LM_T(LmtSavedResponse, ("Saved response found - responding ..."));
-     restReply(ciP, savedResponse);
-     savedResponse[0] = 0;
-  }
-
-  if (ciP->payload)
-     free(ciP->payload);
-  delete(ciP);
-  *con_cls = NULL;
-}
-
-
-
 /* ****************************************************************************
 *
 * wantedOutputSupported - 
@@ -250,7 +215,57 @@ static Format wantedOutputSupported(std::string acceptList, std::string* charset
 *
 * upload_data_size has to do with payload and only valid for such requests.
 */
-static int requests = 0;
+#if 1
+void serve(ConnectionInfo* ciP)
+{
+  if (ciP->payload == NULL)
+    LM_M(("Serving request %s %s without payload", ciP->method.c_str(), ciP->url.c_str()));
+  else
+    LM_M(("Serving request %s %s with %lu bytes of payload", ciP->method.c_str(), ciP->url.c_str(), ciP->httpHeaders.contentLength));
+
+  restService(ciP, restServiceV);
+}
+
+static void requestCompleted
+(
+  void*                       cls,
+  MHD_Connection*             connection,
+  void**                      con_cls,
+  MHD_RequestTerminationCode  toe
+)
+{
+  ConnectionInfo* ciP      = (ConnectionInfo*) *con_cls;
+
+  if (ciP->payload)
+    free(ciP->payload);
+  delete(ciP);
+  *con_cls = NULL;
+}
+
+static int formatCheck(ConnectionInfo* ciP)
+{
+  ciP->inFormat   = formatParse(ciP->httpHeaders.contentType, NULL);
+  ciP->outFormat  = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
+
+  if (ciP->outFormat == NOFORMAT)
+  {
+    /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
+    ciP->outFormat      = XML; // We use XML as default format
+    ciP->answer         = restErrorReplyGet(ciP, XML, "", "OrionError", SccNotAcceptable,
+                                            std::string("acceptable types: 'application/xml' but Accept header in request was: '" + ciP->httpHeaders.accept + "'");
+    ciP->httpStatusCode = SccNotAcceptable;
+
+    return 1;
+  }
+
+  return 0;
+}
+
+static int contentTypeCheck(ConnectionInfo* ciP)
+{
+   return 0;
+}
+
 static int connectionTreat
 (
    void*            cls,
@@ -264,6 +279,100 @@ static int connectionTreat
 )
 {
   ConnectionInfo* ciP      = (ConnectionInfo*) *con_cls;
+  size_t          dataLen  = *upload_data_size;
+
+  // 1. First call - setup ConnectionInfo and get/check HTTP headers
+  if (ciP == NULL)
+  {
+    if ((ciP = new ConnectionInfo(url, method, version, connection)) == NULL)
+      LM_RE(MHD_NO, ("Error allocating ConnectionInfo"));
+        
+    *con_cls = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
+
+    MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
+
+    if ((formatCheck(ciP) != 0) || (contentTypeCheck(ciP) != 0))
+      LM_W(("Error in out-format or content-type"));
+
+    LM_M(("ciP at %p", ciP));
+    return MHD_YES;
+  }
+
+
+  // 2-X. Data gathering calls, acknowledge the receipt of data
+  if ((dataLen != 0) && (dataLen == ciP->httpHeaders.contentLength))
+  {
+    ciP->payload = (char*) malloc(*upload_data_size + 1);
+
+    memcpy(ciP->payload, upload_data, *upload_data_size + 1);
+    *upload_data_size = 0;
+    return MHD_YES;
+  }
+
+
+  // 3. Finally, serve the request (unless an error has occurred)
+  if (ciP->answer != "")
+    restReply(ciP, answer);
+  else
+    serve(ciP);
+
+
+  return MHD_YES;
+}
+#else
+static int  requests = 0;
+extern char savedResponse[2 * 1024 * 1024];
+/* ****************************************************************************
+*
+* requestCompleted - 
+*/
+static void requestCompleted
+(
+  void*                       cls,
+  MHD_Connection*             connection,
+  void**                      con_cls,
+  MHD_RequestTerminationCode  toe
+)
+{
+  ConnectionInfo* ciP = (ConnectionInfo*) *con_cls;
+
+  LM_M(("--------------------------- In requestCompleted -----------------------------------------"));
+
+  if (ciP == NULL)
+    return;
+
+  LM_T(LmtHttpRequest, ("Request Completed. Read %d bytes of %d", ciP->payloadSize, ciP->httpHeaders.contentLength));
+
+  if (savedResponse[0] != 0)
+  {
+     LM_W(("Saved response found - responding ..."));
+     restReply(ciP, savedResponse);
+     savedResponse[0] = 0;
+  }
+
+  if (ciP->payload)
+     free(ciP->payload);
+  delete(ciP);
+  *con_cls = NULL;
+}
+
+
+
+static int connectionTreat
+(
+   void*            cls,
+   MHD_Connection*  connection,
+   const char*      url,
+   const char*      method,
+   const char*      version,
+   const char*      upload_data,
+   size_t*          upload_data_size,
+   void**           con_cls
+)
+{
+  ConnectionInfo* ciP      = (ConnectionInfo*) *con_cls;
+
+  LM_M(("--------------------------- In connectionTreat -----------------------------------------"));
 
   if (ciP == NULL)
     ++requests;
@@ -315,9 +424,7 @@ static int connectionTreat
        /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
        ciP->outFormat = XML; // We use XML as default format
        ciP->httpStatusCode = SccNotAcceptable;
-       char detail[256];
-       snprintf(detail, sizeof(detail), "aceptable types: application/xml but Accept header in request was: '%s'", ciP->httpHeaders.accept.c_str());
-       restReply(ciP, "Not Acceptable", detail);
+       restReply(ciP, "Not Acceptable", std::string("acceptable types: 'application/xml' but Accept header in request was: '" + ciP->httpHeaders.accept + "'"));
        return MHD_YES;
     }
 
@@ -428,6 +535,7 @@ static int connectionTreat
 
   return MHD_YES;
 }
+#endif
 
 
 
@@ -442,7 +550,7 @@ void restInit(char* _bind, unsigned short _port, RestService* _restServiceV)
    port          = _port;
    restServiceV  = _restServiceV;
 
-   savedResponse[0] = 0;
+   // savedResponse[0] = 0;
 }
 
 
