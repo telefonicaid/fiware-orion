@@ -1,6 +1,7 @@
 {
   "orionError" : {
     "code" : "200",
-    "reasonPhrase" : "Good Request"
+    "reasonPhrase" : "OK",
+    "details" : "Good Request"
   }
 }
