@@ -157,3 +157,28 @@ void SubscriptionId::release(void)
    /* This method is included for the sake of homogeneity */
    string = "";
 }
+
+
+
+/* ****************************************************************************
+*
+* SubscriptionId::rendered - 
+*/
+bool SubscriptionId::rendered(RequestType container)
+{
+  if ((string == "") || (string == "000000000000000000000000"))
+  {
+    if ((container == RtSubscribeContextAvailabilityResponse)     || (container == RtUpdateContextAvailabilitySubscriptionResponse) ||
+        (container == RtUnsubscribeContextAvailabilityResponse)   || (container == NotifyContextAvailability)                       ||
+        (container == UpdateContextSubscription)                  || (container == UnsubscribeContext)                              ||
+        (container == RtUnsubscribeContextResponse)               || (container == NotifyContext)                                   ||
+        (container == RtSubscribeResponse)                        || (container == RtSubscribeError))
+    {
+      return true;
+    }
+    else
+      return false; // subscriptionId is Optional
+  }
+
+  return true;
+}

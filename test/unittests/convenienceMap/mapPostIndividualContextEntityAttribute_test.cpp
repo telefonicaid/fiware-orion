@@ -94,6 +94,9 @@ TEST(mapPostIndividualContextEntityAttribute, notFoundThenFound)
 
   ms = mapPostIndividualContextEntityAttribute("MPICE2", "A9", &request, &response);
   EXPECT_EQ(SccOk, ms);
-  // FIXME P9: Why is there a 200 OK here?
+
+  // FIXME P9:  Why is there a 200 OK here?
+  //            To be removed when the convenienceMap library is removed.
+  //            See issue #117
   EXPECT_EQ(200, response.code);
 }
