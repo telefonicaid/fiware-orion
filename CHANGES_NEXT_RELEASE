@@ -5,3 +5,4 @@ o XSD:  Removed some XML tags with spaces ('verbose level' => 'verboseLevel')
 o XSD:  stripped 'reference' of whitespace
 o XSD:  added an empty contextAttributeList for ContextAttributeResponseVector inside
         IndividualContextEntityAttributes (/ngsi10/contextEntities/{EID}/attributes) as the XSD demands it
+o XSD:  Fixed a possible future error for JSON rendering of UpdateContextAvailabilitySubscriptionRequest
