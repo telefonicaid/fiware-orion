@@ -168,3 +168,18 @@ void ContextAttribute::release(void)
 {
   metadataVector.release();
 }
+
+
+
+/* ****************************************************************************
+*
+* toString - 
+*/
+std::string ContextAttribute::toString(std::string start, std::string end)
+{
+  std::string s;
+
+  s = start + name + end;
+
+  return s;
+}

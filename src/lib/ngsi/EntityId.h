@@ -55,6 +55,7 @@ public:
   void         fill(std::string _id, std::string _type, std::string _isPattern);
   void         present(std::string indent, int ix);
   void         release(void);
+  std::string  toString(std::string start, std::string end, std::string delimiter, bool useIsPattern);
 };
 
 #endif

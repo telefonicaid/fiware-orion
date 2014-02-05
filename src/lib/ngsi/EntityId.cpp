@@ -171,3 +171,23 @@ void EntityId::release(void)
 {
    /* This method is included for the sake of homogeneity */
 }
+
+
+
+/* ****************************************************************************
+*
+* toString - 
+*/
+std::string EntityId::toString(std::string start, std::string end, std::string delimiter, bool useIsPattern)
+{
+  std::string s;
+
+  s = start + id + delimiter + type;
+
+  if (useIsPattern)
+    s += delimiter + isPattern;
+
+  s += end;
+
+  return s;
+}

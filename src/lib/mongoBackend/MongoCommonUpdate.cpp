@@ -517,7 +517,8 @@ static void buildGeneralErrorReponse(ContextElement* ceP, ContextAttribute* ca, 
 */
 static bool processContextAttributeVector (ContextElement* ceP, std::string action, std::map<string, BSONObj*>* subsToNotify, BSONObj* attrs, BSONObj* newAttrs, ContextElementResponse* cerP, UpdateContextResponse* responseP) {
 
-    std::string entityId = cerP->contextElement.entityId.id;
+    EntityId*   eP         = &cerP->contextElement.entityId;
+    std::string entityId   = cerP->contextElement.entityId.id;
     std::string entityType = cerP->contextElement.entityId.type;
 
     bool entityModified = false;
@@ -543,14 +544,15 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
                 *attrs = *newAttrs;                
             }
             else {
+                ContextAttribute* aP = ceP->contextAttributeVector.get(ix);
+
                 /* If updateAttribute() returns false, then that particular attribute has not
                  * been found. In this case, we interrupt the processing an early return with
-                 * a error StatusCode */
+                 * an error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter, 
-                                      std::string("action: UPDATE") +
-                                      // FIXME: use toString once EntityID and ContextAttribute becomes objects
-                                      " - entity: (" + entityId + ", " + entityType + ")" +
-                                      " - offending attribute: " + ceP->contextAttributeVector.get(ix)->name);
+                                      std::string("action: UPDATE") + 
+                                      eP->toString(" - entity: (", ")", ", ", false) +
+                                      aP->toString(" - offending attribute: ", ""));
 
                 responseP->contextElementResponseVector.push_back(cerP);
                 return false;
