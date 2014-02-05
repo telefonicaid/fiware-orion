@@ -51,45 +51,6 @@
 #include "logMsg/traceLevels.h"
 
 
-/* ****************************************************************************
-*
-* formatedAnswer - 
-*/
-std::string formatedAnswer
-(
-  Format       format,
-  std::string  header,
-  std::string  tag1,
-  std::string  value1,
-  std::string  tag2,
-  std::string  value2
-)
-{
-   std::string answer;
-
-   if (format == XML)
-   {
-      answer  = std::string("<")   + header + ">\n";
-      answer += std::string("  <") + tag1   + ">" + value1 + "</" + tag1 + ">\n";
-      answer += std::string("  <") + tag2   + ">" + value2 + "</" + tag2 + ">\n";
-      answer += std::string("</")  + header + ">\n";
-   }
-   else if (format == JSON)
-   {
-      answer  = std::string("{\n");
-      answer += std::string("  \"") + header + "\":\n";
-      answer += std::string("  {\n");
-      answer += std::string("    \"") + tag1   + "\": \"" + value1 + "\",\n";
-      answer += std::string("    \"") + tag2   + "\": \"" + value2 + "\"\n";
-      answer += std::string("  }\n");
-      answer += std::string("}\n");
-   }
-   else
-      answer = header + ": " + tag1 + "=" + value1 + ", " + tag2 + "=" + value2;
-
-   return answer;
-}
-
 char savedResponse[2 * 1024 * 1024];
 static int replyIx = 0;
 /* ****************************************************************************
@@ -154,21 +115,6 @@ int restReply(ConnectionInfo* ciP, std::string answer)
   }
 
   return MHD_NO;
-}
-
-
-
-/* ****************************************************************************
-*
-* restReply - 
-*/
-int restReply(ConnectionInfo* ciP, std::string reason, std::string detail)
-{
-  std::string  answer;
-
-  answer = formatedAnswer(ciP->outFormat, "orionError", "reason", reason, "detail", detail);
-
-  return restReply(ciP, answer);
 }
 
 

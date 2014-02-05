@@ -221,7 +221,7 @@ void serve(ConnectionInfo* ciP)
   if (ciP->payload == NULL)
     LM_M(("Serving request %s %s without payload", ciP->method.c_str(), ciP->url.c_str()));
   else
-    LM_M(("Serving request %s %s with %lu bytes of payload", ciP->method.c_str(), ciP->url.c_str(), ciP->httpHeaders.contentLength));
+    LM_M(("Serving request %s %s with %lu bytes of payload:\n\n%s\n\n", ciP->method.c_str(), ciP->url.c_str(), ciP->httpHeaders.contentLength, ciP->payload));
 
   restService(ciP, restServiceV);
 }
@@ -252,7 +252,7 @@ static int formatCheck(ConnectionInfo* ciP)
     /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
     ciP->outFormat      = XML; // We use XML as default format
     ciP->answer         = restErrorReplyGet(ciP, XML, "", "OrionError", SccNotAcceptable,
-                                            std::string("acceptable types: 'application/xml' but Accept header in request was: '" + ciP->httpHeaders.accept + "'");
+                                            std::string("acceptable types: 'application/xml' but Accept header in request was: '") + ciP->httpHeaders.accept + "'");
     ciP->httpStatusCode = SccNotAcceptable;
 
     return 1;
@@ -261,9 +261,42 @@ static int formatCheck(ConnectionInfo* ciP)
   return 0;
 }
 
+
+
+/* ****************************************************************************
+*
+* contentTypeCheck -
+*
+* NOTE
+*   Any failure about Content-Type is an error in the HTTP layer (not exclusively NGSI)
+*   so we don't want to use the default 200
+*/
 static int contentTypeCheck(ConnectionInfo* ciP)
 {
-   return 0;
+  std::string details = "";
+
+  //
+  // Three cases:
+  //   1. If there is no payload, the Content-Type is not interesting
+  //   2. Payload present  but no Content-Type 
+  //   3. Content-Type present but not supported
+
+  if (ciP->httpHeaders.contentLength == 0)
+    details = "";
+  else if (ciP->httpHeaders.contentType == "")
+    details = "Content-Type header not used, default application/octet-stream is not supported";
+  else if ((ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
+     details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
+
+  if (details != "")
+  {
+    ciP->answer         = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
+    ciP->httpStatusCode = SccUnsupportedMediaType;
+
+    return 1;
+  }
+
+  return 0;
 }
 
 static int connectionTreat
@@ -302,8 +335,8 @@ static int connectionTreat
   // 2-X. Data gathering calls, acknowledge the receipt of data
   if ((dataLen != 0) && (dataLen == ciP->httpHeaders.contentLength))
   {
-    ciP->payload = (char*) malloc(*upload_data_size + 1);
-
+    ciP->payload     = (char*) malloc(*upload_data_size + 1);
+    ciP->payloadSize = *upload_data_size;
     memcpy(ciP->payload, upload_data, *upload_data_size + 1);
     *upload_data_size = 0;
     return MHD_YES;
@@ -312,7 +345,7 @@ static int connectionTreat
 
   // 3. Finally, serve the request (unless an error has occurred)
   if (ciP->answer != "")
-    restReply(ciP, answer);
+    restReply(ciP, ciP->answer);
   else
     serve(ciP);
 

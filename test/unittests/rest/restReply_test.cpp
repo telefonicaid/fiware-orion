@@ -38,35 +38,6 @@
 
 /* ****************************************************************************
 *
-* formatedAnswer - 
-*/
-TEST(restReply, formatedAnswer)
-{
-  const char*     outfile1 = "ngsi.restReply.statusCode.valid.xml";
-  const char*     outfile2 = "ngsi.restReply.statusCode.valid.json";
-  std::string     expected3 = "statusCode: code=200, reasonPhrase=OK";
-  std::string     out;
-
-  utInit();
-
-  out = formatedAnswer(XML, "statusCode", "code", "200", "reasonPhrase", "OK");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = formatedAnswer(JSON, "statusCode", "code", "200", "reasonPhrase", "OK");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = formatedAnswer(NOFORMAT, "statusCode", "code", "200", "reasonPhrase", "OK");
-  EXPECT_EQ(expected3, out);
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * MHD_create_response_from_data_error - 
 *
 * Too large response string 
