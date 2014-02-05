@@ -28,7 +28,7 @@
 #include <string>
 
 #include "common/Format.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 #include "ngsi/Request.h"
 #include "ngsi/SubscriptionId.h"
 
@@ -41,7 +41,7 @@
 typedef struct SubscribeError
 {
   SubscriptionId  subscriptionId;     // Optional - but TID always returns it
-  ErrorCode       errorCode;          // Mandatory
+  StatusCode      errorCode;          // Mandatory
 
   SubscribeError();
   std::string render(RequestType requestType, Format format, std::string indent, bool comma = false);

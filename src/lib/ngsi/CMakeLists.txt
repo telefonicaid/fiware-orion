@@ -44,7 +44,6 @@ SET (SOURCES
     EntityAssociation.cpp
     EntityId.cpp
     EntityIdVector.cpp
-    ErrorCode.cpp
     Metadata.cpp
     MetadataVector.cpp
     NotifyCondition.cpp
@@ -89,7 +88,6 @@ SET (HEADERS
     EntityAssociation.h
     EntityId.h
     EntityIdVector.h
-    ErrorCode.h
     Metadata.h
     MetadataVector.h
     NotifyCondition.h

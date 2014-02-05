@@ -43,7 +43,7 @@ TEST(RegisterContextResponse, constructors)
   RegisterContextResponse  rcr2("012301230123012301230123", "PT1S");
   RegisterContextRequest   rcr;
   RegisterContextResponse  rcr3(&rcr);
-  ErrorCode                ec(SccBadRequest, "Reason", "Detail");
+  StatusCode               ec(SccBadRequest, "Reason", "Detail");
   RegisterContextResponse  rcr4("012345678901234567890123", ec);
   RegisterContextResponse  rcr5("012345678901234567890123", "PT1M");
 

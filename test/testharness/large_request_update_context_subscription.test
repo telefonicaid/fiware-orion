@@ -44,7 +44,7 @@ rm $BIGFILE
 <?xml version="1.0"?>
 <updateContextSubscriptionResponse>
   <subscribeError>
-    <subscriptionId>0</subscriptionId>
+    <subscriptionId>000000000000000000000000</subscriptionId>
     <errorCode>
       <code>413</code>
       <reasonPhrase>Request Entity Too Large</reasonPhrase>

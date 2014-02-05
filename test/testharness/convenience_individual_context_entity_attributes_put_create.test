@@ -82,6 +82,7 @@ echo "+++++ 4. done +++++"
 <updateContextElementResponse>
   <contextResponseList>
     <contextAttributeResponse>
+      <contextAttributeList/>
       <statusCode>
         <code>404</code>
         <reasonPhrase>No context element found</reasonPhrase>

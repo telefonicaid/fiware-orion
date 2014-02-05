@@ -48,7 +48,7 @@ std::string putIndividualContextEntityAttributes(ConnectionInfo* ciP, int compon
 
   LM_T(LmtConvenience, ("CONVENIENCE: got a 'PUT' request for entityId '%s'", entityId.c_str()));
   ciP->httpStatusCode = mapPutIndividualContextEntityAttributes(entityId, &parseDataP->ucer.res, &response);
-  answer = response.render(ciP->outFormat, "");
+  answer = response.render(IndividualContextEntityAttributes, ciP->outFormat, "");
   response.release();
 
   return answer;

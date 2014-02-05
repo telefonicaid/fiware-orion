@@ -7662,7 +7662,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
-    EXPECT_EQ("0", res.subscribeError.subscriptionId.get());
+    EXPECT_EQ("000000000000000000000000", res.subscribeError.subscriptionId.get());
     EXPECT_EQ(SccReceiverInternalError, res.subscribeError.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.subscribeError.errorCode.reasonPhrase);
 

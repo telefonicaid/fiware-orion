@@ -32,7 +32,7 @@
 #include "common/string.h"
 #include "common/tag.h"
 #include "ngsi/ContextElementResponse.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextResponse.h"
 
 
@@ -44,6 +44,7 @@
 */
 UpdateContextResponse::UpdateContextResponse()
 {
+  errorCode.tagSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -62,9 +63,11 @@ UpdateContextResponse::~UpdateContextResponse()
 *
 * UpdateContextResponse::UpdateContextResponse - 
 */
-UpdateContextResponse::UpdateContextResponse(ErrorCode _errorCode)
+UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
 {
   errorCode = _errorCode;
+
+  errorCode.tagSet("errorCode");
 }
 
 
@@ -80,7 +83,7 @@ std::string UpdateContextResponse::render(RequestType requestType, Format format
 
   out += startTag(indent, tag, format, false);
 
-  if ((errorCode.code != NO_ERROR_CODE) && (errorCode.code != SccOk))
+  if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
     out += errorCode.render(format, indent + "  ");
   }
@@ -92,7 +95,7 @@ std::string UpdateContextResponse::render(RequestType requestType, Format format
       out += errorCode.render(format, indent + "  ");
     }
     else
-      out += contextElementResponseVector.render(format, indent + "  ");
+      out += contextElementResponseVector.render(UpdateContext, format, indent + "  ");
   }
   
   out += endTag(indent, tag, format);

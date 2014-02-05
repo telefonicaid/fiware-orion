@@ -29,7 +29,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/Format.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
@@ -44,6 +44,7 @@ RegisterContextResponse::RegisterContextResponse()
 {
   registrationId.set("");
   duration.set("");
+  errorCode.tagSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -64,6 +65,7 @@ RegisterContextResponse::RegisterContextResponse(RegisterContextRequest* rcrP)
 {
   registrationId.set(rcrP->registrationId.get());
   duration.set(rcrP->duration.get());
+  errorCode.tagSet("errorCode");
 }
 
 
@@ -76,6 +78,7 @@ RegisterContextResponse::RegisterContextResponse(std::string _registrationId, st
 {
   registrationId.set(_registrationId);
   duration.set(_duration);
+  errorCode.tagSet("errorCode");
 }
 
 
@@ -84,10 +87,11 @@ RegisterContextResponse::RegisterContextResponse(std::string _registrationId, st
 *
 * RegisterContextResponse::RegisterContextResponse - 
 */ 
-RegisterContextResponse::RegisterContextResponse(std::string _registrationId, ErrorCode& _errorCode)
+RegisterContextResponse::RegisterContextResponse(std::string _registrationId, StatusCode& _errorCode)
 {
   registrationId.set(_registrationId);
   errorCode     = _errorCode;
+  errorCode.tagSet("errorCode");
 }
 
 
@@ -100,7 +104,7 @@ std::string RegisterContextResponse::render(RequestType requestType, Format form
 {
   std::string  out = "";
   std::string  tag = "registerContextResponse";
-  bool         errorCodeRendered = (errorCode.code != NO_ERROR_CODE) && (errorCode.code != SccOk);
+  bool         errorCodeRendered = (errorCode.code != SccNone) && (errorCode.code != SccOk);
 
   out += startTag(indent, tag, format, false);
 

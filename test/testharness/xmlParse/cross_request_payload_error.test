@@ -111,13 +111,13 @@ echo "13: ++++++++++++++++++++"
 
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 296
+Content-Length: 319
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <registerContextResponse>
-  <registrationId>0</registrationId>
+  <registrationId>000000000000000000000000</registrationId>
   <errorCode>
     <code>400</code>
     <reasonPhrase>Invalid payload</reasonPhrase>
@@ -140,13 +140,13 @@ Date: REGEX(.*)
 </discoverContextAvailabilityResponse>
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 323
+Content-Length: 346
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <subscribeContextAvailabilityResponse>
-  <subscriptionId>0</subscriptionId>
+  <subscriptionId>000000000000000000000000</subscriptionId>
   <errorCode>
     <code>400</code>
     <reasonPhrase>Invalid payload</reasonPhrase>
@@ -229,14 +229,14 @@ Date: REGEX(.*)
 </subscribeContextResponse>
 8: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 365
+Content-Length: 388
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <updateContextSubscriptionResponse>
   <subscribeError>
-    <subscriptionId>0</subscriptionId>
+    <subscriptionId>000000000000000000000000</subscriptionId>
     <errorCode>
       <code>400</code>
       <reasonPhrase>Invalid payload</reasonPhrase>
@@ -246,13 +246,13 @@ Date: REGEX(.*)
 </updateContextSubscriptionResponse>
 9: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 295
+Content-Length: 318
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <unsubscribeContextResponse>
-  <subscriptionId>0</subscriptionId>
+  <subscriptionId>000000000000000000000000</subscriptionId>
   <statusCode>
     <code>400</code>
     <reasonPhrase>Invalid payload</reasonPhrase>
@@ -297,5 +297,5 @@ Date: REGEX(.*)
 </orionError>
 13: ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
+source ../harnessFunctions.sh
 brokerStop CB

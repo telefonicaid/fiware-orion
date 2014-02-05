@@ -1,0 +1,8 @@
+o XSD:  Removed subscriptionId from SubscribeContextAvailability
+o XSD:  Fixed XML tags for rendering scope ('scopeType'/'scopeValue' instead of 'type'/'value') 
+o XSD:  Changed a few subscriptionId "0" for "000000000000000000000000"
+o XSD:  Removed some XML tags with spaces ('verbose level' => 'verboseLevel')
+o XSD:  stripped 'reference' of whitespace
+o XSD:  added an empty contextAttributeList for ContextAttributeResponseVector inside
+        IndividualContextEntityAttributes (/ngsi10/contextEntities/{EID}/attributes) as the XSD demands it
+o XSD:  Fixed a possible future error for JSON rendering of UpdateContextAvailabilitySubscriptionRequest

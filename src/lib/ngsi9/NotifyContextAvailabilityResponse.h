@@ -30,7 +30,7 @@
 
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 
 /* ****************************************************************************
 *
@@ -42,7 +42,6 @@ typedef struct NotifyContextAvailabilityResponse
 
   NotifyContextAvailabilityResponse();
   NotifyContextAvailabilityResponse(StatusCode& sc);
-  NotifyContextAvailabilityResponse(ErrorCode& ec);
 
   std::string   render(RequestType requestType, Format format, std::string indent);
   void          present(std::string indent);

@@ -22,11 +22,11 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "serviceRoutines/deleteIndividualContextEntityAttribute.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
+
+#include "unittest.h"
 
 
 
@@ -49,9 +49,14 @@ static RestService rs[] =
 */
 TEST(deleteIndividualContextEntityAttribute, ok)
 {
-  std::string    expected = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>No context element found</reasonPhrase>\n  <details>entity901</details>\n</statusCode>\n";
-  ConnectionInfo ci("/ngsi10/contextEntities/entity901/attributes/aa",  "DELETE", "1.1");
+  ConnectionInfo  ci("/ngsi10/contextEntities/entity901/attributes/aa",  "DELETE", "1.1");
+  const char*     outfile = "ngsi10.deleteIndividualContextEntityAttribute.valid.xml";
 
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   std::string out = restService(&ci, rs);
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }

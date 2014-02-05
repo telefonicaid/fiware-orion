@@ -36,7 +36,7 @@ curl localhost:${BROKER_PORT}/ngsi9/registerContext --header "Content-Length: 0"
 --REGEXPECT--
 <?xml version="1.0"?>
 <registerContextResponse>
-  <registrationId>0</registrationId>
+  <registrationId>000000000000000000000000</registrationId>
   <errorCode>
     <code>411</code>
     <reasonPhrase>Length Required</reasonPhrase>

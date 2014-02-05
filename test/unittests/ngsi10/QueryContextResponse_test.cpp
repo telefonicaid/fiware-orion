@@ -36,21 +36,26 @@
 */
 TEST(QueryContextResponse, ok_xml)
 {
-  ErrorCode*            ecP = new ErrorCode(SccOk, "Reason", "Detail");
-  ErrorCode             ec(SccOk, "Reason2", "Detail2");
+  StatusCode*           ecP = new StatusCode(SccOk, "Reason", "Detail");
+  StatusCode            ec(SccOk, "Reason2", "Detail2");
   QueryContextResponse  qcr1;
   QueryContextResponse  qcr2(ec);
-  std::string           rendered;
-  std::string           expected1 = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
-  std::string           expected2 = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
+  std::string           out;
+  const char*           outfile  = "ngsi10.queryContextResponse.notFound.valid.xml";
 
-  rendered = qcr1.render(QueryContext, XML, "");
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  utInit();
 
-  rendered = qcr2.render(QueryContext, XML, "");
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  out = qcr1.render(QueryContext, XML, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  out = qcr2.render(QueryContext, XML, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   delete ecP;
+
+  utExit();
 }
 
 
@@ -78,7 +83,7 @@ TEST(QueryContextResponse, json_render)
   ContextElementResponse*  cerP;
   Metadata*                mdP;
   ContextAttribute*        caP;
-  std::string              rendered;
+  std::string              out;
 
   utInit();
 
@@ -93,8 +98,8 @@ TEST(QueryContextResponse, json_render)
   qcrP->contextElementResponseVector.push_back(cerP);
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = qcrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = qcrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   // 2. ContextElement: +entityId -attributeDomainName -contextAttributeVector +domainMetadataVector
@@ -102,8 +107,8 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.domainMetadataVector.push_back(mdP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = qcrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = qcrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
 
@@ -113,8 +118,8 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.contextAttributeVector.push_back(caP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  rendered = qcrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = qcrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
 
@@ -123,8 +128,8 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.domainMetadataVector.push_back(mdP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
-  rendered = qcrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = qcrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
 
@@ -134,8 +139,8 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.attributeDomainName.set("AttrDomain");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename5)) << "Error getting test data from '" << filename5 << "'";
-  rendered = qcrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = qcrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
 
@@ -144,8 +149,8 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.domainMetadataVector.push_back(mdP);
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename6)) << "Error getting test data from '" << filename6 << "'";
-  rendered = qcrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = qcrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
 
@@ -155,8 +160,8 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.contextAttributeVector.push_back(caP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename7)) << "Error getting test data from '" << filename7 << "'";
-  rendered = qcrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = qcrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
 
@@ -165,8 +170,8 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.domainMetadataVector.push_back(mdP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename8)) << "Error getting test data from '" << filename8 << "'";
-  rendered = qcrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = qcrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
 
@@ -175,8 +180,8 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.contextAttributeVector.push_back(caP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename9)) << "Error getting test data from '" << filename9 << "'";
-  rendered = qcrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = qcrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
 
@@ -185,8 +190,8 @@ TEST(QueryContextResponse, json_render)
   cerP->contextElement.domainMetadataVector.push_back(mdP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename10)) << "Error getting test data from '" << filename10 << "'";
-  rendered = qcrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = qcrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
   
 
 
@@ -198,8 +203,8 @@ TEST(QueryContextResponse, json_render)
   qcrP->contextElementResponseVector.push_back(cerP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename11)) << "Error getting test data from '" << filename11 << "'";
-  rendered = qcrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = qcrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
 
@@ -207,16 +212,16 @@ TEST(QueryContextResponse, json_render)
   qcrP->errorCode.fill(SccOk, "OK");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename12)) << "Error getting test data from '" << filename12 << "'";
-  rendered = qcrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = qcrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   // 13  QueryContextResponse::errorCode NOT OK and contextElementResponseVector filled id (with details)
   qcrP->errorCode.fill(SccBadRequest, "Bad Request", "no details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename13)) << "Error getting test data from '" << filename13 << "'";
-  rendered = qcrP->render(QueryContext, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  out = qcrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

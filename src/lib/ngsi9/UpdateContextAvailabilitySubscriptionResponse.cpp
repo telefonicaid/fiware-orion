@@ -30,7 +30,7 @@
 #include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
 
 
@@ -41,15 +41,20 @@
 */
 UpdateContextAvailabilitySubscriptionResponse::UpdateContextAvailabilitySubscriptionResponse()
 {
+  errorCode.tagSet("errorCode");
 }
 
 /* ****************************************************************************
 *
 * UpdateContextAvailabilitySubscriptionResponse::UpdateContextAvailabilitySubscriptionResponse - 
 */
-UpdateContextAvailabilitySubscriptionResponse::UpdateContextAvailabilitySubscriptionResponse(ErrorCode& _errorCode)
+UpdateContextAvailabilitySubscriptionResponse::UpdateContextAvailabilitySubscriptionResponse(StatusCode& _errorCode)
 {
-   errorCode = _errorCode;
+  errorCode.code         = _errorCode.code;
+  errorCode.reasonPhrase = _errorCode.reasonPhrase;
+  errorCode.details      = _errorCode.details;
+
+  errorCode.tagSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -76,7 +81,7 @@ std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType re
   std::string  out                = "";
   std::string  tag                = "updateContextAvailabilitySubscriptionResponse";
   bool         durationRendered   = !duration.isEmpty();
-  bool         errorCodeRendered  = (errorCode.code != NO_ERROR_CODE);
+  bool         errorCodeRendered  = (errorCode.code != SccNone);
 
   out += startTag(indent, tag, format, false);
 

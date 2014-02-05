@@ -1,0 +1,9 @@
+<updateContextSubscriptionResponse>
+  <subscribeError>
+    <subscriptionId>12345</subscriptionId>
+    <errorCode>
+      <code>400</code>
+      <reasonPhrase>syntax error in duration string</reasonPhrase>
+    </errorCode>
+  </subscribeError>
+</updateContextSubscriptionResponse>

@@ -1,0 +1,9 @@
+{
+  "subscribeError" : {
+    "errorCode" : {
+      "code" : "400",
+      "reasonPhrase" : "invalid payload",
+      "details" : "bad value for 'isPattern'"
+    }
+  }
+}

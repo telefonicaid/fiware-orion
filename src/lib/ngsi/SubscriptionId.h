@@ -50,6 +50,7 @@ typedef struct SubscriptionId
   std::string   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void          present(std::string indent);
   void          release(void);
+  bool          rendered(RequestType container);
 } SubscriptionId;
 
 #endif

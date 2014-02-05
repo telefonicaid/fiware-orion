@@ -1,0 +1,20 @@
+<contextAttributeResponse>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type></type>
+      <contextValue>10</contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>left</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</contextAttributeResponse>

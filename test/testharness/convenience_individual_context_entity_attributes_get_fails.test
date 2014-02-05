@@ -42,6 +42,7 @@ echo "+++++ 1. get an entity +++++"
     <entityId type="" isPattern="false">
       <id>entity01</id>
     </entityId>
+    <contextAttributeList/>
   </contextElement>
   <statusCode>
     <code>404</code>

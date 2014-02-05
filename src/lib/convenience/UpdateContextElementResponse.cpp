@@ -28,8 +28,19 @@
 #include "common/Format.h"
 #include "common/tag.h"
 #include "convenience/ContextAttributeResponse.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 #include "convenience/UpdateContextElementResponse.h"
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextElementResponse::UpdateContextElementResponse - 
+*/
+UpdateContextElementResponse::UpdateContextElementResponse()
+{
+  errorCode.tagSet("errorCode");
+}
 
 
 
@@ -37,17 +48,17 @@
 *
 * render - 
 */
-std::string UpdateContextElementResponse::render(Format format, std::string indent)
+std::string UpdateContextElementResponse::render(RequestType requestType, Format format, std::string indent)
 {
    std::string tag = "updateContextElementResponse";
    std::string out = "";
 
    out += startTag(indent, tag, format);
 
-   if ((errorCode.code != NO_ERROR_CODE) && (errorCode.code != SccOk))
+   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
      out += errorCode.render(format, indent + "  ");
    else
-     out += contextResponseVector.render(format, indent + "  ");
+     out += contextAttributeResponseVector.render(requestType, format, indent + "  ");
 
    out += endTag(indent, tag, format);
 
@@ -66,12 +77,12 @@ std::string UpdateContextElementResponse::check(RequestType requestType, Format 
   
   if (predetectedError != "")
     errorCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), predetectedError);
-  else if ((res = contextResponseVector.check(requestType, format, indent, "", counter)) != "OK")
+  else if ((res = contextAttributeResponseVector.check(requestType, format, indent, "", counter)) != "OK")
     errorCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), res);
   else
     return "OK";
 
-  return render(format, indent);
+  return render(requestType, format, indent);
 }
 
 
@@ -82,6 +93,6 @@ std::string UpdateContextElementResponse::check(RequestType requestType, Format 
 */
 void UpdateContextElementResponse::release(void)
 {
-  contextResponseVector.release();
+  contextAttributeResponseVector.release();
   errorCode.release();
 }

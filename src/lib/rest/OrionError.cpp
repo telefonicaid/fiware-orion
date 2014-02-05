@@ -61,24 +61,11 @@ OrionError::OrionError(int _code, std::string _reasonPhrase, std::string _detail
 *
 * OrionError::OrionError - 
 */
-OrionError::OrionError(ErrorCode& errorCode)
+OrionError::OrionError(StatusCode& sc)
 {
-  code          = errorCode.code;
-  reasonPhrase  = errorCode.reasonPhrase;
-  details       = errorCode.details;
-}
-
-
-
-/* ****************************************************************************
-*
-* OrionError::OrionError - 
-*/
-OrionError::OrionError(StatusCode& statusCode)
-{
-  code          = statusCode.code;
-  reasonPhrase  = statusCode.reasonPhrase;
-  details       = statusCode.details;
+  code          = sc.code;
+  reasonPhrase  = sc.reasonPhrase;
+  details       = sc.details;
 }
 
 

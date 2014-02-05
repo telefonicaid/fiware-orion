@@ -48,11 +48,11 @@ TEST(UpdateContextElementResponse, render)
   const char*                     outfile = "ngsi10.updateContextElementResponse.ok.postponed.xml";
 
   // Just the normal case
-  ucer.contextResponseVector.push_back(&car);
+  ucer.contextAttributeResponseVector.push_back(&car);
   car.contextAttributeVector.push_back(&ca);
   car.statusCode.fill(SccOk, httpStatusCodeString(SccOk), "details");
 
-  out = ucer.render(XML, "");
+  out = ucer.render(UpdateContext, XML, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }
@@ -77,9 +77,9 @@ TEST(UpdateContextElementResponse, check)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  // 2. bad contextResponseVector
+  // 2. bad contextAttributeResponseVector
   car.contextAttributeVector.push_back(&ca);
-  ucer.contextResponseVector.push_back(&car);
+  ucer.contextAttributeResponseVector.push_back(&car);
   out = ucer.check(IndividualContextEntity, XML, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());

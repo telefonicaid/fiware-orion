@@ -69,6 +69,7 @@ echo "+++++ 2. lookup the entity +++++"
 +++++ 2. lookup the entity +++++
 <?xml version="1.0"?>
 <contextAttributeResponse>
+  <contextAttributeList/>
   <statusCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>

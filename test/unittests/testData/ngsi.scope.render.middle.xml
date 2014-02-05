@@ -1,4 +1,4 @@
 <operationScope>
-  <type>Type</type>
-  <value>Value</value>
+  <scopeType>Type</scopeType>
+  <scopeValue>Value</scopeValue>
 </operationScope>

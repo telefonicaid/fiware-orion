@@ -43,7 +43,7 @@ typedef struct UnsubscribeContextAvailabilityResponse
   StatusCode     statusCode;        // Mandatory
 
   UnsubscribeContextAvailabilityResponse();
-  UnsubscribeContextAvailabilityResponse(ErrorCode& errorCode);
+  UnsubscribeContextAvailabilityResponse(StatusCode& sc);
   UnsubscribeContextAvailabilityResponse(SubscriptionId _subscriptionId);
   ~UnsubscribeContextAvailabilityResponse();
 

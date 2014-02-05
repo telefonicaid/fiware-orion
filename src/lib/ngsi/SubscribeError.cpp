@@ -26,7 +26,7 @@
 
 #include "common/Format.h"
 #include "common/tag.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 #include "ngsi/Request.h"
 #include "ngsi/SubscribeError.h"
 
@@ -38,6 +38,7 @@
 */
 SubscribeError::SubscribeError()
 {
+  errorCode.tagSet("errorCode");
 }
 
 
@@ -65,7 +66,7 @@ std::string SubscribeError::render(RequestType requestType, Format format, std::
       subscriptionId.set("000000000000000000000000");
     out += subscriptionId.render(requestType, format, indent + "  ", true);
   }
-  else if ((requestType == SubscribeContext) && (subscriptionId.get() != "0") && (subscriptionId.get() != ""))
+  else if ((requestType == SubscribeContext) && (subscriptionId.get() != "000000000000000000000000") && (subscriptionId.get() != ""))
     out += subscriptionId.render(requestType, format, indent + "  ", true);
 
   out += errorCode.render(format, indent + "  ");

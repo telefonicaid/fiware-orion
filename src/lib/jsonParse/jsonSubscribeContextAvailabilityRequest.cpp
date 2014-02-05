@@ -234,21 +234,6 @@ static std::string scopeValue(std::string path, std::string value, ParseData* re
 
 /* ****************************************************************************
 *
-* subscriptionId - 
-*/
-static std::string subscriptionId(std::string path, std::string value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a subscriptionId: '%s'", value.c_str()));
-
-  reqDataP->scar.res.subscriptionId.set(value);
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * jsonScarParseVector -
 */
 JsonNode jsonScarParseVector[] =
@@ -265,7 +250,6 @@ JsonNode jsonScarParseVector[] =
   { "/restriction/scopes/scope",           scope,               },
   { "/restriction/scopes/scope/type",      scopeType            },
   { "/restriction/scopes/scope/value",     scopeValue           },
-  { "/subscriptionId",                     subscriptionId       },
   { "LAST", NULL }
 };
 

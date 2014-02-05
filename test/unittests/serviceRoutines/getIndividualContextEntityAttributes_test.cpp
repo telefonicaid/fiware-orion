@@ -22,15 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/getIndividualContextEntityAttributes.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "testInit.h"
+#include "unittest.h"
 
 
 
@@ -54,14 +52,16 @@ static RestService rs[] =
 TEST(getIndividualContextEntityAttributes, notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity11/attributes",  "GET", "1.1");
-  std::string    expected = "<contextElementResponse>\n  <contextElement>\n    <entityId type=\"\" isPattern=\"false\">\n      <id>entity11</id>\n    </entityId>\n  </contextElement>\n  <statusCode>\n    <code>404</code>\n    <reasonPhrase>No context element found</reasonPhrase>\n    <details>entity11</details>\n  </statusCode>\n</contextElementResponse>\n";
-
+  const char*    outfile = "ngsi10.contextElementResponse.getIndividualContextEntityAttributes.notFound.valid.xml";
   std::string    out;
 
-  setupDatabase();
+  utInit();
 
   ci.outFormat = XML;
   out          = restService(&ci, rs);
 
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }

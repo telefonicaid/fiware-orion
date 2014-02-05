@@ -30,8 +30,19 @@
 #include "common/Format.h"
 #include "common/tag.h"
 #include "convenience/ContextAttributeResponseVector.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 #include "convenience/AppendContextElementResponse.h"
+
+
+
+/* ****************************************************************************
+*
+* AppendContextElementResponse::AppendContextElementResponse - 
+*/
+AppendContextElementResponse::AppendContextElementResponse()
+{
+  errorCode.tagSet("errorCode");
+}
 
 
 
@@ -46,10 +57,10 @@ std::string AppendContextElementResponse::render(RequestType requestType, Format
 
   out += startTag(indent, tag, format);
 
-  if ((errorCode.code != NO_ERROR_CODE) && (errorCode.code != SccOk))
+  if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
     out += errorCode.render(format, indent + "  ");
   else
-    out += contextResponseVector.render(format, indent + "  ");
+    out += contextResponseVector.render(requestType, format, indent + "  ");
 
   out += endTag(indent, tag, format);
 

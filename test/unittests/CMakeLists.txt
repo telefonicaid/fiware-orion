@@ -192,7 +192,6 @@ SET (SOURCES
     ngsi/ContextRegistrationResponse_test.cpp
     ngsi/ContextRegistrationResponseVector_test.cpp
     ngsi/EntityId_test.cpp
-    ngsi/ErrorCode_test.cpp
     ngsi/Metadata_test.cpp
     ngsi/MetadataVector_test.cpp
     ngsi/NotifyConditionVector_test.cpp
