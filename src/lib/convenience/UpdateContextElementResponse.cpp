@@ -76,9 +76,9 @@ std::string UpdateContextElementResponse::check(RequestType requestType, Format 
   std::string res;
   
   if (predetectedError != "")
-    errorCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), predetectedError);
+    errorCode.fill(SccBadRequest, predetectedError);
   else if ((res = contextAttributeResponseVector.check(requestType, format, indent, "", counter)) != "OK")
-    errorCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), res);
+    errorCode.fill(SccBadRequest, res);
   else
     return "OK";
 

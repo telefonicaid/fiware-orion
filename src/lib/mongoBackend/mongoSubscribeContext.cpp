@@ -112,13 +112,10 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
         connection->insert(getSubscribeContextCollectionName(), subDoc);
     }
     catch( const DBException &e ) {
-        responseP->subscribeError.errorCode.fill(
-            SccReceiverInternalError,
-            httpStatusCodeString(SccReceiverInternalError),
-            std::string("collection: ") + getSubscribeContextCollectionName() +
-                " - insert(): " + subDoc.toString() +
-                " - exception: " + e.what()
-        );
+        responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
+                                                 std::string("collection: ") + getSubscribeContextCollectionName() +
+                                                 " - insert(): " + subDoc.toString() +
+                                                 " - exception: " + e.what());
 
         LM_SRE(SccOk,("Database error '%s'", responseP->subscribeError.errorCode.reasonPhrase.c_str()));
     }    

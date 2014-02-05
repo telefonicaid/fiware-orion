@@ -134,7 +134,7 @@ int restReply(ConnectionInfo* ciP, std::string answer)
   {
     if (strlen(answer.c_str()) > sizeof(savedResponse))
     {
-       std::string errorAnswer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccReceiverInternalError, "response too large", "Maximum size of responses has been set to 2Mb");
+       std::string errorAnswer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccReceiverInternalError, "Exceeding maximum size of response (2Mb)");
        LM_W(("answer too large: %d bytes (max allowed is %d bytes", strlen(answer.c_str()), sizeof(savedResponse)));
        savedResponse[0] = 0;
        restReply(ciP, errorAnswer);
@@ -224,10 +224,10 @@ static std::string tagGet(std::string request)
 * Where the payload type is matched against the request URL, the incoming 'request' is a
 * request and not a response.
 */
-std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string indent, std::string request, HttpStatusCode code, std::string reasonPhrase, std::string detail)
+std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string indent, std::string request, HttpStatusCode code, std::string details)
 {
    std::string   tag = tagGet(request);
-   StatusCode    errorCode(code, reasonPhrase, detail, "errorCode");
+   StatusCode    errorCode(code, details, "errorCode");
    std::string   reply;
 
    ciP->httpStatusCode = SccOk;
@@ -295,7 +295,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string in
    }
    else if (tag == "StatusCode")
    {
-     StatusCode sc((HttpStatusCode) code, reasonPhrase, detail);
+     StatusCode sc(code, details);
      reply = sc.render(format, indent);
    }
    else

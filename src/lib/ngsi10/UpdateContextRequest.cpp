@@ -80,14 +80,14 @@ std::string UpdateContextRequest::check(RequestType requestType, Format format, 
 
   if (predetectedError != "")
   {
-    response.errorCode.fill(SccBadRequest, "Bad request", predetectedError);
+    response.errorCode.fill(SccBadRequest, predetectedError);
     return response.render(UpdateContext, format, indent);
   }
 
   if (((res = contextElementVector.check(requestType, format, indent, predetectedError, counter)) != "OK") || 
       ((res = updateActionType.check(requestType, format, indent, predetectedError, counter)) != "OK"))
   {
-    response.errorCode.fill(SccBadRequest, "Bad request", res);
+    response.errorCode.fill(SccBadRequest, res);
     return response.render(UpdateContext, format, indent);
   }
 

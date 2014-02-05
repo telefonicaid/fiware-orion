@@ -38,7 +38,7 @@
 */
 TEST(NotifyContextAvailabilityResponse, all)
 {
-  StatusCode                         sc(SccBadRequest, "status", "status details");
+  StatusCode                         sc(SccBadRequest, "status details");
   NotifyContextAvailabilityResponse  ncr1;
   NotifyContextAvailabilityResponse  ncr2(sc);
   

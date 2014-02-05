@@ -508,7 +508,7 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
         ContextElementResponse* cer = new ContextElementResponse();
-        cer->statusCode.fill(SccOk, "OK");
+        cer->statusCode.fill(SccOk);
 
         /* Entity part */
 
@@ -548,7 +548,7 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
 
         }
 
-        cer->statusCode.fill(SccOk, "OK");
+        cer->statusCode.fill(SccOk);
 
         cerV->push_back(cer);
     }

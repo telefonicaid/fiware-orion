@@ -213,254 +213,254 @@ TEST(restReply, restErrorReplyGet)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), rcrOutfile01)) << "Error getting test data from '" << rcrOutfile01 << "'";
-  out = restErrorReplyGet(&ci, XML, "", rcr1, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", rcr1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", rcr2, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", rcr2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", rcr3, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", rcr3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", rcr4, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", rcr4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), rcrOutfile02)) << "Error getting test data from '" << rcrOutfile02 << "'";
-  out = restErrorReplyGet(&ci, XML, "", rcr1, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", rcr1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", rcr2, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", rcr2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", rcr3, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", rcr3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", rcr4, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", rcr4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), dcarOutfile01)) << "Error getting test data from '" << dcarOutfile01 << "'";
-  out = restErrorReplyGet(&ci, XML, "", dcar1, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", dcar1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", dcar2, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", dcar2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", dcar3, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", dcar3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", dcar4, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", dcar4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), dcarOutfile02)) << "Error getting test data from '" << dcarOutfile02 << "'";
-  out = restErrorReplyGet(&ci, XML, "", dcar1, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", dcar1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", dcar2, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", dcar2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", dcar3, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", dcar3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", dcar4, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", dcar4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), scarOutfile01)) << "Error getting test data from '" << scarOutfile01 << "'";
-  out = restErrorReplyGet(&ci, XML, "", scar1, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", scar1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", scar2, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", scar2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", scar3, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", scar3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", scar4, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", scar4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), scarOutfile02)) << "Error getting test data from '" << scarOutfile02 << "'";
-  out = restErrorReplyGet(&ci, XML, "", scar1, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", scar1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", scar2, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", scar2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", scar3, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", scar3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", scar4, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", scar4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucasOutfile01)) << "Error getting test data from '" << ucasOutfile01 << "'";
-  out = restErrorReplyGet(&ci, XML, "", ucas1, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucas1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucas2, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucas2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucas3, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucas3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucas4, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucas4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucasOutfile02)) << "Error getting test data from '" << ucasOutfile02 << "'";
-  out = restErrorReplyGet(&ci, XML, "", ucas1, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucas1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucas2, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucas2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucas3, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucas3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucas4, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucas4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucarOutfile01)) << "Error getting test data from '" << ucarOutfile01 << "'";
-  out = restErrorReplyGet(&ci, XML, "", ucar1, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucar1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucar2, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucar2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucar3, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucar3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucar4, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucar4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucarOutfile02)) << "Error getting test data from '" << ucarOutfile02 << "'";
-  out = restErrorReplyGet(&ci, XML, "", ucar1, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucar1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucar2, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucar2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucar3, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucar3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucar4, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucar4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ncarOutfile01)) << "Error getting test data from '" << ncarOutfile01 << "'";
-  out = restErrorReplyGet(&ci, XML, "", ncar1, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ncar1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ncar2, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ncar2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ncar3, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ncar3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ncar4, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ncar4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ncarOutfile02)) << "Error getting test data from '" << ncarOutfile02 << "'";
-  out = restErrorReplyGet(&ci, XML, "", ncar1, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ncar1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ncar2, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ncar2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ncar3, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ncar3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ncar4, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ncar4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), qcrOutfile01)) << "Error getting test data from '" << qcrOutfile01 << "'";
-  out = restErrorReplyGet(&ci, XML, "", qcr1, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", qcr1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", qcr2, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", qcr2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", qcr3, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", qcr3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", qcr4, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", qcr4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), qcrOutfile02)) << "Error getting test data from '" << qcrOutfile02 << "'";
-  out = restErrorReplyGet(&ci, XML, "", qcr1, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", qcr1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", qcr2, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", qcr2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", qcr3, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", qcr3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", qcr4, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", qcr4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), scrOutfile01)) << "Error getting test data from '" << scrOutfile01 << "'";
-  out = restErrorReplyGet(&ci, XML, "", scr1, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", scr1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", scr2, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", scr2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", scr3, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", scr3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", scr4, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", scr4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), scrOutfile02)) << "Error getting test data from '" << scrOutfile02 << "'";
-  out = restErrorReplyGet(&ci, XML, "", scr1, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", scr1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", scr2, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", scr2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", scr3, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", scr3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", scr4, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", scr4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucsOutfile01)) << "Error getting test data from '" << ucsOutfile01 << "'";
-  out = restErrorReplyGet(&ci, XML, "", ucs1, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucs1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucs2, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucs2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucs3, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucs3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucs4, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucs4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucsOutfile02)) << "Error getting test data from '" << ucsOutfile02 << "'";
-  out = restErrorReplyGet(&ci, XML, "", ucs1, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucs1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucs2, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucs2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucs3, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucs3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucs4, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucs4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), uscrOutfile01)) << "Error getting test data from '" << uscrOutfile01 << "'";
-  out = restErrorReplyGet(&ci, XML, "", uscr1, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", uscr1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", uscr2, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", uscr2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", uscr3, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", uscr3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", uscr4, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", uscr4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), uscrOutfile02)) << "Error getting test data from '" << uscrOutfile02 << "'";
-  out = restErrorReplyGet(&ci, XML, "", uscr1, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", uscr1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", uscr2, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", uscr2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", uscr3, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", uscr3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", uscr4, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", uscr4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucrOutfile01)) << "Error getting test data from '" << ucrOutfile01 << "'";
-  out = restErrorReplyGet(&ci, XML, "", ucr1, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucr1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucr2, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucr2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucr3, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucr3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucr4, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucr4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucrOutfile02)) << "Error getting test data from '" << ucrOutfile02 << "'";
-  out = restErrorReplyGet(&ci, XML, "", ucr1, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucr1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucr2, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucr2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucr3, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucr3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ucr4, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ucr4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ncrOutfile01)) << "Error getting test data from '" << ncrOutfile01 << "'";
-  out = restErrorReplyGet(&ci, XML, "", ncr1, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ncr1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ncr2, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ncr2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ncr3, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ncr3, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ncr4, SccOk, "ok", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ncr4, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ncrOutfile02)) << "Error getting test data from '" << ncrOutfile02 << "'";
-  out = restErrorReplyGet(&ci, XML, "", ncr1, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ncr1, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ncr2, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ncr2, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ncr3, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ncr3, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  out = restErrorReplyGet(&ci, XML, "", ncr4, SccBadRequest, "Bad Request", "detail");
+  out = restErrorReplyGet(&ci, XML, "", ncr4, SccBadRequest, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

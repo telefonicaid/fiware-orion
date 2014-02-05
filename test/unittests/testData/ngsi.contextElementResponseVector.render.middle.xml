@@ -7,7 +7,7 @@
     </contextElement>
     <statusCode>
       <code>200</code>
-      <reasonPhrase>reason</reasonPhrase>
+      <reasonPhrase>OK</reasonPhrase>
       <details>details</details>
     </statusCode>
   </contextElementResponse>

@@ -79,7 +79,7 @@ std::string QueryContextResponse::render(RequestType requestType, Format format,
   {
     if (contextElementResponseVector.size() == 0)
     {
-      errorCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound), "");
+      errorCode.fill(SccContextElementNotFound);
       out += errorCode.render(format, indent + "  ");
     }
     else 

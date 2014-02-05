@@ -36,7 +36,7 @@
 */
 TEST(OrionError, all)
 {
-  StatusCode    sc(SccBadRequest, "Bad Request 2", "no details 2");
+  StatusCode    sc(SccBadRequest, "no details 2");
   OrionError    e0;
   OrionError    e1(SccOk, "Good Request", "no details 3");
   OrionError    e3(sc);

@@ -1,5 +1,5 @@
 <orionError>
   <code>400</code>
-  <reasonPhrase>Bad request</reasonPhrase>
+  <reasonPhrase>Bad Request</reasonPhrase>
   <details>no such service</details>
 </orionError>
