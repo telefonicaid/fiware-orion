@@ -56,7 +56,7 @@ typedef struct ContextAttribute
   std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void         present(std::string indent, int ix);
   void         release(void);
-  std::string  toString(std::string start, std::string end);
+  std::string  toString(void);
 } ContextAttribute;
 
 #endif

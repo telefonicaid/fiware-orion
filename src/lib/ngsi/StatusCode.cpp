@@ -42,7 +42,7 @@
 StatusCode::StatusCode()
 {
   code         = SccNone;
-  reasonPhrase = "Uninitialized";
+  reasonPhrase = "";
   details      = "";
   tag          = "statusCode";
 }
@@ -56,7 +56,7 @@ StatusCode::StatusCode()
 StatusCode::StatusCode(std::string _tag)
 {
   code         = SccNone;
-  reasonPhrase = "Uninitialized";
+  reasonPhrase = "";
   details      = "";
   tag          = _tag;
 }

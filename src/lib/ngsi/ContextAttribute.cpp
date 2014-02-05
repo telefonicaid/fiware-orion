@@ -175,11 +175,7 @@ void ContextAttribute::release(void)
 *
 * toString - 
 */
-std::string ContextAttribute::toString(std::string start, std::string end)
+std::string ContextAttribute::toString(void)
 {
-  std::string s;
-
-  s = start + name + end;
-
-  return s;
+  return name;
 }

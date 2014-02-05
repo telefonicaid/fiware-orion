@@ -2442,7 +2442,9 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
             if (fseek(fP, lrV[i].offset, SEEK_SET) != 0)
                 CLEANUP("fseek", LmsFseek);
 
-            fgets(line, LINE_MAX, fP);
+            if (fgets(line, LINE_MAX, fP) == NULL)
+              break;
+
             if (strncmp(line, "Cleared at", 10) != 0)
             {
                 len = strlen(line);

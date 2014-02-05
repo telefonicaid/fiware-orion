@@ -551,8 +551,8 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
                  * an error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter, 
                                       std::string("action: UPDATE") + 
-                                      eP->toString(" - entity: (", ")", ", ", false) +
-                                      aP->toString(" - offending attribute: ", ""));
+                                      std::string(" - entity: (") + eP->toString() + ")" +
+                                      std::string(" - offending attribute: ") + aP->toString());
 
                 responseP->contextElementResponseVector.push_back(cerP);
                 return false;

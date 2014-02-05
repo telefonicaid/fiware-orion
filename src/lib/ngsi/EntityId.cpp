@@ -178,16 +178,14 @@ void EntityId::release(void)
 *
 * toString - 
 */
-std::string EntityId::toString(std::string start, std::string end, std::string delimiter, bool useIsPattern)
+std::string EntityId::toString(bool useIsPattern, std::string delimiter)
 {
   std::string s;
 
-  s = start + id + delimiter + type;
+  s = id + delimiter + type;
 
   if (useIsPattern)
     s += delimiter + isPattern;
-
-  s += end;
 
   return s;
 }

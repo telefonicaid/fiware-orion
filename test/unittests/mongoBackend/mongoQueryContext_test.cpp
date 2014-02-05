@@ -304,7 +304,7 @@ TEST(mongoQueryContextRequest, query1Ent0Attr)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
@@ -358,7 +358,7 @@ TEST(mongoQueryContextRequest, query1Ent1Attr)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
@@ -406,7 +406,7 @@ TEST(mongoQueryContextRequest, query1Ent1AttrSameName)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
@@ -465,7 +465,7 @@ TEST(mongoQueryContextRequest, queryNEnt0Attr)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
@@ -536,7 +536,7 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrSingle)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
@@ -590,7 +590,7 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrMulti)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
@@ -657,7 +657,7 @@ TEST(mongoQueryContextRequest, queryNEntNAttr)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
@@ -836,7 +836,7 @@ TEST(mongoQueryContextRequest, query1EntWA1Attr)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
@@ -886,7 +886,7 @@ TEST(mongoQueryContextRequest, queryNEntWA0Attr)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
@@ -951,7 +951,7 @@ TEST(mongoQueryContextRequest, queryNEntWA1Attr)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
@@ -1005,7 +1005,7 @@ TEST(mongoQueryContextRequest, queryNoType)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(3, res.contextElementResponseVector.size());
@@ -1078,7 +1078,7 @@ TEST(mongoQueryContextRequest, queryIdMetadata)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
@@ -1146,7 +1146,7 @@ TEST(mongoQueryContextRequest, queryPattern0Attr)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
@@ -1212,7 +1212,7 @@ TEST(mongoQueryContextRequest, queryPattern1AttrSingle)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
@@ -1261,7 +1261,7 @@ TEST(mongoQueryContextRequest, queryPattern1AttrMulti)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
@@ -1323,7 +1323,7 @@ TEST(mongoQueryContextRequest, queryPatternNAttr)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
@@ -1424,7 +1424,7 @@ TEST(mongoQueryContextRequest, queryMixPatternAndNotPattern)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(3, res.contextElementResponseVector.size());
@@ -1508,7 +1508,7 @@ TEST(mongoQueryContextRequest, queryNoTypePattern)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(4, res.contextElementResponseVector.size());
@@ -1602,7 +1602,7 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
