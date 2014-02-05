@@ -565,14 +565,15 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
                 *attrs = *newAttrs;
             }
             else {
+                ContextAttribute* aP = ceP->contextAttributeVector.get(ix);
+
                 /* If legalIdUsage() returns false, then that particular attribute can not be appended. In this case,
                  * we interrupt the processing an early return with
                  * a error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter,
                                       std::string("action: APPEND") +
-                                      // FIXME: use toString once EntityID and ContextAttribute becomes objects
-                                      " - entity: (" + entityId + ", " + entityType + ")" +
-                                      " - offending attribute: " + ceP->contextAttributeVector.get(ix)->name);
+                                      " - entity: (" + eP->toString() + ")" +
+                                      " - offending attribute: " + aP->toString());
 
                 responseP->contextElementResponseVector.push_back(cerP);
                 return false;
@@ -584,14 +585,14 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
                 *attrs = *newAttrs;
             }
             else {
+                ContextAttribute* aP = ceP->contextAttributeVector.get(ix);
                 /* If deleteAttribute() returns false, then that particular attribute has not
                  * been found. In this case, we interrupt the processing an early return with
                  * a error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter,
                                       std::string("action: DELETE") +
-                                      // FIXME: use toString once EntityID and ContextAttribute becomes objects
-                                      " - entity: (" + entityId + ", " + entityType + ")" +
-                                      " - offending attribute: " + ceP->contextAttributeVector.get(ix)->name);
+                                      " - entity: (" + eP->toString() + ")" +
+                                      " - offending attribute: " + aP->toString());
 
                 responseP->contextElementResponseVector.push_back(cerP);
                 return false;
@@ -634,7 +635,7 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
     if (!entityModified) {
         /* In this case, there wasn't any failure, but ceP was not set. We need to do it ourselves, as the function caller will
          * do a 'continue' without setting it. */
-        //FIXME P5: this is ugly, it should be improve to set ceP in a common place for the "happy case"
+        //FIXME P5: this is ugly, our code should be improved to set ceP in a common place for the "happy case"
         cerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(cerP);
     }
@@ -654,8 +655,7 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
     LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName()));
 
     if (!legalIdUsage(attrsV)) {
-        // FIXME: use toString once EntityID and ContextAttribute becomes objects
-        *errDetail = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: (" + e.id + ", " + e.type + ")";
+        *errDetail = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: (" + e.toString() + ")";
         return false;
     }
 
@@ -732,14 +732,13 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
             if (ceP->contextAttributeVector.get(ix)->value.size() == 0) {
 
-                ContextAttribute* ca = new ContextAttribute();
-                ca->name = ceP->contextAttributeVector.get(ix)->name;
-                ca->type = ceP->contextAttributeVector.get(ix)->type;
+                ContextAttribute* aP = ceP->contextAttributeVector.get(ix);
+                ContextAttribute* ca = new ContextAttribute(aP);
+
                 buildGeneralErrorReponse(ceP, ca, responseP, SccInvalidParameter,                                   
                                    std::string("action: ") + action +
-                                      // FIXME: use toString once EntityID and ContextAttribute becomes objects
-                                      " - entity: (" + en.id + ", " + en.type + ", " + en.isPattern + ")" +
-                                      " - offending attribute: " + ceP->contextAttributeVector.get(ix)->name);
+                                      " - entity: (" + en.toString(true) + ")" +
+                                      " - offending attribute: " + aP->toString());
                 return;
             }
         }
