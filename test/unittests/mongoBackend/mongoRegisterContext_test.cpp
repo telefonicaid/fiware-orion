@@ -463,7 +463,6 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtNnt_Ok)
 */
 TEST(mongoRegisterContextRequest, ce1_En1nt_AtN_Ok)
 {
-  HttpStatusCode           ms;
   RegisterContextRequest   req;
   RegisterContextResponse  res;
 
@@ -494,7 +493,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtN_Ok)
   prepareDatabase();
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res);
+  mongoRegisterContext(&req, &res);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string

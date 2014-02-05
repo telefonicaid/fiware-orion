@@ -48,14 +48,13 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   std::string              entityId      = compV[2];
   std::string              attributeName = compV[4];
   EntityId*                eP            = new EntityId(entityId, "", "false");
-  HttpStatusCode           s;
   StatusCode               sc;
   ContextAttributeResponse car;
 
   request.entityIdVector.push_back(eP);
   request.attributeList.push_back(attributeName);
 
-  s = mongoQueryContext(&request, &response);
+  mongoQueryContext(&request, &response);
 
   if (response.contextElementResponseVector.size() == 0)
   {

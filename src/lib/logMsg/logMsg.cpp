@@ -2437,13 +2437,12 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
     {
         if (lrV[i].remove == false)
         {
-            char*  line = (char*) calloc(1, LINE_MAX);
-            char*  lineP;
+            char*  line  = (char*) calloc(1, LINE_MAX);
 
             if (fseek(fP, lrV[i].offset, SEEK_SET) != 0)
                 CLEANUP("fseek", LmsFseek);
 
-            lineP = fgets(line, LINE_MAX, fP);
+            fgets(line, LINE_MAX, fP);
             if (strncmp(line, "Cleared at", 10) != 0)
             {
                 len = strlen(line);
