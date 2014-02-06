@@ -360,7 +360,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -436,7 +436,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern_JSON)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -513,7 +513,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_AttrN_noPattern)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -592,7 +592,7 @@ TEST(mongoSubscribeContextAvailability, EntN_Attr0_noPattern)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -675,7 +675,7 @@ TEST(mongoSubscribeContextAvailability, EntN_AttrN_noPattern)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -759,7 +759,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_pattern)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -850,7 +850,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -941,7 +941,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll_JSON)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -1029,7 +1029,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneSingle)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -1127,7 +1127,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneMulti)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -1220,7 +1220,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsSubset)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -1319,7 +1319,7 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralCREs)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -1415,7 +1415,7 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralRegistrations)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -1522,7 +1522,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiEntity)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -1621,7 +1621,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiAttr)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -1728,7 +1728,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiEntityAttrs)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -1843,7 +1843,7 @@ TEST(mongoSubscribeContextAvailability, noPatternNoType)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -1946,7 +1946,7 @@ TEST(mongoSubscribeContextAvailability, pattern0Attr)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -2032,7 +2032,7 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrSingle)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -2126,7 +2126,7 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrMulti)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -2228,7 +2228,7 @@ TEST(mongoSubscribeContextAvailability, patternNAttr)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -2340,7 +2340,7 @@ TEST(mongoSubscribeContextAvailability, patternNoType)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -2449,7 +2449,7 @@ TEST(mongoSubscribeContextAvailability, mixPatternAndNotPattern)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
@@ -2527,7 +2527,7 @@ TEST(mongoSubscribeContextAvailability, defaultDuration)
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
     EXPECT_EQ(NO_CODE, res.errorCode.code);
-    EXPECT_EQ(13, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Check database is as expected */
