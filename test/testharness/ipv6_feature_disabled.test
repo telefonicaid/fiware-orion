@@ -35,8 +35,8 @@ accumulatorStart IPV6
 source harnessFunctions.sh
 
 echo "1: ++++++++++++++++++++"
-curl :::${BROKER_PORT}/version  2>resu_ipv6_version_fails.stderr
-cat resu_ipv6_version_fails.stderr
+curl :::${BROKER_PORT}/version --max-time  10 exit code: $?
+echo $?
 
 echo "2: ++++++++++++++++++++"
 SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
@@ -107,8 +107,7 @@ curl localhost:${LISTENER_PORT}/number -s -S
 
 --REGEXPECT--
 1: ++++++++++++++++++++
-
-curl: (7) couldn't connect to host
+7
 2: ++++++++++++++++++++
 <?xml version="1.0"?>
 <subscribeContextResponse>
@@ -153,8 +152,6 @@ curl: (7) couldn't connect to host
 0
 --TEARDOWN--
 source harnessFunctions.sh
-
-rm resu_ipv6_version_fails.stderr
 
 brokerStop CB
 accumulatorStop

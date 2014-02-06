@@ -264,7 +264,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 </updateContextResponse>
 { "count" : 1 }
 7: ++++++++++++++++++++
-POST http:///notify
+POST http://REGEX(*/)notify
 Content-Length: 739
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: :::REGEX(\d+)
@@ -298,7 +298,7 @@ Content-Type: application/xml
 
 =======================================
 8: ++++++++++++++++++++
-POST http://localhost:9997/notify
+POST http://localhost:REGEX([0-9]{4}|[0-9]{5})/notify
 Content-Length: 739
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
