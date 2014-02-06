@@ -198,34 +198,24 @@ static Format wantedOutputSupported(std::string acceptList, std::string* charset
 
 /* ****************************************************************************
 *
-* connectionTreat - 
-*
-* This is the MHD_AccessHandlerCallback function for MHD_start_daemon
-* This function returns:
-* o MHD_YES  if the connection was handled successfully
-* o MHD_NO   if the socket must be closed due to a serious error
-*
-* This function is called once when the headers are read.
-* Then it is called again.
-* And in the case of a message with payload, it is called a third time.
-*
-* Call 1: *con_cls == NULL
-* Call 2: *con_cls != NULL  AND  *upload_data_size != 0
-* Call 3: *con_cls != NULL  AND  *upload_data_size == 0
-*
-* upload_data_size has to do with payload and only valid for such requests.
+* serve - 
 */
-#if 1
-void serve(ConnectionInfo* ciP)
+static void serve(ConnectionInfo* ciP)
 {
   if (ciP->payload == NULL)
-    LM_M(("Serving request %s %s without payload", ciP->method.c_str(), ciP->url.c_str()));
+    LM_T(LmtService, ("Serving request %s %s without payload", ciP->method.c_str(), ciP->url.c_str()));
   else
-    LM_M(("Serving request %s %s with %lu bytes of payload:\n\n%s\n\n", ciP->method.c_str(), ciP->url.c_str(), ciP->httpHeaders.contentLength, ciP->payload));
+    LM_T(LmtService, ("Serving request %s %s with %lu bytes of payload", ciP->method.c_str(), ciP->url.c_str(), ciP->httpHeaders.contentLength));
 
   restService(ciP, restServiceV);
 }
 
+
+
+/* ****************************************************************************
+*
+* requestCompleted - 
+*/
 static void requestCompleted
 (
   void*                       cls,
@@ -242,6 +232,12 @@ static void requestCompleted
   *con_cls = NULL;
 }
 
+
+
+/* ****************************************************************************
+*
+* formatCheck - 
+*/
 static int formatCheck(ConnectionInfo* ciP)
 {
   ciP->inFormat   = formatParse(ciP->httpHeaders.contentType, NULL);
@@ -299,6 +295,27 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   return 0;
 }
 
+
+
+/* ****************************************************************************
+*
+* connectionTreat - 
+*
+* This is the MHD_AccessHandlerCallback function for MHD_start_daemon
+* This function returns:
+* o MHD_YES  if the connection was handled successfully
+* o MHD_NO   if the socket must be closed due to a serious error
+*
+* - This function is called once when the headers are read and the ciP is created.
+* - Then it is called for data payload and once all the payload an acknowledgement
+*   must be done, setting *upload_data_size to ZERO.
+* - The last call is made with *upload_data_size == 0 and now is when the connection
+*   is open to send responses.
+*
+* Call 1: *con_cls == NULL
+* Call 2: *con_cls != NULL  AND  *upload_data_size != 0
+* Call 3: *con_cls != NULL  AND  *upload_data_size == 0
+*/
 static int connectionTreat
 (
    void*            cls,
@@ -327,248 +344,59 @@ static int connectionTreat
     if ((formatCheck(ciP) != 0) || (contentTypeCheck(ciP) != 0))
       LM_W(("Error in out-format or content-type"));
 
-    LM_M(("ciP at %p", ciP));
     return MHD_YES;
   }
 
 
-  // 2-X. Data gathering calls, acknowledge the receipt of data
-  if ((dataLen != 0) && (dataLen == ciP->httpHeaders.contentLength))
+  //
+  // 2. Data gathering calls
+  //
+  // 2-1. Data gathering calls, just wait
+  // 2-2. Last data gathering call, acknowledge the receipt of data
+  //
+  if (dataLen != 0)
   {
-    ciP->payload     = (char*) malloc(*upload_data_size + 1);
-    ciP->payloadSize = *upload_data_size;
-    memcpy(ciP->payload, upload_data, *upload_data_size + 1);
-    *upload_data_size = 0;
+    if (dataLen == ciP->httpHeaders.contentLength)
+    {
+      if (ciP->httpHeaders.contentLength <= PAYLOAD_MAX_SIZE)
+      {
+        ciP->payload     = (char*) malloc(*upload_data_size + 1);
+        ciP->payloadSize = *upload_data_size;
+        memcpy(ciP->payload, upload_data, *upload_data_size + 1);
+      }
+      else
+      {
+        char details[256];
+        snprintf(details, sizeof(details), "payload size: %d, max size supported: %d", ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE);
+
+        ciP->answer         = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, details);
+        ciP->httpStatusCode = SccRequestEntityTooLarge;
+      }
+
+      // All payload received, acknowledge!
+      *upload_data_size = 0;
+    }
+    else
+      LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, ciP->httpHeaders.contentLength));
+
     return MHD_YES;
   }
 
 
   // 3. Finally, serve the request (unless an error has occurred)
-  if (ciP->answer != "")
+  if (((ciP->verb == POST) || (ciP->verb == PUT)) && (ciP->httpHeaders.contentLength == 0))
+  {
+    std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST request");
+    ciP->httpStatusCode = SccLengthRequired;
+    restReply(ciP, errorMsg);
+  }
+  else if (ciP->answer != "")
     restReply(ciP, ciP->answer);
   else
     serve(ciP);
 
-
   return MHD_YES;
 }
-#else
-static int  requests = 0;
-extern char savedResponse[2 * 1024 * 1024];
-/* ****************************************************************************
-*
-* requestCompleted - 
-*/
-static void requestCompleted
-(
-  void*                       cls,
-  MHD_Connection*             connection,
-  void**                      con_cls,
-  MHD_RequestTerminationCode  toe
-)
-{
-  ConnectionInfo* ciP = (ConnectionInfo*) *con_cls;
-
-  LM_M(("--------------------------- In requestCompleted -----------------------------------------"));
-
-  if (ciP == NULL)
-    return;
-
-  LM_T(LmtHttpRequest, ("Request Completed. Read %d bytes of %d", ciP->payloadSize, ciP->httpHeaders.contentLength));
-
-  if (savedResponse[0] != 0)
-  {
-     LM_W(("Saved response found - responding ..."));
-     restReply(ciP, savedResponse);
-     savedResponse[0] = 0;
-  }
-
-  if (ciP->payload)
-     free(ciP->payload);
-  delete(ciP);
-  *con_cls = NULL;
-}
-
-
-
-static int connectionTreat
-(
-   void*            cls,
-   MHD_Connection*  connection,
-   const char*      url,
-   const char*      method,
-   const char*      version,
-   const char*      upload_data,
-   size_t*          upload_data_size,
-   void**           con_cls
-)
-{
-  ConnectionInfo* ciP      = (ConnectionInfo*) *con_cls;
-
-  LM_M(("--------------------------- In connectionTreat -----------------------------------------"));
-
-  if (ciP == NULL)
-    ++requests;
-
-  if (ciP)
-  {
-     ciP->callNo += 1;
-     LM_T(LmtMhd, ("Request %d, callNo == %d: %d bytes of payload (of %d)", requests, ciP->callNo, *upload_data_size, ciP->httpHeaders.contentLength));
-  }
-
-  if ((ciP != NULL) && (ciP->httpHeaders.contentLength > PAYLOAD_MAX_SIZE))
-  {
-    LM_W(("Content-Length: %d (0x%x) too large. Max size is %d (0x%x)", ciP->httpHeaders.contentLength, ciP->httpHeaders.contentLength, PAYLOAD_MAX_SIZE, PAYLOAD_MAX_SIZE));
-    ciP->requestEntityTooLarge = true;
-  }
-
-  if (((ciP != NULL) && (ciP->httpHeaders.contentLength == 0)) && (ciP->method == "POST" || ciP->method == "PUT"))
-  {
-    LM_W(("Zero/No Content-Length in PUT/POST request"));
-    std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST request");
-    ciP->httpStatusCode = SccLengthRequired;
-    restReply(ciP, errorMsg);
-    LM_RE(MHD_YES, ("Zero/No Content-Length in PUT/POST request"));
-  }
-
-  // In the first call to this callback, only the headers are complete
-  // So, prepare for the data and return
-  if (ciP == NULL)
-  {
-    LM_T(LmtHttpDaemon, ("HTTP method: %s, URL: %s, version: %s", method, url, version));
-
-    // POST 1
-    ciP = new ConnectionInfo(url, method, version);
-    if (ciP == NULL)
-      LM_RE(MHD_NO, ("Error allocating ConnectionInfo"));
-    
-    // Saving the pointer to the newly allocated ConnectionInfo
-    *con_cls         = (void*) ciP;
-
-    ciP->callNo                    = 1;
-    ciP->requestEntityTooLarge     = false;
-
-    MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
-
-    ciP->connection = connection;
-    ciP->outFormat  = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
-    if (ciP->outFormat == NOFORMAT)
-    {
-       /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
-       ciP->outFormat = XML; // We use XML as default format
-       ciP->httpStatusCode = SccNotAcceptable;
-       restReply(ciP, "Not Acceptable", std::string("acceptable types: 'application/xml' but Accept header in request was: '" + ciP->httpHeaders.accept + "'"));
-       return MHD_YES;
-    }
-
-    /* Note that the Content-Type check is done only in cases where there is an actual conent, e.g. a GET request
-     * without content doesn't need to check Content-Type */
-    if (ciP->httpHeaders.contentLength != 0)
-    {
-      /* The ciP->httpHeaders.contentType constructor inits with an empty string, so if the lengh() is 0 at this point
-       * that means that the header was not used in the HTTP request */
-      if (ciP->httpHeaders.contentType.length() == 0)
-      {
-          /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
-          ciP->httpStatusCode = SccUnsupportedMediaType;
-          restReply(ciP, httpStatusCodeString(SccUnsupportedMediaType), "Content-Type header not used, default application/octet-stream is not supported");
-          return MHD_YES;
-      }
-
-      if ((ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
-      {
-          /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
-          ciP->httpStatusCode = SccUnsupportedMediaType;
-          restReply(ciP, httpStatusCodeString(SccUnsupportedMediaType), "not supported content type: " + ciP->httpHeaders.contentType);
-          return MHD_YES;
-      }
-    }
-
-    if (((ciP->method == "POST") || (ciP->method == "PUT")) && (ciP->httpHeaders.contentLength != 0))
-    {
-      ciP->verb = (ciP->method == "POST")? POST : PUT;
-    }
-    else if (((ciP->method == "POST") || (ciP->method == "PUT")) && (ciP->httpHeaders.contentLength == 0))
-    {
-       LM_W(("PUT/POST and contentLength == 0"));
-    }
-
-    ciP->payload     = (char*) calloc(1, PAYLOAD_SIZE);
-    ciP->payloadSize = 0;
-
-    return MHD_YES;
-  }
-
-  if (*upload_data_size != 0)
-     ciP->payloadSize = *upload_data_size;
-
-  LM_D(("Accept: %s", ciP->httpHeaders.accept.c_str()));
-  ciP->inFormat  = formatParse(ciP->httpHeaders.contentType, NULL);
-  ciP->outFormat = formatParse(ciP->httpHeaders.accept, NULL);
-
-  LM_T(LmtRest, ("method: %s", ciP->method.c_str()));
-  if (ciP->method == "POST")
-    ciP->verb = POST;
-  else if (ciP->method == "GET")
-    ciP->verb = GET;
-  else if (ciP->method == "PUT")
-    ciP->verb = PUT;
-  else if (ciP->method == "DELETE")
-    ciP->verb = DELETE;
-
-
-  if (*upload_data_size == ciP->httpHeaders.contentLength)
-  {
-    ciP->payloadSize = *upload_data_size;
-
-    if (*upload_data_size != 0)
-    {
-      // Adding string zero termination
-       char* payload = (char*) upload_data;
-       payload[*upload_data_size] = 0;
-
-       strcpy(ciP->payload, upload_data);
-       ciP->payloadSize = *upload_data_size;
-    }
-
-    LM_T(LmtRest, ("Not post-processing %d bytes of data - setting upload_data_size to ZERO?", ciP->payloadSize));
-    *upload_data_size = 0; // FIXME 8 Check this '*upload_data_size = 0'
-
-    if (ciP->httpHeaders.contentLength == 0)
-    {
-      if (ciP->fractioned == true)
-        LM_T(LmtRest, ("Received entire payload of fractioned message (%d bytes)", ciP->httpHeaders.contentLength));
-      restService(ciP, restServiceV);
-      return MHD_YES;
-    }
-  }
-  else if ((*upload_data_size < ciP->httpHeaders.contentLength) && (*upload_data_size != 0))
-  {
-    LM_T(LmtIncompletePayload, ("Got INCOMPLETE POST payload (%d accumulated bytes): '%s'", *upload_data_size, upload_data));
-    ciP->fractioned = true;
-  }
-  else if (*upload_data_size == 0)
-  {
-    if (ciP->requestEntityTooLarge == true)
-    {
-      char detail[256];
-
-      snprintf(detail, sizeof(detail), "payload size: %d", ciP->httpHeaders.contentLength);
-      std::string out = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->url, SccRequestEntityTooLarge, detail);
-      restReply(ciP, out);
-    }
-    else
-    {
-      LM_T(LmtServiceInputPayload, ("Calling restService '%s' with payload: '%s'", ciP->url.c_str(), ciP->payload));
-      if (ciP->fractioned == true)
-        LM_T(LmtRest, ("Received entire payload of fractioned message (%d bytes)", ciP->httpHeaders.contentLength));
-      restService(ciP, restServiceV);
-    }
-  }
-
-  return MHD_YES;
-}
-#endif
 
 
 
@@ -582,8 +410,6 @@ void restInit(char* _bind, unsigned short _port, RestService* _restServiceV)
 
    port          = _port;
    restServiceV  = _restServiceV;
-
-   // savedResponse[0] = 0;
 }
 
 

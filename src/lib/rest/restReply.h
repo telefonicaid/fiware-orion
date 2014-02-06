@@ -36,9 +36,14 @@
 *
 * restReply - 
 */
-extern int restReply(ConnectionInfo* ciP, std::string answer);
-extern int restReply(ConnectionInfo* ciP, MHD_Response* response);
+extern void restReply(ConnectionInfo* ciP, std::string answer);
 
+
+
+/* ****************************************************************************
+*
+* restErrorReplyGet - 
+*/
 extern std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string indent, std::string request, HttpStatusCode code, std::string detail);
 
 #endif

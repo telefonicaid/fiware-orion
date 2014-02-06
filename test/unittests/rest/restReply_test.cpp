@@ -45,7 +45,6 @@
 #define TEST_SIZE (4 * 1024 * 1024)
 TEST(restReply, MHD_create_response_from_data_error)
 {
-  int             out;
   ConnectionInfo  ci("/ngsi/XXX", "GET", "1.1");
   char*           answer = (char*) malloc(TEST_SIZE);
 
@@ -56,9 +55,7 @@ TEST(restReply, MHD_create_response_from_data_error)
     memset(answer, 'x', TEST_SIZE - 1);
     answer[TEST_SIZE - 1] = 0;
 
-    out = restReply(&ci, answer);
-    EXPECT_EQ(MHD_NO, out);
-
+    restReply(&ci, answer);
     free(answer);
   }
 
@@ -74,13 +71,11 @@ TEST(restReply, MHD_create_response_from_data_error)
 TEST(restReply, json)
 {
   ConnectionInfo  ci("/ngsi/XXX", "GET", "1.1");
-  int             out;
 
   utInit();
 
   ci.outFormat = JSON;
-  out = restReply(&ci, "123");
-  EXPECT_EQ(MHD_YES, out);
+  restReply(&ci, "123");
 
   utExit();
 }
