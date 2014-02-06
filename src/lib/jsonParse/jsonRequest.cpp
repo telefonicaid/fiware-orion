@@ -100,14 +100,19 @@ static JsonRequest jsonRequest[] =
 *
 * jsonRequestGet - 
 */
-static JsonRequest* jsonRequestGet(RequestType requestType)
+static JsonRequest* jsonRequestGet(RequestType request, std::string method)
 {
   for (unsigned int ix = 0; ix < sizeof(jsonRequest) / sizeof(jsonRequest[0]); ++ix)
   {
-    if (requestType == jsonRequest[ix].type)
+    if ((request == jsonRequest[ix].type) && (jsonRequest[ix].method == method))
+    {
+      if (jsonRequest[ix].parseVector != NULL)
+        LM_V2(("Found xmlRequest of type %d, method '%s' - index %d (%s)", request, method.c_str(), ix, jsonRequest[ix].parseVector[0].path.c_str()));
       return &jsonRequest[ix];
+    }
   }
 
+  LM_E(("No request found for RequestType '%s', method '%s'", requestType(request), method.c_str()));
   return NULL;
 }
 
@@ -119,7 +124,7 @@ static JsonRequest* jsonRequestGet(RequestType requestType)
 std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parseDataP, RequestType request, std::string payloadWord, JsonRequest** reqPP)
 {
   std::string   res   = "OK";
-  JsonRequest*  reqP  = jsonRequestGet(request);
+  JsonRequest*  reqP  = jsonRequestGet(request, ciP->method);
 
   LM_T(LmtParse, ("Treating a JSON request: '%s'", content));
 
