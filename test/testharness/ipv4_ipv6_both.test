@@ -21,13 +21,13 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-IPv6 Feature Enabled 
+IPv6 IPv4 Both 
 
 --SHELL-INIT--
 source harnessFunctions.sh
 
 dbInit CB
-brokerStart CB 0-255 IPV6
+brokerStart CB
 accumulatorStart
 accumulatorStart IPV6
 
@@ -35,13 +35,13 @@ accumulatorStart IPV6
 source harnessFunctions.sh
 
 echo "1: ++++++++++++++++++++"
-curl :::${BROKER_PORT}/version | xmllint --format -
+curl ::1:${BROKER_PORT}/version | xmllint --format -
 
 echo "2: ++++++++++++++++++++"
-curl localhost:${BROKER_PORT}/version | xmllint --format -
+curl 127.0.0.1:${BROKER_PORT}/version | xmllint --format -
 
 echo "3: ++++++++++++++++++++"
-SUB_OUT=$((curl :::${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+SUB_OUT=$((curl ::1:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -53,7 +53,7 @@ SUB_OUT=$((curl :::${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Conten
         <attribute>temperature</attribute>
         <attribute>lightstatus</attribute>
   </attributeList>
-  <reference>http://:::${LISTENER_PORT_V6}/notify</reference>
+  <reference>http://::1:${LISTENER_PORT_V6}/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
         <notifyCondition>
@@ -70,7 +70,7 @@ SUB_ID_V6=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | aw
 echo "$SUB_OUT"
 
 echo "4: ++++++++++++++++++++"
-SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+SUB_OUT=$((curl 127.0.0.1:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -82,7 +82,7 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
         <attribute>temperature</attribute>
         <attribute>lightstatus</attribute>
   </attributeList>
-  <reference>http://localhost:${LISTENER_PORT}/notify</reference>
+  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
         <notifyCondition>
@@ -99,7 +99,7 @@ SUB_ID_V4=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | aw
 echo "$SUB_OUT"
 
 echo "5: ++++++++++++++++++++"
-(curl :::${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+(curl ::1:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -129,7 +129,7 @@ EOF
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID_V6\")}, {_id: 0, count: 1})"
 
 echo "6: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+(curl 127.0.0.1:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -160,11 +160,11 @@ mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID_V4\"
 
 echo "7: ++++++++++++++++++++"
 #Get accumulated data
-curl :::${LISTENER_PORT_V6}/dump -s -S 
+curl ::1:${LISTENER_PORT_V6}/dump -s -S 
 
 echo "8: ++++++++++++++++++++"
 #Get accumulated data
-curl localhost:${LISTENER_PORT}/dump -s -S
+curl 127.0.0.1:${LISTENER_PORT}/dump -s -S
 
 --REGEXPECT--
 1: ++++++++++++++++++++
@@ -267,7 +267,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 POST http://REGEX(*/)notify
 Content-Length: 739
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: :::REGEX(\d+)
+Host: ::1:REGEX(\d+)
 Accept: application/xml, application/json
 Content-Type: application/xml
 
@@ -298,10 +298,10 @@ Content-Type: application/xml
 
 =======================================
 8: ++++++++++++++++++++
-POST http://localhost:REGEX([0-9]{4}|[0-9]{5})/notify
+POST http://127.0.0.1:REGEX([0-9]{4}|[0-9]{5})/notify
 Content-Length: 739
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
 Content-Type: application/xml
 

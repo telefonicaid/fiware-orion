@@ -43,6 +43,7 @@
 #include <unistd.h>                             // close()
 
 #include "common/string.h"
+#include "rest/rest.h"
 
 
 /* ****************************************************************************
@@ -61,9 +62,24 @@ int socketHttpConnect(std::string host, unsigned short port)
  LM_VVV(("Generic Connect to: '%s'  port: '%d'", host.c_str(), port));
 
  memset(&hints, 0, sizeof(struct addrinfo));
- hints.ai_family = AF_UNSPEC;    // Allow IPv4 or IPv6
  hints.ai_socktype = SOCK_STREAM;
  hints.ai_protocol = 0;
+
+ if (ipVersionUsed == IPV4) 
+ {
+   hints.ai_family = AF_INET;
+   LM_VVV(("Allow IpV4 only"));
+ }
+ else if (ipVersionUsed == IPV6)
+ {
+   hints.ai_family = AF_INET6;
+   LM_VVV(("Allow  IpV4 only"));
+ }
+ else 
+ {
+   hints.ai_family = AF_UNSPEC;
+   LM_VVV(("Allow IPv4 or IPv6"));
+ }
 
  snprintf(port_str, sizeof(port_str), "%d" , port);
 

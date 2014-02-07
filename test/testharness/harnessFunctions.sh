@@ -70,17 +70,20 @@ function localBrokerStart()
   role=$1
   traceLevels=$2
   ipVersion=$3
-  IPv6Option=""
+  IPvOption=""
 
-  if [ "$ipVersion" == "IPV6" ]
+  if [ "$ipVersion" == "IPV4" ]
   then
-    IPv6Option="-ipv6" 
+    IPvOption="-ipv4" 
+  elif [ "$ipVersion" == "IPV6" ]
+  then
+    IPvOption="-ipv6"
   fi
 
   if [ "$role" == "CB" ]
   then
     port=$BROKER_PORT
-    CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME}     -t $traceLevels $IPv6Option"
+    CB_START_CMD="contextBroker -vvvvv -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME}     -t $traceLevels $IPvOption"
   elif [ "$role" == "CM" ]
   then
     mkdir -p /tmp/configManager
@@ -164,11 +167,6 @@ function brokerStart()
   if [ "$traceLevels" == "" ]
   then
     traceLevels=0-255
-  fi
-
-  if [ "$ipVersion" == "" ]
-  then
-    ipVersion=IPV4
   fi
 
   localBrokerStop $role

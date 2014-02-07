@@ -140,7 +140,8 @@ char            fwdHost[64];
 int             fwdPort;
 bool            ngsi9Only;
 bool            harakiri;
-bool            useIpV6;
+bool            useOnlyIpV4;
+bool            useOnlyIpV6;
 char            bindAddressV6[MAX_LEN_IP];
 char            bindAddressV4[MAX_LEN_IP];
 
@@ -170,7 +171,8 @@ PaArgument paArgs[] =
   { "-fwdHost",     fwdHost,       "FWD_HOST",     PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "host for forwarding NGSI9 regs"  },
   { "-fwdPort",     &fwdPort,      "FWD_PORT",     PaInt,    PaOpt, 0,              0,      65000, "port for forwarding NGSI9 regs"  },
   { "-ngsi9",       &ngsi9Only,    "CONFMAN",      PaBool,   PaOpt, false,          false,  true,  "run as Configuration Manager"    },
-  { "-ipv6",        &useIpV6,      "USEIPV6",      PaBool,   PaOpt, false,          false,  true,  "use ip v6"                       },
+  { "-ipv4",        &useOnlyIpV4,  "USEIPV4",      PaBool,   PaOpt, false,          false,  true,  "use ip v4 only"                  },
+  { "-ipv6",        &useOnlyIpV6,  "USEIPV6",      PaBool,   PaOpt, false,          false,  true,  "use ip v6 only"                  },
   { "-harakiri",    &harakiri,     "HARAKIRI",     PaBool,   PaHid, false,          false,  true,  "commits harakiri on request"     },
 
 
@@ -624,10 +626,26 @@ int main(int argC, char* argV[])
   LM_V(("LocalIpV6 '%s'", bindAddressV6));
 
   RestService* rsP = ngsi9Only? restServiceNgsi9V : restServiceV;
-  restInit(bindAddressV4, port, rsP);
-  if (useIpV6)
-    restInit(bindAddressV6, port, rsP, true);
 
+  IpVersion  ipV;
+
+  if (useOnlyIpV4)
+  {
+    ipV = IPV4;
+    LM_V(("Use IpV4 only"));
+  }
+  else if (useOnlyIpV6)
+  {
+    ipV = IPV6;
+    LM_V(("Use IpV6 only"));
+  }
+  else
+  {
+    ipV = IPDUAL;
+    LM_V(("Use dual Ip"));
+  } 
+   
+  restInit(bindAddressV4, bindAddressV6, port, rsP, ipV);
 
 
   /* Set start time */
@@ -638,16 +656,10 @@ int main(int argC, char* argV[])
   semInit();
 
   int r;
-  if ((r = restStart()) != 0)
+  if ((r = restStart(ipV)) != 0)
   {
     fprintf(stderr, "restStart: error %d\n", r);
     LM_X(1, ("restStart: error %d", r));
-  }
-
-  if (useIpV6)
-  {
-    if ((r = restStart(true)) != 0)
-       LM_X(1, ("restStart: error (IPv6) %d", r));
   }
 
   // Give the rest library the correct version string of this executable

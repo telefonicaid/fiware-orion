@@ -21,13 +21,13 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-IPv6 Feature Disabled 
+IPv6 Only 
 
 --SHELL-INIT--
 source harnessFunctions.sh
 
 dbInit CB
-brokerStart CB
+brokerStart CB 0-255 IPV6
 accumulatorStart
 accumulatorStart IPV6
 
@@ -35,11 +35,11 @@ accumulatorStart IPV6
 source harnessFunctions.sh
 
 echo "1: ++++++++++++++++++++"
-curl :::${BROKER_PORT}/version --max-time  10 exit code: $?
+curl 127.0.0.1:${BROKER_PORT}/version --max-time  10 exit code: $?
 echo $?
 
 echo "2: ++++++++++++++++++++"
-SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+SUB_OUT=$((curl ::1:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -51,7 +51,7 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
         <attribute>temperature</attribute>
         <attribute>lightstatus</attribute>
   </attributeList>
-  <reference>http://:::${LISTENER_PORT_V6}/notify</reference>
+  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
         <notifyCondition>
@@ -68,7 +68,7 @@ SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -
 echo "$SUB_OUT"
 
 echo "3: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+(curl ::1:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -99,11 +99,11 @@ mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")},
 
 echo "4: ++++++++++++++++++++"
 #Get accumulated data
-curl :::${LISTENER_PORT_V6}/number -s -S 
+curl ::1:${LISTENER_PORT_V6}/number -s -S 
 
 echo "5: ++++++++++++++++++++"
 #Get accumulated data
-curl localhost:${LISTENER_PORT}/number -s -S
+curl 127.0.0.1:${LISTENER_PORT}/number -s -S
 
 --REGEXPECT--
 1: ++++++++++++++++++++
@@ -147,7 +147,7 @@ curl localhost:${LISTENER_PORT}/number -s -S
 </updateContextResponse>
 { "count" : 1 }
 4: ++++++++++++++++++++
-1
+0
 5: ++++++++++++++++++++
 0
 --TEARDOWN--
