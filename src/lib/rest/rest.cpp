@@ -246,10 +246,10 @@ static int formatCheck(ConnectionInfo* ciP)
   if (ciP->outFormat == NOFORMAT)
   {
     /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
-    ciP->outFormat      = XML; // We use XML as default format
+    ciP->httpStatusCode = SccNotAcceptable;
     ciP->answer         = restErrorReplyGet(ciP, XML, "", "OrionError", SccNotAcceptable,
                                             std::string("acceptable types: 'application/xml' but Accept header in request was: '") + ciP->httpHeaders.accept + "'");
-    ciP->httpStatusCode = SccNotAcceptable;
+    ciP->outFormat      = XML; // We use XML as default format
 
     return 1;
   }
@@ -274,7 +274,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   //
   // Three cases:
   //   1. If there is no payload, the Content-Type is not interesting
-  //   2. Payload present  but no Content-Type 
+  //   2. Payload present but no Content-Type 
   //   3. Content-Type present but not supported
 
   if (ciP->httpHeaders.contentLength == 0)
