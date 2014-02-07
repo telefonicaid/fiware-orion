@@ -44,8 +44,9 @@
 *
 * PAYLOAD_SIZE - 
 */
-#define PAYLOAD_SIZE      (64 * 1024 * 1024)
-#define PAYLOAD_MAX_SIZE  (1 * 1024 * 1024)
+#define PAYLOAD_SIZE       (64 * 1024 * 1024)
+#define PAYLOAD_MAX_SIZE   (1 * 1024 * 1024)
+#define STATIC_BUFFER_SIZE (32 * 1024)
 
 
 
@@ -53,11 +54,12 @@
 *
 * Globals
 */
-static unsigned short            port          = 0;
-static char                      bindIp[15]    = "0.0.0.0";
-static RestService*              restServiceV  = NULL;
-static MHD_Daemon*               mhdDaemon     = NULL;
-static struct sockaddr_in        sad;
+static unsigned short      port          = 0;
+static char                bindIp[15]    = "0.0.0.0";
+static RestService*        restServiceV  = NULL;
+static MHD_Daemon*         mhdDaemon     = NULL;
+static struct sockaddr_in  sad;
+__thread char              static_buffer[STATIC_BUFFER_SIZE];
 
 
 
@@ -226,8 +228,9 @@ static void requestCompleted
 {
   ConnectionInfo* ciP      = (ConnectionInfo*) *con_cls;
 
-  if (ciP->payload)
+  if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
     free(ciP->payload);
+
   delete(ciP);
   *con_cls = NULL;
 }
@@ -246,9 +249,10 @@ static int formatCheck(ConnectionInfo* ciP)
   if (ciP->outFormat == NOFORMAT)
   {
     /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
-    ciP->httpStatusCode = SccNotAcceptable;
     ciP->answer         = restErrorReplyGet(ciP, XML, "", "OrionError", SccNotAcceptable,
                                             std::string("acceptable types: 'application/xml' but Accept header in request was: '") + ciP->httpHeaders.accept + "'");
+    ciP->httpStatusCode = SccNotAcceptable;
+
     ciP->outFormat      = XML; // We use XML as default format
 
     return 1;
@@ -360,7 +364,11 @@ static int connectionTreat
     {
       if (ciP->httpHeaders.contentLength <= PAYLOAD_MAX_SIZE)
       {
-        ciP->payload     = (char*) malloc(*upload_data_size + 1);
+        if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
+          ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength);
+        else
+          ciP->payload = static_buffer;
+
         ciP->payloadSize = *upload_data_size;
         memcpy(ciP->payload, upload_data, *upload_data_size + 1);
       }
