@@ -109,12 +109,12 @@ TEST(RegisterProviderRequest, xml_ok)
 TEST(RegisterProviderRequest, json_ok)
 {
   ParseData       reqData;
-  const char*     inFile1  = "ngsi9.registerProviderRequest.noRegistrationId.postponed.json";
-  const char*     inFile2  = "ngsi9.registerProviderRequest.ok.postponed.json";
-  const char*     outFile1 = "ngsi9.registerProviderRequestRendered.noRegistrationId.postponed.json";
+  const char*     inFile1  = "ngsi9.registerProviderRequest.noRegistrationId.valid.json";
+  const char*     inFile2  = "ngsi9.registerProviderRequest.ok.valid.json";
+  const char*     outFile1 = "ngsi9.registerProviderRequestRendered.noRegistrationId.valid.json";
   const char*     outFile2 = "ngsi9.registerProviderRequest.noMetdataName.valid.json";
   const char*     outFile3 = "ngsi9.registerProviderRequest.predetectedError.valid.json";
-  const char*     outFile4 = "ngsi9.registerProviderRequestRendered.ok.postponed.json";
+  const char*     outFile4 = "ngsi9.registerProviderRequestRendered.ok.valid.json";
   std::string     result;
   std::string     rendered;
   std::string     checked;

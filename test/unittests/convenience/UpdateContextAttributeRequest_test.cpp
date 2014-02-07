@@ -142,9 +142,9 @@ TEST(UpdateContextAttributeRequest, check_json)
   Metadata                       mdata("name", "type", "value");
   Metadata                       mdata2("", "type", "value");
   std::string                    out;
-  const char*                    outfile1 = "ngsi10.updateContextAttributeRequest.check1.valid.json";
-  const char*                    outfile2 = "ngsi10.updateContextAttributeRequest.check2.valid.json";
-  const char*                    outfile3 = "ngsi10.updateContextAttributeRequest.check3.valid.json";
+  const char*                    outfile1 = "ngsi10.updateContextAttributeRequest.check1.invalid.json";
+  const char*                    outfile2 = "ngsi10.updateContextAttributeRequest.check2.invalid.json";
+  const char*                    outfile3 = "ngsi10.updateContextAttributeRequest.check3.invalid.json";
 
   utInit();
 

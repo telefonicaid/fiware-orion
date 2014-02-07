@@ -157,8 +157,8 @@ TEST(AppendContextElementRequest, check_json)
    ContextAttribute             ca("caName", "caType", "121");
    Metadata                     md("mdName", "mdType", "122");
    const char*                  outfile1 = "ngsi10.appendContextElementResponse.predetectedError.valid.json";
-   const char*                  outfile2 = "ngsi10.appendContextElementResponse.missingAttributeName.invalid.json";
-   const char*                  outfile3 = "ngsi10.appendContextElementResponse.missingMetadataName.invalid.json";
+   const char*                  outfile2 = "ngsi10.appendContextElementResponse.missingAttributeName.valid.json";
+   const char*                  outfile3 = "ngsi10.appendContextElementResponse.missingMetadataName.valid.json";
 
    utInit();
 

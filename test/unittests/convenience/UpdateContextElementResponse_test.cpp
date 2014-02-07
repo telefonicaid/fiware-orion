@@ -69,7 +69,7 @@ TEST(UpdateContextElementResponse, render_json)
   ContextAttributeResponse        car;
   ContextAttribute                ca("caName", "caType", "caValue");
   std::string                     out;
-  const char*                     outfile = "ngsi10.updateContextElementResponse.ok.postponed.json";
+  const char*                     outfile = "ngsi10.updateContextElementResponse.ok.valid.json";
 
   // Just the normal case
   ucer.contextAttributeResponseVector.push_back(&car);
@@ -126,8 +126,8 @@ TEST(UpdateContextElementResponse, check_json)
   ContextAttributeResponse      car;
   ContextAttribute              ca("", "TYPE", "VALUE"); // empty name, thus provoking error
   std::string                   out;
-  const char*                   outfile1 = "ngsi10.updateContextElementResponse.check1.postponed.json";
-  const char*                   outfile2 = "ngsi10.updateContextElementResponse.check2.postponed.json";
+  const char*                   outfile1 = "ngsi10.updateContextElementResponse.check1.valid.json";
+  const char*                   outfile2 = "ngsi10.updateContextElementResponse.check2.valid.json";
 
   // 1. predetected error
   out = ucer.check(IndividualContextEntity, JSON, "", "PRE ERR", 0);
