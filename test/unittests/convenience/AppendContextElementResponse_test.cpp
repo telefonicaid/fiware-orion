@@ -54,7 +54,7 @@ TEST(AppendContextElementResponse, render_xml)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 2. errorCode 'active'
-  acer.errorCode.fill(SccBadRequest, "bad request", "very bad request");
+  acer.errorCode.fill(SccBadRequest, "very bad request");
   out = acer.render(AppendContextElement, XML, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());

@@ -84,21 +84,26 @@ TEST(Convenience, shortPath)
   ConnectionInfo  ci3("ngsi8", "GET", "1.1");
   ConnectionInfo  ci4("ngsi10/nada", "GET", "1.1");
   std::string     out;
-  const char*     outfile = "ngsi10.convenience.shortPath.postponed.xml";
+  const char*     outfile1 = "ngsi.convenience.shortPath.postponed.xml";
+  const char*     outfile2 = "ngsi.convenience.shortPath2.postponed.xml";
+  const char*     outfile3 = "ngsi.convenience.shortPath3.postponed.xml";
+  const char*     outfile4 = "ngsi.convenience.shortPath4.postponed.xml";
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   out = restService(&ci1, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   out = restService(&ci2, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   out = restService(&ci3, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
   out = restService(&ci4, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -115,7 +120,7 @@ TEST(Convenience, badPathNgsi9)
 {
   ConnectionInfo            ci("ngsi9/badpathcomponent", "GET", "1.1");
   std::string               out;
-  const char*               outfile = "ngsi10.convenience.badPathNgsi9.postponed.xml";
+  const char*               outfile = "ngsi.convenience.badPathNgsi9.postponed.xml";
 
   utInit();
 

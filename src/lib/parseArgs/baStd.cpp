@@ -55,7 +55,6 @@ long baStoi(char* string, int* baseP, char* errorText)
     long                multiplicator = 1;
     int                 sign          = 1;
     long                value;
-    IntType             type;
     int                 base;
     char*               validchars = (char*) "Q";
 
@@ -87,42 +86,36 @@ long baStoi(char* string, int* baseP, char* errorText)
 
 	if (strncmp(string, "0x", 2) == 0)
     {
-        type        = Hex;
         base        = 16;
         string      = &string[2];
         validchars  = (char*) "0123456789abcdfeABCDEF";
     }
 	else if (strncmp(string, "H'", 2) == 0)
     {
-        type        = Hex;
         base        = 16;
         string      = &string[2];
         validchars  = (char*) "0123456789abcdfeABCDEF";
     }
     else if (strncmp(string, "H", 1) == 0)
 	{
-        type        = Hex;
         base        = 16;
         string      = &string[1];
         validchars  = (char*) "0123456789abcdfeABCDEF";
     }
 	else if (strncmp(string, "0", 1) == 0)
 	{
-        type        = Oct;
         base        = 8;
         string      = &string[1];
         validchars  = (char*) "01234567";
     }
 	else if (strncmp(string, "B", 1) == 0)
 	{
-        type        = Bin;
         base        = 2;
         string      = &string[1];
         validchars  = (char*) "01";
     }
     else
     {
-        type        = Dec;
         base        = 10;
         validchars  = (char*) "0123456789";
     }

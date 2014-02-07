@@ -34,7 +34,7 @@
 #include "rest/HttpStatusCode.h"
 
 
-struct ErrorCode;
+
 /* ****************************************************************************
 *
 * StatusCode - 
@@ -48,13 +48,13 @@ typedef struct StatusCode
   std::string     tag;              // tag to be rendered
 
   StatusCode();
-  StatusCode(HttpStatusCode _code, std::string _reasonPhrase, std::string _details);
+  StatusCode(std::string _tag);
+  StatusCode(HttpStatusCode _code, std::string _details, std::string _tag = "statusCode");
 
   std::string  render(Format format, std::string indent, bool comma = false);
   std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void         fill(HttpStatusCode _code, std::string _reasonPhrase, std::string _details = "");
-  void         fill(StatusCode* scP);    // FIXME P3: having StatusCode and ErrorCode actually being the same type lead to this dirty duplication
-  void         fill(ErrorCode* ecP);
+  void         fill(HttpStatusCode _code, std::string _details = "");
+  void         fill(StatusCode* scP);
   void         present(std::string indent);
   void         release(void);
   void         tagSet(std::string _tag);

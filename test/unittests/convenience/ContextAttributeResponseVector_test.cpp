@@ -49,7 +49,7 @@ TEST(ContextAttributeResponseVector, render_xml)
   const char*                     outfile = "ngsi10.contextResponseList.render.invalid.xml";
 
   // 1. empty vector
-  car.statusCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), "Empty Vector");
+  car.statusCode.fill(SccBadRequest, "Empty Vector");
   out = carV.render(ContextEntityAttributes, XML, "");
   EXPECT_STREQ("", out.c_str());
 
@@ -215,7 +215,7 @@ TEST(ContextAttributeResponseVector, release)
   ContextAttributeResponseVector  carV;
 
   carP->contextAttributeVector.push_back(caP);
-  carP->statusCode.fill(SccOk, "OK");
+  carP->statusCode.fill(SccOk);
 
   carV.push_back(carP);
 

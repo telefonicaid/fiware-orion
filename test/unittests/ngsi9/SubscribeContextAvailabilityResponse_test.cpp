@@ -40,7 +40,7 @@ TEST(SubscribeContextAvailabilityResponse, constructors)
 {
   SubscribeContextAvailabilityResponse* scar1 = new SubscribeContextAvailabilityResponse();
   SubscribeContextAvailabilityResponse  scar2("012345678901234567890123", "PT1S");
-  ErrorCode                             ec(SccBadRequest, "Reason", "Detail");
+  StatusCode                            ec(SccBadRequest, "Detail");
   SubscribeContextAvailabilityResponse  scar3("012345678901234567890124", ec);
 
   utInit();
@@ -88,7 +88,7 @@ TEST(SubscribeContextAvailabilityResponse, jsonRender)
 
   
   // 2. +subscriptionId -duration +errorCode
-  scarP->errorCode.fill(SccBadRequest, "Bad request");
+  scarP->errorCode.fill(SccBadRequest);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
   rendered = scarP->render(SubscribeContextAvailability, JSON, "");
@@ -96,7 +96,7 @@ TEST(SubscribeContextAvailabilityResponse, jsonRender)
 
 
   // 3. +subscriptionId +duration -errorCode
-  scarP->errorCode.fill(NO_ERROR_CODE, "", "");
+  scarP->errorCode.fill(SccNone);
   scarP->duration.set("PT1H");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
@@ -105,7 +105,7 @@ TEST(SubscribeContextAvailabilityResponse, jsonRender)
 
 
   // 4. +subscriptionId +duration +errorCode
-  scarP->errorCode.fill(SccBadRequest, "Bad request", "no details");
+  scarP->errorCode.fill(SccBadRequest, "no details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
   rendered = scarP->render(SubscribeContextAvailability, JSON, "");

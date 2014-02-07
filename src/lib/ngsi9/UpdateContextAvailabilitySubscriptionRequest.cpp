@@ -54,7 +54,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::render(RequestType req
 {
   std::string   out                      = "";
   std::string   tag                      = "updateContextAvailabilitySubscriptionRequest";
-  bool          subscriptionRendered     = true; // FIXME P9: Right now subscriptionId ALWAYS renders
+  bool          subscriptionRendered     = subscriptionId.rendered(requestType);
   bool          restrictionRendered      = restrictions != 0;
   bool          durationRendered         = duration.get() != "";
   bool          attributeListRendered    = attributeList.size() != 0;

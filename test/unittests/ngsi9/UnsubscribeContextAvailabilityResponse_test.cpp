@@ -24,7 +24,6 @@
 */
 #include "ngsi9/UnsubscribeContextAvailabilityResponse.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
 
 #include "unittest.h"
 
@@ -44,7 +43,7 @@ TEST(UnsubscribeContextAvailabilityResponse, constructorsAndRender)
   subscriptionId.set("111122223333444455556666");
 
   UnsubscribeContextAvailabilityResponse  ucar2(subscriptionId);
-  ErrorCode                               ec(SccBadRequest, "RP", "D");
+  StatusCode                              ec(SccBadRequest, "D");
   UnsubscribeContextAvailabilityResponse  ucar3(ec);
   std::string                             out;
   const char*                             outfile = "ngsi9.unsubscribeContextAvailabilityResponse.constructorsAndRender.valid.xml";
@@ -81,7 +80,7 @@ TEST(UnsubscribeContextAvailabilityResponse, jsonRender)
   ucasP->subscriptionId.set("012345678901234567890123");
 
   // 1. short and ok statusCode
-  ucasP->statusCode.fill(SccOk, "OK");
+  ucasP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
   out = ucasP->render(UpdateContextAvailabilitySubscription, JSON, "");
@@ -89,7 +88,7 @@ TEST(UnsubscribeContextAvailabilityResponse, jsonRender)
 
   
   // 2. Long and !OK statusCode
-  ucasP->statusCode.fill(SccBadRequest, "Bad request", "no details");
+  ucasP->statusCode.fill(SccBadRequest, "no details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
   out = ucasP->render(UpdateContextAvailabilitySubscription, JSON, "");

@@ -50,7 +50,7 @@ TEST(DiscoverContextAvailabilityResponse, render)
   std::string                          out;
   const char*                          outfile1 = "ngsi9.discoverContextAvailabilityResponse.empty.invalid.xml";
   const char*                          outfile2 = "ngsi9.discoverContextAvailabilityResponse.error.valid.xml";
-  ErrorCode                            ec(SccBadRequest, "Reason", "Detail");
+  StatusCode                           ec(SccBadRequest, "Detail");
   DiscoverContextAvailabilityResponse  dcar2(ec);
 
   utInit();
@@ -58,7 +58,7 @@ TEST(DiscoverContextAvailabilityResponse, render)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   out = dcar1.render(DiscoverContextAvailability, XML, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  EXPECT_EQ(NO_ERROR_CODE, dcar1.errorCode.code);
+  EXPECT_EQ(SccNone, dcar1.errorCode.code);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   out = dcar2.render(DiscoverContextAvailability, XML, "");
@@ -131,7 +131,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   crrP  = new ContextRegistrationResponse();
 
   crrP->contextRegistration.providingApplication.set("http://tid.test.com/unitTest2");
-  crrP->errorCode.fill(SccBadRequest, "Bad Request", "errorCode inside ContextRegistrationResponse");
+  crrP->errorCode.fill(SccBadRequest, "errorCode inside ContextRegistrationResponse");
   dcarP->responseVector.push_back(crrP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
@@ -142,7 +142,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
   
   // 3. Two contextRegistrationResponses - one with errorCode and one without errorCode
-  //    We're reusing the ContextRegistrationResponse from test 2 (it has ErrorCode set
+  //    We're reusing the ContextRegistrationResponse from test 2 (it has StatusCode set
   crrP  = new ContextRegistrationResponse();
   crrP->contextRegistration.providingApplication.set("http://tid.test.com/unitTest3");
 
@@ -372,8 +372,8 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
 
 
-  // 18. ErrorCode
-  dcarP->errorCode.fill(SccBadRequest, "Bad Request", "DiscoverContextAvailabilityResponse Unit Test 18");
+  // 18. StatusCode
+  dcarP->errorCode.fill(SccBadRequest, "DiscoverContextAvailabilityResponse Unit Test 18");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename18)) << "Error getting test data from '" << filename18 << "'";
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
@@ -385,8 +385,8 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
 
 
-  // 19. ErrorCode
-  dcarP->errorCode.fill(SccBadRequest, "Bad Request");
+  // 19. StatusCode
+  dcarP->errorCode.fill(SccBadRequest);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename19)) << "Error getting test data from '" << filename19 << "'";
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");

@@ -31,7 +31,6 @@
 #include "common/tag.h"
 #include "common/globals.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
 #include "ngsi10/NotifyContextResponse.h"
 #include "rest/HttpStatusCode.h"
 
@@ -43,7 +42,7 @@
 */
 NotifyContextResponse::NotifyContextResponse()
 {
-   responseCode.fill(SccOk, "", "");
+  responseCode.fill(SccOk);
 }
 
 
@@ -54,18 +53,7 @@ NotifyContextResponse::NotifyContextResponse()
 */
 NotifyContextResponse::NotifyContextResponse(StatusCode& sc)
 {
-   responseCode = sc;
-}
-
-
-
-/* ****************************************************************************
-*
-* NotifyContextResponse::NotifyContextResponse -
-*/
-NotifyContextResponse::NotifyContextResponse(ErrorCode& ec)
-{
-   responseCode.fill(&ec);
+   responseCode.fill(&sc);
 }
 
 

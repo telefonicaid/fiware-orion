@@ -102,7 +102,7 @@ std::string SubscribeContextRequest::check(RequestType requestType, Format forma
       ((res = notifyConditionVector.check(SubscribeContext, format, indent, predetectedError, counter)) != "OK") ||
       ((res = throttling.check(SubscribeContext, format, indent, predetectedError, counter))            != "OK"))
   {
-    response.subscribeError.errorCode.fill(SccBadRequest, "invalid payload", res);
+    response.subscribeError.errorCode.fill(SccBadRequest, std::string("invalid payload: ") + res);
     return response.render(SubscribeContext, format, indent);
   }
 

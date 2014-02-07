@@ -37,11 +37,10 @@
 *
 * SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse - 
 */
-SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse()
+SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse() : errorCode("errorCode")
 {
   subscriptionId.set("");
   duration.set("");
-  errorCode.fill(NO_ERROR_CODE, "", "");
 }
 
 /* ****************************************************************************
@@ -59,11 +58,10 @@ SubscribeContextAvailabilityResponse::~SubscribeContextAvailabilityResponse()
 *
 * SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse - 
 */
-SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(std::string _subscriptionId, std::string _duration)
+SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(std::string _subscriptionId, std::string _duration) : errorCode("errorCode")
 {
   subscriptionId.set(_subscriptionId);
   duration.set(_duration);
-  errorCode.fill(NO_ERROR_CODE, "", "");
 }
 
 
@@ -72,10 +70,11 @@ SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(std::
 *
 * SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse - 
 */
-SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(std::string _subscriptionId, ErrorCode _errorCode)
+SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(std::string _subscriptionId, StatusCode& _errorCode) : errorCode("errorCode")
 {
   subscriptionId.set(_subscriptionId);
-  errorCode     = _errorCode;
+
+  errorCode.fill(&_errorCode);
 }
 
 
@@ -89,7 +88,7 @@ std::string SubscribeContextAvailabilityResponse::render(RequestType requestType
   std::string  tag                = "subscribeContextAvailabilityResponse";
   std::string  out                = "";
   bool         durationRendered   = !duration.isEmpty();
-  bool         errorCodeRendered  = (errorCode.code != NO_ERROR_CODE);
+  bool         errorCodeRendered  = (errorCode.code != SccNone);
 
   out += startTag(indent, tag, format, false);
 

@@ -1,4 +1,5 @@
 <statusCode>
-  <code>0</code>
-  <reasonPhrase></reasonPhrase>
+  <code>500</code>
+  <reasonPhrase>Internal Server Error</reasonPhrase>
+  <details> - ZERO code set to 500</details>
 </statusCode>

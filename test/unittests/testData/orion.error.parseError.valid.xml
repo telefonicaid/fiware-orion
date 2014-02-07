@@ -1,4 +1,5 @@
 <orionError>
   <code>400</code>
-  <reasonPhrase>Parse Error</reasonPhrase>
+  <reasonPhrase>Bad Request</reasonPhrase>
+  <details>XML Parse Error</details>
 </orionError>

@@ -43,7 +43,7 @@ TEST(RegisterContextResponse, constructors)
   RegisterContextResponse  rcr2("012301230123012301230123", "PT1S");
   RegisterContextRequest   rcr;
   RegisterContextResponse  rcr3(&rcr);
-  ErrorCode                ec(SccBadRequest, "Reason", "Detail");
+  StatusCode               ec(SccBadRequest, "Detail");
   RegisterContextResponse  rcr4("012345678901234567890123", ec);
   RegisterContextResponse  rcr5("012345678901234567890123", "PT1M");
 
@@ -120,7 +120,7 @@ TEST(RegisterContextResponse, jsonRender)
 
   // 3. registrationId and errorCode
   rcr.duration.set("");
-  rcr.errorCode.fill(SccBadRequest, "Bad request", "no details");
+  rcr.errorCode.fill(SccBadRequest, "no details");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
   rendered = rcr.render(RegisterContext, JSON, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());

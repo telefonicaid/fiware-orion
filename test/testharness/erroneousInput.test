@@ -41,14 +41,14 @@ echo "2: ++++++++++++++++++++"
 <?xml version="1.0"?>
 <orionError>
   <code>400</code>
-  <reasonPhrase>bad request</reasonPhrase>
+  <reasonPhrase>Bad Request</reasonPhrase>
   <details>service '/NGSI8/contextEntities/entity01' not found</details>
 </orionError>
 1: ++++++++++++++++++++
 <?xml version="1.0"?>
 <orionError>
   <code>400</code>
-  <reasonPhrase>bad ngsi9 request</reasonPhrase>
+  <reasonPhrase>Bad Request</reasonPhrase>
   <details>ngsi9 service '/NGSI9/nothingAtAll' not found</details>
 </orionError>
 2: ++++++++++++++++++++

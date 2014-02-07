@@ -43,7 +43,7 @@ std::string badNgsi10Request(ConnectionInfo* ciP, int components, std::vector<st
 {
   std::string answer;
 
-  answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, "bad ngsi10 request", std::string("ngsi10 service '") + ciP->url +"' not found");
+  answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("ngsi10 service '") + ciP->url +"' not found");
 
   return answer;
 }

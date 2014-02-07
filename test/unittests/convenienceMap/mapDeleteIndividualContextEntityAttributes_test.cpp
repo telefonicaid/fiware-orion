@@ -78,13 +78,12 @@ static void prepareDatabase(std::string id, std::string type)
 */
 TEST(mapDeleteIndividualContextEntityAttributes, notFound)
 {
-  HttpStatusCode  ms;
   StatusCode      sc;
   std::string     id = "XXX";
 
   prepareDatabase("ID", "TYPE");
 
-  ms = mapDeleteIndividualContextEntityAttributes(id, &sc);
+  mapDeleteIndividualContextEntityAttributes(id, &sc);
 
   EXPECT_EQ(SccContextElementNotFound, sc.code);
   EXPECT_STREQ("No context element found", sc.reasonPhrase.c_str());
@@ -108,10 +107,9 @@ TEST(mapDeleteIndividualContextEntityAttributes, ok)
 
   prepareDatabase("ID", "TYPE");
 
-  HttpStatusCode ms;
   StatusCode  sc;
 
-  ms = mapDeleteIndividualContextEntityAttributes(id, &sc);
+  mapDeleteIndividualContextEntityAttributes(id, &sc);
   EXPECT_EQ(SccOk, sc.code);
   EXPECT_STREQ("OK", sc.reasonPhrase.c_str());
   EXPECT_STREQ("", sc.details.c_str());

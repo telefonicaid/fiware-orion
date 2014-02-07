@@ -1,8 +1,8 @@
 <unsubscribeContextResponse>
-  <subscriptionId>0</subscriptionId>
+  <subscriptionId>000000000000000000000000</subscriptionId>
   <statusCode>
     <code>400</code>
-    <reasonPhrase>RP</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>D</details>
   </statusCode>
 </unsubscribeContextResponse>

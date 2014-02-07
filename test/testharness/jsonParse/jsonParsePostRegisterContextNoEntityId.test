@@ -77,17 +77,17 @@ curlJson ${url} "${payload}"
 echo "++++++++++++++++++++"
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 188
+Content-Length: 229
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "JSON parse error: <unspecified file>(1): expected object name", 
-        "reasonPhrase": "Parse Error"
-    }, 
-    "registrationId": "0"
+        "code": "400",
+        "details": "JSON Parse Error: JSON parse error: <unspecified file>(1): expected object name",
+        "reasonPhrase": "Bad Request"
+    },
+    "registrationId": "000000000000000000000000"
 }
 ++++++++++++++++++++
 --TEARDOWN--

@@ -31,7 +31,6 @@
 
 #include "ngsi/ParseData.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
 
@@ -216,7 +215,7 @@ TEST(NotifyContextRequest, predetectedError)
 */
 TEST(NotifyContextResponse, Constructor)
 {
-  StatusCode sc(SccOk, "1", "2");
+  StatusCode sc(SccOk, "2");
   NotifyContextResponse ncr(sc);
 
   utInit();
@@ -225,7 +224,7 @@ TEST(NotifyContextResponse, Constructor)
   ncr.present("");
   ncr.release();
 
-  ErrorCode ec(SccOk, "3", "4");
+  StatusCode ec(SccOk, "4");
   NotifyContextResponse ncr2(ec);
   EXPECT_EQ(SccOk, ncr2.responseCode.code);
 
@@ -264,7 +263,7 @@ TEST(NotifyContextRequest, json_render)
   cerP = new ContextElementResponse();
   cerP->contextElement.entityId.fill("E01", "EType", "false");
   ncrP->contextElementResponseVector.push_back(cerP);
-  cerP->statusCode.fill(SccOk, "OK");
+  cerP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
   rendered = ncrP->render(QueryContext, JSON, "");
@@ -275,8 +274,8 @@ TEST(NotifyContextRequest, json_render)
   cerP = new ContextElementResponse();
   cerP->contextElement.entityId.fill("E02", "EType", "false");
   ncrP->contextElementResponseVector.push_back(cerP);
-  cerP->statusCode.fill(SccOk, "OK");
-  
+  cerP->statusCode.fill(SccOk);
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
   rendered = ncrP->render(QueryContext, JSON, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());

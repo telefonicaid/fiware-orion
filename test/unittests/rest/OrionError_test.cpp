@@ -36,18 +36,14 @@
 */
 TEST(OrionError, all)
 {
-  ErrorCode     ec(SccBadRequest, "Bad Request", "no details");
-  StatusCode    sc(SccBadRequest, "Bad Request 2", "no details 2");
+  StatusCode    sc(SccBadRequest, "no details 2");
   OrionError    e0;
-  OrionError    e1(SccOk, "Good Request", "no details 3");
-  OrionError    e2(ec);
+  OrionError    e1(SccOk, "no details 3");
   OrionError    e3(sc);
   OrionError    e4(SccOk, "Good Request");
   std::string   out;
   const char*   outfile1 = "orion.orionError.all1.valid.xml";
   const char*   outfile2 = "orion.orionError.all1.valid.json";
-  const char*   outfile3 = "orion.orionError.all2.valid.xml";
-  const char*   outfile4 = "orion.orionError.all2.valid.json";
   const char*   outfile5 = "orion.orionError.all3.valid.xml";
   const char*   outfile6 = "orion.orionError.all3.valid.json";
   const char*   outfile7 = "orion.orionError.all4.valid.xml";
@@ -58,27 +54,19 @@ TEST(OrionError, all)
   EXPECT_EQ("",      e0.details);
 
   EXPECT_EQ(SccOk,          e1.code);
-  EXPECT_EQ("Good Request", e1.reasonPhrase);
+  EXPECT_EQ("OK",           e1.reasonPhrase);
   EXPECT_EQ("no details 3", e1.details);
-
-  EXPECT_EQ(ec.code,         e2.code);
-  EXPECT_EQ(ec.reasonPhrase, e2.reasonPhrase);
-  EXPECT_EQ(ec.details,      e2.details);
 
   EXPECT_EQ(sc.code,         e3.code);
   EXPECT_EQ(sc.reasonPhrase, e3.reasonPhrase);
   EXPECT_EQ(sc.details,      e3.details);
 
   EXPECT_EQ(SccOk,          e4.code);
-  EXPECT_EQ("Good Request", e4.reasonPhrase);
-  EXPECT_EQ("",             e4.details);
+  EXPECT_EQ("OK",           e4.reasonPhrase);
+  EXPECT_EQ("Good Request", e4.details);
 
   out = e1.render(XML, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = e2.render(XML, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = e3.render(XML, "");
@@ -91,10 +79,6 @@ TEST(OrionError, all)
 
   out = e1.render(JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = e2.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   out = e3.render(JSON, "");

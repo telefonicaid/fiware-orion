@@ -59,7 +59,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
                          requestP->subscriptionId.get().c_str()));
       sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << id));
       if (sub.isEmpty()) {
-          responseP->statusCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound));
+          responseP->statusCode.fill(SccContextElementNotFound);
           LM_SR(SccOk);
       }
   }
@@ -68,17 +68,14 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
       // FIXME: this checking should be done at parsing stage, without progressing to
       // mongoBackend. By the moment we can live this here, but we should remove in the future
       // (odl issues #95)
-      responseP->statusCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound));
+      responseP->statusCode.fill(SccContextElementNotFound);
       LM_SR(SccOk);
   }
   catch( const DBException &e ) {
-      responseP->statusCode.fill(
-          SccReceiverInternalError,
-          httpStatusCodeString(SccReceiverInternalError),
-          std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
-             " - findOne() _id: " + requestP->subscriptionId.get() +
-             " - exception: " + e.what()
-      );
+      responseP->statusCode.fill(SccReceiverInternalError,
+                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
+                                 " - findOne() _id: " + requestP->subscriptionId.get() +
+                                 " - exception: " + e.what());
       LM_SR(SccOk);
   }
 
@@ -91,17 +88,14 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
       connection->remove(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << OID(requestP->subscriptionId.get())));
   }
   catch( const DBException &e ) {
-      responseP->statusCode.fill(
-          SccReceiverInternalError,
-          httpStatusCodeString(SccReceiverInternalError),
-          std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
-              " - remove() _id: " + requestP->subscriptionId.get().c_str() +
-              " - exception: " + e.what()
-       );
+      responseP->statusCode.fill(SccReceiverInternalError,
+                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
+                                 " - remove() _id: " + requestP->subscriptionId.get().c_str() +
+                                 " - exception: " + e.what());
 
       LM_SR(SccOk);
   }
 
-  responseP->statusCode.fill(SccOk, "OK");
+  responseP->statusCode.fill(SccOk);
   LM_SR(SccOk);
 }

@@ -47,7 +47,7 @@ TEST(ContextAttributeResponse, render_xml)
   utInit();
 
   car.contextAttributeVector.push_back(&ca);
-  car.statusCode.fill(SccOk, "OK"); 
+  car.statusCode.fill(SccOk);
 
   out = car.render(ContextEntityAttributes, XML, "");
 
@@ -94,7 +94,7 @@ TEST(ContextAttributeResponse, check_xml)
 
   // 1. OK
   car.contextAttributeVector.push_back(&ca);
-  car.statusCode.fill(SccOk, "OK"); 
+  car.statusCode.fill(SccOk); 
 
   out = car.check(UpdateContextAttribute, XML, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
@@ -174,7 +174,7 @@ TEST(ContextAttributeResponse, present)
   utInit();
 
   car.contextAttributeVector.push_back(&ca);
-  car.statusCode.fill(SccOk, "OK");
+  car.statusCode.fill(SccOk);
 
   car.present("");
 
@@ -195,7 +195,7 @@ TEST(ContextAttributeResponse, release)
   utInit();
 
   car.contextAttributeVector.push_back(caP);
-  car.statusCode.fill(SccOk, "OK");
+  car.statusCode.fill(SccOk);
 
   car.release();
 

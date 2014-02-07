@@ -28,7 +28,6 @@
 #include "logMsg/logMsg.h"
 #include "common/Format.h"
 #include "common/tag.h"
-#include "ngsi/ErrorCode.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 
@@ -49,23 +48,8 @@ UnsubscribeContextResponse::UnsubscribeContextResponse()
 */
 UnsubscribeContextResponse::UnsubscribeContextResponse(StatusCode& _statusCode)
 {
-   statusCode = _statusCode;
-   subscriptionId.set("0");
-}
-
-
-
-/* ****************************************************************************
-*
-* UnsubscribeContextResponse::UnsubscribeContextResponse -
-*/
-UnsubscribeContextResponse::UnsubscribeContextResponse(ErrorCode& _errorCode)
-{
-   statusCode.code         = (HttpStatusCode) _errorCode.code;
-   statusCode.reasonPhrase = _errorCode.reasonPhrase;
-   statusCode.details      = _errorCode.details;
-
-   subscriptionId.set("0");
+   statusCode.fill(&_statusCode);
+   subscriptionId.set("000000000000000000000000");
 }
 
 

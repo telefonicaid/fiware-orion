@@ -35,7 +35,7 @@
 TEST(UpdateContextResponse, constructors)
 {
   UpdateContextResponse  ucr1;
-  ErrorCode              ec(SccBadRequest, "RP", "D");
+  StatusCode             ec(SccBadRequest, "D");
   UpdateContextResponse  ucr2(ec);
   std::string            out;
   const char*            outfile1 = "ngsi10.updateContextResponse.constructors.render1.valid.xml";
@@ -102,7 +102,7 @@ TEST(UpdateContextResponse, jsonRender)
 
 
   // Test 01. UpdateContextResponse::errorCode OK and contextElementResponseVector filled id (no details)
-  ucrP->errorCode.fill(SccOk, "OK");
+  ucrP->errorCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
   out = ucrP->render(UpdateContext, JSON, "");
@@ -111,11 +111,11 @@ TEST(UpdateContextResponse, jsonRender)
 
 
   // Test 02. UpdateContextResponse::errorCode NOT OK and contextElementResponseVector filled id (with details)
-  ucrP->errorCode.fill(SccBadRequest, "Bad Request", "no details");
+  ucrP->errorCode.fill(SccBadRequest, "no details");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
   out = ucrP->render(UpdateContext, JSON, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  ucrP->errorCode.fill(SccOk, "OK"); // Cleanup
+  ucrP->errorCode.fill(SccOk); // Cleanup
 
 
 
@@ -123,7 +123,7 @@ TEST(UpdateContextResponse, jsonRender)
   cerP = new ContextElementResponse();
 
   cerP->contextElement.entityId.fill("E01", "EType", "false");
-  cerP->statusCode.fill(SccOk, "OK", "");
+  cerP->statusCode.fill(SccOk);
   ucrP->contextElementResponseVector.push_back(cerP);
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
@@ -228,7 +228,7 @@ TEST(UpdateContextResponse, jsonRender)
   cerP = new ContextElementResponse();
 
   cerP->contextElement.entityId.fill("E02", "EType", "false");
-  cerP->statusCode.fill(SccOk, "OK");
+  cerP->statusCode.fill(SccOk);
   ucrP->contextElementResponseVector.push_back(cerP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename13)) << "Error getting test data from '" << filename13 << "'";

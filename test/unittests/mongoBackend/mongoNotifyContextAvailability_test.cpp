@@ -91,7 +91,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok)
   ContextRegistrationResponse crr;
   crr.contextRegistration.entityIdVector.push_back(&en);
   crr.contextRegistration.providingApplication.set("http://dummy.com");
-  crr.errorCode.fill(SccOk, "OK");
+  crr.errorCode.fill(SccOk);
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
@@ -167,7 +167,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_At0_Ok)
   ContextRegistrationResponse crr;
   crr.contextRegistration.entityIdVector.push_back(&en);
   crr.contextRegistration.providingApplication.set("http://dummy.com");
-  crr.errorCode.fill(SccOk, "OK");
+  crr.errorCode.fill(SccOk);
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
@@ -247,7 +247,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtN_Ok)
   crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
   crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra2);
   crr.contextRegistration.providingApplication.set("http://dummy.com");
-  crr.errorCode.fill(SccOk, "OK");
+  crr.errorCode.fill(SccOk);
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
@@ -335,7 +335,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtNnt_Ok)
   crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
   crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra2);
   crr.contextRegistration.providingApplication.set("http://dummy.com");
-  crr.errorCode.fill(SccOk, "OK");
+  crr.errorCode.fill(SccOk);
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
@@ -423,7 +423,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtN_Ok)
   crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
   crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra2);
   crr.contextRegistration.providingApplication.set("http://dummy.com");
-  crr.errorCode.fill(SccOk, "OK");
+  crr.errorCode.fill(SccOk);
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
@@ -511,7 +511,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
   crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
   crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra2);
   crr.contextRegistration.providingApplication.set("http://dummy.com");
-  crr.errorCode.fill(SccOk, "OK");
+  crr.errorCode.fill(SccOk);
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
@@ -597,7 +597,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_At0_Ok)
     crr.contextRegistration.entityIdVector.push_back(&en1);
     crr.contextRegistration.entityIdVector.push_back(&en2);
     crr.contextRegistration.providingApplication.set("http://dummy.com");
-    crr.errorCode.fill(SccOk, "OK");
+    crr.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
@@ -678,7 +678,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_At0_Ok)
     crr.contextRegistration.entityIdVector.push_back(&en1);
     crr.contextRegistration.entityIdVector.push_back(&en2);
     crr.contextRegistration.providingApplication.set("http://dummy.com");
-    crr.errorCode.fill(SccOk, "OK");
+    crr.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
@@ -763,7 +763,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtN_Ok)
     crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
     crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra2);
     crr.contextRegistration.providingApplication.set("http://dummy.com");
-    crr.errorCode.fill(SccOk, "OK");
+    crr.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
@@ -856,7 +856,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtNnt_Ok)
     crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
     crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra2);
     crr.contextRegistration.providingApplication.set("http://dummy.com");
-    crr.errorCode.fill(SccOk, "OK");
+    crr.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
@@ -949,7 +949,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtN_Ok)
     crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
     crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra2);
     crr.contextRegistration.providingApplication.set("http://dummy.com");
-    crr.errorCode.fill(SccOk, "OK");
+    crr.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
@@ -1042,7 +1042,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtNnt_Ok)
     crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra1);
     crr.contextRegistration.contextRegistrationAttributeVector.push_back(&cra2);
     crr.contextRegistration.providingApplication.set("http://dummy.com");
-    crr.errorCode.fill(SccOk, "OK");
+    crr.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
@@ -1132,8 +1132,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_At0_Ok)
     crr1.contextRegistration.providingApplication.set("http://dummy1.com");
     crr2.contextRegistration.entityIdVector.push_back(&en2);
     crr2.contextRegistration.providingApplication.set("http://dummy2.com");
-    crr1.errorCode.fill(SccOk, "OK");
-    crr2.errorCode.fill(SccOk, "OK");
+    crr1.errorCode.fill(SccOk);
+    crr2.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr1);
     req.contextRegistrationResponseVector.push_back(&crr2);
 
@@ -1223,8 +1223,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_At0_Ok)
     crr1.contextRegistration.providingApplication.set("http://dummy1.com");
     crr2.contextRegistration.entityIdVector.push_back(&en2);
     crr2.contextRegistration.providingApplication.set("http://dummy2.com");
-    crr1.errorCode.fill(SccOk, "OK");
-    crr2.errorCode.fill(SccOk, "OK");
+    crr1.errorCode.fill(SccOk);
+    crr2.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr1);
     req.contextRegistrationResponseVector.push_back(&crr2);
 
@@ -1322,8 +1322,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtN_Ok)
     crr2.contextRegistration.contextRegistrationAttributeVector.push_back(&cra3);
     crr2.contextRegistration.contextRegistrationAttributeVector.push_back(&cra4);
     crr2.contextRegistration.providingApplication.set("http://dummy2.com");
-    crr1.errorCode.fill(SccOk, "OK");
-    crr2.errorCode.fill(SccOk, "OK");
+    crr1.errorCode.fill(SccOk);
+    crr2.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr1);
     req.contextRegistrationResponseVector.push_back(&crr2);
 
@@ -1438,8 +1438,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtNnt_Ok)
     crr2.contextRegistration.contextRegistrationAttributeVector.push_back(&cra3);
     crr2.contextRegistration.contextRegistrationAttributeVector.push_back(&cra4);
     crr2.contextRegistration.providingApplication.set("http://dummy2.com");
-    crr1.errorCode.fill(SccOk, "OK");
-    crr2.errorCode.fill(SccOk, "OK");
+    crr1.errorCode.fill(SccOk);
+    crr2.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr1);
     req.contextRegistrationResponseVector.push_back(&crr2);
 
@@ -1554,8 +1554,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtN_Ok)
     crr2.contextRegistration.contextRegistrationAttributeVector.push_back(&cra3);
     crr2.contextRegistration.contextRegistrationAttributeVector.push_back(&cra4);
     crr2.contextRegistration.providingApplication.set("http://dummy2.com");
-    crr1.errorCode.fill(SccOk, "OK");
-    crr2.errorCode.fill(SccOk, "OK");
+    crr1.errorCode.fill(SccOk);
+    crr2.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr1);
     req.contextRegistrationResponseVector.push_back(&crr2);
 
@@ -1670,8 +1670,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtNnt_Ok)
     crr2.contextRegistration.contextRegistrationAttributeVector.push_back(&cra3);
     crr2.contextRegistration.contextRegistrationAttributeVector.push_back(&cra4);
     crr2.contextRegistration.providingApplication.set("http://dummy2.com");
-    crr1.errorCode.fill(SccOk, "OK");
-    crr2.errorCode.fill(SccOk, "OK");
+    crr1.errorCode.fill(SccOk);
+    crr2.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr1);
     req.contextRegistrationResponseVector.push_back(&crr2);
 
@@ -1782,8 +1782,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_At0_Ok)
     crr2.contextRegistration.entityIdVector.push_back(&en3);
     crr2.contextRegistration.entityIdVector.push_back(&en4);
     crr2.contextRegistration.providingApplication.set("http://dummy2.com");
-    crr1.errorCode.fill(SccOk, "OK");
-    crr2.errorCode.fill(SccOk, "OK");
+    crr1.errorCode.fill(SccOk);
+    crr2.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr1);
     req.contextRegistrationResponseVector.push_back(&crr2);
 
@@ -1884,8 +1884,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_At0_Ok)
     crr2.contextRegistration.entityIdVector.push_back(&en3);
     crr2.contextRegistration.entityIdVector.push_back(&en4);
     crr2.contextRegistration.providingApplication.set("http://dummy2.com");
-    crr1.errorCode.fill(SccOk, "OK");
-    crr2.errorCode.fill(SccOk, "OK");
+    crr1.errorCode.fill(SccOk);
+    crr2.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr1);
     req.contextRegistrationResponseVector.push_back(&crr2);
 
@@ -1994,8 +1994,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtN_Ok)
     crr2.contextRegistration.contextRegistrationAttributeVector.push_back(&cra3);
     crr2.contextRegistration.contextRegistrationAttributeVector.push_back(&cra4);
     crr2.contextRegistration.providingApplication.set("http://dummy2.com");
-    crr1.errorCode.fill(SccOk, "OK");
-    crr2.errorCode.fill(SccOk, "OK");
+    crr1.errorCode.fill(SccOk);
+    crr2.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr1);
     req.contextRegistrationResponseVector.push_back(&crr2);
 
@@ -2120,8 +2120,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtNnt_Ok)
     crr2.contextRegistration.contextRegistrationAttributeVector.push_back(&cra3);
     crr2.contextRegistration.contextRegistrationAttributeVector.push_back(&cra4);
     crr2.contextRegistration.providingApplication.set("http://dummy2.com");
-    crr1.errorCode.fill(SccOk, "OK");
-    crr2.errorCode.fill(SccOk, "OK");
+    crr1.errorCode.fill(SccOk);
+    crr2.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr1);
     req.contextRegistrationResponseVector.push_back(&crr2);
 
@@ -2246,8 +2246,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtN_Ok)
     crr2.contextRegistration.contextRegistrationAttributeVector.push_back(&cra3);
     crr2.contextRegistration.contextRegistrationAttributeVector.push_back(&cra4);
     crr2.contextRegistration.providingApplication.set("http://dummy2.com");
-    crr1.errorCode.fill(SccOk, "OK");
-    crr2.errorCode.fill(SccOk, "OK");
+    crr1.errorCode.fill(SccOk);
+    crr2.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr1);
     req.contextRegistrationResponseVector.push_back(&crr2);
 
@@ -2372,8 +2372,8 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtNnt_Ok)
     crr2.contextRegistration.contextRegistrationAttributeVector.push_back(&cra3);
     crr2.contextRegistration.contextRegistrationAttributeVector.push_back(&cra4);
     crr2.contextRegistration.providingApplication.set("http://dummy2.com");
-    crr1.errorCode.fill(SccOk, "OK");
-    crr2.errorCode.fill(SccOk, "OK");
+    crr1.errorCode.fill(SccOk);
+    crr2.errorCode.fill(SccOk);
     req.contextRegistrationResponseVector.push_back(&crr1);
     req.contextRegistrationResponseVector.push_back(&crr2);
 

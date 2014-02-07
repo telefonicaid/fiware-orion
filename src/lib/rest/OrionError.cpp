@@ -37,7 +37,7 @@
 */
 OrionError::OrionError()
 {
-  code         = 0;
+  code         = SccNone;
   reasonPhrase = "";
   details      = "";
 }
@@ -48,10 +48,10 @@ OrionError::OrionError()
 *
 * OrionError::OrionError - 
 */
-OrionError::OrionError(int _code, std::string _reasonPhrase, std::string _details)
+OrionError::OrionError(HttpStatusCode _code, std::string _details)
 {
   code          = _code;
-  reasonPhrase  = _reasonPhrase;
+  reasonPhrase  = httpStatusCodeString(code);
   details       = _details;
 }
 
@@ -61,24 +61,11 @@ OrionError::OrionError(int _code, std::string _reasonPhrase, std::string _detail
 *
 * OrionError::OrionError - 
 */
-OrionError::OrionError(ErrorCode& errorCode)
+OrionError::OrionError(StatusCode& sc)
 {
-  code          = errorCode.code;
-  reasonPhrase  = errorCode.reasonPhrase;
-  details       = errorCode.details;
-}
-
-
-
-/* ****************************************************************************
-*
-* OrionError::OrionError - 
-*/
-OrionError::OrionError(StatusCode& statusCode)
-{
-  code          = statusCode.code;
-  reasonPhrase  = statusCode.reasonPhrase;
-  details       = statusCode.details;
+  code          = sc.code;
+  reasonPhrase  = httpStatusCodeString(code);
+  details       = sc.details;
 }
 
 
@@ -89,8 +76,9 @@ OrionError::OrionError(StatusCode& statusCode)
 */
 std::string OrionError::render(Format format, std::string indent)
 {
-  std::string out     = "";
-  std::string tag     = "orionError";
+  std::string out           = "";
+  std::string tag           = "orionError";
+  std::string initialIndent = indent;
 
   //
   // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
@@ -98,7 +86,7 @@ std::string OrionError::render(Format format, std::string indent)
 
   if (format == JSON)
   {
-    out     = "{\n";
+    out     = initialIndent + "{\n";
     indent += "  ";
   }
 
@@ -112,7 +100,7 @@ std::string OrionError::render(Format format, std::string indent)
   out += endTag(indent, tag, format);
 
   if (format == JSON)
-    out += "}\n";
+    out += initialIndent + "}\n";
 
   return out;
 }

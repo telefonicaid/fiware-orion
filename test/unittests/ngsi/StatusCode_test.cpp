@@ -26,7 +26,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
 
 #include "unittest.h"
 
@@ -39,9 +38,9 @@
 TEST(StatusCode, render)
 {
   StatusCode    sc1;
-  StatusCode    sc2(SccOk, "REASON", "");
-  StatusCode    sc3(SccOk, "REASON", "DETAILS");
-  StatusCode    sc4(SccOk, "REASON", "DETAILS");
+  StatusCode    sc2(SccOk, "");
+  StatusCode    sc3(SccOk, "DETAILS");
+  StatusCode    sc4(SccOk, "DETAILS");
   std::string   out;
   const char*   outfile1  = "ngsi.statusCode.render1.valid.xml";
   const char*   outfile2  = "ngsi.statusCode.render2.valid.xml";
@@ -80,25 +79,25 @@ TEST(StatusCode, render)
 TEST(StatusCode, fill)
 {
   StatusCode    sc;
-  StatusCode    sc2(SccOk, "Reason", "Details");
-  ErrorCode     ec(SccBadRequest, "Bad request", "Very bad request :-)");
+  StatusCode    sc2(SccOk, "Details");
+  StatusCode    ec(SccBadRequest, "Very bad request :-)");
   std::string   out;
 
   utInit();
 
-  sc.fill(SccForbidden, "R", "D");
+  sc.fill(SccForbidden, "D");
   EXPECT_EQ(sc.code, SccForbidden);
-  EXPECT_STREQ(sc.reasonPhrase.c_str(), "R");
+  EXPECT_STREQ(sc.reasonPhrase.c_str(), "Forbidden");
   EXPECT_STREQ(sc.details.c_str(), "D");
 
   sc.fill(&sc2);
   EXPECT_EQ(sc.code, SccOk);
-  EXPECT_STREQ(sc.reasonPhrase.c_str(), "Reason");
+  EXPECT_STREQ(sc.reasonPhrase.c_str(), "OK");
   EXPECT_STREQ(sc.details.c_str(), "Details");
 
   sc.fill(&ec);
   EXPECT_EQ(sc.code, SccBadRequest);
-  EXPECT_STREQ(sc.reasonPhrase.c_str(), "Bad request");
+  EXPECT_STREQ(sc.reasonPhrase.c_str(), "Bad Request");
   EXPECT_STREQ(sc.details.c_str(), "Very bad request :-)");
 
   utExit();
@@ -112,7 +111,7 @@ TEST(StatusCode, fill)
 */
 TEST(StatusCode, check)
 {
-  StatusCode    sc(SccOk, "REASON", "");
+  StatusCode    sc(SccOk, "");
   std::string   out;
 
   utInit();
@@ -120,13 +119,13 @@ TEST(StatusCode, check)
   out = sc.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
-  sc.fill((HttpStatusCode) 0, "XXX", "YYY");
+  sc.fill(SccNone, "YYY");
   out = sc.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ("no code", out.c_str());
 
-  sc.fill(SccOk, "", "YYY");
+  sc.fill(SccOk, "YYY");
   out = sc.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ("no reason phrase", out.c_str());
+  EXPECT_STREQ("OK", out.c_str());
 
   utExit();
 }
@@ -139,7 +138,7 @@ TEST(StatusCode, check)
 */
 TEST(StatusCode, present)
 {
-  StatusCode    sc(SccOk, "REASON", "");
+  StatusCode    sc(SccOk, "");
   std::string   out;
 
   utInit();

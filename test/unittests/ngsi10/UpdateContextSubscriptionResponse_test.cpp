@@ -38,7 +38,7 @@
 TEST(UpdateContextSubscriptionResponse, constructors)
 {
   UpdateContextSubscriptionResponse  ucsr1;
-  ErrorCode                          ec(SccBadRequest, "RP", "D");
+  StatusCode                         ec(SccBadRequest, "D");
   UpdateContextSubscriptionResponse  ucsr2(ec);
   std::string                        out;
   const char*                        outfile1 = "ngsi10.updateContextSubscriptionResponse.empty.valid.xml";
@@ -87,7 +87,7 @@ TEST(UpdateContextSubscriptionResponse, json_render)
   // 6. subscribeResponse: +subscription +duration +throttling
 
   // 1.
-  ucsrP->subscribeError.errorCode.fill(SccBadRequest, "Bad Request", "details");
+  ucsrP->subscribeError.errorCode.fill(SccBadRequest, "details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
   out = ucsrP->render(QueryContext, JSON, "");
@@ -96,14 +96,14 @@ TEST(UpdateContextSubscriptionResponse, json_render)
 
 
   // 2.
-  ucsrP->subscribeError.errorCode.fill(SccBadRequest, "Bad Request", "");
+  ucsrP->subscribeError.errorCode.fill(SccBadRequest);
   ucsrP->subscribeError.subscriptionId.set("012345678901234567890123");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
   out = ucsrP->render(QueryContext, JSON, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ucsrP->subscribeError.errorCode.fill(NO_ERROR_CODE, "", "");
+  ucsrP->subscribeError.errorCode.fill(SccNone);
 
 
 

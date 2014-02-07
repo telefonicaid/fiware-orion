@@ -28,8 +28,19 @@
 #include "common/Format.h"
 #include "common/tag.h"
 #include "convenience/ContextAttributeResponse.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 #include "convenience/UpdateContextElementResponse.h"
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextElementResponse::UpdateContextElementResponse - 
+*/
+UpdateContextElementResponse::UpdateContextElementResponse()
+{
+  errorCode.tagSet("errorCode");
+}
 
 
 
@@ -44,7 +55,7 @@ std::string UpdateContextElementResponse::render(RequestType requestType, Format
 
    out += startTag(indent, tag, format, false);
 
-   if ((errorCode.code != NO_ERROR_CODE) && (errorCode.code != SccOk))
+   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
      out += errorCode.render(format, indent + "  ");
    else
      out += contextAttributeResponseVector.render(requestType, format, indent + "  ");
@@ -65,9 +76,9 @@ std::string UpdateContextElementResponse::check(RequestType requestType, Format 
   std::string res;
   
   if (predetectedError != "")
-    errorCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), predetectedError);
+    errorCode.fill(SccBadRequest, predetectedError);
   else if ((res = contextAttributeResponseVector.check(requestType, format, indent, "", counter)) != "OK")
-    errorCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), res);
+    errorCode.fill(SccBadRequest, res);
   else
     return "OK";
 

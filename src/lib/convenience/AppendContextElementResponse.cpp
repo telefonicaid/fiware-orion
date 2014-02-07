@@ -30,8 +30,18 @@
 #include "common/Format.h"
 #include "common/tag.h"
 #include "convenience/ContextAttributeResponseVector.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 #include "convenience/AppendContextElementResponse.h"
+
+
+
+/* ****************************************************************************
+*
+* AppendContextElementResponse::AppendContextElementResponse - 
+*/
+AppendContextElementResponse::AppendContextElementResponse() : errorCode("errorCode")
+{
+}
 
 
 
@@ -46,7 +56,7 @@ std::string AppendContextElementResponse::render(RequestType requestType, Format
 
   out += startTag(indent, tag, format, false);
 
-  if ((errorCode.code != NO_ERROR_CODE) && (errorCode.code != SccOk))
+  if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
     out += errorCode.render(format, indent + "  ");
   else
     out += contextResponseVector.render(requestType, format, indent + "  ");
@@ -68,9 +78,9 @@ std::string AppendContextElementResponse::check(RequestType requestType, Format 
   std::string res;
   
   if (predetectedError != "")
-    errorCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), predetectedError); 
+    errorCode.fill(SccBadRequest, predetectedError); 
   else if ((res = contextResponseVector.check(requestType, format, indent, "", counter)) != "OK")
-    errorCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), res);
+    errorCode.fill(SccBadRequest, res);
   else
     return "OK";
 
