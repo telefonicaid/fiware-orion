@@ -30,8 +30,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/string.h"
+#include "common/globals.h"
 #include "common/statistics.h"
+#include "common/string.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/RestService.h"
 #include "rest/restReply.h"
@@ -164,10 +165,8 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     compV.clear();
 
     if (response == "DIE")
-    {
-      // FIXME: cannot call 'restStop';
-      exit(0);
-    }
+      orionExitFunction(1, "Received a 'DIE' request");
+
 
     restReply(ciP, response);
     return response;

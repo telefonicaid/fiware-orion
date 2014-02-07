@@ -34,9 +34,21 @@
 *
 * Globals
 */
-static Timer*   timer           = NULL;
-int             startTime       = -1;
-int             statisticsTime  = -1;
+static Timer*     timer             = NULL;
+int               startTime         = -1;
+int               statisticsTime    = -1;
+OrionExitFunction orionExitFunction = NULL;
+
+
+
+/* ****************************************************************************
+*
+* orionInit - 
+*/
+void orionInit(OrionExitFunction exitFunction)
+{
+  orionExitFunction = exitFunction;
+}
 
 
 
@@ -94,7 +106,11 @@ void setTimer(Timer* t) {
 int getCurrentTime(void)
 {
   if (getTimer() == NULL)
-    LM_X(1, ("getTimer() == NULL"));
+  {
+    LM_E(("getTimer() == NULL - calling exit function for library user"));
+    orionExitFunction(1, "getTimer() == NULL");
+    return -1;
+  }
 
   return getTimer()->getCurrentTime();
 }

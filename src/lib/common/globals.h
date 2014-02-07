@@ -39,14 +39,31 @@
 
 /* ****************************************************************************
 *
+* OrionExitFunction - 
+*/
+typedef void (*OrionExitFunction)(int exitCode, std::string reason);
+
+
+
+/* ****************************************************************************
+*
 * global variables
 */
-extern char            fwdHost[];
-extern int             fwdPort;
-extern bool            ngsi9Only;
-extern bool            harakiri;
-extern int             startTime;
-extern int             statisticsTime;
+extern char               fwdHost[];
+extern int                fwdPort;
+extern bool               ngsi9Only;
+extern bool               harakiri;
+extern int                startTime;
+extern int                statisticsTime;
+extern OrionExitFunction  orionExitFunction;
+
+
+
+/* ****************************************************************************
+*
+* orionInit - 
+*/
+extern void orionInit(OrionExitFunction exitFunction);
 
 
 
