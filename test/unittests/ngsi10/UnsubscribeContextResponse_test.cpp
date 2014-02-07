@@ -36,9 +36,9 @@
 TEST(UnsubscribeContextResponse, constructorsAndRender)
 {
   UnsubscribeContextResponse  uncr1;
-  StatusCode                  sc(SccOk, "RP", "D");
+  StatusCode                  sc(SccOk, "D");
   UnsubscribeContextResponse  uncr2(sc);
-  StatusCode                  ec(SccBadRequest, "RP", "D");
+  StatusCode                  ec(SccBadRequest, "D");
   UnsubscribeContextResponse  uncr3(ec);
   std::string                 out;
   const char*                 outfile = "ngsi10.unsubscribeContextResponse.constructorsAndRender.ok.valid.xml";
@@ -78,7 +78,7 @@ TEST(UnsubscribeContextResponse, jsonRender)
 
   // 1. 400, with details
   uncrP->subscriptionId.set("012345678901234567890123");
-  uncrP->statusCode.fill(SccBadRequest, "Bad Request", "details");
+  uncrP->statusCode.fill(SccBadRequest, "details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
   out = uncrP->render(QueryContext, JSON, "");
@@ -87,7 +87,7 @@ TEST(UnsubscribeContextResponse, jsonRender)
 
   // 2. 200, no details
   uncrP->subscriptionId.set("012345678901234567890123");
-  uncrP->statusCode.fill(SccOk, "OK");
+  uncrP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
   out = uncrP->render(QueryContext, JSON, "");

@@ -53,7 +53,7 @@ HttpStatusCode mongoUpdateContext(UpdateContextRequest* requestP, UpdateContextR
         strcasecmp(requestP->updateActionType.c_str(), "append") != 0 &&
         strcasecmp(requestP->updateActionType.c_str(), "delete") != 0) {
 
-        responseP->errorCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), std::string("offending action: ") + requestP->updateActionType.get());
+        responseP->errorCode.fill(SccReceiverInternalError, std::string("offending action: ") + requestP->updateActionType.get());
         LM_SRE(SccOk, ("Unknown updateContext action '%s'", requestP->updateActionType.get().c_str()));
     }
 

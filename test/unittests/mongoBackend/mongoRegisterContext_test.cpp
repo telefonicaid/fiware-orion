@@ -3056,7 +3056,7 @@ TEST(mongoRegisterContextRequest, AssociationsDbFail)
     EXPECT_TRUE(res.registrationId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
-    EXPECT_EQ("boom!!", res.errorCode.details);
+    EXPECT_EQ("", res.errorCode.details);
 
     /* Release mock */
     delete connectionMock;

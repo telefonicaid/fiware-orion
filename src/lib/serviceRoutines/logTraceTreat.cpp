@@ -89,7 +89,7 @@ std::string logTraceTreat(ConnectionInfo* ciP, int components, std::vector<std::
   }
   else
   {
-    OrionError error(SccBadRequest, httpStatusCodeString(SccBadRequest), std::string("bad URL/Verb: ") + ciP->method + " " + path);
+    OrionError error(SccBadRequest, std::string("bad URL/Verb: ") + ciP->method + " " + path);
     out = error.render(ciP->outFormat, "");
   }
 

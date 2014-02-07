@@ -58,7 +58,7 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
 
   if (response.contextElementResponseVector.size() == 0)
   {
-    car.statusCode.fill(SccContextElementNotFound, "The ContextElement requested is not found", entityId + "-" + attributeName);
+     car.statusCode.fill(SccContextElementNotFound, std::string("Entity-Attribute pair: '") + entityId + "-" + attributeName + "'");
   }
   else
   {

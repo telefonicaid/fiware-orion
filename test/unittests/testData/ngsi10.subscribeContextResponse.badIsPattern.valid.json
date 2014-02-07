@@ -2,8 +2,8 @@
   "subscribeError" : {
     "errorCode" : {
       "code" : "400",
-      "reasonPhrase" : "invalid payload",
-      "details" : "bad value for 'isPattern'"
+      "reasonPhrase" : "Bad Request",
+      "details" : "invalid payload: bad value for 'isPattern'"
     }
   }
 }

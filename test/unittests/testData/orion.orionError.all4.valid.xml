@@ -1,4 +1,5 @@
 <orionError>
   <code>200</code>
-  <reasonPhrase>Good Request</reasonPhrase>
+  <reasonPhrase>OK</reasonPhrase>
+  <details>Good Request</details>
 </orionError>

@@ -53,13 +53,13 @@ HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResp
 
     std::string err;
     if (!entitiesQuery(requestP->entityIdVector, requestP->attributeList, &(responseP->contextElementResponseVector), &err, true)) {
-        responseP->errorCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err);
+        responseP->errorCode.fill(SccReceiverInternalError, err);
         LM_SRE(SccOk,(responseP->errorCode.details.c_str()));
     }
 
     if (responseP->contextElementResponseVector.size() == 0) {
       /* If query hasn't any result we have to fill the status code part in the response */
-      responseP->errorCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound));
+      responseP->errorCode.fill(SccContextElementNotFound);
       LM_SR(SccOk);
     }
 

@@ -368,11 +368,11 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
 
         std::string err;
         if (!processAssociations(cr->registrationMetadataVector, &err)) {
-            responseP->errorCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err );
+            responseP->errorCode.fill(SccReceiverInternalError);
             LM_RE(SccOk, (err.c_str()));
         }
         if (!addTriggeredSubscriptions(*cr, &subsToNotify, &err)) {
-            responseP->errorCode.fill(SccReceiverInternalError, httpStatusCodeString(SccReceiverInternalError), err );
+            responseP->errorCode.fill(SccReceiverInternalError, err);
             LM_RE(SccOk, (err.c_str()));
         }
 
@@ -388,13 +388,10 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
         connection->update(getRegistrationsCollectionName(), BSON("_id" << oid), regDoc, true);
     }
     catch( const DBException &e ) {
-        responseP->errorCode.fill(
-            SccReceiverInternalError,
-            httpStatusCodeString(SccReceiverInternalError),
-            std::string("collection: ") + getRegistrationsCollectionName() +
-                " - upsert update(): " + regDoc.toString() +
-                " - exception: " + e.what()
-        );
+        responseP->errorCode.fill(SccReceiverInternalError,
+                                  std::string("collection: ") + getRegistrationsCollectionName() +
+                                  " - upsert update(): " + regDoc.toString() +
+                                  " - exception: " + e.what());
 
         LM_RE(SccOk,("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
     }
@@ -407,7 +404,7 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
     /* Fill the response element */
     responseP->duration = requestP->duration;
     responseP->registrationId.set(oid.str());
-    responseP->errorCode.fill(SccOk, "OK");
+    responseP->errorCode.fill(SccOk);
 
     return SccOk;
 }

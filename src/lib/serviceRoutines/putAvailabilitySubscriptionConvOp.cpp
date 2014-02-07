@@ -46,7 +46,8 @@ std::string putAvailabilitySubscriptionConvOp(ConnectionInfo* ciP, int component
   {
     std::string out;
 
-    out = restErrorReplyGet(ciP, ciP->outFormat, "", "updateContextAvailabilitySubscription", SccBadRequest, "unmatching subscriptionId URI/payload", subscriptionId);
+    out = restErrorReplyGet(ciP, ciP->outFormat, "", "updateContextAvailabilitySubscription", SccBadRequest,
+                            std::string("unmatching subscriptionId URI/payload: '") + subscriptionId + "' vs '" + ucasP->subscriptionId.get() + "'");
     return out;
   }
 

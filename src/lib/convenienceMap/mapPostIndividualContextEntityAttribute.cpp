@@ -52,7 +52,7 @@ HttpStatusCode mapPostIndividualContextEntityAttribute(std::string entityId, std
 
    ms = mongoUpdateContext(&ucRequest, &ucResponse);
 
-   response->fill(SccOk, "OK", "");
+   response->fill(SccOk);
    
    return ms;
 }
