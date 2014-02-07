@@ -202,15 +202,15 @@ Date: REGEX(.*)
 </queryContextResponse>
 1: ++++++++++++++++++++
 HTTP/1.1 406 Not Acceptable
-Connection: close
-Content-Length: 160
+Content-Length: 196
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <orionError>
-  <reason>Not Acceptable</reason>
-  <detail>aceptable types: application/xml but Accept header in request was: 'text/plain'</detail>
+  <code>406</code>
+  <reasonPhrase>Not Acceptable</reasonPhrase>
+  <details>acceptable types: 'application/xml' but Accept header in request was: 'text/plain'</details>
 </orionError>
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -253,27 +253,27 @@ Date: REGEX(.*)
 </queryContextResponse>
 5: ++++++++++++++++++++
 HTTP/1.1 406 Not Acceptable
-Connection: close
-Content-Length: 172
+Content-Length: 208
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <orionError>
-  <reason>Not Acceptable</reason>
-  <detail>aceptable types: application/xml but Accept header in request was: 'text/plain, image/jpeg'</detail>
+  <code>406</code>
+  <reasonPhrase>Not Acceptable</reasonPhrase>
+  <details>acceptable types: 'application/xml' but Accept header in request was: 'text/plain, image/jpeg'</details>
 </orionError>
 6: ++++++++++++++++++++
 HTTP/1.1 406 Not Acceptable
-Connection: close
-Content-Length: 187
+Content-Length: 223
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <orionError>
-  <reason>Not Acceptable</reason>
-  <detail>aceptable types: application/xml but Accept header in request was: 'text/plain, image/jpeg; charset=UTF-8'</detail>
+  <code>406</code>
+  <reasonPhrase>Not Acceptable</reasonPhrase>
+  <details>acceptable types: 'application/xml' but Accept header in request was: 'text/plain, image/jpeg; charset=UTF-8'</details>
 </orionError>
 7: ++++++++++++++++++++
 --TEARDOWN--

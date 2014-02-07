@@ -85,6 +85,7 @@ typedef enum TraceLevels
   LmtServiceOutPayload,
   LmtClientInputPayload,
   LmtClientOutputPayload,
+  LmtPartialPayload,
 
   /* Others (>=200) */
   LmtCm = 200,

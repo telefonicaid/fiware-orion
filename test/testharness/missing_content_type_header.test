@@ -84,14 +84,16 @@ EOF
 --REGEXPECT--
 <?xml version="1.0"?>
 <orionError>
-  <reason>Unsupported Media Type</reason>
-  <detail>Content-Type header not used, default application/octet-stream is not supported</detail>
+  <code>415</code>
+  <reasonPhrase>Unsupported Media Type</reasonPhrase>
+  <details>Content-Type header not used, default application/octet-stream is not supported</details>
 </orionError>
 1: ++++++++++++++++++++
 <?xml version="1.0"?>
 <orionError>
-  <reason>Unsupported Media Type</reason>
-  <detail>not supported content type: application/x-www-form-encoded</detail>
+  <code>415</code>
+  <reasonPhrase>Unsupported Media Type</reasonPhrase>
+  <details>not supported content type: application/x-www-form-encoded</details>
 </orionError>
 2: ++++++++++++++++++++
 <?xml version="1.0"?>
