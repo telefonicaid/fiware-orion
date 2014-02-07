@@ -77,7 +77,7 @@ TEST(ContextAttributeResponseVector, render_json)
   const char*                     outfile = "ngsi10.contextResponseList.render.invalid.json";
 
   // 1. empty vector
-  car.statusCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), "Empty Vector");
+  car.statusCode.fill(SccBadRequest, "Empty Vector");
   out = carV.render(ContextEntityAttributes, JSON, "");
   EXPECT_STREQ("", out.c_str());
 

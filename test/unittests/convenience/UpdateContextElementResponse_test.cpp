@@ -74,7 +74,7 @@ TEST(UpdateContextElementResponse, render_json)
   // Just the normal case
   ucer.contextAttributeResponseVector.push_back(&car);
   car.contextAttributeVector.push_back(&ca);
-  car.statusCode.fill(SccOk, httpStatusCodeString(SccOk), "details");
+  car.statusCode.fill(SccOk, "details");
 
   out = ucer.render(UpdateContext, JSON, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
