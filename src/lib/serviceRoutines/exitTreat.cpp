@@ -34,6 +34,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "rest/rest.h"
+#include "rest/restReply.h"
 #include "serviceRoutines/exitTreat.h"
 
 
@@ -75,8 +76,7 @@ std::string exitTreat(ConnectionInfo* ciP, int components, std::vector<std::stri
    {
       mongoDisconnect();
       compV.clear();
-      OrionError orionError(SccOk, "Exiting");
-      return orionError.render(ciP->outFormat, "");;
+      return "DIE";
    }
 
    return out;

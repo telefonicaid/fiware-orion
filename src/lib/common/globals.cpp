@@ -119,12 +119,12 @@ int getCurrentTime(void)
 *
 * toSeconds -
 */
-int toSeconds(int value, char what, bool dayPart)
+long long toSeconds(int value, char what, bool dayPart)
 {
   if (dayPart == true)
   {
     if (what == 'Y')
-      return 365 * 24 * 3600 * value;
+      return 365L * 24 * 3600 * value;
     else if (what == 'M')
       return 30 * 24 * 3600 * value;
     else if (what == 'W')
@@ -152,12 +152,16 @@ int toSeconds(int value, char what, bool dayPart)
 * This is common code for Duration and Throttling (at least)
 *
 */
-int parse8601(std::string s) {
+long long parse8601(std::string s)
+{
+    if (s == "")
+        return 0;
 
-    char* duration = strdup(s.c_str());
-    char* toFree   = duration;
-    char* start;
-    bool  dayPart = true;
+    char*      duration    = strdup(s.c_str());
+    char*      toFree      = duration;
+    bool       dayPart     = true;
+    long long  accumulated = 0;
+    char*      start;
 
     if (*duration != 'P')
     {
@@ -168,7 +172,6 @@ int parse8601(std::string s) {
     ++duration;
     start = duration;
 
-    int accumulated = 0;
     while (*duration != 0)
     {
       if (isdigit(*duration))

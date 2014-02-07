@@ -148,6 +148,7 @@ TEST(commonGlobals, parse8601)
 TEST(commonGlobals, toSeconds)
 {
   int secs;
+  long long longsecs;
 
   // 3 years
   secs = toSeconds(3, 'Y', true);
@@ -184,6 +185,12 @@ TEST(commonGlobals, toSeconds)
   // error
   secs = toSeconds(3, 'f', false);
   EXPECT_EQ(-1, secs);
+
+  longsecs = toSeconds(30, 'Y', true);
+  EXPECT_EQ(946080000, longsecs);
+
+  longsecs = toSeconds(300, 'Y', true);
+  EXPECT_EQ(9460800000L, longsecs);
 }
 
 

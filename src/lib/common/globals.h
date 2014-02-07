@@ -96,7 +96,7 @@ extern int getCurrentTime(void);
 *
 * toSeconds -
 */
-extern int toSeconds(int value, char what, bool dayPart);
+extern long long toSeconds(int value, char what, bool dayPart);
 
 /*****************************************************************************
 *
@@ -105,6 +105,6 @@ extern int toSeconds(int value, char what, bool dayPart);
 * This is common code for Duration and Throttling (at least)
 *
 */
-extern int parse8601(std::string s);
+extern long long parse8601(std::string s);
 
 #endif
