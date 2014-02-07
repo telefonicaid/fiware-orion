@@ -64,6 +64,7 @@ static char                      bindIpV6[MAX_LEN_IP]  = "::";
 static MHD_Daemon*               mhdDaemon_v6  = NULL;
 static struct sockaddr_in6       sad_v6;
 
+IpVersion ipVersionUsed = IPDUAL;
 
 /* ****************************************************************************
 *
@@ -438,17 +439,19 @@ static int connectionTreat
 *
 * restInit - 
 */
-void restInit(char* _bind, unsigned short _port, RestService* _restServiceV, bool useIpV6 )
+void restInit(char* _bind, char* _bindv6, unsigned short _port, RestService* _restServiceV, IpVersion ipV)
 {
-   if (useIpV6)
-   {
-     memset(bindIpV6, 0, MAX_LEN_IP);
-     strncpy(bindIpV6, _bind, MAX_LEN_IP - 1);
-   }
-   else
+   ipVersionUsed = ipV;
+   if ((ipV == IPV4) || (ipV == IPDUAL))
    {
      memset(bindIp, 0, MAX_LEN_IP);
      strncpy(bindIp, _bind, MAX_LEN_IP - 1);
+   }
+
+   if ((ipV == IPV6) || (ipV == IPDUAL))
+   {
+     memset(bindIpV6, 0, MAX_LEN_IP);
+     strncpy(bindIpV6, _bindv6, MAX_LEN_IP - 1);
    }
 
    port          = _port;
@@ -462,25 +465,25 @@ void restInit(char* _bind, unsigned short _port, RestService* _restServiceV, boo
 *
 * restStart - 
 */
-int restStart(bool useIpV6)
+int restStart(IpVersion ipV)
 {
   int ret;
 
   if (port == 0)
      LM_RE(1, ("Please call restInit before starting the REST service"));
 
-  if (!useIpV6)
+  if ((ipV == IPV4) || (ipV == IPDUAL)) 
   { 
     // Code for IPv4 stack
     ret = inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr));
     if (ret != 1) {
-      LM_RE(2, ("could not parse bind IP address %s", bindIp));
+      LM_RE(2, ("V4 inet_pton fail for %s", bindIp));
     }
 
     sad.sin_family = AF_INET;
     sad.sin_port = htons(port);
 
-    LM_T(LmtHttpDaemon, ("Starting http daemon on IP %s port %d", bindIp, port));
+    LM_V(("Starting http daemon on IPv4 %s port %d", bindIp, port));
     mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY
                                htons(port),
                                NULL,
@@ -499,7 +502,8 @@ int restStart(bool useIpV6)
        LM_RE(3, ("MHD_start_daemon failed"));
 
   }  
-  else
+
+  if ((ipV == IPV6) || (ipV == IPDUAL))
   { 
     // Code for IPv6 stack
     ret = inet_pton(AF_INET6, bindIpV6, &(sad_v6.sin6_addr.s6_addr));
@@ -510,7 +514,7 @@ int restStart(bool useIpV6)
     sad_v6.sin6_family = AF_INET6;
     sad_v6.sin6_port = htons(port);
 
-    LM_T(LmtHttpDaemon, ("Starting http daemon on IPv6 %s port %d", bindIpV6, port));
+    LM_V(("Starting http daemon on IPv6 %s port %d", bindIpV6, port));
 
     mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6,
                                htons(port),
