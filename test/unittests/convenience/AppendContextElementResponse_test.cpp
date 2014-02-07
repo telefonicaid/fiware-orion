@@ -73,8 +73,8 @@ TEST(AppendContextElementResponse, render_json)
   AppendContextElementResponse  acer;
   ContextAttributeResponse      car;
   std::string                   out;
-  const char*                   outfile1 = "ngsi10.appendContextElementResponse.empty.postponed.json";
-  const char*                   outfile2 = "ngsi10.appendContextElementResponse.badRequest.postponed.json";
+  const char*                   outfile1 = "ngsi10.appendContextElementResponse.empty.valid.json";
+  const char*                   outfile2 = "ngsi10.appendContextElementResponse.badRequest.valid.json";
 
   utInit();
 
