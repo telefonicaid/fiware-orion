@@ -1,5 +1,5 @@
 <orionError>
   <code>200</code>
-  <reasonPhrase>Leak test</reasonPhrase>
-  <details>Leak test done</details>
+  <reasonPhrase>OK</reasonPhrase>
+  <details>Leak test; Leak test done</details>
 </orionError>
