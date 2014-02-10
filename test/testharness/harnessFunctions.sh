@@ -211,16 +211,26 @@ function brokerStop
 #
 function accumulatorStop()
 {
-  versionIp=$1
-  portNum=${LISTENER_PORT}
+  #versionIp=$1
+  #portNum=${LISTENER_PORT}
 
-  if [ "$versionIp" == "IPV6" ]
+  #if [ "$versionIp" == "IPV6" ]
+  #then
+  #  kill $(curl -g [::1]:${LISTENER_PORT_V6}/pid -s -S)
+  #  portNum=${LISTENER_PORT_V6}
+  #else
+  #  kill $(curl localhost:${LISTENER_PORT}/pid -s -S)
+  #fi
+
+  port=$1
+
+  # If port is missing, we use the default LISTERNER_PORT
+  if [ -z "$port" ]
   then
-    kill $(curl :::${LISTENER_PORT_V6}/pid -s -S)
-    portNum=${LISTENER_PORT_V6}
-  else
-    kill $(curl localhost:${LISTENER_PORT}/pid -s -S)
+    port=${LISTENER_PORT}
   fi
+
+  kill $(curl localhost:$port/pid -s -S)
 
   sleep 1
 
@@ -255,20 +265,29 @@ function accumulatorStop()
 #
 function accumulatorStart()
 {
-  ipVersion=$1
-  
-  accumulatorStop $ipVersion
 
-  IPv6Host=""
-  port=${LISTENER_PORT} 
+  bindIp=$1
+  port=$2
 
-  if [ "$ipVersion" == "IPV6" ]
+  # If port is missing, we use the default LISTERNER_PORT
+  if [ -z "$port" ]
   then
-    IPv6Host="::"
-    port=${LISTENER_PORT_V6}
+    port=${LISTENER_PORT}
   fi
 
-  accumulator-server.py $port /notify $IPv6Host &
+  if [ "$bindIp" == "::" ]
+  then
+    # IPv6 variant
+    loopbackIp = "::1"
+  else
+    # Implicitly, "$bindIP" == "0.0.0.0" (i.e. IPv4 variant)
+    loopbackIp = "127.0.0.1"
+  fi
+
+  #accumulatorStop $loopbackIp $port
+  accumulatorStop $port
+
+  accumulator-server.py $port /notify $bindIp &
   echo accumulator running as PID $$
 
   # Wait until accumulator has started or we have waited a given maximum time
@@ -286,7 +305,8 @@ function accumulatorStart()
    sleep 1
 
    time=$time+1
-   nc -z localhost $port 
+   #nc -z $loopbackIp $port
+   nc -z localhost $port
    port_not_ok=$?
   done
 }

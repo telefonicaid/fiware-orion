@@ -87,7 +87,7 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
         <attribute>temperature</attribute>
         <attribute>lightstatus</attribute>
   </attributeList>
-  <reference>http://localhost:${LISTENER_PORT}/notify</reference>
+  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
   <duration>PT5H</duration>
   <notifyConditions>
         <notifyCondition>
@@ -187,10 +187,10 @@ echo "TIMES: $TIMES"
   </statusCode>
 </unsubscribeContextResponse>
 4: ++++++++++++++++++++
-POST http://localhost:REGEX(\d+)/notify
+POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 1287
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
 Content-Type: application/xml
 
