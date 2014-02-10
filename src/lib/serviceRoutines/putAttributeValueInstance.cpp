@@ -69,7 +69,8 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
       {
         std::string out;
 
-        out = restErrorReplyGet(ciP, ciP->outFormat, "", "StatusCode", SccBadRequest, "unmatching metadata ID value URI/payload", valueId + " vs " + mP->value);
+        out = restErrorReplyGet(ciP, ciP->outFormat, "", "StatusCode", SccBadRequest,
+                                std::string("unmatching metadata ID value URI/payload: '") + valueId + "' vs '" + mP->value + "'");
         return out;
       }
       else
@@ -103,7 +104,7 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   
   StatusCode statusCode;
   if (response.contextElementResponseVector.size() == 0)
-    statusCode.fill(SccContextElementNotFound, "The ContextElement requested is not found", entityId + "-" + attributeName);
+    statusCode.fill(SccContextElementNotFound, std::string("Entity-Attribute pair: '") + entityId + "-" + attributeName + "'");
   else if (response.contextElementResponseVector.size() == 1)
   {
     ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
@@ -113,10 +114,10 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
     else if (cerP->statusCode.code != SccNone)
       statusCode.fill(&cerP->statusCode);
     else
-      statusCode.fill(SccOk, "OK", "");
+      statusCode.fill(SccOk);
   }
   else
-    statusCode.fill(SccReceiverInternalError, "Internal Error", "More than one response from putAttributeValueInstance::mongoUpdateContext");
+    statusCode.fill(SccReceiverInternalError, "More than one response from putAttributeValueInstance::mongoUpdateContext");
 
   request.release();
   return statusCode.render(ciP->outFormat, "", false);

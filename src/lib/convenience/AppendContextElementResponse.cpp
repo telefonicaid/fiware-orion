@@ -39,9 +39,8 @@
 *
 * AppendContextElementResponse::AppendContextElementResponse - 
 */
-AppendContextElementResponse::AppendContextElementResponse()
+AppendContextElementResponse::AppendContextElementResponse() : errorCode("errorCode")
 {
-  errorCode.tagSet("errorCode");
 }
 
 
@@ -79,9 +78,9 @@ std::string AppendContextElementResponse::check(RequestType requestType, Format 
   std::string res;
   
   if (predetectedError != "")
-    errorCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), predetectedError); 
+    errorCode.fill(SccBadRequest, predetectedError); 
   else if ((res = contextResponseVector.check(requestType, format, indent, "", counter)) != "OK")
-    errorCode.fill(SccBadRequest, httpStatusCodeString(SccBadRequest), res);
+    errorCode.fill(SccBadRequest, res);
   else
     return "OK";
 

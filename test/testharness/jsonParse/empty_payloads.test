@@ -156,12 +156,12 @@ Date: REGEX(.*)
     "errorCode": {
         "code": "400",
         "details": "empty update action type",
-        "reasonPhrase": "Bad request"
+        "reasonPhrase": "Bad Request"
     }
 }
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 153
+Content-Length: 166
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -169,8 +169,8 @@ Date: REGEX(.*)
     "subscribeError": {
         "errorCode": {
             "code": "400",
-            "details": "No entities",
-            "reasonPhrase": "invalid payload"
+            "details": "invalid payload: No entities",
+            "reasonPhrase": "Bad Request"
         }
     }
 }
@@ -204,7 +204,7 @@ Date: REGEX(.*)
 }
 10: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 160
+Content-Length: 154
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -212,12 +212,12 @@ Date: REGEX(.*)
     "orionError": {
         "code": "400",
         "details": "ngsi9 service '/NGSI9/notSupportedRequest' not found",
-        "reasonPhrase": "bad ngsi9 request"
+        "reasonPhrase": "Bad Request"
     }
 }
 11: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 163
+Content-Length: 156
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -225,7 +225,7 @@ Date: REGEX(.*)
     "orionError": {
         "code": "400",
         "details": "ngsi10 service '/NGSI10/notSupportedRequest' not found",
-        "reasonPhrase": "bad ngsi10 request"
+        "reasonPhrase": "Bad Request"
     }
 }
 12: ++++++++++++++++++++
@@ -238,7 +238,7 @@ Date: REGEX(.*)
     "orionError": {
         "code": "400",
         "details": "service '/notSupportedRequest' not found",
-        "reasonPhrase": "bad request"
+        "reasonPhrase": "Bad Request"
     }
 }
 13: ++++++++++++++++++++

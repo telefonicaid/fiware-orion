@@ -2,7 +2,7 @@
   "registrationId" : "000000000000000000000000",
   "errorCode" : {
     "code" : "400",
-    "reasonPhrase" : "bad request",
-    "details" : "Service not recognized"
+    "reasonPhrase" : "Bad Request",
+    "details" : "Service not recognized: /ngsi9/discoverContextAvailability"
   }
 }

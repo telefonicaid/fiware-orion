@@ -35,7 +35,7 @@
 TEST(SubscribeContextResponse, constructorsAndRender)
 {
   SubscribeContextResponse  scr1;
-  StatusCode                ec(SccOk, "RP", "D");
+  StatusCode                ec(SccOk, "D");
   SubscribeContextResponse  scr2(ec);
   std::string               out;
   const char*               outfile = "ngsi10.subscribeContextResponse.ok.valid.xml";
@@ -44,7 +44,7 @@ TEST(SubscribeContextResponse, constructorsAndRender)
 
   EXPECT_STREQ("000000000000000000000000", scr1.subscribeError.subscriptionId.get().c_str());
   EXPECT_STREQ("000000000000000000000000", scr2.subscribeError.subscriptionId.get().c_str());
-  EXPECT_STREQ("RP", scr2.subscribeError.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("OK", scr2.subscribeError.errorCode.reasonPhrase.c_str());
 
   out = scr2.render(SubscribeContext, XML, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -83,7 +83,7 @@ TEST(SubscribeContextResponse, json_render)
   // 6. subscribeResponse: +subscription +duration +throttling
 
   // 1.
-  scrP->subscribeError.errorCode.fill(SccBadRequest, "Bad Request", "details");
+  scrP->subscribeError.errorCode.fill(SccBadRequest, "details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
   out = scrP->render(SubscribeContext, JSON, "");
@@ -92,14 +92,14 @@ TEST(SubscribeContextResponse, json_render)
 
 
   // 2.
-  scrP->subscribeError.errorCode.fill(SccBadRequest, "Bad Request", "");
+  scrP->subscribeError.errorCode.fill(SccBadRequest);
   scrP->subscribeError.subscriptionId.set("012345678901234567890123");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
   out = scrP->render(SubscribeContext, JSON, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  scrP->subscribeError.errorCode.fill(SccNone, "", "");
+  scrP->subscribeError.errorCode.fill(SccNone);
 
 
 

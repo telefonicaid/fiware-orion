@@ -101,13 +101,10 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
         connection->insert(getSubscribeContextAvailabilityCollectionName(), subDoc);
     }
     catch( const DBException &e ) {
-        responseP->errorCode.fill(
-            SccReceiverInternalError,
-            httpStatusCodeString(SccReceiverInternalError),
-            std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
-                " - insert(): " + subDoc.toString() +
-                " - exception: " + e.what()
-        );
+        responseP->errorCode.fill(SccReceiverInternalError,
+                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
+                                  " - insert(): " + subDoc.toString() +
+                                  " - exception: " + e.what());
 
         LM_SRE(SccOk,("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
     }

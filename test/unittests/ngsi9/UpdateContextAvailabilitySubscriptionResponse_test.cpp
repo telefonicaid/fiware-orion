@@ -63,7 +63,7 @@ TEST(UpdateContextAvailabilitySubscriptionResponse, jsonRender)
 
   
   // 2. +subscriptionId -duration +errorCode
-  ucasP->errorCode.fill(SccBadRequest, "Bad request");
+  ucasP->errorCode.fill(SccBadRequest);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
   rendered = ucasP->render(UpdateContextAvailabilitySubscription, JSON, "", 1);
@@ -71,7 +71,7 @@ TEST(UpdateContextAvailabilitySubscriptionResponse, jsonRender)
 
 
   // 3. +subscriptionId +duration -errorCode
-  ucasP->errorCode.fill(SccNone, "", "");
+  ucasP->errorCode.fill(SccNone);
   ucasP->duration.set("PT1H");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
@@ -80,7 +80,7 @@ TEST(UpdateContextAvailabilitySubscriptionResponse, jsonRender)
 
 
   // 4. +subscriptionId +duration +errorCode
-  ucasP->errorCode.fill(SccBadRequest, "Bad request", "no details");
+  ucasP->errorCode.fill(SccBadRequest, "no details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
   rendered = ucasP->render(UpdateContextAvailabilitySubscription, JSON, "", 1);

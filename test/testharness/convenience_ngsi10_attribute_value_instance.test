@@ -132,8 +132,8 @@ echo "9: ++++++++++++++++++++"
   <contextAttributeList/>
   <statusCode>
     <code>404</code>
-    <reasonPhrase>The ContextElement requested is not found</reasonPhrase>
-    <details>E01-A1</details>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Entity-Attribute pair: 'E01-A1'</details>
   </statusCode>
 </contextAttributeResponse>
 2: ++++++++++++++++++++
@@ -200,8 +200,8 @@ Date: REGEX(.*)
 <?xml version="1.0"?>
 <statusCode>
   <code>400</code>
-  <reasonPhrase>unmatching metadata ID value URI/payload</reasonPhrase>
-  <details>right vs left</details>
+  <reasonPhrase>Bad Request</reasonPhrase>
+  <details>unmatching metadata ID value URI/payload: 'right' vs 'left'</details>
 </statusCode>
 7: ++++++++++++++++++++
 <?xml version="1.0"?>
@@ -222,8 +222,8 @@ Date: REGEX(.*)
   <contextAttributeList/>
   <statusCode>
     <code>404</code>
-    <reasonPhrase>The ContextElement requested is not found</reasonPhrase>
-    <details>E01-A1</details>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Entity-Attribute pair: 'E01-A1'</details>
   </statusCode>
 </contextAttributeResponse>
 --TEARDOWN--

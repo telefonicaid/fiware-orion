@@ -51,7 +51,7 @@ HttpStatusCode mapGetIndividualContextEntityAttribute(std::string entityId, std:
    if ((ms != SccOk) || (qcResponse.contextElementResponseVector.size() == 0))
    {
      // Here I fill in statusCode for the response
-     response->statusCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound), entityId);
+     response->statusCode.fill(SccContextElementNotFound, std::string("Entity id: '") + entityId + "'");
      LM_RE(ms, ("entityId '%s' not found", entityId.c_str()));
    }   
 
@@ -60,6 +60,6 @@ HttpStatusCode mapGetIndividualContextEntityAttribute(std::string entityId, std:
        ContextAttribute* ca = new ContextAttribute(attrV[ix]->name, attrV[ix]->type, attrV[ix]->value);
        response->contextAttributeVector.push_back(ca);
    }
-   response->statusCode.fill(SccOk, "OK", "");
+   response->statusCode.fill(SccOk);
    return ms;
 }

@@ -79,7 +79,7 @@ Date: REGEX(.*)
 </subscribeContextResponse>
 2: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 260
+Content-Length: 273
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -88,8 +88,8 @@ Date: REGEX(.*)
   <subscribeError>
     <errorCode>
       <code>400</code>
-      <reasonPhrase>invalid payload</reasonPhrase>
-      <details>syntax error in throttling string</details>
+      <reasonPhrase>Bad Request</reasonPhrase>
+      <details>invalid payload: syntax error in throttling string</details>
     </errorCode>
   </subscribeError>
 </subscribeContextResponse>

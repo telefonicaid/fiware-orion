@@ -2,7 +2,7 @@
   "subscriptionId" : "SUB_123",
   "errorCode" : {
     "code" : "400",
-    "reasonPhrase" : "reason",
+    "reasonPhrase" : "Bad Request",
     "details" : "detail"
   }
 }

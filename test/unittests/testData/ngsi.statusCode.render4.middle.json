@@ -1,5 +1,5 @@
 "statusCode" : {
   "code" : "200",
-  "reasonPhrase" : "REASON",
+  "reasonPhrase" : "OK",
   "details" : "DETAILS"
 }

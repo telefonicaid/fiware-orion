@@ -107,7 +107,9 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
 
   if (reqP == NULL)
   {
-    std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", requestType(request), SccBadRequest, "no request treating object found", std::string("Sorry, no request treating object found for RequestType '") + requestType(request) + "'");
+    std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", requestType(request), SccBadRequest,
+                                               std::string("Sorry, no request treating object found for RequestType '") + requestType(request) + "'");
+
     LM_RE(errorReply, ("Sorry, no request treating object found for RequestType %d (%s)", request, requestType(request)));
   }
 
@@ -122,7 +124,7 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
   catch (std::exception &e)
   {
     res = std::string("JSON parse error: ") + e.what();
-    std::string errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, "Parse Error", res);
+    std::string errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, std::string("JSON Parse Error: ") + res);
     LM_E(("JSON Parse Error: '%s'", e.what()));
     LM_RE(errorReply, (res.c_str()));
   }

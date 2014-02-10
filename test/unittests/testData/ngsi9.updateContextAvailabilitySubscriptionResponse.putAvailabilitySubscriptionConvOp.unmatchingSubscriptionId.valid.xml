@@ -2,7 +2,7 @@
   <subscriptionId>000000000000000000000000</subscriptionId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>unmatching subscriptionId URI/payload</reasonPhrase>
-    <details>111222333444555666777881</details>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>unmatching subscriptionId URI/payload: '111222333444555666777881' vs '111222333444555666777888'</details>
   </errorCode>
 </updateContextAvailabilitySubscriptionResponse>

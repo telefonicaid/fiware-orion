@@ -44,14 +44,14 @@ echo "3: +++++++++++++++++++++++++++++"
 <?xml version="1.0"?>
 <orionError>
   <code>400</code>
-  <reasonPhrase>Bad request</reasonPhrase>
+  <reasonPhrase>Bad Request</reasonPhrase>
   <details>Password requested</details>
 </orionError>
 2: +++++++++++++++++++++++++++++
 <?xml version="1.0"?>
 <orionError>
   <code>400</code>
-  <reasonPhrase>Bad request</reasonPhrase>
+  <reasonPhrase>Bad Request</reasonPhrase>
   <details>Request denied - password erroneous</details>
 </orionError>
 3: +++++++++++++++++++++++++++++

@@ -2,8 +2,8 @@
   "subscribeError" : {
     "errorCode" : {
       "code" : "400",
-      "reasonPhrase" : "invalid payload",
-      "details" : "syntax error in duration string"
+      "reasonPhrase" : "Bad Request",
+      "details" : "invalid payload: syntax error in duration string"
     }
   }
 }

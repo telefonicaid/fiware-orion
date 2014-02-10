@@ -59,7 +59,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
                            requestP->subscriptionId.get().c_str()));
         sub = connection->findOne(getSubscribeContextCollectionName(), BSON("_id" << id));
         if (sub.isEmpty()) {
-            responseP->statusCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound), std::string("subscriptionId: '") + requestP->subscriptionId.get() + "'");
+            responseP->statusCode.fill(SccContextElementNotFound, std::string("subscriptionId: '") + requestP->subscriptionId.get() + "'");
             LM_SR(SccOk);
         }
     }
@@ -68,17 +68,14 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
         // FIXME: this checking should be done at parsing stage, without progressing to
         // mongoBackend. By the moment we can live this here, but we should remove in the future
         // (old issue #95)
-        responseP->statusCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound));
+        responseP->statusCode.fill(SccContextElementNotFound);
         LM_SR(SccOk);
     }
     catch( const DBException &e ) {
-        responseP->statusCode.fill(
-            SccReceiverInternalError,
-            httpStatusCodeString(SccReceiverInternalError),
-            std::string("collection: ") + getSubscribeContextCollectionName() +
-               " - findOne() _id: " + requestP->subscriptionId.get() +
-               " - exception: " + e.what()
-        );
+        responseP->statusCode.fill(SccReceiverInternalError,
+                                   std::string("collection: ") + getSubscribeContextCollectionName() +
+                                   " - findOne() _id: " + requestP->subscriptionId.get() +
+                                   " - exception: " + e.what());
         LM_SR(SccOk);
     }
 
@@ -91,13 +88,10 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
         connection->remove(getSubscribeContextCollectionName(), BSON("_id" << OID(requestP->subscriptionId.get())));
     }
     catch( const DBException &e ) {
-        responseP->statusCode.fill(
-            SccReceiverInternalError,
-            httpStatusCodeString(SccReceiverInternalError),
-            std::string("collection: ") + getSubscribeContextCollectionName() +
-                " - remove() _id: " + requestP->subscriptionId.get().c_str() +
-                " - exception: " + e.what()
-         );
+        responseP->statusCode.fill(SccReceiverInternalError,
+                                   std::string("collection: ") + getSubscribeContextCollectionName() +
+                                   " - remove() _id: " + requestP->subscriptionId.get().c_str() +
+                                   " - exception: " + e.what());
 
         LM_SR(SccOk);
     }
@@ -105,6 +99,6 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     /* Destroy any previous ONTIMEINTERVAL thread */
     getNotifier()->destroyOntimeIntervalThreads(requestP->subscriptionId.get());
 
-    responseP->statusCode.fill(SccOk, "OK");
+    responseP->statusCode.fill(SccOk);
     LM_SR(SccOk);
 }

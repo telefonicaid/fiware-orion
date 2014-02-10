@@ -140,7 +140,7 @@ curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 315
+Content-Length: 328
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -154,7 +154,7 @@ Date: REGEX(.*)
   <statusCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>ENTITY_ID</details>
+    <details>Entity id: 'ENTITY_ID'</details>
   </statusCode>
 </contextElementResponse>
 2: +++++++++++++++++++++++++++++
