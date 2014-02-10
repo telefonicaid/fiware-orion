@@ -410,7 +410,7 @@ function curlJsonNoPayload()
   url=$1
   extraoptions=$2
   
-  curlNoPayload "JSON" $url $extraoptions "Content-Type: application/json" "Accept: application/json"
+  curlNoPayload "JSON" $url "${extraoptions}" "Content-Type: application/json" "Accept: application/json"
 }
 
 
