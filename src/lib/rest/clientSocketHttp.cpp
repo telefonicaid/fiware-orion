@@ -68,12 +68,12 @@ int socketHttpConnect(std::string host, unsigned short port)
  if (ipVersionUsed == IPV4) 
  {
    hints.ai_family = AF_INET;
-   LM_VVV(("Allow IpV4 only"));
+   LM_VVV(("Allow IPv4 only"));
  }
  else if (ipVersionUsed == IPV6)
  {
    hints.ai_family = AF_INET6;
-   LM_VVV(("Allow  IpV4 only"));
+   LM_VVV(("Allow  IPv6 only"));
  }
  else 
  {
