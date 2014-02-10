@@ -38,6 +38,8 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 
+#include <netdb.h>
+
 
 
 /* ****************************************************************************
@@ -54,14 +56,18 @@
 *
 * Globals
 */
-static unsigned short      port          = 0;
-static char                bindIp[15]    = "0.0.0.0";
-static RestService*        restServiceV  = NULL;
-static MHD_Daemon*         mhdDaemon     = NULL;
-static struct sockaddr_in  sad;
-__thread char              static_buffer[STATIC_BUFFER_SIZE];
 
+static unsigned short            port          = 0;
+static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
+static RestService*              restServiceV  = NULL;
+static MHD_Daemon*               mhdDaemon     = NULL;
+static struct sockaddr_in        sad;
+static char                      bindIPv6[MAX_LEN_IP]  = "::";
+static MHD_Daemon*               mhdDaemon_v6  = NULL;
+static struct sockaddr_in6       sad_v6;
+__thread char                    static_buffer[STATIC_BUFFER_SIZE];
 
+IpVersion ipVersionUsed = IPDUAL;
 
 /* ****************************************************************************
 *
@@ -407,44 +413,58 @@ static int connectionTreat
 }
 
 
-
 /* ****************************************************************************
 *
 * restInit - 
 */
-void restInit(char* _bind, unsigned short _port, RestService* _restServiceV)
+void restInit(char* _bind, char* _bindv6, unsigned short _port, RestService* _restServiceV, IpVersion ipVersion)
 {
-   strcpy(bindIp, _bind);
+   ipVersionUsed = ipVersion;
+   if ((ipVersion == IPV4) || (ipVersion == IPDUAL))
+   {
+     memset(bindIp, 0, MAX_LEN_IP);
+     strncpy(bindIp, _bind, MAX_LEN_IP - 1);
+   }
+
+   if ((ipVersion == IPV6) || (ipVersion == IPDUAL))
+   {
+     memset(bindIPv6, 0, MAX_LEN_IP);
+     strncpy(bindIPv6, _bindv6, MAX_LEN_IP - 1);
+   }
 
    port          = _port;
    restServiceV  = _restServiceV;
 }
 
 
-
 /* ****************************************************************************
 *
 * restStart - 
 */
-int restStart(void)
+int restStart(IpVersion ipVersion)
 {
+  int ret;
+
   if (port == 0)
      LM_RE(1, ("Please call restInit before starting the REST service"));
 
-  int ret = inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr));
-  if (ret != 1) {
-    LM_RE(2, ("could not parse bind IP address %s", bindIp));
-  }
+  if ((ipVersion == IPV4) || (ipVersion == IPDUAL)) 
+  { 
+    // Code for IPv4 stack
+    ret = inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr));
+    if (ret != 1) {
+      LM_RE(2, ("V4 inet_pton fail for %s", bindIp));
+    }
 
-  sad.sin_family = AF_INET;
-  sad.sin_port = htons(port);
+    sad.sin_family = AF_INET;
+    sad.sin_port = htons(port);
 
-  LM_T(LmtHttpDaemon, ("Starting http daemon on IP %s port %d", bindIp, port));
-  mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY
+    LM_V(("Starting http daemon on IPv4 %s port %d", bindIp, port));
+    mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY
                                htons(port),
                                NULL,
                                NULL,
-                               &connectionTreat,
+                               connectionTreat,
                                NULL,
                                MHD_OPTION_NOTIFY_COMPLETED,
                                requestCompleted,
@@ -454,8 +474,43 @@ int restStart(void)
                                MHD_OPTION_SOCK_ADDR, (struct sockaddr*) &sad,
                                MHD_OPTION_END);
   
-  if (mhdDaemon == NULL)
-     LM_RE(3, ("MHD_start_daemon failed"));
+    if (mhdDaemon == NULL)
+       LM_RE(3, ("MHD_start_daemon failed"));
+
+  }  
+
+  if ((ipVersion == IPV6) || (ipVersion == IPDUAL))
+  { 
+    // Code for IPv6 stack
+    ret = inet_pton(AF_INET6, bindIPv6, &(sad_v6.sin6_addr.s6_addr));
+    if (ret != 1) {
+      LM_RE(1, ("V6 inet_pton fail for %s", bindIPv6));
+    }
+
+    sad_v6.sin6_family = AF_INET6;
+    sad_v6.sin6_port = htons(port);
+
+    LM_V(("Starting http daemon on IPv6 %s port %d", bindIPv6, port));
+
+    mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6,
+                               htons(port),
+                               NULL,
+                               NULL,
+                               connectionTreat,
+                               NULL,
+                               MHD_OPTION_NOTIFY_COMPLETED,
+                               requestCompleted,
+                               NULL,
+                               MHD_OPTION_CONNECTION_MEMORY_LIMIT,
+                               2 * PAYLOAD_SIZE,
+                               MHD_OPTION_SOCK_ADDR, (struct sockaddr*) &sad_v6,
+                               MHD_OPTION_END);
+
+    if (mhdDaemon_v6 == NULL)
+       LM_RE(1, ("MHD_start_daemon_v6 failed"));
+
+  }
 
   return 0;
 }
+
