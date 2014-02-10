@@ -34,16 +34,30 @@
 
 /* ****************************************************************************
 *
+*  IpVersion -
+*/
+typedef enum IpVersion 
+{
+  IPV4     = 1,
+  IPV6     = 2,
+  IPDUAL   = 3
+} IpVersion;
+
+
+extern  IpVersion  ipVersionUsed;  
+
+/* ****************************************************************************
+*
 * restInit - 
 */
-extern void restInit(char* bindIp, unsigned short port, RestService* restServiceV, bool use_v6 = false);
+extern void restInit(char* _bind, char* _bindv6, unsigned short _port, RestService* _restServiceV, IpVersion ipVersion);
 
 
 /* ****************************************************************************
 *
 * restStart - 
 */
-extern int restStart(bool use_v6 = false);
+extern int restStart(IpVersion ipVersion);
 
 
 #endif
