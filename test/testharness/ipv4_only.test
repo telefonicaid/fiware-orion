@@ -35,8 +35,9 @@ accumulatorStart IPV6
 source harnessFunctions.sh
 
 echo "1: ++++++++++++++++++++"
-curl ::1:${BROKER_PORT}/version --max-time  10 exit code: $?
-echo $?
+curl ::1:${BROKER_PORT}/version --max-time 10 > /dev/null 2>&1
+echo exit code: $?
+
 
 echo "2: ++++++++++++++++++++"
 SUB_OUT=$((curl 127.0.0.1:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
@@ -107,7 +108,7 @@ curl 127.0.0.1:${LISTENER_PORT}/number -s -S
 
 --REGEXPECT--
 1: ++++++++++++++++++++
-7
+REGEX(exit code: 3|exit code: 7)
 2: ++++++++++++++++++++
 <?xml version="1.0"?>
 <subscribeContextResponse>
