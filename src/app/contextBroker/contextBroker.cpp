@@ -629,6 +629,11 @@ int main(int argC, char* argV[])
 
   IpVersion  ipVersion;
 
+  if (useOnlyIPv6 && useOnlyIPv4)
+  {
+    LM_X(1, ("-ipv4 and -ipv6 can not been activated at the same time, they are incompatible"));
+  }
+
   if (useOnlyIPv4)
   {
     ipVersion = IPV4;
@@ -638,10 +643,6 @@ int main(int argC, char* argV[])
   {
     ipVersion = IPV6;
     LM_V(("Using IPv6 only"));
-  }
-  else if (useOnlyIPv6 && useOnlyIPv4)
-  {
-    LM_X(1, ("-ipv4 and -ipv6 can not been activated at the same time, they are incompatible"));
   }
   else
   {
