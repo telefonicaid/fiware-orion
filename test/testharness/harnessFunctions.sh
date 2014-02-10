@@ -224,20 +224,20 @@ function accumulatorStop()
 
   sleep 1
 
-  running_app=$(ps -fe | grep accumulator-server | grep $portNum | wc -l)
+  running_app=$(ps -fe | grep accumulator-server | grep $port | wc -l)
 
   if [ $running_app -ne 0 ]
   then
-    kill $(ps -fe | grep accumulator-server | grep $portNum | awk '{print $2}')
+    kill $(ps -fe | grep accumulator-server | grep $port | awk '{print $2}')
     # Wait some time so the accumulator can finish properly
     sleep 1
-    running_app=$(ps -fe | grep accumulator-server | grep $portNum | wc -l)
+    running_app=$(ps -fe | grep accumulator-server | grep $port | wc -l)
     if [ $running_app -ne 0 ]
     then
       # If the accumulator refuses to stop politely, kill the process by brute force
-      kill -9 $(ps -fe | grep accumulator-server | grep $portNum | awk '{print $2}')
+      kill -9 $(ps -fe | grep accumulator-server | grep $port | awk '{print $2}')
       sleep 1
-      running_app=$(ps -fe | grep accumulator-server | grep $portNum | wc -l)
+      running_app=$(ps -fe | grep accumulator-server | grep $port | wc -l)
 
       if [ $running_app -ne 0 ]
       then
