@@ -35,13 +35,13 @@ accumulatorStart IPV6
 source harnessFunctions.sh
 
 echo "1: ++++++++++++++++++++"
-curl ::1:${BROKER_PORT}/version | xmllint --format -
+curl -g [::1]:${BROKER_PORT}/version | xmllint --format -
 
 echo "2: ++++++++++++++++++++"
 curl 127.0.0.1:${BROKER_PORT}/version | xmllint --format -
 
 echo "3: ++++++++++++++++++++"
-SUB_OUT=$((curl ::1:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+SUB_OUT=$((curl -g [::1]:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -99,7 +99,7 @@ SUB_ID_V4=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | aw
 echo "$SUB_OUT"
 
 echo "5: ++++++++++++++++++++"
-(curl ::1:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+(curl -g [::1]:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -160,7 +160,7 @@ mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID_V4\"
 
 echo "7: ++++++++++++++++++++"
 #Get accumulated data
-curl ::1:${LISTENER_PORT_V6}/dump -s -S 
+curl -g [::1]:${LISTENER_PORT_V6}/dump -s -S 
 
 echo "8: ++++++++++++++++++++"
 #Get accumulated data

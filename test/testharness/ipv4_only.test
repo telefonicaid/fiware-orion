@@ -35,9 +35,8 @@ accumulatorStart IPV6
 source harnessFunctions.sh
 
 echo "1: ++++++++++++++++++++"
-curl ::1:${BROKER_PORT}/version --max-time 10 > /dev/null 2>&1
+curl -g [::1]:${BROKER_PORT}/version --max-time 10 > /dev/null 2>&1
 echo exit code: $?
-
 
 echo "2: ++++++++++++++++++++"
 SUB_OUT=$((curl 127.0.0.1:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
@@ -100,7 +99,7 @@ mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")},
 
 echo "4: ++++++++++++++++++++"
 #Get accumulated data
-curl ::1:${LISTENER_PORT_V6}/number -s -S 
+curl -g [::1]:${LISTENER_PORT_V6}/number -s -S 
 
 echo "5: ++++++++++++++++++++"
 #Get accumulated data
@@ -108,7 +107,7 @@ curl 127.0.0.1:${LISTENER_PORT}/number -s -S
 
 --REGEXPECT--
 1: ++++++++++++++++++++
-REGEX(exit code: 3|exit code: 7)
+exit code: 7
 2: ++++++++++++++++++++
 <?xml version="1.0"?>
 <subscribeContextResponse>
