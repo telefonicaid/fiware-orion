@@ -28,8 +28,8 @@ source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB
-accumulatorStart
-accumulatorStart IPV6
+accumulatorStart 0.0.0.0 ${LISTENER_PORT}
+accumulatorStart :: ${LISTENER_PORT_AUX}
 
 --SHELL--
 source harnessFunctions.sh
@@ -46,14 +46,14 @@ SUB_OUT=$((curl -g [::1]:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header '
 <subscribeContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
-          <id>OfficeRoom6</id>
+          <id>OfficeRoom</id>
         </entityId>
   </entityIdList>
   <attributeList>
         <attribute>temperature</attribute>
         <attribute>lightstatus</attribute>
   </attributeList>
-  <reference>http://::1:${LISTENER_PORT_V6}/notify</reference>
+  <reference>http://::1:${LISTENER_PORT_AUX}/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
         <notifyCondition>
@@ -75,7 +75,7 @@ SUB_OUT=$((curl 127.0.0.1:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
 <subscribeContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
-          <id>OfficeRoom4</id>
+          <id>OfficeRoom</id>
         </entityId>
   </entityIdList>
   <attributeList>
@@ -105,7 +105,7 @@ echo "5: ++++++++++++++++++++"
   <contextElementList>
         <contextElement>
           <entityId type="Room" isPattern="false">
-                <id>OfficeRoom6</id>
+                <id>OfficeRoom</id>
           </entityId>
           <contextAttributeList>
             <contextAttribute>
@@ -124,45 +124,12 @@ echo "5: ++++++++++++++++++++"
   <updateAction>APPEND</updateAction>
 </updateContextRequest>
 EOF
-
-# Get notifications count
-mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID_V6\")}, {_id: 0, count: 1})"
 
 echo "6: ++++++++++++++++++++"
-(curl 127.0.0.1:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<updateContextRequest>
-  <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom4</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
-          <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p2300</contextValue>
-                </contextAttribute>
-            <contextAttribute>
-          <name>lightstatus</name>
-                  <type>light</type>
-                  <contextValue>L23</contextValue>
-                </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-
-# Get notifications count
-mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID_V4\")}, {_id: 0, count: 1})"
+#Get accumulated data
+curl -g [::1]:${LISTENER_PORT_AUX}/dump -s -S
 
 echo "7: ++++++++++++++++++++"
-#Get accumulated data
-curl -g [::1]:${LISTENER_PORT_V6}/dump -s -S 
-
-echo "8: ++++++++++++++++++++"
 #Get accumulated data
 curl 127.0.0.1:${LISTENER_PORT}/dump -s -S
 
@@ -210,7 +177,7 @@ curl 127.0.0.1:${LISTENER_PORT}/dump -s -S
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
-          <id>OfficeRoom6</id>
+          <id>OfficeRoom</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
@@ -232,40 +199,9 @@ curl 127.0.0.1:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-{ "count" : 1 }
 6: ++++++++++++++++++++
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom4</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue/>
-          </contextAttribute>
-          <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
-{ "count" : 1 }
-7: ++++++++++++++++++++
-POST http://REGEX(*/)notify
-Content-Length: 739
+POST http://::1:REGEX(\d+)/notify
+Content-Length: 738
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: ::1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -278,7 +214,7 @@ Content-Type: application/xml
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
-          <id>OfficeRoom6</id>
+          <id>OfficeRoom</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
@@ -297,9 +233,9 @@ Content-Type: application/xml
 </notifyContextRequest>
 
 =======================================
-8: ++++++++++++++++++++
-POST http://127.0.0.1:REGEX([0-9]{4}|[0-9]{5})/notify
-Content-Length: 739
+7: ++++++++++++++++++++
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 738
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -312,7 +248,7 @@ Content-Type: application/xml
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
-          <id>OfficeRoom4</id>
+          <id>OfficeRoom</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
@@ -335,5 +271,5 @@ Content-Type: application/xml
 source harnessFunctions.sh
 
 brokerStop CB
-accumulatorStop
-accumulatorStop IPV6
+accumulatorStop ${LISTENER_PORT}
+accumulatorStop ${LISTENER_PORT_AUX}

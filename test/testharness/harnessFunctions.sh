@@ -211,16 +211,6 @@ function brokerStop
 #
 function accumulatorStop()
 {
-  #versionIp=$1
-  #portNum=${LISTENER_PORT}
-
-  #if [ "$versionIp" == "IPV6" ]
-  #then
-  #  kill $(curl -g [::1]:${LISTENER_PORT_V6}/pid -s -S)
-  #  portNum=${LISTENER_PORT_V6}
-  #else
-  #  kill $(curl localhost:${LISTENER_PORT}/pid -s -S)
-  #fi
 
   port=$1
 
@@ -275,16 +265,6 @@ function accumulatorStart()
     port=${LISTENER_PORT}
   fi
 
-  if [ "$bindIp" == "::" ]
-  then
-    # IPv6 variant
-    loopbackIp = "::1"
-  else
-    # Implicitly, "$bindIP" == "0.0.0.0" (i.e. IPv4 variant)
-    loopbackIp = "127.0.0.1"
-  fi
-
-  #accumulatorStop $loopbackIp $port
   accumulatorStop $port
 
   accumulator-server.py $port /notify $bindIp &
@@ -305,7 +285,6 @@ function accumulatorStart()
    sleep 1
 
    time=$time+1
-   #nc -z $loopbackIp $port
    nc -z localhost $port
    port_not_ok=$?
   done
