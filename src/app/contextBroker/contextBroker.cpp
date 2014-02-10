@@ -140,8 +140,8 @@ char            fwdHost[64];
 int             fwdPort;
 bool            ngsi9Only;
 bool            harakiri;
-bool            useOnlyIpV4;
-bool            useOnlyIpV6;
+bool            useOnlyIPv4;
+bool            useOnlyIPv6;
 char            bindAddressV6[MAX_LEN_IP];
 char            bindAddressV4[MAX_LEN_IP];
 
@@ -171,8 +171,8 @@ PaArgument paArgs[] =
   { "-fwdHost",     fwdHost,       "FWD_HOST",     PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "host for forwarding NGSI9 regs"  },
   { "-fwdPort",     &fwdPort,      "FWD_PORT",     PaInt,    PaOpt, 0,              0,      65000, "port for forwarding NGSI9 regs"  },
   { "-ngsi9",       &ngsi9Only,    "CONFMAN",      PaBool,   PaOpt, false,          false,  true,  "run as Configuration Manager"    },
-  { "-ipv4",        &useOnlyIpV4,  "USEIPV4",      PaBool,   PaOpt, false,          false,  true,  "use ip v4 only"                  },
-  { "-ipv6",        &useOnlyIpV6,  "USEIPV6",      PaBool,   PaOpt, false,          false,  true,  "use ip v6 only"                  },
+  { "-ipv4",        &useOnlyIPv4,  "USEIPV4",      PaBool,   PaOpt, false,          false,  true,  "use ip v4 only"                  },
+  { "-ipv6",        &useOnlyIPv6,  "USEIPV6",      PaBool,   PaOpt, false,          false,  true,  "use ip v6 only"                  },
   { "-harakiri",    &harakiri,     "HARAKIRI",     PaBool,   PaHid, false,          false,  true,  "commits harakiri on request"     },
 
 
@@ -633,30 +633,35 @@ int main(int argC, char* argV[])
     strncpy(bindAddressV4, bindAddress, MAX_LEN_IP - 1);
     strncpy(bindAddressV6, LOCAL_IP_V6, MAX_LEN_IP - 1);
   }
-  LM_V(("LocalIpV4 '%s'", bindAddressV4));
-  LM_V(("LocalIpV6 '%s'", bindAddressV6));
+  LM_V(("LocalIPv4 '%s'", bindAddressV4));
+  LM_V(("LocalIPv6 '%s'", bindAddressV6));
 
   RestService* rsP = ngsi9Only? restServiceNgsi9V : restServiceV;
 
-  IpVersion  ipV;
+  IpVersion  ipVersion;
 
-  if (useOnlyIpV4)
+  if (useOnlyIPv6 && useOnlyIPv4)
   {
-    ipV = IPV4;
-    LM_V(("Use IpV4 only"));
+    LM_X(1, ("-ipv4 and -ipv6 can not been activated at the same time, they are incompatible"));
   }
-  else if (useOnlyIpV6)
+
+  if (useOnlyIPv4)
   {
-    ipV = IPV6;
-    LM_V(("Use IpV6 only"));
+    ipVersion = IPV4;
+    LM_V(("Using IPv4 only"));
+  }
+  else if (useOnlyIPv6)
+  {
+    ipVersion = IPV6;
+    LM_V(("Using IPv6 only"));
   }
   else
   {
-    ipV = IPDUAL;
-    LM_V(("Use dual Ip"));
+    ipVersion = IPDUAL;
+    LM_V(("Using dual IP stack"));
   } 
    
-  restInit(bindAddressV4, bindAddressV6, port, rsP, ipV);
+  restInit(bindAddressV4, bindAddressV6, port, rsP, ipVersion);
 
 
   /* Set start time */
@@ -667,7 +672,7 @@ int main(int argC, char* argV[])
   semInit();
 
   int r;
-  if ((r = restStart(ipV)) != 0)
+  if ((r = restStart(ipVersion)) != 0)
   {
     fprintf(stderr, "restStart: error %d\n", r);
     LM_X(1, ("restStart: error %d", r));
