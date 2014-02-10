@@ -351,7 +351,7 @@ function curlJson()
   payload=$2
   extraoptions=$3
   
-  curlIt "JSON" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/json" "Accept: application/json" $extraoptions
+  curlIt "JSON" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/json" "Accept: application/json" "${extraoptions}"
 }
 
 
