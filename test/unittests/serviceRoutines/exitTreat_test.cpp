@@ -62,7 +62,6 @@ TEST(exitTreat, error)
   const char*    outfile1 = "orion.exit.error1.valid.xml";
   const char*    outfile2 = "orion.exit.error2.valid.xml";
   const char*    outfile3 = "orion.exit.error3.valid.xml";
-  const char*    outfile4 = "orion.exit.ok.valid.xml";
   std::string    out;
 
   utInit();
@@ -84,8 +83,7 @@ TEST(exitTreat, error)
 
   harakiri = true;
   out = restService(&ci3, rs);
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_STREQ("DIE", out.c_str());
   harakiri = false;
 
   utExit();
