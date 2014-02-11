@@ -456,8 +456,9 @@ int restStart(IpVersion ipVersion)
       LM_RE(2, ("V4 inet_pton fail for %s", bindIp));
     }
 
+    LM_V(("IPv4 port: %d", port));
     sad.sin_family = AF_INET;
-    sad.sin_port = htons(port);
+    sad.sin_port   = htons(port);
 
     LM_V(("Starting http daemon on IPv4 %s port %d", bindIp, port));
     mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY
