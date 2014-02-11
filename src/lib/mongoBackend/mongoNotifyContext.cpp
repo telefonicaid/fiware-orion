@@ -49,7 +49,7 @@ HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextR
         processContextElement(&requestP->contextElementResponseVector.get(ix)->contextElement, &ucr, "append");
     }
 
-    responseP->responseCode.fill(SccOk, "OK");
+    responseP->responseCode.fill(SccOk);
 
     LM_SR(SccOk);
 }

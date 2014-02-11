@@ -42,7 +42,7 @@
 */
 NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse()
 {
-   responseCode.fill(SccOk, "", "");
+  responseCode.fill(SccOk);
 }
 
 

@@ -45,7 +45,7 @@ accumulatorStart
         <attributeList>
                 <attribute>temperature</attribute>
         </attributeList>
-        <reference>http://localhost:${LISTENER_PORT}/notify</reference>
+        <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
         <duration>PT5S</duration>
 </subscribeContextAvailabilityRequest>
 EOF
@@ -128,10 +128,10 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 3: ++++++++++++++++++++
-POST http://localhost:REGEX(\d+)/notify
+POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 840
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
 Content-Type: application/xml
 

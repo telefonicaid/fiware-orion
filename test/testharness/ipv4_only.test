@@ -28,8 +28,8 @@ source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB 0-255 IPV4
-accumulatorStart
-accumulatorStart IPV6
+accumulatorStart 0.0.0.0 ${LISTENER_PORT}
+accumulatorStart :: ${LISTENER_PORT_AUX}
 
 --SHELL--
 source harnessFunctions.sh
@@ -51,7 +51,7 @@ SUB_OUT=$((curl 127.0.0.1:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
         <attribute>temperature</attribute>
         <attribute>lightstatus</attribute>
   </attributeList>
-  <reference>http://::1:${LISTENER_PORT_V6}/notify</reference>
+  <reference>http://::1:${LISTENER_PORT_AUX}/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
         <notifyCondition>
@@ -94,12 +94,9 @@ echo "3: ++++++++++++++++++++"
 </updateContextRequest>
 EOF
 
-# Get notifications count
-mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
-
 echo "4: ++++++++++++++++++++"
 #Get accumulated data
-curl -g [::1]:${LISTENER_PORT_V6}/number -s -S 
+curl -g [::1]:${LISTENER_PORT_AUX}/number -s -S
 
 echo "5: ++++++++++++++++++++"
 #Get accumulated data
@@ -145,7 +142,6 @@ exit code: 7
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-{ "count" : 1 }
 4: ++++++++++++++++++++
 0
 5: ++++++++++++++++++++
@@ -154,5 +150,5 @@ exit code: 7
 source harnessFunctions.sh
 
 brokerStop CB
-accumulatorStop
-accumulatorStop IPV6
+accumulatorStop ${LISTENER_PORT}
+accumulatorStop ${LISTENER_PORT_AUX}

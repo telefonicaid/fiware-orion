@@ -60,7 +60,7 @@ HttpStatusCode mongoNotifyContextAvailability(NotifyContextAvailabilityRequest* 
     RegisterContextResponse rcres;
     processRegisterContext(&rcr, &rcres, NULL);
 
-    responseP->responseCode.fill(SccOk, "OK");
+    responseP->responseCode.fill(SccOk);
 
     LM_SR(SccOk);
 }

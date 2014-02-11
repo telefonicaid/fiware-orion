@@ -51,54 +51,14 @@
 #include "logMsg/traceLevels.h"
 
 
-/* ****************************************************************************
-*
-* formatedAnswer - 
-*/
-std::string formatedAnswer
-(
-  Format       format,
-  std::string  header,
-  std::string  tag1,
-  std::string  value1,
-  std::string  tag2,
-  std::string  value2
-)
-{
-   std::string answer;
 
-   if (format == XML)
-   {
-      answer  = std::string("<")   + header + ">\n";
-      answer += std::string("  <") + tag1   + ">" + value1 + "</" + tag1 + ">\n";
-      answer += std::string("  <") + tag2   + ">" + value2 + "</" + tag2 + ">\n";
-      answer += std::string("</")  + header + ">\n";
-   }
-   else if (format == JSON)
-   {
-      answer  = std::string("{\n");
-      answer += std::string("  \"") + header + "\":\n";
-      answer += std::string("  {\n");
-      answer += std::string("    \"") + tag1   + "\": \"" + value1 + "\",\n";
-      answer += std::string("    \"") + tag2   + "\": \"" + value2 + "\"\n";
-      answer += std::string("  }\n");
-      answer += std::string("}\n");
-   }
-   else
-      answer = header + ": " + tag1 + "=" + value1 + ", " + tag2 + "=" + value2;
-
-   return answer;
-}
-
-char savedResponse[2 * 1024 * 1024];
 static int replyIx = 0;
 /* ****************************************************************************
 *
 * restReply - 
 */
-int restReply(ConnectionInfo* ciP, std::string answer)
+void restReply(ConnectionInfo* ciP, std::string answer)
 {
-  int            ret;
   MHD_Response*  response;
 
   ++replyIx;
@@ -111,7 +71,7 @@ int restReply(ConnectionInfo* ciP, std::string answer)
     response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_YES, MHD_YES);
 
   if (!response)
-    LM_RE(MHD_NO, ("MHD_create_response_from_buffer FAILED"));
+    LM_RVE(("MHD_create_response_from_buffer FAILED"));
 
   if (ciP->httpHeader.size() != 0)
   {
@@ -127,43 +87,8 @@ int restReply(ConnectionInfo* ciP, std::string answer)
       MHD_add_response_header(response, "Content-Type", "application/json");
   }
 
-  ret = MHD_queue_response(ciP->connection, ciP->httpStatusCode, response);
+  MHD_queue_response(ciP->connection, ciP->httpStatusCode, response);
   MHD_destroy_response(response);
-
-  if (ret != MHD_YES)
-  {
-    if (strlen(answer.c_str()) > sizeof(savedResponse))
-    {
-       std::string errorAnswer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccReceiverInternalError, "response too large", "Maximum size of responses has been set to 2Mb");
-       LM_W(("answer too large: %d bytes (max allowed is %d bytes", strlen(answer.c_str()), sizeof(savedResponse)));
-       savedResponse[0] = 0;
-       restReply(ciP, errorAnswer);
-       return MHD_NO;
-    }
-    else
-    {
-       strcpy(savedResponse, answer.c_str());
-       LM_T(LmtSavedResponse, ("MHD_queue_response failed - saved the answer for later"));
-    }
-    return MHD_YES;
-  }
-
-  return MHD_NO;
-}
-
-
-
-/* ****************************************************************************
-*
-* restReply - 
-*/
-int restReply(ConnectionInfo* ciP, std::string reason, std::string detail)
-{
-  std::string  answer;
-
-  answer = formatedAnswer(ciP->outFormat, "orionError", "reason", reason, "detail", detail);
-
-  return restReply(ciP, answer);
 }
 
 
@@ -224,10 +149,10 @@ static std::string tagGet(std::string request)
 * Where the payload type is matched against the request URL, the incoming 'request' is a
 * request and not a response.
 */
-std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string indent, std::string request, HttpStatusCode code, std::string reasonPhrase, std::string detail)
+std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string indent, std::string request, HttpStatusCode code, std::string details)
 {
    std::string   tag = tagGet(request);
-   StatusCode    errorCode(code, reasonPhrase, detail, "errorCode");
+   StatusCode    errorCode(code, details, "errorCode");
    std::string   reply;
 
    ciP->httpStatusCode = SccOk;
@@ -295,7 +220,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string in
    }
    else if (tag == "StatusCode")
    {
-     StatusCode sc((HttpStatusCode) code, reasonPhrase, detail);
+     StatusCode sc(code, details);
      reply = sc.render(format, indent);
    }
    else

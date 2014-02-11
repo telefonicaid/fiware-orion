@@ -49,7 +49,7 @@ TEST(ContextElementResponseVector, check)
   cer.contextElement.entityId.id         = "ID";
   cer.contextElement.entityId.type       = "Type";
   cer.contextElement.entityId.isPattern  = "false";
-  cer.statusCode.fill(SccOk, "reason", "details");
+  cer.statusCode.fill(SccOk, "details");
 
   cerv.push_back(&cer);
   out = cerv.check(UpdateContext, XML, "", "", 0);
@@ -79,7 +79,7 @@ TEST(ContextElementResponseVector, render)
   cer.contextElement.entityId.id         = "ID";
   cer.contextElement.entityId.type       = "Type";
   cer.contextElement.entityId.isPattern  = "false";
-  cer.statusCode.fill(SccOk, "reason", "details");
+  cer.statusCode.fill(SccOk, "details");
 
   cerv.push_back(&cer);
   out = cerv.render(UpdateContextElement, XML, "");
@@ -107,7 +107,7 @@ TEST(ContextElementResponseVector, present)
   cer.contextElement.entityId.id         = "ID";
   cer.contextElement.entityId.type       = "Type";
   cer.contextElement.entityId.isPattern  = "false";
-  cer.statusCode.fill(SccOk, "reason", "details");
+  cer.statusCode.fill(SccOk, "details");
   cerv.push_back(&cer);
 
   cerv.present("");

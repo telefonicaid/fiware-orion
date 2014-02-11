@@ -196,7 +196,7 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
 
   if (father == NULL)
   {
-    std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", "unknown", SccBadRequest, "Parse Error", "");
+    std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", "unknown", SccBadRequest, "XML Parse Error");
     LM_RE(errorReply, ("Parse Error"));
   }
 
@@ -204,7 +204,6 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
   {
     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", requestType(request),
                                                SccBadRequest,
-                                               "no request treating object found",
                                                std::string("Sorry, no request treating object found for RequestType '") + requestType(request) + "', method '" + ciP->method + "'");
 
     LM_RE(errorReply, ("Sorry, no request treating object found for RequestType %d (%s), method %s", request, requestType(request), ciP->method.c_str()));
@@ -232,7 +231,7 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
 
     if (strncasecmp(payloadWord.c_str(), payloadStart, payloadWord.length()) != 0)
     {
-      errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, "Invalid payload", std::string("Expected '") + payloadWord + "' payload, got '" + payloadStart + "'");
+      errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, std::string("Expected '") + payloadWord + "' payload, got '" + payloadStart + "'");
       LM_RE(errorReply, ("Invalid payload: wanted: '%s', got '%s'", payloadWord.c_str(), payloadStart));
     }
   }

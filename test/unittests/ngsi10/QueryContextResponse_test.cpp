@@ -36,8 +36,8 @@
 */
 TEST(QueryContextResponse, ok_xml)
 {
-  StatusCode*           ecP = new StatusCode(SccOk, "Reason", "Detail");
-  StatusCode            ec(SccOk, "Reason2", "Detail2");
+  StatusCode*           ecP = new StatusCode(SccOk, "Detail");
+  StatusCode            ec(SccOk, "Detail2");
   QueryContextResponse  qcr1;
   QueryContextResponse  qcr2(ec);
   std::string           out;
@@ -94,7 +94,7 @@ TEST(QueryContextResponse, json_render)
   cerP = new ContextElementResponse();
 
   cerP->contextElement.entityId.fill("E01", "EType", "false");
-  cerP->statusCode.fill(SccOk, "OK");
+  cerP->statusCode.fill(SccOk);
   qcrP->contextElementResponseVector.push_back(cerP);
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
@@ -199,7 +199,7 @@ TEST(QueryContextResponse, json_render)
   cerP = new ContextElementResponse();
 
   cerP->contextElement.entityId.fill("E02", "EType", "false");
-  cerP->statusCode.fill(SccOk, "OK");
+  cerP->statusCode.fill(SccOk);
   qcrP->contextElementResponseVector.push_back(cerP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename11)) << "Error getting test data from '" << filename11 << "'";
@@ -209,7 +209,7 @@ TEST(QueryContextResponse, json_render)
 
 
   // 12  QueryContextResponse::errorCode OK and contextElementResponseVector filled id (no details)
-  qcrP->errorCode.fill(SccOk, "OK");
+  qcrP->errorCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename12)) << "Error getting test data from '" << filename12 << "'";
   out = qcrP->render(QueryContext, JSON, "");
@@ -217,7 +217,7 @@ TEST(QueryContextResponse, json_render)
 
 
   // 13  QueryContextResponse::errorCode NOT OK and contextElementResponseVector filled id (with details)
-  qcrP->errorCode.fill(SccBadRequest, "Bad Request", "no details");
+  qcrP->errorCode.fill(SccBadRequest, "no details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename13)) << "Error getting test data from '" << filename13 << "'";
   out = qcrP->render(QueryContext, JSON, "");

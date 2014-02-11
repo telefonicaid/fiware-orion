@@ -50,14 +50,14 @@ extern  IpVersion  ipVersionUsed;
 *
 * restInit - 
 */
-extern void restInit(char* _bind, char* _bindv6, unsigned short _port, RestService* _restServiceV, IpVersion ipV);
+extern void restInit(char* _bind, char* _bindv6, unsigned short _port, RestService* _restServiceV, IpVersion ipVersion);
 
 
 /* ****************************************************************************
 *
 * restStart - 
 */
-extern int restStart(IpVersion ipV);
+extern int restStart(IpVersion ipVersion);
 
 
 #endif

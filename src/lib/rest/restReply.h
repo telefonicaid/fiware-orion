@@ -34,28 +34,16 @@
 
 /* ****************************************************************************
 *
-* formatedAnswer - 
+* restReply - 
 */
-extern std::string formatedAnswer
-(
-  Format       format,
-  std::string  header,
-  std::string  tag1,
-  std::string  value1,
-  std::string  tag2,
-  std::string  value2
-);
+extern void restReply(ConnectionInfo* ciP, std::string answer);
 
 
 
 /* ****************************************************************************
 *
-* restReply - 
+* restErrorReplyGet - 
 */
-extern int restReply(ConnectionInfo* ciP, std::string answer);
-extern int restReply(ConnectionInfo* ciP, MHD_Response* response);
-extern int restReply(ConnectionInfo* ciP, std::string reason, std::string detail);
-
-extern std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string indent, std::string request, HttpStatusCode code, std::string reasonPhrase, std::string detail);
+extern std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string indent, std::string request, HttpStatusCode code, std::string detail);
 
 #endif

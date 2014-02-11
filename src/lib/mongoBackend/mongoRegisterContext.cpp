@@ -65,7 +65,7 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
         OID id = OID(requestP->registrationId.get());
         BSONObj reg = connection->findOne(getRegistrationsCollectionName(), BSON("_id" << id));
         if (reg.isEmpty()) {
-           responseP->errorCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound), std::string("registration id: '") + requestP->registrationId.get() + "'");
+            responseP->errorCode.fill(SccContextElementNotFound, std::string("registration id: '") + requestP->registrationId.get() + "'");
             responseP->registrationId = requestP->registrationId;
             ++noOfRegistrationUpdateErrors;
             LM_SR(SccOk);
@@ -78,19 +78,16 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
         /* This happens when OID format is wrong */
         // FIXME: this checking should be done at parsing stage, without progressing to
         // mongoBackend. By the moment we can live this here, but we should remove in the future
-        responseP->errorCode.fill(SccContextElementNotFound, httpStatusCodeString(SccContextElementNotFound));
+        responseP->errorCode.fill(SccContextElementNotFound);
         responseP->registrationId = requestP->registrationId;
         ++noOfRegistrationUpdateErrors;
         LM_SR(SccOk);
     }
     catch( const DBException &e ) {
-        responseP->errorCode.fill(
-            SccReceiverInternalError,
-           httpStatusCodeString(SccReceiverInternalError),
-            std::string("collection: ") + getRegistrationsCollectionName() +
-               " - findOne() _id: " + requestP->registrationId.get() +
-               " - exception: " + e.what()
-        );
+        responseP->errorCode.fill(SccReceiverInternalError,
+                                  std::string("collection: ") + getRegistrationsCollectionName() +
+                                  " - findOne() _id: " + requestP->registrationId.get() +
+                                  " - exception: " + e.what());
         ++noOfRegistrationUpdateErrors;
         LM_SR(SccOk);
     }

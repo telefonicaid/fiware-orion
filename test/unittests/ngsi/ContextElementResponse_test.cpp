@@ -52,7 +52,7 @@ TEST(ContextElementResponse, check)
    out = cer.check(UpdateContext, XML, "", "", 0);
    EXPECT_STREQ("no code", out.c_str());
 
-   cer.statusCode.fill(SccOk, "reason", "details");
+   cer.statusCode.fill(SccOk, "details");
    out = cer.check(UpdateContext, XML, "", "", 0);
    EXPECT_STREQ("OK", out.c_str());
 
@@ -78,7 +78,7 @@ TEST(ContextElementResponse, render)
    cer.contextElement.entityId.type       = "Type";
    cer.contextElement.entityId.isPattern  = "false";
 
-   cer.statusCode.fill(SccOk, "reason", "details");
+   cer.statusCode.fill(SccOk, "details");
 
    out = cer.render(UpdateContextElement, XML, "");
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
@@ -106,7 +106,7 @@ TEST(ContextElementResponse, present)
    cer.contextElement.entityId.type       = "Type";
    cer.contextElement.entityId.isPattern  = "false";
 
-   cer.statusCode.fill(SccOk, "reason", "details");
+   cer.statusCode.fill(SccOk, "details");
 
    cer.present("", 0);
 

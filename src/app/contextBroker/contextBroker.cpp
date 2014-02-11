@@ -552,6 +552,8 @@ const char* description =
    "  compiled by:        " COMPILED_BY     "\n"
    "  compiled in:        " COMPILED_IN     "\n";
 
+
+
 /* ****************************************************************************
 *
 * main - 
@@ -614,11 +616,11 @@ int main(int argC, char* argV[])
   setNotifier(new Notifier());
 
   if (ngsi9Only)
-      LM_F(("Running in NGSI9 only mode"));
+    LM_F(("Running in NGSI9 only mode"));
 
   /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (only if not ngsi9 mode) */
   if (!ngsi9Only)
-     recoverOntimeIntervalThreads();
+    recoverOntimeIntervalThreads();
 
   memset(bindAddressV4, 0, MAX_LEN_IP);
   memset(bindAddressV6, 0, MAX_LEN_IP);
@@ -661,26 +663,26 @@ int main(int argC, char* argV[])
     LM_V(("Using dual IP stack"));
   } 
    
-  restInit(bindAddressV4, bindAddressV6, port, rsP, ipVersion);
-
-
   /* Set start time */
   startTime      = getCurrentTime();
   statisticsTime = startTime;
 
-  /* Initialize the semaphore used by mongoBackend */
-  semInit();
+  restInit(bindAddressV4, bindAddressV6, port, rsP, ipVersion);
 
   int r;
+  LM_M(("Calling restStart, ipVersion == %d", ipVersion));
   if ((r = restStart(ipVersion)) != 0)
   {
     fprintf(stderr, "restStart: error %d\n", r);
     LM_X(1, ("restStart: error %d", r));
   }
 
+  /* Initialize the semaphore used by mongoBackend */
+  semInit();
+
   // Give the rest library the correct version string of this executable
   versionSet(ORION_VERSION);
 
   while (1)
-     sleep(10);
+    sleep(10);
 }

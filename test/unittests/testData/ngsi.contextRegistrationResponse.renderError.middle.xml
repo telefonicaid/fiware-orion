@@ -3,6 +3,6 @@
   </contextRegistration>
   <errorCode>
     <code>400</code>
-    <reasonPhrase></reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
   </errorCode>
 </contextRegistrationResponse>

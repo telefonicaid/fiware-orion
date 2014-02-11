@@ -3,7 +3,7 @@
   "duration" : "PT1H",
   "errorCode" : {
     "code" : "400",
-    "reasonPhrase" : "Bad request",
+    "reasonPhrase" : "Bad Request",
     "details" : "no details"
   }
 }

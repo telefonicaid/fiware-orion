@@ -50,7 +50,7 @@ TEST(DiscoverContextAvailabilityResponse, render)
   std::string                          out;
   const char*                          outfile1 = "ngsi9.discoverContextAvailabilityResponse.empty.invalid.xml";
   const char*                          outfile2 = "ngsi9.discoverContextAvailabilityResponse.error.valid.xml";
-  StatusCode                           ec(SccBadRequest, "Reason", "Detail");
+  StatusCode                           ec(SccBadRequest, "Detail");
   DiscoverContextAvailabilityResponse  dcar2(ec);
 
   utInit();
@@ -131,7 +131,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
   crrP  = new ContextRegistrationResponse();
 
   crrP->contextRegistration.providingApplication.set("http://tid.test.com/unitTest2");
-  crrP->errorCode.fill(SccBadRequest, "Bad Request", "errorCode inside ContextRegistrationResponse");
+  crrP->errorCode.fill(SccBadRequest, "errorCode inside ContextRegistrationResponse");
   dcarP->responseVector.push_back(crrP);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
@@ -373,7 +373,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
 
   // 18. StatusCode
-  dcarP->errorCode.fill(SccBadRequest, "Bad Request", "DiscoverContextAvailabilityResponse Unit Test 18");
+  dcarP->errorCode.fill(SccBadRequest, "DiscoverContextAvailabilityResponse Unit Test 18");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename18)) << "Error getting test data from '" << filename18 << "'";
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");
@@ -386,7 +386,7 @@ TEST(DiscoverContextAvailabilityResponse, jsonRender)
 
 
   // 19. StatusCode
-  dcarP->errorCode.fill(SccBadRequest, "Bad Request");
+  dcarP->errorCode.fill(SccBadRequest);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename19)) << "Error getting test data from '" << filename19 << "'";
   rendered = dcarP->render(DiscoverContextAvailability, JSON, "");

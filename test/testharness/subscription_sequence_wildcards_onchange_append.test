@@ -41,7 +41,7 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
   </entityIdList>
   <attributeList>
   </attributeList>
-  <reference>http://localhost:${LISTENER_PORT}/notify</reference>
+  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
         <notifyCondition>
@@ -357,10 +357,10 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   </contextResponseList>
 </updateContextResponse>
 7: ++++++++++++++++++++
-POST http://localhost:REGEX(\d+)/notify
+POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 735
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
 Content-Type: application/xml
 
@@ -390,10 +390,10 @@ Content-Type: application/xml
 </notifyContextRequest>
 
 =======================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 735
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
 Content-Type: application/xml
 
@@ -423,10 +423,10 @@ Content-Type: application/xml
 </notifyContextRequest>
 
 =======================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 736
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
 Content-Type: application/xml
 
@@ -456,10 +456,10 @@ Content-Type: application/xml
 </notifyContextRequest>
 
 =======================================
-POST http://localhost:REGEX(\d+)/notify
+POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 908
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: localhost:REGEX(\d+)
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
 Content-Type: application/xml
 
