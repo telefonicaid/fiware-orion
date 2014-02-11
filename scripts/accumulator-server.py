@@ -44,6 +44,7 @@ app = Flask(__name__)
 
 # Default arguments
 port = 1028
+host='0.0.0.0'
 server_url = '/accumulate'
 verbose = 0
 
@@ -56,6 +57,14 @@ if len(argv) > 3:
     if argv[3] == 'on':
         print 'verbose mode is on'
         verbose = 1
+    else:
+        host = argv[3]
+
+if len(argv) > 4:
+    if argv[4] == 'on':
+        print 'verbose mode is on'
+        verbose = 1
+
 
 @app.route(server_url, methods=['GET', 'POST', 'PUT', 'DELETE'])
 def record():
@@ -140,4 +149,4 @@ t0 = ''
 times = []
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host=host, port=port, debug=True)

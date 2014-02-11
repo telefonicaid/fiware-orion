@@ -46,16 +46,16 @@
 class ConnectionInfo
 {
 public:
-  ConnectionInfo(std::string _url, std::string _method, std::string _version) : url(_url), method(_method), version(_version)
+  ConnectionInfo(std::string _url, std::string _method, std::string _version, MHD_Connection* _connection = NULL) : url(_url), method(_method), version(_version)
   {
-    connection            = NULL;
+    connection            = _connection;
     payload               = NULL;
     payloadSize           = 0;
     inFormat              = XML;
     outFormat             = XML;
     httpStatusCode        = SccOk;
     fractioned            = false;
-    callNo                = 0;
+    callNo                = 1;
     requestEntityTooLarge = false;
 
     memset(payloadWord, 0, sizeof(payloadWord));
@@ -64,7 +64,7 @@ public:
     else if (_method == "PUT")     verb = PUT;
     else if (_method == "GET")     verb = GET;
     else if (_method == "DELETE")  verb = DELETE;
-    else                           verb = GET;
+    else                           verb = NOVERB;
   }
 
   MHD_Connection*           connection;

@@ -33,6 +33,7 @@
 #include "common/string.h"
 #include "common/statistics.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/OrionError.h"
 #include "rest/RestService.h"
 #include "rest/restReply.h"
 #include "rest/rest.h"
@@ -91,8 +92,9 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
   if ((ciP->url.length() == 0) || ((ciP->url.length() == 1) && (ciP->url.c_str()[0] == '/')))
   {
-    ciP->httpStatusCode = SccBadRequest;
-    restReply(ciP, "Not a web page", "The Orion Context Broker is a REST service, not a 'web page'");
+    OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
+    std::string response = error.render(ciP->outFormat, "");
+    restReply(ciP, response);
     return std::string("Empty URL");
   }
 

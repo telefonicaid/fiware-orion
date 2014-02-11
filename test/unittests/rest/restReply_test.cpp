@@ -38,35 +38,6 @@
 
 /* ****************************************************************************
 *
-* formatedAnswer - 
-*/
-TEST(restReply, formatedAnswer)
-{
-  const char*     outfile1 = "ngsi.restReply.statusCode.valid.xml";
-  const char*     outfile2 = "ngsi.restReply.statusCode.valid.json";
-  std::string     expected3 = "statusCode: code=200, reasonPhrase=OK";
-  std::string     out;
-
-  utInit();
-
-  out = formatedAnswer(XML, "statusCode", "code", "200", "reasonPhrase", "OK");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = formatedAnswer(JSON, "statusCode", "code", "200", "reasonPhrase", "OK");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  out = formatedAnswer(NOFORMAT, "statusCode", "code", "200", "reasonPhrase", "OK");
-  EXPECT_EQ(expected3, out);
-
-  utExit();
-}
-
-
-
-/* ****************************************************************************
-*
 * MHD_create_response_from_data_error - 
 *
 * Too large response string 
@@ -74,7 +45,6 @@ TEST(restReply, formatedAnswer)
 #define TEST_SIZE (4 * 1024 * 1024)
 TEST(restReply, MHD_create_response_from_data_error)
 {
-  int             out;
   ConnectionInfo  ci("/ngsi/XXX", "GET", "1.1");
   char*           answer = (char*) malloc(TEST_SIZE);
 
@@ -85,9 +55,7 @@ TEST(restReply, MHD_create_response_from_data_error)
     memset(answer, 'x', TEST_SIZE - 1);
     answer[TEST_SIZE - 1] = 0;
 
-    out = restReply(&ci, answer);
-    EXPECT_EQ(MHD_NO, out);
-
+    restReply(&ci, answer);
     free(answer);
   }
 
@@ -103,13 +71,11 @@ TEST(restReply, MHD_create_response_from_data_error)
 TEST(restReply, json)
 {
   ConnectionInfo  ci("/ngsi/XXX", "GET", "1.1");
-  int             out;
 
   utInit();
 
   ci.outFormat = JSON;
-  out = restReply(&ci, "123");
-  EXPECT_EQ(MHD_YES, out);
+  restReply(&ci, "123");
 
   utExit();
 }

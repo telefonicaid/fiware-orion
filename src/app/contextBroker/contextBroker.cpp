@@ -121,13 +121,15 @@
 #include "serviceRoutines/badRequest.h"
 #include "contextBroker/version.h"
 
+#include "common/string.h"
+
 
 /* ****************************************************************************
 *
 * Option variables
 */
 bool            fg;
-char            localIp[15];
+char            bindAddress[MAX_LEN_IP];
 int             port;
 char            dbHost[64];
 char            dbName[64];
@@ -138,6 +140,14 @@ char            fwdHost[64];
 int             fwdPort;
 bool            ngsi9Only;
 bool            harakiri;
+bool            useOnlyIPv4;
+bool            useOnlyIPv6;
+char            bindAddressV6[MAX_LEN_IP];
+char            bindAddressV4[MAX_LEN_IP];
+
+#define  LOCAL_IP_V6  "::"
+#define  LOCAL_IP_V4  "0.0.0.0"
+
 
 
 
@@ -149,7 +159,7 @@ bool            harakiri;
 PaArgument paArgs[] =
 {
   { "-fg",          &fg,           "FOREGROUND",   PaBool,   PaOpt, false,          false,  true,  "don't start as daemon"           },
-  { "-localIp",     localIp,       "LOCALIP",      PaString, PaOpt, _i "0.0.0.0",   PaNL,   PaNL,  "IP to receive new connections"   },
+  { "-localIp",     bindAddress,   "LOCALIP",      PaString, PaOpt, _i "0.0.0.0",   PaNL,   PaNL,  "IP to receive new connections"   },
   { "-port",        &port,         "PORT",         PaInt,    PaOpt, 1026,           PaNL,   PaNL,  "port to receive new connections" },
   { "-pidpath",      pidPath,      "PID_PATH",     PaString, PaOpt, PIDPATH,        PaNL,   PaNL,  "pid file path"                   },
 
@@ -161,7 +171,10 @@ PaArgument paArgs[] =
   { "-fwdHost",     fwdHost,       "FWD_HOST",     PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "host for forwarding NGSI9 regs"  },
   { "-fwdPort",     &fwdPort,      "FWD_PORT",     PaInt,    PaOpt, 0,              0,      65000, "port for forwarding NGSI9 regs"  },
   { "-ngsi9",       &ngsi9Only,    "CONFMAN",      PaBool,   PaOpt, false,          false,  true,  "run as Configuration Manager"    },
+  { "-ipv4",        &useOnlyIPv4,  "USEIPV4",      PaBool,   PaOpt, false,          false,  true,  "use ip v4 only"                  },
+  { "-ipv6",        &useOnlyIPv6,  "USEIPV6",      PaBool,   PaOpt, false,          false,  true,  "use ip v6 only"                  },
   { "-harakiri",    &harakiri,     "HARAKIRI",     PaBool,   PaHid, false,          false,  true,  "commits harakiri on request"     },
+
 
   PA_END_OF_ARGS
 };
@@ -596,11 +609,49 @@ int main(int argC, char* argV[])
   if (!ngsi9Only)
      recoverOntimeIntervalThreads();
 
-  LM_F(("Listening on port %d", port));
-  if (ngsi9Only)
-    restInit(localIp, port, restServiceNgsi9V);
+  memset(bindAddressV4, 0, MAX_LEN_IP);
+  memset(bindAddressV6, 0, MAX_LEN_IP);
+
+  if (isIPv6(std::string(bindAddress)))
+  { 
+    strncpy(bindAddressV4, LOCAL_IP_V4, MAX_LEN_IP - 1);
+    strncpy(bindAddressV6, bindAddress, MAX_LEN_IP - 1);
+  }
   else
-    restInit(localIp, port, restServiceV);
+  {
+    strncpy(bindAddressV4, bindAddress, MAX_LEN_IP - 1);
+    strncpy(bindAddressV6, LOCAL_IP_V6, MAX_LEN_IP - 1);
+  }
+  LM_V(("LocalIPv4 '%s'", bindAddressV4));
+  LM_V(("LocalIPv6 '%s'", bindAddressV6));
+
+  RestService* rsP = ngsi9Only? restServiceNgsi9V : restServiceV;
+
+  IpVersion  ipVersion;
+
+  if (useOnlyIPv6 && useOnlyIPv4)
+  {
+    LM_X(1, ("-ipv4 and -ipv6 can not been activated at the same time, they are incompatible"));
+  }
+
+  if (useOnlyIPv4)
+  {
+    ipVersion = IPV4;
+    LM_V(("Using IPv4 only"));
+  }
+  else if (useOnlyIPv6)
+  {
+    ipVersion = IPV6;
+    LM_V(("Using IPv6 only"));
+  }
+  else
+  {
+    ipVersion = IPDUAL;
+    LM_V(("Using dual IP stack"));
+  } 
+   
+  restInit(bindAddressV4, bindAddressV6, port, rsP, ipVersion);
+
 
   /* Set start time */
   startTime      = getCurrentTime();
@@ -610,7 +661,7 @@ int main(int argC, char* argV[])
   semInit();
 
   int r;
-  if ((r = restStart()) != 0)
+  if ((r = restStart(ipVersion)) != 0)
   {
     fprintf(stderr, "restStart: error %d\n", r);
     LM_X(1, ("restStart: error %d", r));

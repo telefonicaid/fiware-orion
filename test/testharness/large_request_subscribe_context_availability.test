@@ -47,7 +47,7 @@ rm $BIGFILE
   <errorCode>
     <code>413</code>
     <reasonPhrase>Request Entity Too Large</reasonPhrase>
-    <details>payload size: 1500000</details>
+    <details>payload size: 1500000, max size supported: 1048576</details>
   </errorCode>
 </subscribeContextAvailabilityResponse>
 --TEARDOWN--

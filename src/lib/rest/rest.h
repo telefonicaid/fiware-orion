@@ -30,20 +30,34 @@
 
 #include "rest/RestService.h"
 
+#define  MAX_LEN_IP   64
 
+/* ****************************************************************************
+*
+*  IpVersion -
+*/
+typedef enum IpVersion 
+{
+  IPV4     = 1,
+  IPV6     = 2,
+  IPDUAL   = 3
+} IpVersion;
+
+
+extern  IpVersion  ipVersionUsed;  
 
 /* ****************************************************************************
 *
 * restInit - 
 */
-extern void restInit(char* bindIp, unsigned short port, RestService* restServiceV);
-
+extern void restInit(char* _bind, char* _bindv6, unsigned short _port, RestService* _restServiceV, IpVersion ipVersion);
 
 
 /* ****************************************************************************
 *
 * restStart - 
 */
-extern int restStart(void);
+extern int restStart(IpVersion ipVersion);
+
 
 #endif

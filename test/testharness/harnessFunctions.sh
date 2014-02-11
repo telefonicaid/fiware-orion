@@ -69,12 +69,21 @@ function localBrokerStart()
 {
   role=$1
   traceLevels=$2
+  ipVersion=$3
+  IPvOption=""
 
+  if [ "$ipVersion" == "IPV4" ]
+  then
+    IPvOption="-ipv4" 
+  elif [ "$ipVersion" == "IPV6" ]
+  then
+    IPvOption="-ipv6"
+  fi
 
   if [ "$role" == "CB" ]
   then
     port=$BROKER_PORT
-    CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME}     -t $traceLevels"
+    CB_START_CMD="contextBroker -vvvvv -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME}     -t $traceLevels $IPvOption"
   elif [ "$role" == "CM" ]
   then
     mkdir -p /tmp/configManager
@@ -147,6 +156,7 @@ function brokerStart()
 {
   role=$1
   traceLevels=$2
+  ipVersion=$3
 
   if [ "$role" == "" ]
   then
@@ -160,7 +170,7 @@ function brokerStart()
   fi
 
   localBrokerStop $role
-  localBrokerStart $role $traceLevels
+  localBrokerStart $role $traceLevels $ipVersion
 }
 
 
@@ -201,23 +211,33 @@ function brokerStop
 #
 function accumulatorStop()
 {
-  kill $(curl localhost:${LISTENER_PORT}/pid -s -S)
+
+  port=$1
+
+  # If port is missing, we use the default LISTERNER_PORT
+  if [ -z "$port" ]
+  then
+    port=${LISTENER_PORT}
+  fi
+
+  kill $(curl localhost:$port/pid -s -S)
+
   sleep 1
 
-  running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
+  running_app=$(ps -fe | grep accumulator-server | grep $port | wc -l)
 
   if [ $running_app -ne 0 ]
   then
-    kill $(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | awk '{print $2}')
+    kill $(ps -fe | grep accumulator-server | grep $port | awk '{print $2}')
     # Wait some time so the accumulator can finish properly
     sleep 1
-    running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
+    running_app=$(ps -fe | grep accumulator-server | grep $port | wc -l)
     if [ $running_app -ne 0 ]
     then
       # If the accumulator refuses to stop politely, kill the process by brute force
-      kill -9 $(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | awk '{print $2}')
+      kill -9 $(ps -fe | grep accumulator-server | grep $port | awk '{print $2}')
       sleep 1
-      running_app=$(ps -fe | grep accumulator-server | grep ${LISTENER_PORT} | wc -l)
+      running_app=$(ps -fe | grep accumulator-server | grep $port | wc -l)
 
       if [ $running_app -ne 0 ]
       then
@@ -229,16 +249,25 @@ function accumulatorStop()
 }
 
 
-
 # ------------------------------------------------------------------------------
 #
 # accumulatorStart - 
 #
 function accumulatorStart()
 {
-  accumulatorStop
 
-  accumulator-server.py ${LISTENER_PORT} /notify &
+  bindIp=$1
+  port=$2
+
+  # If port is missing, we use the default LISTERNER_PORT
+  if [ -z "$port" ]
+  then
+    port=${LISTENER_PORT}
+  fi
+
+  accumulatorStop $port
+
+  accumulator-server.py $port /notify $bindIp &
   echo accumulator running as PID $$
 
   # Wait until accumulator has started or we have waited a given maximum time
@@ -256,7 +285,7 @@ function accumulatorStart()
    sleep 1
 
    time=$time+1
-   nc -z localhost ${LISTENER_PORT} 
+   nc -z localhost $port
    port_not_ok=$?
   done
 }
