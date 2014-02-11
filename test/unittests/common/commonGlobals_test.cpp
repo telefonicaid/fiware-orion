@@ -22,11 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
+
+#include "unittest.h"
+
 
 
 /* ****************************************************************************
@@ -182,4 +184,24 @@ TEST(commonGlobals, toSeconds)
   // error
   secs = toSeconds(3, 'f', false);
   EXPECT_EQ(-1, secs);
+}
+
+
+/* ****************************************************************************
+*
+* getCurrentTime - 
+*/
+TEST(commonGlobals, getCurrentTime)
+{
+  int now;
+
+  // 1. No timer
+  setTimer(NULL);
+  now = getCurrentTime();
+  EXPECT_EQ(-1, now);
+
+  utInit();  // timer is set up inside utInit
+  now = getCurrentTime();
+  EXPECT_TRUE(now != -1);
+  utExit();
 }

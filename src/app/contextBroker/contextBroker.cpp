@@ -525,6 +525,16 @@ void sigHandler(int sigNo)
 
 /* ****************************************************************************
 *
+* orionExit - 
+*/
+void orionExit(int code, std::string reason)
+{
+  LM_E((reason.c_str()));
+  exit(code);
+}
+
+/* ****************************************************************************
+*
 * exitFunc - 
 */
 void exitFunc(void)
@@ -556,6 +566,7 @@ int main(int argC, char* argV[])
   signal(SIGUSR2, sigHandler);
 
   atexit(exitFunc);
+  orionInit(orionExit);
 
   paConfig("man synopsis",         (void*) "[options]");
   paConfig("man shortdescription", (void*) "Options:");

@@ -56,18 +56,18 @@
 *
 * Globals
 */
-
 static unsigned short            port          = 0;
 static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
-static RestService*              restServiceV  = NULL;
-static MHD_Daemon*               mhdDaemon     = NULL;
-static struct sockaddr_in        sad;
 static char                      bindIPv6[MAX_LEN_IP]  = "::";
-static MHD_Daemon*               mhdDaemon_v6  = NULL;
+static RestService*              restServiceV          = NULL;
+static MHD_Daemon*               mhdDaemon             = NULL;
+static MHD_Daemon*               mhdDaemon_v6          = NULL;
+IpVersion                        ipVersionUsed         = IPDUAL;
+static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
 __thread char                    static_buffer[STATIC_BUFFER_SIZE];
 
-IpVersion ipVersionUsed = IPDUAL;
+
 
 /* ****************************************************************************
 *
