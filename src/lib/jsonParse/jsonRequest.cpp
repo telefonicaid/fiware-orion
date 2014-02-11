@@ -80,14 +80,20 @@ static JsonRequest jsonRequest[] =
   { UnsubscribeContext,                    "POST", "unsubscribeContextRequest",                     jsonUncrParseVector, jsonUncrInit, jsonUncrCheck,  jsonUncrPresent, jsonUncrRelease },
   { UpdateContextSubscription,             "POST", "updateContextSubscriptionRequest",              jsonUcsrParseVector, jsonUcsrInit, jsonUcsrCheck,  jsonUcsrPresent, jsonUcsrRelease },
 
-  // Convenience NGSI9
+  // Convenience
+  { ContextEntityAttributes,               "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
+  { ContextEntityAttributes,               "*",    "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
+  { ContextEntityTypeAttributeContainer,   "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
+  { ContextEntityTypeAttributeContainer,   "*",    "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
   { ContextEntitiesByEntityId,             "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
+  { ContextEntitiesByEntityId,             "*",    "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
   { EntityByIdAttributeByName,             "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
+  { EntityByIdAttributeByName,             "*",    "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
   { ContextEntityTypes,                    "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
+  { ContextEntityTypes,                    "*",    "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
   { ContextEntityTypeAttribute,            "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
+  { ContextEntityTypeAttribute,            "*",    "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
   { Ngsi9SubscriptionsConvOp,              "PUT",  "updateContextAvailabilitySubscriptionRequest",  jsonUcasParseVector, jsonUcasInit, jsonUcasCheck,  jsonUcasPresent, jsonUcasRelease },
-
-  // Convenience NGSI10
   { IndividualContextEntity,               "PUT",  "updateContextElementRequest",                   jsonUcerParseVector, jsonUcerInit, jsonUcerCheck,  jsonUcerPresent, jsonUcerRelease },
   { IndividualContextEntity,               "POST", "appendContextElementRequest",                   jsonAcerParseVector, jsonAcerInit, jsonAcerCheck,  jsonAcerPresent, jsonAcerRelease },
   { IndividualContextEntityAttribute,      "POST", "updateContextAttributeRequest",                 jsonUpcarParseVector,jsonUpcarInit,jsonUpcarCheck, jsonUpcarPresent,jsonUpcarRelease},
