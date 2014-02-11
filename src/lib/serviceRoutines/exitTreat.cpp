@@ -75,8 +75,7 @@ std::string exitTreat(ConnectionInfo* ciP, int components, std::vector<std::stri
    {
       mongoDisconnect();
       compV.clear();
-      OrionError orionError(SccOk, "Exiting");
-      return orionError.render(ciP->outFormat, "");;
+      return "DIE";
    }
 
    return out;
