@@ -335,7 +335,7 @@ function curlIt()
   accept=$5
   extraoptions=$6
   
-  params="-s -S --dump-header headers.out --header \"Expect:\""
+  params="-s -S --dump-header headers.out"
   
   response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" --header "Expect:" ${extraoptions} -d @- ))
   
