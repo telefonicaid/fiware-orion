@@ -22,7 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-
 #include <time.h>
 
 #include "logMsg/logMsg.h"
@@ -121,28 +120,33 @@ int getCurrentTime(void)
 */
 long long toSeconds(int value, char what, bool dayPart)
 {
+  long long result = -1;
+
   if (dayPart == true)
   {
     if (what == 'Y')
-      return 365L * 24 * 3600 * value;
+      result = 365L * 24 * 3600 * value;
     else if (what == 'M')
-      return 30 * 24 * 3600 * value;
+      result = 30 * 24 * 3600 * value;
     else if (what == 'W')
-      return 7 * 24 * 3600 * value;
+      result = 7 * 24 * 3600 * value;
     else if (what == 'D')
-      return 24 * 3600 * value;
+      result = 24 * 3600 * value;
   }
   else
   {
     if (what == 'H')
-      return 3600 * value;
+      result = 3600 * value;
     else if (what == 'M')
-      return 60 * value;
+      result = 60 * value;
     else if (what == 'S')
-      return value;
+      result = value;
   }
 
-  LM_RE(-1, ("ERROR in duration string!"));
+  if (result == -1)
+    LM_E(("ERROR in duration string!"));
+
+  return result;
 }
 
 /*****************************************************************************
@@ -211,6 +215,7 @@ long long parse8601(std::string s)
       }
     }
 
-    free(toFree);
+free(toFree);
+
     return accumulated;
 }
