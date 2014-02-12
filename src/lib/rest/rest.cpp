@@ -44,6 +44,15 @@
 
 /* ****************************************************************************
 *
+* IP - 
+*/
+#define  LOCAL_IP_V6  "::"
+#define  LOCAL_IP_V4  "0.0.0.0"
+
+
+
+/* ****************************************************************************
+*
 * PAYLOAD_SIZE - 
 */
 #define PAYLOAD_SIZE       (64 * 1024 * 1024)
@@ -62,9 +71,10 @@ static char                      bindIPv6[MAX_LEN_IP]  = "::";
 static RestService*              restServiceV          = NULL;
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
-IpVersion                        ipVersionUsed         = IPDUAL;
 static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
+
+IpVersion                        ipVersionUsed         = IPDUAL;
 __thread char                    static_buffer[STATIC_BUFFER_SIZE];
 
 
@@ -413,35 +423,12 @@ static int connectionTreat
 }
 
 
-/* ****************************************************************************
-*
-* restInit - 
-*/
-void restInit(char* _bind, char* _bindv6, unsigned short _port, RestService* _restServiceV, IpVersion ipVersion)
-{
-   ipVersionUsed = ipVersion;
-   if ((ipVersion == IPV4) || (ipVersion == IPDUAL))
-   {
-     memset(bindIp, 0, MAX_LEN_IP);
-     strncpy(bindIp, _bind, MAX_LEN_IP - 1);
-   }
-
-   if ((ipVersion == IPV6) || (ipVersion == IPDUAL))
-   {
-     memset(bindIPv6, 0, MAX_LEN_IP);
-     strncpy(bindIPv6, _bindv6, MAX_LEN_IP - 1);
-   }
-
-   port          = _port;
-   restServiceV  = _restServiceV;
-}
-
 
 /* ****************************************************************************
 *
 * restStart - 
 */
-int restStart(IpVersion ipVersion)
+static int restStart(IpVersion ipVersion)
 {
   int ret;
 
@@ -515,3 +502,39 @@ int restStart(IpVersion ipVersion)
   return 0;
 }
 
+
+
+/* ****************************************************************************
+*
+* restInit - 
+*/
+void restInit(RestService* _restServiceV, IpVersion _ipVersion, const char* _bindAddress, unsigned short _port)
+{
+  port          = _port;
+  restServiceV  = _restServiceV;
+  ipVersionUsed = _ipVersion;
+
+  strncpy(bindIp, LOCAL_IP_V4, MAX_LEN_IP - 1);
+  strncpy(bindIPv6, LOCAL_IP_V6, MAX_LEN_IP - 1);
+
+  if (isIPv6(std::string(_bindAddress)))
+    strncpy(bindIPv6, _bindAddress, MAX_LEN_IP - 1);
+  else
+    strncpy(bindIp, _bindAddress, MAX_LEN_IP - 1);
+
+  if ((_ipVersion == IPV4) || (_ipVersion == IPDUAL))
+     strncpy(bindIp, bindIp, MAX_LEN_IP - 1);
+
+  if ((_ipVersion == IPV6) || (_ipVersion == IPDUAL))
+     strncpy(bindIPv6, bindIPv6, MAX_LEN_IP - 1);
+
+
+  // Starting REST intrerface
+  LM_M(("Calling restStart, ipVersion == %d", _ipVersion));
+  int r;
+  if ((r = restStart(_ipVersion)) != 0)
+  {
+    fprintf(stderr, "restStart: error %d\n", r);
+    LM_X(1, ("restStart: error %d", r));
+  }
+}

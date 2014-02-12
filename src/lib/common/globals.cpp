@@ -29,6 +29,10 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/sem.h"
+#include "serviceRoutines/versionTreat.h"     // For orionInit()
+#include "mongoBackend/MongoGlobal.h"         // For orionInit()
+#include "ngsiNotify/onTimeIntervalThread.h"  // For orionInit()
 
 /* ****************************************************************************
 *
@@ -45,9 +49,32 @@ OrionExitFunction orionExitFunction = NULL;
 *
 * orionInit - 
 */
-void orionInit(OrionExitFunction exitFunction)
+void orionInit(OrionExitFunction exitFunction, const char* version, bool ngsi9Only)
 {
+  // Give the rest library the correct version string of this executable
+  versionSet(version);
+
+  // The function to call on fatal error
   orionExitFunction = exitFunction;
+
+  /* Initialize the semaphore used by mongoBackend */
+  semInit();
+
+  /* Set timer object (singleton) */
+  setTimer(new Timer());
+
+  /* Set notifier object (singleton) */
+  setNotifier(new Notifier());
+
+  /* Set start time */
+  startTime      = getCurrentTime();
+  statisticsTime = startTime;
+
+  /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
+  if (!ngsi9Only)
+    recoverOntimeIntervalThreads();
+  else
+    LM_F(("Running in NGSI9 only mode"));
 }
 
 

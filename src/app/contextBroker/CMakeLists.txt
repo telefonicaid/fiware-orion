@@ -27,6 +27,7 @@ SET (HEADERS
 
 
 SET (STATIC_LIBS
+    common
     mongoBackend
     ngsiNotify
     serviceRoutines
