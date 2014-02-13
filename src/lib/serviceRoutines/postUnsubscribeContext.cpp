@@ -42,7 +42,7 @@ std::string postUnsubscribeContext(ConnectionInfo* ciP, int components, std::vec
   UnsubscribeContextResponse  uncr;
   std::string                 answer;
 
-  mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr);
+  ciP->httpStatusCode = mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr);
   answer = uncr.render(UnsubscribeContext, ciP->outFormat, "");
 
   return answer;
