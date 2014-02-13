@@ -1,13 +1,13 @@
-o XSD:  Removed subscriptionId from SubscribeContextAvailability
-o XSD:  Fixed XML tags for rendering scope ('scopeType'/'scopeValue' instead of 'type'/'value') 
-o XSD:  Changed a few subscriptionId "0" for "000000000000000000000000"
-o XSD:  Removed some XML tags with spaces ('verbose level' => 'verboseLevel')
-o XSD:  stripped 'reference' of whitespace
-o XSD:  added an empty contextAttributeList for ContextAttributeResponseVector inside
-        IndividualContextEntityAttributes (/ngsi10/contextEntities/{EID}/attributes) as the XSD demands it
-o XSD:  Fixed a possible future error for JSON rendering of UpdateContextAvailabilitySubscriptionRequest
-o IPv6 support (new -ipv6 command line option)
-o REST: The reasonPhrase in statusCode/errorCode and OrionError is now 100% tied to the 'code'
-o Render: OrionError now also with 'reasonPhrase' following 'code'
-o JSON support for all the convenience operations implemented
-o JSON parser: fix crashes with concurrent requests
+o XSD:     Removed subscriptionId from SubscribeContextAvailability
+o XSD:     Fixed XML tags for rendering scope ('scopeType'/'scopeValue' instead of 'type'/'value') 
+o XSD:     Changed a few subscriptionId "0" for "000000000000000000000000"
+o XSD:     Removed some XML tags with spaces ('verbose level' => 'verboseLevel')
+o XSD:     Stripped 'reference' of whitespace
+o XSD:     Added an empty contextAttributeList for ContextAttributeResponseVector inside
+             IndividualContextEntityAttributes (/ngsi10/contextEntities/{EID}/attributes) as the XSD demands it
+o XSD:     Fixed a possible future error for JSON rendering of UpdateContextAvailabilitySubscriptionRequest
+o Feature: IPv6 support (new -ipv6 command line option)
+o REST:    The reasonPhrase in statusCode/errorCode and OrionError is now 100% tied to the 'code'
+o Render:  OrionError now also with 'reasonPhrase' following 'code'
+o JSON:    for all the convenience operations implemented
+o JSON:    fix crashes with concurrent requests in JSON parser layer

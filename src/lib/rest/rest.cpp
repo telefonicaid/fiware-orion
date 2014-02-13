@@ -56,18 +56,18 @@
 *
 * Globals
 */
-
 static unsigned short            port          = 0;
 static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
-static RestService*              restServiceV  = NULL;
-static MHD_Daemon*               mhdDaemon     = NULL;
-static struct sockaddr_in        sad;
 static char                      bindIPv6[MAX_LEN_IP]  = "::";
-static MHD_Daemon*               mhdDaemon_v6  = NULL;
+static RestService*              restServiceV          = NULL;
+static MHD_Daemon*               mhdDaemon             = NULL;
+static MHD_Daemon*               mhdDaemon_v6          = NULL;
+IpVersion                        ipVersionUsed         = IPDUAL;
+static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
 __thread char                    static_buffer[STATIC_BUFFER_SIZE];
 
-IpVersion ipVersionUsed = IPDUAL;
+
 
 /* ****************************************************************************
 *
@@ -456,8 +456,9 @@ int restStart(IpVersion ipVersion)
       LM_RE(2, ("V4 inet_pton fail for %s", bindIp));
     }
 
+    LM_V(("IPv4 port: %d", port));
     sad.sin_family = AF_INET;
-    sad.sin_port = htons(port);
+    sad.sin_port   = htons(port);
 
     LM_V(("Starting http daemon on IPv4 %s port %d", bindIp, port));
     mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY
