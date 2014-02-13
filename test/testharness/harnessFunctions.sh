@@ -335,7 +335,7 @@ function curlIt()
   accept=$5
   extraoptions=$6
   
-  params="-s -S --dump-header headers.out --header \"Expect:\""
+  params="-s -S --dump-header headers.out"
   
   response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" --header "Expect:" ${extraoptions} -d @- ))
   
@@ -380,7 +380,7 @@ function curlJson()
   payload=$2
   extraoptions=$3
   
-  curlIt "JSON" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/json" "Accept: application/json" $extraoptions
+  curlIt "JSON" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/json" "Accept: application/json" "${extraoptions}"
 }
 
 
@@ -439,7 +439,7 @@ function curlJsonNoPayload()
   url=$1
   extraoptions=$2
   
-  curlNoPayload "JSON" $url $extraoptions "Content-Type: application/json" "Accept: application/json"
+  curlNoPayload "JSON" $url "${extraoptions}" "Content-Type: application/json" "Accept: application/json"
 }
 
 

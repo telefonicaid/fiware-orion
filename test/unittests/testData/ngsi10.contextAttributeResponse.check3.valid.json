@@ -1,0 +1,14 @@
+{
+  "attributes" : [
+    {
+      "name" : "caName",
+      "type" : "caType",
+      "contextValue" : "caValue"
+    }
+  ],
+  "statusCode" : {
+    "code" : "400",
+    "reasonPhrase" : "PRE Error",
+    "details" : "OK"
+  }
+}
