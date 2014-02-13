@@ -76,6 +76,9 @@ void exitFunction(int code, std::string reason)
 }
 
 
+const char* orionUnitTestVersion = "0.0.1-unittest";
+
+
 
 /* ****************************************************************************
 *
@@ -102,7 +105,7 @@ int main(int argC, char** argV)
     paParse(paArgs, 1, argV, 1, false);
 
   LM_M(("Init tests"));
-  orionInit(exitFunction, "0.9.1-next", true);
+  orionInit(exitFunction, orionUnitTestVersion, true);
   setupDatabase();
 
   LM_M(("Run all tests"));

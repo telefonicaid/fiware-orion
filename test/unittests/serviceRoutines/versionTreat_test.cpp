@@ -77,6 +77,10 @@ TEST(versionTreat, ok)
   EXPECT_TRUE(strstr(out.c_str(), "</compiled_in>") != NULL);
   EXPECT_TRUE(strstr(out.c_str(), "</orion>") != NULL);
 
+  extern const char*  orionUnitTestVersion;
+  std::string         expected = std::string("<version>") + orionUnitTestVersion + "</version>";
+  EXPECT_TRUE(strstr(out.c_str(), expected.c_str()) != NULL);
+
   versionSet("1.2.3");
   out       = restService(&ci, rs);
   EXPECT_TRUE(strstr(out.c_str(), "<version>1.2.3</version>") != NULL);
