@@ -55,6 +55,7 @@ TEST(leakTreat, error)
   const char*    outfile1 = "orion.leak.passwordRequested.valid.xml";
   const char*    outfile2 = "orion.leak.passwordErroneous.valid.xml";
   const char*    outfile3 = "orion.leak.noSuchService.valid.xml";
+  const char*    outfile4 = "orion.leak.ok.valid.xml";
   std::string    out;
 
   utInit();
@@ -73,6 +74,13 @@ TEST(leakTreat, error)
   out       = restService(&ci3, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  harakiri = true;
+  out       = restService(&ci3, rs);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  harakiri = false;
 
   utExit();
 }

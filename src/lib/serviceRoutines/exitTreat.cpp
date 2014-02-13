@@ -73,9 +73,6 @@ std::string exitTreat(ConnectionInfo* ciP, int components, std::vector<std::stri
    }
    else
    {
-      // Cleanup for valgrind
-      free(ciP->payload);
-      delete ciP;
       mongoDisconnect();
       compV.clear();
       return "DIE";

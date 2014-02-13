@@ -77,10 +77,14 @@ TEST(exitTreat, error)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   harakiri = false;
-
   out = restService(&ci3, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  harakiri = true;
+  out = restService(&ci3, rs);
+  EXPECT_STREQ("DIE", out.c_str());
+  harakiri = false;
 
   utExit();
 }
