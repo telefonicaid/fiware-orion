@@ -559,29 +559,21 @@ const char* description =
 * setRegistrationsCollectionName(db + .registrations");
 * etc.
 */
-void mongoInit(const char* dbHost, const char* dbName, const char* user, const char* pwd)
+void mongoInit(const char* dbHost, std::string dbName, const char* user, const char* pwd)
 {
-  std::string db = dbName;
-
-  std::string entitiesCollection                      = db + ".entities";
-  std::string registrationCollection                  = db + ".registrations";
-  std::string subscribeContextCollection              = db + ".csubs";
-  std::string subscribeContextAvailabilityCollection  = db + ".casubs";
-  std::string associationsCollection                  = db + ".associations";
-
-  if (!mongoConnect(dbHost, dbName, user, pwd))
+   if (!mongoConnect(dbHost, dbName.c_str(), user, pwd))
     LM_X(1, ("MongoDB error"));
 
   if (user[0] != 0) 
-    LM_F(("Connected to mongo at %s:%s as user '%s'", dbHost, dbName, user));
+    LM_F(("Connected to mongo at %s:%s as user '%s'", dbHost, dbName.c_str(), user));
   else
-    LM_F(("Connected to mongo at %s:%s", dbHost, dbName));
+    LM_F(("Connected to mongo at %s:%s", dbHost, dbName.c_str()));
 
-  setEntitiesCollectionName(entitiesCollection.c_str());
-  setRegistrationsCollectionName(registrationCollection.c_str());
-  setSubscribeContextCollectionName(subscribeContextCollection.c_str());
-  setSubscribeContextAvailabilityCollectionName(subscribeContextAvailabilityCollection.c_str());
-  setAssociationsCollectionName(associationsCollection.c_str());
+  setEntitiesCollectionName(dbName + ".entities");
+  setRegistrationsCollectionName(dbName + ".registrations");
+  setSubscribeContextCollectionName(dbName + ".csubs");
+  setSubscribeContextAvailabilityCollectionName(dbName + ".casubs");
+  setAssociationsCollectionName(dbName + ".associations");
 }
 
 

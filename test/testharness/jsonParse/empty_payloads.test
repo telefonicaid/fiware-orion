@@ -148,14 +148,14 @@ Date: REGEX(.*)
 }
 6: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 125
+Content-Length: 120
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
         "code": "400",
-        "details": "empty update action type",
+        "details": "No context elements",
         "reasonPhrase": "Bad Request"
     }
 }
