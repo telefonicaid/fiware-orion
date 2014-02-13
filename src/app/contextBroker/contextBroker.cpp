@@ -550,14 +550,7 @@ const char* description =
 
 /* ****************************************************************************
 *
-* mongoInit - to be moved to mongoBackend?
-*
-* If setEntitiesCollectionName etc accepted std::string, this function would be shorter.
-* The variables entitiesCollection etc would be removed and:
-*
-* setEntitiesCollectionName(db + ".entities");
-* setRegistrationsCollectionName(db + .registrations");
-* etc.
+* mongoInit - 
 */
 void mongoInit(const char* dbHost, std::string dbName, const char* user, const char* pwd)
 {
