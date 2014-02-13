@@ -25,6 +25,15 @@
 #include <set>
 #include <string>
 
+//
+// http://www.boost.org/doc/libs/1_31_0/libs/spirit/doc/grammar.html:
+//
+//  if a grammar is intended to be used in multithreaded code, we should then define
+//  BOOST_SPIRIT_THREADSAFE before including any spirit header files.
+//  In this case it will also be required to link against Boost.Threads
+//
+#define BOOST_SPIRIT_THREADSAFE
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
