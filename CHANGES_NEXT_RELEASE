@@ -10,3 +10,4 @@ o IPv6 support (new -ipv6 command line option)
 o REST: The reasonPhrase in statusCode/errorCode and OrionError is now 100% tied to the 'code'
 o Render: OrionError now also with 'reasonPhrase' following 'code'
 o JSON support for all the convenience operations implemented
+o JSON parser: fix crashes with concurrent requests
