@@ -56,58 +56,6 @@ echo "1: ++++++++++++++++++++"
 # to avoid race conditions in the order of notifications
 sleep 0.5s
 
-# Bad duration 1
-(curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
-<subscribeContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-        <attribute>temperature</attribute>
-  </attributeList>
-  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
-  <duration>PT99Y</duration>
-  <notifyConditions>
-        <notifyCondition>
-          <type>ONTIMEINTERVAL</type>
-          <condValueList>
-                <condValue>PT2S</condValue>
-          </condValueList>          
-        </notifyCondition>
-  </notifyConditions>
-</subscribeContextRequest>
-EOF
-echo "2: ++++++++++++++++++++"
-
-# Bad duration 2
-(curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
-<subscribeContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-        <attribute>temperature</attribute>
-  </attributeList>
-  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
-  <duration>PY99</duration>
-  <notifyConditions>
-        <notifyCondition>
-          <type>ONTIMEINTERVAL</type>
-          <condValueList>
-                <condValue>PT2S</condValue>
-          </condValueList>          
-        </notifyCondition>
-  </notifyConditions>
-</subscribeContextRequest>
-EOF
-echo "3: ++++++++++++++++++++"
-
 #Subscribe for a LONG period of time (99 years - should give overflow in an int)
 SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
@@ -134,7 +82,7 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "$SUB_OUT"
-echo "4: ++++++++++++++++++++"
+echo "2: ++++++++++++++++++++"
 
 #Sleep 10 seconds. Only 3 subscriptions arrive (at time 0, 2 and 4)
 sleep 10s
@@ -168,34 +116,12 @@ curl localhost:${LISTENER_PORT}/dump -s -S
 1: ++++++++++++++++++++
 <?xml version="1.0"?>
 <subscribeContextResponse>
-  <subscribeError>
-    <errorCode>
-      <code>400</code>
-      <reasonPhrase>Bad Request</reasonPhrase>
-      <details>invalid payload: syntax error in duration string</details>
-    </errorCode>
-  </subscribeError>
-</subscribeContextResponse>
-2: ++++++++++++++++++++
-<?xml version="1.0"?>
-<subscribeContextResponse>
-  <subscribeError>
-    <errorCode>
-      <code>400</code>
-      <reasonPhrase>Bad Request</reasonPhrase>
-      <details>invalid payload: syntax error in duration string</details>
-    </errorCode>
-  </subscribeError>
-</subscribeContextResponse>
-3: ++++++++++++++++++++
-<?xml version="1.0"?>
-<subscribeContextResponse>
   <subscribeResponse>
     <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
     <duration>P99Y</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-4: ++++++++++++++++++++
+2: ++++++++++++++++++++
 POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 738
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
