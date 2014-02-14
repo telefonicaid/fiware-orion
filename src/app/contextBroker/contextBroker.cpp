@@ -142,12 +142,6 @@ bool            ngsi9Only;
 bool            harakiri;
 bool            useOnlyIPv4;
 bool            useOnlyIPv6;
-char            bindAddressV6[MAX_LEN_IP];
-char            bindAddressV4[MAX_LEN_IP];
-
-#define  LOCAL_IP_V6  "::"
-#define  LOCAL_IP_V4  "0.0.0.0"
-
 
 
 
@@ -446,7 +440,7 @@ int pidFile(void)
   sz = strlen(buffer);
   nb = write(fd, buffer, sz);
   if (nb != sz)
-     LM_RE(-2, ("written %d bytes and not %d to pid file '%s': %s", nb, sz, pidPath, strerror(errno)));
+    LM_RE(-2, ("written %d bytes and not %d to pid file '%s': %s", nb, sz, pidPath, strerror(errno)));
 
   return 0;
 }
@@ -459,36 +453,36 @@ int pidFile(void)
 */
 void daemonize(void)
 {
-    pid_t  pid;
-    pid_t  sid;
+  pid_t  pid;
+  pid_t  sid;
 
-    // already daemon
-    if (getppid() == 1)
-        return;
+  // already daemon
+  if (getppid() == 1)
+    return;
+  
+  pid = fork();
+  if (pid == -1)
+    LM_X(1, ("fork: %s", strerror(errno)));
 
-    pid = fork();
-    if (pid == -1)
-        LM_X(1, ("fork: %s", strerror(errno)));
+  // Exiting father process
+  if (pid > 0)
+    exit(0);
 
-    // Exiting father process
-    if (pid > 0)
-        exit(0);
+  // Change the file mode mask */
+  umask(0);
 
-    // Change the file mode mask */
-    umask(0);
+  // Removing the controlling terminal
+  sid = setsid();
+  if (sid == -1)
+    LM_X(1, ("setsid: %s", strerror(errno)));
 
-    // Removing the controlling terminal
-    sid = setsid();
-    if (sid == -1)
-        LM_X(1, ("setsid: %s", strerror(errno)));
+  // Change current working directory.
+  // This prevents the current directory from being locked; hence not being able to remove it.
+  if (chdir("/") == -1)
+    LM_X(1, ("chdir: %s", strerror(errno)));
 
-    // Change current working directory.
-    // This prevents the current directory from being locked; hence not being able to remove it.
-    if (chdir("/") == -1)
-        LM_X(1, ("chdir: %s", strerror(errno)));
-
-    // We have to call this after a fork, see: http://api.mongodb.org/cplusplus/2.2.2/classmongo_1_1_o_i_d.html
-    OID::justForked();
+  // We have to call this after a fork, see: http://api.mongodb.org/cplusplus/2.2.2/classmongo_1_1_o_i_d.html
+  OID::justForked();
 }
 
 /* ****************************************************************************
@@ -556,6 +550,35 @@ const char* description =
 
 /* ****************************************************************************
 *
+* mongoInit - 
+*/
+static void mongoInit(const char* dbHost, std::string dbName, const char* user, const char* pwd, bool ngsi9Only)
+{
+   if (!mongoConnect(dbHost, dbName.c_str(), user, pwd))
+    LM_X(1, ("MongoDB error"));
+
+  if (user[0] != 0) 
+    LM_F(("Connected to mongo at %s:%s as user '%s'", dbHost, dbName.c_str(), user));
+  else
+    LM_F(("Connected to mongo at %s:%s", dbHost, dbName.c_str()));
+
+  setEntitiesCollectionName(dbName + ".entities");
+  setRegistrationsCollectionName(dbName + ".registrations");
+  setSubscribeContextCollectionName(dbName + ".csubs");
+  setSubscribeContextAvailabilityCollectionName(dbName + ".casubs");
+  setAssociationsCollectionName(dbName + ".associations");
+
+  /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
+  if (!ngsi9Only)
+    recoverOntimeIntervalThreads();
+  else
+    LM_F(("Running in NGSI9 only mode"));
+}
+
+
+
+/* ****************************************************************************
+*
 * main - 
 */
 int main(int argC, char* argV[])
@@ -566,122 +589,41 @@ int main(int argC, char* argV[])
   signal(SIGUSR2, sigHandler);
 
   atexit(exitFunc);
-  orionInit(orionExit);
 
-  paConfig("man synopsis",         (void*) "[options]");
-  paConfig("man shortdescription", (void*) "Options:");
-  paConfig("man description",      (void*) description);
-  paConfig("man author",           (void*) "Telefonica I+D");
-  paConfig("man exitstatus",       (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
-  paConfig("man version",          (void*) ORION_VERSION);
-
-  paConfig("builtin prefix",                    (void*) "ORION_");
-  paConfig("usage and exit on any warning",     (void*) true);
-  paConfig("log to screen",                     (void*) true);
-  paConfig("log to file",                       (void*) true);
   paConfig("remove builtin", "-d");
   paConfig("remove builtin", "-r");
   paConfig("remove builtin", "-w");
-  paConfig("log file line format",              (void*) "TYPE:DATE:EXEC-AUX/FILE[LINE] FUNC: TEXT");
-  paConfig("screen line format",                (void*) "TYPE@TIME  FUNC[LINE]: TEXT");
+  paConfig("man synopsis",                  (void*) "[options]");
+  paConfig("man shortdescription",          (void*) "Options:");
+  paConfig("man description",               (void*) description);
+  paConfig("man author",                    (void*) "Telefonica I+D");
+  paConfig("man exitstatus",                (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
+  paConfig("man version",                   (void*) ORION_VERSION);
+  paConfig("log to screen",                 (void*) true);
+  paConfig("log to file",                   (void*) true);
+  paConfig("log file line format",          (void*) "TYPE:DATE:EXEC-AUX/FILE[LINE] FUNC: TEXT");
+  paConfig("screen line format",            (void*) "TYPE@TIME  FUNC[LINE]: TEXT");
+  paConfig("builtin prefix",                (void*) "ORION_");
+  paConfig("usage and exit on any warning", (void*) true);
 
   paParse(paArgs, argC, (char**) argV, 1, false);
+
+  if (useOnlyIPv6 && useOnlyIPv4)
+    LM_X(1, ("-ipv4 and -ipv6 can not be activated at the same time. They are incompatible"));
 
   if (fg == false)
     daemonize();
 
+  RestService* rsP       = ngsi9Only? restServiceNgsi9V : restServiceV;
+  IpVersion    ipVersion = IPDUAL;
+
+  if      (useOnlyIPv4)    ipVersion = IPV4;
+  else if (useOnlyIPv6)    ipVersion = IPV6;
+
   pidFile();
-
-  LM_F(("Opening mongo connection"));
-  std::string entitiesCollection                      = std::string(dbName) + ".entities";
-  std::string registrationCollection                  = std::string(dbName) + ".registrations";
-  std::string subscribeContextCollection              = std::string(dbName) + ".csubs";
-  std::string subscribeContextAvailabilityCollection  = std::string(dbName) + ".casubs";
-  std::string associationsCollection                  = std::string(dbName) + ".associations";
-
-  if (!mongoConnect(dbHost, dbName, user, pwd))
-    LM_X(1, ("MongoDB error"));
-  LM_F(("Connected to %s:%s as user %s", dbHost, dbName, user));
-
-  setEntitiesCollectionName(entitiesCollection.c_str());
-  setRegistrationsCollectionName(registrationCollection.c_str());
-  setSubscribeContextCollectionName(subscribeContextCollection.c_str());
-  setSubscribeContextAvailabilityCollectionName(subscribeContextAvailabilityCollection.c_str());
-  setAssociationsCollectionName(associationsCollection.c_str());
-
-  /* Set timer object (singleton) */
-  setTimer(new Timer());
-
-  /* Set notifier object (singleton) */
-  setNotifier(new Notifier());
-
-  if (ngsi9Only)
-    LM_F(("Running in NGSI9 only mode"));
-
-  /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (only if not ngsi9 mode) */
-  if (!ngsi9Only)
-    recoverOntimeIntervalThreads();
-
-  memset(bindAddressV4, 0, MAX_LEN_IP);
-  memset(bindAddressV6, 0, MAX_LEN_IP);
-
-  if (isIPv6(std::string(bindAddress)))
-  { 
-    strncpy(bindAddressV4, LOCAL_IP_V4, MAX_LEN_IP - 1);
-    strncpy(bindAddressV6, bindAddress, MAX_LEN_IP - 1);
-  }
-  else
-  {
-    strncpy(bindAddressV4, bindAddress, MAX_LEN_IP - 1);
-    strncpy(bindAddressV6, LOCAL_IP_V6, MAX_LEN_IP - 1);
-  }
-  LM_V(("LocalIPv4 '%s'", bindAddressV4));
-  LM_V(("LocalIPv6 '%s'", bindAddressV6));
-
-  RestService* rsP = ngsi9Only? restServiceNgsi9V : restServiceV;
-
-  IpVersion  ipVersion;
-
-  if (useOnlyIPv6 && useOnlyIPv4)
-  {
-    LM_X(1, ("-ipv4 and -ipv6 can not been activated at the same time, they are incompatible"));
-  }
-
-  if (useOnlyIPv4)
-  {
-    ipVersion = IPV4;
-    LM_V(("Using IPv4 only"));
-  }
-  else if (useOnlyIPv6)
-  {
-    ipVersion = IPV6;
-    LM_V(("Using IPv6 only"));
-  }
-  else
-  {
-    ipVersion = IPDUAL;
-    LM_V(("Using dual IP stack"));
-  } 
-   
-  /* Set start time */
-  startTime      = getCurrentTime();
-  statisticsTime = startTime;
-
-  restInit(bindAddressV4, bindAddressV6, port, rsP, ipVersion);
-
-  int r;
-  LM_M(("Calling restStart, ipVersion == %d", ipVersion));
-  if ((r = restStart(ipVersion)) != 0)
-  {
-    fprintf(stderr, "restStart: error %d\n", r);
-    LM_X(1, ("restStart: error %d", r));
-  }
-
-  /* Initialize the semaphore used by mongoBackend */
-  semInit();
-
-  // Give the rest library the correct version string of this executable
-  versionSet(ORION_VERSION);
+  orionInit(orionExit, ORION_VERSION);
+  mongoInit(dbHost, dbName, user, pwd, ngsi9Only);
+  restInit(rsP, ipVersion, bindAddress, port);
 
   while (1)
     sleep(10);

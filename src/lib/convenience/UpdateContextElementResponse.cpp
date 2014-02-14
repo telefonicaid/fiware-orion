@@ -53,7 +53,7 @@ std::string UpdateContextElementResponse::render(RequestType requestType, Format
    std::string tag = "updateContextElementResponse";
    std::string out = "";
 
-   out += startTag(indent, tag, format);
+   out += startTag(indent, tag, format, false);
 
    if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
      out += errorCode.render(format, indent + "  ");

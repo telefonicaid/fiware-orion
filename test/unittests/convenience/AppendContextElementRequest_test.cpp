@@ -36,9 +36,9 @@
 
 /* ****************************************************************************
 *
-* render - 
+* render_xml - 
 */
-TEST(AppendContextElementRequest, render)
+TEST(AppendContextElementRequest, render_xml)
 {
    AppendContextElementRequest  acer;
    std::string                  out;
@@ -63,9 +63,36 @@ TEST(AppendContextElementRequest, render)
 
 /* ****************************************************************************
 *
-* check - 
+* render_json - 
 */
-TEST(AppendContextElementRequest, check)
+TEST(AppendContextElementRequest, render_json)
+{
+   AppendContextElementRequest  acer;
+   std::string                  out;
+   ContextAttribute             ca("caName", "caType", "121");
+   Metadata                     md("mdName", "mdType", "122");
+   const char*                  outfile = "ngsi10.appendContextElementRequest.adn.valid.json";
+
+   utInit();
+
+   acer.attributeDomainName.set("ADN");
+   acer.contextAttributeVector.push_back(&ca);
+   
+   out = acer.render(UpdateContext, JSON, "");
+
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+   EXPECT_STREQ(expectedBuf, out.c_str());
+
+   utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* check_xml - 
+*/
+TEST(AppendContextElementRequest, check_xml)
 {
    AppendContextElementRequest  acer;
    std::string                  out;
@@ -107,6 +134,64 @@ TEST(AppendContextElementRequest, check)
 
    acer.domainMetadataVector.push_back(&md2);
    out = acer.check(AppendContextElement, XML, "", "", 0);
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";   
+   EXPECT_STREQ(expectedBuf, out.c_str());
+
+
+   // 5. Bad attributeDomainName
+   // FIXME P3: AttributeDomainName::check always returns "OK"
+
+   utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* check_json - 
+*/
+TEST(AppendContextElementRequest, check_json)
+{
+   AppendContextElementRequest  acer;
+   std::string                  out;
+   ContextAttribute             ca("caName", "caType", "121");
+   Metadata                     md("mdName", "mdType", "122");
+   const char*                  outfile1 = "ngsi10.appendContextElementResponse.predetectedError.valid.json";
+   const char*                  outfile2 = "ngsi10.appendContextElementResponse.missingAttributeName.valid.json";
+   const char*                  outfile3 = "ngsi10.appendContextElementResponse.missingMetadataName.valid.json";
+
+   utInit();
+
+   acer.attributeDomainName.set("ADN");
+   acer.contextAttributeVector.push_back(&ca);
+   acer.domainMetadataVector.push_back(&md);
+
+   // 1. ok
+   out = acer.check(AppendContextElement, JSON, "", "", 0);
+   EXPECT_STREQ("OK", out.c_str());
+
+
+   // 2. Predetected error 
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+   out = acer.check(AppendContextElement, JSON, "", "Error is predetected", 0);
+   EXPECT_STREQ(expectedBuf, out.c_str());
+   
+
+   // 3. bad ContextAttribute
+   ContextAttribute  ca2("", "caType", "121");
+
+   acer.contextAttributeVector.push_back(&ca2);
+   out = acer.check(AppendContextElement, JSON, "", "", 0);
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";   
+   EXPECT_STREQ(expectedBuf, out.c_str());
+   ca2.name = "ca2Name";
+
+
+   // 4. Bad domainMetadata
+   Metadata  md2("", "mdType", "122");
+
+   acer.domainMetadataVector.push_back(&md2);
+   out = acer.check(AppendContextElement, JSON, "", "", 0);
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";   
    EXPECT_STREQ(expectedBuf, out.c_str());
 
