@@ -148,18 +148,18 @@ long long toSeconds(int value, char what, bool dayPart)
     if (what == 'Y')
       result = 365L * 24 * 3600 * value;
     else if (what == 'M')
-      result = 30 * 24 * 3600 * value;
+      result = 30L * 24 * 3600 * value;
     else if (what == 'W')
-      result = 7 * 24 * 3600 * value;
+      result = 7L * 24 * 3600 * value;
     else if (what == 'D')
-      result = 24 * 3600 * value;
+      result = 24L * 3600 * value;
   }
   else
   {
     if (what == 'H')
-      result = 3600 * value;
+      result = 3600L * value;
     else if (what == 'M')
-      result = 60 * value;
+      result = 60L * value;
     else if (what == 'S')
       result = value;
   }
@@ -236,7 +236,7 @@ long long parse8601(std::string s)
       }
     }
 
-free(toFree);
+    free(toFree);
 
     return accumulated;
 }
