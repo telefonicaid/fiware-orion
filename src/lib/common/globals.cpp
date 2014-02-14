@@ -208,6 +208,12 @@ long long parse8601(std::string s)
         *duration = 0;
         int value = atoi(start);
 
+        if ((value == 0) && (*start != '0'))
+        {
+           free(toFree);
+           LM_RE(-1, ("parse error for '%s'", start));
+        }
+
         accumulated += toSeconds(value, what, dayPart);
         ++duration;
         start = duration;
