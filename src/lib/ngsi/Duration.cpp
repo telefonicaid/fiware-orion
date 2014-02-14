@@ -77,6 +77,7 @@ std::string Duration::check(RequestType requestType, Format format, std::string 
 void Duration::set(std::string value)
 {
   string = value;
+  LM_M(("set Duration to '%s'", value.c_str()));
   parse(); // just to flag valid/invalid
 }
 
@@ -108,12 +109,13 @@ bool Duration::isEmpty(void)
 *
 * Duration::parse - 
 */
-int Duration::parse(void)
+long long Duration::parse(void)
 {
   seconds = parse8601(string);
 
   valid = (seconds == -1)? false : true;
 
+  LM_M(("seconds: %lu", seconds));
   return seconds;
 }
 
