@@ -155,68 +155,64 @@ DBClientConnection* getMongoConnection(void) {
 *
 * setEntitiesCollectionName -
 */
-void setEntitiesCollectionName(const char* name) {
+void setEntitiesCollectionName(std::string name) {
 
     if (entitiesCollectionName != NULL) {
         free(entitiesCollectionName);
     }
 
-    entitiesCollectionName = strdup(name);
+    entitiesCollectionName = strdup(name.c_str());
 }
 
 /*****************************************************************************
 *
 * setRegistrationsCollectionName -
 */
-void setRegistrationsCollectionName(const char* name) {
+void setRegistrationsCollectionName(std::string name) {
 
     if (registrationsCollectionName != NULL) {
         free(registrationsCollectionName);
     }
 
-    registrationsCollectionName = strdup(name);
-
+    registrationsCollectionName = strdup(name.c_str());
 }
 
 /*****************************************************************************
 *
 * setSubscribeContextCollectionName -
 */
-void setSubscribeContextCollectionName(const char* name) {
+void setSubscribeContextCollectionName(std::string name) {
 
     if (subscribeContextCollectionName != NULL) {
         free(subscribeContextCollectionName);
     }
 
-    subscribeContextCollectionName = strdup(name);
-
+    subscribeContextCollectionName = strdup(name.c_str());
 }
 
 /*****************************************************************************
 *
 * setSubscribeContextAvailabilityCollectionName -
 */
-void setSubscribeContextAvailabilityCollectionName(const char* name) {
+void setSubscribeContextAvailabilityCollectionName(std::string name) {
 
     if (subscribeContextAvailabilityCollectionName != NULL) {
         free(subscribeContextAvailabilityCollectionName);
     }
 
-    subscribeContextAvailabilityCollectionName = strdup(name);
-
+    subscribeContextAvailabilityCollectionName = strdup(name.c_str());
 }
 
 /*****************************************************************************
 *
 * setAssociationsCollectionName -
 */
-extern void setAssociationsCollectionName(const char* name) {
+extern void setAssociationsCollectionName(std::string name) {
     if (assocationsCollectionName != NULL) {
         free(assocationsCollectionName);
     }
 
-    assocationsCollectionName = strdup(name);
-
+    assocationsCollectionName = strdup(name.c_str());
 }
 
 /*****************************************************************************

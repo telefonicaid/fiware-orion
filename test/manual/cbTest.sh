@@ -116,7 +116,7 @@ do
   elif [ "$1" == "-en" ];        then entityId=$2;                    shift;
   elif [ "$1" == "-attr" ];      then attributeName=$2;               shift;
   elif [ "$1" == "-id" ];        then id=$2;                          shift;
-  elif [ "$1" == "-json" ];      then IN_FORMAT="Content-Type: application/json"; OUT_FORMAT="Accept: application/json";  shift;
+  elif [ "$1" == "-json" ];      then IN_FORMAT="Content-Type: application/json"; OUT_FORMAT="Accept: application/json";
   elif [ "$1" == "-informat" ];  then IN_FORMAT="Content-Type: $2";   shift;
   elif [ "$1" == "-outformat" ]; then OUT_FORMAT="Accept: $2";        shift;
   elif [ "$1" == "-table" ];     then table=$2;                       shift;

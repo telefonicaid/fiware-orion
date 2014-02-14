@@ -187,31 +187,31 @@ extern DBClientConnection* getMongoConnection(void);
 *
 * setEntitiesCollectionName -
 */
-extern void setEntitiesCollectionName(const char* name);
+extern void setEntitiesCollectionName(std::string name);
 
 /*****************************************************************************
 *
 * setRegistrationsCollectionName -
 */
-extern void setRegistrationsCollectionName(const char* name);
+extern void setRegistrationsCollectionName(std::string name);
 
 /*****************************************************************************
 *
 * setSubscribeContextCollectionName -
 */
-extern void setSubscribeContextCollectionName(const char* name);
+extern void setSubscribeContextCollectionName(std::string name);
 
 /*****************************************************************************
 *
 * setSubscribeContextAvailabilityCollectionName -
 */
-extern void setSubscribeContextAvailabilityCollectionName(const char* name);
+extern void setSubscribeContextAvailabilityCollectionName(std::string name);
 
 /*****************************************************************************
 *
 * setAssociationsCollectionName -
 */
-extern void setAssociationsCollectionName(const char* name);
+extern void setAssociationsCollectionName(std::string name);
 
 /*****************************************************************************
 *
