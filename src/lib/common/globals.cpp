@@ -49,7 +49,7 @@ OrionExitFunction orionExitFunction = NULL;
 *
 * orionInit - 
 */
-void orionInit(OrionExitFunction exitFunction, const char* version, bool ngsi9Only)
+void orionInit(OrionExitFunction exitFunction, const char* version)
 {
   // Give the rest library the correct version string of this executable
   versionSet(version);
@@ -69,12 +69,6 @@ void orionInit(OrionExitFunction exitFunction, const char* version, bool ngsi9On
   /* Set start time */
   startTime      = getCurrentTime();
   statisticsTime = startTime;
-
-  /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
-  if (!ngsi9Only)
-    recoverOntimeIntervalThreads();
-  else
-    LM_F(("Running in NGSI9 only mode"));
 }
 
 

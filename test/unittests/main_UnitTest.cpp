@@ -105,7 +105,7 @@ int main(int argC, char** argV)
     paParse(paArgs, 1, argV, 1, false);
 
   LM_M(("Init tests"));
-  orionInit(exitFunction, orionUnitTestVersion, true);
+  orionInit(exitFunction, orionUnitTestVersion);
   setupDatabase();
 
   LM_M(("Run all tests"));

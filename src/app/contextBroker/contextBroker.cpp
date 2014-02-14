@@ -552,7 +552,7 @@ const char* description =
 *
 * mongoInit - 
 */
-void mongoInit(const char* dbHost, std::string dbName, const char* user, const char* pwd)
+static void mongoInit(const char* dbHost, std::string dbName, const char* user, const char* pwd, bool ngsi9Only)
 {
    if (!mongoConnect(dbHost, dbName.c_str(), user, pwd))
     LM_X(1, ("MongoDB error"));
@@ -567,6 +567,12 @@ void mongoInit(const char* dbHost, std::string dbName, const char* user, const c
   setSubscribeContextCollectionName(dbName + ".csubs");
   setSubscribeContextAvailabilityCollectionName(dbName + ".casubs");
   setAssociationsCollectionName(dbName + ".associations");
+
+  /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
+  if (!ngsi9Only)
+    recoverOntimeIntervalThreads();
+  else
+    LM_F(("Running in NGSI9 only mode"));
 }
 
 
@@ -615,8 +621,8 @@ int main(int argC, char* argV[])
   else if (useOnlyIPv6)    ipVersion = IPV6;
 
   pidFile();
-  mongoInit(dbHost, dbName, user, pwd);
-  orionInit(orionExit, ORION_VERSION, ngsi9Only);
+  orionInit(orionExit, ORION_VERSION);
+  mongoInit(dbHost, dbName, user, pwd, ngsi9Only);
   restInit(rsP, ipVersion, bindAddress, port);
 
   while (1)

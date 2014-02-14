@@ -63,7 +63,7 @@ extern OrionExitFunction  orionExitFunction;
 *
 * orionInit - 
 */
-extern void orionInit(OrionExitFunction exitFunction, const char* version, bool ngsi9Only);
+extern void orionInit(OrionExitFunction exitFunction, const char* version);
 
 
 
