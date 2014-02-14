@@ -83,7 +83,9 @@ HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscri
     }
 
     // FIXME P11 - getIntField returns 'int', we want 'long long'
-    csiP->expiration = sub.getIntField(CSUB_EXPIRATION);    
+    BSONElement be = sub.getField(CSUB_EXPIRATION);
+    csiP->expiration = be.numberLong();
+
     csiP->url = STR_FIELD(sub, CSUB_REFERENCE);
     if (sub.hasElement(CSUB_LASTNOTIFICATION)) {
         csiP->lastNotification = sub.getIntField(CSUB_LASTNOTIFICATION);
