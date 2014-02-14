@@ -11,6 +11,6 @@ o REST:     The reasonPhrase in statusCode/errorCode and OrionError is now 100% 
 o Render:   OrionError now also with 'reasonPhrase' following 'code'
 o JSON:     Resolved concurrency problem for JSON parser
 o JSON:     Implemented JSON parser for all implemented convenience operations
-o JSON:     Fixed bug that prevented the use of UpdateContextRequest in JSON with DELETE as action.
+o JSON:     Fixed bug that prevented the use of UpdateContextRequest in JSON with DELETE as action. (Issue #224)
 o Bug:      Expiration times are now 64-bit integers (there was a previous problem with overflow).
               Duration and Throttling are 64-bit integers in the parse phase. (Issue #208)
