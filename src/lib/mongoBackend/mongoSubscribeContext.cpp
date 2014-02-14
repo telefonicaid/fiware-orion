@@ -55,8 +55,8 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
     }
 
     /* Calculate expiration (using the current time and the duration field in the request) */
-    int expiration = getCurrentTime() + requestP->duration.parse();
-    LM_T(LmtMongo, ("Subscription expiration: %d", expiration));
+    long long expiration = getCurrentTime() + requestP->duration.parse();
+    LM_T(LmtMongo, ("Subscription expiration: %lu", expiration));
 
     /* Create the mongoDB subscription document */
     BSONObjBuilder sub;

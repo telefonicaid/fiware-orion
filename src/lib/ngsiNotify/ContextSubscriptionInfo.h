@@ -36,7 +36,7 @@ typedef struct ContextSubscriptionInfo {
     std::string            url;
     Format                 format;
     int                    lastNotification;
-    int                    expiration;
+    long long              expiration;
     int                    throttling;
 
     void         release(void);
