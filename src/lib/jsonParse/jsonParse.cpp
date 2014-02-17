@@ -24,6 +24,8 @@
 */
 #include <set>
 #include <string>
+#include <stdint.h>
+#include <exception>
 
 //
 // http://www.boost.org/doc/libs/1_31_0/libs/spirit/doc/grammar.html:
@@ -84,7 +86,7 @@ static std::string getArrayElementName(std::string arrayName)
   std::string elementName = arrayName.substr(pos + 1);
   elementName = elementName.substr(0, elementName.length()-1);
 
-  if(elementName.substr(elementName.length()-2).compare("ie") == 0)
+  if(elementName.length() > 2 && elementName.substr(elementName.length()-2).compare("ie") == 0)
     elementName.replace(elementName.length()-2, 2, "y");
 
   return elementName;
@@ -102,16 +104,22 @@ static std::string jsonParse
    ParseData*                                reqDataP
 )
 {
-  std::string  nodeName  = v.first.data();
-  std::string  value     = v.second.data();
-  std::string  res       = "OK";
+  std::string nodeName         = v.first.data();
+  std::string value            = v.second.data();
+  std::string res              = "OK";
+  std::string arrayElementName = getArrayElementName(path);
 
   // If the node name is empty, boost will yield an empty name.
   // See: http://www.boost.org/doc/libs/1_41_0/doc/html/boost_propertytree/parsers.html#boost_propertytree.parsers.json_parser
   if (nodeName != "")
-    path = path + "/" + nodeName;
+  {
+    if(nodeName != arrayElementName)
+      path = path + "/" + nodeName;
+    else
+      throw std::logic_error("The object '" + path + "' may not have a child named '" + nodeName + "'");
+  }
   else
-    path = path + "/" + getArrayElementName(path);
+    path = path + "/" + arrayElementName;
 
   if (value == "")
     res = treat(1, path, value, parseVector, reqDataP);
