@@ -48,7 +48,7 @@ Throttling::Throttling()
 *
 * Throttling::parse -
 */
-int Throttling::parse(void)
+long long Throttling::parse(void)
 {
     seconds = parse8601(string);
     return seconds;

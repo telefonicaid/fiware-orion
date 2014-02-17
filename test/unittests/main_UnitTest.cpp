@@ -76,6 +76,9 @@ void exitFunction(int code, std::string reason)
 }
 
 
+const char* orionUnitTestVersion = "0.0.1-unittest";
+
+
 
 /* ****************************************************************************
 *
@@ -102,18 +105,8 @@ int main(int argC, char** argV)
     paParse(paArgs, 1, argV, 1, false);
 
   LM_M(("Init tests"));
-  orionInit(exitFunction);
+  orionInit(exitFunction, orionUnitTestVersion);
   setupDatabase();
-
-  /* Initialize the semaphore used by mongoBackend */
-  if (semInit() != 0)
-    LM_X(1, ("Error initializing semaphore: %s\n", strerror(errno)));
-
-  /* Set timer object (singleton) */
-  setTimer(new Timer());
-
-  /* Set notifier object (singleton) */
-  setNotifier(new Notifier());
 
   LM_M(("Run all tests"));
   ::testing::InitGoogleMock(&argC, argV);

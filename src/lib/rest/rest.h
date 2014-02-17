@@ -44,20 +44,19 @@ typedef enum IpVersion
 } IpVersion;
 
 
-extern  IpVersion  ipVersionUsed;  
+
+/* ****************************************************************************
+*
+* ipVersionUsed - 
+*/
+extern IpVersion  ipVersionUsed;  
+
+
 
 /* ****************************************************************************
 *
 * restInit - 
 */
-extern void restInit(char* _bind, char* _bindv6, unsigned short _port, RestService* _restServiceV, IpVersion ipVersion);
-
-
-/* ****************************************************************************
-*
-* restStart - 
-*/
-extern int restStart(IpVersion ipVersion);
-
+extern void restInit(RestService* _restServiceV, IpVersion _ipVersion, const char* _bindAddress, unsigned short _port);
 
 #endif
