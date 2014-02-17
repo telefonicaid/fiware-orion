@@ -42,7 +42,7 @@ std::string postUnsubscribeContextAvailability(ConnectionInfo* ciP, int componen
   UnsubscribeContextAvailabilityResponse  ucar;
   std::string                             answer;
 
-  mongoUnsubscribeContextAvailability(&parseDataP->ucar.res, &ucar);
+  ciP->httpStatusCode = mongoUnsubscribeContextAvailability(&parseDataP->ucar.res, &ucar);
   answer = ucar.render(UnsubscribeContextAvailability, ciP->outFormat, "");
 
   return answer;

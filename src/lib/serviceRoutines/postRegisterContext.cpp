@@ -78,7 +78,7 @@ static void registerContextForward(ConnectionInfo* ciP, ParseData* parseDataP, R
   if (parseDataP->rcr.res.registrationId.isEmpty())
   {
     /* New registration case */
-    mongoRegisterContext(&parseDataP->rcr.res, rcrP);
+    ciP->httpStatusCode  = mongoRegisterContext(&parseDataP->rcr.res, rcrP);
 
     std::string payload  = parseDataP->rcr.res.render(RegisterContext, ciP->inFormat, "");
     std::string response = fordwardRegisterContext(fwdHost, fwdPort, payload);
@@ -110,7 +110,7 @@ static void registerContextForward(ConnectionInfo* ciP, ParseData* parseDataP, R
   {
     /* Update case */
     std::string fwdRegId = mongoGetFwdRegId(parseDataP->rcr.res.registrationId.get());
-    mongoRegisterContext(&parseDataP->rcr.res, rcrP);
+    ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, rcrP);
     parseDataP->rcr.res.registrationId.set(fwdRegId);
     mongoSetFwdRegId(rcrP->registrationId.get(), fwdRegId);
     std::string payload = parseDataP->rcr.res.render(RegisterContext, ciP->inFormat, "");
@@ -133,7 +133,7 @@ std::string postRegisterContext(ConnectionInfo* ciP, int components, std::vector
     registerContextForward(ciP, parseDataP, &rcr);
   }
   else
-    mongoRegisterContext(&parseDataP->rcr.res, &rcr);
+    ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr);
 
   std::string answer = rcr.render(RegisterContext, ciP->outFormat, "");
 

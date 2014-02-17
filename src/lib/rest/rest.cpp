@@ -530,7 +530,6 @@ void restInit(RestService* _restServiceV, IpVersion _ipVersion, const char* _bin
 
 
   // Starting REST intrerface
-  LM_M(("Calling restStart, ipVersion == %d", _ipVersion));
   int r;
   if ((r = restStart(_ipVersion)) != 0)
   {

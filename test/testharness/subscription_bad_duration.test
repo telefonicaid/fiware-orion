@@ -30,6 +30,7 @@ brokerStart CB
 
 --SHELL--
 # Bad duration 1
+#INVALID_XML
 echo "1: ++++++++++++++++++++"
 (curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
@@ -57,6 +58,7 @@ EOF
 
 echo "2: ++++++++++++++++++++"
 # Bad duration 2
+#INVALID_XML
 (curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>

@@ -100,7 +100,7 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   request.updateActionType.set("UPDATE");
 
   response.errorCode.code = SccNone;
-  mongoUpdateContext(&request, &response);
+  ciP->httpStatusCode = mongoUpdateContext(&request, &response);
   
   StatusCode statusCode;
   if (response.contextElementResponseVector.size() == 0)
