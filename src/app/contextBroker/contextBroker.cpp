@@ -568,6 +568,9 @@ static void mongoInit(const char* dbHost, std::string dbName, const char* user, 
   setSubscribeContextAvailabilityCollectionName(dbName + ".casubs");
   setAssociationsCollectionName(dbName + ".associations");
 
+  /* Set notifier object (singleton) */
+  setNotifier(new Notifier());
+
   /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
   if (!ngsi9Only)
     recoverOntimeIntervalThreads();

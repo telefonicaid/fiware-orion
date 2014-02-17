@@ -62,9 +62,6 @@ void orionInit(OrionExitFunction exitFunction, const char* version)
   /* Set timer object (singleton) */
   setTimer(new Timer());
 
-  /* Set notifier object (singleton) */
-  setNotifier(new Notifier());
-
   /* Set start time */
   startTime      = getCurrentTime();
   statisticsTime = startTime;
