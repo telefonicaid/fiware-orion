@@ -240,3 +240,35 @@ This is due to a virtual destructor within boost/exception/detail/exception_ptr_
 ```
 
 Reference: https://groups.google.com/forum/?fromgroups=#!topic/boost-list/gBodhfp9LjI
+
+### Building Boost Libraries
+
+* OS version: openSUSE 13.1
+* GCC version: 4.8.1
+
+You may encounter this problem:
+
+```
+/usr/local/include/boost/atomic/atomic.hpp:202:16: error: ‘uintptr_t’ was not declared in this scope
+typedef atomic<uintptr_t> atomic_uintptr_t;
+
+/usr/local/include/boost/atomic/atomic.hpp:202:25: error: template argument 1 is invalid
+typedef atomic<uintptr_t> atomic_uintptr_t;
+```
+
+There seems to be a problem with boost libraries. It can be fixed changing /usr/local/include/boost/cstdint.hpp. Find the line
+
+```
+#if defined(BOOST_HAS_STDINT_H) && (!defined(__GLIBC__) || defined(__GLIBC_HAVE_LONG_LONG)) 
+```
+
+And change it for
+
+```
+#if defined(BOOST_HAS_STDINT_H)                                 \ 
+    && (!defined(__GLIBC__)                                       \ 
+        || defined(__GLIBC_HAVE_LONG_LONG)                        \ 
+        || (defined(__GLIBC__) && ((__GLIBC__ > 2) || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 17))))) 
+```
+
+Reference: https://svn.boost.org/trac/boost/changeset/84950
