@@ -84,10 +84,10 @@ static std::string getArrayElementName(std::string arrayName)
 {
   int pos = arrayName.find_last_of("/");
   std::string elementName = arrayName.substr(pos + 1);
-  elementName = elementName.substr(0, elementName.length()-1);
+  elementName = elementName.substr(0, elementName.length() - 1);
 
-  if(elementName.length() > 2 && elementName.substr(elementName.length()-2).compare("ie") == 0)
-    elementName.replace(elementName.length()-2, 2, "y");
+  if(elementName.length() > 2 && elementName.substr(elementName.length() - 2).compare("ie") == 0)
+    elementName.replace(elementName.length() - 2, 2, "y");
 
   return elementName;
 }
