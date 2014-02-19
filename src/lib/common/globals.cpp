@@ -22,13 +22,16 @@
 *
 * Author: Ken Zangelin
 */
-
 #include <time.h>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/sem.h"
+#include "serviceRoutines/versionTreat.h"     // For orionInit()
+#include "mongoBackend/MongoGlobal.h"         // For orionInit()
+#include "ngsiNotify/onTimeIntervalThread.h"  // For orionInit()
 
 /* ****************************************************************************
 *
@@ -45,9 +48,23 @@ OrionExitFunction orionExitFunction = NULL;
 *
 * orionInit - 
 */
-void orionInit(OrionExitFunction exitFunction)
+void orionInit(OrionExitFunction exitFunction, const char* version)
 {
+  // Give the rest library the correct version string of this executable
+  versionSet(version);
+
+  // The function to call on fatal error
   orionExitFunction = exitFunction;
+
+  /* Initialize the semaphore used by mongoBackend */
+  semInit();
+
+  /* Set timer object (singleton) */
+  setTimer(new Timer());
+
+  /* Set start time */
+  startTime      = getCurrentTime();
+  statisticsTime = startTime;
 }
 
 
@@ -119,30 +136,35 @@ int getCurrentTime(void)
 *
 * toSeconds -
 */
-int toSeconds(int value, char what, bool dayPart)
+long long toSeconds(int value, char what, bool dayPart)
 {
+  long long result = -1;
+
   if (dayPart == true)
   {
     if (what == 'Y')
-      return 365 * 24 * 3600 * value;
+      result = 365L * 24 * 3600 * value;
     else if (what == 'M')
-      return 30 * 24 * 3600 * value;
+      result = 30L * 24 * 3600 * value;
     else if (what == 'W')
-      return 7 * 24 * 3600 * value;
+      result = 7L * 24 * 3600 * value;
     else if (what == 'D')
-      return 24 * 3600 * value;
+      result = 24L * 3600 * value;
   }
   else
   {
     if (what == 'H')
-      return 3600 * value;
+      result = 3600L * value;
     else if (what == 'M')
-      return 60 * value;
+      result = 60L * value;
     else if (what == 'S')
-      return value;
+      result = value;
   }
 
-  LM_RE(-1, ("ERROR in duration string!"));
+  if (result == -1)
+    LM_E(("ERROR in duration string!"));
+
+  return result;
 }
 
 /*****************************************************************************
@@ -152,12 +174,16 @@ int toSeconds(int value, char what, bool dayPart)
 * This is common code for Duration and Throttling (at least)
 *
 */
-int parse8601(std::string s) {
+long long parse8601(std::string s)
+{
+    if (s == "")
+        return 0;
 
-    char* duration = strdup(s.c_str());
-    char* toFree   = duration;
-    char* start;
-    bool  dayPart = true;
+    char*      duration    = strdup(s.c_str());
+    char*      toFree      = duration;
+    bool       dayPart     = true;
+    long long  accumulated = 0;
+    char*      start;
 
     if (*duration != 'P')
     {
@@ -168,7 +194,6 @@ int parse8601(std::string s) {
     ++duration;
     start = duration;
 
-    int accumulated = 0;
     while (*duration != 0)
     {
       if (isdigit(*duration))
@@ -179,6 +204,12 @@ int parse8601(std::string s) {
 
         *duration = 0;
         int value = atoi(start);
+
+        if ((value == 0) && (*start != '0'))
+        {
+           free(toFree);
+           LM_RE(-1, ("parse error for '%s'", start));
+        }
 
         accumulated += toSeconds(value, what, dayPart);
         ++duration;
@@ -209,5 +240,6 @@ int parse8601(std::string s) {
     }
 
     free(toFree);
+
     return accumulated;
 }

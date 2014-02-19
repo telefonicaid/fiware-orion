@@ -108,7 +108,7 @@ bool Duration::isEmpty(void)
 *
 * Duration::parse - 
 */
-int Duration::parse(void)
+long long Duration::parse(void)
 {
   seconds = parse8601(string);
 

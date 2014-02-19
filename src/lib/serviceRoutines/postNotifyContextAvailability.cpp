@@ -45,7 +45,7 @@ std::string postNotifyContextAvailability(ConnectionInfo* ciP, int components, s
 {
   NotifyContextAvailabilityResponse  ncar;
 
-  mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar);
+  ciP->httpStatusCode = mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar);
 
   std::string answer = ncar.render(NotifyContextAvailability, ciP->outFormat, "");
 

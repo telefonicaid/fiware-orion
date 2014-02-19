@@ -299,8 +299,8 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
     }
 
     /* Calculate expiration (using the current time and the duration field in the request) */
-    int expiration = getCurrentTime() + requestP->duration.parse();
-    LM_T(LmtMongo, ("Registration expiration: %d", expiration));
+    long long expiration = getCurrentTime() + requestP->duration.parse();
+    LM_T(LmtMongo, ("Registration expiration: %lu", expiration));
 
     /* Create the mongoDB registration document */
     BSONObjBuilder reg;

@@ -34,6 +34,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "rest/rest.h"
+#include "rest/restReply.h"
 #include "serviceRoutines/exitTreat.h"
 
 
