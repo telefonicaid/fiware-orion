@@ -82,10 +82,15 @@ std::string treat(int type, std::string path, std::string value, JsonNode* parse
 */
 static std::string getArrayElementName(std::string arrayName)
 {
+  // Get the name of the array
   int pos = arrayName.find_last_of("/");
   std::string elementName = arrayName.substr(pos + 1);
+
+  // Take out the last letter (if it is an array it will delete the 's' character
+  // that is present in every case
   elementName = elementName.substr(0, elementName.length() - 1);
 
+  // Is the singular is formed changing 'ie' for 'y' ??
   if(elementName.length() > 2 && elementName.substr(elementName.length() - 2).compare("ie") == 0)
     elementName.replace(elementName.length() - 2, 2, "y");
 
@@ -109,7 +114,7 @@ static std::string jsonParse
   std::string res              = "OK";
   std::string arrayElementName = getArrayElementName(path);
 
-  // If the node name is empty, boost will yield an empty name.
+  // If the node name is empty, boost will yield an empty name. This will happen only in the case of a vector.
   // See: http://www.boost.org/doc/libs/1_41_0/doc/html/boost_propertytree/parsers.html#boost_propertytree.parsers.json_parser
   if (nodeName != "")
   {
