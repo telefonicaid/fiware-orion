@@ -5,7 +5,7 @@
         {
           "name" : "caName",
           "type" : "caType",
-          "contextValue" : "caValue"
+          "value" : "caValue"
         }
       ],
       "statusCode" : {

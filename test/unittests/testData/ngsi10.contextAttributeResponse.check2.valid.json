@@ -3,12 +3,12 @@
     {
       "name" : "caName",
       "type" : "caType",
-      "contextValue" : "caValue"
+      "value" : "caValue"
     },
     {
       "name" : "",
       "type" : "caType",
-      "contextValue" : "caValue"
+      "value" : "caValue"
     }
   ],
   "statusCode" : {

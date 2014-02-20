@@ -115,7 +115,7 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
   out += startTag(indent, xmlTag, jsonTag, format, false, false);
   out += valueTag(indent + "  ", "name",         name,  format, true);
   out += valueTag(indent + "  ", "type",         type,  format, true);
-  out += valueTag(indent + "  ", "contextValue", value, format, commaAfterContextValue);
+  out += valueTag(indent + "  ", ((format == XML)? "contextValue" : "value"), value, format, commaAfterContextValue);
   out += metadataVector.render(format, indent + "  ", false);
   out += endTag(indent, xmlTag, format, comma);
 

@@ -15,3 +15,4 @@ o JSON:     Fixed bug that prevented the use of UpdateContextRequest in JSON wit
 o Bug:      Expiration times are now 64-bit integers (there was a previous problem with overflow).
               Duration and Throttling are 64-bit integers in the parse phase. (Issue #208)
 o JSON:     Fixed bug that allowed using an object within an object instead of an object in an array. (Issue #223)
+o JSON:     Fixed bug that displayed the tag "contextValue" instead of "value" in some instances. (Issue #219)
