@@ -547,12 +547,27 @@ const char* description =
    "  compiled in:        " COMPILED_IN     "\n";
 
 
+/* ****************************************************************************
+*
+* contextBrokerInit -
+*/
+static void contextBrokerInit(bool ngsi9Only)
+{
+  /* Set notifier object (singleton) */
+  setNotifier(new Notifier());
+
+  /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
+  if (!ngsi9Only)
+    recoverOntimeIntervalThreads();
+  else
+    LM_F(("Running in NGSI9 only mode"));
+}
 
 /* ****************************************************************************
 *
 * mongoInit - 
 */
-static void mongoInit(const char* dbHost, std::string dbName, const char* user, const char* pwd, bool ngsi9Only)
+static void mongoInit(const char* dbHost, std::string dbName, const char* user, const char* pwd)
 {
    if (!mongoConnect(dbHost, dbName.c_str(), user, pwd))
     LM_X(1, ("MongoDB error"));
@@ -567,15 +582,6 @@ static void mongoInit(const char* dbHost, std::string dbName, const char* user, 
   setSubscribeContextCollectionName(dbName + ".csubs");
   setSubscribeContextAvailabilityCollectionName(dbName + ".casubs");
   setAssociationsCollectionName(dbName + ".associations");
-
-  /* Set notifier object (singleton) */
-  setNotifier(new Notifier());
-
-  /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
-  if (!ngsi9Only)
-    recoverOntimeIntervalThreads();
-  else
-    LM_F(("Running in NGSI9 only mode"));
 }
 
 
@@ -625,7 +631,8 @@ int main(int argC, char* argV[])
 
   pidFile();
   orionInit(orionExit, ORION_VERSION);
-  mongoInit(dbHost, dbName, user, pwd, ngsi9Only);
+  mongoInit(dbHost, dbName, user, pwd);
+  contextBrokerInit(ngsi9Only);
   restInit(rsP, ipVersion, bindAddress, port);
 
   while (1)
