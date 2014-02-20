@@ -219,9 +219,9 @@ Date: REGEX(.*)
 ** Too large errors:
 1
 ** Notification sizes:
- sendHttpSocket: Sending to HTTP server: sending static message of 19878 bytes to HTTP server
- sendHttpSocket: Sending to HTTP server: sending dynamic message of 21878 bytes to HTTP server
- sendHttpSocket: Sending to HTTP server: sending dynamic message of 8100880 bytes to HTTP server
+ sendHttpSocket: Sending to HTTP server: sending static message of 19879 bytes to HTTP server
+ sendHttpSocket: Sending to HTTP server: sending dynamic message of 21879 bytes to HTTP server
+ sendHttpSocket: Sending to HTTP server: sending dynamic message of 8100881 bytes to HTTP server
 --TEARDOWN--
 source harnessFunctions.sh
 cp /tmp/contextBrokerLog /tmp/contextBrokerLog.notification_different_sizes
