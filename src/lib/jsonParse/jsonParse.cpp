@@ -24,6 +24,8 @@
 */
 #include <set>
 #include <string>
+#include <stdint.h>
+#include <exception>
 
 //
 // http://www.boost.org/doc/libs/1_31_0/libs/spirit/doc/grammar.html:
@@ -80,12 +82,17 @@ std::string treat(int type, std::string path, std::string value, JsonNode* parse
 */
 static std::string getArrayElementName(std::string arrayName)
 {
+  // Get the name of the array
   int pos = arrayName.find_last_of("/");
   std::string elementName = arrayName.substr(pos + 1);
-  elementName = elementName.substr(0, elementName.length()-1);
 
-  if(elementName.substr(elementName.length()-2).compare("ie") == 0)
-    elementName.replace(elementName.length()-2, 2, "y");
+  // Take out the last letter (if it is an array it will delete the 's' character
+  // that is present in every case
+  elementName = elementName.substr(0, elementName.length() - 1);
+
+  // Is the singular is formed changing 'ie' for 'y' ??
+  if(elementName.length() > 2 && elementName.substr(elementName.length() - 2).compare("ie") == 0)
+    elementName.replace(elementName.length() - 2, 2, "y");
 
   return elementName;
 }
@@ -102,16 +109,24 @@ static std::string jsonParse
    ParseData*                                reqDataP
 )
 {
-  std::string  nodeName  = v.first.data();
-  std::string  value     = v.second.data();
-  std::string  res       = "OK";
+  std::string nodeName         = v.first.data();
+  std::string value            = v.second.data();
+  std::string res              = "OK";
+  std::string arrayElementName = getArrayElementName(path);
 
-  // If the node name is empty, boost will yield an empty name.
+  // If the node name is empty, boost will yield an empty name. This will happen only in the case of a vector.
   // See: http://www.boost.org/doc/libs/1_41_0/doc/html/boost_propertytree/parsers.html#boost_propertytree.parsers.json_parser
   if (nodeName != "")
-    path = path + "/" + nodeName;
+  {
+    // This detects whether we are trying to use an object within an object instead of a one-item array.
+    // We don't allow the first case, hence the exception thrown.
+    if (nodeName != arrayElementName)
+      path = path + "/" + nodeName;
+    else
+      throw std::logic_error("The object '" + path + "' may not have a child named '" + nodeName + "'");
+  }
   else
-    path = path + "/" + getArrayElementName(path);
+    path = path + "/" + arrayElementName;
 
   if (value == "")
     res = treat(1, path, value, parseVector, reqDataP);

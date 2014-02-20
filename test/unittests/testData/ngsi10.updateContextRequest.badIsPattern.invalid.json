@@ -1,6 +1,6 @@
 {
-	"contextElements": {
-		"contextElement": {
+	"contextElements": [
+		{
 			"type": "Room",
 			"isPattern": "fahlse",
 			"id": "ConferenceRoom",
@@ -42,6 +42,6 @@
         }
       ]
 		}
-	},
+	],
 	"updateAction": "UPDATE"
 }

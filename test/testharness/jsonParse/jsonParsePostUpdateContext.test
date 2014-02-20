@@ -34,8 +34,8 @@ echo "1: ***********************************"
 
 url="/NGSI10/updateContext"
 payload='{
-  "contextElements": {
-    "contextElement": {
+  "contextElements": [
+    {
       "type": "Room",
       "isPattern": "false",
       "id": "ConferenceRoom",
@@ -64,7 +64,7 @@ payload='{
         }
       ]
     }
-  },
+  ],
   "updateAction": "APPEND"
 }'
 curlJson ${url} "${payload}"
@@ -118,8 +118,8 @@ curlJson ${url} "${payload}"
 echo "3: ***********************************"
 url="/NGSI10/updateContext"
 payload='{
-  "contextElements": {
-    "contextElement": {
+  "contextElements": [
+    {
       "type": "Room",
       "isPattern": "false",
       "id": "ConferenceRoom",
@@ -148,7 +148,7 @@ payload='{
         }
       ]
     }
-  },
+  ],
   "updateAction": "UPDATE"
 }'
 curlJson ${url} "${payload}"
