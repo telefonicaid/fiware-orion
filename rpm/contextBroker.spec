@@ -161,6 +161,24 @@ Using these interfaces, clients can do several operations:
 %files -n %{name}-fiware
 
 %changelog
+* Thu Feb 20 2014 Fermin Galan <fermin@tid.es> 0.10.0-1 (FIWARE-3.3.2-1)
+- Added:  IPv6 support (By default, both IPv4 and IPv6 are activated - the new command line options '-ipv4' and '-ipv6' make the broker activate only one of them)
+- Added:  JSON support for all implemented convenience operations
+- Fixed:  Concurrency problem for JSON parser is solved
+- Fixed:  Bug that prevented the use of UpdateContextRequest in JSON with DELETE as action (closes #224)
+- Fixed:  Expiration times are now 64-bit integers (there was a previous problem with overflow) (closes #208)
+- Fixed:  Bug that incorrectly allowed using an object within an object instead of an object in an array (closes #223)
+- Fixed:  Fixed bug that displayed the tag "contextValue" instead of "value" in some instances for Javascript rendering (closes #219)
+- Fixed:  Removed subscriptionId from SubscribeContextAvailability
+- Fixed:  XML tag names for scope rendering ('scopeType'/'scopeValue' instead of 'type'/'value')
+- Fixed:  Changed "0" for "000000000000000000000000" in subscriptionId
+- Fixed:  Removed some spaces from XML tags (E.g. 'verbose level' => 'verboseLevel')
+- Fixed:  Stripped 'reference' of whitespace
+- Fixed:  Added an empty contextAttributeList for ContextAttributeResponseVector inside IndividualContextEntityAttributes (/ngsi10/contextEntities/{EID}/attributes) as the XSD demands it
+- Fixed:  Possible future error for JSON rendering of UpdateContextAvailabilitySubscriptionRequest
+- Fixed:  The reasonPhrase in statusCode/errorCode and OrionError is now 100% tied to the 'code'
+- Fixed:  OrionError now also with 'reasonPhrase' following 'code'
+
 * Mon Jan 20 2014 Fermin Galan <fermin@tid.es> 0.9.1-1 (FIWARE-3.3.1-1)
 - Added:  tracelevels for input/output for notifications and registrations forwarding
 - Added:  creDate attribute now also for attributes in mongodb
