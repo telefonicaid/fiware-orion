@@ -157,7 +157,7 @@ echo "4: ***********************************"
 --REGEXPECT--
 1: ***********************************
 HTTP/1.1 200 OK
-Content-Length: 413
+Content-Length: 406
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -167,9 +167,9 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "contextValue": "", 
                         "name": "temperature", 
-                        "type": "degree"
+                        "type": "degree",
+                        "value": ""
                     }
                 ], 
                 "id": "ConferenceRoom", 
@@ -195,7 +195,7 @@ Date: REGEX(.*)
 }
 3: ***********************************
 HTTP/1.1 200 OK
-Content-Length: 413
+Content-Length: 406
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -205,9 +205,9 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "contextValue": "", 
                         "name": "temperature", 
-                        "type": "degree"
+                        "type": "degree",
+                        "value": ""
                     }
                 ], 
                 "id": "ConferenceRoom", 

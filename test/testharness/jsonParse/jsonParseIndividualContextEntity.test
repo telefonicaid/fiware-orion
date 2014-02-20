@@ -155,7 +155,7 @@ Date: REGEX(.*)
 }
 2: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 271
+Content-Length: 264
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -164,9 +164,9 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "contextValue": "",
                     "name": "pressure",
-                    "type": "clima"
+                    "type": "clima",
+                    "value": ""
                 }
             ],
             "statusCode": {
@@ -207,7 +207,7 @@ Date: REGEX(.*)
 }
 6: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 298
+Content-Length: 291
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -215,9 +215,9 @@ Date: REGEX(.*)
     "contextElement": {
         "attributes": [
             {
-                "contextValue": "p23",
                 "name": "pressure",
-                "type": "clima"
+                "type": "clima",
+                "value": "p23"
             }
         ],
         "id": "ENTITY_ID",
@@ -231,7 +231,7 @@ Date: REGEX(.*)
 }
 7: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 271
+Content-Length: 264
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -240,9 +240,9 @@ Date: REGEX(.*)
         {
             "attributes": [
                 {
-                    "contextValue": "",
                     "name": "pressure",
-                    "type": "clima"
+                    "type": "clima",
+                    "value": ""
                 }
             ],
             "statusCode": {
