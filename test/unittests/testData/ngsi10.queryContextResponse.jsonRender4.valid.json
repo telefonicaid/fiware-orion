@@ -9,7 +9,7 @@
           {
             "name" : "ca",
             "type" : "string",
-            "contextValue" : "a context attribute"
+            "value" : "a context attribute"
           }
         ],
         "metadatas" : [

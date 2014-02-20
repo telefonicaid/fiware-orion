@@ -10,12 +10,12 @@
           {
             "name" : "ca9",
             "type" : "string",
-            "contextValue" : "context attribute 9"
+            "value" : "context attribute 9"
           },
           {
             "name" : "ca11",
             "type" : "string",
-            "contextValue" : "context attribute 11"
+            "value" : "context attribute 11"
           }
         ],
         "metadatas" : [
