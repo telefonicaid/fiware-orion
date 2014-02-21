@@ -168,7 +168,8 @@ Using these interfaces, clients can do several operations:
 - Fixed:  Bug that prevented the use of UpdateContextRequest in JSON with DELETE as action (closes #224)
 - Fixed:  Expiration times are now 64-bit integers (there was a previous problem with overflow) (closes #208)
 - Fixed:  Bug that incorrectly allowed using an object within an object instead of an object in an array (closes #223)
-- Fixed:  Fixed bug that displayed the tag "contextValue" instead of "value" in some instances for Javascript rendering (closes #219)
+- Fixed:  Fixed bug that displayed the tag "contextValue" instead of "value" in some instances for JSON rendering (closes 
+#219)
 - Fixed:  Removed subscriptionId from SubscribeContextAvailability
 - Fixed:  XML tag names for scope rendering ('scopeType'/'scopeValue' instead of 'type'/'value')
 - Fixed:  Changed "0" for "000000000000000000000000" in subscriptionId
