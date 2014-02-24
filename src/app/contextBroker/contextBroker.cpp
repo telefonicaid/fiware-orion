@@ -636,8 +636,5 @@ int main(int argC, char* argV[])
   restInit(rsP, ipVersion, bindAddress, port);
 
   while (1)
-  {
-    sleep(1);
-    LM_M(("broker is alive"));
-  }
+    sleep(10);
 }
