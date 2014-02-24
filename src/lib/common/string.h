@@ -60,4 +60,16 @@ extern char* i2s(int i, char* placeholder);
 */
 extern std::string parsedUptime(int uptime);
 
+/* ****************************************************************************
+*
+* string2coords - 
+*/
+extern bool string2coords(std::string s, double& latitude, double& longitude);
+
+/* ****************************************************************************
+*
+* coords2string - 
+*/
+extern void coords2string(std::string& s, double latitude, double longitude, int decimals = 6);
+
 #endif
