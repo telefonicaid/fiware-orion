@@ -45,14 +45,14 @@
 
 /* ****************************************************************************
 *
-* ScopeType - 
+* AreaType - 
 */
-typedef enum ScopeType
+typedef enum AreaType
 {
-  ScopeStringValue,
-  ScopeAreaCircle,
-  ScopeAreaPolygon
-} ScopeType;
+  AreaNone,
+  AreaCircle,
+  AreaPolygon
+} AreaType;
 
 
 
@@ -74,8 +74,9 @@ typedef struct ScopePoint
 */
 typedef struct ScopeCircle
 {
-  ScopePoint origin;
+  ScopePoint center;
   double     radius; 
+  bool       inverted;
 } ScopeCircle;
 
 
@@ -87,6 +88,7 @@ typedef struct ScopeCircle
 typedef struct ScopePolygon
 {
   std::vector<ScopePoint*> vertexList;
+  bool                     inverted;
 } ScopePolygon;
 
 
@@ -100,7 +102,7 @@ typedef struct Scope
   std::string  type;    // Mandatory
   std::string  value;   // Mandatory
 
-  ScopeType    scopeType;
+  AreaType     areaType;
   ScopeCircle  circle;
   ScopePolygon polygon;
 

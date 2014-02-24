@@ -177,7 +177,7 @@ static int scopeValue(xml_node<>* node, ParseData* reqData)
 static int circle(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circle"));
-  reqData->dcar.scopeP->scopeType = ScopeAreaCircle;
+  reqData->dcar.scopeP->areaType = AreaCircle;
   return 0;
 }
 
@@ -190,7 +190,7 @@ static int circle(xml_node<>* node, ParseData* reqData)
 static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circleCenterLatitude: %s", node->value()));
-  reqData->dcar.scopeP->circle.origin.latitude = atof(node->value());
+  reqData->dcar.scopeP->circle.center.latitude = atof(node->value());
 
   return 0;
 }
@@ -204,7 +204,7 @@ static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
 static int circleCenterLongitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circleCenterLongitude: %s", node->value()));
-  reqData->dcar.scopeP->circle.origin.longitude = atof(node->value());
+  reqData->dcar.scopeP->circle.center.longitude = atof(node->value());
   return 0;
 }
 
@@ -230,7 +230,7 @@ static int circleRadius(xml_node<>* node, ParseData* reqData)
 static int polygon(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygon"));
-  reqData->dcar.scopeP->scopeType = ScopeAreaPolygon;
+  reqData->dcar.scopeP->areaType = AreaPolygon;
   return 0;
 }
 

@@ -39,19 +39,23 @@ TEST(commonGlobals, isTrue)
 {
    bool bTrue;
 
-   bTrue = isTrue("TRUE");
-   EXPECT_TRUE(bTrue) << "'TRUE' should be true";
-   bTrue = isTrue("True");
-   EXPECT_TRUE(bTrue) << "'True' should be true";
    bTrue = isTrue("true");
-   EXPECT_TRUE(bTrue) << "'true' should be true";
+   EXPECT_TRUE(bTrue);
+   bTrue = isTrue("1");
+   EXPECT_TRUE(bTrue);
 
+   bTrue = isTrue("TRUE");
+   EXPECT_FALSE(bTrue);
+   bTrue = isTrue("True");
+   EXPECT_FALSE(bTrue);
    bTrue = isTrue("YES");
-   EXPECT_TRUE(bTrue) << "'YES' should be true";
+   EXPECT_FALSE(bTrue);
    bTrue = isTrue("Yes");
-   EXPECT_TRUE(bTrue) << "'Yes' should be true";
+   EXPECT_FALSE(bTrue);
    bTrue = isTrue("yes");
-   EXPECT_TRUE(bTrue) << "'yes' should be true";
+   EXPECT_FALSE(bTrue);
+   bTrue = isTrue("0");
+   EXPECT_FALSE(bTrue);
 }
 
 
@@ -64,19 +68,23 @@ TEST(commonGlobals, isFalse)
 {
    bool bFalse;
 
-   bFalse = isFalse("FALSE");
-   EXPECT_TRUE(bFalse) << "'FALSE' should be false";
-   bFalse = isFalse("False");
-   EXPECT_TRUE(bFalse) << "'False' should be false";
    bFalse = isFalse("false");
-   EXPECT_TRUE(bFalse) << "'false' should be false";
+   EXPECT_TRUE(bFalse);
+   bFalse = isFalse("0");
+   EXPECT_TRUE(bFalse);
 
+   bFalse = isFalse("FALSE");
+   EXPECT_FALSE(bFalse);
+   bFalse = isFalse("False");
+   EXPECT_FALSE(bFalse);
    bFalse = isFalse("NO");
-   EXPECT_TRUE(bFalse) << "'NO' should be false";
+   EXPECT_FALSE(bFalse);
    bFalse = isFalse("No");
-   EXPECT_TRUE(bFalse) << "'No' should be false";
+   EXPECT_FALSE(bFalse);
    bFalse = isFalse("no");
-   EXPECT_TRUE(bFalse) << "'no' should be false";
+   EXPECT_FALSE(bFalse);
+   bFalse = isFalse("0");
+   EXPECT_FALSE(bFalse);
 }
 
 
