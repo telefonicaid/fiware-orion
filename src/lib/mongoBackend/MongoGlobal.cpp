@@ -421,7 +421,22 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
                 geoWithin = BSON("$centerSphere" << BSON_ARRAY(BSON_ARRAY( sco->circle.origin.latitude << sco->circle.origin.longitude) << radians ));
             }
             else {  // sco->scopeType == ScopeAreaPolygon
-                // FIXME P10
+                BSONArrayBuilder vertex;
+                double x0, y0;
+                for (unsigned int jx = 0; jx < sco->polygon.vertexList.size() ; ++jx) {
+                    double x = sco->polygon.vertexList[jx]->latitude;
+                    double y = sco->polygon.vertexList[jx]->longitude;
+                    if (jx == 0) {
+                        x0 = x;
+                        y0 = y;
+                    }
+                    vertex.append(BSON_ARRAY(x << y));
+                }
+                /* MongoDB query API needs to "close" the polygon with the same point that the initial point */
+                vertex.append(BSON_ARRAY(x0 << y0));
+
+                /* Note that MongoDB query API uses an ugly "double array" structure for coordinates */
+                geoWithin = BSON("$geometry" << BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(vertex.arr())));
             }
             // FIXME P10 take into account the inverted flag to use $not in the query
             areaQuery = BSON("$geoWithin" << geoWithin);
