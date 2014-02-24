@@ -145,6 +145,18 @@ static std::string attributeList(std::string path, std::string value, ParseData*
 
 /* ****************************************************************************
 *
+* restriction - 
+*/
+static std::string restriction(std::string path, std::string value, ParseData* reqDataP)
+{
+  reqDataP->qcr.res.restrictions += 1;
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
 * attributeExpression - 
 */
 static std::string attributeExpression(std::string path, std::string value, ParseData* reqDataP)
@@ -202,21 +214,70 @@ static std::string scopeType(std::string path, std::string value, ParseData* req
 */
 static std::string scopeValue(std::string path, std::string value, ParseData* reqDataP)
 {
-   reqDataP->qcr.scopeP->value = value;
-   LM_T(LmtParse, ("Set scope 'value' to '%s' for a scope", reqDataP->qcr.scopeP->value.c_str()));
+  if (reqDataP->qcr.scopeP->type == "FIWARE_Location")
+  {
+    reqDataP->qcr.scopeP->value = "FIWARE_Location";
+    LM_T(LmtParse, ("Preparing scopeValue for '%s'", reqDataP->qcr.scopeP->type.c_str()));
+  }
+  else
+  {
+    reqDataP->qcr.scopeP->value = value;
+    LM_T(LmtParse, ("Got a scopeValue: '%s' for scopeType '%s'", value.c_str(), reqDataP->qcr.scopeP->type.c_str()));
+  }
 
-   return "OK";
+  return "OK";
 }
 
 
 
 /* ****************************************************************************
 *
-* restriction - 
+* circle - 
 */
-static std::string restriction(std::string path, std::string value, ParseData* reqDataP)
+static std::string circle(std::string path, std::string value, ParseData* reqDataP)
 {
-  reqDataP->qcr.res.restrictions += 1;
+  LM_T(LmtParse, ("Got a circle"));
+  reqDataP->qcr.scopeP->scopeType = ScopeAreaCircle;
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* circleCenterLatitude - 
+*/
+static std::string circleCenterLatitude(std::string path, std::string value, ParseData* reqDataP)
+{
+  LM_T(LmtParse, ("Got a circleCenterLatitude: %s", value.c_str()));
+  reqDataP->qcr.scopeP->circle.origin.latitude = atof(value.c_str());
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* circleCenterLongitude - 
+*/
+static std::string circleCenterLongitude(std::string path, std::string value, ParseData* reqDataP)
+{
+  LM_T(LmtParse, ("Got a circleCenterLongitude: %s", value.c_str()));
+  reqDataP->qcr.scopeP->circle.origin.longitude = atof(value.c_str());
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* circleRadius - 
+*/
+static std::string circleRadius(std::string path, std::string value, ParseData* reqDataP)
+{
+  LM_T(LmtParse, ("Got a circleRadius: %s", value.c_str()));
+  reqDataP->qcr.scopeP->circle.radius = atof(value.c_str());
   return "OK";
 }
 
@@ -243,6 +304,11 @@ JsonNode jsonQcrParseVector[] =
    { "/restriction/scopes/scope",        operationScope         },
    { "/restriction/scopes/scope/type",   scopeType              },
    { "/restriction/scopes/scope/value",  scopeValue             },
+
+  { "/restriction/scopes/scope/value/circle",                  circle                     },
+  { "/restriction/scopes/scope/value/circle/center_latitude",  circleCenterLatitude       },
+  { "/restriction/scopes/scope/value/circle/center_longitude", circleCenterLongitude      },
+  { "/restriction/scopes/scope/value/circle/radius",           circleRadius               },
 
    { "LAST", NULL }
 };

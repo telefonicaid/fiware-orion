@@ -41,6 +41,56 @@
 #define SCOPE_VALUE_ASSOC_TARGET   "TARGETS"
 #define SCOPE_VALUE_ASSOC_ALL      "ALL"
 
+
+
+/* ****************************************************************************
+*
+* ScopeType - 
+*/
+typedef enum ScopeType
+{
+  ScopeStringValue,
+  ScopeAreaCircle,
+  ScopeAreaPolygon
+} ScopeType;
+
+
+
+/* ****************************************************************************
+*
+* ScopePoint - 
+*/
+typedef struct ScopePoint
+{
+  double latitude;
+  double longitude;
+} ScopePoint;
+
+
+
+/* ****************************************************************************
+*
+* ScopeCircle - 
+*/
+typedef struct ScopeCircle
+{
+  ScopePoint origin;
+  double     radius; 
+} ScopeCircle;
+
+
+
+/* ****************************************************************************
+*
+* ScopePolygon - 
+*/
+typedef struct ScopePolygon
+{
+  std::vector<ScopePoint*> vertexList;
+} ScopePolygon;
+
+
+
 /* ****************************************************************************
 *
 * Scope -
@@ -49,6 +99,10 @@ typedef struct Scope
 {
   std::string  type;    // Mandatory
   std::string  value;   // Mandatory
+
+  ScopeType    scopeType;
+  ScopeCircle  circle;
+  ScopePolygon polygon;
 
   Scope();
   Scope(std::string _type, std::string _value);

@@ -1,0 +1,85 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# fermin at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+XML Parse Post DiscoverContextAvailability with Geolocalization areas
+--SHELL-INIT--
+source ../harnessFunctions.sh
+
+dbInit CB
+brokerStart CB
+
+--SHELL--
+source ../harnessFunctions.sh
+echo "+++++ Discovery +++++"
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0"?>
+  <discoverContextAvailabilityRequest>
+    <entityIdList>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom2</id>
+      </entityId>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom2</id>
+      </entityId>
+    </entityIdList>
+    <attributeList>
+      <attribute>temperature</attribute>
+      <attribute>pressure</attribute>
+    </attributeList>
+    <restriction>
+      <scope>
+        <operationScope>
+          <scopeType>FIWARE_Location</scopeType>
+          <scopeValue>
+            <circle>
+              <center_latitude>5</center_latitude>
+              <center_longitude>5</center_longitude>
+              <radius>10</radius>
+            </circle>
+          </scopeValue>
+        </operationScope>
+      </scope>
+    </restriction>
+  </discoverContextAvailabilityRequest>'
+curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+
+echo "+++++ Discovery Done +++++"
+
+--REGEXPECT--
++++++ Discovery +++++
+HTTP/1.1 200 OK
+Content-Length: 185
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<discoverContextAvailabilityResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
+</discoverContextAvailabilityResponse>
++++++ Discovery Done +++++
+--TEARDOWN--
+source ../harnessFunctions.sh
+brokerStop CB

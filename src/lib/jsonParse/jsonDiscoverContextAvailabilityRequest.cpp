@@ -135,6 +135,18 @@ static std::string attributeList(std::string path, std::string value, ParseData*
 
 /* ****************************************************************************
 *
+* restriction - 
+*/
+static std::string restriction(std::string path, std::string value, ParseData* reqDataP)
+{
+  reqDataP->dcar.res.restrictions += 1;
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
 * attributeExpression - 
 */
 static std::string attributeExpression(std::string path, std::string value, ParseData* reqDataP)
@@ -190,9 +202,16 @@ static std::string scopeType(std::string path, std::string value, ParseData* req
 */
 static std::string scopeValue(std::string path, std::string value, ParseData* reqDataP)
 {
-   LM_W(("Setting scope value to '%s'", value.c_str()));
-   reqDataP->dcar.scopeP->value = value;
-   LM_T(LmtParse, ("Set scope 'value' to '%s' for a scope", reqDataP->dcar.scopeP->value.c_str()));
+  if (reqDataP->dcar.scopeP->type == "FIWARE_Location")
+  {
+    reqDataP->dcar.scopeP->value = "FIWARE_Location";
+    LM_T(LmtParse, ("Preparing scopeValue for '%s'", reqDataP->dcar.scopeP->type.c_str()));
+  }
+  else
+  {
+    reqDataP->dcar.scopeP->value = value;
+    LM_T(LmtParse, ("Got a scopeValue: '%s' for scopeType '%s'", value.c_str(), reqDataP->dcar.scopeP->type.c_str()));
+  }
 
    return "OK";
 }
@@ -201,11 +220,12 @@ static std::string scopeValue(std::string path, std::string value, ParseData* re
 
 /* ****************************************************************************
 *
-* restriction - 
+* circle - 
 */
-static std::string restriction(std::string path, std::string value, ParseData* reqDataP)
+static std::string circle(std::string path, std::string value, ParseData* reqDataP)
 {
-  reqDataP->dcar.res.restrictions += 1;
+  LM_T(LmtParse, ("Got a circle"));
+  reqDataP->dcar.scopeP->scopeType = ScopeAreaCircle;
   return "OK";
 }
 
@@ -213,28 +233,42 @@ static std::string restriction(std::string path, std::string value, ParseData* r
 
 /* ****************************************************************************
 *
-* dcarParseVector - 
+* circleCenterLatitude - 
 */
-JsonNode jsonDcarParseVector[] =
+static std::string circleCenterLatitude(std::string path, std::string value, ParseData* reqDataP)
 {
-   { "/entities",                         jsonNullTreat         },
-   { "/entities/entity",                  entityId              },
-   { "/entities/entity/id",               entityIdId            },
-   { "/entities/entity/type",             entityIdType          },
-   { "/entities/entity/isPattern",        entityIdIsPattern     },
+  LM_T(LmtParse, ("Got a circleCenterLatitude: %s", value.c_str()));
+  reqDataP->dcar.scopeP->circle.origin.latitude = atof(value.c_str());
 
-   { "/attributes",                       attributeList         },
-   { "/attributes/attribute",             attribute             },
+  return "OK";
+}
 
-   { "/restriction",                      restriction           },
-   { "/restriction/attributeExpression",  attributeExpression   },
-   { "/restriction/scopes",               jsonNullTreat         },
-   { "/restriction/scopes/scope",         operationScope        },
-   { "/restriction/scopes/scope/type",    scopeType             },
-   { "/restriction/scopes/scope/value",   scopeValue            },
 
-  { "LAST", NULL }
-};
+
+/* ****************************************************************************
+*
+* circleCenterLongitude - 
+*/
+static std::string circleCenterLongitude(std::string path, std::string value, ParseData* reqDataP)
+{
+  LM_T(LmtParse, ("Got a circleCenterLongitude: %s", value.c_str()));
+  reqDataP->dcar.scopeP->circle.origin.longitude = atof(value.c_str());
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* circleRadius - 
+*/
+static std::string circleRadius(std::string path, std::string value, ParseData* reqDataP)
+{
+  LM_T(LmtParse, ("Got a circleRadius: %s", value.c_str()));
+  reqDataP->dcar.scopeP->circle.radius = atof(value.c_str());
+  return "OK";
+}
+
 
 
 /* ****************************************************************************
@@ -290,3 +324,35 @@ void jsonDcarPresent(ParseData* reqDataP)
   PRINTF("\n\n");
   reqDataP->dcar.res.present("");
 }
+
+
+
+/* ****************************************************************************
+*
+* dcarParseVector - 
+*/
+JsonNode jsonDcarParseVector[] =
+{
+   { "/entities",                         jsonNullTreat         },
+   { "/entities/entity",                  entityId              },
+   { "/entities/entity/id",               entityIdId            },
+   { "/entities/entity/type",             entityIdType          },
+   { "/entities/entity/isPattern",        entityIdIsPattern     },
+
+   { "/attributes",                       attributeList         },
+   { "/attributes/attribute",             attribute             },
+
+   { "/restriction",                      restriction           },
+   { "/restriction/attributeExpression",  attributeExpression   },
+   { "/restriction/scopes",               jsonNullTreat         },
+   { "/restriction/scopes/scope",         operationScope        },
+   { "/restriction/scopes/scope/type",    scopeType             },
+   { "/restriction/scopes/scope/value",   scopeValue            },
+
+   { "/restriction/scopes/scope/value/circle",                   circle                },
+   { "/restriction/scopes/scope/value/circle/center_latitude",   circleCenterLatitude  },
+   { "/restriction/scopes/scope/value/circle/center_longitude",  circleCenterLongitude },
+   { "/restriction/scopes/scope/value/circle/radius",            circleRadius          },
+
+  { "LAST", NULL }
+};

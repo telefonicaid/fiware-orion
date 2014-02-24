@@ -171,10 +171,137 @@ static int scopeType(xml_node<>* node, ParseData* reqDataP)
 *
 * scopeValue - 
 */
-static int scopeValue(xml_node<>* node, ParseData* reqDataP)
+static int scopeValue(xml_node<>* node, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a scopeValue: '%s'", node->value()));
-  reqDataP->scar.scopeP->value = node->value();
+  if (reqData->scar.scopeP->type == "FIWARE_Location")
+  {
+    reqData->scar.scopeP->value = "FIWARE_Location";
+    LM_T(LmtParse, ("Preparing scopeValue for '%s'", reqData->scar.scopeP->type.c_str()));
+  }
+  else
+  {
+    reqData->scar.scopeP->value = node->value();
+    LM_T(LmtParse, ("Got a scopeValue: '%s' for scopeType '%s'", node->value(), reqData->scar.scopeP->type.c_str()));
+  }
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* circle - 
+*/
+static int circle(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a circle"));
+  reqData->scar.scopeP->scopeType = ScopeAreaCircle;
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* circleCenterLatitude - 
+*/
+static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a circleCenterLatitude: %s", node->value()));
+  reqData->scar.scopeP->circle.origin.latitude = atof(node->value());
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* circleCenterLongitude - 
+*/
+static int circleCenterLongitude(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a circleCenterLongitude: %s", node->value()));
+  reqData->scar.scopeP->circle.origin.longitude = atof(node->value());
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* circleRadius - 
+*/
+static int circleRadius(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a circleRadius: %s", node->value()));
+  reqData->scar.scopeP->circle.radius = atof(node->value());
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* polygon - 
+*/
+static int polygon(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a polygon"));
+  reqData->scar.scopeP->scopeType = ScopeAreaPolygon;
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonVertexList - 
+*/
+static int polygonVertexList(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a polygonVertexList"));
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonVertex - 
+*/
+static int polygonVertex(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a polygonVertex - creating new vertex for the vertex list"));
+  reqData->scar.vertexP = new ScopePoint();
+  reqData->scar.scopeP->polygon.vertexList.push_back(reqData->scar.vertexP);
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonVertexLatitude - 
+*/
+static int polygonVertexLatitude(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a polygonVertexLatitude: %s", node->value()));
+  reqData->scar.vertexP->latitude = atof(node->value());
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonVertexLongitude - 
+*/
+static int polygonVertexLongitude(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a polygonVertexLongitude: %s", node->value()));
+  reqData->scar.vertexP->longitude = atof(node->value());
   return 0;
 }
 
@@ -272,6 +399,17 @@ XmlNode scarParseVector[] =
   { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope",            operationScope       },
   { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeType",  scopeType            },
   { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeValue", scopeValue           },
+
+  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/circle",                   circle                 },
+  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/circle/center_latitude",   circleCenterLatitude   },
+  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/circle/center_longitude",  circleCenterLongitude  },
+  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/circle/radius",            circleRadius           },
+
+  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/polygon",                             polygon                 },
+  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList",                  polygonVertexList       },
+  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex",           polygonVertex           },
+  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex/latitude",  polygonVertexLatitude   },
+  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex/longitude", polygonVertexLongitude  },
 
   { "LAST", NULL }
 };

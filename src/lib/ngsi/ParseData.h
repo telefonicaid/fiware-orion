@@ -89,6 +89,7 @@ typedef struct DiscoverContextAvailabilityData
   DiscoverContextAvailabilityRequest  res;
   EntityId*                           entityIdP;
   Scope*                              scopeP;
+  ScopePoint*                         vertexP;
 } DiscoverContextAvailabilityData;
 
 
@@ -102,6 +103,7 @@ typedef struct QueryContextData
    QueryContextRequest  res;
    EntityId*            entityIdP;
    Scope*               scopeP;
+   ScopePoint*          vertexP;
 } QueryContextData;
 
 
@@ -115,6 +117,7 @@ typedef struct SubscribeContextAvailabilityData
    SubscribeContextAvailabilityRequest  res;
    EntityId*                            entityIdP;
    Scope*                               scopeP;
+   ScopePoint*                          vertexP;
 } SubscribeContextAvailabilityData;
 
 
@@ -131,6 +134,7 @@ typedef struct SubscribeContextData
    Restriction*                   restrictionP;
    NotifyCondition*               notifyConditionP;
    Scope*                         scopeP;
+   ScopePoint*                    vertexP;
 } SubscribeContextData;
 
 
@@ -197,6 +201,7 @@ typedef struct UpdateContextAvailabilitySubscriptionData
    UpdateContextAvailabilitySubscriptionRequest  res;
    EntityId*                                     entityIdP;
    Scope*                                        scopeP;
+   ScopePoint*                                   vertexP;
 } UpdateContextAvailabilitySubscriptionData;
 
 
@@ -226,6 +231,7 @@ typedef struct UpdateContextSubscriptionData
   UpdateContextSubscriptionRequest  res;
   NotifyCondition*                  notifyConditionP;
   Scope*                            scopeP;
+  ScopePoint*                       vertexP;
 } UpdateContextSubscriptionData;
 
 

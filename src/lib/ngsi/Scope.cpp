@@ -110,7 +110,27 @@ void Scope::present(std::string indent, int ix)
     PRINTF("%sScope %d:\n",    indent.c_str(), ix);
 
   PRINTF("%s  Type:     %s\n", indent.c_str(), type.c_str());
-  PRINTF("%s  Value:    %s\n", indent.c_str(), value.c_str());
+
+  if (scopeType == ScopeStringValue)
+    PRINTF("%s  Value:    %s\n", indent.c_str(), value.c_str());
+  else if (scopeType == ScopeAreaCircle)
+  {
+    PRINTF("%s  FI-WARE Circle Area:\n", indent.c_str());
+    PRINTF("%s    Radius:     %f\n", indent.c_str(), circle.radius);
+    PRINTF("%s    Longitude:  %f\n", indent.c_str(), circle.origin.longitude);
+    PRINTF("%s    Latitude:   %f\n", indent.c_str(), circle.origin.latitude);
+  }
+  else if (scopeType == ScopeAreaPolygon)
+  {
+    PRINTF("%s  FI-WARE Polygon Area (%lu vertices):\n", indent.c_str(), polygon.vertexList.size());
+
+    for (unsigned int ix = 0; ix < polygon.vertexList.size(); ++ix)
+    {
+      PRINTF("%s    Vertex %d\n", indent.c_str(), ix);
+      PRINTF("%s      Longitude:  %f\n", indent.c_str(), polygon.vertexList[ix]->longitude);
+      PRINTF("%s      Latitude:   %f\n", indent.c_str(), polygon.vertexList[ix]->latitude);
+    }
+  }
 }
 
 
