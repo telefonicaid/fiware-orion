@@ -212,6 +212,7 @@ SET (SOURCES
     mongoBackend/mongoDiscoverContextAvailability_test.cpp
     mongoBackend/mongoOntimeintervalOperations_test.cpp
     mongoBackend/mongoQueryContext_test.cpp
+    mongoBackend/mongoQueryContextGeo_test.cpp
     mongoBackend/mongoRegisterContext_test.cpp
     mongoBackend/mongoRegisterContext_update_test.cpp
     mongoBackend/mongoSubscribeContextAvailability_test.cpp

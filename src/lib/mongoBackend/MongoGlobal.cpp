@@ -38,6 +38,7 @@
 #include "ngsi/AttributeList.h"
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/Duration.h"
+#include "ngsi/Restriction.h"
 
 #include "ngsiNotify/Notifier.h"
 
@@ -403,20 +404,52 @@ static void processEntitityPatternTrue(BSONArrayBuilder* arrayP, EntityId* enP) 
 
 /* ****************************************************************************
 *
+* processAreaScope -
+*
+* Returns true if a location was found, false otherwise
+*/
+static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
+
+    for (unsigned int ix = 0; ix < scoV.size(); ++ix) {
+        Scope* sco = scoV.get(ix);
+        if (sco->type == SCOPE_LOCATION) {
+            // FIXME P2: current version only support one geolocation scope. If the client includes several ones,
+            // only the first is taken into account
+            BSONObj geoWithin;
+            if (sco->scopeType == ScopeAreaCircle) {
+                double radians = sco->circle.radius / EARTH_RADIUS_METERS;
+                geoWithin = BSON("$centerSphere" << BSON_ARRAY(BSON_ARRAY( sco->circle.origin.latitude << sco->circle.origin.longitude) << radians ));
+            }
+            else {  // sco->scopeType == ScopeAreaPolygon
+                // FIXME P10
+            }
+            // FIXME P10 take into account the inverted flag to use $not in the query
+            areaQuery = BSON("$geoWithin" << geoWithin);
+
+            return true;
+        }
+    }
+
+    return false;
+
+}
+
+/* ****************************************************************************
+*
 * entitiesQuery -
 *
 * This method is used by queryContext and subscribeContext (ONCHANGE conditions). It takes
 * a vector with entities and a vector with attributes as input and returns the corresponding
 * ContextElementResponseVector or error.
 *
-* Note thte includeEmpty argument. This is used if we don't want the result to include empty
+* Note the includeEmpty argument. This is used if we don't want the result to include empty
 * attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is amited at
 * subscribeContext case, as empty values can cause problems in the case of federating Context
 * Brokers (the notifyContext is processed as an updateContext and in the latter case, an
 * empty value causes an error)
 *
 */
-bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty) {
+bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty) {
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -475,6 +508,14 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
          * make the query fail*/
         queryBuilder.append(attrNames, BSON("$in" << attrs.arr()));
     }
+
+    /* Potentially include area scope in the query */
+    BSONObj areaQuery;
+    if (processAreaScope(res.scopeVector, areaQuery)) {
+       std::string locCoords = std::string(ENT_LOCATION) + "." + ENT_LOCATION_COORDS;
+       queryBuilder.append(locCoords, areaQuery);
+    }
+
     BSONObj query = queryBuilder.obj();
 
     /* Do the query on MongoDB */
@@ -840,7 +881,9 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
     std::string err;
     NotifyContextRequest ncr;
 
-    if (!entitiesQuery(enV, attrL, &ncr.contextElementResponseVector, &err, false)) {
+    // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
+    Restriction res;
+    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false)) {
         ncr.contextElementResponseVector.release();
         LM_RE(false, (err.c_str()));
     }
@@ -857,7 +900,8 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
              * Note that in this case we do a query for all the attributes, not restricted to attrV */
             ContextElementResponseVector allCerV;
             AttributeList emptyList;
-            if (!entitiesQuery(enV, emptyList, &allCerV, &err, false)) {
+            // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
+            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false)) {
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
                 LM_RE(false, (err.c_str()));

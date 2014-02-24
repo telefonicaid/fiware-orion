@@ -54,7 +54,7 @@ using ::testing::Throw;
 * - queryGeoPolygonIn2
 * - queryGeoPolygonIn3
 * - queryGeoPolygonOut1
-* - queryGeoPolygonOuT2
+* - queryGeoPolygonOut2
 *
 */
 
@@ -72,57 +72,69 @@ static void prepareDatabase(void) {
 
   DBClientConnection* connection = getMongoConnection();
 
+  connection->ensureIndex("tutorial.persons", BSON("location.coords" << "2dsphere" ));
+
   BSONObj A = BSON("_id" << BSON("id" << "A" << "type" << "Point") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << BSON_ARRAY(3 << 2)) <<
+                        BSON("name" << "pos" << "type" << "location" << "value" << "3, 2") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_A")
                         ) <<
-                     "locAttr" << "pos"
+                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(3 << 2))
                     );
 
   BSONObj B = BSON("_id" << BSON("id" << "B" << "type" << "Point") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << BSON_ARRAY(5 << 5)) <<
+                        BSON("name" << "pos" << "type" << "location" << "value" << "5, 5") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_B")
                         ) <<
-                     "locAttr" << "pos"
+                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(5 << 5))
                     );
 
   BSONObj C = BSON("_id" << BSON("id" << "C" << "type" << "Point") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << BSON_ARRAY(7 << 4)) <<
+                        BSON("name" << "pos" << "type" << "location" << "value" << "7, 4") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_C")
                         ) <<
-                     "locAttr" << "pos"
+                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(7 << 4))
+                    );
+
+  // Entity D hasn't a location attribute (i.e. no location field). This entity will be never returned
+  // when a geoscope is defined
+  BSONObj D = BSON("_id" << BSON("id" << "D" << "type" << "Point") <<
+                     "attrs" << BSON_ARRAY(
+                        BSON("name" << "pos" << "type" << "location" << "value" << "7, 4") <<
+                        BSON("name" << "foo" << "type" << "string" << "value" << "attr_C")
+                        )
                     );
 
   BSONObj city1 = BSON("_id" << BSON("id" << "Madrid" << "type" << "City") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << BSON_ARRAY(40.418889 << -3.691944)) <<
+                        BSON("name" << "pos" << "type" << "location" << "value" << "40.418889, -3.691944") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_Mad")
                         ) <<
-                     "locAttr" << "pos"
+                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(40.418889 << -3.691944))
                     );
 
   BSONObj city2 = BSON("_id" << BSON("id" << "Alcobendas" << "type" << "City") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << BSON_ARRAY(40.533333 << -3.633333)) <<
+                        BSON("name" << "pos" << "type" << "location" << "value" << "40.533333, -3.633333") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_Alc")
                         ) <<
-                     "locAttr" << "pos"
+                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(40.533333 << -3.633333))
                     );
 
   BSONObj city3 = BSON("_id" << BSON("id" << "Leganes" << "type" << "City") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << BSON_ARRAY(40.316667 << -3.75)) <<
+                        BSON("name" << "pos" << "type" << "location" << "value" << "40.316667, -3.75") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_Leg")
                         ) <<
-                     "locAttr" << "pos"
+                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(40.316667 << -3.75))
                     );
 
   connection->insert(ENTITIES_COLL, A);
   connection->insert(ENTITIES_COLL, B);
   connection->insert(ENTITIES_COLL, C);
+  connection->insert(ENTITIES_COLL, D);
   connection->insert(ENTITIES_COLL, city1);
   connection->insert(ENTITIES_COLL, city2);
   connection->insert(ENTITIES_COLL, city3);
@@ -188,16 +200,16 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
     /* Context Element response # 2 */
-    EXPECT_EQ("Alcobendas", RES_CER(1).entityId.id);
+    EXPECT_EQ("Leganes", RES_CER(1).entityId.id);
     EXPECT_EQ("City", RES_CER(1).entityId.type);
     EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
     ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("40.533333, -3.633333", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("40.316667, -3.75", RES_CER_ATTR(1, 0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(1, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(1, 1)->type);
-    EXPECT_EQ("attr_Alc", RES_CER_ATTR(1, 1)->value);
+    EXPECT_EQ("attr_Leg", RES_CER_ATTR(1, 1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
