@@ -228,12 +228,54 @@ static int circleRadius(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
+* circleInverted - 
+*/
+static int circleInverted(xml_node<>* node, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a circleInverted: %s", node->value()));
+
+  if (!isTrue(node->value()) && !isFalse(node->value()))
+  {
+    parseDataP->errorString = std::string("bad string for circle/inverted: '") + node->value() + "'";
+    return 1;
+  }
+  else
+    parseDataP->ucas.scopeP->circle.inverted = isTrue(node->value());
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
 * polygon - 
 */
 static int polygon(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygon"));
   reqData->ucas.scopeP->areaType = AreaPolygon;
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonInverted - 
+*/
+static int polygonInverted(xml_node<>* node, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a polygonInverted: %s", node->value()));
+
+  if (!isTrue(node->value()) && !isFalse(node->value()))
+  {
+    parseDataP->errorString = std::string("bad string for polygon/inverted: '") + node->value() + "'";
+    return 1;
+  }
+  else
+    parseDataP->ucas.scopeP->polygon.inverted = isTrue(node->value());
+
   return 0;
 }
 
@@ -396,12 +438,14 @@ XmlNode ucasParseVector[] =
   { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeType",   scopeType            },
   { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeValue",  scopeValue           },
 
-  { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeValue/circle",                   circle                 },
-  { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/center_latitude",   circleCenterLatitude   },
-  { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/center_longitude",  circleCenterLongitude  },
-  { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/radius",            circleRadius           },
+  { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeValue/circle",                              circle                  },
+  { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/center_latitude",              circleCenterLatitude    },
+  { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/center_longitude",             circleCenterLongitude   },
+  { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/radius",                       circleRadius            },
+  { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/inverted",                     circleInverted          },
 
   { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeValue/polygon",                             polygon                 },
+  { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeValue/polygon/inverted",                    polygonInverted         },
   { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList",                  polygonVertexList       },
   { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex",           polygonVertex           },
   { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex/latitude",  polygonVertexLatitude   },

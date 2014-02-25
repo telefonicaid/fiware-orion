@@ -1,0 +1,37 @@
+{
+	"entities": [
+		{
+			"type": "Room",
+			"isPattern": "false",
+			"id": "ConferenceRoom"
+		},
+		{
+			"type": "Room",
+			"isPattern": "false",
+			"id": "OfficeRoom"
+		}
+	],
+	"attributes": [
+		"pressure"
+	],
+	"restriction": {
+		"attributeExpression" : "Attribute Expression",
+		"scopes": [
+			{
+				"type" : "FIWARE_Location",
+				"value" : {
+          "circle" : {
+            "radius" : "0",
+            "center_latitude" : "10",
+            "center_longitude" : "10",
+            "inverted" : "false"
+          }
+        }
+			},
+			{
+				"type" : "st2",
+				"value" : "sv2"
+			}
+		]
+	}
+}

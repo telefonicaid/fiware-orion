@@ -225,12 +225,54 @@ static int circleRadius(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
+* circleInverted - 
+*/
+static int circleInverted(xml_node<>* node, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a circleInverted: %s", node->value()));
+
+  if (!isTrue(node->value()) && !isFalse(node->value()))
+  {
+    parseDataP->errorString = std::string("bad string for circle/inverted: '") + node->value() + "'";
+    return 1;
+  }
+  else
+    parseDataP->dcar.scopeP->circle.inverted = isTrue(node->value());
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
 * polygon - 
 */
 static int polygon(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygon"));
   reqData->dcar.scopeP->areaType = AreaPolygon;
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonInverted - 
+*/
+static int polygonInverted(xml_node<>* node, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a polygonInverted: %s", node->value()));
+
+  if (!isTrue(node->value()) && !isFalse(node->value()))
+  {
+    parseDataP->errorString = std::string("bad string for polygon/inverted: '") + node->value() + "'";
+    return 1;
+  }
+  else
+    parseDataP->dcar.scopeP->polygon.inverted = isTrue(node->value());
+
   return 0;
 }
 
@@ -366,12 +408,14 @@ XmlNode dcarParseVector[] =
   { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeType",  scopeType            },
   { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue", scopeValue           },
 
-  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/circle",                   circle                 },
-  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/circle/center_latitude",   circleCenterLatitude   },
-  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/circle/center_longitude",  circleCenterLongitude  },
-  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/circle/radius",            circleRadius           },
+  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/circle",                              circle                  },
+  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/circle/center_latitude",              circleCenterLatitude    },
+  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/circle/center_longitude",             circleCenterLongitude   },
+  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/circle/radius",                       circleRadius            },
+  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/circle/inverted",                     circleInverted          },
 
   { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/polygon",                             polygon                 },
+  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/polygon/inverted",                    polygonInverted         },
   { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList",                  polygonVertexList       },
   { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex",           polygonVertex           },
   { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex/latitude",  polygonVertexLatitude   },

@@ -464,10 +464,10 @@ JsonNode jsonDcarParseVector[] =
 
   { "/restriction/scopes/scope/value/polygon",                             polygon                 },
   { "/restriction/scopes/scope/value/polygon/inverted",                    polygonInverted         },
-  { "/restriction/scopes/scope/value/polygon/vertexList",                  polygonVertexList       },
-  { "/restriction/scopes/scope/value/polygon/vertexList/vertex",           polygonVertex           },
-  { "/restriction/scopes/scope/value/polygon/vertexList/vertex/latitude",  polygonVertexLatitude   },
-  { "/restriction/scopes/scope/value/polygon/vertexList/vertex/longitude", polygonVertexLongitude  },
+  { "/restriction/scopes/scope/value/polygon/vertices",                    polygonVertexList       },
+  { "/restriction/scopes/scope/value/polygon/vertices/vertice",            polygonVertex           },
+  { "/restriction/scopes/scope/value/polygon/vertices/vertice/latitude",   polygonVertexLatitude   },
+  { "/restriction/scopes/scope/value/polygon/vertices/vertice/longitude",  polygonVertexLongitude  },
 
   { "LAST", NULL }
 };
