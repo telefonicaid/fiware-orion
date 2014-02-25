@@ -182,7 +182,7 @@ static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONOb
     else {
         queryNoPattern.append(CASUB_ATTRS, BSON("$size" << 0));
     }
-    queryNoPattern.append(CASUB_EXPIRATION, BSON("$gt" << getCurrentTime()));
+    queryNoPattern.append(CASUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
 
     /* This is JavaScript code that runs in MongoDB engine. As far as I know, this is the only
      * way to do a "reverse regex" query in MongoDB (see
@@ -233,7 +233,7 @@ static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONOb
 
     BSONObjBuilder queryPattern;
     queryPattern.append(entPatternQ, "true");
-    queryPattern.append(CASUB_EXPIRATION, BSON("$gt" << getCurrentTime()));
+    queryPattern.append(CASUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
     queryPattern.appendCode("$where", function);
 
     BSONObj query = BSON("$or" << BSON_ARRAY(queryNoPattern.obj() << queryPattern.obj()));
