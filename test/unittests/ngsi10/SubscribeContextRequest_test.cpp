@@ -205,3 +205,435 @@ TEST(SubscribeContextRequest, invalidEntityIdAttribute_xml)
   reqP->release(&parseData);
   EXPECT_STREQ(expected, result.c_str());
 }
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleOk - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationCircleOk)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.subscribeContextRequest.circleOk.postponed.xml";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  result = xmlTreat(testBuf, &ci, &reqData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleInverted - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationCircleInverted)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.subscribeContextRequest.circleInverted.postponed.xml";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  result = xmlTreat(testBuf, &ci, &reqData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleInvertedBadValue - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedBadValue)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.subscribeContextRequest.circleInvertedBadValue.invalid.xml";
+  const char*     outFile = "ngsi10.subscribeContextResponse.circleInvertedBadValue.invalid.xml";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
+  result = xmlTreat(testBuf, &ci, &reqData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleZeroRadius - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationCircleZeroRadius)
+{
+  ParseData       reqData;
+  // ngsi9.discoverContextAvailabilityRequest.circleZeroRadius.postponed.xml
+  const char*     inFile  = "ngsi10.subscribeContextRequest.circleZeroRadius.postponed.xml";
+  const char*     outFile = "ngsi10.subscribeContextResponse.circleZeroRadius.postponed.xml";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
+  result = xmlTreat(testBuf, &ci, &reqData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
+}
+
+
+
+#if 0
+/* ****************************************************************************
+*
+* scopeGeolocationCircleOkJson - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationCircleOkJson)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.subscribeContextRequest.circleOk.postponed.json";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleZeroRadiusJson - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationCircleZeroRadiusJson)
+{
+  ParseData       reqData;
+  // ngsi9.discoverContextAvailabilityRequest.circleZeroRadius.postponed.json
+  const char*     inFile  = "ngsi10.subscribeContextRequest.circleZeroRadius.postponed.json";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.circleZeroRadius.valid.json";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
+  result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleInvertedJson - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedJson)
+{
+  ParseData       reqData;
+  // ngsi9.discoverContextAvailabilityRequest.circleInverted.postponed.json
+  const char*     inFile  = "ngsi10.subscribeContextRequest.circleInverted.postponed.json";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleInvertedBadValueJson - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedBadValueJson)
+{
+  ParseData       reqData;
+  con  // ngsi9.discoverContextAvailabilityRequest.circleInvertedBadValue.invalid.json
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityReques10.subscribeContextRequest.invalid.json";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.circleInvertedBadValue.valid.json";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
+  result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonOk - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationPolygonOk)
+{
+  ParseData       parseData;
+  // ngsi9.discoverContextAvailabilityRequest.polygonOk.postponed.xml
+  const char*     inFile  = "ngsi10.subscribeContextRequest.polygonOk.postponed.xml";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  result = xmlTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonInverted - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationPolygonInverted)
+{
+  ParseData       parseData;
+  // ngsi9.discoverContextAvailabilityRequest.polygonInverted.postponed.xml
+  const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInverted.postponed.xml";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  result = xmlTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonInvertedBadValue - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedBadValue)
+{
+  ParseData       parseData;
+  // ngsi9.discoverContextAvailabilityRequest.polygonInvertedBadValue.invalid.xml
+  const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedBadValue.invalid.xml";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.polygonInvertedBadValue.valid.xml";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
+  result = xmlTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonTwoVertices - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationPolygonNoVertices)
+{
+  ParseData       parseData;
+  // ngsi9.discoverContextAvailabilityRequest.polygonInvertedNoVertices.postponed.xml
+  const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedNoVertices.postponed.xml";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.polygonInvertedNoVertices.valid.xml";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
+  result = xmlTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonOneVertex - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationPolygonOneVertex)
+{
+  ParseData       parseData;
+  // ngsi9.discoverContextAvailabilityRequest.polygonInvertedOneVertex.postponed.xml
+  const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedOneVertex.postponed.xml";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.polygonInvertedOneVertex.valid.xml";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
+  result = xmlTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonTwoVertices - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationPolygonTwoVertices)
+{
+  ParseData       parseData;
+  // ngsi9.discoverContextAvailabilityRequest.polygonTwoVertices.postponed.xml
+  const char*     inFile  = "ngsi10.subscribeContextRequest.polygonTwoVertices.postponed.xml";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.polygonTwoVertices.valid.xml";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
+  result = xmlTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonOkJson - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationPolygonOkJson)
+{
+  ParseData       parseData;
+  // ngsi9.discoverContextAvailabilityRequest.polygonOk.postponed.json
+  const char*     inFile  = "ngsi10.subscribeContextRequest.polygonOk.postponed.json";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonInvertedJson - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedJson)
+{
+  ParseData       parseData;
+  // ngsi9.discoverContextAvailabilityRequest.polygonInverted.postponed.json
+  const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInverted.postponed.json";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonInvertedBadValueJson - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedBadValueJson)
+{
+  ParseData       parseData;
+  // ngsi9.discoverContextAvailabilityRequest.polygonInvertedBadValue.invalid.json
+  const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedBadValue.invalid.json";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.polygonInvertedBadValue.valid.json";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
+  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonNoVerticesJson - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationPolygonNoVerticesJson)
+{
+  ParseData       parseData;
+  // ngsi9.discoverContextAvailabilityRequest.polygonInvertedNoVertices.postponed.json
+  const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedNoVertices.postponed.json";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.polygonInvertedNoVertices.valid.json";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
+  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonOneVertexJson - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationPolygonOneVertexJson)
+{
+  ParseData       parseData;
+  // ngsi9.discoverContextAvailabilityRequest.polygonInvertedOneVertex.postponed.json
+  const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedOneVertex.postponed.json";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.polygonInvertedOneVertex.valid.json";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
+  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonTwoVerticesJson - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationPolygonTwoVerticesJson)
+{
+  ParseData       parseData;
+  // ngsi9.discoverContextAvailabilityRequest.polygonTwoVertices.postponed.json
+  const char*     inFile  = "ngsi10.subscribeContextRequest.polygonTwoVertices.postponed.json";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.polygonTwoVertices.valid.json";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
+  result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
+}
+#endif

@@ -89,7 +89,6 @@ typedef struct DiscoverContextAvailabilityData
   DiscoverContextAvailabilityRequest  res;
   EntityId*                           entityIdP;
   Scope*                              scopeP;
-  ScopePoint*                         vertexP;
 } DiscoverContextAvailabilityData;
 
 
@@ -117,7 +116,6 @@ typedef struct SubscribeContextAvailabilityData
    SubscribeContextAvailabilityRequest  res;
    EntityId*                            entityIdP;
    Scope*                               scopeP;
-   ScopePoint*                          vertexP;
 } SubscribeContextAvailabilityData;
 
 
@@ -201,7 +199,6 @@ typedef struct UpdateContextAvailabilitySubscriptionData
    UpdateContextAvailabilitySubscriptionRequest  res;
    EntityId*                                     entityIdP;
    Scope*                                        scopeP;
-   ScopePoint*                                   vertexP;
 } UpdateContextAvailabilitySubscriptionData;
 
 

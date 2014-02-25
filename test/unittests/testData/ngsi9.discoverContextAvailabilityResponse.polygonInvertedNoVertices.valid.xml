@@ -1,6 +1,0 @@
-<discoverContextAvailabilityResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>too few vertices for a polygon</reasonPhrase>
-  </errorCode>
-</discoverContextAvailabilityResponse>
