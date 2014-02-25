@@ -2,12 +2,12 @@
 	"entities": [
 		{
 			"type": "Room",
-			"isPattern": "false1",
+			"isPattern": "FrALSE",
 			"id": "ConferenceRoom"
 		},
 		{
 			"type": "Room",
-			"isPattern": "false2",
+			"isPattern": "2",
 			"id": "OfficeRoom"
 		}
 	],

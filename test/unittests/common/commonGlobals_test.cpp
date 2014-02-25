@@ -83,7 +83,7 @@ TEST(commonGlobals, isFalse)
    EXPECT_FALSE(bFalse);
    bFalse = isFalse("no");
    EXPECT_FALSE(bFalse);
-   bFalse = isFalse("0");
+   bFalse = isFalse("1");
    EXPECT_FALSE(bFalse);
 }
 

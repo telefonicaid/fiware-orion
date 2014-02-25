@@ -2,6 +2,6 @@
   <subscriptionId>000000000000000000000000</subscriptionId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>
+    <reasonPhrase>invalid isPattern (boolean) value for entity: 'fahlse'</reasonPhrase>
   </errorCode>
 </subscribeContextAvailabilityResponse>

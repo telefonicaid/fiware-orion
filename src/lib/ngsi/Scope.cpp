@@ -67,7 +67,7 @@ std::string Scope::render(Format format, std::string indent, bool notLastInVecto
 {
   std::string out      = "";
   std::string tag      = "operationScope";
-  const char* tTag     = (format == XML)? "areaType" : "type";
+  const char* tTag     = (format == XML)? "scopeType" : "type";
   const char* vTag     = (format == XML)? "scopeValue" : "value";
 
   out += startTag(indent, tag, tag, format, false, false);
