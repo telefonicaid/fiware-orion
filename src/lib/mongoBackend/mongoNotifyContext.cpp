@@ -27,7 +27,6 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonUpdate.h"
-#include "common/sem.h"
 #include "ngsi10/UpdateContextResponse.h"
 
 /* ****************************************************************************
@@ -35,9 +34,6 @@
 * mongoNofityContext -
 */
 HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextResponse* responseP) {
-
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
 
     /* We ignore "subscriptionId" and "originator" in the request, as we don't have anything interesting
      * to do with them */
@@ -51,5 +47,5 @@ HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextR
 
     responseP->responseCode.fill(SccOk);
 
-    LM_SR(SccOk);
+    return SccOk;
 }

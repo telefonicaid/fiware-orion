@@ -29,13 +29,12 @@
 
 #include "common/globals.h"
 #include "common/Format.h"
+#include "common/sem.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContextAvailabilitySubscription.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionRequest.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
-
-#include "common/sem.h"
 
 /* ****************************************************************************
 *
@@ -43,9 +42,6 @@
 */
 HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabilitySubscriptionRequest* requestP, UpdateContextAvailabilitySubscriptionResponse* responseP, Format inFormat)
 {
-  /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-  semTake();
-
   LM_T(LmtMongo, ("Update Context Subscription"));
 
   DBClientConnection* connection = getMongoConnection();
@@ -54,10 +50,12 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
   BSONObj sub;
   try {
       OID id = OID(requestP->subscriptionId.get());
+      semTake(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection");
       sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << id));
+      semGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection");
       if (sub.isEmpty()) {
           responseP->errorCode.fill(SccContextElementNotFound);
-          LM_SR(SccOk);
+          return SccOk;
       }
   }
   catch( const AssertionException &e ) {
@@ -65,15 +63,25 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
       // FIXME: this checking should be done at parsing stage, without progressing to
       // mongoBackend. By the moment we can live this here, but we should remove in the future
       // (old issue #95)
+      semGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (AssertionException)");
       responseP->errorCode.fill(SccContextElementNotFound);
-      LM_SR(SccOk);
+      return SccOk;
   }
   catch( const DBException &e ) {
+      semGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (DBException)");
       responseP->errorCode.fill(SccReceiverInternalError,
                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                 " - findOne() _id: " + requestP->subscriptionId.get() +
                                 " - exception: " + e.what());
-      LM_SR(SccOk);
+      return SccOk;
+  }
+  catch(...) {
+      semGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (Generic Exception)");
+      responseP->errorCode.fill(SccReceiverInternalError,
+                                std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
+                                " - findOne() _id: " + requestP->subscriptionId.get() +
+                                " - exception: " + "generic");
+      return SccOk;
   }
 
   /* We start with an empty BSONObjBuilder and process requestP for all the fields that can
@@ -143,16 +151,29 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
       LM_T(LmtMongo, ("update() in '%s' collection _id '%s': %s}", getSubscribeContextAvailabilityCollectionName(),
                          requestP->subscriptionId.get().c_str(),
                          update.toString().c_str()));
+      semTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
       connection->update(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << OID(requestP->subscriptionId.get())), update);
+      semGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
   }
   catch( const DBException &e ) {
+      semGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (DBException)");
       responseP->errorCode.fill(SccReceiverInternalError,
                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                 " - update() _id: " + requestP->subscriptionId.get().c_str() +
                                 " - update() doc: " + update.toString() +
                                 " - exception: " + e.what());
 
-      LM_SR(SccOk);
+      return SccOk;
+  }
+  catch(...) {
+      semGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (Generic Exception)");
+      responseP->errorCode.fill(SccReceiverInternalError,
+                                std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
+                                " - update() _id: " + requestP->subscriptionId.get().c_str() +
+                                " - update() doc: " + update.toString() +
+                                " - exception: " + "generic");
+
+      return SccOk;
   }
 
   /* Send notifications for matching context registrations */
@@ -166,5 +187,5 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
 
   responseP->subscriptionId = requestP->subscriptionId;
 
-  LM_SR(SccOk);
+  return SccOk;
 }

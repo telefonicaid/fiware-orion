@@ -25,6 +25,7 @@
 *
 * Author: Fermin Galan
 */
+#include <stdio.h>
 
 /* ****************************************************************************
 *
@@ -36,12 +37,12 @@ extern int semInit(void);
 *
 * semTake -
 */
-extern int semTake(void);
+extern int semTake(const char* who, const char* what);
 
 /* ****************************************************************************
 *
 * semGive -
 */
-int semGive(void);
+int semGive(const char* who, const char* what = NULL);
 
 #endif

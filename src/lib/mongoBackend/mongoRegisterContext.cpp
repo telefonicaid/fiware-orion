@@ -27,8 +27,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
-#include "common/sem.h"
 #include "common/statistics.h"
+#include "common/sem.h"
 #include "mongoBackend/mongoRegisterContext.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonRegister.h"
@@ -46,10 +46,6 @@ using namespace mongo;
 */
 HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterContextResponse* responseP)
 {    
-
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
-
     LM_T(LmtMongo, ("Register Context Request"));
 
     DBClientConnection* connection = getMongoConnection();
@@ -57,39 +53,57 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
     /* Check if new registration */
     if (requestP->registrationId.isEmpty()) {
         HttpStatusCode result = processRegisterContext(requestP, responseP, NULL);
-        LM_SR(result);
+        return result;
     }
 
     /* It is not a new registration, so it should be an update */
     try {
         OID id = OID(requestP->registrationId.get());
-        BSONObj reg = connection->findOne(getRegistrationsCollectionName(), BSON("_id" << id));
+        BSONObj reg;
+
+        semTake(__FUNCTION__, "findOne from RegistrationsCollection");
+        reg = connection->findOne(getRegistrationsCollectionName(), BSON("_id" << id));
+        semGive(__FUNCTION__, "findOne from RegistrationsCollection");
+
         if (reg.isEmpty()) {
             responseP->errorCode.fill(SccContextElementNotFound, std::string("registration id: '") + requestP->registrationId.get() + "'");
             responseP->registrationId = requestP->registrationId;
             ++noOfRegistrationUpdateErrors;
-            LM_SR(SccOk);
+            return SccOk;
         }
 
         HttpStatusCode result = processRegisterContext(requestP, responseP, &id);
-        LM_SR(result);
+        return result;
     }
     catch( const AssertionException &e ) {
+        semGive(__FUNCTION__, "findOne from RegistrationsCollection (AssertionException)");
         /* This happens when OID format is wrong */
         // FIXME: this checking should be done at parsing stage, without progressing to
         // mongoBackend. By the moment we can live this here, but we should remove in the future
         responseP->errorCode.fill(SccContextElementNotFound);
         responseP->registrationId = requestP->registrationId;
         ++noOfRegistrationUpdateErrors;
-        LM_SR(SccOk);
+        return SccOk;
     }
     catch( const DBException &e ) {
+        semGive(__FUNCTION__, "findOne from RegistrationsCollection (DBException)");
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getRegistrationsCollectionName() +
                                   " - findOne() _id: " + requestP->registrationId.get() +
                                   " - exception: " + e.what());
         ++noOfRegistrationUpdateErrors;
-        LM_SR(SccOk);
+        return SccOk;
+    }
+    catch(...) {
+        semGive(__FUNCTION__, "findOne from RegistrationsCollection (Generic Exception)");
+        responseP->errorCode.fill(SccReceiverInternalError,
+                                  std::string("collection: ") + getRegistrationsCollectionName() +
+                                  " - findOne() _id: " + requestP->registrationId.get() +
+                                  " - exception: " + "generic");
+        ++noOfRegistrationUpdateErrors;
+        return SccOk;
     }
 
+    LM_E(("We should never get here!!!"));
+    return SccOk;
 }

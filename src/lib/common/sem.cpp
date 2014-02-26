@@ -58,14 +58,26 @@ int semInit(void) {
 *
 * semTake -
 */
-int semTake(void) {
-  return sem_wait(&sem);
+int semTake(const char* who, const char* what)
+{
+  int x;
+
+  LM_M(("%s taking semaphore for '%s'", who, what));
+  x = sem_wait(&sem);
+  LM_M(("%s has the semaphore", who));
+
+  return x;
 }
 
 /* ****************************************************************************
 *
 * semGive -
 */
-int semGive(void) {
+int semGive(const char* who, const char* what)
+{
+  if (what != NULL)
+    LM_M(("%s gives the semaphore for '%s'", who, what));
+  else
+    LM_M(("%s gives the semaphore", who));
   return sem_post(&sem);
 }

@@ -29,16 +29,12 @@
 #include "mongoBackend/MongoCommonRegister.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
-#include "common/sem.h"
 
 /* ****************************************************************************
 *
 * mongoNofityContextAvailability -
 */
 HttpStatusCode mongoNotifyContextAvailability(NotifyContextAvailabilityRequest* requestP, NotifyContextAvailabilityResponse* responseP) {
-
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
 
     /* We ignore "subscriptionId" and "originator" in the request, as we don't have anything interesting
      * to do with them */
@@ -62,6 +58,6 @@ HttpStatusCode mongoNotifyContextAvailability(NotifyContextAvailabilityRequest* 
 
     responseP->responseCode.fill(SccOk);
 
-    LM_SR(SccOk);
+    return SccOk;
 }
 

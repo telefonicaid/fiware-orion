@@ -43,9 +43,6 @@
 */
 HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityRequest* requestP, SubscribeContextAvailabilityResponse* responseP, Format inFormat)
 {
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
-
     LM_T(LmtMongo, ("Subscribe Context Availability Request"));
 
     DBClientConnection* connection = getMongoConnection();
@@ -98,15 +95,28 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
     BSONObj subDoc = sub.obj();
     try {
         LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextAvailabilityCollectionName(), subDoc.toString().c_str()));
+
+        semTake(__FUNCTION__, "insert into SubscribeContextAvailabilityCollection");
         connection->insert(getSubscribeContextAvailabilityCollectionName(), subDoc);
+        semGive(__FUNCTION__, "insert into SubscribeContextAvailabilityCollection");
     }
     catch( const DBException &e ) {
+        semGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (DBException)");
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                   " - insert(): " + subDoc.toString() +
                                   " - exception: " + e.what());
 
-        LM_SRE(SccOk,("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
+        LM_RE(SccOk, ("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
+    }
+    catch(...) {
+        semGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (Generic Exception)");
+        responseP->errorCode.fill(SccReceiverInternalError,
+                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
+                                  " - insert(): " + subDoc.toString() +
+                                  " - exception: " + "generic");
+
+        LM_RE(SccOk, ("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
     }
 
     /* Send notifications for matching context registrations */
@@ -116,5 +126,5 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
     responseP->duration = requestP->duration;
     responseP->subscriptionId.set(oid.str());
 
-    LM_SR(SccOk);
+    return SccOk;
 }

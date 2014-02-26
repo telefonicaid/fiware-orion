@@ -27,9 +27,12 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/statistics.h"
+#include "common/sem.h"
+
 #include "mongoBackend/MongoGlobal.h"
 
 
@@ -85,11 +88,19 @@ static bool processAssociations(MetadataVector mdV, std::string* err) {
         BSONObj doc = BSON("_id" << name << ASSOC_SOURCE_ENT << srcEn << ASSOC_TARGET_ENT << tgtEn << ASSOC_ATTRS << attrs.arr());
         try {
             LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getAssociationsCollectionName(), doc.toString().c_str()));
+            semTake(__FUNCTION__, "insert into AssociationsCollection");
             connection->insert(getAssociationsCollectionName(), doc);
+            semGive(__FUNCTION__, "insert into AssociationsCollection");
         }
         catch( const DBException &e ) {
+            semGive(__FUNCTION__, "insert into AssociationsCollection (DBException)");
             *err = e.what();
             LM_RE(false,("Database error '%s'", err->c_str()));
+        }
+        catch(...) {
+            semGive(__FUNCTION__, "insert into AssociationsCollection (Generic Exception)");
+            *err = "Generic Exception from mongo"
+            LM_RE(false, ("Database error: '%s'", err->c_str()));
         }
     }
     return true;
@@ -114,7 +125,11 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
         //FIXME P8: see old issue #90
         //BSONObj sub = *(it->second);
         std::string mapSubId = it->first;
-        BSONObj sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << OID(mapSubId)));
+        BSONObj     sub;
+
+        semTake(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
+        sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << OID(mapSubId)));
+        semGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
         LM_T(LmtMongo, ("retrieved document: '%s'", sub.toString().c_str()));
         OID subId = sub.getField("_id").OID();
 
@@ -242,7 +257,10 @@ static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONOb
     auto_ptr<DBClientCursor> cursor;
     try {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextAvailabilityCollectionName(), query.toString().c_str()));
+
+        semTake(__FUNCTION__, "query in SubscribeContextAvailabilityCollection");
         cursor = connection->query(getSubscribeContextAvailabilityCollectionName(), query);
+        semGive(__FUNCTION__, "query in SubscribeContextAvailabilityCollection");
         /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
          * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
          * exception ourselves */
@@ -251,9 +269,17 @@ static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONOb
         }
     }
     catch( const DBException &e ) {
+        semGive(__FUNCTION__, "query in SubscribeContextAvailabilityCollection (DBException)");
         *err = std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                " - query(): " + query.toString() +
                " - exception: " + e.what();
+        return false;
+    }
+    catch(...) {
+        semGive(__FUNCTION__, "query in SubscribeContextAvailabilityCollection (Generic Exception)");
+        *err = std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
+               " - query(): " + query.toString() +
+               " - exception: " + "generic";
         return false;
     }
 
@@ -385,13 +411,26 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
          * exist in colleciton, it is created at the same time. Thus, this way is ok with both uses of
          * registerContext (either new registration or updating an existing one) */
         LM_T(LmtMongo, ("upsert update() in '%s' collection: '%s'", getRegistrationsCollectionName(), regDoc.toString().c_str()));
+
+        semTake(__FUNCTION__, "update in RegistrationsCollection");
         connection->update(getRegistrationsCollectionName(), BSON("_id" << oid), regDoc, true);
+        semGive(__FUNCTION__, "update in RegistrationsCollection");
     }
     catch( const DBException &e ) {
+        semGive(__FUNCTION__, "update in RegistrationsCollection (DBException)");
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getRegistrationsCollectionName() +
                                   " - upsert update(): " + regDoc.toString() +
                                   " - exception: " + e.what());
+
+        LM_RE(SccOk,("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
+    }
+    catch(...) {
+        semGive(__FUNCTION__, "update in RegistrationsCollection (Generic Exception)");
+        responseP->errorCode.fill(SccReceiverInternalError,
+                                  std::string("collection: ") + getRegistrationsCollectionName() +
+                                  " - upsert update(): " + regDoc.toString() +
+                                  " - exception: " + "generic");
 
         LM_RE(SccOk,("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
     }

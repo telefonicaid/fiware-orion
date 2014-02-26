@@ -36,25 +36,19 @@
 #include "ngsi10/UpdateContextResponse.h"
 #include "ngsi/NotifyCondition.h"
 
-#include "common/sem.h"
-
 /* ****************************************************************************
 *
 * mongoUpdateContext - 
 */
 HttpStatusCode mongoUpdateContext(UpdateContextRequest* requestP, UpdateContextResponse* responseP)
 {
-
-   /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-   semTake();
-
    /* FIXME: This check is done already, should be removed. */
     if (strcasecmp(requestP->updateActionType.c_str(), "update") != 0 &&
         strcasecmp(requestP->updateActionType.c_str(), "append") != 0 &&
         strcasecmp(requestP->updateActionType.c_str(), "delete") != 0) {
 
         responseP->errorCode.fill(SccReceiverInternalError, std::string("offending action: ") + requestP->updateActionType.get());
-        LM_SRE(SccOk, ("Unknown updateContext action '%s'", requestP->updateActionType.get().c_str()));
+        LM_RE(SccOk, ("Unknown updateContext action '%s'", requestP->updateActionType.get().c_str()));
     }
 
     /* Process each ContextElement */
@@ -66,5 +60,5 @@ HttpStatusCode mongoUpdateContext(UpdateContextRequest* requestP, UpdateContextR
        error get "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
        consider the overall mongoUpdateContext() as MsOk. */
 
-    LM_SR(SccOk);
+    return SccOk;
 }

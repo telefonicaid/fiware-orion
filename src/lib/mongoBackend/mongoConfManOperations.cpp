@@ -26,10 +26,10 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-#include "mongoBackend/MongoGlobal.h"
-#include "mongo/client/dbclient.h"
 
 #include "common/sem.h"
+#include "mongoBackend/MongoGlobal.h"
+#include "mongo/client/dbclient.h"
 
 using namespace mongo;
 
@@ -39,9 +39,6 @@ using namespace mongo;
 */
 void mongoSetFwdRegId(std::string regId, std::string fwdRegId)
 {
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
-
     LM_T(LmtMongo, ("Mongo Set Forward RegId"));
 
     DBClientConnection* connection = getMongoConnection();
@@ -51,13 +48,22 @@ void mongoSetFwdRegId(std::string regId, std::string fwdRegId)
         LM_T(LmtMongo, ("update() in '%s' collection doc _id '%s': %s",
                         getRegistrationsCollectionName(),
                         regId.c_str(), updateQuery.toString().c_str()));
+
+        semTake(__FUNCTION__, "update in RegistrationsCollection");
         connection->update(getRegistrationsCollectionName(), BSON("_id" << OID(regId)), updateQuery);
-        LM_SRV;
+        semGive(__FUNCTION__, "update in RegistrationsCollection");
     }
     catch( const DBException &e ) {
-        // FIXME: probably we can do something appart of printint the error, but currently
+        // FIXME: probably we can do something apart of printint the error, but currently
         // we haven't a use case for that
-        LM_SRVE(("Database error '%s'", e.what()));
+        semGive(__FUNCTION__, "update in RegistrationsCollection (DBException)");
+        LM_E(("Database error '%s'", e.what()));
+    }
+    catch(...) {
+        // FIXME: probably we can do something apart of printint the error, but currently
+        // we haven't a use case for that
+        semGive(__FUNCTION__, "update in RegistrationsCollection (Generic Exception)");
+        LM_E(("Database error '%s'", e.what()));
     }
 
 }
@@ -68,25 +74,32 @@ void mongoSetFwdRegId(std::string regId, std::string fwdRegId)
 */
 std::string mongoGetFwdRegId(std::string regId)
 {
-
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
-
     LM_T(LmtMongo, ("Mongo Get Forward RegId"));
 
     DBClientConnection* connection = getMongoConnection();
 
     try {
         LM_T(LmtMongo, ("findOne() in '%s' collection doc _id '%s'", getRegistrationsCollectionName(), regId.c_str()));
-        BSONObj doc = connection->findOne(getRegistrationsCollectionName(), BSON("_id" << OID(regId)));
+        BSONObj doc;
+
+        semTake(__FUNCTION__, "findOne in RegistrationsCollection");
+        doc = connection->findOne(getRegistrationsCollectionName(), BSON("_id" << OID(regId)));
+        semGive(__FUNCTION__, "findOne in RegistrationsCollection");
+
         LM_T(LmtMongo, ("reg doc: '%s'", doc.toString().c_str()));
-        LM_SR(STR_FIELD(doc, REG_FWS_REGID));
+        return STR_FIELD(doc, REG_FWS_REGID);
     }
     catch( const DBException &e ) {
-        // FIXME: probably we can do something appart of printing the error, but currently
+        // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
-        LM_SRE("",("Database error '%s'", e.what()));
+        semGive(__FUNCTION__, "findOne in RegistrationsCollection (DBException)");
+        LM_RE("", ("Database error '%s'", e.what()));
     }
-
+    catch(...) {
+        // FIXME: probably we can do something apart of printing the error, but currently
+        // we haven't a use case for that
+        semGive(__FUNCTION__, "findOne in RegistrationsCollection (Generic Exception)");
+        LM_RE("", ("Database error '%s'", e.what()));
+    }
 }
 

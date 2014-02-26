@@ -27,8 +27,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
-#include "common/sem.h"
 #include "common/Format.h"
+#include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubscribeContext.h"
 #include "ngsi10/SubscribeContextRequest.h"
@@ -41,10 +41,6 @@
 */
 HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, SubscribeContextResponse* responseP, Format inFormat)
 {
-
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
-
     LM_T(LmtMongo, ("Subscribe Context Request"));
 
     DBClientConnection* connection = getMongoConnection();
@@ -109,15 +105,28 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
     BSONObj subDoc = sub.obj();
     try {
         LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextCollectionName(), subDoc.toString().c_str()));
+
+        semTake(__FUNCTION__, "insert into SubscribeContextCollection");
         connection->insert(getSubscribeContextCollectionName(), subDoc);
+        semGive(__FUNCTION__, "insert into SubscribeContextCollection");
     }
     catch( const DBException &e ) {
+        semGive(__FUNCTION__, "insert into SubscribeContextCollection (DBException)");
         responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                  std::string("collection: ") + getSubscribeContextCollectionName() +
                                                  " - insert(): " + subDoc.toString() +
                                                  " - exception: " + e.what());
 
-        LM_SRE(SccOk,("Database error '%s'", responseP->subscribeError.errorCode.reasonPhrase.c_str()));
+        LM_RE(SccOk, ("Database error '%s'", responseP->subscribeError.errorCode.reasonPhrase.c_str()));
+    }    
+    catch(...) {
+        semGive(__FUNCTION__, "insert into SubscribeContextCollection (Generic Exception)");
+        responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
+                                                 std::string("collection: ") + getSubscribeContextCollectionName() +
+                                                 " - insert(): " + subDoc.toString() +
+                                                 " - exception: " + e.what());
+
+        LM_RE(SccOk, ("Database error '%s'", responseP->subscribeError.errorCode.reasonPhrase.c_str()));
     }    
 
     /* Fill the response element */
@@ -125,6 +134,5 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
     responseP->subscribeResponse.subscriptionId.set(oid.str());
     responseP->subscribeResponse.throttling = requestP->throttling;
 
-    LM_SR(SccOk);
-
+    return SccOk;
 }

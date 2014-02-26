@@ -24,15 +24,16 @@
 */
 
 #include <regex.h>
+#include "mongo/client/dbclient.h"
 
-#include "common/globals.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/globals.h"
+#include "common/sem.h"
+
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoOntimeintervalOperations.h"
-
-#include "mongo/client/dbclient.h"
 
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/AttributeList.h"
@@ -47,13 +48,13 @@ using namespace mongo;
 *
 * Globals
 */
-static DBClientConnection* connection;
-static char* entitiesCollectionName = NULL;
-static char* registrationsCollectionName = NULL;
-static char* subscribeContextCollectionName = NULL;
-static char* subscribeContextAvailabilityCollectionName = NULL;
-static char* assocationsCollectionName = NULL;
-static Notifier* notifier = NULL;
+static DBClientConnection*  connection;
+static char*                entitiesCollectionName                      = NULL;
+static char*                registrationsCollectionName                 = NULL;
+static char*                subscribeContextCollectionName              = NULL;
+static char*                subscribeContextAvailabilityCollectionName  = NULL;
+static char*                assocationsCollectionName                   = NULL;
+static Notifier*            notifier                                    = NULL;
 
 /* ****************************************************************************
 *
@@ -63,19 +64,24 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
 
     std::string err;
 
+    semTake(__FUNCTION__, "connecting to mongo");
+
     /* The first argument to true is to use autoreconnect */
     connection = new DBClientConnection(true);
 
     if (!connection->connect(host, err)) {
+        semGive(__FUNCTION__, "connecting to mongo failed");
         LM_RE(false, ("MongoDB connection fails: '%s'", err.c_str()));
     }
 
     if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0) {
         if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err)) {
+            semGive(__FUNCTION__, "connecting to mongo failed during authentication");
             LM_RE(false, ("Auth error (db=%s, username=%s, pswd=%s): %s", db, username, passwd, err.c_str()));
         }
     }
 
+    semGive(__FUNCTION__, "connecting to mongo");
     return true;
 }
 
@@ -267,11 +273,33 @@ extern const char* getAssociationsCollectionName(void) {
 bool resetDb(void) {
     // FIXME: this needs a try/catch to capture problems
     if ( connection != NULL && entitiesCollectionName != NULL && registrationsCollectionName != NULL) {
-        connection->dropCollection(entitiesCollectionName);
-        connection->dropCollection(registrationsCollectionName);
-        connection->dropCollection(subscribeContextCollectionName);
-        connection->dropCollection(subscribeContextAvailabilityCollectionName);
-        connection->dropCollection(assocationsCollectionName);
+
+        try 
+        {
+          semTake(__FUNCTION__, "resetting database");
+          connection->dropCollection(entitiesCollectionName);
+          connection->dropCollection(registrationsCollectionName);
+          connection->dropCollection(subscribeContextCollectionName);
+          connection->dropCollection(subscribeContextAvailabilityCollectionName);
+          connection->dropCollection(assocationsCollectionName);
+          semGive(__FUNCTION__, "resetting database");
+        }
+        catch (const AssertionException &e)
+        {
+          semGive(__FUNCTION__, "resetting database (AssertionException)");
+          return false;
+        }
+        catch (const DBException &e)
+        {
+          semGive(__FUNCTION__, "resetting database (DBException)");
+          return false;
+        }
+        catch (...)
+        {
+          semGive(__FUNCTION__, "resetting database (Generic Exception)");
+          return false;
+        }
+        
         return true;
     }
     return false;
@@ -481,7 +509,9 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
     auto_ptr<DBClientCursor> cursor;
     try {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(), query.toString().c_str()));
+        semTake(__FUNCTION__, "query in EntitiesCollection");
         cursor = connection->query(getEntitiesCollectionName(), query);
+        semGive(__FUNCTION__, "query in EntitiesCollection");
         /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
          * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
          * exception ourselves */
@@ -491,11 +521,21 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
     }
     catch( const DBException &e ) {
 
+        semGive(__FUNCTION__, "query in EntitiesCollection (DBException)");
         *err = std::string("collection: ") + getEntitiesCollectionName() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
 
-       LM_RE(false,(err->c_str()));
+        LM_RE(false,(err->c_str()));
+    }
+    catch(...) {
+
+        semGive(__FUNCTION__, "query in EntitiesCollection (Generic Exception)");
+        *err = std::string("collection: ") + getEntitiesCollectionName() +
+                " - query(): " + query.toString() +
+                " - exception: " + "generic";
+
+        LM_RE(false, (err->c_str()));
     }
 
     /* Process query result */
@@ -719,15 +759,29 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
     /* Do the query on MongoDB */
     //FIXME P2: use field selector to include the only relevant field: contextRegistration array (e.g. "expiration" is not needed)
     auto_ptr<DBClientCursor> cursor;
+
     try {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(), query.toString().c_str()));
+        semTake(__FUNCTION__, "query in RegistrationsCollection");
         cursor = connection->query(getRegistrationsCollectionName(), query);
+        semGive(__FUNCTION__, "query in RegistrationsCollection");
     }
     catch( const DBException &e ) {
 
+        semGive(__FUNCTION__, "query in RegistrationsCollection (DBException)");
         *err = std::string("collection: ") + getRegistrationsCollectionName() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
+
+        return false;
+    }
+    catch(...) {
+
+        semGive(__FUNCTION__, "query in RegistrationsCollection (Generic Exception)");
+        *err = std::string("collection: ") + getRegistrationsCollectionName() +
+                " - query(): " + query.toString() +
+                " - exception: " + "generic";
+
         return false;
     }
 
@@ -967,11 +1021,20 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
         LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextAvailabilityCollectionName(),
                         query.toString().c_str(),
                         update.toString().c_str()));
+
+        semTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
         connection->update(getSubscribeContextAvailabilityCollectionName(), query, update);
+        semGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
     }
     catch( const DBException &e ) {
+        semGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (DBException)");
         *err = e.what();
         LM_RE(SccOk, ("Database error '%s'", err->c_str()));
+    }
+    catch(...) {
+        semGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (Generic Exception)");
+        *err = "Database error - exception thrown";
+        LM_RE(SccOk, (*err));
     }
 
     return SccOk;
