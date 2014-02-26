@@ -40,6 +40,8 @@
 */
 HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilityRequest* requestP, UnsubscribeContextAvailabilityResponse* responseP)
 {
+  reqSemTake(__FUNCTION__, "ngsi9 unsubscribe request");
+
   LM_T(LmtMongo, ("Unsubscribe Context Availability"));
 
   DBClientConnection* connection = getMongoConnection();
@@ -59,6 +61,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
       if (sub.isEmpty()) {
           responseP->statusCode.fill(SccContextElementNotFound);
+          reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (no subscriptions)");
           return SccOk;
       }
   }
@@ -78,7 +81,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                  " - findOne() _id: " + requestP->subscriptionId.get() +
                                  " - exception: " + e.what());
-      mongoSemGive(__FUNCTION__, "");
+      reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)");
       return SccOk;
   }
   catch(...) {
@@ -87,7 +90,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                  " - findOne() _id: " + requestP->subscriptionId.get() +
                                  " - exception: " + "generic");
-      mongoSemGive(__FUNCTION__, "");
+      reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo generic exception)");
       return SccOk;
   }
 
@@ -107,6 +110,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                  " - remove() _id: " + requestP->subscriptionId.get().c_str() +
                                  " - exception: " + e.what());
+      reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)");
       return SccOk;
   }
   catch(...) {
@@ -115,9 +119,11 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                  " - remove() _id: " + requestP->subscriptionId.get().c_str() +
                                  " - exception: " + "generic");
+      reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo generic exception)");
       return SccOk;
   }
 
   responseP->statusCode.fill(SccOk);
+  reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request");
   return SccOk;
 }

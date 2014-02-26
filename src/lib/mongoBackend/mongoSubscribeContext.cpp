@@ -41,6 +41,8 @@
 */
 HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, SubscribeContextResponse* responseP, Format inFormat)
 {
+    reqSemTake(__FUNCTION__, "ngsi10 subscribe request");
+
     LM_T(LmtMongo, ("Subscribe Context Request"));
 
     DBClientConnection* connection = getMongoConnection();
@@ -117,6 +119,7 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
                                                  " - insert(): " + subDoc.toString() +
                                                  " - exception: " + e.what());
 
+        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (database exception)");
         LM_RE(SccOk, ("Database error '%s'", responseP->subscribeError.errorCode.reasonPhrase.c_str()));
     }    
     catch(...) {
@@ -126,6 +129,7 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
                                                  " - insert(): " + subDoc.toString() +
                                                  " - exception: " + "generic");
 
+        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (generic exception)");
         LM_RE(SccOk, ("Database error '%s'", responseP->subscribeError.errorCode.reasonPhrase.c_str()));
     }    
 
@@ -134,5 +138,6 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
     responseP->subscribeResponse.subscriptionId.set(oid.str());
     responseP->subscribeResponse.throttling = requestP->throttling;
 
+    reqSemGive(__FUNCTION__, "ngsi10 subscribe request");
     return SccOk;
 }

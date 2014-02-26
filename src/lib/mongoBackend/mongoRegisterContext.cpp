@@ -46,6 +46,8 @@ using namespace mongo;
 */
 HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterContextResponse* responseP)
 {    
+    reqSemTake(__FUNCTION__, "ngsi9 register request");
+
     LM_T(LmtMongo, ("Register Context Request"));
 
     DBClientConnection* connection = getMongoConnection();
@@ -53,6 +55,7 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
     /* Check if new registration */
     if (requestP->registrationId.isEmpty()) {
         HttpStatusCode result = processRegisterContext(requestP, responseP, NULL);
+        reqSemGive(__FUNCTION__, "ngsi9 register request");
         return result;
     }
 
@@ -69,10 +72,12 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
             responseP->errorCode.fill(SccContextElementNotFound, std::string("registration id: '") + requestP->registrationId.get() + "'");
             responseP->registrationId = requestP->registrationId;
             ++noOfRegistrationUpdateErrors;
+            reqSemGive(__FUNCTION__, "ngsi9 register request (no registrations found)");
             return SccOk;
         }
 
         HttpStatusCode result = processRegisterContext(requestP, responseP, &id);
+        reqSemGive(__FUNCTION__, "ngsi9 register request");
         return result;
     }
     catch( const AssertionException &e ) {
@@ -83,7 +88,6 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
         responseP->errorCode.fill(SccContextElementNotFound);
         responseP->registrationId = requestP->registrationId;
         ++noOfRegistrationUpdateErrors;
-        return SccOk;
     }
     catch( const DBException &e ) {
         mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection (DBException)");
@@ -92,7 +96,6 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
                                   " - findOne() _id: " + requestP->registrationId.get() +
                                   " - exception: " + e.what());
         ++noOfRegistrationUpdateErrors;
-        return SccOk;
     }
     catch(...) {
         mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection (Generic Exception)");
@@ -101,9 +104,8 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
                                   " - findOne() _id: " + requestP->registrationId.get() +
                                   " - exception: " + "generic");
         ++noOfRegistrationUpdateErrors;
-        return SccOk;
     }
 
-    LM_E(("We should never get here!!!"));
+    reqSemGive(__FUNCTION__, "ngsi9 register request");
     return SccOk;
 }

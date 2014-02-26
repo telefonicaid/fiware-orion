@@ -88,9 +88,11 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
         mongoSemTake(__FUNCTION__, "query in AssociationsCollection");
         cursor = connection->query(getAssociationsCollectionName(), query);
         mongoSemGive(__FUNCTION__, "query in AssociationsCollection");
+
         /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
          * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
          * exception ourselves */
+
         if (cursor.get() == NULL) {
             throw DBException("Null cursor", 0);
         }
@@ -146,8 +148,6 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
     }
 
     return true;
-
-
 }
 
 /* ****************************************************************************
@@ -243,6 +243,8 @@ static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAva
 */
 HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP)
 {
+  reqSemTake(__FUNCTION__, "mongo ngsi9 discovery request");
+
   LM_T(LmtMongo, ("DiscoverContextAvailability Request"));  
 
   /* Depending on the scope used, we invoke one function or other. DiscoverContextAvailability may behave
@@ -258,6 +260,7 @@ HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityReque
 
     if (scopeType == SCOPE_TYPE_ASSOC) {
       HttpStatusCode ms = associationsDiscoverConvextAvailability(requestP, responseP, scopeValue);
+      reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request (association)");
       return ms;
     }
     else {
@@ -269,5 +272,6 @@ HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityReque
   if (hsCode != SccOk)
     ++noOfDiscoveryErrors;
 
+  reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request");
   return hsCode;
 }

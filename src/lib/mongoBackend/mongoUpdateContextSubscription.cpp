@@ -42,6 +42,8 @@
 */
 HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* requestP, UpdateContextSubscriptionResponse* responseP, Format inFormat)
 {
+  reqSemTake(__FUNCTION__, "ngsi10 update subscription request");
+
   LM_T(LmtMongo, ("Update Context Subscription"));
 
   DBClientConnection* connection = getMongoConnection();
@@ -56,6 +58,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
       if (sub.isEmpty()) {
           responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
+          reqSemGive(__FUNCTION__, "ngsi10 update subscription request (no subscriptions found)");
           return SccOk;
       }
   }
@@ -66,6 +69,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
       // (old issue #95)
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (AssertionException)");
       responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo assertion exception)");
       return SccOk;
   }
   catch( const DBException &e ) {
@@ -74,6 +78,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
                                                std::string("collection: ") + getSubscribeContextCollectionName() +
                                                " - findOne() _id: " + requestP->subscriptionId.get() +
                                                " - exception: " + e.what());
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo db exception)");
       return SccOk;
   }
   catch(...) {
@@ -82,6 +87,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
                                                std::string("collection: ") + getSubscribeContextCollectionName() +
                                                " - findOne() _id: " + requestP->subscriptionId.get() +
                                                " - exception: " + "generic");
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo generic exception)");
       return SccOk;
   }
 
@@ -196,6 +202,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
                                                " - update() doc: " + update.toString() +
                                                " - exception: " + e.what());
 
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo db exception)");
       return SccOk;
   }
   catch(...) {
@@ -206,6 +213,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
                                                " - update() doc: " + update.toString() +
                                                " - exception: " + "generic");
 
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo generic exception)");
       return SccOk;
   }
 
@@ -219,5 +227,6 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
   }  
   responseP->subscribeResponse.subscriptionId = requestP->subscriptionId;
 
+  reqSemGive(__FUNCTION__, "ngsi10 update subscription request");
   return SccOk;
 }

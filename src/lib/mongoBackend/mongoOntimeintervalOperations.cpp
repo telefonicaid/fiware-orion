@@ -40,6 +40,9 @@ using namespace mongo;
 * mongoGetContextSubscriptionInfo -
 */
 HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscriptionInfo* csiP, std::string* err) {
+
+    reqSemTake(__FUNCTION__, "get info on subscriptions");
+
     LM_T(LmtMongo, ("Get Subscription Info operation"));
 
     DBClientConnection* connection = getMongoConnection();
@@ -68,6 +71,7 @@ HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscri
 
     /* Check if we found anything */
     if (sub.isEmpty()) {
+        reqSemGive(__FUNCTION__, "get info on subscriptions (nothing found)");
         return SccOk;
     }
 
@@ -103,6 +107,7 @@ HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscri
     /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
     csiP->format = sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML;
 
+    reqSemGive(__FUNCTION__, "get info on subscriptions");
     return SccOk;
 }
 
@@ -112,15 +117,19 @@ HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscri
 */
 HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList attrL, ContextElementResponseVector* cerV, std::string* err) {
 
+    reqSemTake(__FUNCTION__, "get context-element responses");
+
     LM_T(LmtMongo, ("Get Notify Context Request operation"));
 
     /* This function is basically a wrapper of mongoBackend internal entitiesQuery() function */
 
     if (!entitiesQuery(enV, attrL, cerV, err, true)) {
         cerV->release();
+        reqSemGive(__FUNCTION__, "get context-element responses (no entities found)");
         LM_RE(SccOk, ((*err).c_str()));
     }
 
+    reqSemGive(__FUNCTION__, "get context-element responses");
     return SccOk;
 }
 
@@ -130,6 +139,9 @@ HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList
 *
 */
 HttpStatusCode mongoUpdateCsubNewNotification(std::string subId, std::string* err) {
+
+    reqSemTake(__FUNCTION__, "update subscription notifications");
+
     LM_T(LmtMongo, ("Update NGI10 Subscription New Notification"));
 
     DBClientConnection* connection = getMongoConnection();
@@ -149,16 +161,16 @@ HttpStatusCode mongoUpdateCsubNewNotification(std::string subId, std::string* er
     catch( const DBException &e ) {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (DBException)");
         *err = e.what();
-        LM_RE(SccOk,("Database error '%s'", err->c_str()));
+        LM_E(("Database error '%s'", err->c_str()));
     }
     catch(...) {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (Generic Exception)");
         *err = "Generic Exception";
-        LM_RE(SccOk,("Database error: '%s'", err->c_str()));
+        LM_E(("Database error: '%s'", err->c_str()));
     }
 
+    reqSemGive(__FUNCTION__, "update subscription notifications");
     return SccOk;
-
 }
 
 

@@ -27,6 +27,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/sem.h"
+
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoQueryContext.h"
 
@@ -40,6 +42,8 @@
 */
 HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResponse* responseP)
 {
+    reqSemTake(__FUNCTION__, "ngsi10 request");
+
     LM_T(LmtMongo, ("QueryContext Request"));    
 
     /* FIXME: restriction not supported for the moment */
@@ -50,14 +54,13 @@ HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResp
     std::string err;
     if (!entitiesQuery(requestP->entityIdVector, requestP->attributeList, &(responseP->contextElementResponseVector), &err, true)) {
         responseP->errorCode.fill(SccReceiverInternalError, err);
-        LM_RE(SccOk, (responseP->errorCode.details.c_str()));
+        LM_E((responseP->errorCode.details.c_str()));
     }
-
-    if (responseP->contextElementResponseVector.size() == 0) {
+    else if (responseP->contextElementResponseVector.size() == 0) {
       /* If query hasn't any result we have to fill the status code part in the response */
       responseP->errorCode.fill(SccContextElementNotFound);
-      return SccOk;
     }
 
+    reqSemGive(__FUNCTION__, "ngsi10 request");
     return SccOk;
 }

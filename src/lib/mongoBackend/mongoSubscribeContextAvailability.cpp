@@ -43,6 +43,8 @@
 */
 HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityRequest* requestP, SubscribeContextAvailabilityResponse* responseP, Format inFormat)
 {
+    reqSemTake(__FUNCTION__, "ngsi9 subscribe request");
+
     LM_T(LmtMongo, ("Subscribe Context Availability Request"));
 
     DBClientConnection* connection = getMongoConnection();
@@ -107,6 +109,7 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
                                   " - insert(): " + subDoc.toString() +
                                   " - exception: " + e.what());
 
+        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (database exception)");
         LM_RE(SccOk, ("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
     }
     catch(...) {
@@ -116,6 +119,7 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
                                   " - insert(): " + subDoc.toString() +
                                   " - exception: " + "generic");
 
+        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (generic exception)");
         LM_RE(SccOk, ("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
     }
 
@@ -126,5 +130,6 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
     responseP->duration = requestP->duration;
     responseP->subscriptionId.set(oid.str());
 
+    reqSemGive(__FUNCTION__, "ngsi9 subscribe request");
     return SccOk;
 }

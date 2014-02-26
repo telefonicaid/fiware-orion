@@ -23,8 +23,9 @@
 * Author: Fermín Galán
 */
 
-#include "mongoNotifyContext.h"
+#include "common/sem.h"
 
+#include "mongoBackend/mongoNotifyContext.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonUpdate.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -34,6 +35,8 @@
 * mongoNofityContext -
 */
 HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextResponse* responseP) {
+
+    reqSemTake(__FUNCTION__, "ngsi10 notification");
 
     /* We ignore "subscriptionId" and "originator" in the request, as we don't have anything interesting
      * to do with them */
@@ -47,5 +50,6 @@ HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextR
 
     responseP->responseCode.fill(SccOk);
 
+    reqSemGive(__FUNCTION__, "ngsi10 notification");
     return SccOk;
 }

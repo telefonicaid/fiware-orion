@@ -39,6 +39,8 @@ using namespace mongo;
 */
 void mongoSetFwdRegId(std::string regId, std::string fwdRegId)
 {
+    reqSemTake(__FUNCTION__, "Mongo Set Forward RegId");
+
     LM_T(LmtMongo, ("Mongo Set Forward RegId"));
 
     DBClientConnection* connection = getMongoConnection();
@@ -66,6 +68,7 @@ void mongoSetFwdRegId(std::string regId, std::string fwdRegId)
         LM_E(("Database error: '%s'", "generic exception"));
     }
 
+    reqSemGive(__FUNCTION__, "Mongo Set Forward RegId");
 }
 
 /* ****************************************************************************
@@ -74,6 +77,10 @@ void mongoSetFwdRegId(std::string regId, std::string fwdRegId)
 */
 std::string mongoGetFwdRegId(std::string regId)
 {
+    std::string retVal = "";
+
+    reqSemTake(__FUNCTION__, "Mongo Get Forward RegId");
+
     LM_T(LmtMongo, ("Mongo Get Forward RegId"));
 
     DBClientConnection* connection = getMongoConnection();
@@ -87,19 +94,23 @@ std::string mongoGetFwdRegId(std::string regId)
         mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection");
 
         LM_T(LmtMongo, ("reg doc: '%s'", doc.toString().c_str()));
-        return STR_FIELD(doc, REG_FWS_REGID);
+        retVal = STR_FIELD(doc, REG_FWS_REGID);
     }
     catch( const DBException &e ) {
         // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
         mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection (DBException)");
-        LM_RE("", ("Database error '%s'", e.what()));
+        LM_E(("Database error '%s'", e.what()));
     }
     catch(...) {
         // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
         mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection (Generic Exception)");
-        LM_RE("", ("Database error: 'generic exception'"));
+        LM_E(("Database error: 'generic exception'"));
     }
+
+    reqSemGive(__FUNCTION__, "Mongo Get Forward RegId");
+
+    return retVal;
 }
 

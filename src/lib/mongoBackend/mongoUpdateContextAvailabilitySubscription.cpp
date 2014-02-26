@@ -43,6 +43,7 @@
 HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabilitySubscriptionRequest* requestP, UpdateContextAvailabilitySubscriptionResponse* responseP, Format inFormat)
 {
   LM_T(LmtMongo, ("Update Context Subscription"));
+  reqSemTake(__FUNCTION__, "ngsi9 update subscription request");
 
   DBClientConnection* connection = getMongoConnection();
 
@@ -55,6 +56,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
       mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection");
       if (sub.isEmpty()) {
           responseP->errorCode.fill(SccContextElementNotFound);
+          reqSemGive(__FUNCTION__, "ngsi9 update subscription request (no subscriptions found)");
           return SccOk;
       }
   }
@@ -73,6 +75,8 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                 " - findOne() _id: " + requestP->subscriptionId.get() +
                                 " - exception: " + e.what());
+
+      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)");
       return SccOk;
   }
   catch(...) {
@@ -81,6 +85,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                 " - findOne() _id: " + requestP->subscriptionId.get() +
                                 " - exception: " + "generic");
+      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo generic exception)");
       return SccOk;
   }
 
@@ -163,6 +168,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
                                 " - update() doc: " + update.toString() +
                                 " - exception: " + e.what());
 
+      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)");
       return SccOk;
   }
   catch(...) {
@@ -173,6 +179,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
                                 " - update() doc: " + update.toString() +
                                 " - exception: " + "generic");
 
+      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo generic exception)");
       return SccOk;
   }
 
@@ -186,6 +193,8 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
   }
 
   responseP->subscriptionId = requestP->subscriptionId;
+
+  reqSemGive(__FUNCTION__, "ngsi9 update subscription request");
 
   return SccOk;
 }

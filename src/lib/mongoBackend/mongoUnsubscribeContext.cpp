@@ -40,6 +40,8 @@
 */
 HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, UnsubscribeContextResponse* responseP)
 {
+    reqSemTake(__FUNCTION__, "ngsi10 unsubscribe request");
+
     LM_T(LmtMongo, ("Unsubscribe Context"));
 
     DBClientConnection* connection = getMongoConnection();
@@ -60,6 +62,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
 
         if (sub.isEmpty()) {
             responseP->statusCode.fill(SccContextElementNotFound, std::string("subscriptionId: '") + requestP->subscriptionId.get() + "'");
+            reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)");
             return SccOk;
         }
     }
@@ -70,6 +73,8 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
         // (old issue #95)
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (AssertionException)");
         responseP->statusCode.fill(SccContextElementNotFound);
+
+        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo assertion)");
         return SccOk;
     }
     catch( const DBException &e ) {
@@ -78,6 +83,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
                                    std::string("collection: ") + getSubscribeContextCollectionName() +
                                    " - findOne() _id: " + requestP->subscriptionId.get() +
                                    " - exception: " + e.what());
+        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo exception)");
         return SccOk;
     }
     catch(...) {
@@ -86,6 +92,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
                                    std::string("collection: ") + getSubscribeContextCollectionName() +
                                    " - findOne() _id: " + requestP->subscriptionId.get() +
                                    " - exception: " + "generic");
+        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (generic exception)");
         return SccOk;
     }
 
@@ -107,6 +114,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
                                    " - remove() _id: " + requestP->subscriptionId.get().c_str() +
                                    " - exception: " + e.what());
 
+        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo exception)");
         return SccOk;
     }
     catch(...) {
@@ -116,6 +124,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
                                    " - remove() _id: " + requestP->subscriptionId.get().c_str() +
                                    " - exception: " + "generic");
 
+        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (generic exception)");
         return SccOk;
     }
 
@@ -123,5 +132,6 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     getNotifier()->destroyOntimeIntervalThreads(requestP->subscriptionId.get());
 
     responseP->statusCode.fill(SccOk);
+    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request");
     return SccOk;
 }

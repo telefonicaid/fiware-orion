@@ -28,7 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "sem.h"
+#include "common/sem.h"
 
 
 
@@ -72,9 +72,9 @@ int reqSemTake(const char* who, const char* what)
 {
   int x;
 
-  LM_T(LmtReqSem, ("%s taking semaphore for '%s'", who, what));
+  LM_T(LmtReqSem, ("%s taking the 'req' semaphore for '%s'", who, what));
   x = sem_wait(&reqSem);
-  LM_T(LmtReqSem, ("%s has the semaphore", who));
+  LM_T(LmtReqSem, ("%s has the 'req' semaphore", who));
 
   return x;
 }
@@ -87,9 +87,9 @@ int mongoSemTake(const char* who, const char* what)
 {
   int x;
 
-  LM_T(LmtMongoSem, ("%s taking semaphore for '%s'", who, what));
+  LM_T(LmtMongoSem, ("%s taking the 'mongo' semaphore for '%s'", who, what));
   x = sem_wait(&mongoSem);
-  LM_T(LmtMongoSem, ("%s has the semaphore", who));
+  LM_T(LmtMongoSem, ("%s has the 'mongo' semaphore", who));
 
   return x;
 }
@@ -101,9 +101,9 @@ int mongoSemTake(const char* who, const char* what)
 int reqSemGive(const char* who, const char* what)
 {
   if (what != NULL)
-    LM_T(LmtReqSem, ("%s gives the semaphore for '%s'", who, what));
+    LM_T(LmtReqSem, ("%s gives the 'req' semaphore for '%s'", who, what));
   else
-    LM_T(LmtReqSem, ("%s gives the semaphore", who));
+    LM_T(LmtReqSem, ("%s gives the 'req' semaphore", who));
 
   return sem_post(&reqSem);
 }
@@ -115,9 +115,9 @@ int reqSemGive(const char* who, const char* what)
 int mongoSemGive(const char* who, const char* what)
 {
   if (what != NULL)
-    LM_T(LmtMongoSem, ("%s gives the semaphore for '%s'", who, what));
+    LM_T(LmtMongoSem, ("%s gives the 'mongo' semaphore for '%s'", who, what));
   else
-    LM_T(LmtMongoSem, ("%s gives the semaphore", who));
+    LM_T(LmtMongoSem, ("%s gives the 'mongo' semaphore", who));
 
   return sem_post(&mongoSem);
 }

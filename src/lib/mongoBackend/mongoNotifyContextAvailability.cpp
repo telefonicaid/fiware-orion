@@ -23,8 +23,9 @@
 * Author: Fermín Galán
 */
 
-#include "mongoNotifyContextAvailability.h"
+#include "common/sem.h"
 
+#include "mongoBackend/mongoNotifyContextAvailability.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonRegister.h"
 #include "ngsi9/RegisterContextRequest.h"
@@ -35,6 +36,8 @@
 * mongoNofityContextAvailability -
 */
 HttpStatusCode mongoNotifyContextAvailability(NotifyContextAvailabilityRequest* requestP, NotifyContextAvailabilityResponse* responseP) {
+
+    reqSemTake(__FUNCTION__, "mongo ngsi9 notification");
 
     /* We ignore "subscriptionId" and "originator" in the request, as we don't have anything interesting
      * to do with them */
@@ -58,6 +61,7 @@ HttpStatusCode mongoNotifyContextAvailability(NotifyContextAvailabilityRequest* 
 
     responseP->responseCode.fill(SccOk);
 
+    reqSemGive(__FUNCTION__, "mongo ngsi9 notification");
     return SccOk;
 }
 

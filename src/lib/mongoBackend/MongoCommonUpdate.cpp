@@ -390,7 +390,7 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
         cursor = connection->query(getSubscribeContextCollectionName(), query);
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection");
         /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-         * raising an exceiption the query() method set the cursor to NULL. In this case, we raise the
+         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
          * exception ourselves */
         if (cursor.get() == NULL) {
             throw DBException("Null cursor", 0);
@@ -401,7 +401,6 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
         *err = std::string("collection: ") + getSubscribeContextCollectionName() +
                " - query(): " + query.toString() +
                " - exception: " + e.what();
-        mongoSemGive(__FUNCTION__, "");
         return false;
     }
     catch(...) {
@@ -409,7 +408,6 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
         *err = std::string("collection: ") + getSubscribeContextCollectionName() +
                " - query(): " + query.toString() +
                " - exception: " + "generic";
-        mongoSemGive(__FUNCTION__, "");
         return false;
     }
 
@@ -424,10 +422,7 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
             // FIXME P8: see old issues #90
             // subs->insert(std::pair<string, BSONObj*>(subIdStr, new BSONObj(sub)));
 
-            // FIXME P10: is try/catch necessary here?
-            mongoSemTake(__FUNCTION__, "insert into 'a subscription'");
             subs->insert(std::pair<string, BSONObj*>(subIdStr, NULL));
-            mongoSemGive(__FUNCTION__, "insert into 'a subscription'");
         }
     }
 
