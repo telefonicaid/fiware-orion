@@ -346,7 +346,7 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
                 entPatternQ << "false" <<
                 condTypeQ << ON_CHANGE_CONDITION <<
                 condValueQ << attr <<
-                CSUB_EXPIRATION << BSON("$gt" << getCurrentTime())
+                CSUB_EXPIRATION << BSON("$gt" << (long long) getCurrentTime())
                 );
 
     /* This is JavaScript code that runs in MongoDB engine. As far as I know, this is the only
@@ -374,7 +374,7 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
     queryPattern.append(entPatternQ, "true");
     queryPattern.append(condTypeQ, ON_CHANGE_CONDITION);
     queryPattern.append(condValueQ, attr);
-    queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << getCurrentTime()));
+    queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
     queryPattern.appendCode("$where", function);
 
     // FIXME: the condTypeQ and condValudeQ part can be "factorized" out of the $or clause
@@ -439,10 +439,10 @@ static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::
 
         /* Check that throttling is not blocking notication */
         if (sub.hasField(CSUB_THROTTLING) && sub.hasField(CSUB_LASTNOTIFICATION)) {
-            int current = getCurrentTime();
-            int sinceLastNotification = current - sub.getIntField(CSUB_LASTNOTIFICATION);
-            if (sub.getIntField(CSUB_THROTTLING) > sinceLastNotification) {
-                LM_T(LmtMongo, ("blocked due to throttling, current time is: %d", current));
+            long long current = getCurrentTime();
+            long long sinceLastNotification = current - sub.getIntField(CSUB_LASTNOTIFICATION);
+            if (sub.getField(CSUB_THROTTLING).numberLong() > sinceLastNotification) {
+                LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
                 continue;
             }
         }

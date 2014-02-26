@@ -113,12 +113,12 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
 
   /* Duration (optional) */
   if (requestP->duration.isEmpty()) {
-      newSub.append(CASUB_EXPIRATION, sub.getIntField(CASUB_EXPIRATION));
+      newSub.append(CASUB_EXPIRATION, sub.getField(CASUB_EXPIRATION).numberLong());
   }
   else {
-      int expiration = getCurrentTime() + requestP->duration.parse();
+      long long expiration = getCurrentTime() + requestP->duration.parse();
       newSub.append(CASUB_EXPIRATION, expiration);
-      LM_T(LmtMongo, ("New subscription expiration: %d", expiration));
+      LM_T(LmtMongo, ("New subscription expiration: %l", expiration));
   }
 
   /* Reference is not updatable, so it is appended directly */

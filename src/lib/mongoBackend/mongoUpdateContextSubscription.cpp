@@ -94,13 +94,13 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
   newSub.append(CSUB_REFERENCE, STR_FIELD(sub, CSUB_REFERENCE));
 
   /* Duration update */
-  if (requestP->duration.isEmpty()) {
-      newSub.append(CSUB_EXPIRATION, sub.getIntField(CSUB_EXPIRATION));
+  if (requestP->duration.isEmpty()) {      
+      newSub.append(CSUB_EXPIRATION, sub.getField(CSUB_EXPIRATION).numberLong());
   }
   else {
-      int expiration = getCurrentTime() + requestP->duration.parse();
+      long long expiration = getCurrentTime() + requestP->duration.parse();
       newSub.append(CSUB_EXPIRATION, expiration);
-      LM_T(LmtMongo, ("New subscription expiration: %d", expiration));
+      LM_T(LmtMongo, ("New subscription expiration: %l", expiration));
   }
 
   /* Restriction update */
@@ -109,7 +109,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
   /* Throttling update */
   if (!requestP->throttling.isEmpty()) {
       /* Throttling equal to 0 removes throttling */
-      int throttling = requestP->throttling.parse();
+      long long throttling = requestP->throttling.parse();
       if (throttling != 0) {
           newSub.append(CSUB_THROTTLING, throttling);
       }
@@ -117,7 +117,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
   else {
       /* The hasField check is needed due to Throttling could not be present in the original doc */
       if (sub.hasField(CSUB_THROTTLING)) {
-          newSub.append(CSUB_THROTTLING, sub.getIntField(CSUB_THROTTLING));
+          newSub.append(CSUB_THROTTLING, sub.getField(CSUB_THROTTLING).numberLong());
       }
   }
 

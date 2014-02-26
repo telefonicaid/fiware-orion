@@ -37,7 +37,7 @@ typedef struct ContextSubscriptionInfo {
     Format                 format;
     int                    lastNotification;
     long long              expiration;
-    int                    throttling;
+    long long              throttling;
 
     void         release(void);
 } ContextSubscriptionInfo;

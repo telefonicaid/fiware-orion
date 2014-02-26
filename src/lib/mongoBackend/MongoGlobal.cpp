@@ -708,7 +708,7 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
     /* The $or clause could be omitted if it contains only one element, but we can assume that
      * it has no impact on MongoDB query optimizer */
     queryBuilder.append("$or", entityOr.arr());
-    queryBuilder.append(REG_EXPIRATION, BSON("$gt" << getCurrentTime()));
+    queryBuilder.append(REG_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
     if (attrs.arrSize() > 0) {
         /* If we don't do this checking, the {$in: [] } in the attribute name part will
          * make the query fail*/

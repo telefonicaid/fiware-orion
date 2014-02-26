@@ -93,7 +93,7 @@ HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscri
         csiP->lastNotification = -1;
     }
 
-    csiP->throttling = sub.hasField(CSUB_THROTTLING) ? sub.getIntField(CSUB_THROTTLING) : -1;
+    csiP->throttling = sub.hasField(CSUB_THROTTLING) ? sub.getField(CSUB_THROTTLING).numberLong() : -1;
 
     /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
     csiP->format = sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML;
@@ -130,6 +130,7 @@ HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList
 HttpStatusCode mongoUpdateCsubNewNotification(std::string subId, std::string* err) {
 
     /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
+    semTake();
 
     LM_T(LmtMongo, ("Update NGI10 Subscription New Notification"));
 
