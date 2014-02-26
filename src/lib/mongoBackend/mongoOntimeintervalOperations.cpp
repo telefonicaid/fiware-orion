@@ -130,6 +130,7 @@ HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList
 HttpStatusCode mongoUpdateCsubNewNotification(std::string subId, std::string* err) {
 
     /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
+    semTake();
 
     LM_T(LmtMongo, ("Update NGI10 Subscription New Notification"));
 
