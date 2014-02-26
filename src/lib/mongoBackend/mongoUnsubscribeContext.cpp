@@ -54,9 +54,9 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
         OID id = OID(requestP->subscriptionId.get());
         LM_T(LmtMongo, ("findOne() in '%s' collection _id '%s'}", getSubscribeContextCollectionName(),
                            requestP->subscriptionId.get().c_str()));
-        semTake(__FUNCTION__, "findOne in SubscribeContextCollection");
+        mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
         sub = connection->findOne(getSubscribeContextCollectionName(), BSON("_id" << id));
-        semGive(__FUNCTION__, "findOne in SubscribeContextCollection");
+        mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
 
         if (sub.isEmpty()) {
             responseP->statusCode.fill(SccContextElementNotFound, std::string("subscriptionId: '") + requestP->subscriptionId.get() + "'");
@@ -68,12 +68,12 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
         // FIXME: this checking should be done at parsing stage, without progressing to
         // mongoBackend. By the moment we can live this here, but we should remove in the future
         // (old issue #95)
-        semGive(__FUNCTION__, "findOne in SubscribeContextCollection (AssertionException)");
+        mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (AssertionException)");
         responseP->statusCode.fill(SccContextElementNotFound);
         return SccOk;
     }
     catch( const DBException &e ) {
-        semGive(__FUNCTION__, "findOne in SubscribeContextCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (DBException)");
         responseP->statusCode.fill(SccReceiverInternalError,
                                    std::string("collection: ") + getSubscribeContextCollectionName() +
                                    " - findOne() _id: " + requestP->subscriptionId.get() +
@@ -81,11 +81,11 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
         return SccOk;
     }
     catch(...) {
-        semGive(__FUNCTION__, "findOne in SubscribeContextCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (Generic Exception)");
         responseP->statusCode.fill(SccReceiverInternalError,
                                    std::string("collection: ") + getSubscribeContextCollectionName() +
                                    " - findOne() _id: " + requestP->subscriptionId.get() +
-                                   " - exception: " + e.what());
+                                   " - exception: " + "generic");
         return SccOk;
     }
 
@@ -96,12 +96,12 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
         LM_T(LmtMongo, ("remove() in '%s' collection _id '%s'}", getSubscribeContextCollectionName(),
                            requestP->subscriptionId.get().c_str()));
 
-        semTake(__FUNCTION__, "remove from SubscribeContextCollection");
+        mongoSemTake(__FUNCTION__, "remove from SubscribeContextCollection");
         connection->remove(getSubscribeContextCollectionName(), BSON("_id" << OID(requestP->subscriptionId.get())));
-        semGive(__FUNCTION__, "remove from SubscribeContextCollection");
+        mongoSemGive(__FUNCTION__, "remove from SubscribeContextCollection");
     }
     catch( const DBException &e ) {
-        semGive(__FUNCTION__, "remove from SubscribeContextCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "remove from SubscribeContextCollection (DBException)");
         responseP->statusCode.fill(SccReceiverInternalError,
                                    std::string("collection: ") + getSubscribeContextCollectionName() +
                                    " - remove() _id: " + requestP->subscriptionId.get().c_str() +
@@ -110,11 +110,11 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
         return SccOk;
     }
     catch(...) {
-        semGive(__FUNCTION__, "remove from SubscribeContextCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "remove from SubscribeContextCollection (Generic Exception)");
         responseP->statusCode.fill(SccReceiverInternalError,
                                    std::string("collection: ") + getSubscribeContextCollectionName() +
                                    " - remove() _id: " + requestP->subscriptionId.get().c_str() +
-                                   " - exception: " + e.what());
+                                   " - exception: " + "generic");
 
         return SccOk;
     }

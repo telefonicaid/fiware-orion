@@ -48,9 +48,15 @@ TEST(commonSem, unique)
    s = semInit();
    EXPECT_EQ(0, s);
 
-   s = semGive();
+   s = mongoSemGive(__FUNCTION__, "test");
    EXPECT_EQ(0, s);
    
-   s = semTake();
+   s = reqSemGive(__FUNCTION__, "test");
+   EXPECT_EQ(0, s);
+
+   s = mongoSemTake(__FUNCTION__, "test");
+   EXPECT_EQ(0, s);
+
+   s = reqSemTake(__FUNCTION__, "test");
    EXPECT_EQ(0, s);
 }

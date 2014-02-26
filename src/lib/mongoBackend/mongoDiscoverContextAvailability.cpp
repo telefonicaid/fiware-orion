@@ -85,9 +85,9 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
     try {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getAssociationsCollectionName(), query.toString().c_str()));
 
-        semTake(__FUNCTION__, "query in AssociationsCollection");
+        mongoSemTake(__FUNCTION__, "query in AssociationsCollection");
         cursor = connection->query(getAssociationsCollectionName(), query);
-        semGive(__FUNCTION__, "query in AssociationsCollection");
+        mongoSemGive(__FUNCTION__, "query in AssociationsCollection");
         /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
          * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
          * exception ourselves */
@@ -97,7 +97,7 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
     }
     catch( const DBException &e ) {
 
-        semGive(__FUNCTION__, "query in AssociationsCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "query in AssociationsCollection (DBException)");
         *err = std::string("collection: ") + getAssociationsCollectionName() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
@@ -105,7 +105,7 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
     }
     catch(...) {
 
-        semGive(__FUNCTION__, "query in AssociationsCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "query in AssociationsCollection (Generic Exception)");
         *err = std::string("collection: ") + getAssociationsCollectionName() +
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";

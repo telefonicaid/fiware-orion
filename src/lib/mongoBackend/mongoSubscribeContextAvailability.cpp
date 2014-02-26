@@ -96,12 +96,12 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
     try {
         LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextAvailabilityCollectionName(), subDoc.toString().c_str()));
 
-        semTake(__FUNCTION__, "insert into SubscribeContextAvailabilityCollection");
+        mongoSemTake(__FUNCTION__, "insert into SubscribeContextAvailabilityCollection");
         connection->insert(getSubscribeContextAvailabilityCollectionName(), subDoc);
-        semGive(__FUNCTION__, "insert into SubscribeContextAvailabilityCollection");
+        mongoSemGive(__FUNCTION__, "insert into SubscribeContextAvailabilityCollection");
     }
     catch( const DBException &e ) {
-        semGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (DBException)");
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                   " - insert(): " + subDoc.toString() +
@@ -110,7 +110,7 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
         LM_RE(SccOk, ("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
     }
     catch(...) {
-        semGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (Generic Exception)");
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                   " - insert(): " + subDoc.toString() +

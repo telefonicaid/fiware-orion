@@ -49,19 +49,19 @@ HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscri
     try {
         LM_T(LmtMongo, ("findOne() in '%s' collection by _id '%s'", getSubscribeContextCollectionName(), subId.c_str()));
 
-        semTake(__FUNCTION__, "findOne in SubscribeContextCollection");
+        mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
         sub = connection->findOne(getSubscribeContextCollectionName(), BSON("_id" << OID(subId)));
-        semGive(__FUNCTION__, "findOne in SubscribeContextCollection");
+        mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
     }
     catch( const DBException &e ) {
-        semGive(__FUNCTION__, "findOne in SubscribeContextCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (DBException)");
         *err = e.what();
         LM_RE(SccOk, ("Database error '%s'", err->c_str()));
     }
-    catch( const DBException &e ) {
-        semGive(__FUNCTION__, "findOne in SubscribeContextCollection (Generic Exception)");
-        *err = e.what();
-        LM_RE(SccOk, ("Database error '%s'", err->c_str()));
+    catch(...) {
+        mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (Generic Exception)");
+        *err = "Database error: received generic exception";
+        LM_RE(SccOk, ("Database error '%s'", "received generic exception"));
     }
 
     LM_T(LmtMongo, ("retrieved subscription: %s", sub.toString().c_str()));
@@ -130,7 +130,6 @@ HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList
 *
 */
 HttpStatusCode mongoUpdateCsubNewNotification(std::string subId, std::string* err) {
-
     LM_T(LmtMongo, ("Update NGI10 Subscription New Notification"));
 
     DBClientConnection* connection = getMongoConnection();
@@ -143,19 +142,19 @@ HttpStatusCode mongoUpdateCsubNewNotification(std::string subId, std::string* er
                         query.toString().c_str(),
                         update.toString().c_str()));
 
-        semTake(__FUNCTION__, "update in SubscribeContextCollection");
+        mongoSemTake(__FUNCTION__, "update in SubscribeContextCollection");
         connection->update(getSubscribeContextCollectionName(), query, update);
-        semGive(__FUNCTION__, "update in SubscribeContextCollection");
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection");
     }
     catch( const DBException &e ) {
-        semGive(__FUNCTION__, "update in SubscribeContextCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (DBException)");
         *err = e.what();
         LM_RE(SccOk,("Database error '%s'", err->c_str()));
     }
     catch(...) {
-        semGive(__FUNCTION__, "update in SubscribeContextCollection (Generic Exception)");
-        *err = e.what();
-        LM_RE(SccOk,("Database error '%s'", err->c_str()));
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (Generic Exception)");
+        *err = "Generic Exception";
+        LM_RE(SccOk,("Database error: '%s'", err->c_str()));
     }
 
     return SccOk;

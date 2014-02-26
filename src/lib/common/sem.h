@@ -31,18 +31,20 @@
 *
 * semInit -
 */
-extern int semInit(void);
+extern int semInit(int shared = 0, int takenInitially = 1);
 
 /* ****************************************************************************
 *
 * semTake -
 */
-extern int semTake(const char* who, const char* what);
+extern int reqSemTake(const char* who, const char* what);
+extern int mongoSemTake(const char* who, const char* what);
 
 /* ****************************************************************************
 *
 * semGive -
 */
-int semGive(const char* who, const char* what = NULL);
+int reqSemGive(const char* who, const char* what = NULL);
+int mongoSemGive(const char* who, const char* what = NULL);
 
 #endif

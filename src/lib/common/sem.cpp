@@ -22,62 +22,102 @@
 *
 * Author: Fermin Galan
 */
-
-#include "sem.h"
 #include <semaphore.h>
 #include <errno.h>
+
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
+#include "sem.h"
+
+
 
 /* ****************************************************************************
 *
 * Globals -
 */
-static sem_t sem;
+static sem_t reqSem;
+static sem_t mongoSem;
 
 /* ****************************************************************************
 *
 * semInit -
 *
-* Return Value (of sem_init)
+*   parameter #1: 0 - the semaphore is to be shared between threads,
+*   parameter #2: 1 - initially the semaphore is free
+*
+* RETURN VALUE (of sem_init)
 *   0 on success,
 *  -1 on failure
 *
 */
-int semInit(void) {
-  // sem_init: 
-  //   parameter #1: 0 - the semaphore is to be shared between threads,
-  //   parameter #2: 1 - initially the semaphore is free
-  if (sem_init(&sem, 0, 1) == -1) 
-  {
-    LM_RE(1, ("Error initializing semaphore: %s\n", strerror(errno)));
-  }  
+int semInit(int shared, int takenInitially)
+{
+  if (sem_init(&reqSem, shared, takenInitially) == -1) 
+    LM_RE(1, ("Error initializing 'req' semaphore: %s\n", strerror(errno)));
+  if (sem_init(&mongoSem, shared, takenInitially) == -1) 
+    LM_RE(2, ("Error initializing 'mongo' semaphore: %s\n", strerror(errno)));
+
+  LM_T(LmtReqSem,   ("Initialized 'req' semaphore"));
+  LM_T(LmtMongoSem, ("Initialized 'mongo' semaphore"));
+
   return 0;
 }
 
 /* ****************************************************************************
 *
-* semTake -
+* reqSemTake -
 */
-int semTake(const char* who, const char* what)
+int reqSemTake(const char* who, const char* what)
 {
   int x;
 
-  LM_M(("%s taking semaphore for '%s'", who, what));
-  x = sem_wait(&sem);
-  LM_M(("%s has the semaphore", who));
+  LM_T(LmtReqSem, ("%s taking semaphore for '%s'", who, what));
+  x = sem_wait(&reqSem);
+  LM_T(LmtReqSem, ("%s has the semaphore", who));
 
   return x;
 }
 
 /* ****************************************************************************
 *
-* semGive -
+* mongoSemTake -
 */
-int semGive(const char* who, const char* what)
+int mongoSemTake(const char* who, const char* what)
+{
+  int x;
+
+  LM_T(LmtMongoSem, ("%s taking semaphore for '%s'", who, what));
+  x = sem_wait(&mongoSem);
+  LM_T(LmtMongoSem, ("%s has the semaphore", who));
+
+  return x;
+}
+
+/* ****************************************************************************
+*
+* reqSemGive -
+*/
+int reqSemGive(const char* who, const char* what)
 {
   if (what != NULL)
-    LM_M(("%s gives the semaphore for '%s'", who, what));
+    LM_T(LmtReqSem, ("%s gives the semaphore for '%s'", who, what));
   else
-    LM_M(("%s gives the semaphore", who));
-  return sem_post(&sem);
+    LM_T(LmtReqSem, ("%s gives the semaphore", who));
+
+  return sem_post(&reqSem);
+}
+
+/* ****************************************************************************
+*
+* mongoSemGive -
+*/
+int mongoSemGive(const char* who, const char* what)
+{
+  if (what != NULL)
+    LM_T(LmtMongoSem, ("%s gives the semaphore for '%s'", who, what));
+  else
+    LM_T(LmtMongoSem, ("%s gives the semaphore", who));
+
+  return sem_post(&mongoSem);
 }

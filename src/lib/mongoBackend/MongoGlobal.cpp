@@ -64,24 +64,24 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
 
     std::string err;
 
-    semTake(__FUNCTION__, "connecting to mongo");
+    mongoSemTake(__FUNCTION__, "connecting to mongo");
 
     /* The first argument to true is to use autoreconnect */
     connection = new DBClientConnection(true);
 
     if (!connection->connect(host, err)) {
-        semGive(__FUNCTION__, "connecting to mongo failed");
+        mongoSemGive(__FUNCTION__, "connecting to mongo failed");
         LM_RE(false, ("MongoDB connection fails: '%s'", err.c_str()));
     }
 
     if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0) {
         if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err)) {
-            semGive(__FUNCTION__, "connecting to mongo failed during authentication");
+            mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
             LM_RE(false, ("Auth error (db=%s, username=%s, pswd=%s): %s", db, username, passwd, err.c_str()));
         }
     }
 
-    semGive(__FUNCTION__, "connecting to mongo");
+    mongoSemGive(__FUNCTION__, "connecting to mongo");
     return true;
 }
 
@@ -276,27 +276,27 @@ bool resetDb(void) {
 
         try 
         {
-          semTake(__FUNCTION__, "resetting database");
+          mongoSemTake(__FUNCTION__, "resetting database");
           connection->dropCollection(entitiesCollectionName);
           connection->dropCollection(registrationsCollectionName);
           connection->dropCollection(subscribeContextCollectionName);
           connection->dropCollection(subscribeContextAvailabilityCollectionName);
           connection->dropCollection(assocationsCollectionName);
-          semGive(__FUNCTION__, "resetting database");
+          mongoSemGive(__FUNCTION__, "resetting database");
         }
         catch (const AssertionException &e)
         {
-          semGive(__FUNCTION__, "resetting database (AssertionException)");
+          mongoSemGive(__FUNCTION__, "resetting database (AssertionException)");
           return false;
         }
         catch (const DBException &e)
         {
-          semGive(__FUNCTION__, "resetting database (DBException)");
+          mongoSemGive(__FUNCTION__, "resetting database (DBException)");
           return false;
         }
         catch (...)
         {
-          semGive(__FUNCTION__, "resetting database (Generic Exception)");
+          mongoSemGive(__FUNCTION__, "resetting database (Generic Exception)");
           return false;
         }
         
@@ -509,9 +509,9 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
     auto_ptr<DBClientCursor> cursor;
     try {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(), query.toString().c_str()));
-        semTake(__FUNCTION__, "query in EntitiesCollection");
+        mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
         cursor = connection->query(getEntitiesCollectionName(), query);
-        semGive(__FUNCTION__, "query in EntitiesCollection");
+        mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
         /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
          * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
          * exception ourselves */
@@ -521,7 +521,7 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
     }
     catch( const DBException &e ) {
 
-        semGive(__FUNCTION__, "query in EntitiesCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (DBException)");
         *err = std::string("collection: ") + getEntitiesCollectionName() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
@@ -530,7 +530,7 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
     }
     catch(...) {
 
-        semGive(__FUNCTION__, "query in EntitiesCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (Generic Exception)");
         *err = std::string("collection: ") + getEntitiesCollectionName() +
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
@@ -762,13 +762,13 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
 
     try {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(), query.toString().c_str()));
-        semTake(__FUNCTION__, "query in RegistrationsCollection");
+        mongoSemTake(__FUNCTION__, "query in RegistrationsCollection");
         cursor = connection->query(getRegistrationsCollectionName(), query);
-        semGive(__FUNCTION__, "query in RegistrationsCollection");
+        mongoSemGive(__FUNCTION__, "query in RegistrationsCollection");
     }
     catch( const DBException &e ) {
 
-        semGive(__FUNCTION__, "query in RegistrationsCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (DBException)");
         *err = std::string("collection: ") + getRegistrationsCollectionName() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
@@ -777,7 +777,7 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
     }
     catch(...) {
 
-        semGive(__FUNCTION__, "query in RegistrationsCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (Generic Exception)");
         *err = std::string("collection: ") + getRegistrationsCollectionName() +
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
@@ -1022,19 +1022,19 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
                         query.toString().c_str(),
                         update.toString().c_str()));
 
-        semTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
+        mongoSemTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
         connection->update(getSubscribeContextAvailabilityCollectionName(), query, update);
-        semGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
     }
     catch( const DBException &e ) {
-        semGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (DBException)");
         *err = e.what();
         LM_RE(SccOk, ("Database error '%s'", err->c_str()));
     }
     catch(...) {
-        semGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (Generic Exception)");
         *err = "Database error - exception thrown";
-        LM_RE(SccOk, (*err));
+        LM_RE(SccOk, ("Database error - exception thrown"));
     }
 
     return SccOk;

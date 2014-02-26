@@ -106,12 +106,12 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
     try {
         LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextCollectionName(), subDoc.toString().c_str()));
 
-        semTake(__FUNCTION__, "insert into SubscribeContextCollection");
+        mongoSemTake(__FUNCTION__, "insert into SubscribeContextCollection");
         connection->insert(getSubscribeContextCollectionName(), subDoc);
-        semGive(__FUNCTION__, "insert into SubscribeContextCollection");
+        mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection");
     }
     catch( const DBException &e ) {
-        semGive(__FUNCTION__, "insert into SubscribeContextCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection (DBException)");
         responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                  std::string("collection: ") + getSubscribeContextCollectionName() +
                                                  " - insert(): " + subDoc.toString() +
@@ -120,11 +120,11 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
         LM_RE(SccOk, ("Database error '%s'", responseP->subscribeError.errorCode.reasonPhrase.c_str()));
     }    
     catch(...) {
-        semGive(__FUNCTION__, "insert into SubscribeContextCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection (Generic Exception)");
         responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                  std::string("collection: ") + getSubscribeContextCollectionName() +
                                                  " - insert(): " + subDoc.toString() +
-                                                 " - exception: " + e.what());
+                                                 " - exception: " + "generic");
 
         LM_RE(SccOk, ("Database error '%s'", responseP->subscribeError.errorCode.reasonPhrase.c_str()));
     }    

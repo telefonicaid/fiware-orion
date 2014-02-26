@@ -50,9 +50,9 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
   BSONObj sub;
   try {
       OID id = OID(requestP->subscriptionId.get());
-      semTake(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection");
+      mongoSemTake(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection");
       sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << id));
-      semGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection");
+      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection");
       if (sub.isEmpty()) {
           responseP->errorCode.fill(SccContextElementNotFound);
           return SccOk;
@@ -63,12 +63,12 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
       // FIXME: this checking should be done at parsing stage, without progressing to
       // mongoBackend. By the moment we can live this here, but we should remove in the future
       // (old issue #95)
-      semGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (AssertionException)");
+      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (AssertionException)");
       responseP->errorCode.fill(SccContextElementNotFound);
       return SccOk;
   }
   catch( const DBException &e ) {
-      semGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (DBException)");
+      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (DBException)");
       responseP->errorCode.fill(SccReceiverInternalError,
                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                 " - findOne() _id: " + requestP->subscriptionId.get() +
@@ -76,7 +76,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
       return SccOk;
   }
   catch(...) {
-      semGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (Generic Exception)");
+      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (Generic Exception)");
       responseP->errorCode.fill(SccReceiverInternalError,
                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                 " - findOne() _id: " + requestP->subscriptionId.get() +
@@ -151,12 +151,12 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
       LM_T(LmtMongo, ("update() in '%s' collection _id '%s': %s}", getSubscribeContextAvailabilityCollectionName(),
                          requestP->subscriptionId.get().c_str(),
                          update.toString().c_str()));
-      semTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
+      mongoSemTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
       connection->update(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << OID(requestP->subscriptionId.get())), update);
-      semGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
+      mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
   }
   catch( const DBException &e ) {
-      semGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (DBException)");
+      mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (DBException)");
       responseP->errorCode.fill(SccReceiverInternalError,
                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                 " - update() _id: " + requestP->subscriptionId.get().c_str() +
@@ -166,7 +166,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
       return SccOk;
   }
   catch(...) {
-      semGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (Generic Exception)");
+      mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (Generic Exception)");
       responseP->errorCode.fill(SccReceiverInternalError,
                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                 " - update() _id: " + requestP->subscriptionId.get().c_str() +

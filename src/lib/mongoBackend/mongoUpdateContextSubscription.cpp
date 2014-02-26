@@ -51,9 +51,9 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
   try {
       OID id = OID(requestP->subscriptionId.get());
 
-      semTake(__FUNCTION__, "findOne in SubscribeContextCollection");
+      mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
       sub = connection->findOne(getSubscribeContextCollectionName(), BSON("_id" << id));
-      semGive(__FUNCTION__, "findOne in SubscribeContextCollection");
+      mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
       if (sub.isEmpty()) {
           responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
           return SccOk;
@@ -64,12 +64,12 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
       // FIXME: this checking should be done at parsing stage, without progressing to
       // mongoBackend. By the moment we can live this here, but we should remove in the future
       // (old issue #95)
-      semGive(__FUNCTION__, "findOne in SubscribeContextCollection (AssertionException)");
+      mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (AssertionException)");
       responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
       return SccOk;
   }
   catch( const DBException &e ) {
-      semGive(__FUNCTION__, "findOne in SubscribeContextCollection (DBException)");
+      mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (DBException)");
       responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                std::string("collection: ") + getSubscribeContextCollectionName() +
                                                " - findOne() _id: " + requestP->subscriptionId.get() +
@@ -77,7 +77,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
       return SccOk;
   }
   catch(...) {
-      semGive(__FUNCTION__, "findOne in SubscribeContextCollection (Generic Exception)");
+      mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (Generic Exception)");
       responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                std::string("collection: ") + getSubscribeContextCollectionName() +
                                                " - findOne() _id: " + requestP->subscriptionId.get() +
@@ -184,12 +184,12 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
       LM_T(LmtMongo, ("update() in '%s' collection _id '%s': %s}", getSubscribeContextCollectionName(),
                          requestP->subscriptionId.get().c_str(),
                          update.toString().c_str()));
-      semTake(__FUNCTION__, "update in SubscribeContextCollection");
+      mongoSemTake(__FUNCTION__, "update in SubscribeContextCollection");
       connection->update(getSubscribeContextCollectionName(), BSON("_id" << OID(requestP->subscriptionId.get())), update);
-      semGive(__FUNCTION__, "update in SubscribeContextCollection");
+      mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection");
   }
   catch( const DBException &e ) {
-      semGive(__FUNCTION__, "update in SubscribeContextCollection (DBException)");
+      mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (DBException)");
       responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                std::string("collection: ") + getSubscribeContextCollectionName() +
                                                " - update() _id: " + requestP->subscriptionId.get().c_str() +
@@ -199,7 +199,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
       return SccOk;
   }
   catch(...) {
-      semGive(__FUNCTION__, "update in SubscribeContextCollection (Generic Exception)");
+      mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (Generic Exception)");
       responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                std::string("collection: ") + getSubscribeContextCollectionName() +
                                                " - update() _id: " + requestP->subscriptionId.get().c_str() +
