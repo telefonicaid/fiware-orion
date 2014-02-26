@@ -41,16 +41,16 @@
 *
 * xmlParse - 
 */
-void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* parseVector, ParseData* reqDataP)
+std::string xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* parseVector, ParseData* reqDataP)
 {
   if (node == NULL)
-    return;
+    return "OK";
 
   if (node->name() == NULL)
-    return;
+    return "OK";
 
   if (node->name()[0] == 0)
-    return;
+    return "OK";
 
   std::string path = fatherPath + "/" + node->name();
 
@@ -77,7 +77,10 @@ void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std
   }
 
   if (treated == false)
+  {
     LM_W(("Warning: node '%s' not treated (%s)", path.c_str(), node->name()));
+    return "OK";
+  }
 
   xml_node<>* child = node->first_node();
 
@@ -86,6 +89,8 @@ void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std
     xmlParse(node, child, indentation + "  ", path, parseVector, reqDataP);
     child = child->next_sibling();
   }
+
+  return "OK";
 }
 
 

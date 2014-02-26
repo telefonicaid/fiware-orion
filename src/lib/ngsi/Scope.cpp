@@ -40,8 +40,9 @@
 */
 Scope::Scope()
 {
-  type  = "";
-  value = "";
+  type     = "";
+  value    = "";
+  areaType = AreaNone;
 }
 
 
@@ -85,13 +86,27 @@ std::string Scope::render(Format format, std::string indent, bool notLastInVecto
 */
 std::string Scope::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
-  LM_T(LmtScope, ("type == '%s'", type.c_str()));
+  if (type == "FIWARE_Location")
+  {
+    if (areaType == AreaCircle)
+    {
+      if (circle.radius == 0)
+        return "Radius zero for a circle area";
+    }
+    else if (areaType == AreaPolygon)
+    {
+      if (polygon.vertexList.size() < 3)
+        return "too few vertices for a polygon";
+    }
+  }
+  else
+  {
+    if ((type == "") || (type == "not in use"))
+      return "Empty type in restriction scope";
 
-  if ((type == "") || (type == "not in use"))
-    return "Empty type in restriction scope";
-
-  if ((value == "") || (value == "not in use"))
-    return "Empty value in restriction scope";
+    if ((value == "") || (value == "not in use"))
+      return "Empty value in restriction scope";
+  }
 
   return "OK";
 }
@@ -111,19 +126,21 @@ void Scope::present(std::string indent, int ix)
 
   PRINTF("%s  Type:     %s\n", indent.c_str(), type.c_str());
 
-  if (scopeType == ScopeStringValue)
+  if (areaType == AreaNone)
     PRINTF("%s  Value:    %s\n", indent.c_str(), value.c_str());
-  else if (scopeType == ScopeAreaCircle)
+  else if (areaType == AreaCircle)
   {
     PRINTF("%s  FI-WARE Circle Area:\n", indent.c_str());
     PRINTF("%s    Radius:     %f\n", indent.c_str(), circle.radius);
-    PRINTF("%s    Longitude:  %f\n", indent.c_str(), circle.origin.longitude);
-    PRINTF("%s    Latitude:   %f\n", indent.c_str(), circle.origin.latitude);
+    PRINTF("%s    Longitude:  %f\n", indent.c_str(), circle.center.longitude);
+    PRINTF("%s    Latitude:   %f\n", indent.c_str(), circle.center.latitude);
+    PRINTF("%s    Inverted:   %s\n", indent.c_str(), circle.inverted? "YES" :"NO");
   }
-  else if (scopeType == ScopeAreaPolygon)
+  else if (areaType == AreaPolygon)
   {
     PRINTF("%s  FI-WARE Polygon Area (%lu vertices):\n", indent.c_str(), polygon.vertexList.size());
 
+    PRINTF("%s    Inverted:   %s\n", indent.c_str(), polygon.inverted? "YES" :"NO");
     for (unsigned int ix = 0; ix < polygon.vertexList.size(); ++ix)
     {
       PRINTF("%s    Vertex %d\n", indent.c_str(), ix);

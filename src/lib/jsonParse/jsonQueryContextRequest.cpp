@@ -103,7 +103,7 @@ static std::string entityIdIsPattern(std::string path, std::string value, ParseD
   reqDataP->qcr.entityIdP->isPattern = value;
 
   if (!isTrue(value) && !isFalse(value))
-    return "bad 'isPattern' value: '" + value + "'";
+    return "invalid isPattern (boolean) value for entity: '" + value + "'";
 
   return "OK";
 }
@@ -237,7 +237,7 @@ static std::string scopeValue(std::string path, std::string value, ParseData* re
 static std::string circle(std::string path, std::string value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a circle"));
-  reqDataP->qcr.scopeP->scopeType = ScopeAreaCircle;
+  reqDataP->qcr.scopeP->areaType = AreaCircle;
   return "OK";
 }
 
@@ -250,7 +250,7 @@ static std::string circle(std::string path, std::string value, ParseData* reqDat
 static std::string circleCenterLatitude(std::string path, std::string value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a circleCenterLatitude: %s", value.c_str()));
-  reqDataP->qcr.scopeP->circle.origin.latitude = atof(value.c_str());
+  reqDataP->qcr.scopeP->circle.center.latitude = atof(value.c_str());
 
   return "OK";
 }
@@ -264,7 +264,7 @@ static std::string circleCenterLatitude(std::string path, std::string value, Par
 static std::string circleCenterLongitude(std::string path, std::string value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a circleCenterLongitude: %s", value.c_str()));
-  reqDataP->qcr.scopeP->circle.origin.longitude = atof(value.c_str());
+  reqDataP->qcr.scopeP->circle.center.longitude = atof(value.c_str());
   return "OK";
 }
 
@@ -285,32 +285,147 @@ static std::string circleRadius(std::string path, std::string value, ParseData* 
 
 /* ****************************************************************************
 *
+* circleInverted - 
+*/
+static std::string circleInverted(std::string path, std::string value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a circleInverted: %s", value.c_str()));
+
+  if (!isTrue(value) && !isFalse(value))
+  {
+    parseDataP->errorString = "bad string for circle/inverted: '" + value + "'";
+    return parseDataP->errorString;
+  }
+  else
+    parseDataP->qcr.scopeP->circle.inverted = isTrue(value);
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* polygon - 
+*/
+static std::string polygon(std::string path, std::string value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a polygon"));
+  parseDataP->qcr.scopeP->areaType = AreaPolygon;
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonInverted - 
+*/
+static std::string polygonInverted(std::string path, std::string value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a polygonInverted: %s", value.c_str()));
+
+  if (!isTrue(value) && !isFalse(value))
+  {
+    parseDataP->errorString = "bad string for polygon/inverted: '" + value + "'";
+    return parseDataP->errorString;
+  }
+  else
+    parseDataP->qcr.scopeP->polygon.inverted = isTrue(value);
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonVertexList - 
+*/
+static std::string polygonVertexList(std::string path, std::string value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a polygonVertexList"));
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonVertex - 
+*/
+static std::string polygonVertex(std::string path, std::string value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a polygonVertex - creating new vertex for the vertex list"));
+  parseDataP->qcr.vertexP = new ScopePoint();
+  parseDataP->qcr.scopeP->polygon.vertexList.push_back(parseDataP->qcr.vertexP);
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonVertexLatitude - 
+*/
+static std::string polygonVertexLatitude(std::string path, std::string value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a polygonVertexLatitude: %s", value.c_str()));
+  parseDataP->qcr.vertexP->latitude = atof(value.c_str());
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonVertexLongitude - 
+*/
+static std::string polygonVertexLongitude(std::string path, std::string value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a polygonVertexLongitude: %s", value.c_str()));
+  parseDataP->qcr.vertexP->longitude = atof(value.c_str());
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
 * qcrParseVector -
 */
 JsonNode jsonQcrParseVector[] =
 {
-   { "/entities",                   jsonNullTreat      },
-   { "/entities/entity",            entityId           },
-   { "/entities/entity/id",         entityIdId         },
-   { "/entities/entity/type",       entityIdType       },
-   { "/entities/entity/isPattern",  entityIdIsPattern  },
+  { "/entities",                   jsonNullTreat      },
+  { "/entities/entity",            entityId           },
+  { "/entities/entity/id",         entityIdId         },
+  { "/entities/entity/type",       entityIdType       },
+  { "/entities/entity/isPattern",  entityIdIsPattern  },
 
-   { "/attributes",                 attributeList       },
-   { "/attributes/attribute",       attribute           },
+  { "/attributes",                 attributeList       },
+  { "/attributes/attribute",       attribute           },
 
-   { "/restriction",                     restriction            },
-   { "/restriction/attributeExpression", attributeExpression    },
-   { "/restriction/scopes",              jsonNullTreat          },
-   { "/restriction/scopes/scope",        operationScope         },
-   { "/restriction/scopes/scope/type",   scopeType              },
-   { "/restriction/scopes/scope/value",  scopeValue             },
+  { "/restriction",                     restriction            },
+  { "/restriction/attributeExpression", attributeExpression    },
+  { "/restriction/scopes",              jsonNullTreat          },
+  { "/restriction/scopes/scope",        operationScope         },
+  { "/restriction/scopes/scope/type",   scopeType              },
+  { "/restriction/scopes/scope/value",  scopeValue             },
 
-  { "/restriction/scopes/scope/value/circle",                  circle                     },
-  { "/restriction/scopes/scope/value/circle/center_latitude",  circleCenterLatitude       },
-  { "/restriction/scopes/scope/value/circle/center_longitude", circleCenterLongitude      },
-  { "/restriction/scopes/scope/value/circle/radius",           circleRadius               },
+  { "/restriction/scopes/scope/value/circle",                              circle                  },
+  { "/restriction/scopes/scope/value/circle/center_latitude",              circleCenterLatitude    },
+  { "/restriction/scopes/scope/value/circle/center_longitude",             circleCenterLongitude   },
+  { "/restriction/scopes/scope/value/circle/radius",                       circleRadius            },
+  { "/restriction/scopes/scope/value/circle/inverted",                     circleInverted          },
 
-   { "LAST", NULL }
+  { "/restriction/scopes/scope/value/polygon",                             polygon                 },
+  { "/restriction/scopes/scope/value/polygon/inverted",                    polygonInverted         },
+  { "/restriction/scopes/scope/value/polygon/vertexList",                  polygonVertexList       },
+  { "/restriction/scopes/scope/value/polygon/vertexList/vertex",           polygonVertex           },
+  { "/restriction/scopes/scope/value/polygon/vertexList/vertex/latitude",  polygonVertexLatitude   },
+  { "/restriction/scopes/scope/value/polygon/vertexList/vertex/longitude", polygonVertexLongitude  },
+
+  { "LAST", NULL }
 };
 
 

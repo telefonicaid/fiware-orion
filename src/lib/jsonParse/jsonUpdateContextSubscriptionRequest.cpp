@@ -146,7 +146,7 @@ static std::string scopeValue(std::string path, std::string value, ParseData* pa
 static std::string circle(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a circle"));
-  parseDataP->ucsr.scopeP->scopeType = ScopeAreaCircle;
+  parseDataP->ucsr.scopeP->areaType = AreaCircle;
   return "OK";
 }
 
@@ -159,7 +159,7 @@ static std::string circle(std::string path, std::string value, ParseData* parseD
 static std::string circleCenterLatitude(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a circleCenterLatitude: %s", value.c_str()));
-  parseDataP->ucsr.scopeP->circle.origin.latitude = atof(value.c_str());
+  parseDataP->ucsr.scopeP->circle.center.latitude = atof(value.c_str());
 
   return "OK";
 }
@@ -173,7 +173,7 @@ static std::string circleCenterLatitude(std::string path, std::string value, Par
 static std::string circleCenterLongitude(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a circleCenterLongitude: %s", value.c_str()));
-  parseDataP->ucsr.scopeP->circle.origin.longitude = atof(value.c_str());
+  parseDataP->ucsr.scopeP->circle.center.longitude = atof(value.c_str());
   return "OK";
 }
 
@@ -187,6 +187,113 @@ static std::string circleRadius(std::string path, std::string value, ParseData* 
 {
   LM_T(LmtParse, ("Got a circleRadius: %s", value.c_str()));
   parseDataP->ucsr.scopeP->circle.radius = atof(value.c_str());
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* circleInverted - 
+*/
+static std::string circleInverted(std::string path, std::string value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a circleInverted: %s", value.c_str()));
+
+  if (!isTrue(value) && !isFalse(value))
+  {
+    parseDataP->errorString = "bad string for circle/inverted: '" + value + "'";
+    return parseDataP->errorString;
+  }
+  else
+    parseDataP->ucsr.scopeP->circle.inverted = isTrue(value);
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* polygon - 
+*/
+static std::string polygon(std::string path, std::string value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a polygon"));
+  parseDataP->ucsr.scopeP->areaType = AreaPolygon;
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonInverted - 
+*/
+static std::string polygonInverted(std::string path, std::string value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a polygonInverted: %s", value.c_str()));
+
+  if (!isTrue(value) && !isFalse(value))
+  {
+    parseDataP->errorString = "bad string for polygon/inverted: '" + value + "'";
+    return parseDataP->errorString;
+  }
+  else
+    parseDataP->ucsr.scopeP->polygon.inverted = isTrue(value);
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonVertexList - 
+*/
+static std::string polygonVertexList(std::string path, std::string value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a polygonVertexList"));
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonVertex - 
+*/
+static std::string polygonVertex(std::string path, std::string value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a polygonVertex - creating new vertex for the vertex list"));
+  parseDataP->ucsr.vertexP = new ScopePoint();
+  parseDataP->ucsr.scopeP->polygon.vertexList.push_back(parseDataP->ucsr.vertexP);
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonVertexLatitude - 
+*/
+static std::string polygonVertexLatitude(std::string path, std::string value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a polygonVertexLatitude: %s", value.c_str()));
+  parseDataP->ucsr.vertexP->latitude = atof(value.c_str());
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonVertexLongitude - 
+*/
+static std::string polygonVertexLongitude(std::string path, std::string value, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a polygonVertexLongitude: %s", value.c_str()));
+  parseDataP->ucsr.vertexP->longitude = atof(value.c_str());
   return "OK";
 }
 
@@ -287,10 +394,18 @@ JsonNode jsonUcsrParseVector[] =
   { "/restriction/scopes/scope/type",                          scopeType                  },
   { "/restriction/scopes/scope/value",                         scopeValue                 },
 
-  { "/restriction/scopes/scope/value/circle",                  circle                     },
-  { "/restriction/scopes/scope/value/circle/center_latitude",  circleCenterLatitude       },
-  { "/restriction/scopes/scope/value/circle/center_longitude", circleCenterLongitude      },
-  { "/restriction/scopes/scope/value/circle/radius",           circleRadius               },
+  { "/restriction/scopes/scope/value/circle",                              circle                  },
+  { "/restriction/scopes/scope/value/circle/center_latitude",              circleCenterLatitude    },
+  { "/restriction/scopes/scope/value/circle/center_longitude",             circleCenterLongitude   },
+  { "/restriction/scopes/scope/value/circle/radius",                       circleRadius            },
+  { "/restriction/scopes/scope/value/circle/inverted",                     circleInverted          },
+
+  { "/restriction/scopes/scope/value/polygon",                             polygon                 },
+  { "/restriction/scopes/scope/value/polygon/inverted",                    polygonInverted         },
+  { "/restriction/scopes/scope/value/polygon/vertexList",                  polygonVertexList       },
+  { "/restriction/scopes/scope/value/polygon/vertexList/vertex",           polygonVertex           },
+  { "/restriction/scopes/scope/value/polygon/vertexList/vertex/latitude",  polygonVertexLatitude   },
+  { "/restriction/scopes/scope/value/polygon/vertexList/vertex/longitude", polygonVertexLongitude  },
 
   { "/subscriptionId",                                         subscriptionId             },
   { "/notifyConditions/notifyCondition",                       notifyCondition            },

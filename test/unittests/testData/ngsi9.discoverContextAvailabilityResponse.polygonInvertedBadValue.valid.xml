@@ -1,0 +1,6 @@
+<discoverContextAvailabilityResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>bad string for polygon/inverted: 'thru'</reasonPhrase>
+  </errorCode>
+</discoverContextAvailabilityResponse>

@@ -118,7 +118,8 @@ static std::string entityIdIsPattern(std::string path, std::string value, ParseD
   parseDataP->ncr.cerP->contextElement.entityId.isPattern = value;
 
   if (!isTrue(value) && !isFalse(value))
-    LM_W(("bad 'isPattern' value: '%s'", value.c_str()));
+    return "invalid isPattern (boolean) value for entity: '" + value + "'";
+
 
   return "OK";
 }

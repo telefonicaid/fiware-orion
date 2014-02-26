@@ -180,7 +180,7 @@ static int scopeValue(xml_node<>* node, ParseData* reqData)
 static int circle(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circle"));
-  reqData->scr.scopeP->scopeType = ScopeAreaCircle;
+  reqData->scr.scopeP->areaType = AreaCircle;
   return 0;
 }
 
@@ -193,7 +193,7 @@ static int circle(xml_node<>* node, ParseData* reqData)
 static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circleCenterLatitude: %s", node->value()));
-  reqData->scr.scopeP->circle.origin.latitude = atof(node->value());
+  reqData->scr.scopeP->circle.center.latitude = atof(node->value());
 
   return 0;
 }
@@ -207,7 +207,7 @@ static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
 static int circleCenterLongitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circleCenterLongitude: %s", node->value()));
-  reqData->scr.scopeP->circle.origin.longitude = atof(node->value());
+  reqData->scr.scopeP->circle.center.longitude = atof(node->value());
   return 0;
 }
 
@@ -228,12 +228,54 @@ static int circleRadius(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
+* circleInverted - 
+*/
+static int circleInverted(xml_node<>* node, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a circleInverted: %s", node->value()));
+
+  if (!isTrue(node->value()) && !isFalse(node->value()))
+  {
+    parseDataP->errorString = std::string("bad string for circle/inverted: '") + node->value() + "'";
+    return 1;
+  }
+  else
+    parseDataP->scr.scopeP->circle.inverted = isTrue(node->value());
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
 * polygon - 
 */
 static int polygon(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygon"));
-  reqData->scr.scopeP->scopeType = ScopeAreaPolygon;
+  reqData->scr.scopeP->areaType = AreaPolygon;
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonInverted - 
+*/
+static int polygonInverted(xml_node<>* node, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a polygonInverted: %s", node->value()));
+
+  if (!isTrue(node->value()) && !isFalse(node->value()))
+  {
+    parseDataP->errorString = std::string("bad string for polygon/inverted: '") + node->value() + "'";
+    return 1;
+  }
+  else
+    parseDataP->scr.scopeP->polygon.inverted = isTrue(node->value());
+
   return 0;
 }
 
@@ -463,12 +505,14 @@ XmlNode scrParseVector[] =
   { "/subscribeContextRequest/restriction/scope/operationScope/scopeType",   scopeType            },
   { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue",  scopeValue           },
 
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle",                   circle                 },
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/center_latitude",   circleCenterLatitude   },
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/center_longitude",  circleCenterLongitude  },
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/radius",            circleRadius           },
+  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle",                              circle                  },
+  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/center_latitude",              circleCenterLatitude    },
+  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/center_longitude",             circleCenterLongitude   },
+  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/radius",                       circleRadius            },
+  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/inverted",                     circleInverted          },
 
   { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/polygon",                             polygon                 },
+  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/polygon/inverted",                    polygonInverted         },
   { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList",                  polygonVertexList       },
   { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex",           polygonVertex           },
   { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex/latitude",  polygonVertexLatitude   },
