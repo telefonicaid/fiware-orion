@@ -137,7 +137,7 @@ static int circle(xml_node<>* node, ParseData* reqData)
 static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circleCenterLatitude: %s", node->value()));
-  reqData->ucsr.scopeP->circle.center.latitude = atof(node->value());
+  reqData->ucsr.scopeP->circle.center.latitude = node->value();
 
   return 0;
 }
@@ -151,7 +151,7 @@ static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
 static int circleCenterLongitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circleCenterLongitude: %s", node->value()));
-  reqData->ucsr.scopeP->circle.center.longitude = atof(node->value());
+  reqData->ucsr.scopeP->circle.center.longitude = node->value();
   return 0;
 }
 
@@ -164,7 +164,7 @@ static int circleCenterLongitude(xml_node<>* node, ParseData* reqData)
 static int circleRadius(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circleRadius: %s", node->value()));
-  reqData->ucsr.scopeP->circle.radius = atof(node->value());
+  reqData->ucsr.scopeP->circle.radius = node->value();
   return 0;
 }
 
@@ -178,13 +178,13 @@ static int circleInverted(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a circleInverted: %s", node->value()));
 
+  parseDataP->ucsr.scopeP->circle.inverted = isTrue(node->value());
+
   if (!isTrue(node->value()) && !isFalse(node->value()))
   {
     parseDataP->errorString = std::string("bad string for circle/inverted: '") + node->value() + "'";
     return 1;
   }
-  else
-    parseDataP->ucsr.scopeP->circle.inverted = isTrue(node->value());
 
   return 0;
 }
@@ -212,13 +212,13 @@ static int polygonInverted(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a polygonInverted: %s", node->value()));
 
+  parseDataP->ucsr.scopeP->polygon.inverted = node->value();
+
   if (!isTrue(node->value()) && !isFalse(node->value()))
   {
     parseDataP->errorString = std::string("bad string for polygon/inverted: '") + node->value() + "'";
     return 1;
   }
-  else
-    parseDataP->ucsr.scopeP->polygon.inverted = isTrue(node->value());
 
   return 0;
 }
@@ -258,7 +258,7 @@ static int polygonVertex(xml_node<>* node, ParseData* reqData)
 static int polygonVertexLatitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygonVertexLatitude: %s", node->value()));
-  reqData->ucsr.vertexP->latitude = atof(node->value());
+  reqData->ucsr.vertexP->latitude = node->value();
   return 0;
 }
 
@@ -271,7 +271,7 @@ static int polygonVertexLatitude(xml_node<>* node, ParseData* reqData)
 static int polygonVertexLongitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygonVertexLongitude: %s", node->value()));
-  reqData->ucsr.vertexP->longitude = atof(node->value());
+  reqData->ucsr.vertexP->longitude = node->value();
   return 0;
 }
 

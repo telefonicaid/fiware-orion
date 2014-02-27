@@ -271,7 +271,6 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedBadValue)
 TEST(SubscribeContextRequest, scopeGeolocationCircleZeroRadius)
 {
   ParseData       reqData;
-  // ngsi9.discoverContextAvailabilityRequest.circleZeroRadius.postponed.xml
   const char*     inFile  = "ngsi10.subscribeContextRequest.circleZeroRadius.postponed.xml";
   const char*     outFile = "ngsi10.subscribeContextResponse.circleZeroRadius.postponed.xml";
   ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
@@ -285,7 +284,6 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleZeroRadius)
 
 
 
-#if 0
 /* ****************************************************************************
 *
 * scopeGeolocationCircleOkJson - 
@@ -314,9 +312,8 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleOkJson)
 TEST(SubscribeContextRequest, scopeGeolocationCircleZeroRadiusJson)
 {
   ParseData       reqData;
-  // ngsi9.discoverContextAvailabilityRequest.circleZeroRadius.postponed.json
   const char*     inFile  = "ngsi10.subscribeContextRequest.circleZeroRadius.postponed.json";
-  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.circleZeroRadius.valid.json";
+  const char*     outFile = "ngsi10.subscribeContextResponse.circleZeroRadius.valid.json";
   ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
   std::string     result;
 
@@ -338,7 +335,6 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleZeroRadiusJson)
 TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedJson)
 {
   ParseData       reqData;
-  // ngsi9.discoverContextAvailabilityRequest.circleInverted.postponed.json
   const char*     inFile  = "ngsi10.subscribeContextRequest.circleInverted.postponed.json";
   ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
   std::string     result;
@@ -360,9 +356,8 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedJson)
 TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedBadValueJson)
 {
   ParseData       reqData;
-  con  // ngsi9.discoverContextAvailabilityRequest.circleInvertedBadValue.invalid.json
-  const char*     inFile  = "ngsi9.discoverContextAvailabilityReques10.subscribeContextRequest.invalid.json";
-  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.circleInvertedBadValue.valid.json";
+  const char*     inFile  = "ngsi10.subscribeContextRequest.circleInvertedBadValue.invalid.json";
+  const char*     outFile = "ngsi10.subscribeContextResponse.circleInvertedBadValue.ok.json";
   ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
   std::string     result;
 
@@ -384,7 +379,6 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedBadValueJson)
 TEST(SubscribeContextRequest, scopeGeolocationPolygonOk)
 {
   ParseData       parseData;
-  // ngsi9.discoverContextAvailabilityRequest.polygonOk.postponed.xml
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonOk.postponed.xml";
   ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
   std::string     result;
@@ -403,7 +397,6 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonOk)
 TEST(SubscribeContextRequest, scopeGeolocationPolygonInverted)
 {
   ParseData       parseData;
-  // ngsi9.discoverContextAvailabilityRequest.polygonInverted.postponed.xml
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInverted.postponed.xml";
   ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
   std::string     result;
@@ -422,9 +415,8 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonInverted)
 TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedBadValue)
 {
   ParseData       parseData;
-  // ngsi9.discoverContextAvailabilityRequest.polygonInvertedBadValue.invalid.xml
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedBadValue.invalid.xml";
-  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.polygonInvertedBadValue.valid.xml";
+  const char*     outFile = "ngsi10.subscribeContextResponse.polygonInvertedBadValue.valid.xml";
   ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
   std::string     result;
 
@@ -443,9 +435,8 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedBadValue)
 TEST(SubscribeContextRequest, scopeGeolocationPolygonNoVertices)
 {
   ParseData       parseData;
-  // ngsi9.discoverContextAvailabilityRequest.polygonInvertedNoVertices.postponed.xml
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedNoVertices.postponed.xml";
-  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.polygonInvertedNoVertices.valid.xml";
+  const char*     outFile = "ngsi10.subscribeContextResponse.polygonInvertedNoVertices.valid.xml";
   ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
   std::string     result;
 
@@ -464,9 +455,8 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonNoVertices)
 TEST(SubscribeContextRequest, scopeGeolocationPolygonOneVertex)
 {
   ParseData       parseData;
-  // ngsi9.discoverContextAvailabilityRequest.polygonInvertedOneVertex.postponed.xml
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedOneVertex.postponed.xml";
-  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.polygonInvertedOneVertex.valid.xml";
+  const char*     outFile = "ngsi10.subscribeContextResponse.polygonInvertedOneVertex.valid.xml";
   ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
   std::string     result;
 
@@ -485,9 +475,8 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonOneVertex)
 TEST(SubscribeContextRequest, scopeGeolocationPolygonTwoVertices)
 {
   ParseData       parseData;
-  // ngsi9.discoverContextAvailabilityRequest.polygonTwoVertices.postponed.xml
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonTwoVertices.postponed.xml";
-  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.polygonTwoVertices.valid.xml";
+  const char*     outFile = "ngsi10.subscribeContextResponse.polygonTwoVertices.valid.xml";
   ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
   std::string     result;
 
@@ -506,7 +495,6 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonTwoVertices)
 TEST(SubscribeContextRequest, scopeGeolocationPolygonOkJson)
 {
   ParseData       parseData;
-  // ngsi9.discoverContextAvailabilityRequest.polygonOk.postponed.json
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonOk.postponed.json";
   ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
   std::string     result;
@@ -528,7 +516,6 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonOkJson)
 TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedJson)
 {
   ParseData       parseData;
-  // ngsi9.discoverContextAvailabilityRequest.polygonInverted.postponed.json
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInverted.postponed.json";
   ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
   std::string     result;
@@ -550,9 +537,8 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedJson)
 TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedBadValueJson)
 {
   ParseData       parseData;
-  // ngsi9.discoverContextAvailabilityRequest.polygonInvertedBadValue.invalid.json
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedBadValue.invalid.json";
-  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.polygonInvertedBadValue.valid.json";
+  const char*     outFile = "ngsi10.subscribeContextResponse.polygonInvertedBadValue.valid.json";
   ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
   std::string     result;
 
@@ -574,9 +560,8 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonInvertedBadValueJson)
 TEST(SubscribeContextRequest, scopeGeolocationPolygonNoVerticesJson)
 {
   ParseData       parseData;
-  // ngsi9.discoverContextAvailabilityRequest.polygonInvertedNoVertices.postponed.json
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedNoVertices.postponed.json";
-  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.polygonInvertedNoVertices.valid.json";
+  const char*     outFile = "ngsi10.subscribeContextResponse.polygonInvertedNoVertices.valid.json";
   ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
   std::string     result;
 
@@ -598,9 +583,8 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonNoVerticesJson)
 TEST(SubscribeContextRequest, scopeGeolocationPolygonOneVertexJson)
 {
   ParseData       parseData;
-  // ngsi9.discoverContextAvailabilityRequest.polygonInvertedOneVertex.postponed.json
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonInvertedOneVertex.postponed.json";
-  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.polygonInvertedOneVertex.valid.json";
+  const char*     outFile = "ngsi10.subscribeContextResponse.polygonInvertedOneVertex.valid.json";
   ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
   std::string     result;
 
@@ -622,9 +606,8 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonOneVertexJson)
 TEST(SubscribeContextRequest, scopeGeolocationPolygonTwoVerticesJson)
 {
   ParseData       parseData;
-  // ngsi9.discoverContextAvailabilityRequest.polygonTwoVertices.postponed.json
   const char*     inFile  = "ngsi10.subscribeContextRequest.polygonTwoVertices.postponed.json";
-  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.polygonTwoVertices.valid.json";
+  const char*     outFile = "ngsi10.subscribeContextResponse.polygonTwoVertices.valid.json";
   ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
   std::string     result;
 
@@ -636,4 +619,3 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonTwoVerticesJson)
   result = jsonTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
 }
-#endif

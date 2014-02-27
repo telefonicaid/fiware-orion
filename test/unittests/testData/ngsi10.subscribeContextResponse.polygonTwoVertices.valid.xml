@@ -3,7 +3,7 @@
     <errorCode>
       <code>400</code>
       <reasonPhrase>Bad Request</reasonPhrase>
-      <details>invalid payload: Radius zero for a circle area</details>
+      <details>invalid payload: too few vertices for a polygon</details>
     </errorCode>
   </subscribeError>
 </subscribeContextResponse>

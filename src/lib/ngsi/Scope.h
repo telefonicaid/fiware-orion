@@ -62,8 +62,8 @@ typedef enum AreaType
 */
 typedef struct ScopePoint
 {
-  double latitude;
-  double longitude;
+  std::string latitude;
+  std::string longitude;
 } ScopePoint;
 
 
@@ -74,9 +74,9 @@ typedef struct ScopePoint
 */
 typedef struct ScopeCircle
 {
-  ScopePoint center;
-  double     radius; 
-  bool       inverted;
+  ScopePoint   center;
+  std::string  radius; 
+  std::string  inverted;
 } ScopeCircle;
 
 
@@ -88,7 +88,7 @@ typedef struct ScopeCircle
 typedef struct ScopePolygon
 {
   std::vector<ScopePoint*> vertexList;
-  bool                     inverted;
+  std::string              inverted;
 } ScopePolygon;
 
 
