@@ -386,8 +386,18 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
     auto_ptr<DBClientCursor> cursor;
     try {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(), query.toString().c_str()));
+
         mongoSemTake(__FUNCTION__, "query in SubscribeContextCollection");
         cursor = connection->query(getSubscribeContextCollectionName(), query);
+
+        /*
+         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+         * exception ourselves
+         */
+        if (cursor.get() == NULL) {
+            throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
+        }
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection");
     }
     catch( const DBException &e ) {
@@ -403,13 +413,6 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
                " - query(): " + query.toString() +
                " - exception: " + "generic";
         return false;
-    }
-
-    /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-     * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
-     * exception ourselves */
-    if (cursor.get() == NULL) {
-       throw DBException("Null cursor", 0);
     }
 
     /* For each one of the subscriptions found, add it to the map (if not already there) */
@@ -812,6 +815,15 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(), query.toString().c_str()));
         mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
         cursor = connection->query(getEntitiesCollectionName(), query);
+
+        /*
+         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+         * exception ourselves
+         */
+        if (cursor.get() == NULL) {
+            throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
+        }
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
     }
     catch( const DBException &e ) {
@@ -829,13 +841,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                               " - query(): " + query.toString() +
                               " - exception: " + "generic");
         return;
-    }
-
-    /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-     * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
-     * exception ourselves */
-    if (cursor.get() == NULL) {
-       throw DBException("Null cursor", 0);
     }
 
     bool atLeastOneResult = false;

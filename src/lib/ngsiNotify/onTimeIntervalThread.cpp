@@ -22,24 +22,22 @@
 *
 * Author: Fermin Galan
 */
-
-#include "onTimeIntervalThread.h"
-
 #include <string>
 #include <stdio.h>
 #include <unistd.h>      // needed for sleep in Debian 7
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-
-#include "Notifier.h"
-#include "mongoBackend/mongoOntimeintervalOperations.h"
-#include "ContextSubscriptionInfo.h"
-
+#include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
-#include "ngsi/NotifyCondition.h"
+#include "mongoBackend/mongoOntimeintervalOperations.h"
 #include "ngsi/Duration.h"
+#include "ngsi/NotifyCondition.h"
+#include "ngsiNotify/ContextSubscriptionInfo.h"
+#include "ngsiNotify/Notifier.h"
+#include "ngsiNotify/onTimeIntervalThread.h"
 
 /* ****************************************************************************
 *
@@ -141,16 +139,26 @@ extern void recoverOntimeIntervalThreads() {
     auto_ptr<DBClientCursor> cursor;
     try {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(), query.toString().c_str()));
+        mongoSemTake(__FUNCTION__, "query in SubscribeContextCollection");
         cursor = connection->query(getSubscribeContextCollectionName(), query);
-        /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-         * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
-         * exception ourselves */
+
+        /*
+         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+         * exception ourselves
+         */
         if (cursor.get() == NULL) {
-            throw DBException("Null cursor", 0);
+            throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection");
     }
     catch( const DBException &e ) {
-        LM_RVE(("DBException: %s", e.what()));
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongp db exception)");
+        LM_RVE(("Mongo DBException: %s", e.what()));
+    }
+    catch (...) {
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongp generic exception)");
+        LM_RVE(("Caugth Mongo Generic Exception"));
     }
 
     /* For each one of the subscriptions found, create threads */
@@ -166,10 +174,7 @@ extern void recoverOntimeIntervalThreads() {
                int interval = condition.getIntField(CSUB_CONDITIONS_VALUE);
                LM_T(LmtNotifier, ("creating ONTIMEINTERVAL for subscription %s with interval %d", subId.c_str(), interval));
                processOntimeIntervalCondition(subId, interval);
-
             }
         }
-
     }
-
 }

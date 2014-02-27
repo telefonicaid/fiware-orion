@@ -87,15 +87,16 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
 
         mongoSemTake(__FUNCTION__, "query in AssociationsCollection");
         cursor = connection->query(getAssociationsCollectionName(), query);
-        mongoSemGive(__FUNCTION__, "query in AssociationsCollection");
 
-        /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-         * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
-         * exception ourselves */
-
+        /*
+         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+         * exception ourselves
+         */
         if (cursor.get() == NULL) {
-            throw DBException("Null cursor", 0);
+            throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
+        mongoSemGive(__FUNCTION__, "query in AssociationsCollection");
     }
     catch( const DBException &e ) {
 
