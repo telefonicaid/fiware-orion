@@ -70,13 +70,13 @@ int semInit(int shared, int takenInitially)
 */
 int reqSemTake(const char* who, const char* what)
 {
-  int x;
+  int r;
 
   LM_T(LmtReqSem, ("%s taking the 'req' semaphore for '%s'", who, what));
-  x = sem_wait(&reqSem);
+  r = sem_wait(&reqSem);
   LM_T(LmtReqSem, ("%s has the 'req' semaphore", who));
 
-  return x;
+  return r;
 }
 
 /* ****************************************************************************
@@ -85,13 +85,13 @@ int reqSemTake(const char* who, const char* what)
 */
 int mongoSemTake(const char* who, const char* what)
 {
-  int x;
+  int r;
 
   LM_T(LmtMongoSem, ("%s taking the 'mongo' semaphore for '%s'", who, what));
-  x = sem_wait(&mongoSem);
+  r = sem_wait(&mongoSem);
   LM_T(LmtMongoSem, ("%s has the 'mongo' semaphore", who));
 
-  return x;
+  return r;
 }
 
 /* ****************************************************************************
