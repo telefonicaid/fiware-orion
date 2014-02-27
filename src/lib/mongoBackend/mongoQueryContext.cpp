@@ -42,7 +42,7 @@
 */
 HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResponse* responseP)
 {
-    reqSemTake(__FUNCTION__, "ngsi10 request");
+    reqSemTake(__FUNCTION__, "ngsi10 query request");
 
     LM_T(LmtMongo, ("QueryContext Request"));    
 
@@ -61,6 +61,6 @@ HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResp
       responseP->errorCode.fill(SccContextElementNotFound);
     }
 
-    reqSemGive(__FUNCTION__, "ngsi10 request");
+    reqSemGive(__FUNCTION__, "ngsi10 query request");
     return SccOk;
 }

@@ -49,7 +49,7 @@ HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextR
     }
 
     responseP->responseCode.fill(SccOk);
-
     reqSemGive(__FUNCTION__, "ngsi10 notification");
+
     return SccOk;
 }

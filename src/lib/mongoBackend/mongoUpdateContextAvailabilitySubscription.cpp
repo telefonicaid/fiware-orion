@@ -65,27 +65,27 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
       // FIXME: this checking should be done at parsing stage, without progressing to
       // mongoBackend. By the moment we can live this here, but we should remove in the future
       // (old issue #95)
-      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (AssertionException)");
+      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (mongo assertion exception)");
+      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo assertion exception)");
       responseP->errorCode.fill(SccContextElementNotFound);
       return SccOk;
   }
   catch( const DBException &e ) {
-      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (DBException)");
+      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (mongo db exception)");
+      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)");
       responseP->errorCode.fill(SccReceiverInternalError,
                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                 " - findOne() _id: " + requestP->subscriptionId.get() +
                                 " - exception: " + e.what());
-
-      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)");
       return SccOk;
   }
   catch(...) {
-      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (Generic Exception)");
+      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (mongo generic exception)");
+      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo generic exception)");
       responseP->errorCode.fill(SccReceiverInternalError,
                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                 " - findOne() _id: " + requestP->subscriptionId.get() +
                                 " - exception: " + "generic");
-      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo generic exception)");
       return SccOk;
   }
 
@@ -161,25 +161,24 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
       mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
   }
   catch( const DBException &e ) {
-      mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (DBException)");
+      mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo db exception)");
+      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)");
       responseP->errorCode.fill(SccReceiverInternalError,
                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                 " - update() _id: " + requestP->subscriptionId.get().c_str() +
                                 " - update() doc: " + update.toString() +
                                 " - exception: " + e.what());
 
-      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)");
       return SccOk;
   }
   catch(...) {
-      mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (Generic Exception)");
+      mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo generic exception)");
+      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo generic exception)");
       responseP->errorCode.fill(SccReceiverInternalError,
                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                                 " - update() _id: " + requestP->subscriptionId.get().c_str() +
                                 " - update() doc: " + update.toString() +
                                 " - exception: " + "generic");
-
-      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo generic exception)");
       return SccOk;
   }
 

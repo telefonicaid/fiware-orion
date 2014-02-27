@@ -93,12 +93,12 @@ static bool processAssociations(MetadataVector mdV, std::string* err) {
             mongoSemGive(__FUNCTION__, "insert into AssociationsCollection");
         }
         catch( const DBException &e ) {
-            mongoSemGive(__FUNCTION__, "insert into AssociationsCollection (DBException)");
+            mongoSemGive(__FUNCTION__, "insert into AssociationsCollection (mongo db exception)");
             *err = e.what();
             LM_RE(false,("Database error '%s'", err->c_str()));
         }
         catch(...) {
-            mongoSemGive(__FUNCTION__, "insert into AssociationsCollection (Generic Exception)");
+            mongoSemGive(__FUNCTION__, "insert into AssociationsCollection (mongo generic exception)");
             *err = "Generic Exception from mongo";
             LM_RE(false, ("Database error: '%s'", err->c_str()));
         }
@@ -127,10 +127,19 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
         std::string mapSubId = it->first;
         BSONObj     sub;
 
-        mongoSemTake(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
-        sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << OID(mapSubId)));
-        mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
-        LM_T(LmtMongo, ("retrieved document: '%s'", sub.toString().c_str()));
+        try
+        {
+           mongoSemTake(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
+           sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << OID(mapSubId)));
+           mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
+           LM_T(LmtMongo, ("retrieved document: '%s'", sub.toString().c_str()));
+        }
+        catch (...)
+        {
+           mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection (mongo generic exception)");
+           return false;
+        }
+
         OID subId = sub.getField("_id").OID();
 
         /* Build attribute list vector */
@@ -148,7 +157,6 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
          * addTriggeredSubscriptions */
         attrL.release();
         delete it->second;
-
     }
 
     return ret;
@@ -264,19 +272,21 @@ static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONOb
         /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
          * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
          * exception ourselves */
+
+        /* FIXME P6: Will we not just capture this exception in this very function? */
         if (cursor.get() == NULL) {
             throw DBException("Null cursor", 0);
         }
     }
     catch( const DBException &e ) {
-        mongoSemGive(__FUNCTION__, "query in SubscribeContextAvailabilityCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextAvailabilityCollection (mongo db exception)");
         *err = std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                " - query(): " + query.toString() +
                " - exception: " + e.what();
         return false;
     }
     catch(...) {
-        mongoSemGive(__FUNCTION__, "query in SubscribeContextAvailabilityCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextAvailabilityCollection (mongo generic exception)");
         *err = std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                " - query(): " + query.toString() +
                " - exception: " + "generic";

@@ -56,15 +56,15 @@ void mongoSetFwdRegId(std::string regId, std::string fwdRegId)
         mongoSemGive(__FUNCTION__, "update in RegistrationsCollection");
     }
     catch( const DBException &e ) {
-        // FIXME: probably we can do something apart of printint the error, but currently
+        // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
-        mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (mongo db exception)");
         LM_E(("Database error '%s'", e.what()));
     }
     catch(...) {
-        // FIXME: probably we can do something apart of printint the error, but currently
+        // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
-        mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (mongo generic exception)");
         LM_E(("Database error: '%s'", "generic exception"));
     }
 
@@ -99,13 +99,13 @@ std::string mongoGetFwdRegId(std::string regId)
     catch( const DBException &e ) {
         // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
-        mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection (mongo db exception)");
         LM_E(("Database error '%s'", e.what()));
     }
     catch(...) {
         // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
-        mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection (mongo generic exception)");
         LM_E(("Database error: 'generic exception'"));
     }
 

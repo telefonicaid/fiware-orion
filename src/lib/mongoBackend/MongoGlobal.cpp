@@ -270,40 +270,37 @@ extern const char* getAssociationsCollectionName(void) {
 * returning "false" in that case.
 *
 */
-bool resetDb(void) {
-    // FIXME: this needs a try/catch to capture problems
-    if ( connection != NULL && entitiesCollectionName != NULL && registrationsCollectionName != NULL) {
+bool resetDb(void)
+{
+  if (connection != NULL && entitiesCollectionName != NULL && registrationsCollectionName != NULL)
+  {
+    try 
+    {
+      mongoSemTake(__FUNCTION__, "resetting database");
+      connection->dropCollection(entitiesCollectionName);
+      connection->dropCollection(registrationsCollectionName);
+      connection->dropCollection(subscribeContextCollectionName);
+      connection->dropCollection(subscribeContextAvailabilityCollectionName);
+      connection->dropCollection(assocationsCollectionName);
+      mongoSemGive(__FUNCTION__, "resetting database");
 
-        try 
-        {
-          mongoSemTake(__FUNCTION__, "resetting database");
-          connection->dropCollection(entitiesCollectionName);
-          connection->dropCollection(registrationsCollectionName);
-          connection->dropCollection(subscribeContextCollectionName);
-          connection->dropCollection(subscribeContextAvailabilityCollectionName);
-          connection->dropCollection(assocationsCollectionName);
-          mongoSemGive(__FUNCTION__, "resetting database");
-        }
-        catch (const AssertionException &e)
-        {
-          mongoSemGive(__FUNCTION__, "resetting database (AssertionException)");
-          return false;
-        }
-        catch (const DBException &e)
-        {
-          mongoSemGive(__FUNCTION__, "resetting database (DBException)");
-          return false;
-        }
-        catch (...)
-        {
-          mongoSemGive(__FUNCTION__, "resetting database (Generic Exception)");
-          return false;
-        }
-        
-        return true;
+      return true;
     }
-    return false;
+    catch (const AssertionException &e)
+    {
+      mongoSemGive(__FUNCTION__, "resetting database (mongo assertion exception)");
+    }
+    catch (const DBException &e)
+    {
+      mongoSemGive(__FUNCTION__, "resetting database (mongo db exception)");
+    }
+    catch (...)
+    {
+      mongoSemGive(__FUNCTION__, "resetting database (mongo generic exception)");
+    }
+  }
 
+  return false;
 }
 
 /* ****************************************************************************
@@ -521,7 +518,7 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
     }
     catch( const DBException &e ) {
 
-        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo db exception)");
         *err = std::string("collection: ") + getEntitiesCollectionName() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
@@ -530,7 +527,7 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
     }
     catch(...) {
 
-        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo generic exception)");
         *err = std::string("collection: ") + getEntitiesCollectionName() +
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
@@ -768,7 +765,7 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
     }
     catch( const DBException &e ) {
 
-        mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo db exception)");
         *err = std::string("collection: ") + getRegistrationsCollectionName() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
@@ -777,7 +774,7 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
     }
     catch(...) {
 
-        mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo generic exception)");
         *err = std::string("collection: ") + getRegistrationsCollectionName() +
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
@@ -1027,12 +1024,12 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
         mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
     }
     catch( const DBException &e ) {
-        mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo db exception)");
         *err = e.what();
         LM_RE(SccOk, ("Database error '%s'", err->c_str()));
     }
     catch(...) {
-        mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo generic exception)");
         *err = "Database error - exception thrown";
         LM_RE(SccOk, ("Database error - exception thrown"));
     }

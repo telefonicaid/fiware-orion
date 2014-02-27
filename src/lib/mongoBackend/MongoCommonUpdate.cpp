@@ -389,12 +389,6 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
         mongoSemTake(__FUNCTION__, "query in SubscribeContextCollection");
         cursor = connection->query(getSubscribeContextCollectionName(), query);
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection");
-        /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
-         * exception ourselves */
-        if (cursor.get() == NULL) {
-            throw DBException("Null cursor", 0);
-        }
     }
     catch( const DBException &e ) {
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (DBException)");
@@ -409,6 +403,13 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
                " - query(): " + query.toString() +
                " - exception: " + "generic";
         return false;
+    }
+
+    /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+     * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+     * exception ourselves */
+    if (cursor.get() == NULL) {
+       throw DBException("Null cursor", 0);
     }
 
     /* For each one of the subscriptions found, add it to the map (if not already there) */
@@ -444,12 +445,24 @@ static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::
 
         //FIXME P8: see old issue #90
         //BSONObj sub = *(it->second);
+
         std::string  mapSubId = it->first;
         BSONObj      sub;
 
-        mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
-        sub = connection->findOne(getSubscribeContextCollectionName(), BSON("_id" << OID(mapSubId)));
-        mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
+        try
+        {
+           mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
+           sub = connection->findOne(getSubscribeContextCollectionName(), BSON("_id" << OID(mapSubId)));
+           mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
+        }
+        catch (...)
+        {
+           mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo generic exception)");
+           LM_E(("Got an exception during findOne of collection '%s'", getSubscribeContextCollectionName()));
+
+           *err = std::string("collection: ") + getEntitiesCollectionName();
+           return false;
+        }
 
         LM_T(LmtMongo, ("retrieved document: '%s'", sub.toString().c_str()));
         OID subId = sub.getField("_id").OID();
@@ -492,7 +505,7 @@ static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::
                 mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection");
             }
             catch( const DBException &e ) {
-                mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (DBException)");
+                mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
                 *err = std::string("collection: ") + getEntitiesCollectionName() +
                        " - query(): " + query.toString() + " - update(): " + update.toString() + " - exception: " + e.what();
                 enV.release();
@@ -500,7 +513,7 @@ static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::
                 return false;
             }
             catch(...) {
-                mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (Generic Exception)");
+                mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
                 *err = std::string("collection: ") + getEntitiesCollectionName() +
                        " - query(): " + query.toString() + " - update(): " + update.toString() + " - exception: " + "generic";
                 enV.release();
@@ -513,7 +526,7 @@ static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::
          * addTriggeredSubscriptions */
         attrL.release();
         enV.release();
-        //delete it->second; FIXME P8: see old issue #90
+        // delete it->second; FIXME P8: see old issue #90
     }
 
     return true;
@@ -729,7 +742,7 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
         mongoSemGive(__FUNCTION__, "insert into EntitiesCollection");
     }
     catch( const DBException &e ) {
-        mongoSemGive(__FUNCTION__, "insert into EntitiesCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "insert into EntitiesCollection (mongo db exception)");
         *errDetail = std::string("Database Error: collection: ") + getEntitiesCollectionName() +
                 " - insert(): " + insertedDoc.toString() +
                 " - exception: " + e.what();
@@ -737,7 +750,7 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
         return false;
     }
     catch(...) {
-        mongoSemGive(__FUNCTION__, "insert into EntitiesCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "insert into EntitiesCollection (mongo generic exception)");
         *errDetail = std::string("Database Error: collection: ") + getEntitiesCollectionName() +
                 " - insert(): " + insertedDoc.toString() +
                 " - exception: " + "generic";
@@ -800,15 +813,9 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
         cursor = connection->query(getEntitiesCollectionName(), query);
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
-        /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-         * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
-         * exception ourselves */
-        if (cursor.get() == NULL) {
-            throw DBException("Null cursor", 0);
-        }
     }
     catch( const DBException &e ) {
-        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo db exception)");
         buildGeneralErrorReponse(ceP, NULL, responseP, SccReceiverInternalError,                           
                            std::string("collection: ") + getEntitiesCollectionName() +
                               " - query(): " + query.toString() +
@@ -816,12 +823,19 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         return;
     }
     catch(...) {
-        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo generic exception)");
         buildGeneralErrorReponse(ceP, NULL, responseP, SccReceiverInternalError,                           
                            std::string("collection: ") + getEntitiesCollectionName() +
                               " - query(): " + query.toString() +
                               " - exception: " + "generic");
         return;
+    }
+
+    /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+     * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
+     * exception ourselves */
+    if (cursor.get() == NULL) {
+       throw DBException("Null cursor", 0);
     }
 
     bool atLeastOneResult = false;
@@ -882,7 +896,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             mongoSemGive(__FUNCTION__, "update in EntitiesCollection");
         }
         catch( const DBException &e ) {
-            mongoSemGive(__FUNCTION__, "update in EntitiesCollection (DBException)");
+            mongoSemGive(__FUNCTION__, "update in EntitiesCollection (mongo db exception)");
             cerP->statusCode.fill(SccReceiverInternalError,
                std::string("collection: ") + getEntitiesCollectionName() +
                " - update() query: " + query.toString() +
@@ -893,7 +907,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             return;
         }
         catch(...) {
-            mongoSemGive(__FUNCTION__, "update in EntitiesCollection (Generic Exception)");
+            mongoSemGive(__FUNCTION__, "update in EntitiesCollection (mongo generic exception)");
             cerP->statusCode.fill(SccReceiverInternalError,
                std::string("collection: ") + getEntitiesCollectionName() +
                " - update() query: " + query.toString() +

@@ -113,23 +113,23 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
         mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection");
     }
     catch( const DBException &e ) {
-        mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection (DBException)");
+        mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection (mongo db exception)");
+        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo db exception)");
         responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                  std::string("collection: ") + getSubscribeContextCollectionName() +
                                                  " - insert(): " + subDoc.toString() +
                                                  " - exception: " + e.what());
 
-        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (database exception)");
         LM_RE(SccOk, ("Database error '%s'", responseP->subscribeError.errorCode.reasonPhrase.c_str()));
     }    
     catch(...) {
-        mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection (Generic Exception)");
+        mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection (mongo generic exception)");
+        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo generic exception)");
         responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                  std::string("collection: ") + getSubscribeContextCollectionName() +
                                                  " - insert(): " + subDoc.toString() +
                                                  " - exception: " + "generic");
 
-        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (generic exception)");
         LM_RE(SccOk, ("Database error '%s'", responseP->subscribeError.errorCode.reasonPhrase.c_str()));
     }    
 

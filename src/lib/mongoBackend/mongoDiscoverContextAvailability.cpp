@@ -144,7 +144,6 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
         }
 
         mdV->push_back(md);
-
     }
 
     return true;
