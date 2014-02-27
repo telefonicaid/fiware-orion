@@ -21,7 +21,7 @@
 --NAME--
 broker version
 --SHELL--
-contextBroker -version
+contextBroker --version
 --EXPECT--
 0.10.0-next
 Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
