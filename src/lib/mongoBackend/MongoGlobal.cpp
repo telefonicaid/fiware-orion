@@ -412,15 +412,17 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
 
     for (unsigned int ix = 0; ix < scoV.size(); ++ix) {
         Scope* sco = scoV.get(ix);
+        bool inverted = false;
         if (sco->type == SCOPE_LOCATION) {
             // FIXME P2: current version only support one geolocation scope. If the client includes several ones,
             // only the first is taken into account
             BSONObj geoWithin;
-            if (sco->scopeType == ScopeAreaCircle) {
+            if (sco->areaType== AreaCircle) {
                 double radians = sco->circle.radius / EARTH_RADIUS_METERS;
-                geoWithin = BSON("$centerSphere" << BSON_ARRAY(BSON_ARRAY( sco->circle.origin.latitude << sco->circle.origin.longitude) << radians ));
+                geoWithin = BSON("$centerSphere" << BSON_ARRAY(BSON_ARRAY( sco->circle.center.latitude << sco->circle.center.longitude) << radians ));
+                inverted = sco->circle.inverted;
             }
-            else {  // sco->scopeType == ScopeAreaPolygon
+            else {  // sco->scopeType == AreaPolygon
                 BSONArrayBuilder vertex;
                 double x0, y0;
                 for (unsigned int jx = 0; jx < sco->polygon.vertexList.size() ; ++jx) {
@@ -437,9 +439,15 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
 
                 /* Note that MongoDB query API uses an ugly "double array" structure for coordinates */
                 geoWithin = BSON("$geometry" << BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(vertex.arr())));
+
+                inverted = sco->polygon.inverted;
             }
-            // FIXME P10 take into account the inverted flag to use $not in the query
-            areaQuery = BSON("$geoWithin" << geoWithin);
+            if (inverted) {
+                areaQuery = BSON("$not" << BSON("$geoWithin" << geoWithin));
+            }
+            else {
+                areaQuery = BSON("$geoWithin" << geoWithin);
+            }
 
             return true;
         }
