@@ -261,48 +261,6 @@ extern const char* getAssociationsCollectionName(void) {
     return assocationsCollectionName;
 }
 
-/*****************************************************************************
-*
-* resetDb -
-*
-* This function has to be called after mongoConnect(), setRegistrationsCollectionName()
-* and setEntitiesCollectionName(). As sanify check, this is checked at the begining,
-* returning "false" in that case.
-*
-*/
-bool resetDb(void)
-{
-  if (connection != NULL && entitiesCollectionName != NULL && registrationsCollectionName != NULL)
-  {
-    try 
-    {
-      mongoSemTake(__FUNCTION__, "resetting database");
-      connection->dropCollection(entitiesCollectionName);
-      connection->dropCollection(registrationsCollectionName);
-      connection->dropCollection(subscribeContextCollectionName);
-      connection->dropCollection(subscribeContextAvailabilityCollectionName);
-      connection->dropCollection(assocationsCollectionName);
-      mongoSemGive(__FUNCTION__, "resetting database");
-
-      return true;
-    }
-    catch (const AssertionException &e)
-    {
-      mongoSemGive(__FUNCTION__, "resetting database (mongo assertion exception)");
-    }
-    catch (const DBException &e)
-    {
-      mongoSemGive(__FUNCTION__, "resetting database (mongo db exception)");
-    }
-    catch (...)
-    {
-      mongoSemGive(__FUNCTION__, "resetting database (mongo generic exception)");
-    }
-  }
-
-  return false;
-}
-
 /* ****************************************************************************
 *
 * includedEntity -

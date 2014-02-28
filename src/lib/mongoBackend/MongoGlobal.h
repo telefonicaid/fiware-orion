@@ -243,12 +243,6 @@ extern const char* getSubscribeContextAvailabilityCollectionName(void);
 */
 extern const char* getAssociationsCollectionName(void);
 
-/*****************************************************************************
-*
-* resetDb -
-*/
-extern bool resetDb(void);
-
 /* ****************************************************************************
 *
 * includedEntity -
