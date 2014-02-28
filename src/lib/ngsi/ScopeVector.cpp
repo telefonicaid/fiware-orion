@@ -66,6 +66,7 @@ std::string ScopeVector::check(RequestType requestType, Format format, std::stri
   {
     std::string res;
 
+    LM_M(("Checking scope %d", ix));
     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
     {
       LM_E(("error for scope %d: %s", ix, res.c_str()));

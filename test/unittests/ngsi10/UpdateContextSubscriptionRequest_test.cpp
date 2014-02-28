@@ -181,3 +181,81 @@ TEST(UpdateContextSubscriptionRequest, invalidDuration_json)
 
   utExit();
 }
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleOk - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleOk)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleOk.postponed.xml";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     result;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  result = xmlTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleInvertedBadValue - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedBadValue)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleInvertedBadValue.postponed.xml";
+  const char*     outfile = "ngsi10.updateContextSubscriptionResponse.circleInvertedBadValue.valid.xml";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  out = xmlTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonOk - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOk)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonOk.postponed.xml";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     result;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  result = xmlTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonInvertedBadValue - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedBadValue)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonInvertedBadValue.postponed.xml";
+  const char*     outfile = "ngsi10.updateContextSubscriptionResponse.polygonInvertedBadValue.valid.xml";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  out = xmlTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+}

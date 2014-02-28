@@ -133,6 +133,8 @@ std::string Scope::check(RequestType requestType, Format format, std::string ind
   }
   else
   {
+    LM_M(("Checking scope of type %s", type.c_str()));
+
     if ((type == "") || (type == "not in use"))
       return "Empty type in restriction scope";
 

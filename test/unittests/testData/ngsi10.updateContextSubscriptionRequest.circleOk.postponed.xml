@@ -9,8 +9,15 @@
 		    <scopeValue>sv1</scopeValue>
 	    </operationScope>
 	    <operationScope>
-		    <scopeType>st2</scopeType>
-		    <scopeValue>sv2</scopeValue>
+		    <scopeType>FIWARE_Location</scopeType>
+		    <scopeValue>
+          <circle>
+            <radius>10</radius>
+            <center_latitude>45</center_latitude>
+            <center_longitude>45</center_longitude>
+            <inverted>0</inverted>
+          </circle>
+        </scopeValue>
 	    </operationScope>
 	  </scope>
   </restriction>
