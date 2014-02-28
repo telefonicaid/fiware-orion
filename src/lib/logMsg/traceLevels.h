@@ -87,8 +87,12 @@ typedef enum TraceLevels
   LmtClientOutputPayload,
   LmtPartialPayload,
 
-  /* Others (>=200) */
-  LmtCm = 200,
+  /* Semaphores (200-201) */
+  LmtReqSem = 200,
+  LmtMongoSem,
+
+  /* Others (>=210) */
+  LmtCm = 210,
   LmtIotaXmlReg,
   LmtIotaXmlObs,
 } TraceLevels;

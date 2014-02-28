@@ -24,15 +24,16 @@
 */
 
 #include <regex.h>
+#include "mongo/client/dbclient.h"
 
-#include "common/globals.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/globals.h"
+#include "common/sem.h"
+
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoOntimeintervalOperations.h"
-
-#include "mongo/client/dbclient.h"
 
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/AttributeList.h"
@@ -47,13 +48,13 @@ using namespace mongo;
 *
 * Globals
 */
-static DBClientConnection* connection;
-static char* entitiesCollectionName = NULL;
-static char* registrationsCollectionName = NULL;
-static char* subscribeContextCollectionName = NULL;
-static char* subscribeContextAvailabilityCollectionName = NULL;
-static char* assocationsCollectionName = NULL;
-static Notifier* notifier = NULL;
+static DBClientConnection*  connection;
+static char*                entitiesCollectionName                      = NULL;
+static char*                registrationsCollectionName                 = NULL;
+static char*                subscribeContextCollectionName              = NULL;
+static char*                subscribeContextAvailabilityCollectionName  = NULL;
+static char*                assocationsCollectionName                   = NULL;
+static Notifier*            notifier                                    = NULL;
 
 /* ****************************************************************************
 *
@@ -63,19 +64,24 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
 
     std::string err;
 
+    mongoSemTake(__FUNCTION__, "connecting to mongo");
+
     /* The first argument to true is to use autoreconnect */
     connection = new DBClientConnection(true);
 
     if (!connection->connect(host, err)) {
+        mongoSemGive(__FUNCTION__, "connecting to mongo failed");
         LM_RE(false, ("MongoDB connection fails: '%s'", err.c_str()));
     }
 
     if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0) {
         if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err)) {
+            mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
             LM_RE(false, ("Auth error (db=%s, username=%s, pswd=%s): %s", db, username, passwd, err.c_str()));
         }
     }
 
+    mongoSemGive(__FUNCTION__, "connecting to mongo");
     return true;
 }
 
@@ -251,32 +257,64 @@ const char* getSubscribeContextAvailabilityCollectionName(void) {
 *
 * getAssociationsCollectionName -
 */
-extern const char* getAssociationsCollectionName(void) {
+const char* getAssociationsCollectionName(void) {
     return assocationsCollectionName;
 }
 
-/*****************************************************************************
+/* ****************************************************************************
 *
-* resetDb -
-*
-* This function has to be called after mongoConnect(), setRegistrationsCollectionName()
-* and setEntitiesCollectionName(). As sanify check, this is checked at the begining,
-* returning "false" in that case.
-*
+* recoverOntimeIntervalThreads -
 */
-bool resetDb(void) {
-    // FIXME: this needs a try/catch to capture problems
-    if ( connection != NULL && entitiesCollectionName != NULL && registrationsCollectionName != NULL) {
-        connection->dropCollection(entitiesCollectionName);
-        connection->dropCollection(registrationsCollectionName);
-        connection->dropCollection(subscribeContextCollectionName);
-        connection->dropCollection(subscribeContextAvailabilityCollectionName);
-        connection->dropCollection(assocationsCollectionName);
-        return true;
-    }
-    return false;
+void recoverOntimeIntervalThreads() {
 
+    /* Look for ONTIMEINTERVAL subscriptions in database */
+    std::string condType= std::string(CSUB_CONDITIONS) + "."  + CSUB_CONDITIONS_TYPE;
+    BSONObj query = BSON(condType << ON_TIMEINTERVAL_CONDITION);
+
+    DBClientConnection* connection = getMongoConnection();
+    auto_ptr<DBClientCursor> cursor;
+    try {
+        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(), query.toString().c_str()));
+        mongoSemTake(__FUNCTION__, "query in SubscribeContextCollection");
+        cursor = connection->query(getSubscribeContextCollectionName(), query);
+
+        /*
+         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+         * exception ourselves
+         */
+        if (cursor.get() == NULL) {
+            throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
+        }
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection");
+    }
+    catch( const DBException &e ) {
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongp db exception)");
+        LM_RVE(("Mongo DBException: %s", e.what()));
+    }
+    catch (...) {
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongp generic exception)");
+        LM_RVE(("Caugth Mongo Generic Exception"));
+    }
+
+    /* For each one of the subscriptions found, create threads */
+    while (cursor->more()) {
+
+        BSONObj sub = cursor->next();
+        std::string subId = sub.getField("_id").OID().str();
+
+        std::vector<BSONElement> condV = sub.getField(CSUB_CONDITIONS).Array();
+        for (unsigned int ix = 0; ix < condV.size(); ++ix) {
+            BSONObj condition = condV[ix].embeddedObject();
+            if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0) {
+               int interval = condition.getIntField(CSUB_CONDITIONS_VALUE);
+               LM_T(LmtNotifier, ("creating ONTIMEINTERVAL for subscription %s with interval %d", subId.c_str(), interval));
+               processOntimeIntervalCondition(subId, interval);
+            }
+        }
+    }
 }
+
 
 /* ****************************************************************************
 *
@@ -481,21 +519,36 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
     auto_ptr<DBClientCursor> cursor;
     try {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(), query.toString().c_str()));
+        mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
         cursor = connection->query(getEntitiesCollectionName(), query);
-        /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-         * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
-         * exception ourselves */
+
+        /*
+         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+         * exception ourselves
+         */
         if (cursor.get() == NULL) {
-            throw DBException("Null cursor", 0);
+           throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
+        mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
     }
     catch( const DBException &e ) {
 
+        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo db exception)");
         *err = std::string("collection: ") + getEntitiesCollectionName() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
 
-       LM_RE(false,(err->c_str()));
+        LM_RE(false,(err->c_str()));
+    }
+    catch(...) {
+
+        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo generic exception)");
+        *err = std::string("collection: ") + getEntitiesCollectionName() +
+                " - query(): " + query.toString() +
+                " - exception: " + "generic";
+
+        LM_RE(false, (err->c_str()));
     }
 
     /* Process query result */
@@ -719,15 +772,29 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
     /* Do the query on MongoDB */
     //FIXME P2: use field selector to include the only relevant field: contextRegistration array (e.g. "expiration" is not needed)
     auto_ptr<DBClientCursor> cursor;
+
     try {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(), query.toString().c_str()));
+        mongoSemTake(__FUNCTION__, "query in RegistrationsCollection");
         cursor = connection->query(getRegistrationsCollectionName(), query);
+        mongoSemGive(__FUNCTION__, "query in RegistrationsCollection");
     }
     catch( const DBException &e ) {
 
+        mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo db exception)");
         *err = std::string("collection: ") + getRegistrationsCollectionName() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
+
+        return false;
+    }
+    catch(...) {
+
+        mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo generic exception)");
+        *err = std::string("collection: ") + getRegistrationsCollectionName() +
+                " - query(): " + query.toString() +
+                " - exception: " + "generic";
+
         return false;
     }
 
@@ -967,11 +1034,20 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
         LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextAvailabilityCollectionName(),
                         query.toString().c_str(),
                         update.toString().c_str()));
+
+        mongoSemTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
         connection->update(getSubscribeContextAvailabilityCollectionName(), query, update);
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
     }
     catch( const DBException &e ) {
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo db exception)");
         *err = e.what();
         LM_RE(SccOk, ("Database error '%s'", err->c_str()));
+    }
+    catch(...) {
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo generic exception)");
+        *err = "Database error - exception thrown";
+        LM_RE(SccOk, ("Database error - exception thrown"));
     }
 
     return SccOk;

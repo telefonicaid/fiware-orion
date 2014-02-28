@@ -1,1 +1,2 @@
 - Fix: the CLI options now coincide with the documentation
+- Fix: Introduced a second semaphore level as additional security measure to ensure all MongoDB driver invocations run in thread-safe mode

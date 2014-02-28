@@ -23,11 +23,11 @@
 * Author: Fermín Galán
 */
 
-#include "mongoNotifyContext.h"
+#include "common/sem.h"
 
+#include "mongoBackend/mongoNotifyContext.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonUpdate.h"
-#include "common/sem.h"
 #include "ngsi10/UpdateContextResponse.h"
 
 /* ****************************************************************************
@@ -36,8 +36,7 @@
 */
 HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextResponse* responseP) {
 
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
+    reqSemTake(__FUNCTION__, "ngsi10 notification");
 
     /* We ignore "subscriptionId" and "originator" in the request, as we don't have anything interesting
      * to do with them */
@@ -49,7 +48,8 @@ HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextR
         processContextElement(&requestP->contextElementResponseVector.get(ix)->contextElement, &ucr, "append");
     }
 
+    reqSemGive(__FUNCTION__, "ngsi10 notification");
     responseP->responseCode.fill(SccOk);
 
-    LM_SR(SccOk);
+    return SccOk;
 }
