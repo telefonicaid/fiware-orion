@@ -137,7 +137,8 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
         catch (...)
         {
            mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection (mongo generic exception)");
-           return false;
+           *err = "Generic Exception from mongo";
+           LM_RE(false, ("Database error: '%s'", err->c_str()));
         }
 
         OID subId = sub.getField("_id").OID();
