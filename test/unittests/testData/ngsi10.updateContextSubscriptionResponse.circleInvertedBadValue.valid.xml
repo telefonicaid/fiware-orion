@@ -1,0 +1,9 @@
+<updateContextSubscriptionResponse>
+  <subscribeError>
+    <subscriptionId>111222333444555666777888</subscriptionId>
+    <errorCode>
+      <code>400</code>
+      <reasonPhrase>bad string for circle/inverted: '2'</reasonPhrase>
+    </errorCode>
+  </subscribeError>
+</updateContextSubscriptionResponse>

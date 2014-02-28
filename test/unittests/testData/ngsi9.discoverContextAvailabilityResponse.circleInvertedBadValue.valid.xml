@@ -1,6 +1,0 @@
-<discoverContextAvailabilityResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>bad string for circle/inverted: 'truhe'</reasonPhrase>
-  </errorCode>
-</discoverContextAvailabilityResponse>

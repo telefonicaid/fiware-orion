@@ -187,10 +187,8 @@ static std::string operationScope(std::string path, std::string value, ParseData
 */
 static std::string scopeType(std::string path, std::string value, ParseData* reqDataP)
 {
-   LM_W(("Setting scope type to '%s'", value.c_str()));
    reqDataP->dcar.scopeP->type = value;
    LM_T(LmtParse, ("Set scope 'type' to '%s' for a scope", reqDataP->dcar.scopeP->type.c_str()));
-
    return "OK";
 }
 
@@ -202,178 +200,10 @@ static std::string scopeType(std::string path, std::string value, ParseData* req
 */
 static std::string scopeValue(std::string path, std::string value, ParseData* reqDataP)
 {
-  if (reqDataP->dcar.scopeP->type == "FIWARE_Location")
-  {
-    reqDataP->dcar.scopeP->value = "FIWARE_Location";
-    LM_T(LmtParse, ("Preparing scopeValue for '%s'", reqDataP->dcar.scopeP->type.c_str()));
-  }
-  else
-  {
-    reqDataP->dcar.scopeP->value = value;
-    LM_T(LmtParse, ("Got a scopeValue: '%s' for scopeType '%s'", value.c_str(), reqDataP->dcar.scopeP->type.c_str()));
-  }
+   reqDataP->dcar.scopeP->value = value;
+   LM_T(LmtParse, ("Set scope 'value' to '%s' for a scope", reqDataP->dcar.scopeP->value.c_str()));
 
    return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* circle - 
-*/
-static std::string circle(std::string path, std::string value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a circle"));
-  reqDataP->dcar.scopeP->areaType = AreaCircle;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* circleCenterLatitude - 
-*/
-static std::string circleCenterLatitude(std::string path, std::string value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a circleCenterLatitude: %s", value.c_str()));
-  reqDataP->dcar.scopeP->circle.center.latitude = atof(value.c_str());
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* circleCenterLongitude - 
-*/
-static std::string circleCenterLongitude(std::string path, std::string value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a circleCenterLongitude: %s", value.c_str()));
-  reqDataP->dcar.scopeP->circle.center.longitude = atof(value.c_str());
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* circleRadius - 
-*/
-static std::string circleRadius(std::string path, std::string value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a circleRadius: %s", value.c_str()));
-  reqDataP->dcar.scopeP->circle.radius = atof(value.c_str());
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* circleInverted - 
-*/
-static std::string circleInverted(std::string path, std::string value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a circleInverted: %s", value.c_str()));
-
-  if (!isTrue(value) && !isFalse(value))
-  {
-    parseDataP->errorString = "bad string for circle/inverted: '" + value + "'";
-    return parseDataP->errorString;
-  }
-  else
-    parseDataP->dcar.scopeP->circle.inverted = isTrue(value);
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* polygon - 
-*/
-static std::string polygon(std::string path, std::string value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a polygon"));
-  parseDataP->dcar.scopeP->areaType = AreaPolygon;
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* polygonInverted - 
-*/
-static std::string polygonInverted(std::string path, std::string value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a polygonInverted: %s", value.c_str()));
-
-  if (!isTrue(value) && !isFalse(value))
-  {
-    parseDataP->errorString = "bad string for polygon/inverted: '" + value + "'";
-    return parseDataP->errorString;
-  }
-  else
-    parseDataP->dcar.scopeP->polygon.inverted = isTrue(value);
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* polygonVertexList - 
-*/
-static std::string polygonVertexList(std::string path, std::string value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a polygonVertexList"));
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* polygonVertex - 
-*/
-static std::string polygonVertex(std::string path, std::string value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a polygonVertex - creating new vertex for the vertex list"));
-  parseDataP->dcar.vertexP = new ScopePoint();
-  parseDataP->dcar.scopeP->polygon.vertexList.push_back(parseDataP->dcar.vertexP);
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* polygonVertexLatitude - 
-*/
-static std::string polygonVertexLatitude(std::string path, std::string value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a polygonVertexLatitude: %s", value.c_str()));
-  parseDataP->dcar.vertexP->latitude = atof(value.c_str());
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* polygonVertexLongitude - 
-*/
-static std::string polygonVertexLongitude(std::string path, std::string value, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("Got a polygonVertexLongitude: %s", value.c_str()));
-  parseDataP->dcar.vertexP->longitude = atof(value.c_str());
-  return "OK";
 }
 
 
@@ -455,19 +285,6 @@ JsonNode jsonDcarParseVector[] =
   { "/restriction/scopes/scope",         operationScope        },
   { "/restriction/scopes/scope/type",    scopeType             },
   { "/restriction/scopes/scope/value",   scopeValue            },
-
-  { "/restriction/scopes/scope/value/circle",                              circle                  },
-  { "/restriction/scopes/scope/value/circle/center_latitude",              circleCenterLatitude    },
-  { "/restriction/scopes/scope/value/circle/center_longitude",             circleCenterLongitude   },
-  { "/restriction/scopes/scope/value/circle/radius",                       circleRadius            },
-  { "/restriction/scopes/scope/value/circle/inverted",                     circleInverted          },
-
-  { "/restriction/scopes/scope/value/polygon",                             polygon                 },
-  { "/restriction/scopes/scope/value/polygon/inverted",                    polygonInverted         },
-  { "/restriction/scopes/scope/value/polygon/vertices",                    polygonVertexList       },
-  { "/restriction/scopes/scope/value/polygon/vertices/vertice",            polygonVertex           },
-  { "/restriction/scopes/scope/value/polygon/vertices/vertice/latitude",   polygonVertexLatitude   },
-  { "/restriction/scopes/scope/value/polygon/vertices/vertice/longitude",  polygonVertexLongitude  },
 
   { "LAST", NULL }
 };

@@ -60,12 +60,20 @@ std::string ScopeVector::render(Format format, std::string indent, bool comma)
 */
 std::string ScopeVector::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
+  LM_M(("Checking scope vector of %d scopes", vec.size()));
+
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
+    LM_M(("Checking scope %d", ix));
     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    {
+      LM_E(("error for scope %d: %s", ix, res.c_str()));
       return res;
+    }
+    else
+      LM_M(("for scope %d: %s", ix, res.c_str()));
   }
 
   return "OK";
