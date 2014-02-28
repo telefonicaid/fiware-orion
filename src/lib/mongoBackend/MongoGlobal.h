@@ -116,36 +116,6 @@ using namespace mongo;
 #define C_STR_FIELD(i, sf) i.getStringField(sf)
 
 
-/* ****************************************************************************
-*
-* log macros that also free semaphore - 
-*/
-#define LM_SRE(retVal, s)          \
-do {                               \
-   LM_E(s);                        \
-   semGive();                      \
-   return retVal;                  \
-} while (0)
-
-#define LM_SRVE(s)                 \
-do {                               \
-   LM_E(s);                        \
-   semGive();                      \
-   return;                         \
-} while (0)
-
-#define LM_SR(retVal)              \
-do {                               \
-   semGive();                      \
-   return retVal;                  \
-} while (0)
-
-#define LM_SRV                     \
-do {                               \
-   semGive();                      \
-   return;                         \
-} while (0)
-
 /*****************************************************************************
 *
 * mongoConnect -
