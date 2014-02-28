@@ -64,7 +64,7 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
     BSONObj reg;
     try {
 
-       id = OID(requestP->registrationId.get());
+        id = OID(requestP->registrationId.get());
 
         mongoSemTake(__FUNCTION__, "findOne from RegistrationsCollection");
         reg = connection->findOne(getRegistrationsCollectionName(), BSON("_id" << id));
