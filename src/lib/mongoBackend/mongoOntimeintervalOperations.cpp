@@ -47,9 +47,8 @@ HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscri
 
     DBClientConnection* connection = getMongoConnection();
 
-    LM_T(LmtMongo, ("findOne() in '%s' collection by _id '%s'", getSubscribeContextCollectionName(), subId.c_str()));
-
     /* Search for the document */
+    LM_T(LmtMongo, ("findOne() in '%s' collection by _id '%s'", getSubscribeContextCollectionName(), subId.c_str()));
     BSONObj sub;
     try {
         mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
