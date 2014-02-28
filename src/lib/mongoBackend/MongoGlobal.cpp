@@ -418,16 +418,16 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
             // only the first is taken into account
             BSONObj geoWithin;
             if (sco->areaType== AreaCircle) {
-                double radians = sco->circle.radius / EARTH_RADIUS_METERS;
-                geoWithin = BSON("$centerSphere" << BSON_ARRAY(BSON_ARRAY( sco->circle.center.latitude << sco->circle.center.longitude) << radians ));
-                inverted = sco->circle.inverted;
+                double radians = sco->circle._radius() / EARTH_RADIUS_METERS;
+                geoWithin = BSON("$centerSphere" << BSON_ARRAY(BSON_ARRAY( sco->circle.center._latitude() << sco->circle.center._longitude()) << radians ));
+                inverted = sco->circle._inverted();
             }
             else {  // sco->scopeType == AreaPolygon
                 BSONArrayBuilder vertex;
                 double x0, y0;
                 for (unsigned int jx = 0; jx < sco->polygon.vertexList.size() ; ++jx) {
-                    double x = sco->polygon.vertexList[jx]->latitude;
-                    double y = sco->polygon.vertexList[jx]->longitude;
+                    double x = sco->polygon.vertexList[jx]->_latitude();
+                    double y = sco->polygon.vertexList[jx]->_longitude();
                     if (jx == 0) {
                         x0 = x;
                         y0 = y;
@@ -440,7 +440,7 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
                 /* Note that MongoDB query API uses an ugly "double array" structure for coordinates */
                 geoWithin = BSON("$geometry" << BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(vertex.arr())));
 
-                inverted = sco->polygon.inverted;
+                inverted = sco->polygon._inverted();
             }
             if (inverted) {
                 areaQuery = BSON("$not" << BSON("$geoWithin" << geoWithin));

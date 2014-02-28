@@ -168,9 +168,9 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     Scope sc;
     sc.type = "FIWARE_Location";
     sc.areaType = AreaCircle;
-    sc.circle.center.latitude = 40.418889;
-    sc.circle.center.longitude = -3.691944;
-    sc.circle.radius  = 14000;
+    sc.circle.center.latitude = "40.418889";
+    sc.circle.center.longitude = "-3.691944";
+    sc.circle.radius = "14000";
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -250,9 +250,9 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     Scope sc;
     sc.type = "FIWARE_Location";
     sc.areaType = AreaCircle;
-    sc.circle.center.latitude = 40.418889;
-    sc.circle.center.longitude = -3.691944;
-    sc.circle.radius  = 15000;
+    sc.circle.center.latitude = "40.418889";
+    sc.circle.center.longitude = "-3.691944";
+    sc.circle.radius = "15000";
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -347,10 +347,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
     Scope sc;
     sc.type = "FIWARE_Location";
     sc.areaType = AreaCircle;
-    sc.circle.center.latitude = 40.418889;
-    sc.circle.center.longitude = -3.691944;
-    sc.circle.radius  = 14000;
-    // TBD: define out area
+    sc.circle.center.latitude = "40.418889";
+    sc.circle.center.longitude = "-3.691944";
+    sc.circle.radius  = "14000";
+    sc.circle.inverted = "true";
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -365,16 +365,16 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
-    EXPECT_EQ("Leganes", RES_CER(0).entityId.id);
+    EXPECT_EQ("Alcobendas", RES_CER(0).entityId.id);
     EXPECT_EQ("City", RES_CER(0).entityId.type);
     EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("40.316667, -3.75", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("40.533333, -3.633333", RES_CER_ATTR(0, 0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("attr_Leg", RES_CER_ATTR(0, 1)->value);
+    EXPECT_EQ("attr_Alc", RES_CER_ATTR(0, 1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
@@ -416,10 +416,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn1)
     sc.type = "FIWARE_Location";
     sc.areaType = AreaPolygon;
     ScopePoint p1, p2, p3, p4;
-    p1.latitude = 0; p1.longitude = 0; sc.polygon.vertexList.push_back(&p1);
-    p2.latitude = 0; p2.longitude = 6; sc.polygon.vertexList.push_back(&p2);
-    p3.latitude = 6; p3.longitude = 6; sc.polygon.vertexList.push_back(&p3);
-    p4.latitude = 6; p4.longitude = 0; sc.polygon.vertexList.push_back(&p4);
+    p1.latitude = "0"; p1.longitude = "0"; sc.polygon.vertexList.push_back(&p1);
+    p2.latitude = "0"; p2.longitude = "6"; sc.polygon.vertexList.push_back(&p2);
+    p3.latitude = "6"; p3.longitude = "6"; sc.polygon.vertexList.push_back(&p3);
+    p4.latitude = "6"; p4.longitude = "0"; sc.polygon.vertexList.push_back(&p4);
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -500,10 +500,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn2)
     sc.type = "FIWARE_Location";
     sc.areaType = AreaPolygon;
     ScopePoint p1, p2, p3, p4;
-    p1.latitude = 3; p1.longitude = 8; sc.polygon.vertexList.push_back(&p1);
-    p2.latitude = 11; p2.longitude = 8; sc.polygon.vertexList.push_back(&p2);
-    p3.latitude = 11; p3.longitude = 3; sc.polygon.vertexList.push_back(&p3);
-    p4.latitude = 3; p4.longitude = 3; sc.polygon.vertexList.push_back(&p4);
+    p1.latitude = "3"; p1.longitude = "8"; sc.polygon.vertexList.push_back(&p1);
+    p2.latitude = "11"; p2.longitude = "8"; sc.polygon.vertexList.push_back(&p2);
+    p3.latitude = "11"; p3.longitude = "3"; sc.polygon.vertexList.push_back(&p3);
+    p4.latitude = "3"; p4.longitude = "3"; sc.polygon.vertexList.push_back(&p4);
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -584,9 +584,9 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn3)
     sc.type = "FIWARE_Location";
     sc.areaType = AreaPolygon;
     ScopePoint p1, p2, p3;
-    p1.latitude = 0; p1.longitude = 0; sc.polygon.vertexList.push_back(&p1);
-    p2.latitude = 0; p2.longitude = 6; sc.polygon.vertexList.push_back(&p2);
-    p3.latitude = 6; p3.longitude = 0; sc.polygon.vertexList.push_back(&p3);
+    p1.latitude = "0"; p1.longitude = "0"; sc.polygon.vertexList.push_back(&p1);
+    p2.latitude = "0"; p2.longitude = "6"; sc.polygon.vertexList.push_back(&p2);
+    p3.latitude = "6"; p3.longitude = "0"; sc.polygon.vertexList.push_back(&p3);
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -652,11 +652,11 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut1)
     sc.type = "FIWARE_Location";
     sc.areaType = AreaPolygon;
     ScopePoint p1, p2, p3, p4;
-    p1.latitude = 3; p1.longitude = 8; sc.polygon.vertexList.push_back(&p1);
-    p2.latitude = 11; p2.longitude = 8; sc.polygon.vertexList.push_back(&p2);
-    p3.latitude = 11; p3.longitude = 3; sc.polygon.vertexList.push_back(&p3);
-    p4.latitude = 3; p4.longitude = 3; sc.polygon.vertexList.push_back(&p4);
-    // TBD: define out area
+    p1.latitude = "3"; p1.longitude = "8"; sc.polygon.vertexList.push_back(&p1);
+    p2.latitude = "11"; p2.longitude = "8"; sc.polygon.vertexList.push_back(&p2);
+    p3.latitude = "11"; p3.longitude = "3"; sc.polygon.vertexList.push_back(&p3);
+    p4.latitude = "3"; p4.longitude = "3"; sc.polygon.vertexList.push_back(&p4);
+    sc.polygon.inverted = "true";
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -722,10 +722,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut2)
     sc.type = "FIWARE_Location";
     sc.areaType = AreaPolygon;
     ScopePoint p1, p2, p3;
-    p1.latitude = 0; p1.longitude = 0; sc.polygon.vertexList.push_back(&p1);
-    p2.latitude = 0; p2.longitude = 6; sc.polygon.vertexList.push_back(&p2);
-    p3.latitude = 6; p3.longitude = 0; sc.polygon.vertexList.push_back(&p3);
-    // TBD: define out area
+    p1.latitude = "0"; p1.longitude = "0"; sc.polygon.vertexList.push_back(&p1);
+    p2.latitude = "0"; p2.longitude = "6"; sc.polygon.vertexList.push_back(&p2);
+    p3.latitude = "6"; p3.longitude = "0"; sc.polygon.vertexList.push_back(&p3);
+    sc.polygon.inverted = "true";
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */

@@ -112,7 +112,7 @@ using namespace mongo;
 #define ASSOC_ATTRS_SOURCE      "src"
 #define ASSOC_ATTRS_TARGET      "tgt"
 
-#define EARTH_RADIUS_METERS     6371000
+#define EARTH_RADIUS_METERS     6371000.0
 
 /*****************************************************************************
 *
