@@ -602,6 +602,20 @@ int main(int argC, char* argV[])
   paConfig("remove builtin", "-d");
   paConfig("remove builtin", "-r");
   paConfig("remove builtin", "-w");
+  paConfig("remove builtin", "-F");
+  paConfig("remove builtin", "-B");
+  paConfig("remove builtin", "-b");
+  paConfig("remove builtin", "-?");
+  paConfig("remove builtin", "-toDo");
+  paConfig("remove builtin", "-lmnc");
+  paConfig("remove builtin", "-lmca");
+  paConfig("remove builtin", "-lmkl");
+  paConfig("remove builtin", "-lmll");
+  paConfig("remove builtin", "-assert");
+  paConfig("remove builtin", "-version");
+  paConfig("remove builtin", "-h");
+  paConfig("remove builtin", "-help");
+
   paConfig("man synopsis",                  (void*) "[options]");
   paConfig("man shortdescription",          (void*) "Options:");
   paConfig("man description",               (void*) description);
