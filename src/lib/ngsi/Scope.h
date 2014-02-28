@@ -64,6 +64,9 @@ typedef struct ScopePoint
 {
   std::string latitude;
   std::string longitude;
+
+  double _latitude(void)  { return atof(latitude.c_str());  }
+  double _longitude(void) { return atof(longitude.c_str()); }
 } ScopePoint;
 
 
@@ -77,6 +80,8 @@ typedef struct ScopeCircle
   ScopePoint   center;
   std::string  radius; 
   std::string  inverted;
+  bool         _inverted(void) { if ((inverted == "true") || (inverted == "1")) return true; return false; }
+  int          _radius(void)   { return atoi(radius.c_str()); }
 } ScopeCircle;
 
 
@@ -89,6 +94,7 @@ typedef struct ScopePolygon
 {
   std::vector<ScopePoint*> vertexList;
   std::string              inverted;
+  bool                     _inverted(void) { if ((inverted == "true") || (inverted == "1")) return true; return false; }
 } ScopePolygon;
 
 

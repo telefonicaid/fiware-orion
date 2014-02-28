@@ -404,9 +404,14 @@ TEST(SubscribeContextRequest, scopeGeolocationPolygonInverted)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
   result = xmlTreat(testBuf, &ci, &parseData, SubscribeContext, "subscribeContextRequest", NULL);
   EXPECT_STREQ("OK", result.c_str());
+
   EXPECT_EQ("10",   parseData.scr.res.restriction.scopeVector.get(0)->polygon.vertexList[0]->longitude);
   EXPECT_EQ("20",   parseData.scr.res.restriction.scopeVector.get(0)->polygon.vertexList[0]->latitude);
   EXPECT_EQ("true", parseData.scr.res.restriction.scopeVector.get(0)->polygon.inverted);
+
+  EXPECT_EQ(10,   parseData.scr.res.restriction.scopeVector.get(0)->polygon.vertexList[0]->_longitude());
+  EXPECT_EQ(20,   parseData.scr.res.restriction.scopeVector.get(0)->polygon.vertexList[0]->_latitude());
+  EXPECT_TRUE(parseData.scr.res.restriction.scopeVector.get(0)->polygon._inverted());
 }
 
 
