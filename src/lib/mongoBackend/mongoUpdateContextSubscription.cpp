@@ -49,19 +49,12 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
   DBClientConnection* connection = getMongoConnection();
 
   /* Look for document */
-  BSONObj sub;
+  BSONObj  sub;
+  OID      id = OID(requestP->subscriptionId.get());
   try {
-      OID id = OID(requestP->subscriptionId.get());
-
       mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
       sub = connection->findOne(getSubscribeContextCollectionName(), BSON("_id" << id));
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
-
-      if (sub.isEmpty()) {
-          responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
-          reqSemGive(__FUNCTION__, "ngsi10 update subscription request (no subscriptions found)");
-          return SccOk;
-      }
   }
   catch( const AssertionException &e ) {
       /* This happens when OID format is wrong */
@@ -70,12 +63,14 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
       // (old issue #95)
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo assertion exception)");
       reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo assertion exception)");
+
       responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
       return SccOk;
   }
   catch( const DBException &e ) {
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo db exception)");
       reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo db exception)");
+
       responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                std::string("collection: ") + getSubscribeContextCollectionName() +
                                                " - findOne() _id: " + requestP->subscriptionId.get() +
@@ -85,10 +80,18 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
   catch(...) {
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo generic exception)");
       reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo generic exception)");
+
       responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                std::string("collection: ") + getSubscribeContextCollectionName() +
                                                " - findOne() _id: " + requestP->subscriptionId.get() +
                                                " - exception: " + "generic");
+      return SccOk;
+  }
+
+
+  if (sub.isEmpty()) {
+      responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (no subscriptions found)");
       return SccOk;
   }
 

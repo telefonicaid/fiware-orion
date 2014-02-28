@@ -59,12 +59,6 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
         mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
         sub = connection->findOne(getSubscribeContextCollectionName(), BSON("_id" << id));
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
-
-        if (sub.isEmpty()) {
-            responseP->statusCode.fill(SccContextElementNotFound, std::string("subscriptionId: '") + requestP->subscriptionId.get() + "'");
-            reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)");
-            return SccOk;
-        }
     }
     catch( const AssertionException &e ) {
         /* This happens when OID format is wrong */
@@ -96,13 +90,18 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
         return SccOk;
     }
 
+    if (sub.isEmpty()) {
+       responseP->statusCode.fill(SccContextElementNotFound, std::string("subscriptionId: '") + requestP->subscriptionId.get() + "'");
+       reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)");
+       return SccOk;
+    }
+
     /* Remove document in MongoDB */
     // FIXME: I will prefer to do the find and remove in a single operation. Is the some similar
     // to findAndModify for this?
+    LM_T(LmtMongo, ("remove() in '%s' collection _id '%s'}", getSubscribeContextCollectionName(),
+                    requestP->subscriptionId.get().c_str()));
     try {
-        LM_T(LmtMongo, ("remove() in '%s' collection _id '%s'}", getSubscribeContextCollectionName(),
-                           requestP->subscriptionId.get().c_str()));
-
         mongoSemTake(__FUNCTION__, "remove from SubscribeContextCollection");
         connection->remove(getSubscribeContextCollectionName(), BSON("_id" << OID(requestP->subscriptionId.get())));
         mongoSemGive(__FUNCTION__, "remove from SubscribeContextCollection");

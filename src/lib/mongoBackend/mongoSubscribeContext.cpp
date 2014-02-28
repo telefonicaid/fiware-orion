@@ -104,8 +104,8 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
     sub.append(CSUB_FORMAT, std::string(formatToString(inFormat)));
 
     /* Insert document in database */
-    LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextCollectionName(), subDoc.toString().c_str()));
     BSONObj subDoc = sub.obj();
+    LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextCollectionName(), subDoc.toString().c_str()));
     try {
         mongoSemTake(__FUNCTION__, "insert into SubscribeContextCollection");
         connection->insert(getSubscribeContextCollectionName(), subDoc);

@@ -86,8 +86,8 @@ static bool processAssociations(MetadataVector mdV, std::string* err) {
         }
 
         BSONObj doc = BSON("_id" << name << ASSOC_SOURCE_ENT << srcEn << ASSOC_TARGET_ENT << tgtEn << ASSOC_ATTRS << attrs.arr());
+        LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getAssociationsCollectionName(), doc.toString().c_str()));
         try {
-            LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getAssociationsCollectionName(), doc.toString().c_str()));
             mongoSemTake(__FUNCTION__, "insert into AssociationsCollection");
             connection->insert(getAssociationsCollectionName(), doc);
             mongoSemGive(__FUNCTION__, "insert into AssociationsCollection");
@@ -132,7 +132,6 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
            mongoSemTake(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
            sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << OID(mapSubId)));
            mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
-           LM_T(LmtMongo, ("retrieved document: '%s'", sub.toString().c_str()));
         }
         catch (...)
         {
@@ -140,6 +139,8 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
            *err = "Generic Exception from mongo";
            LM_RE(false, ("Database error: '%s'", err->c_str()));
         }
+
+        LM_T(LmtMongo, ("retrieved document: '%s'", sub.toString().c_str()));
 
         OID subId = sub.getField("_id").OID();
 
@@ -264,9 +265,8 @@ static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONOb
 
     /* Do the query */
     auto_ptr<DBClientCursor> cursor;
+    LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextAvailabilityCollectionName(), query.toString().c_str()));
     try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextAvailabilityCollectionName(), query.toString().c_str()));
-
         mongoSemTake(__FUNCTION__, "query in SubscribeContextAvailabilityCollection");
         cursor = connection->query(getSubscribeContextAvailabilityCollectionName(), query);
 
@@ -278,6 +278,7 @@ static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONOb
         if (cursor.get() == NULL) {
             throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
+
         mongoSemGive(__FUNCTION__, "query in SubscribeContextAvailabilityCollection");
     }
     catch( const DBException &e ) {
@@ -418,13 +419,12 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
     reg.append(REG_CONTEXT_REGISTRATION, contextRegistration.arr());
 
     BSONObj regDoc = reg.obj();
+    LM_T(LmtMongo, ("upsert update() in '%s' collection: '%s'", getRegistrationsCollectionName(), regDoc.toString().c_str()));
     try {
-        /* Note the four parameter to "true". This means "upsert", so if the document doesn't previously
-         * exist in colleciton, it is created at the same time. Thus, this way is ok with both uses of
-         * registerContext (either new registration or updating an existing one) */
-        LM_T(LmtMongo, ("upsert update() in '%s' collection: '%s'", getRegistrationsCollectionName(), regDoc.toString().c_str()));
-
         mongoSemTake(__FUNCTION__, "update in RegistrationsCollection");
+        /* Note the fourth parameter is set to "true". This means "upsert", so if the document doesn't previously
+         * exist in the collection, it is created. Thus, this way is ok with both uses of
+         * registerContext (either new registration or updating an existing one) */
         connection->update(getRegistrationsCollectionName(), BSON("_id" << oid), regDoc, true);
         mongoSemGive(__FUNCTION__, "update in RegistrationsCollection");
     }
