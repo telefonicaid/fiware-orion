@@ -50,8 +50,9 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
 
   /* Look for document */
   BSONObj  sub;
-  OID      id = OID(requestP->subscriptionId.get());
   try {
+      OID id = OID(requestP->subscriptionId.get());
+
       mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
       sub = connection->findOne(getSubscribeContextCollectionName(), BSON("_id" << id));
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");

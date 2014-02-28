@@ -60,8 +60,8 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
     }
 
     /* It is not a new registration, so it should be an update */
-    OID id;
     BSONObj reg;
+    OID     id;
     try {
 
         id = OID(requestP->registrationId.get());

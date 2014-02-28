@@ -49,8 +49,9 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
 
   /* Look for document */
   BSONObj  sub;
-  OID      id = OID(requestP->subscriptionId.get());
   try {
+      OID id = OID(requestP->subscriptionId.get());
+
       mongoSemTake(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection");
       sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << id));
       mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection");
