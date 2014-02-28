@@ -161,6 +161,10 @@ Using these interfaces, clients can do several operations:
 %files -n %{name}-fiware
 
 %changelog
+* Wed Feb 26 2014 Fermin Galan <fermin@tid.es> 0.10.1-1 (FIWARE-3.3.2-1)
+- Fix: concurrently bug in ONTIMEINTERVAL threads running with the same clock frecuency and phase
+- Fix: some problems in the previous solution to issue #208
+
 * Thu Feb 20 2014 Fermin Galan <fermin@tid.es> 0.10.0-1 (FIWARE-3.3.2-1)
 - Added:  IPv6 support (By default, both IPv4 and IPv6 are activated - the new command line options '-ipv4' and '-ipv6' make the broker activate only one of them)
 - Added:  JSON support for all implemented convenience operations
