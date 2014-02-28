@@ -21,7 +21,10 @@
 --NAME--
 broker version
 --SHELL--
-contextBroker -version
+# We have found sometimes problems with using CLI options with two hyphens in the .test files, breaking the testHarness.sh script.
+# However, in this case, it seems to work with the double-hyphened "--version" argument.
+
+contextBroker --version
 --EXPECT--
 0.10.1-next
 Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
