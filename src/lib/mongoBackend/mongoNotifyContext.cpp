@@ -48,8 +48,8 @@ HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextR
         processContextElement(&requestP->contextElementResponseVector.get(ix)->contextElement, &ucr, "append");
     }
 
-    responseP->responseCode.fill(SccOk);
     reqSemGive(__FUNCTION__, "ngsi10 notification");
+    responseP->responseCode.fill(SccOk);
 
     return SccOk;
 }

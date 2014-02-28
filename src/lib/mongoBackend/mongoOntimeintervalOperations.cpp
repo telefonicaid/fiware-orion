@@ -56,15 +56,15 @@ HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscri
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
     }
     catch( const DBException &e ) {
-        *err = e.what();
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo db exception)");
         reqSemGive(__FUNCTION__, "get info on subscriptions (mongo db exception)");
+        *err = e.what();
         LM_RE(SccOk, ("Database error '%s'", err->c_str()));
     }
     catch(...) {
-        *err = "Database error: received generic exception";
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo generic exception)");
         reqSemGive(__FUNCTION__, "get info on subscriptions (mongo generic exception)");
+        *err = "Database error: received generic exception";
         LM_RE(SccOk, ("Database error '%s'", "received generic exception"));
     }
 
@@ -124,8 +124,8 @@ HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList
     LM_T(LmtMongo, ("Get Notify Context Request operation"));
 
     if (!entitiesQuery(enV, attrL, cerV, err, true)) {
-        cerV->release();
         reqSemGive(__FUNCTION__, "get context-element responses (no entities found)");
+        cerV->release();
         LM_RE(SccOk, ((*err).c_str()));
     }
 

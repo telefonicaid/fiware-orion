@@ -104,10 +104,9 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
     sub.append(CSUB_FORMAT, std::string(formatToString(inFormat)));
 
     /* Insert document in database */
+    LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextCollectionName(), subDoc.toString().c_str()));
     BSONObj subDoc = sub.obj();
     try {
-        LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextCollectionName(), subDoc.toString().c_str()));
-
         mongoSemTake(__FUNCTION__, "insert into SubscribeContextCollection");
         connection->insert(getSubscribeContextCollectionName(), subDoc);
         mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection");
@@ -133,11 +132,12 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
         LM_RE(SccOk, ("Database error '%s'", responseP->subscribeError.errorCode.reasonPhrase.c_str()));
     }    
 
+    reqSemGive(__FUNCTION__, "ngsi10 subscribe request");
+
     /* Fill the response element */
     responseP->subscribeResponse.duration = requestP->duration;
     responseP->subscribeResponse.subscriptionId.set(oid.str());
     responseP->subscribeResponse.throttling = requestP->throttling;
 
-    reqSemGive(__FUNCTION__, "ngsi10 subscribe request");
     return SccOk;
 }

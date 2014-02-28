@@ -72,41 +72,44 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
     }
     catch( const AssertionException &e ) {
         mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection (AssertionException)");
+        reqSemGive(__FUNCTION__, "ngsi9 register request");
+
         /* This happens when OID format is wrong */
         // FIXME: this checking should be done at parsing stage, without progressing to
         // mongoBackend. By the moment we can live this here, but we should remove in the future
         responseP->errorCode.fill(SccContextElementNotFound);
         responseP->registrationId = requestP->registrationId;
         ++noOfRegistrationUpdateErrors;
-        reqSemGive(__FUNCTION__, "ngsi9 register request");
         return SccOk;
     }
     catch( const DBException &e ) {
         mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection (DBException)");
+        reqSemGive(__FUNCTION__, "ngsi9 register request");
+
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getRegistrationsCollectionName() +
                                   " - findOne() _id: " + requestP->registrationId.get() +
                                   " - exception: " + e.what());
         ++noOfRegistrationUpdateErrors;
-        reqSemGive(__FUNCTION__, "ngsi9 register request");
         return SccOk;
     }
     catch(...) {
         mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection (Generic Exception)");
+        reqSemGive(__FUNCTION__, "ngsi9 register request");
+
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getRegistrationsCollectionName() +
                                   " - findOne() _id: " + requestP->registrationId.get() +
                                   " - exception: " + "generic");
         ++noOfRegistrationUpdateErrors;
-        reqSemGive(__FUNCTION__, "ngsi9 register request");
         return SccOk;
     }
 
     if (reg.isEmpty()) {
+       reqSemGive(__FUNCTION__, "ngsi9 register request (no registrations found)");
        responseP->errorCode.fill(SccContextElementNotFound, std::string("registration id: '") + requestP->registrationId.get() + "'");
        responseP->registrationId = requestP->registrationId;
        ++noOfRegistrationUpdateErrors;
-       reqSemGive(__FUNCTION__, "ngsi9 register request (no registrations found)");
        return SccOk;
     }
 
