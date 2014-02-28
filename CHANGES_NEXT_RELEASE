@@ -1,2 +1,3 @@
 - Fix: concurrently bug in ONTIMEINTERVAL threads running with the same clock frecuency and phase
 - Fix: some problems in the previous solution to issue #208
+- Fix: the CLI options now coincide with the documentation
