@@ -215,6 +215,12 @@ extern const char* getAssociationsCollectionName(void);
 
 /* ****************************************************************************
 *
+* recoverOntimeIntervalThreads -
+*/
+extern void recoverOntimeIntervalThreads();
+
+/* ****************************************************************************
+*
 * includedEntity -
 */
 extern bool includedEntity(EntityId en, EntityIdVector* entityIdV);

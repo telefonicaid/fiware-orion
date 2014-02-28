@@ -257,9 +257,64 @@ const char* getSubscribeContextAvailabilityCollectionName(void) {
 *
 * getAssociationsCollectionName -
 */
-extern const char* getAssociationsCollectionName(void) {
+const char* getAssociationsCollectionName(void) {
     return assocationsCollectionName;
 }
+
+/* ****************************************************************************
+*
+* recoverOntimeIntervalThreads -
+*/
+void recoverOntimeIntervalThreads() {
+
+    /* Look for ONTIMEINTERVAL subscriptions in database */
+    std::string condType= std::string(CSUB_CONDITIONS) + "."  + CSUB_CONDITIONS_TYPE;
+    BSONObj query = BSON(condType << ON_TIMEINTERVAL_CONDITION);
+
+    DBClientConnection* connection = getMongoConnection();
+    auto_ptr<DBClientCursor> cursor;
+    try {
+        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(), query.toString().c_str()));
+        mongoSemTake(__FUNCTION__, "query in SubscribeContextCollection");
+        cursor = connection->query(getSubscribeContextCollectionName(), query);
+
+        /*
+         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+         * exception ourselves
+         */
+        if (cursor.get() == NULL) {
+            throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
+        }
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection");
+    }
+    catch( const DBException &e ) {
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongp db exception)");
+        LM_RVE(("Mongo DBException: %s", e.what()));
+    }
+    catch (...) {
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongp generic exception)");
+        LM_RVE(("Caugth Mongo Generic Exception"));
+    }
+
+    /* For each one of the subscriptions found, create threads */
+    while (cursor->more()) {
+
+        BSONObj sub = cursor->next();
+        std::string subId = sub.getField("_id").OID().str();
+
+        std::vector<BSONElement> condV = sub.getField(CSUB_CONDITIONS).Array();
+        for (unsigned int ix = 0; ix < condV.size(); ++ix) {
+            BSONObj condition = condV[ix].embeddedObject();
+            if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0) {
+               int interval = condition.getIntField(CSUB_CONDITIONS_VALUE);
+               LM_T(LmtNotifier, ("creating ONTIMEINTERVAL for subscription %s with interval %d", subId.c_str(), interval));
+               processOntimeIntervalCondition(subId, interval);
+            }
+        }
+    }
+}
+
 
 /* ****************************************************************************
 *
