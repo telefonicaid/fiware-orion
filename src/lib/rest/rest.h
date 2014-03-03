@@ -55,8 +55,24 @@ extern IpVersion  ipVersionUsed;
 
 /* ****************************************************************************
 *
+* RestServeFunction - 
+*/
+typedef void (*RestServeFunction)(ConnectionInfo* ciP);
+
+
+
+/* ****************************************************************************
+*
 * restInit - 
 */
-extern void restInit(RestService* _restServiceV, IpVersion _ipVersion, const char* _bindAddress, unsigned short _port);
+extern void restInit
+(
+   RestService*      _restServiceV,
+   IpVersion         _ipVersion,
+   const char*       _bindAddress,
+   unsigned short    _port,
+   RestServeFunction _serveFunction = NULL,
+   bool              _acceptTextXml = false
+);
 
 #endif
