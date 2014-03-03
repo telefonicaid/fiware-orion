@@ -201,7 +201,7 @@ static Format wantedOutputSupported(std::string acceptList, std::string* charset
      if (format == "application/json") return JSON;
      if (format == "*/json")           return JSON;
      
-     if ((acceptTextXml == true) && (format == "test/xml"))  return XML;
+     if ((acceptTextXml == true) && (format == "text/xml"))  return XML;
 
      // Here we put in cases for JSON, TEXT etc ...
 
