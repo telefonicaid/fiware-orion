@@ -204,6 +204,28 @@ TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleOk)
 
 /* ****************************************************************************
 *
+* scopeGeolocationCircleInverted - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInverted)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleInverted.postponed.xml";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  out = xmlTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ("OK", out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
 * scopeGeolocationCircleInvertedBadValue - 
 */
 TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedBadValue)

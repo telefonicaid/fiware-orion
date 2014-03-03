@@ -307,29 +307,6 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleOkJson)
 
 /* ****************************************************************************
 *
-* scopeGeolocationCircleZeroRadiusJson - 
-*/
-TEST(SubscribeContextRequest, scopeGeolocationCircleZeroRadiusJson)
-{
-  ParseData       reqData;
-  const char*     inFile  = "ngsi10.subscribeContextRequest.circleZeroRadius.postponed.json";
-  const char*     outFile = "ngsi10.subscribeContextResponse.circleZeroRadius.valid.json";
-  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
-  std::string     result;
-
-  ci.inFormat  = JSON;
-  ci.outFormat = JSON;
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
-  result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "subscribeContextRequest", NULL);
-  EXPECT_STREQ(expectedBuf, result.c_str());
-}
-
-
-
-/* ****************************************************************************
-*
 * scopeGeolocationCircleInvertedJson - 
 */
 TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedJson)
@@ -368,6 +345,33 @@ TEST(SubscribeContextRequest, scopeGeolocationCircleInvertedBadValueJson)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
   result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "subscribeContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, result.c_str());
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleZeroRadiusJson - 
+*/
+TEST(SubscribeContextRequest, scopeGeolocationCircleZeroRadiusJson)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.subscribeContextRequest.circleZeroRadius.postponed.json";
+  const char*     outFile = "ngsi10.subscribeContextResponse.circleZeroRadius.valid.json";
+  ConnectionInfo  ci("/ngsi10/subscribeContext", "POST", "1.1");
+  std::string     result;
+
+  utInit();
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
+  result = jsonTreat(testBuf, &ci, &reqData, SubscribeContext, "subscribeContextRequest", NULL);
+  EXPECT_STREQ(expectedBuf, result.c_str());
+
+  utExit();
 }
 
 

@@ -27,6 +27,7 @@
               <radius>10</radius>
               <center_latitude>45</center_latitude>
               <center_longitude>45</center_longitude>
+              <inverted>1</inverted>
             </circle>
           </scopeValue>
   			</operationScope>

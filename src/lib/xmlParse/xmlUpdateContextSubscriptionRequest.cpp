@@ -179,6 +179,7 @@ static int circleInverted(xml_node<>* node, ParseData* parseDataP)
   LM_T(LmtParse, ("Got a circleInverted: %s", node->value()));
 
   parseDataP->ucsr.scopeP->circle.inverted = node->value();
+
   if (!isTrue(node->value()) && !isFalse(node->value()))
   {
     parseDataP->errorString = std::string("bad string for circle/inverted: '") + node->value() + "'";
