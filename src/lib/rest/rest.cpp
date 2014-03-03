@@ -305,6 +305,8 @@ static int contentTypeCheck(ConnectionInfo* ciP)
     details = "";
   else if (ciP->httpHeaders.contentType == "")
     details = "Content-Type header not used, default application/octet-stream is not supported";
+  else if ((acceptTextXml == true) && (ciP->httpHeaders.contentType == "text/xml"))
+    details = "";
   else if ((ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
      details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
 
@@ -511,6 +513,10 @@ static int restStart(IpVersion ipVersion)
 /* ****************************************************************************
 *
 * restInit - 
+*
+* FIXME P5: add vector of the accepted content-types, instead of the bool
+*           argument _acceptTextXml that was added for iotAgent only.
+*           See Issue #256
 */
 void restInit(RestService* _restServiceV, IpVersion _ipVersion, const char* _bindAddress, unsigned short _port, RestServeFunction _serveFunction, bool _acceptTextXml)
 {
