@@ -214,15 +214,15 @@ static std::string scopeType(std::string path, std::string value, ParseData* req
 */
 static std::string scopeValue(std::string path, std::string value, ParseData* reqDataP)
 {
-  if (reqDataP->qcr.scopeP->type == "FIWARE_Location")
+  if (reqDataP->qcr.scopeP->type == FIWARE_LOCATION)
   {
     //
     // If the scope type is 'FIWARE_Location', then the value of this scope is stored in 'circle' or 'polygon'.
     // The field 'value' is not used as more complexity is needed.
-    // scopeP->value is here set to "FIWARE_Location", in an attempt to warn a future use of 'scopeP->value' when
+    // scopeP->value is here set to FIWARE_LOCATION, in an attempt to warn a future use of 'scopeP->value' when
     // instead 'circle' or 'polygon' should be used.
     //
-    reqDataP->qcr.scopeP->value = "FIWARE_Location";
+    reqDataP->qcr.scopeP->value = FIWARE_LOCATION;
     LM_T(LmtParse, ("Preparing scopeValue for '%s'", reqDataP->qcr.scopeP->type.c_str()));
   }
   else

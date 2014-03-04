@@ -223,15 +223,15 @@ static std::string scopeType(std::string path, std::string value, ParseData* par
 */
 static std::string scopeValue(std::string path, std::string value, ParseData* parseDataP)
 {
-  if (parseDataP->scr.scopeP->type == "FIWARE_Location")
+  if (parseDataP->scr.scopeP->type == FIWARE_LOCATION)
   {
     //
     // If the scope type is 'FIWARE_Location', then the value of this scope is stored in 'circle' or 'polygon'.
     // The field 'value' is not used as more complexity is needed.
-    // scopeP->value is here set to "FIWARE_Location", in an attempt to warn a future use of 'scopeP->value' when
+    // scopeP->value is here set to FIWARE_LOCATION, in an attempt to warn a future use of 'scopeP->value' when
     // instead 'circle' or 'polygon' should be used.
     //
-    parseDataP->scr.scopeP->value = "FIWARE_Location";
+    parseDataP->scr.scopeP->value = FIWARE_LOCATION;
     LM_T(LmtParse, ("Preparing scopeValue for '%s'", parseDataP->scr.scopeP->type.c_str()));
   }
   else
