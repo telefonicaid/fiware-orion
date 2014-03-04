@@ -11,22 +11,11 @@
 	    <operationScope>
 		    <scopeType>FIWARE_Location</scopeType>
 		    <scopeValue>
-          <polygon>
-            <vertexList>
-              <vertex>
-                <longitude>10</longitude>
-                <latitude>20</latitude>
-              </vertex>
-              <vertex>
-                <longitude>110</longitude>
-                <latitude>120</latitude>
-              </vertex>
-              <vertex>
-                <longitude>210</longitude>
-                <latitude>220</latitude>
-              </vertex>
-            </vertexList>
-          </polygon>
+          <circle>
+            <radius>0</radius>
+            <center_latitude>45</center_latitude>
+            <center_longitude>45</center_longitude>
+          </circle>
         </scopeValue>
 	    </operationScope>
 	  </scope>

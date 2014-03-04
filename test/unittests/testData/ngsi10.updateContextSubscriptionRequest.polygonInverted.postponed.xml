@@ -26,6 +26,7 @@
                 <latitude>220</latitude>
               </vertex>
             </vertexList>
+            <inverted>true</inverted>
           </polygon>
         </scopeValue>
 	    </operationScope>
