@@ -62,7 +62,6 @@ echo "0: ++++++++++++++++++++"
 </updateContextRequest>
 EOF
 
-#INVALID_XML
 echo "1: ++++++++++++++++++++"
 (curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
@@ -76,6 +75,8 @@ echo "1: ++++++++++++++++++++"
     <attribute>temperature</attribute>
     <attribute>lightstatus</attribute>
   </attributeList>
+  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
+  <duration>PT1H</duration>
   <restriction>
     <scope>
       <operationScope>
@@ -90,8 +91,6 @@ echo "1: ++++++++++++++++++++"
       </operationScope>
     </scope>
   </restriction>
-  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
-  <duration>PT1H</duration>
   <notifyConditions>
     <notifyCondition>
       <type>ONCHANGE</type>
@@ -105,7 +104,6 @@ echo "1: ++++++++++++++++++++"
 EOF
 
 echo "2: ++++++++++++++++++++"
-#INVALID_XML
 (curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
@@ -118,6 +116,8 @@ echo "2: ++++++++++++++++++++"
     <attribute>temperature</attribute>
     <attribute>lightstatus</attribute>
   </attributeList>
+  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
+  <duration>PT1H</duration>
   <restriction>
     <scope>
       <operationScope>
@@ -143,8 +143,6 @@ echo "2: ++++++++++++++++++++"
       </operationScope>
     </scope>
   </restriction>
-  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
-  <duration>PT1H</duration>
   <notifyConditions>
     <notifyCondition>
       <type>ONCHANGE</type>
