@@ -117,8 +117,6 @@ std::string SubscribeContextRequest::check(RequestType requestType, Format forma
 */
 void SubscribeContextRequest::present(std::string indent)
 {
-  LM_M(("------------ presenting"));
-
   entityIdVector.present(indent + "  ");
   attributeList.present(indent + "  ");
   reference.present(indent + "  ");

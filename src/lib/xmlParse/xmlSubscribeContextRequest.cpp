@@ -470,11 +470,9 @@ std::string scrCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void scrPresent(ParseData* reqData)
 {
-  LM_M(("------------ presenting?"));
   if (!lmTraceIsSet(LmtDump))
     return;
 
-  LM_M(("------------ presenting"));
   reqData->scr.res.present("");
 }
 

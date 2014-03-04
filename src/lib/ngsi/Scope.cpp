@@ -88,15 +88,8 @@ std::string Scope::check(RequestType requestType, Format format, std::string ind
 {
   if (type == "FIWARE_Location")
   {
-    LM_M(("Checking a FIWARE_Location scope"));
     if (areaType == AreaCircle)
     {
-      LM_M(("Checking a FIWARE_Location Circle"));
-      LM_M(("  o circle.radius:           '%s'", circle.radius.c_str()));
-      LM_M(("  o circle.inverted:         '%s'", circle.inverted.c_str()));
-      LM_M(("  o circle.center.latitude:  '%s'", circle.center.latitude.c_str()));
-      LM_M(("  o circle.center.longitude: '%s'", circle.center.longitude.c_str()));
-
       if (circle.radius == "0")
         return "Radius zero for a circle area";
       else if (circle.radius == "")
@@ -113,7 +106,6 @@ std::string Scope::check(RequestType requestType, Format format, std::string ind
     }
     else if (areaType == AreaPolygon)
     {
-      LM_M(("Checking a FIWARE_Location Polygon"));
       if (polygon.vertexList.size() < 3)
         return "too few vertices for a polygon";
       else if (polygon.inverted != "")
@@ -133,8 +125,6 @@ std::string Scope::check(RequestType requestType, Format format, std::string ind
   }
   else
   {
-    LM_M(("Checking scope of type %s", type.c_str()));
-
     if ((type == "") || (type == "not in use"))
       return "Empty type in restriction scope";
 

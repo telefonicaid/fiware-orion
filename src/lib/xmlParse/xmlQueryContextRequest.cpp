@@ -132,7 +132,6 @@ static int operationScope(xml_node<>* node, ParseData* reqDataP)
   Scope* newScopeP = new Scope();
 
   LM_T(LmtParse, ("Got an operationScope"));
-  LM_M(("Creating a Scope (no %d)", reqDataP->qcr.res.restriction.scopeVector.size()));
   reqDataP->qcr.scopeP = newScopeP;
   reqDataP->qcr.res.restriction.scopeVector.push_back(reqDataP->qcr.scopeP);
 
