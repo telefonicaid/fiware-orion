@@ -1,24 +1,24 @@
 {
-	"entities": [
-		{
-			"type": "Room",
-			"isPattern": "false",
-			"id": "ConferenceRoom"
-		},
-		{
-			"type": "Room",
-			"isPattern": "false",
-			"id": "OfficeRoom"
-		}
-	],
-	"attributes": [
-		"temperature",
-		"occupancy",
-		"lightstatus"
-	],
-	"restriction": {
-		"attributeExpression" : "Attribute Expression",
-		"scopes": [
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "occupancy",
+    "lightstatus"
+  ],
+  "restriction": {
+    "attributeExpression" : "Attribute Expression",
+    "scopes": [
       {
         "type" : "FIWARE_Location",
         "value" : {
@@ -41,14 +41,14 @@
           }
         }
       },
-			{
-				"type" : "t1",
-				"value" : "1"
-			},
-			{
-				"type" : "t2",
-				"value" : "2"
-			}
-		]
-	}
+      {
+        "type" : "t1",
+        "value" : "1"
+      },
+      {
+        "type" : "t2",
+        "value" : "2"
+      }
+    ]
+  }
 }

@@ -57,26 +57,26 @@ ucr='<?xml version="1.0" encoding="UTF-8"?>
 
 qcr='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
-	<entityIdList>
-		<entityId type="Room" isPattern="false">
- 			<id>entity01</id>
- 		</entityId>
- 	</entityIdList>
- 	<attributeList>
- 		<attribute>temperature</attribute>
- 		<attribute>occupancy</attribute>
- 		<attribute>lightstatus</attribute>
- 	</attributeList>
- 	<restriction>
- 		<attributeExpression>Attribute Expression</attributeExpression>
- 		<scope>
- 			<operationScope>
- 				<scopeType>st1</scopeType>
- 				<scopeValue>sv1</scopeValue>
- 			</operationScope>
-	    <operationScope>
-		    <scopeType>FIWARE_Location</scopeType>
-		    <scopeValue>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>entity01</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>temperature</attribute>
+    <attribute>occupancy</attribute>
+    <attribute>lightstatus</attribute>
+  </attributeList>
+  <restriction>
+    <attributeExpression>Attribute Expression</attributeExpression>
+    <scope>
+      <operationScope>
+        <scopeType>st1</scopeType>
+        <scopeValue>sv1</scopeValue>
+      </operationScope>
+      <operationScope>
+        <scopeType>FIWARE_Location</scopeType>
+        <scopeValue>
           <circle>
             <radius>10</radius>
             <center_latitude>45</center_latitude>
@@ -84,45 +84,45 @@ qcr='<?xml version="1.0" encoding="UTF-8"?>
             <inverted>0</inverted>
           </circle>
         </scopeValue>
-	    </operationScope>
- 			<operationScope>
- 				<scopeType>st2</scopeType>
- 				<scopeValue>sv2</scopeValue>
- 			</operationScope>
- 		</scope>
- 	</restriction>
+      </operationScope>
+      <operationScope>
+        <scopeType>st2</scopeType>
+        <scopeValue>sv2</scopeValue>
+      </operationScope>
+    </scope>
+  </restriction>
 </queryContextRequest>'
 
 scr='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
   <entityIdList>
-	  <entityId type="Room" isPattern="false">
-	    <id>ConferenceRoom</id>   
-	  </entityId>
-	  <entityId type="Room" isPattern="false">
-	    <id>OfficeRoom</id>   
-	  </entityId>
+    <entityId type="Room" isPattern="false">
+      <id>ConferenceRoom</id>   
+    </entityId>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>   
+    </entityId>
   </entityIdList>
   <attributeList>
-	  <attribute>temperature</attribute>
-	  <attribute>lightstatus</attribute>
+    <attribute>temperature</attribute>
+    <attribute>lightstatus</attribute>
   </attributeList>
   <reference>http://127.0.0.1:1028</reference>
   <duration>P5Y</duration>
   <restriction>
-	  <attributeExpression>testRestriction</attributeExpression>
-	  <scope>
-	    <operationScope>
-		    <scopeType>scope1</scopeType>
-		    <scopeValue>sval1</scopeValue>
-	    </operationScope>
-	    <operationScope>
-		    <scopeType>scope2</scopeType>
-		    <scopeValue>sval2</scopeValue>
-	    </operationScope>
-	    <operationScope>
-		    <scopeType>FIWARE_Location</scopeType>
-		    <scopeValue>
+    <attributeExpression>testRestriction</attributeExpression>
+    <scope>
+      <operationScope>
+        <scopeType>scope1</scopeType>
+        <scopeValue>sval1</scopeValue>
+      </operationScope>
+      <operationScope>
+        <scopeType>scope2</scopeType>
+        <scopeValue>sval2</scopeValue>
+      </operationScope>
+      <operationScope>
+        <scopeType>FIWARE_Location</scopeType>
+        <scopeValue>
           <circle>
             <radius>11</radius>
             <center_latitude>55</center_latitude>
@@ -130,18 +130,18 @@ scr='<?xml version="1.0" encoding="UTF-8"?>
             <inverted>0</inverted>
           </circle>
         </scopeValue>
-	    </operationScope>
-	  </scope>
+      </operationScope>
+    </scope>
   </restriction>
   <notifyConditions>
-	  <notifyCondition>
-	    <type>ONCHANGE</type>
-	    <condValueList>
-		    <condValue>temperature</condValue>
-		    <condValue>lightstatus</condValue>
-	    </condValueList>
-	    <restriction>restriction</restriction>
-	  </notifyCondition>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>temperature</condValue>
+        <condValue>lightstatus</condValue>
+      </condValueList>
+      <restriction>restriction</restriction>
+    </notifyCondition>
   </notifyConditions>
   <throttling>P5Y</throttling>
 </subscribeContextRequest>'
@@ -150,15 +150,15 @@ ucsr='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextSubscriptionRequest>
   <duration>P50Y</duration>
   <restriction>
-	  <attributeExpression>AttriTest</attributeExpression>
-	  <scope>
-	    <operationScope>
-		    <scopeType>st1</scopeType>
-		    <scopeValue>sv1</scopeValue>
-	    </operationScope>
-	    <operationScope>
-		    <scopeType>FIWARE_Location</scopeType>
-		    <scopeValue>
+    <attributeExpression>AttriTest</attributeExpression>
+    <scope>
+      <operationScope>
+        <scopeType>st1</scopeType>
+        <scopeValue>sv1</scopeValue>
+      </operationScope>
+      <operationScope>
+        <scopeType>FIWARE_Location</scopeType>
+        <scopeValue>
           <circle>
             <radius>12</radius>
             <center_latitude>65</center_latitude>
@@ -166,18 +166,18 @@ ucsr='<?xml version="1.0" encoding="UTF-8"?>
             <inverted>0</inverted>
           </circle>
         </scopeValue>
-	    </operationScope>
-	  </scope>
+      </operationScope>
+    </scope>
   </restriction>
   <subscriptionId>111222333444555666777888</subscriptionId>
   <notifyConditions>
-	  <notifyCondition>
-	    <type>ONCHANGE</type>
-	    <condValueList>
-		    <condValue>CondValue3</condValue>
-		    <condValue>CondValue4</condValue>
-	    </condValueList>
-	  </notifyCondition>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>CondValue3</condValue>
+        <condValue>CondValue4</condValue>
+      </condValueList>
+    </notifyCondition>
   </notifyConditions>
   <throttling>P5Y</throttling>
 </updateContextSubscriptionRequest>'
@@ -191,10 +191,8 @@ curl localhost:${BROKER_PORT}/ngsi10/queryContext -s -S --header "Content-Type: 
 echo '4: +++++++++++++++++++++++++++++++++++++'
 curl localhost:${BROKER_PORT}/ngsi10/subscribeContext -s -S --header "Content-Type: application/xml" -d "$scr"
 echo '5: +++++++++++++++++++++++++++++++++++++'
-curl localhost:${BROKER_PORT}/ngsi10/updateContextSubscription -s -S --header "Content-Type: application/xml" -d "$ucsr"
-echo '6: +++++++++++++++++++++++++++++++++++++'
 grep 'circleRadius: Got a circleRadius' /tmp/contextBrokerLog | awk -F'] ' '{ print $2 }'
-echo '7: +++++++++++++++++++++++++++++++++++++'
+echo '6: +++++++++++++++++++++++++++++++++++++'
 
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++++++++++
@@ -269,18 +267,8 @@ echo '7: +++++++++++++++++++++++++++++++++++++'
   </subscribeResponse>
 </subscribeContextResponse>
 5: +++++++++++++++++++++++++++++++++++++
-<updateContextSubscriptionResponse>
-  <subscribeError>
-    <subscriptionId>111222333444555666777888</subscriptionId>
-    <errorCode>
-      <code>404</code>
-      <reasonPhrase>No context element found</reasonPhrase>
-    </errorCode>
-  </subscribeError>
-</updateContextSubscriptionResponse>
-6: +++++++++++++++++++++++++++++++++++++
 circleRadius: Got a circleRadius: 10
 circleRadius: Got a circleRadius: 10
 circleRadius: Got a circleRadius: 11
 circleRadius: Got a circleRadius: 12
-7: +++++++++++++++++++++++++++++++++++++
+6: +++++++++++++++++++++++++++++++++++++
