@@ -39,6 +39,49 @@
 
 /* ****************************************************************************
 *
+* complexValueRoots - 
+*/
+const char* complexValueRootV[] =
+{
+  "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue" 
+};
+
+
+
+static bool isComplexValuePath(const char* path, char* root = NULL, char* rest = NULL)
+{
+   unsigned int len;
+
+   for (unsigned int ix = 0; ix < sizeof(complexValueRootV) / sizeof(complexValueRootV[0]); ++ix)
+   {
+      len = strlen(complexValueRootV[ix]);
+
+      if (strlen(path) < len)
+          continue;
+
+      if (strncmp(complexValueRootV[ix], path, len) == 0)
+      {
+         if (root != NULL)
+            strcpy(root, complexValueRootV[ix]);
+         if (rest != NULL)
+            strcpy(rest, &path[len]);
+
+         return true;
+      }
+   }
+
+   return false;
+}
+
+static void complexValuePath(const char* path, char* root, char* rest, xml_node<>* node)
+{
+  LM_M(("Got a part of doc-in-doc for '%s': '%s'. value: '%s'", root, rest, node->value()));
+}
+
+
+
+/* ****************************************************************************
+*
 * xmlParse - 
 */
 void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* parseVector, ParseData* reqDataP)
@@ -77,7 +120,15 @@ void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std
   }
 
   if (treated == false)
-    LM_W(("Warning: node '%s' not treated (%s)", path.c_str(), node->name()));
+  {
+    char root[256];
+    char rest[256];
+
+    if (isComplexValuePath(path.c_str(), root, rest))
+      complexValuePath(path.c_str(), root, rest, node);
+    else
+      LM_E(("Parse Error: unknown node '%s'", path.c_str(), node->name()));
+  }
 
   xml_node<>* child = node->first_node();
 
