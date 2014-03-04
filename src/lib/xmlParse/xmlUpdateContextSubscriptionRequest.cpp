@@ -31,10 +31,13 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "orionTypes/areas.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "xmlParse/XmlNode.h"
 #include "xmlParse/xmlParse.h"
 #include "xmlParse/xmlUpdateContextSubscriptionRequest.h"
+
+using namespace orion;
 
 
 
@@ -130,7 +133,7 @@ static int scopeValue(xml_node<>* node, ParseData* reqData)
 static int circle(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circle"));
-  reqData->ucsr.scopeP->areaType = AreaCircle;
+  reqData->ucsr.scopeP->areaType = orion::CircleType;
   return 0;
 }
 
@@ -204,7 +207,7 @@ static int circleInverted(xml_node<>* node, ParseData* parseDataP)
 static int polygon(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygon"));
-  reqData->ucsr.scopeP->areaType = AreaPolygon;
+  reqData->ucsr.scopeP->areaType = orion::PolygonType;
   return 0;
 }
 
@@ -249,7 +252,7 @@ static int polygonVertexList(xml_node<>* node, ParseData* reqData)
 static int polygonVertex(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygonVertex - creating new vertex for the vertex list"));
-  reqData->ucsr.vertexP = new ScopePoint();
+  reqData->ucsr.vertexP = new orion::Point();
   reqData->ucsr.scopeP->polygon.vertexList.push_back(reqData->ucsr.vertexP);
   return 0;
 }

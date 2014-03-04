@@ -42,7 +42,7 @@ Scope::Scope()
 {
   type     = "";
   value    = "";
-  areaType = AreaNone;
+  areaType = orion::NoArea;
 }
 
 
@@ -88,7 +88,7 @@ std::string Scope::check(RequestType requestType, Format format, std::string ind
 {
   if (type == "FIWARE_Location")
   {
-    if (areaType == AreaCircle)
+    if (areaType == orion::CircleType)
     {
       if (circle.radius == "0")
         return "Radius zero for a circle area";
@@ -104,7 +104,7 @@ std::string Scope::check(RequestType requestType, Format format, std::string ind
       else if (circle.center.longitude == "")
         return "Missing longitude for circle center";
     }
-    else if (areaType == AreaPolygon)
+    else if (areaType == orion::PolygonType)
     {
       if (polygon.vertexList.size() < 3)
         return "too few vertices for a polygon";
@@ -150,9 +150,9 @@ void Scope::present(std::string indent, int ix)
 
   PRINTF("%s  Type:     %s\n", indent.c_str(), type.c_str());
 
-  if (areaType == AreaNone)
+  if (areaType == orion::NoArea)
     PRINTF("%s  Value:    %s\n", indent.c_str(), value.c_str());
-  else if (areaType == AreaCircle)
+  else if (areaType == orion::CircleType)
   {
     PRINTF("%s  FI-WARE Circle Area:\n", indent.c_str());
     PRINTF("%s    Radius:     %s\n", indent.c_str(), circle.radius.c_str());
@@ -160,7 +160,7 @@ void Scope::present(std::string indent, int ix)
     PRINTF("%s    Latitude:   %s\n", indent.c_str(), circle.center.latitude.c_str());
     PRINTF("%s    Inverted:   %s\n", indent.c_str(), circle.inverted.c_str());
   }
-  else if (areaType == AreaPolygon)
+  else if (areaType == orion::PolygonType)
   {
     PRINTF("%s  FI-WARE Polygon Area (%lu vertices):\n", indent.c_str(), polygon.vertexList.size());
 

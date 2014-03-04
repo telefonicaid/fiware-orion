@@ -29,6 +29,10 @@
 
 #include "ngsi/Request.h"
 #include "common/Format.h"
+#include "orionTypes/areas.h"
+
+using namespace orion;
+
 
 /* ****************************************************************************
 *
@@ -45,62 +49,6 @@
 
 /* ****************************************************************************
 *
-* AreaType - 
-*/
-typedef enum AreaType
-{
-  AreaNone,
-  AreaCircle,
-  AreaPolygon
-} AreaType;
-
-
-
-/* ****************************************************************************
-*
-* ScopePoint - 
-*/
-typedef struct ScopePoint
-{
-  std::string latitude;
-  std::string longitude;
-
-  double _latitude(void)  { return atof(latitude.c_str());  }
-  double _longitude(void) { return atof(longitude.c_str()); }
-} ScopePoint;
-
-
-
-/* ****************************************************************************
-*
-* ScopeCircle - 
-*/
-typedef struct ScopeCircle
-{
-  ScopePoint   center;
-  std::string  radius; 
-  std::string  inverted;
-  bool         _inverted(void) { if ((inverted == "true") || (inverted == "1")) return true; return false; }
-  int          _radius(void)   { return atoi(radius.c_str()); }
-} ScopeCircle;
-
-
-
-/* ****************************************************************************
-*
-* ScopePolygon - 
-*/
-typedef struct ScopePolygon
-{
-  std::vector<ScopePoint*> vertexList;
-  std::string              inverted;
-  bool                     _inverted(void) { if ((inverted == "true") || (inverted == "1")) return true; return false; }
-} ScopePolygon;
-
-
-
-/* ****************************************************************************
-*
 * Scope -
 */
 typedef struct Scope
@@ -108,9 +56,9 @@ typedef struct Scope
   std::string  type;    // Mandatory
   std::string  value;   // Mandatory
 
-  AreaType     areaType;
-  ScopeCircle  circle;
-  ScopePolygon polygon;
+  orion::AreaType     areaType;
+  orion::Circle       circle;
+  orion::Polygon      polygon;
 
   Scope();
   Scope(std::string _type, std::string _value);
