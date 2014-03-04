@@ -125,6 +125,12 @@ static std::string scopeValue(std::string path, std::string value, ParseData* pa
 {
   if (parseDataP->ucsr.scopeP->type == "FIWARE_Location")
   {
+    //
+    // If the scope type is 'FIWARE_Location', then the value of this scope is stored in 'circle' or 'polygon'.
+    // The field 'value' is not used as more complexity is needed.
+    // scopeP->value is here set to "FIWARE_Location", in an attempt to warn a future use of 'scopeP->value' when
+    // instead 'circle' or 'polygon' should be used.
+    //
     parseDataP->ucsr.scopeP->value = "FIWARE_Location";
     LM_T(LmtParse, ("Preparing scopeValue for '%s'", parseDataP->ucsr.scopeP->type.c_str()));
   }
