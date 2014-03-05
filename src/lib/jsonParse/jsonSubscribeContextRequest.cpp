@@ -265,7 +265,7 @@ static std::string circle(std::string path, std::string value, ParseData* parseD
 static std::string circleCenterLatitude(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a circleCenterLatitude: %s", value.c_str()));
-  parseDataP->scr.scopeP->circle.center.latitude = value.c_str();
+  parseDataP->scr.scopeP->circle.center.latitudeSet(value);
 
   return "OK";
 }
@@ -279,7 +279,7 @@ static std::string circleCenterLatitude(std::string path, std::string value, Par
 static std::string circleCenterLongitude(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a circleCenterLongitude: %s", value.c_str()));
-  parseDataP->scr.scopeP->circle.center.longitude = value.c_str();
+  parseDataP->scr.scopeP->circle.center.longitudeSet(value);
   return "OK";
 }
 
@@ -292,7 +292,7 @@ static std::string circleCenterLongitude(std::string path, std::string value, Pa
 static std::string circleRadius(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a circleRadius: %s", value.c_str()));
-  parseDataP->scr.scopeP->circle.radius = value.c_str();
+  parseDataP->scr.scopeP->circle.radiusSet(value);
   return "OK";
 }
 
@@ -306,7 +306,7 @@ static std::string circleInverted(std::string path, std::string value, ParseData
 {
   LM_T(LmtParse, ("Got a circleInverted: %s", value.c_str()));
 
-  parseDataP->scr.scopeP->circle.inverted = value;
+  parseDataP->scr.scopeP->circle.invertedSet(value);
 
   if (!isTrue(value) && !isFalse(value))
   {
@@ -341,7 +341,7 @@ static std::string polygonInverted(std::string path, std::string value, ParseDat
 {
   LM_T(LmtParse, ("Got a polygonInverted: %s", value.c_str()));
 
-  parseDataP->scr.scopeP->polygon.inverted = value;;
+  parseDataP->scr.scopeP->polygon.invertedSet(value);;
 
   if (!isTrue(value) && !isFalse(value))
   {
@@ -387,7 +387,7 @@ static std::string  polygonVertex(std::string path, std::string value, ParseData
 static std::string  polygonVertexLatitude(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a polygonVertexLatitude: %s", value.c_str()));
-  parseDataP->scr.vertexP->latitude = value;
+  parseDataP->scr.vertexP->latitudeSet(value);
   return "OK";
 }
 
@@ -400,7 +400,7 @@ static std::string  polygonVertexLatitude(std::string path, std::string value, P
 static std::string  polygonVertexLongitude(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a polygonVertexLongitude: %s", value.c_str()));
-  parseDataP->scr.vertexP->longitude = value;
+  parseDataP->scr.vertexP->longitudeSet(value);
   return "OK";
 }
 

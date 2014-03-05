@@ -205,7 +205,7 @@ static int circle(xml_node<>* node, ParseData* reqData)
 static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circleCenterLatitude: %s", node->value()));
-  reqData->qcr.scopeP->circle.center.latitude = node->value();
+  reqData->qcr.scopeP->circle.center.latitudeSet(node->value());
 
   return 0;
 }
@@ -219,7 +219,7 @@ static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
 static int circleCenterLongitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circleCenterLongitude: %s", node->value()));
-  reqData->qcr.scopeP->circle.center.longitude = node->value();
+  reqData->qcr.scopeP->circle.center.longitudeSet(node->value());
   return 0;
 }
 
@@ -232,7 +232,7 @@ static int circleCenterLongitude(xml_node<>* node, ParseData* reqData)
 static int circleRadius(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circleRadius: %s", node->value()));
-  reqData->qcr.scopeP->circle.radius = node->value();
+  reqData->qcr.scopeP->circle.radiusSet(node->value());
   return 0;
 }
 
@@ -246,7 +246,7 @@ static int circleInverted(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a circleInverted: %s", node->value()));
 
-  parseDataP->qcr.scopeP->circle.inverted = node->value();
+  parseDataP->qcr.scopeP->circle.invertedSet(node->value());
 
   if (!isTrue(node->value()) && !isFalse(node->value()))
   {
@@ -280,7 +280,7 @@ static int polygonInverted(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a polygonInverted: %s", node->value()));
 
-  parseDataP->qcr.scopeP->polygon.inverted = node->value();
+  parseDataP->qcr.scopeP->polygon.invertedSet(node->value());
   if (!isTrue(node->value()) && !isFalse(node->value()))
   {
     parseDataP->errorString = std::string("bad string for polygon/inverted: '") + node->value() + "'";
@@ -325,7 +325,7 @@ static int polygonVertex(xml_node<>* node, ParseData* reqData)
 static int polygonVertexLatitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygonVertexLatitude: %s", node->value()));
-  reqData->qcr.vertexP->latitude = node->value();
+  reqData->qcr.vertexP->latitudeSet(node->value());
   return 0;
 }
 
@@ -338,7 +338,7 @@ static int polygonVertexLatitude(xml_node<>* node, ParseData* reqData)
 static int polygonVertexLongitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygonVertexLongitude: %s", node->value()));
-  reqData->qcr.vertexP->longitude = node->value();
+  reqData->qcr.vertexP->longitudeSet(node->value());
   return 0;
 }
 

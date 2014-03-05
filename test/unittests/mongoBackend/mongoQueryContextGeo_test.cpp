@@ -169,9 +169,9 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     Scope sc;
     sc.type = "FIWARE_Location";
     sc.areaType = orion::CircleType;
-    sc.circle.center.latitude = "40.418889";
-    sc.circle.center.longitude = "-3.691944";
-    sc.circle.radius = "14000";
+    sc.circle.center.latitudeSet("40.418889");
+    sc.circle.center.longitudeSet("-3.691944");
+    sc.circle.radiusSet("14000");
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -251,9 +251,9 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     Scope sc;
     sc.type = "FIWARE_Location";
     sc.areaType = orion::CircleType;
-    sc.circle.center.latitude = "40.418889";
-    sc.circle.center.longitude = "-3.691944";
-    sc.circle.radius = "15000";
+    sc.circle.center.latitudeSet("40.418889");
+    sc.circle.center.longitudeSet("-3.691944");
+    sc.circle.radiusSet("15000");
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -348,10 +348,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
     Scope sc;
     sc.type = "FIWARE_Location";
     sc.areaType = orion::CircleType;
-    sc.circle.center.latitude = "40.418889";
-    sc.circle.center.longitude = "-3.691944";
-    sc.circle.radius  = "14000";
-    sc.circle.inverted = "true";
+    sc.circle.center.latitudeSet("40.418889");
+    sc.circle.center.longitudeSet("-3.691944");
+    sc.circle.radiusSet("14000");
+    sc.circle.invertedSet("true");
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -417,10 +417,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn1)
     sc.type = "FIWARE_Location";
     sc.areaType = orion::PolygonType;
     orion::Point p1, p2, p3, p4;
-    p1.latitude = "0"; p1.longitude = "0"; sc.polygon.vertexList.push_back(&p1);
-    p2.latitude = "0"; p2.longitude = "6"; sc.polygon.vertexList.push_back(&p2);
-    p3.latitude = "6"; p3.longitude = "6"; sc.polygon.vertexList.push_back(&p3);
-    p4.latitude = "6"; p4.longitude = "0"; sc.polygon.vertexList.push_back(&p4);
+    p1.latitudeSet("0"); p1.longitudeSet("0"); sc.polygon.vertexList.push_back(&p1);
+    p2.latitudeSet("0"); p2.longitudeSet("6"); sc.polygon.vertexList.push_back(&p2);
+    p3.latitudeSet("6"); p3.longitudeSet("6"); sc.polygon.vertexList.push_back(&p3);
+    p4.latitudeSet("6"); p4.longitudeSet("0"); sc.polygon.vertexList.push_back(&p4);
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -501,10 +501,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn2)
     sc.type = "FIWARE_Location";
     sc.areaType = orion::PolygonType;
     orion::Point p1, p2, p3, p4;
-    p1.latitude = "3"; p1.longitude = "8"; sc.polygon.vertexList.push_back(&p1);
-    p2.latitude = "11"; p2.longitude = "8"; sc.polygon.vertexList.push_back(&p2);
-    p3.latitude = "11"; p3.longitude = "3"; sc.polygon.vertexList.push_back(&p3);
-    p4.latitude = "3"; p4.longitude = "3"; sc.polygon.vertexList.push_back(&p4);
+    p1.latitudeSet("3"); p1.longitudeSet("8"); sc.polygon.vertexList.push_back(&p1);
+    p2.latitudeSet("11"); p2.longitudeSet("8"); sc.polygon.vertexList.push_back(&p2);
+    p3.latitudeSet("11"); p3.longitudeSet("3"); sc.polygon.vertexList.push_back(&p3);
+    p4.latitudeSet("3"); p4.longitudeSet("3"); sc.polygon.vertexList.push_back(&p4);
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -585,9 +585,9 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn3)
     sc.type = "FIWARE_Location";
     sc.areaType = orion::PolygonType;
     orion::Point p1, p2, p3;
-    p1.latitude = "0"; p1.longitude = "0"; sc.polygon.vertexList.push_back(&p1);
-    p2.latitude = "0"; p2.longitude = "6"; sc.polygon.vertexList.push_back(&p2);
-    p3.latitude = "6"; p3.longitude = "0"; sc.polygon.vertexList.push_back(&p3);
+    p1.latitudeSet("0"); p1.longitudeSet("0"); sc.polygon.vertexList.push_back(&p1);
+    p2.latitudeSet("0"); p2.longitudeSet("6"); sc.polygon.vertexList.push_back(&p2);
+    p3.latitudeSet("6"); p3.longitudeSet("0"); sc.polygon.vertexList.push_back(&p3);
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -653,11 +653,11 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut1)
     sc.type = "FIWARE_Location";
     sc.areaType = orion::PolygonType;
     orion::Point p1, p2, p3, p4;
-    p1.latitude = "3"; p1.longitude = "8"; sc.polygon.vertexList.push_back(&p1);
-    p2.latitude = "11"; p2.longitude = "8"; sc.polygon.vertexList.push_back(&p2);
-    p3.latitude = "11"; p3.longitude = "3"; sc.polygon.vertexList.push_back(&p3);
-    p4.latitude = "3"; p4.longitude = "3"; sc.polygon.vertexList.push_back(&p4);
-    sc.polygon.inverted = "true";
+    p1.latitudeSet("3"); p1.longitudeSet("8"); sc.polygon.vertexList.push_back(&p1);
+    p2.latitudeSet("11"); p2.longitudeSet("8"); sc.polygon.vertexList.push_back(&p2);
+    p3.latitudeSet("11"); p3.longitudeSet("3"); sc.polygon.vertexList.push_back(&p3);
+    p4.latitudeSet("3"); p4.longitudeSet("3"); sc.polygon.vertexList.push_back(&p4);
+    sc.polygon.invertedSet("true");
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -723,10 +723,10 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut2)
     sc.type = "FIWARE_Location";
     sc.areaType = orion::PolygonType;
     orion::Point p1, p2, p3;
-    p1.latitude = "0"; p1.longitude = "0"; sc.polygon.vertexList.push_back(&p1);
-    p2.latitude = "0"; p2.longitude = "6"; sc.polygon.vertexList.push_back(&p2);
-    p3.latitude = "6"; p3.longitude = "0"; sc.polygon.vertexList.push_back(&p3);
-    sc.polygon.inverted = "true";
+    p1.latitudeSet("0"); p1.longitudeSet("0"); sc.polygon.vertexList.push_back(&p1);
+    p2.latitudeSet("0"); p2.longitudeSet("6"); sc.polygon.vertexList.push_back(&p2);
+    p3.latitudeSet("6"); p3.longitudeSet("0"); sc.polygon.vertexList.push_back(&p3);
+    sc.polygon.invertedSet("true");
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */

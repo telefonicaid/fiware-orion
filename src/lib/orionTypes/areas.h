@@ -48,38 +48,59 @@ typedef enum AreaType
 *
 * Point - 
 */
-typedef struct Point
+class Point
 {
-  ::std::string latitude;
-  ::std::string longitude;
+private:
+  ::std::string _latitude;
+  ::std::string _longitude;
 
-  double _latitude(void)  { return atof(latitude.c_str());  }
-  double _longitude(void) { return atof(longitude.c_str()); }
-} Point;
+public:
+  double latitude(void)                        { return atof(_latitude.c_str());  }
+  double longitude(void)                       { return atof(_longitude.c_str()); }
+  void   latitudeSet(::std::string latitude)   { _latitude  = latitude;           }
+  void   longitudeSet(::std::string longitude) { _longitude = longitude;          }
+  ::std::string latitudeString(void)           { return _latitude;                }
+  ::std::string longitudeString(void)          { return _longitude;               }
+};
 
 /* ****************************************************************************
 *
 * Circle - 
 */
-typedef struct Circle
+class Circle
 {
+private:
+  ::std::string  _radius; 
+  ::std::string  _inverted;
+
+public:
   Point          center;
-  ::std::string  radius; 
-  ::std::string  inverted;
-  bool           _inverted(void) { if ((inverted == "true") || (inverted == "1")) return true; return false; }
-  double         _radius(void)   { return atof(radius.c_str()); }
-} Circle;
+  bool           inverted(void) { if ((_inverted == "true") || (_inverted == "1")) return true; return false; }
+  double         radius(void)   { return atof(_radius.c_str()); }
+
+  ::std::string  radiusString(void)                   { return  _radius;      }
+  ::std::string  invertedString(void)                 { return  _inverted;    }
+  void           radiusSet(::std::string radius)      { _radius   = radius;   }
+  void           invertedSet(::std::string inverted)  { _inverted = inverted; }
+};
 
 /* ****************************************************************************
 *
 * Polygon - 
 */
-typedef struct Polygon
+class Polygon
 {
+private:
+  ::std::string         _inverted;
+
+public:
   ::std::vector<Point*> vertexList;
-  ::std::string         inverted;
-  bool                  _inverted(void) { if ((inverted == "true") || (inverted == "1")) return true; return false; }
-} Polygon;
+  bool                  inverted(void)                      { if ((_inverted == "true") || (_inverted == "1")) return true; return false; }
+  void                  invertedSet(::std::string inverted) { _inverted = inverted;    }
+  ::std::string         invertedString(void)                { return _inverted;        }
+  void                  vertexAdd(Point* p)                 { vertexList.push_back(p); }
+};
+
 }
 
 #endif

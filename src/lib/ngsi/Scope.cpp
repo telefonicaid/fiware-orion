@@ -90,35 +90,35 @@ std::string Scope::check(RequestType requestType, Format format, std::string ind
   {
     if (areaType == orion::CircleType)
     {
-      if (circle.radius == "0")
+      if (circle.radiusString() == "0")
         return "Radius zero for a circle area";
-      else if (circle.radius == "")
+      else if (circle.radiusString() == "")
         return "Missing radius for circle area";
-      else if (circle.inverted != "")
+      else if (circle.invertedString() != "")
       {
-        if (!isTrue(circle.inverted) && !isFalse(circle.inverted))
-          return "bad value for circle/inverted: '" + circle.inverted + "'";
+        if (!isTrue(circle.invertedString()) && !isFalse(circle.invertedString()))
+          return "bad value for circle/inverted: '" + circle.invertedString() + "'";
       }
-      else if (circle.center.latitude == "")
+      else if (circle.center.latitudeString() == "")
         return "Missing latitude for circle center";
-      else if (circle.center.longitude == "")
+      else if (circle.center.longitudeString() == "")
         return "Missing longitude for circle center";
     }
     else if (areaType == orion::PolygonType)
     {
       if (polygon.vertexList.size() < 3)
         return "too few vertices for a polygon";
-      else if (polygon.inverted != "")
+      else if (polygon.invertedString() != "")
       {
-        if (!isTrue(polygon.inverted) && !isFalse(polygon.inverted))
-          return "bad value for polygon/inverted: '" + polygon.inverted + "'";
+        if (!isTrue(polygon.invertedString()) && !isFalse(polygon.invertedString()))
+          return "bad value for polygon/inverted: '" + polygon.invertedString() + "'";
       }
 
       for (unsigned int ix = 0; ix < polygon.vertexList.size(); ++ix)
       {
-        if (polygon.vertexList[ix]->latitude == "")
+        if (polygon.vertexList[ix]->latitudeString() == "")
           return std::string("missing latitude value for polygon vertex");
-        if (polygon.vertexList[ix]->longitude == "")
+        if (polygon.vertexList[ix]->longitudeString() == "")
           return std::string("missing longitude value for polygon vertex");
       }
     }
@@ -155,21 +155,21 @@ void Scope::present(std::string indent, int ix)
   else if (areaType == orion::CircleType)
   {
     PRINTF("%s  FI-WARE Circle Area:\n", indent.c_str());
-    PRINTF("%s    Radius:     %s\n", indent.c_str(), circle.radius.c_str());
-    PRINTF("%s    Longitude:  %s\n", indent.c_str(), circle.center.longitude.c_str());
-    PRINTF("%s    Latitude:   %s\n", indent.c_str(), circle.center.latitude.c_str());
-    PRINTF("%s    Inverted:   %s\n", indent.c_str(), circle.inverted.c_str());
+    PRINTF("%s    Radius:     %s\n", indent.c_str(), circle.radiusString().c_str());
+    PRINTF("%s    Longitude:  %s\n", indent.c_str(), circle.center.longitudeString().c_str());
+    PRINTF("%s    Latitude:   %s\n", indent.c_str(), circle.center.latitudeString().c_str());
+    PRINTF("%s    Inverted:   %s\n", indent.c_str(), circle.invertedString().c_str());
   }
   else if (areaType == orion::PolygonType)
   {
     PRINTF("%s  FI-WARE Polygon Area (%lu vertices):\n", indent.c_str(), polygon.vertexList.size());
 
-    PRINTF("%s    Inverted:   %s\n", indent.c_str(), polygon.inverted.c_str());
+    PRINTF("%s    Inverted:   %s\n", indent.c_str(), polygon.invertedString().c_str());
     for (unsigned int ix = 0; ix < polygon.vertexList.size(); ++ix)
     {
       PRINTF("%s    Vertex %d\n", indent.c_str(), ix);
-      PRINTF("%s      Longitude:  %s\n", indent.c_str(), polygon.vertexList[ix]->longitude.c_str());
-      PRINTF("%s      Latitude:   %s\n", indent.c_str(), polygon.vertexList[ix]->latitude.c_str());
+      PRINTF("%s      Longitude:  %s\n", indent.c_str(), polygon.vertexList[ix]->longitudeString().c_str());
+      PRINTF("%s      Latitude:   %s\n", indent.c_str(), polygon.vertexList[ix]->latitudeString().c_str());
     }
   }
 }
