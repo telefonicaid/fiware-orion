@@ -417,12 +417,12 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
             // FIXME P2: current version only support one geolocation scope. If the client includes several ones,
             // only the first is taken into account
             BSONObj geoWithin;
-            if (sco->areaType== AreaCircle) {
+            if (sco->areaType== orion::CircleType) {
                 double radians = sco->circle._radius() / EARTH_RADIUS_METERS;
                 geoWithin = BSON("$centerSphere" << BSON_ARRAY(BSON_ARRAY( sco->circle.center._latitude() << sco->circle.center._longitude()) << radians ));
                 inverted = sco->circle._inverted();
             }
-            else {  // sco->scopeType == AreaPolygon
+            else {  // sco->scopeType == orion::PolygonType
                 BSONArrayBuilder vertex;
                 double x0, y0;
                 for (unsigned int jx = 0; jx < sco->polygon.vertexList.size() ; ++jx) {

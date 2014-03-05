@@ -34,6 +34,7 @@
 #include "ngsi/EntityId.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
+#include "orionTypes/areas.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -167,7 +168,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     /* Define area scope */
     Scope sc;
     sc.type = "FIWARE_Location";
-    sc.areaType = AreaCircle;
+    sc.areaType = orion::CircleType;
     sc.circle.center.latitude = "40.418889";
     sc.circle.center.longitude = "-3.691944";
     sc.circle.radius = "14000";
@@ -249,7 +250,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     /* Define area scope */
     Scope sc;
     sc.type = "FIWARE_Location";
-    sc.areaType = AreaCircle;
+    sc.areaType = orion::CircleType;
     sc.circle.center.latitude = "40.418889";
     sc.circle.center.longitude = "-3.691944";
     sc.circle.radius = "15000";
@@ -346,7 +347,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
     /* Define area scope */
     Scope sc;
     sc.type = "FIWARE_Location";
-    sc.areaType = AreaCircle;
+    sc.areaType = orion::CircleType;
     sc.circle.center.latitude = "40.418889";
     sc.circle.center.longitude = "-3.691944";
     sc.circle.radius  = "14000";
@@ -414,8 +415,8 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn1)
     /* Define area scope */
     Scope sc;
     sc.type = "FIWARE_Location";
-    sc.areaType = AreaPolygon;
-    ScopePoint p1, p2, p3, p4;
+    sc.areaType = orion::PolygonType;
+    orion::Point p1, p2, p3, p4;
     p1.latitude = "0"; p1.longitude = "0"; sc.polygon.vertexList.push_back(&p1);
     p2.latitude = "0"; p2.longitude = "6"; sc.polygon.vertexList.push_back(&p2);
     p3.latitude = "6"; p3.longitude = "6"; sc.polygon.vertexList.push_back(&p3);
@@ -498,8 +499,8 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn2)
     /* Define area scope */
     Scope sc;
     sc.type = "FIWARE_Location";
-    sc.areaType = AreaPolygon;
-    ScopePoint p1, p2, p3, p4;
+    sc.areaType = orion::PolygonType;
+    orion::Point p1, p2, p3, p4;
     p1.latitude = "3"; p1.longitude = "8"; sc.polygon.vertexList.push_back(&p1);
     p2.latitude = "11"; p2.longitude = "8"; sc.polygon.vertexList.push_back(&p2);
     p3.latitude = "11"; p3.longitude = "3"; sc.polygon.vertexList.push_back(&p3);
@@ -582,8 +583,8 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn3)
     /* Define area scope */
     Scope sc;
     sc.type = "FIWARE_Location";
-    sc.areaType = AreaPolygon;
-    ScopePoint p1, p2, p3;
+    sc.areaType = orion::PolygonType;
+    orion::Point p1, p2, p3;
     p1.latitude = "0"; p1.longitude = "0"; sc.polygon.vertexList.push_back(&p1);
     p2.latitude = "0"; p2.longitude = "6"; sc.polygon.vertexList.push_back(&p2);
     p3.latitude = "6"; p3.longitude = "0"; sc.polygon.vertexList.push_back(&p3);
@@ -650,8 +651,8 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut1)
     /* Define area scope */
     Scope sc;
     sc.type = "FIWARE_Location";
-    sc.areaType = AreaPolygon;
-    ScopePoint p1, p2, p3, p4;
+    sc.areaType = orion::PolygonType;
+    orion::Point p1, p2, p3, p4;
     p1.latitude = "3"; p1.longitude = "8"; sc.polygon.vertexList.push_back(&p1);
     p2.latitude = "11"; p2.longitude = "8"; sc.polygon.vertexList.push_back(&p2);
     p3.latitude = "11"; p3.longitude = "3"; sc.polygon.vertexList.push_back(&p3);
@@ -720,8 +721,8 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut2)
     /* Define area scope */
     Scope sc;
     sc.type = "FIWARE_Location";
-    sc.areaType = AreaPolygon;
-    ScopePoint p1, p2, p3;
+    sc.areaType = orion::PolygonType;
+    orion::Point p1, p2, p3;
     p1.latitude = "0"; p1.longitude = "0"; sc.polygon.vertexList.push_back(&p1);
     p2.latitude = "0"; p2.longitude = "6"; sc.polygon.vertexList.push_back(&p2);
     p3.latitude = "6"; p3.longitude = "0"; sc.polygon.vertexList.push_back(&p3);
