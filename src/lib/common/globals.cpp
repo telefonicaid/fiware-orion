@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <time.h>
+#include <string>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -75,9 +76,7 @@ void orionInit(OrionExitFunction exitFunction, const char* version)
 */
 bool isTrue(const std::string& s)
 {
-  if (strcasecmp(s.c_str(), "true") == 0)
-    return true;
-  if (strcasecmp(s.c_str(), "yes") == 0)
+  if ((s == "true") || (s == "1"))
     return true;
 
   return false;
@@ -91,9 +90,7 @@ bool isTrue(const std::string& s)
 */
 bool isFalse(const std::string& s)
 {
-  if (strcasecmp(s.c_str(), "false") == 0)
-    return true;
-  if (strcasecmp(s.c_str(), "no") == 0)
+  if ((s == "false") || (s == "0"))
     return true;
 
   return false;

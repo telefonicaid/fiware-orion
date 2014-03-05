@@ -87,6 +87,8 @@ std::string ContextRegistrationAttribute::render(Format format, std::string inde
 */
 std::string ContextRegistrationAttribute::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
+  std::string errorString;
+
   if (name == "")
     return "missing name for registration attribute";
 
@@ -94,7 +96,7 @@ std::string ContextRegistrationAttribute::check(RequestType requestType, Format 
     return "missing isDomain value for registration attribute";
 
   if (!isTrue(isDomain) && !isFalse(isDomain))
-    return "bad isDomain value for registration attribute";
+    return std::string("invalid isDomain (boolean) value for registration attribute: '") + isDomain + "'";
 
   std::string res;
   if ((res = metadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")

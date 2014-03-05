@@ -38,7 +38,7 @@
 *
 * xmlParse - 
 */
-extern void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* treatV, ParseData* reqData);
+extern std::string xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* treatV, ParseData* reqData);
 
 
 

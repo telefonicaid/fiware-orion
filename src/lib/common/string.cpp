@@ -32,6 +32,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/string.h"
+#include "common/wsStrip.h"
 
 #define DEFAULT_HTTP_PORT 80
 
@@ -310,4 +311,58 @@ std::string parsedUptime(int uptime)
 
   sprintf(s, "%d d, %d h, %d m, %d s", days, hours, minutes, seconds);
   return std::string(s);
+}
+
+
+
+/* ****************************************************************************
+*
+* string2coords - 
+*/
+bool string2coords(std::string s, double& latitude, double& longitude)
+{
+  char* initial = strdup(s.c_str());
+  char* cP      = initial;
+  char* comma;
+  char* number1;
+  char* number2;
+
+  cP = wsStrip(cP);
+
+  comma = strchr(cP, ',');
+  if (comma == NULL)
+  {
+    free(initial);
+    return false;
+  }
+  *comma = 0;
+  ++comma;
+
+  number1 = cP;
+  number2 = comma;
+
+  number1 = wsStrip(number1);
+  number2 = wsStrip(number2);
+
+  latitude  = atof(number1);
+  longitude = atof(number2);
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* coords2string - 
+*/
+void coords2string(std::string& s, double latitude, double longitude, int decimals)
+{
+  char buf[256];
+  char format[32];
+
+  snprintf(format, sizeof(format), "%%.%df, %%.%df", decimals, decimals);
+  snprintf(buf,    sizeof(buf),    format,           latitude, longitude);
+
+  s = buf;
 }

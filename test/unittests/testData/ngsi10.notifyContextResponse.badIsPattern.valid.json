@@ -1,6 +1,6 @@
 {
   "responseCode" : {
     "code" : "400",
-    "reasonPhrase" : "bad value for 'isPattern'"
+    "reasonPhrase" : "invalid isPattern (boolean) value for entity: 'phalse'"
   }
 }

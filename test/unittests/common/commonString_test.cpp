@@ -27,7 +27,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/string.h"
-
+#include "common/wsStrip.h"
 
 /* ****************************************************************************
 *
@@ -315,4 +315,50 @@ TEST(string, parsedUptime)
   // 3 days, 4 hours, 5 min and 6 seconds
   uptime = parsedUptime(3 * (24 * 3600) + 4 * 3600 + 5 * 60 + 6);
   EXPECT_EQ(uptime, "3 d, 4 h, 5 m, 6 s");
+}
+
+/* ****************************************************************************
+*
+* string2coords -
+*/
+TEST(string, string2coords)
+{
+  bool   r;
+  double latitude  = 0;
+  double longitude = 0;
+
+  r = string2coords("2 4", latitude, longitude);
+  EXPECT_FALSE(r);
+  EXPECT_EQ(0, latitude);
+  EXPECT_EQ(0, longitude);
+
+  r = string2coords("2, 4", latitude, longitude);
+  EXPECT_TRUE(r);
+  EXPECT_EQ(2, latitude);
+  EXPECT_EQ(4, longitude);
+
+  r = string2coords("                        2                , 4                 ", latitude, longitude);
+  EXPECT_TRUE(r);
+  EXPECT_EQ(2, latitude);
+  EXPECT_EQ(4, longitude);
+
+  r = string2coords("2.123, 4.12345", latitude, longitude);
+  EXPECT_TRUE(r);
+  EXPECT_EQ(2.123, latitude);
+  EXPECT_EQ(4.12345, longitude);
+}
+
+/* ****************************************************************************
+*
+* coords2string - 
+*/
+TEST(string, coords2string)
+{
+  std::string s;
+
+  coords2string(s, 0, 1, 0);
+  EXPECT_EQ(s, "0, 1");
+
+  coords2string(s, 0.123, 1.123, 3);
+  EXPECT_STREQ(s.c_str(), "0.123, 1.123");
 }
