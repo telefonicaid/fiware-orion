@@ -30,6 +30,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "orionTypes/areas.h"
 #include "ngsi/Request.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/EntityId.h"
@@ -38,6 +39,8 @@
 #include "xmlParse/XmlNode.h"
 #include "xmlParse/xmlQueryContextRequest.h"
 #include "xmlParse/xmlParse.h"
+
+using namespace orion;
 
 
 
@@ -132,7 +135,6 @@ static int operationScope(xml_node<>* node, ParseData* reqDataP)
   Scope* newScopeP = new Scope();
 
   LM_T(LmtParse, ("Got an operationScope"));
-  LM_M(("Creating a Scope (no %d)", reqDataP->qcr.res.restriction.scopeVector.size()));
   reqDataP->qcr.scopeP = newScopeP;
   reqDataP->qcr.res.restriction.scopeVector.push_back(reqDataP->qcr.scopeP);
 
@@ -161,9 +163,15 @@ static int scopeType(xml_node<>* node, ParseData* reqDataP)
 */
 static int scopeValue(xml_node<>* node, ParseData* reqData)
 {
-  if (reqData->qcr.scopeP->type == "FIWARE_Location")
+  if (reqData->qcr.scopeP->type == FIWARE_LOCATION)
   {
-    reqData->qcr.scopeP->value = "FIWARE_Location";
+    //
+    // If the scope type is 'FIWARE_Location', then the value of this scope is stored in 'circle' or 'polygon'.
+    // The field 'value' is not used as more complexity is needed.
+    // scopeP->value is here set to FIWARE_LOCATION, in an attempt to warn a future use of 'scopeP->value' when
+    // instead 'circle' or 'polygon' should be used.
+    //
+    reqData->qcr.scopeP->value = FIWARE_LOCATION;
     LM_T(LmtParse, ("Preparing scopeValue for '%s'", reqData->qcr.scopeP->type.c_str()));
   }
   else
@@ -184,7 +192,7 @@ static int scopeValue(xml_node<>* node, ParseData* reqData)
 static int circle(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circle"));
-  reqData->qcr.scopeP->areaType = AreaCircle;
+  reqData->qcr.scopeP->areaType = orion::CircleType;
   return 0;
 }
 
@@ -258,7 +266,7 @@ static int circleInverted(xml_node<>* node, ParseData* parseDataP)
 static int polygon(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygon"));
-  reqData->qcr.scopeP->areaType = AreaPolygon;
+  reqData->qcr.scopeP->areaType = orion::PolygonType;
   return 0;
 }
 
@@ -303,7 +311,7 @@ static int polygonVertexList(xml_node<>* node, ParseData* reqData)
 static int polygonVertex(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygonVertex - creating new vertex for the vertex list"));
-  reqData->qcr.vertexP = new ScopePoint();
+  reqData->qcr.vertexP = new orion::Point();
   reqData->qcr.scopeP->polygon.vertexList.push_back(reqData->qcr.vertexP);
   return 0;
 }

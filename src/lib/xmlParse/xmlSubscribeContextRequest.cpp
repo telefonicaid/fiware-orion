@@ -31,6 +31,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "orionTypes/areas.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/EntityId.h"
@@ -40,6 +41,7 @@
 #include "xmlParse/xmlParse.h"
 #include "xmlParse/xmlSubscribeContextRequest.h"
 
+using namespace orion;
 
 
 /* ****************************************************************************
@@ -157,9 +159,15 @@ static int scopeType(xml_node<>* node, ParseData* reqData)
 */
 static int scopeValue(xml_node<>* node, ParseData* reqData)
 {
-  if (reqData->scr.scopeP->type == "FIWARE_Location")
+  if (reqData->scr.scopeP->type == FIWARE_LOCATION)
   {
-    reqData->scr.scopeP->value = "FIWARE_Location";
+    //
+    // If the scope type is 'FIWARE_Location', then the value of this scope is stored in 'circle' or 'polygon'.
+    // The field 'value' is not used as more complexity is needed.
+    // scopeP->value is here set to FIWARE_LOCATION, in an attempt to warn a future use of 'scopeP->value' when
+    // instead 'circle' or 'polygon' should be used.
+    //
+    reqData->scr.scopeP->value = FIWARE_LOCATION;
     LM_T(LmtParse, ("Preparing scopeValue for '%s'", reqData->scr.scopeP->type.c_str()));
   }
   else
@@ -180,7 +188,7 @@ static int scopeValue(xml_node<>* node, ParseData* reqData)
 static int circle(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circle"));
-  reqData->scr.scopeP->areaType = AreaCircle;
+  reqData->scr.scopeP->areaType = orion::CircleType;
   return 0;
 }
 
@@ -254,7 +262,7 @@ static int circleInverted(xml_node<>* node, ParseData* parseDataP)
 static int polygon(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygon"));
-  reqData->scr.scopeP->areaType = AreaPolygon;
+  reqData->scr.scopeP->areaType = orion::PolygonType;
   return 0;
 }
 
@@ -300,7 +308,7 @@ static int polygonVertexList(xml_node<>* node, ParseData* reqData)
 static int polygonVertex(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygonVertex - creating new vertex for the vertex list"));
-  reqData->scr.vertexP = new ScopePoint();
+  reqData->scr.vertexP = new orion::Point();
   reqData->scr.scopeP->polygon.vertexList.push_back(reqData->scr.vertexP);
   return 0;
 }
@@ -470,11 +478,9 @@ std::string scrCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void scrPresent(ParseData* reqData)
 {
-  LM_M(("------------ presenting?"));
   if (!lmTraceIsSet(LmtDump))
     return;
 
-  LM_M(("------------ presenting"));
   reqData->scr.res.present("");
 }
 

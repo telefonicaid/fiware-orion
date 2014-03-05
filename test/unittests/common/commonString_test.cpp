@@ -350,7 +350,7 @@ TEST(string, string2coords)
 
 /* ****************************************************************************
 *
-* coords2string- 
+* coords2string - 
 */
 TEST(string, coords2string)
 {

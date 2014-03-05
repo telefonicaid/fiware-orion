@@ -29,11 +29,14 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "orionTypes/areas.h"
 #include "ngsi/EntityId.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "jsonParse/jsonNullTreat.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonSubscribeContextRequest.h"
+
+using namespace orion;
 
 
 
@@ -220,9 +223,15 @@ static std::string scopeType(std::string path, std::string value, ParseData* par
 */
 static std::string scopeValue(std::string path, std::string value, ParseData* parseDataP)
 {
-  if (parseDataP->scr.scopeP->type == "FIWARE_Location")
+  if (parseDataP->scr.scopeP->type == FIWARE_LOCATION)
   {
-    parseDataP->scr.scopeP->value = "FIWARE_Location";
+    //
+    // If the scope type is 'FIWARE_Location', then the value of this scope is stored in 'circle' or 'polygon'.
+    // The field 'value' is not used as more complexity is needed.
+    // scopeP->value is here set to FIWARE_LOCATION, in an attempt to warn a future use of 'scopeP->value' when
+    // instead 'circle' or 'polygon' should be used.
+    //
+    parseDataP->scr.scopeP->value = FIWARE_LOCATION;
     LM_T(LmtParse, ("Preparing scopeValue for '%s'", parseDataP->scr.scopeP->type.c_str()));
   }
   else
@@ -243,7 +252,7 @@ static std::string scopeValue(std::string path, std::string value, ParseData* pa
 static std::string circle(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a circle"));
-  parseDataP->scr.scopeP->areaType = AreaCircle;
+  parseDataP->scr.scopeP->areaType = orion::CircleType;
   return "OK";
 }
 
@@ -301,7 +310,7 @@ static std::string circleInverted(std::string path, std::string value, ParseData
 
   if (!isTrue(value) && !isFalse(value))
   {
-    LM_M(("bad string for circle/inverted: '%s'", value.c_str()));
+    LM_E(("bad string for circle/inverted: '%s'", value.c_str()));
     parseDataP->errorString = "bad string for circle/inverted: '" + value + "'";
     return parseDataP->errorString;
   }
@@ -318,7 +327,7 @@ static std::string circleInverted(std::string path, std::string value, ParseData
 static std::string polygon(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a polygon"));
-  parseDataP->scr.scopeP->areaType = AreaPolygon;
+  parseDataP->scr.scopeP->areaType = orion::PolygonType;
   return "OK";
 }
 
@@ -364,7 +373,7 @@ static std::string  polygonVertexList(std::string path, std::string value, Parse
 static std::string  polygonVertex(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a polygonVertex - creating new vertex for the vertex list"));
-  parseDataP->scr.vertexP = new ScopePoint();
+  parseDataP->scr.vertexP = new orion::Point();
   parseDataP->scr.scopeP->polygon.vertexList.push_back(parseDataP->scr.vertexP);
   return "OK";
 }

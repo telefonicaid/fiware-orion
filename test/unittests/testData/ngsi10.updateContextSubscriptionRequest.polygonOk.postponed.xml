@@ -2,15 +2,15 @@
 <updateContextSubscriptionRequest>
   <duration>P50Y</duration>
   <restriction>
-	  <attributeExpression>AttriTest</attributeExpression>
-	  <scope>
-	    <operationScope>
-		    <scopeType>st1</scopeType>
-		    <scopeValue>sv1</scopeValue>
-	    </operationScope>
-	    <operationScope>
-		    <scopeType>FIWARE_Location</scopeType>
-		    <scopeValue>
+    <attributeExpression>AttriTest</attributeExpression>
+    <scope>
+      <operationScope>
+        <scopeType>st1</scopeType>
+        <scopeValue>sv1</scopeValue>
+      </operationScope>
+      <operationScope>
+        <scopeType>FIWARE_Location</scopeType>
+        <scopeValue>
           <polygon>
             <vertexList>
               <vertex>
@@ -26,21 +26,20 @@
                 <latitude>220</latitude>
               </vertex>
             </vertexList>
-            <inverted>false</inverted>
           </polygon>
         </scopeValue>
-	    </operationScope>
-	  </scope>
+      </operationScope>
+    </scope>
   </restriction>
   <subscriptionId>111222333444555666777888</subscriptionId>
   <notifyConditions>
-	  <notifyCondition>
-	    <type>ONCHANGE</type>
-	    <condValueList>
-		    <condValue>CondValue3</condValue>
-		    <condValue>CondValue4</condValue>
-	    </condValueList>
-	  </notifyCondition>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>CondValue3</condValue>
+        <condValue>CondValue4</condValue>
+      </condValueList>
+    </notifyCondition>
   </notifyConditions>
   <throttling>P5Y</throttling>
 </updateContextSubscriptionRequest>

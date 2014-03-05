@@ -31,10 +31,13 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "orionTypes/areas.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "xmlParse/XmlNode.h"
 #include "xmlParse/xmlParse.h"
 #include "xmlParse/xmlUpdateContextSubscriptionRequest.h"
+
+using namespace orion;
 
 
 
@@ -102,9 +105,15 @@ static int scopeType(xml_node<>* node, ParseData* reqData)
 */
 static int scopeValue(xml_node<>* node, ParseData* reqData)
 {
-  if (reqData->ucsr.scopeP->type == "FIWARE_Location")
+  if (reqData->ucsr.scopeP->type == FIWARE_LOCATION)
   {
-    reqData->ucsr.scopeP->value = "FIWARE_Location";
+    //
+    // If the scope type is 'FIWARE_Location', then the value of this scope is stored in 'circle' or 'polygon'.
+    // The field 'value' is not used as more complexity is needed.
+    // scopeP->value is here set to FIWARE_LOCATION, in an attempt to warn a future use of 'scopeP->value' when
+    // instead 'circle' or 'polygon' should be used.
+    //
+    reqData->ucsr.scopeP->value = FIWARE_LOCATION;
     LM_T(LmtParse, ("Preparing scopeValue for '%s'", reqData->ucsr.scopeP->type.c_str()));
   }
   else
@@ -124,7 +133,7 @@ static int scopeValue(xml_node<>* node, ParseData* reqData)
 static int circle(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circle"));
-  reqData->ucsr.scopeP->areaType = AreaCircle;
+  reqData->ucsr.scopeP->areaType = orion::CircleType;
   return 0;
 }
 
@@ -179,6 +188,7 @@ static int circleInverted(xml_node<>* node, ParseData* parseDataP)
   LM_T(LmtParse, ("Got a circleInverted: %s", node->value()));
 
   parseDataP->ucsr.scopeP->circle.inverted = node->value();
+
   if (!isTrue(node->value()) && !isFalse(node->value()))
   {
     parseDataP->errorString = std::string("bad string for circle/inverted: '") + node->value() + "'";
@@ -197,7 +207,7 @@ static int circleInverted(xml_node<>* node, ParseData* parseDataP)
 static int polygon(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygon"));
-  reqData->ucsr.scopeP->areaType = AreaPolygon;
+  reqData->ucsr.scopeP->areaType = orion::PolygonType;
   return 0;
 }
 
@@ -242,7 +252,7 @@ static int polygonVertexList(xml_node<>* node, ParseData* reqData)
 static int polygonVertex(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygonVertex - creating new vertex for the vertex list"));
-  reqData->ucsr.vertexP = new ScopePoint();
+  reqData->ucsr.vertexP = new orion::Point();
   reqData->ucsr.scopeP->polygon.vertexList.push_back(reqData->ucsr.vertexP);
   return 0;
 }

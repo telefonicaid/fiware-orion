@@ -29,12 +29,13 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "orionTypes/areas.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "jsonParse/jsonNullTreat.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonUpdateContextSubscriptionRequest.h"
 
-
+using namespace orion;
 
 /* ****************************************************************************
 *
@@ -123,9 +124,15 @@ static std::string scopeType(std::string path, std::string value, ParseData* par
 */
 static std::string scopeValue(std::string path, std::string value, ParseData* parseDataP)
 {
-  if (parseDataP->ucsr.scopeP->type == "FIWARE_Location")
+  if (parseDataP->ucsr.scopeP->type == FIWARE_LOCATION)
   {
-    parseDataP->ucsr.scopeP->value = "FIWARE_Location";
+    //
+    // If the scope type is 'FIWARE_Location', then the value of this scope is stored in 'circle' or 'polygon'.
+    // The field 'value' is not used as more complexity is needed.
+    // scopeP->value is here set to FIWARE_LOCATION, in an attempt to warn a future use of 'scopeP->value' when
+    // instead 'circle' or 'polygon' should be used.
+    //
+    parseDataP->ucsr.scopeP->value = FIWARE_LOCATION;
     LM_T(LmtParse, ("Preparing scopeValue for '%s'", parseDataP->ucsr.scopeP->type.c_str()));
   }
   else
@@ -146,7 +153,7 @@ static std::string scopeValue(std::string path, std::string value, ParseData* pa
 static std::string circle(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a circle"));
-  parseDataP->ucsr.scopeP->areaType = AreaCircle;
+  parseDataP->ucsr.scopeP->areaType = orion::CircleType;
   return "OK";
 }
 
@@ -219,7 +226,7 @@ static std::string circleInverted(std::string path, std::string value, ParseData
 static std::string polygon(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a polygon"));
-  parseDataP->ucsr.scopeP->areaType = AreaPolygon;
+  parseDataP->ucsr.scopeP->areaType = orion::PolygonType;
   return "OK";
 }
 
@@ -264,7 +271,7 @@ static std::string polygonVertexList(std::string path, std::string value, ParseD
 static std::string polygonVertex(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a polygonVertex - creating new vertex for the vertex list"));
-  parseDataP->ucsr.vertexP = new ScopePoint();
+  parseDataP->ucsr.vertexP = new orion::Point();
   parseDataP->ucsr.scopeP->polygon.vertexList.push_back(parseDataP->ucsr.vertexP);
   return "OK";
 }

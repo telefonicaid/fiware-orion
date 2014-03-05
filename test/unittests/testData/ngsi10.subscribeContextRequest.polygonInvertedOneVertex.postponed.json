@@ -1,18 +1,18 @@
 {
-	"entities": [
-		{
-			"type": "Room",
-			"isPattern": "false",
-			"id": "ConferenceRoom"
-		}
-	],
-	"attributes": [
-		"lightstatus"
-	],
-	"reference": "127.0.0.1",
-	"duration": "P5Y",
-	"restriction": {
-		"attributeExpression": "testRestriction",
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    }
+  ],
+  "attributes": [
+    "lightstatus"
+  ],
+  "reference": "127.0.0.1",
+  "duration": "P5Y",
+  "restriction": {
+    "attributeExpression": "testRestriction",
     "scopes" : [
       {
         "type" : "TEST-TYPE",
@@ -33,17 +33,17 @@
         }
       }
     ]
-	},
-	"notifyConditions": [
-		{
-			"type": "ONTIMEINTERVAL",
-			"condValues": [
-				"temperature",
+  },
+  "notifyConditions": [
+    {
+      "type": "ONTIMEINTERVAL",
+      "condValues": [
+        "temperature",
         "lightstatus"
-			]
-			,
-			"restriction": "restriction"
-		}
-	],
-	"throttling": "P5Y"
+      ]
+      ,
+      "restriction": "restriction"
+    }
+  ],
+  "throttling": "P5Y"
 }

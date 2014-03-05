@@ -247,9 +247,8 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
   if (check != "OK")
      LM_E(("check(%s): %s", reqP->keyword.c_str(), check.c_str()));
 
-  LM_M(("------------ presenting"));
   reqP->present(parseDataP);
-  LM_M(("------------ presented"));
+
 
   // -----------------------------
   //

@@ -28,6 +28,7 @@
 #include <string>
 
 #include "common/Format.h"
+#include "orionTypes/areas.h"
 #include "ngsi/AttributeAssociation.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextRegistrationAttribute.h"
@@ -102,7 +103,7 @@ typedef struct QueryContextData
    QueryContextRequest  res;
    EntityId*            entityIdP;
    Scope*               scopeP;
-   ScopePoint*          vertexP;
+   orion::Point*        vertexP;
 } QueryContextData;
 
 
@@ -132,7 +133,7 @@ typedef struct SubscribeContextData
    Restriction*                   restrictionP;
    NotifyCondition*               notifyConditionP;
    Scope*                         scopeP;
-   ScopePoint*                    vertexP;
+   orion::Point*                  vertexP;
 } SubscribeContextData;
 
 
@@ -228,7 +229,7 @@ typedef struct UpdateContextSubscriptionData
   UpdateContextSubscriptionRequest  res;
   NotifyCondition*                  notifyConditionP;
   Scope*                            scopeP;
-  ScopePoint*                       vertexP;
+  orion::Point*                     vertexP;
 } UpdateContextSubscriptionData;
 
 

@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <time.h>
+#include <string>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
