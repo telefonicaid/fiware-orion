@@ -410,19 +410,26 @@ static void processEntitityPatternTrue(BSONArrayBuilder* arrayP, EntityId* enP) 
 */
 static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
 
+    unsigned int geoScopes = 0;
     for (unsigned int ix = 0; ix < scoV.size(); ++ix) {
-        Scope* sco = scoV.get(ix);
-        bool inverted = false;
-        if (sco->type == SCOPE_LOCATION) {
+        Scope* sco = scoV.get(ix);        
+
+        if (sco->type == FIWARE_LOCATION) {
+            geoScopes++;
+        }
+
+        if (geoScopes == 1) {
             // FIXME P2: current version only support one geolocation scope. If the client includes several ones,
             // only the first is taken into account
+            bool inverted = false;
+
             BSONObj geoWithin;
             if (sco->areaType== orion::CircleType) {
                 double radians = sco->circle.radius() / EARTH_RADIUS_METERS;
                 geoWithin = BSON("$centerSphere" << BSON_ARRAY(BSON_ARRAY( sco->circle.center.latitude() << sco->circle.center.longitude()) << radians ));
                 inverted = sco->circle.inverted();
             }
-            else {  // sco->scopeType == orion::PolygonType
+            else if (sco->areaType== orion::PolygonType) {
                 BSONArrayBuilder vertex;
                 double x0, y0;
                 for (unsigned int jx = 0; jx < sco->polygon.vertexList.size() ; ++jx) {
@@ -442,18 +449,23 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
 
                 inverted = sco->polygon.inverted();
             }
+            else {
+                LM_RE(false, ("unknown area type"));
+            }
+
             if (inverted) {
                 areaQuery = BSON("$not" << BSON("$geoWithin" << geoWithin));
             }
             else {
                 areaQuery = BSON("$geoWithin" << geoWithin);
             }
-
-            return true;
         }
     }
 
-    return false;
+    if (geoScopes > 1) {
+        LM_W(("current version supports only one area scope: %d were found, the first one was used", geoScopes));
+    }
+    return (geoScopes > 0);
 
 }
 
