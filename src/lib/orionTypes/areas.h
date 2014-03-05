@@ -67,7 +67,7 @@ typedef struct Circle
   ::std::string  radius; 
   ::std::string  inverted;
   bool           _inverted(void) { if ((inverted == "true") || (inverted == "1")) return true; return false; }
-  int            _radius(void)   { return atoi(radius.c_str()); }
+  double         _radius(void)   { return atof(radius.c_str()); }
 } Circle;
 
 /* ****************************************************************************
