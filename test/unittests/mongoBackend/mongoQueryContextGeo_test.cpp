@@ -38,11 +38,6 @@
 
 #include "mongo/client/dbclient.h"
 
-#include "commonMocks.h"
-
-using ::testing::_;
-using ::testing::Throw;
-
 /* ****************************************************************************
 *
 * Tests
