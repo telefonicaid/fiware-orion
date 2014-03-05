@@ -32,9 +32,10 @@
 #include "common/globals.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/EntityId.h"
+#include "parse/ComplexValueNode.h"
+#include "rest/ConnectionInfo.h"
 #include "xmlParse/XmlNode.h"
 #include "xmlParse/xmlParse.h"
-
 
 
 /* ****************************************************************************
@@ -48,9 +49,12 @@ const char* complexValueRootV[] =
 
 
 
-static bool isComplexValuePath(const char* path, char* root = NULL, char* rest = NULL)
+static bool isComplexValuePath(const char* path, char* root, char* rest)
 {
    unsigned int len;
+
+   root[0] = 0;
+   rest[0] = 0;
 
    for (unsigned int ix = 0; ix < sizeof(complexValueRootV) / sizeof(complexValueRootV[0]); ++ix)
    {
@@ -73,27 +77,46 @@ static bool isComplexValuePath(const char* path, char* root = NULL, char* rest =
    return false;
 }
 
-static void complexValuePath(const char* path, char* root, char* rest, xml_node<>* node)
-{
-  LM_M(("Got a part of doc-in-doc for '%s': '%s'. value: '%s'", root, rest, node->value()));
-}
-
 
 
 /* ****************************************************************************
 *
 * xmlParse - 
 */
-void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* parseVector, ParseData* reqDataP)
+void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* parseVector, ParseData* reqDataP)
 {
-  if (node == NULL)
-    return;
+  static orion::ComplexValueNode* container = NULL;
+  static int                      level     = 0;
 
-  if (node->name() == NULL)
-    return;
+  if ((node == NULL) || (node->name() == NULL))
+  {
+     LM_M(("NULL node/name for father '%s'", fatherPath.c_str()));
+     return;
+  }
 
   if (node->name()[0] == 0)
+  {
+    if (ciP->inComplexValue)
+    {
+      char root[1024];
+      char rest[1024];
+
+      isComplexValuePath(fatherPath.c_str(), root, rest);
+      if (rest[0] == 0)
+      {
+        LM_T(LmtComplexValue, ("******************** Complex value ends here (%s)", fatherPath.c_str()));
+        ciP->inComplexValue = false;
+        ciP->complexValueNode[ciP->complexValueNode.size() - 1]->show("");
+      }
+      else
+      {
+        container = container->container;
+        --level;
+        LM_T(LmtComplexValue, ("Complex part '%s' ends - new container is '%s', level %d", rest, container->path.c_str(), level));
+      }
+    }
     return;
+  }
 
   std::string path = fatherPath + "/" + node->name();
 
@@ -125,7 +148,42 @@ void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std
     char rest[256];
 
     if (isComplexValuePath(path.c_str(), root, rest))
-      complexValuePath(path.c_str(), root, rest, node);
+    {
+      if (ciP->inComplexValue == false)
+      {
+        LM_T(LmtComplexValue, ("-------------- Complex value starts here (%s)", root));
+
+        container = new orion::ComplexValueNode(root);
+        ciP->complexValueNode.push_back(container);
+        LM_T(LmtComplexValue, ("Created complexValueNode number %d", ciP->complexValueNode.size()));
+      }
+
+      ciP->inComplexValue = true;
+
+      if (node->value()[0] == 0)
+        LM_T(LmtComplexValue, ("Complex part: '%s'", rest));
+      else
+      {
+        orion::ComplexValueNode* cvNode;
+
+        if (strcmp(node->value(), " ") == 0)
+        {
+
+          LM_T(LmtComplexValue, ("Create Struct: '%s', father is '%s'", rest, container->path.c_str()));
+          cvNode = new orion::ComplexValueNode(container, rest, node->name(), node->value(), container->childV.size(), orion::ComplexValueNode::Struct, level);
+          container->add(cvNode);
+
+          container = cvNode;
+          ++level;
+        }
+        else
+        {
+           cvNode = new orion::ComplexValueNode(container, rest, node->name(), node->value(), container->childV.size(), orion::ComplexValueNode::Leaf, level);
+           container->add(cvNode);
+           LM_T(LmtComplexValue, ("Complex part: '%s', value '%s'", rest, node->value()));
+        }
+      }
+    }
     else
       LM_E(("Parse Error: unknown node '%s'", path.c_str(), node->name()));
   }
@@ -134,7 +192,7 @@ void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std
 
   while (child != NULL)
   {
-    xmlParse(node, child, indentation + "  ", path, parseVector, reqDataP);
+    xmlParse(ciP, node, child, indentation + "  ", path, parseVector, reqDataP);
     child = child->next_sibling();
   }
 }

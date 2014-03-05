@@ -57,6 +57,7 @@ typedef enum TraceLevels
   LmtTreat,
   LmtDump,
   LmtNullNode,
+  LmtComplexValue,
 
   /* RestService and Service (60-79) */
   LmtService     = 60,

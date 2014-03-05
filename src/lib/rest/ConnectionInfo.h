@@ -36,7 +36,7 @@
 #include "rest/mhd.h"
 #include "rest/Verb.h"
 #include "rest/HttpHeaders.h"
-
+#include "parse/ComplexValueNode.h"
 
 
 /* ****************************************************************************
@@ -57,6 +57,7 @@ public:
     fractioned            = false;
     callNo                = 1;
     requestEntityTooLarge = false;
+    inComplexValue        = false;
 
     memset(payloadWord, 0, sizeof(payloadWord));
 
@@ -83,6 +84,9 @@ public:
   bool                      fractioned;
   int                       callNo;
   bool                      requestEntityTooLarge;
+  bool                      inComplexValue;
+
+  ::std::vector<orion::ComplexValueNode*> complexValueNode;
 
   // Outgoing
   HttpStatusCode            httpStatusCode;

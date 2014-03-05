@@ -240,7 +240,7 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
     return "OK";
 
   reqP->init(parseDataP);
-  xmlParse(NULL, father, "", "", reqP->parseVector, parseDataP);
+  xmlParse(ciP, NULL, father, "", "", reqP->parseVector, parseDataP);
 
   std::string check = reqP->check(parseDataP, ciP);
   if (check != "OK")

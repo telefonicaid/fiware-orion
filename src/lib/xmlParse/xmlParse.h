@@ -30,6 +30,7 @@
 #include "XmlNode.h"
 
 #include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
 #include "xmlParse/XmlNode.h"
 
 
@@ -38,7 +39,7 @@
 *
 * xmlParse - 
 */
-extern void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* treatV, ParseData* reqData);
+extern void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* treatV, ParseData* reqData);
 
 
 
