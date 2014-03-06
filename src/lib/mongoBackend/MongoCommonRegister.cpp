@@ -27,9 +27,12 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "common/string.h"
 #include "common/globals.h"
 #include "common/statistics.h"
+#include "common/sem.h"
+
 #include "mongoBackend/MongoGlobal.h"
 
 
@@ -83,13 +86,21 @@ static bool processAssociations(MetadataVector mdV, std::string* err) {
         }
 
         BSONObj doc = BSON("_id" << name << ASSOC_SOURCE_ENT << srcEn << ASSOC_TARGET_ENT << tgtEn << ASSOC_ATTRS << attrs.arr());
+        LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getAssociationsCollectionName(), doc.toString().c_str()));
         try {
-            LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getAssociationsCollectionName(), doc.toString().c_str()));
+            mongoSemTake(__FUNCTION__, "insert into AssociationsCollection");
             connection->insert(getAssociationsCollectionName(), doc);
+            mongoSemGive(__FUNCTION__, "insert into AssociationsCollection");
         }
         catch( const DBException &e ) {
+            mongoSemGive(__FUNCTION__, "insert into AssociationsCollection (mongo db exception)");
             *err = e.what();
             LM_RE(false,("Database error '%s'", err->c_str()));
+        }
+        catch(...) {
+            mongoSemGive(__FUNCTION__, "insert into AssociationsCollection (mongo generic exception)");
+            *err = "Generic Exception from mongo";
+            LM_RE(false, ("Database error: '%s'", err->c_str()));
         }
     }
     return true;
@@ -114,8 +125,23 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
         //FIXME P8: see old issue #90
         //BSONObj sub = *(it->second);
         std::string mapSubId = it->first;
-        BSONObj sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << OID(mapSubId)));
+        BSONObj     sub;
+
+        try
+        {
+           mongoSemTake(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
+           sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << OID(mapSubId)));
+           mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
+        }
+        catch (...)
+        {
+           mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection (mongo generic exception)");
+           *err = "Generic Exception from mongo";
+           LM_RE(false, ("Database error: '%s'", err->c_str()));
+        }
+
         LM_T(LmtMongo, ("retrieved document: '%s'", sub.toString().c_str()));
+
         OID subId = sub.getField("_id").OID();
 
         /* Build attribute list vector */
@@ -133,7 +159,6 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
          * addTriggeredSubscriptions */
         attrL.release();
         delete it->second;
-
     }
 
     return ret;
@@ -182,7 +207,7 @@ static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONOb
     else {
         queryNoPattern.append(CASUB_ATTRS, BSON("$size" << 0));
     }
-    queryNoPattern.append(CASUB_EXPIRATION, BSON("$gt" << getCurrentTime()));
+    queryNoPattern.append(CASUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
 
     /* This is JavaScript code that runs in MongoDB engine. As far as I know, this is the only
      * way to do a "reverse regex" query in MongoDB (see
@@ -233,27 +258,41 @@ static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONOb
 
     BSONObjBuilder queryPattern;
     queryPattern.append(entPatternQ, "true");
-    queryPattern.append(CASUB_EXPIRATION, BSON("$gt" << getCurrentTime()));
+    queryPattern.append(CASUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
     queryPattern.appendCode("$where", function);
 
     BSONObj query = BSON("$or" << BSON_ARRAY(queryNoPattern.obj() << queryPattern.obj()));
 
     /* Do the query */
     auto_ptr<DBClientCursor> cursor;
+    LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextAvailabilityCollectionName(), query.toString().c_str()));
     try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextAvailabilityCollectionName(), query.toString().c_str()));
+        mongoSemTake(__FUNCTION__, "query in SubscribeContextAvailabilityCollection");
         cursor = connection->query(getSubscribeContextAvailabilityCollectionName(), query);
-        /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-         * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
-         * exception ourselves */
+
+        /*
+         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+         * exception ourselves
+         */
         if (cursor.get() == NULL) {
-            throw DBException("Null cursor", 0);
+            throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
+
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextAvailabilityCollection");
     }
     catch( const DBException &e ) {
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextAvailabilityCollection (mongo db exception)");
         *err = std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
                " - query(): " + query.toString() +
                " - exception: " + e.what();
+        return false;
+    }
+    catch(...) {
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextAvailabilityCollection (mongo generic exception)");
+        *err = std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
+               " - query(): " + query.toString() +
+               " - exception: " + "generic";
         return false;
     }
 
@@ -380,18 +419,30 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
     reg.append(REG_CONTEXT_REGISTRATION, contextRegistration.arr());
 
     BSONObj regDoc = reg.obj();
+    LM_T(LmtMongo, ("upsert update() in '%s' collection: '%s'", getRegistrationsCollectionName(), regDoc.toString().c_str()));
     try {
-        /* Note the four parameter to "true". This means "upsert", so if the document doesn't previously
-         * exist in colleciton, it is created at the same time. Thus, this way is ok with both uses of
+        mongoSemTake(__FUNCTION__, "update in RegistrationsCollection");
+        /* Note the fourth parameter is set to "true". This means "upsert", so if the document doesn't previously
+         * exist in the collection, it is created. Thus, this way is ok with both uses of
          * registerContext (either new registration or updating an existing one) */
-        LM_T(LmtMongo, ("upsert update() in '%s' collection: '%s'", getRegistrationsCollectionName(), regDoc.toString().c_str()));
         connection->update(getRegistrationsCollectionName(), BSON("_id" << oid), regDoc, true);
+        mongoSemGive(__FUNCTION__, "update in RegistrationsCollection");
     }
     catch( const DBException &e ) {
+        mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (DBException)");
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getRegistrationsCollectionName() +
                                   " - upsert update(): " + regDoc.toString() +
                                   " - exception: " + e.what());
+
+        LM_RE(SccOk,("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
+    }
+    catch(...) {
+        mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (Generic Exception)");
+        responseP->errorCode.fill(SccReceiverInternalError,
+                                  std::string("collection: ") + getRegistrationsCollectionName() +
+                                  " - upsert update(): " + regDoc.toString() +
+                                  " - exception: " + "generic");
 
         LM_RE(SccOk,("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
     }

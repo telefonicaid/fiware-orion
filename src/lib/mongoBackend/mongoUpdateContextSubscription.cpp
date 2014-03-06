@@ -42,39 +42,58 @@
 */
 HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* requestP, UpdateContextSubscriptionResponse* responseP, Format inFormat)
 {
-
-  /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-  semTake();
+  reqSemTake(__FUNCTION__, "ngsi10 update subscription request");
 
   LM_T(LmtMongo, ("Update Context Subscription"));
 
   DBClientConnection* connection = getMongoConnection();
 
   /* Look for document */
-  BSONObj sub;
+  BSONObj  sub;
   try {
       OID id = OID(requestP->subscriptionId.get());
 
+      mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
       sub = connection->findOne(getSubscribeContextCollectionName(), BSON("_id" << id));
-      if (sub.isEmpty()) {
-          responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
-          LM_SR(SccOk);
-      }
+      mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
   }
   catch( const AssertionException &e ) {
       /* This happens when OID format is wrong */
       // FIXME: this checking should be done at parsing stage, without progressing to
       // mongoBackend. By the moment we can live this here, but we should remove in the future
       // (old issue #95)
+      mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo assertion exception)");
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo assertion exception)");
+
       responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
-      LM_SR(SccOk);
+      return SccOk;
   }
   catch( const DBException &e ) {
+      mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo db exception)");
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo db exception)");
+
       responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                std::string("collection: ") + getSubscribeContextCollectionName() +
                                                " - findOne() _id: " + requestP->subscriptionId.get() +
                                                " - exception: " + e.what());
-      LM_SR(SccOk);
+      return SccOk;
+  }
+  catch(...) {
+      mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo generic exception)");
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo generic exception)");
+
+      responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
+                                               std::string("collection: ") + getSubscribeContextCollectionName() +
+                                               " - findOne() _id: " + requestP->subscriptionId.get() +
+                                               " - exception: " + "generic");
+      return SccOk;
+  }
+
+
+  if (sub.isEmpty()) {
+      responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (no subscriptions found)");
+      return SccOk;
   }
 
   /* We start with an empty BSONObjBuilder and process requestP for all the fields that can
@@ -94,13 +113,13 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
   newSub.append(CSUB_REFERENCE, STR_FIELD(sub, CSUB_REFERENCE));
 
   /* Duration update */
-  if (requestP->duration.isEmpty()) {
-      newSub.append(CSUB_EXPIRATION, sub.getIntField(CSUB_EXPIRATION));
+  if (requestP->duration.isEmpty()) {      
+      newSub.append(CSUB_EXPIRATION, sub.getField(CSUB_EXPIRATION).numberLong());
   }
   else {
-      int expiration = getCurrentTime() + requestP->duration.parse();
+      long long expiration = getCurrentTime() + requestP->duration.parse();
       newSub.append(CSUB_EXPIRATION, expiration);
-      LM_T(LmtMongo, ("New subscription expiration: %d", expiration));
+      LM_T(LmtMongo, ("New subscription expiration: %l", expiration));
   }
 
   /* Restriction update */
@@ -109,7 +128,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
   /* Throttling update */
   if (!requestP->throttling.isEmpty()) {
       /* Throttling equal to 0 removes throttling */
-      int throttling = requestP->throttling.parse();
+      long long throttling = requestP->throttling.parse();
       if (throttling != 0) {
           newSub.append(CSUB_THROTTLING, throttling);
       }
@@ -117,7 +136,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
   else {
       /* The hasField check is needed due to Throttling could not be present in the original doc */
       if (sub.hasField(CSUB_THROTTLING)) {
-          newSub.append(CSUB_THROTTLING, sub.getIntField(CSUB_THROTTLING));
+          newSub.append(CSUB_THROTTLING, sub.getField(CSUB_THROTTLING).numberLong());
       }
   }
 
@@ -176,16 +195,31 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
       LM_T(LmtMongo, ("update() in '%s' collection _id '%s': %s}", getSubscribeContextCollectionName(),
                          requestP->subscriptionId.get().c_str(),
                          update.toString().c_str()));
+      mongoSemTake(__FUNCTION__, "update in SubscribeContextCollection");
       connection->update(getSubscribeContextCollectionName(), BSON("_id" << OID(requestP->subscriptionId.get())), update);
+      mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection");
   }
   catch( const DBException &e ) {
+      mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo db exception)");
       responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                std::string("collection: ") + getSubscribeContextCollectionName() +
                                                " - update() _id: " + requestP->subscriptionId.get().c_str() +
                                                " - update() doc: " + update.toString() +
                                                " - exception: " + e.what());
 
-      LM_SR(SccOk);
+      return SccOk;
+  }
+  catch(...) {
+      mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo generic exception)");
+      responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
+                                               std::string("collection: ") + getSubscribeContextCollectionName() +
+                                               " - update() _id: " + requestP->subscriptionId.get().c_str() +
+                                               " - update() doc: " + update.toString() +
+                                               " - exception: " + "generic");
+
+      return SccOk;
   }
 
   /* Duration and throttling are optional parameters, they are only added in the case they
@@ -198,5 +232,6 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
   }  
   responseP->subscribeResponse.subscriptionId = requestP->subscriptionId;
 
-  LM_SR(SccOk);
+  reqSemGive(__FUNCTION__, "ngsi10 update subscription request");
+  return SccOk;
 }

@@ -34,10 +34,4 @@
 */
 extern void* startOnIntervalThread(void* params);
 
-/* ****************************************************************************
-*
-* recoverOntimeIntervalThreads -
-*/
-extern void recoverOntimeIntervalThreads();
-
 #endif

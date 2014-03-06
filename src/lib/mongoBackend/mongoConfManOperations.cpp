@@ -26,10 +26,10 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-#include "mongoBackend/MongoGlobal.h"
-#include "mongo/client/dbclient.h"
 
 #include "common/sem.h"
+#include "mongoBackend/MongoGlobal.h"
+#include "mongo/client/dbclient.h"
 
 using namespace mongo;
 
@@ -39,8 +39,7 @@ using namespace mongo;
 */
 void mongoSetFwdRegId(std::string regId, std::string fwdRegId)
 {
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
+    reqSemTake(__FUNCTION__, "Mongo Set Forward RegId");
 
     LM_T(LmtMongo, ("Mongo Set Forward RegId"));
 
@@ -51,15 +50,25 @@ void mongoSetFwdRegId(std::string regId, std::string fwdRegId)
         LM_T(LmtMongo, ("update() in '%s' collection doc _id '%s': %s",
                         getRegistrationsCollectionName(),
                         regId.c_str(), updateQuery.toString().c_str()));
+
+        mongoSemTake(__FUNCTION__, "update in RegistrationsCollection");
         connection->update(getRegistrationsCollectionName(), BSON("_id" << OID(regId)), updateQuery);
-        LM_SRV;
+        mongoSemGive(__FUNCTION__, "update in RegistrationsCollection");
     }
     catch( const DBException &e ) {
-        // FIXME: probably we can do something appart of printint the error, but currently
+        // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
-        LM_SRVE(("Database error '%s'", e.what()));
+        mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (mongo db exception)");
+        LM_E(("Database error '%s'", e.what()));
+    }
+    catch(...) {
+        // FIXME: probably we can do something apart of printing the error, but currently
+        // we haven't a use case for that
+        mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (mongo generic exception)");
+        LM_E(("Database error: '%s'", "generic exception"));
     }
 
+    reqSemGive(__FUNCTION__, "Mongo Set Forward RegId");
 }
 
 /* ****************************************************************************
@@ -68,9 +77,9 @@ void mongoSetFwdRegId(std::string regId, std::string fwdRegId)
 */
 std::string mongoGetFwdRegId(std::string regId)
 {
+    std::string retVal = "";
 
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
+    reqSemTake(__FUNCTION__, "Mongo Get Forward RegId");
 
     LM_T(LmtMongo, ("Mongo Get Forward RegId"));
 
@@ -78,15 +87,30 @@ std::string mongoGetFwdRegId(std::string regId)
 
     try {
         LM_T(LmtMongo, ("findOne() in '%s' collection doc _id '%s'", getRegistrationsCollectionName(), regId.c_str()));
-        BSONObj doc = connection->findOne(getRegistrationsCollectionName(), BSON("_id" << OID(regId)));
+        BSONObj doc;
+
+        mongoSemTake(__FUNCTION__, "findOne in RegistrationsCollection");
+        doc = connection->findOne(getRegistrationsCollectionName(), BSON("_id" << OID(regId)));
+        mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection");
+
         LM_T(LmtMongo, ("reg doc: '%s'", doc.toString().c_str()));
-        LM_SR(STR_FIELD(doc, REG_FWS_REGID));
+        retVal = STR_FIELD(doc, REG_FWS_REGID);
     }
     catch( const DBException &e ) {
-        // FIXME: probably we can do something appart of printing the error, but currently
+        // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
-        LM_SRE("",("Database error '%s'", e.what()));
+        mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection (mongo db exception)");
+        LM_E(("Database error '%s'", e.what()));
+    }
+    catch(...) {
+        // FIXME: probably we can do something apart of printing the error, but currently
+        // we haven't a use case for that
+        mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection (mongo generic exception)");
+        LM_E(("Database error: 'generic exception'"));
     }
 
+    reqSemGive(__FUNCTION__, "Mongo Get Forward RegId");
+
+    return retVal;
 }
 

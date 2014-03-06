@@ -65,16 +65,18 @@
 *
 * Globals
 */
-static unsigned short            port          = 0;
+static RestService*              restServiceV          = NULL;
+static unsigned short            port                  = 0;
+static RestServeFunction         serveFunction         = NULL;
+static bool                      acceptTextXml         = false;
 static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
 static char                      bindIPv6[MAX_LEN_IP]  = "::";
-static RestService*              restServiceV          = NULL;
+IpVersion                        ipVersionUsed         = IPDUAL;
+
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
-
-IpVersion                        ipVersionUsed         = IPDUAL;
 __thread char                    static_buffer[STATIC_BUFFER_SIZE];
 
 
@@ -199,6 +201,8 @@ static Format wantedOutputSupported(std::string acceptList, std::string* charset
      if (format == "application/json") return JSON;
      if (format == "*/json")           return JSON;
      
+     if ((acceptTextXml == true) && (format == "text/xml"))  return XML;
+
      // Here we put in cases for JSON, TEXT etc ...
 
 
@@ -301,6 +305,8 @@ static int contentTypeCheck(ConnectionInfo* ciP)
     details = "";
   else if (ciP->httpHeaders.contentType == "")
     details = "Content-Type header not used, default application/octet-stream is not supported";
+  else if ((acceptTextXml == true) && (ciP->httpHeaders.contentType == "text/xml"))
+    details = "";
   else if ((ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
      details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
 
@@ -417,7 +423,7 @@ static int connectionTreat
   else if (ciP->answer != "")
     restReply(ciP, ciP->answer);
   else
-    serve(ciP);
+    serveFunction(ciP);
 
   return MHD_YES;
 }
@@ -507,12 +513,18 @@ static int restStart(IpVersion ipVersion)
 /* ****************************************************************************
 *
 * restInit - 
+*
+* FIXME P5: add vector of the accepted content-types, instead of the bool
+*           argument _acceptTextXml that was added for iotAgent only.
+*           See Issue #256
 */
-void restInit(RestService* _restServiceV, IpVersion _ipVersion, const char* _bindAddress, unsigned short _port)
+void restInit(RestService* _restServiceV, IpVersion _ipVersion, const char* _bindAddress, unsigned short _port, RestServeFunction _serveFunction, bool _acceptTextXml)
 {
   port          = _port;
   restServiceV  = _restServiceV;
   ipVersionUsed = _ipVersion;
+  serveFunction = (_serveFunction != NULL)? _serveFunction : serve;
+  acceptTextXml = _acceptTextXml;
 
   strncpy(bindIp, LOCAL_IP_V4, MAX_LEN_IP - 1);
   strncpy(bindIPv6, LOCAL_IP_V6, MAX_LEN_IP - 1);

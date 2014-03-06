@@ -26,8 +26,8 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-#include "common/sem.h"
 #include "common/statistics.h"
+#include "common/sem.h"
 #include "mongoBackend/mongoDiscoverContextAvailability.h"
 #include "rest/HttpStatusCode.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -84,19 +84,34 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
     auto_ptr<DBClientCursor> cursor;
     try {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getAssociationsCollectionName(), query.toString().c_str()));
+
+        mongoSemTake(__FUNCTION__, "query in AssociationsCollection");
         cursor = connection->query(getAssociationsCollectionName(), query);
-        /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-         * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
-         * exception ourselves */
+
+        /*
+         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+         * exception ourselves
+         */
         if (cursor.get() == NULL) {
-            throw DBException("Null cursor", 0);
+            throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
+        mongoSemGive(__FUNCTION__, "query in AssociationsCollection");
     }
     catch( const DBException &e ) {
 
+        mongoSemGive(__FUNCTION__, "query in AssociationsCollection (DBException)");
         *err = std::string("collection: ") + getAssociationsCollectionName() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
+        return false;
+    }
+    catch(...) {
+
+        mongoSemGive(__FUNCTION__, "query in AssociationsCollection (Generic Exception)");
+        *err = std::string("collection: ") + getAssociationsCollectionName() +
+                " - query(): " + query.toString() +
+                " - exception: " + "generic";
         return false;
     }
 
@@ -130,12 +145,9 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
         }
 
         mdV->push_back(md);
-
     }
 
     return true;
-
-
 }
 
 /* ****************************************************************************
@@ -231,8 +243,7 @@ static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAva
 */
 HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP)
 {
-  /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-  semTake();
+  reqSemTake(__FUNCTION__, "mongo ngsi9 discovery request");
 
   LM_T(LmtMongo, ("DiscoverContextAvailability Request"));  
 
@@ -249,7 +260,8 @@ HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityReque
 
     if (scopeType == SCOPE_TYPE_ASSOC) {
       HttpStatusCode ms = associationsDiscoverConvextAvailability(requestP, responseP, scopeValue);
-      LM_SR(ms);
+      reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request (association)");
+      return ms;
     }
     else {
       LM_W(("Unsupported scope (%s, %s), doing conventional discoverContextAvailability", scopeType.c_str(), scopeValue.c_str()));
@@ -260,5 +272,6 @@ HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityReque
   if (hsCode != SccOk)
     ++noOfDiscoveryErrors;
 
-  LM_SR(hsCode);
+  reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request");
+  return hsCode;
 }
