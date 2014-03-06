@@ -44,7 +44,7 @@ payload='{
     {
       "name" : "pressure",
       "type" : "clima",
-      "contextValue" : "p23"
+      "value" : "p23"
     }
   ]
 }'
@@ -59,7 +59,7 @@ payload='{
     {
       "name" : "temperature",
       "type" : "degree",
-      "contextValue" : "10"
+      "value" : "10"
     }
   ]
 }'
@@ -109,7 +109,7 @@ payload='{
     {
       "name" : "pressure",
       "type" : "clima",
-      "contextValue" : "p23"
+      "value" : "p23"
     }
   ]
 }'
@@ -124,7 +124,7 @@ payload='{
     {
       "name" : "temperature",
       "type" : "degree",
-      "contextValue" : "10"
+      "value" : "10"
     }
   ]
 }'
