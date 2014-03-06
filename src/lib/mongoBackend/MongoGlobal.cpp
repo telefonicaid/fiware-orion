@@ -278,11 +278,19 @@ const char* getAssociationsCollectionName(void) {
 
 /*****************************************************************************
 *
+* mongoLocationCapable -
+*/
+bool mongoLocationCapable() {
+    return (mongoVersionMayor >= 2 && mongoVersionMinor >= 4);
+}
+
+/*****************************************************************************
+*
 * ensureLocationIndex -
 */
 void ensureLocationIndex() {
     /* Ensure index for entity locations, in the case of using 2.4 */
-    if (mongoVersionMayor >= 2 && mongoVersionMinor >= 4) {
+    if (mongoLocationCapable()) {
         std::string index = std::string(ENT_LOCATION) + "." + ENT_LOCATION_COORDS;
         connection->ensureIndex(getEntitiesCollectionName(), BSON(index << "2dsphere" ));
         LM_M(("ensuring 2dsphere index on %s", index.c_str()));
@@ -484,6 +492,12 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
         }
 
         if (geoScopes == 1) {
+
+            if (!mongoLocationCapable()) {
+                LM_W(("location scope was found but your MongoDB version doesn't support it. Please upgrade MongoDB server to 2.4"));
+                return false;
+            }
+
             // FIXME P2: current version only support one geolocation scope. If the client includes several ones,
             // only the first is taken into account
             bool inverted = false;
