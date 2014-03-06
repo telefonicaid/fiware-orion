@@ -582,6 +582,8 @@ static void mongoInit(const char* dbHost, std::string dbName, const char* user, 
   setSubscribeContextCollectionName(dbName + ".csubs");
   setSubscribeContextAvailabilityCollectionName(dbName + ".casubs");
   setAssociationsCollectionName(dbName + ".associations");
+
+  ensureLocationIndex();
 }
 
 

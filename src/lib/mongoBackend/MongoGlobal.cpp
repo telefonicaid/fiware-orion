@@ -276,6 +276,19 @@ const char* getAssociationsCollectionName(void) {
     return assocationsCollectionName;
 }
 
+/*****************************************************************************
+*
+* ensureLocationIndex -
+*/
+void ensureLocationIndex() {
+    /* Ensure index for entity locations, in the case of using 2.4 */
+    if (mongoVersionMayor >= 2 && mongoVersionMinor >= 4) {
+        std::string index = std::string(ENT_LOCATION) + "." + ENT_LOCATION_COORDS;
+        connection->ensureIndex(getEntitiesCollectionName(), BSON(index << "2dsphere" ));
+        LM_M(("ensuring 2dsphere index on %s", index.c_str()));
+    }
+}
+
 /* ****************************************************************************
 *
 * recoverOntimeIntervalThreads -

@@ -219,6 +219,12 @@ extern const char* getSubscribeContextAvailabilityCollectionName(void);
 */
 extern const char* getAssociationsCollectionName(void);
 
+/*****************************************************************************
+*
+* ensureLocationIndex -
+*/
+void ensureLocationIndex();
+
 /* ****************************************************************************
 *
 * recoverOntimeIntervalThreads -
