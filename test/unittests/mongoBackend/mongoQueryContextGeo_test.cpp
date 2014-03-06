@@ -68,7 +68,7 @@ static void prepareDatabase(void) {
 
   DBClientConnection* connection = getMongoConnection();
 
-  connection->ensureIndex("tutorial.persons", BSON("location.coords" << "2dsphere" ));
+  connection->ensureIndex("unittest.entities", BSON("location.coords" << "2dsphere" ));
 
   BSONObj A = BSON("_id" << BSON("id" << "A" << "type" << "Point") <<
                      "attrs" << BSON_ARRAY(
@@ -137,6 +137,22 @@ static void prepareDatabase(void) {
 
 }
 
+
+
+/* ****************************************************************************
+*
+* getEntityIndex -
+*
+*/
+int getEntityIndex(ContextElementResponseVector& v, std::string id) {
+    for (unsigned int ix = 0; ix < v.size(); ++ix) {
+        if (v.get(ix)->contextElement.entityId.id == id) {
+            return ix;
+        }
+    }
+    return -1;
+}
+
 /* ****************************************************************************
 *
 * queryGeoCircleIn1 -
@@ -180,35 +196,41 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
+    int i;
+
     /* Context Element response # 1 */
-    EXPECT_EQ("Madrid", RES_CER(0).entityId.id);
-    EXPECT_EQ("City", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("pos", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("40.418889, -3.691944", RES_CER_ATTR(0, 0)->value);
-    EXPECT_EQ("foo", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("attr_Mad", RES_CER_ATTR(0, 1)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    i = getEntityIndex(res.contextElementResponseVector, "Madrid");
+    ASSERT_TRUE(i >= 0);
+    EXPECT_EQ("Madrid", RES_CER(i).entityId.id);
+    EXPECT_EQ("City", RES_CER(i).entityId.type);
+    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
+    EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
+    EXPECT_EQ("40.418889, -3.691944", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
+    EXPECT_EQ("attr_Mad", RES_CER_ATTR(i, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(i).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(i).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(i).details.size());
 
     /* Context Element response # 2 */
-    EXPECT_EQ("Leganes", RES_CER(1).entityId.id);
-    EXPECT_EQ("City", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
-    EXPECT_EQ("pos", RES_CER_ATTR(1, 0)->name);
-    EXPECT_EQ("location", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("40.316667, -3.75", RES_CER_ATTR(1, 0)->value);
-    EXPECT_EQ("foo", RES_CER_ATTR(1, 1)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(1, 1)->type);
-    EXPECT_EQ("attr_Leg", RES_CER_ATTR(1, 1)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+    i = getEntityIndex(res.contextElementResponseVector, "Leganes");
+    ASSERT_TRUE(i >= 0);
+    EXPECT_EQ("Leganes", RES_CER(i).entityId.id);
+    EXPECT_EQ("City", RES_CER(i).entityId.type);
+    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
+    EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
+    EXPECT_EQ("40.316667, -3.75", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
+    EXPECT_EQ("attr_Leg", RES_CER_ATTR(i, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(i).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(i).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(i).details.size());
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
@@ -262,50 +284,58 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(3, res.contextElementResponseVector.size());
+    int i;
     /* Context Element response # 1 */
-    EXPECT_EQ("Madrid", RES_CER(0).entityId.id);
-    EXPECT_EQ("City", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("pos", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("40.418889, -3.691944", RES_CER_ATTR(0, 0)->value);
-    EXPECT_EQ("foo", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("attr_Mad", RES_CER_ATTR(0, 1)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+    i = getEntityIndex(res.contextElementResponseVector, "Madrid");
+    ASSERT_TRUE(i >= 0);
+    EXPECT_EQ("Madrid", RES_CER(i).entityId.id);
+    EXPECT_EQ("City", RES_CER(i).entityId.type);
+    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
+    EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
+    EXPECT_EQ("40.418889, -3.691944", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
+    EXPECT_EQ("attr_Mad", RES_CER_ATTR(i, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(i).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(i).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(i).details.size());
 
     /* Context Element response # 2 */
-    EXPECT_EQ("Alcobendas", RES_CER(1).entityId.id);
-    EXPECT_EQ("City", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
-    EXPECT_EQ("pos", RES_CER_ATTR(1, 0)->name);
-    EXPECT_EQ("location", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("40.533333, -3.633333", RES_CER_ATTR(1, 0)->value);
-    EXPECT_EQ("foo", RES_CER_ATTR(1, 1)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(1, 1)->type);
-    EXPECT_EQ("attr_Alc", RES_CER_ATTR(1, 1)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+    i = getEntityIndex(res.contextElementResponseVector, "Alcobendas");
+    ASSERT_TRUE(i >= 0);
+    EXPECT_EQ("Alcobendas", RES_CER(i).entityId.id);
+    EXPECT_EQ("City", RES_CER(i).entityId.type);
+    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
+    EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
+    EXPECT_EQ("40.533333, -3.633333", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
+    EXPECT_EQ("attr_Alc", RES_CER_ATTR(i, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(i).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(i).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(i).details.size());
 
     /* Context Element response # 3 */
-    EXPECT_EQ("Leganes", RES_CER(2).entityId.id);
-    EXPECT_EQ("City", RES_CER(2).entityId.type);
-    EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(2).contextAttributeVector.size());
-    EXPECT_EQ("pos", RES_CER_ATTR(2, 0)->name);
-    EXPECT_EQ("location", RES_CER_ATTR(2, 0)->type);
-    EXPECT_EQ("40.316667, -3.75", RES_CER_ATTR(2, 0)->value);
-    EXPECT_EQ("foo", RES_CER_ATTR(2, 1)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(2, 1)->type);
-    EXPECT_EQ("attr_Leg", RES_CER_ATTR(2, 1)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
+    i = getEntityIndex(res.contextElementResponseVector, "Leganes");
+    ASSERT_TRUE(i >= 0);
+    EXPECT_EQ("Leganes", RES_CER(i).entityId.id);
+    EXPECT_EQ("City", RES_CER(i).entityId.type);
+    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
+    EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
+    EXPECT_EQ("40.316667, -3.75", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
+    EXPECT_EQ("attr_Leg", RES_CER_ATTR(i, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(i).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(i).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(i).details.size());
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
@@ -360,20 +390,24 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
+    int i;
+
     /* Context Element response # 1 */
-    EXPECT_EQ("Alcobendas", RES_CER(0).entityId.id);
-    EXPECT_EQ("City", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("pos", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("40.533333, -3.633333", RES_CER_ATTR(0, 0)->value);
-    EXPECT_EQ("foo", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("attr_Alc", RES_CER_ATTR(0, 1)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    i = getEntityIndex(res.contextElementResponseVector, "Alcobendas");
+    ASSERT_TRUE(i >= 0);
+    EXPECT_EQ("Alcobendas", RES_CER(i).entityId.id);
+    EXPECT_EQ("City", RES_CER(i).entityId.type);
+    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
+    EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
+    EXPECT_EQ("40.533333, -3.633333", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
+    EXPECT_EQ("attr_Alc", RES_CER_ATTR(i, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(i).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(i).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(i).details.size());
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
@@ -429,35 +463,41 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn1)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
+    int i;
+
     /* Context Element response # 1 */
-    EXPECT_EQ("A", RES_CER(0).entityId.id);
-    EXPECT_EQ("Point", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("pos", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("3, 2", RES_CER_ATTR(0, 0)->value);
-    EXPECT_EQ("foo", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("attr_A", RES_CER_ATTR(0, 1)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    i = getEntityIndex(res.contextElementResponseVector, "A");
+    ASSERT_TRUE(i >= 0);
+    EXPECT_EQ("A", RES_CER(i).entityId.id);
+    EXPECT_EQ("Point", RES_CER(i).entityId.type);
+    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
+    EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
+    EXPECT_EQ("3, 2", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
+    EXPECT_EQ("attr_A", RES_CER_ATTR(i, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(i).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(i).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(i).details.size());
 
     /* Context Element response # 2 */
-    EXPECT_EQ("B", RES_CER(1).entityId.id);
-    EXPECT_EQ("Point", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
-    EXPECT_EQ("pos", RES_CER_ATTR(1, 0)->name);
-    EXPECT_EQ("location", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("5, 5", RES_CER_ATTR(1, 0)->value);
-    EXPECT_EQ("foo", RES_CER_ATTR(1, 1)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(1, 1)->type);
-    EXPECT_EQ("attr_B", RES_CER_ATTR(1, 1)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+    i = getEntityIndex(res.contextElementResponseVector, "B");
+    ASSERT_TRUE(i >= 0);
+    EXPECT_EQ("B", RES_CER(i).entityId.id);
+    EXPECT_EQ("Point", RES_CER(i).entityId.type);
+    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
+    EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
+    EXPECT_EQ("5, 5", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
+    EXPECT_EQ("attr_B", RES_CER_ATTR(i, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(i).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(i).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(i).details.size());
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
@@ -513,35 +553,41 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn2)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
+    int i;
+
     /* Context Element response # 1 */
-    EXPECT_EQ("B", RES_CER(0).entityId.id);
-    EXPECT_EQ("Point", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("pos", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("5, 5", RES_CER_ATTR(0, 0)->value);
-    EXPECT_EQ("foo", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("attr_B", RES_CER_ATTR(0, 1)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    i = getEntityIndex(res.contextElementResponseVector, "B");
+    ASSERT_TRUE(i >= 0);
+    EXPECT_EQ("B", RES_CER(i).entityId.id);
+    EXPECT_EQ("Point", RES_CER(i).entityId.type);
+    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
+    EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
+    EXPECT_EQ("5, 5", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
+    EXPECT_EQ("attr_B", RES_CER_ATTR(i, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(i).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(i).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(i).details.size());
 
     /* Context Element response # 2 */
-    EXPECT_EQ("C", RES_CER(1).entityId.id);
-    EXPECT_EQ("Point", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
-    EXPECT_EQ("pos", RES_CER_ATTR(1, 0)->name);
-    EXPECT_EQ("location", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("7, 4", RES_CER_ATTR(1, 0)->value);
-    EXPECT_EQ("foo", RES_CER_ATTR(1, 1)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(1, 1)->type);
-    EXPECT_EQ("attr_C", RES_CER_ATTR(1, 1)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+    i = getEntityIndex(res.contextElementResponseVector, "C");
+    ASSERT_TRUE(i >= 0);
+    EXPECT_EQ("C", RES_CER(i).entityId.id);
+    EXPECT_EQ("Point", RES_CER(i).entityId.type);
+    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
+    EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
+    EXPECT_EQ("7, 4", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
+    EXPECT_EQ("attr_C", RES_CER_ATTR(i, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(i).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(i).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(i).details.size());
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
@@ -596,20 +642,24 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn3)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
+    int i;
+
     /* Context Element response # 1 */
-    EXPECT_EQ("A", RES_CER(0).entityId.id);
-    EXPECT_EQ("Point", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("pos", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("3, 2", RES_CER_ATTR(0, 0)->value);
-    EXPECT_EQ("foo", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("attr_A", RES_CER_ATTR(0, 1)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    i = getEntityIndex(res.contextElementResponseVector, "A");
+    ASSERT_TRUE(i >= 0);
+    EXPECT_EQ("A", RES_CER(i).entityId.id);
+    EXPECT_EQ("Point", RES_CER(i).entityId.type);
+    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
+    EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
+    EXPECT_EQ("3, 2", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
+    EXPECT_EQ("attr_A", RES_CER_ATTR(i, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(i).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(i).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(i).details.size());
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
@@ -666,20 +716,24 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut1)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
+    int i;
+
     /* Context Element response # 1 */
-    EXPECT_EQ("A", RES_CER(0).entityId.id);
-    EXPECT_EQ("Point", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("pos", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("3, 2", RES_CER_ATTR(0, 0)->value);
-    EXPECT_EQ("foo", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("attr_A", RES_CER_ATTR(0, 1)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    i = getEntityIndex(res.contextElementResponseVector, "A");
+    ASSERT_TRUE(i >= 0);
+    EXPECT_EQ("A", RES_CER(i).entityId.id);
+    EXPECT_EQ("Point", RES_CER(i).entityId.type);
+    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
+    EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
+    EXPECT_EQ("3, 2", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
+    EXPECT_EQ("attr_A", RES_CER_ATTR(i, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(i).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(i).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(i).details.size());
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
@@ -735,35 +789,41 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut2)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
+    int i;
+
     /* Context Element response # 1 */
-    EXPECT_EQ("B", RES_CER(0).entityId.id);
-    EXPECT_EQ("Point", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("pos", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("5, 5", RES_CER_ATTR(0, 0)->value);
-    EXPECT_EQ("foo", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("attr_B", RES_CER_ATTR(0, 1)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    i = getEntityIndex(res.contextElementResponseVector, "B");
+    ASSERT_TRUE(i >= 0);
+    EXPECT_EQ("B", RES_CER(i).entityId.id);
+    EXPECT_EQ("Point", RES_CER(i).entityId.type);
+    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
+    EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
+    EXPECT_EQ("5, 5", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
+    EXPECT_EQ("attr_B", RES_CER_ATTR(i, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(i).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(i).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(i).details.size());
 
     /* Context Element response # 2 */
-    EXPECT_EQ("C", RES_CER(1).entityId.id);
-    EXPECT_EQ("Point", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
-    EXPECT_EQ("pos", RES_CER_ATTR(1, 0)->name);
-    EXPECT_EQ("location", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("7, 4", RES_CER_ATTR(1, 0)->value);
-    EXPECT_EQ("foo", RES_CER_ATTR(1, 1)->name);
-    EXPECT_EQ("string", RES_CER_ATTR(1, 1)->type);
-    EXPECT_EQ("attr_C", RES_CER_ATTR(1, 1)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+    i = getEntityIndex(res.contextElementResponseVector, "C");
+    ASSERT_TRUE(i >= 0);
+    EXPECT_EQ("C", RES_CER(i).entityId.id);
+    EXPECT_EQ("Point", RES_CER(i).entityId.type);
+    EXPECT_EQ("false", RES_CER(i).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
+    EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
+    EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
+    EXPECT_EQ("7, 4", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
+    EXPECT_EQ("attr_C", RES_CER_ATTR(i, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(i).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(i).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(i).details.size());
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();

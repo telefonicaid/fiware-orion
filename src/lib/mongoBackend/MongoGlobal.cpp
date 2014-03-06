@@ -65,7 +65,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
 
     std::string err;
 
-    mongoSemTake(__FUNCTION__, "connecting to mongo");
+    mongoSemTake(__FUNCTION__, "connecting to mongo");   
 
     /* The first argument to true is to use autoreconnect */
     connection = new DBClientConnection(true);
@@ -81,6 +81,10 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
             LM_RE(false, ("Auth error (db=%s, username=%s, pswd=%s): %s", db, username, passwd, err.c_str()));
         }
     }
+
+    /* Get mongo version with the 'buildinfo' command */
+
+    /* Ensure index for entity locations, in the case of using 2.4 */
 
     mongoSemGive(__FUNCTION__, "connecting to mongo");
     return true;
