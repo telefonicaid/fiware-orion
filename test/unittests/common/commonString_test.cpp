@@ -387,5 +387,4 @@ TEST(string, versionParse)
 
   r = versionParse("wrong version", mayor, minor, bugFix);
   EXPECT_FALSE(r);
-
 }
