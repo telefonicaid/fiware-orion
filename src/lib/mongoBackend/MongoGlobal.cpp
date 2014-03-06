@@ -68,7 +68,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
 
     std::string err;
 
-    mongoSemTake(__FUNCTION__, "connecting to mongo");   
+    mongoSemTake(__FUNCTION__, "connecting to mongo");
 
     /* The first argument to true is to use autoreconnect */
     connection = new DBClientConnection(true);
