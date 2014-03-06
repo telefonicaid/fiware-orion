@@ -301,7 +301,7 @@ TEST(commonString, i2s)
   char* p;
   
   p = i2s(19, ph);
-  EXPECT_STREQ(p, "19");
+  EXPECT_STREQ("19", p);
 }
 
 /* ****************************************************************************
@@ -314,7 +314,7 @@ TEST(string, parsedUptime)
 
   // 3 days, 4 hours, 5 min and 6 seconds
   uptime = parsedUptime(3 * (24 * 3600) + 4 * 3600 + 5 * 60 + 6);
-  EXPECT_EQ(uptime, "3 d, 4 h, 5 m, 6 s");
+  EXPECT_EQ("3 d, 4 h, 5 m, 6 s", uptime);
 }
 
 /* ****************************************************************************
@@ -357,8 +357,35 @@ TEST(string, coords2string)
   std::string s;
 
   coords2string(s, 0, 1, 0);
-  EXPECT_EQ(s, "0, 1");
+  EXPECT_EQ("0, 1", s);
 
   coords2string(s, 0.123, 1.123, 3);
-  EXPECT_STREQ(s.c_str(), "0.123, 1.123");
+  EXPECT_STREQ("0.123, 1.123", s.c_str());
+}
+
+/* ****************************************************************************
+*
+* coords2string -
+*/
+TEST(string, versionParse)
+{
+  bool r;
+  std::string bugFix;
+  int mayor, minor;
+
+  r = versionParse("2.4.5-rc", mayor, minor, bugFix);
+  EXPECT_TRUE(r);
+  EXPECT_EQ(2, mayor);
+  EXPECT_EQ(4, minor);
+  EXPECT_EQ("5-rc", bugFix);
+
+  r = versionParse("2.4", mayor, minor, bugFix);
+  EXPECT_TRUE(r);
+  EXPECT_EQ(2, mayor);
+  EXPECT_EQ(4, minor);
+  EXPECT_EQ("", bugFix);
+
+  r = versionParse("wrong version", mayor, minor, bugFix);
+  EXPECT_FALSE(r);
+
 }

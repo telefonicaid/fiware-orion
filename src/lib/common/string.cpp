@@ -366,3 +366,72 @@ void coords2string(std::string& s, double latitude, double longitude, int decima
 
   s = buf;
 }
+
+/* ****************************************************************************
+*
+* versionParse -
+*/
+bool versionParse(std::string version, int& mayor, int& minor, std::string& extra)
+{
+   char* copy = strdup(version.c_str());
+   char* s    = wsStrip(copy);
+   char* dotP;
+
+
+   //
+   // mayor number
+   //
+   dotP = strchr(s, '.');
+   if (dotP == NULL)
+   {
+      free(copy);
+      return false;
+   }
+
+   *dotP = 0;
+   ++dotP;
+
+   s = wsStrip(s);
+   mayor = atoi(s);
+   if (strspn(s, "0123456789") != strlen(s))
+   {
+      free(copy);
+      return false;
+   }
+   s = dotP;
+
+
+   //
+   // minor number
+   //
+   dotP = strchr(s, '.');
+   if (dotP == NULL)
+   {
+      free(copy);
+      return false;
+   }
+
+   *dotP = 0;
+   ++dotP;
+
+   s = wsStrip(s);
+   minor = atoi(s);
+   if (strspn(s, "0123456789") != strlen(s))
+   {
+      free(copy);
+      return false;
+   }
+
+   s = dotP;
+
+
+
+   //
+   // bugfix
+   //
+   s = wsStrip(s);
+   extra = s;
+
+   free(copy);
+   return true;
+}

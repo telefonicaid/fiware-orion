@@ -72,4 +72,10 @@ extern bool string2coords(std::string s, double& latitude, double& longitude);
 */
 extern void coords2string(std::string& s, double latitude, double longitude, int decimals = 6);
 
+/* ****************************************************************************
+*
+* versionParse -
+*/
+bool versionParse(std::string version, int& mayor, int& minor, std::string& extra);
+
 #endif

@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "common/sem.h"
+#include "common/string.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoOntimeintervalOperations.h"
@@ -50,6 +51,8 @@ using namespace mongo;
 * Globals
 */
 static DBClientConnection*  connection;
+static int                  mongoVersionMayor = -1;
+static int                  mongoVersionMinor = -1;
 static char*                entitiesCollectionName                      = NULL;
 static char*                registrationsCollectionName                 = NULL;
 static char*                subscribeContextCollectionName              = NULL;
@@ -83,8 +86,15 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
     }
 
     /* Get mongo version with the 'buildinfo' command */
-
-    /* Ensure index for entity locations, in the case of using 2.4 */
+    BSONObj result;
+    std::string extra;
+    connection->runCommand("admin", BSON("buildinfo" << 1), result);
+    std::string versionString = std::string(result.getStringField("version"));
+    if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra)) {
+        mongoSemGive(__FUNCTION__, "wrong mongo version format");
+        LM_RE(false, ("wrong mongo version format: <%s>", versionString.c_str()));
+    }
+    LM_M(("mongo version server: %s (mayor: %d, minor: %d, extra: %s)", versionString.c_str(), mongoVersionMayor, mongoVersionMinor, extra.c_str()));
 
     mongoSemGive(__FUNCTION__, "connecting to mongo");
     return true;
