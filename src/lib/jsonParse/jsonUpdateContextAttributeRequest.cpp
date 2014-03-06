@@ -123,7 +123,7 @@ static std::string contextMetadataValue(std::string path, std::string value, Par
 JsonNode jsonUpcarParseVector[] =
 {
   { "/type",                     attributeType        },
-  { "/contextValue",             attributeValue       },
+  { "/value",                    attributeValue       },
   { "/metadatas",                jsonNullTreat        },
   { "/metadatas/metadata",       contextMetadata      },
   { "/metadatas/metadata/name",  contextMetadataName  },

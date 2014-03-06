@@ -221,7 +221,7 @@ JsonNode jsonAcerParseVector[] =
   { "/attributes/attribute",                         contextAttribute      },
   { "/attributes/attribute/name",                    contextAttributeName  },
   { "/attributes/attribute/type",                    contextAttributeType  },
-  { "/attributes/attribute/contextValue",            contextAttributeValue },
+  { "/attributes/attribute/value",                   contextAttributeValue },
 
   { "/attributes/attribute/metadata",                jsonNullTreat         },
   { "/attributes/attribute/metadata/metadata",       contextMetadata       },
