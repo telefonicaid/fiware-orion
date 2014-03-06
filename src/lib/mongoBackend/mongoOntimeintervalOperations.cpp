@@ -114,7 +114,9 @@ HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList
 
     /* This function is basically a wrapper of mongoBackend internal entitiesQuery() function */
 
-    if (!entitiesQuery(enV, attrL, cerV, err, true)) {
+    // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
+    Restriction res;
+    if (!entitiesQuery(enV, attrL, res, cerV, err, true)) {
         cerV->release();
         LM_SRE(SccOk, ((*err).c_str()));
     }

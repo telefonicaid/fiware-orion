@@ -38,6 +38,7 @@
 #include "ngsi/AttributeList.h"
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/Duration.h"
+#include "ngsi/Restriction.h"
 
 #include "ngsiNotify/Notifier.h"
 
@@ -403,20 +404,87 @@ static void processEntitityPatternTrue(BSONArrayBuilder* arrayP, EntityId* enP) 
 
 /* ****************************************************************************
 *
+* processAreaScope -
+*
+* Returns true if a location was found, false otherwise
+*/
+static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
+
+    unsigned int geoScopes = 0;
+    for (unsigned int ix = 0; ix < scoV.size(); ++ix) {
+        Scope* sco = scoV.get(ix);        
+
+        if (sco->type == FIWARE_LOCATION) {
+            geoScopes++;
+        }
+
+        if (geoScopes == 1) {
+            // FIXME P2: current version only support one geolocation scope. If the client includes several ones,
+            // only the first is taken into account
+            bool inverted = false;
+
+            BSONObj geoWithin;
+            if (sco->areaType== orion::CircleType) {
+                double radians = sco->circle.radius() / EARTH_RADIUS_METERS;
+                geoWithin = BSON("$centerSphere" << BSON_ARRAY(BSON_ARRAY( sco->circle.center.latitude() << sco->circle.center.longitude()) << radians ));
+                inverted = sco->circle.inverted();
+            }
+            else if (sco->areaType== orion::PolygonType) {
+                BSONArrayBuilder vertex;
+                double x0, y0;
+                for (unsigned int jx = 0; jx < sco->polygon.vertexList.size() ; ++jx) {
+                    double x = sco->polygon.vertexList[jx]->latitude();
+                    double y = sco->polygon.vertexList[jx]->longitude();
+                    if (jx == 0) {
+                        x0 = x;
+                        y0 = y;
+                    }
+                    vertex.append(BSON_ARRAY(x << y));
+                }
+                /* MongoDB query API needs to "close" the polygon with the same point that the initial point */
+                vertex.append(BSON_ARRAY(x0 << y0));
+
+                /* Note that MongoDB query API uses an ugly "double array" structure for coordinates */
+                geoWithin = BSON("$geometry" << BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(vertex.arr())));
+
+                inverted = sco->polygon.inverted();
+            }
+            else {
+                LM_RE(false, ("unknown area type"));
+            }
+
+            if (inverted) {
+                areaQuery = BSON("$not" << BSON("$geoWithin" << geoWithin));
+            }
+            else {
+                areaQuery = BSON("$geoWithin" << geoWithin);
+            }
+        }
+    }
+
+    if (geoScopes > 1) {
+        LM_W(("current version supports only one area scope: %d were found, the first one was used", geoScopes));
+    }
+    return (geoScopes > 0);
+
+}
+
+/* ****************************************************************************
+*
 * entitiesQuery -
 *
 * This method is used by queryContext and subscribeContext (ONCHANGE conditions). It takes
 * a vector with entities and a vector with attributes as input and returns the corresponding
 * ContextElementResponseVector or error.
 *
-* Note thte includeEmpty argument. This is used if we don't want the result to include empty
+* Note the includeEmpty argument. This is used if we don't want the result to include empty
 * attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is amited at
 * subscribeContext case, as empty values can cause problems in the case of federating Context
 * Brokers (the notifyContext is processed as an updateContext and in the latter case, an
 * empty value causes an error)
 *
 */
-bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty) {
+bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty) {
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -475,6 +543,14 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
          * make the query fail*/
         queryBuilder.append(attrNames, BSON("$in" << attrs.arr()));
     }
+
+    /* Potentially include area scope in the query */
+    BSONObj areaQuery;
+    if (processAreaScope(res.scopeVector, areaQuery)) {
+       std::string locCoords = std::string(ENT_LOCATION) + "." + ENT_LOCATION_COORDS;
+       queryBuilder.append(locCoords, areaQuery);
+    }
+
     BSONObj query = queryBuilder.obj();
 
     /* Do the query on MongoDB */
@@ -840,7 +916,9 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
     std::string err;
     NotifyContextRequest ncr;
 
-    if (!entitiesQuery(enV, attrL, &ncr.contextElementResponseVector, &err, false)) {
+    // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
+    Restriction res;
+    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false)) {
         ncr.contextElementResponseVector.release();
         LM_RE(false, (err.c_str()));
     }
@@ -857,7 +935,8 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
              * Note that in this case we do a query for all the attributes, not restricted to attrV */
             ContextElementResponseVector allCerV;
             AttributeList emptyList;
-            if (!entitiesQuery(enV, emptyList, &allCerV, &err, false)) {
+            // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
+            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false)) {
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
                 LM_RE(false, (err.c_str()));

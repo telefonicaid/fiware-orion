@@ -201,7 +201,7 @@ static int circle(xml_node<>* node, ParseData* reqData)
 static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circleCenterLatitude: %s", node->value()));
-  reqData->scr.scopeP->circle.center.latitude = node->value();
+  reqData->scr.scopeP->circle.center.latitudeSet(node->value());
 
   return 0;
 }
@@ -215,7 +215,7 @@ static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
 static int circleCenterLongitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circleCenterLongitude: %s", node->value()));
-  reqData->scr.scopeP->circle.center.longitude = node->value();
+  reqData->scr.scopeP->circle.center.longitudeSet(node->value());
   return 0;
 }
 
@@ -228,7 +228,7 @@ static int circleCenterLongitude(xml_node<>* node, ParseData* reqData)
 static int circleRadius(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circleRadius: %s", node->value()));
-  reqData->scr.scopeP->circle.radius = node->value();
+  reqData->scr.scopeP->circle.radiusSet(node->value());
   return 0;
 }
 
@@ -242,7 +242,7 @@ static int circleInverted(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a circleInverted: %s", node->value()));
 
-  parseDataP->scr.scopeP->circle.inverted = node->value();
+  parseDataP->scr.scopeP->circle.invertedSet(node->value());
 
   if (!isTrue(node->value()) && !isFalse(node->value()))
   {
@@ -276,7 +276,7 @@ static int polygonInverted(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a polygonInverted: %s", node->value()));
 
-  parseDataP->scr.scopeP->polygon.inverted = node->value();
+  parseDataP->scr.scopeP->polygon.invertedSet(node->value());
 
   if (!isTrue(node->value()) && !isFalse(node->value()))
   {
@@ -309,7 +309,8 @@ static int polygonVertex(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygonVertex - creating new vertex for the vertex list"));
   reqData->scr.vertexP = new orion::Point();
-  reqData->scr.scopeP->polygon.vertexList.push_back(reqData->scr.vertexP);
+  reqData->scr.scopeP->polygon.vertexAdd(reqData->scr.vertexP);
+  // reqData->scr.scopeP->polygon.vertexList.push_back(reqData->scr.vertexP);
   return 0;
 }
 
@@ -322,7 +323,7 @@ static int polygonVertex(xml_node<>* node, ParseData* reqData)
 static int polygonVertexLatitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygonVertexLatitude: %s", node->value()));
-  reqData->scr.vertexP->latitude = node->value();
+  reqData->scr.vertexP->latitudeSet(node->value());
   return 0;
 }
 
@@ -335,7 +336,7 @@ static int polygonVertexLatitude(xml_node<>* node, ParseData* reqData)
 static int polygonVertexLongitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygonVertexLongitude: %s", node->value()));
-  reqData->scr.vertexP->longitude = node->value();
+  reqData->scr.vertexP->longitudeSet(node->value());
   return 0;
 }
 

@@ -45,8 +45,6 @@ using namespace orion;
 #define SCOPE_VALUE_ASSOC_TARGET   "TARGETS"
 #define SCOPE_VALUE_ASSOC_ALL      "ALL"
 
-
-
 /* ****************************************************************************
 *
 * Scope -
