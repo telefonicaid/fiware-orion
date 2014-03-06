@@ -58,6 +58,7 @@ public:
     callNo                = 1;
     requestEntityTooLarge = false;
     inComplexValue        = false;
+    complexValueContainer = NULL;
 
     memset(payloadWord, 0, sizeof(payloadWord));
 
@@ -85,6 +86,7 @@ public:
   int                       callNo;
   bool                      requestEntityTooLarge;
   bool                      inComplexValue;
+  orion::ComplexValueNode*  complexValueContainer;
 
   ::std::vector<orion::ComplexValueNode*> complexValueNode;
 

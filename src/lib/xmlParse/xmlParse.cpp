@@ -85,38 +85,14 @@ static bool isComplexValuePath(const char* path, char* root, char* rest)
 */
 void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* parseVector, ParseData* reqDataP)
 {
-  static orion::ComplexValueNode* container = NULL;
-  static int                      level     = 0;
-
   if ((node == NULL) || (node->name() == NULL))
   {
      LM_M(("NULL node/name for father '%s'", fatherPath.c_str()));
      return;
   }
 
-  if (node->name()[0] == 0)
-  {
-    if (ciP->inComplexValue)
-    {
-      char root[1024];
-      char rest[1024];
-
-      isComplexValuePath(fatherPath.c_str(), root, rest);
-      if (rest[0] == 0)
-      {
-        LM_T(LmtComplexValue, ("******************** Complex value ends here (%s)", fatherPath.c_str()));
-        ciP->inComplexValue = false;
-        ciP->complexValueNode[ciP->complexValueNode.size() - 1]->show("");
-      }
-      else
-      {
-        container = container->container;
-        --level;
-        LM_T(LmtComplexValue, ("Complex part '%s' ends - new container is '%s', level %d", rest, container->path.c_str(), level));
-      }
-    }
-    return;
-  }
+  if ((node->name()[0] == 0) && (ciP->complexValueContainer == NULL))
+     return;
 
   std::string path = fatherPath + "/" + node->name();
 
@@ -144,48 +120,35 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
 
   if (treated == false)
   {
-    char root[256];
-    char rest[256];
+    char root[1024];
+    char rest[1024];
 
-    if (isComplexValuePath(path.c_str(), root, rest))
+    if (isComplexValuePath(fatherPath.c_str(), root, rest))
     {
-      if (ciP->inComplexValue == false)
+      std::string  name  = node->name();
+      std::string  value = node->value();
+
+      if (rest[0] == 0)  // Toplevel
       {
-        LM_T(LmtComplexValue, ("-------------- Complex value starts here (%s)", root));
-
-        container = new orion::ComplexValueNode(root);
-        ciP->complexValueNode.push_back(container);
-        LM_T(LmtComplexValue, ("Created complexValueNode number %d", ciP->complexValueNode.size()));
-      }
-
-      ciP->inComplexValue = true;
-
-      if (node->value()[0] == 0)
-        LM_T(LmtComplexValue, ("Complex part: '%s'", rest));
-      else
-      {
-        orion::ComplexValueNode* cvNode;
-
-        if (strcmp(node->value(), " ") == 0)
+        if (ciP->complexValueContainer == NULL) // Toplevel start
         {
-
-          LM_T(LmtComplexValue, ("Create Struct: '%s', father is '%s'", rest, container->path.c_str()));
-          cvNode = new orion::ComplexValueNode(container, rest, node->name(), node->value(), container->childV.size(), orion::ComplexValueNode::Struct, level);
-          container->add(cvNode);
-
-          container = cvNode;
-          ++level;
+          LM_T(LmtComplexValue, ("Complex value start for '%s'", fatherPath.c_str()));
+          ciP->complexValueContainer = new orion::ComplexValueNode(root);
+          ciP->complexValueNode.push_back(ciP->complexValueContainer);
         }
-        else
+        else // Toplevel END
         {
-           cvNode = new orion::ComplexValueNode(container, rest, node->name(), node->value(), container->childV.size(), orion::ComplexValueNode::Leaf, level);
-           container->add(cvNode);
-           LM_T(LmtComplexValue, ("Complex part: '%s', value '%s'", rest, node->value()));
+          LM_T(LmtComplexValue, ("Complex value end for '%s'", fatherPath.c_str()));
+          ciP->complexValueContainer->finish();
+          ciP->complexValueContainer = NULL;
         }
       }
+
+      if ((value == " ") && (name != ""))
+        ciP->complexValueContainer->add(orion::ComplexValueNode::Struct, name, rest);
+      else if (name != "")
+        ciP->complexValueContainer->add(orion::ComplexValueNode::Leaf, name, rest, value);
     }
-    else
-      LM_E(("Parse Error: unknown node '%s'", path.c_str(), node->name()));
   }
 
   xml_node<>* child = node->first_node();

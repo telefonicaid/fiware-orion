@@ -31,6 +31,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/string.h"
 
 
 
@@ -66,38 +67,30 @@ public:
    // Constructor for toplevel 'node'
    ComplexValueNode(const char* _root)
    {
-      LM_T(LmtComplexValue, ("Creating ROOT of ComplexValue tree for '%s'", _root));
-      root      = _root;
-      type      = Struct;
-      container = NULL;
-      level     = 0;
-      name      = "toplevel";
-      path      = "/";
-      LM_T(LmtComplexValue, ("Created ROOT of ComplexValue tree for '%s'", root.c_str()));
-      show("");
+      LM_T(LmtComplexValue2, ("Creating ROOT of ComplexValue tree for '%s'", _root));
+      root       = _root;
+      rootP      = this;
+      type       = Struct;
+      container  = NULL;
+      level      = 0;
+      name       = "";
+      path       = "/";
+      siblingNo  = 0;
+      LM_T(LmtComplexValue2, ("Created ROOT of ComplexValue tree for '%s'", root.c_str()));
    }
 
    // Constructor for all nodes except toplevel
    ComplexValueNode(ComplexValueNode* _container, std::string _path, std::string _name, std::string _value, int _siblingNo, Type _type, int _level = -1)
    {
-      LM_T(LmtComplexValue, ("Creating node %d of level %d", _siblingNo, _level));
-
       container = _container;
-      if (level == 1)
-         rootP = container;
-      else
-         rootP = container->rootP;
-
+      rootP     = (level == 1)? container : container->rootP;
       name      = _name;
       value     = _value;
       path      = _path;
       level     = container->level + 1;
       siblingNo = _siblingNo;
       type      = _type;
-
-      LM_T(LmtComplexValue, ("Created %s node %d of level %d", typeName(), siblingNo, level));
-
-      rootP->show("");
+      counter   = 0;
    }
 
    ::std::string                     root;       // Only for 'top level'
@@ -107,13 +100,97 @@ public:
    int                               level;      // Nesting level
    int                               siblingNo;  // Order in nesting level (sibling number)
    Type                              type;       // The type of this node
+   int                               counter;    // Internal variable necessary during parsing
    ComplexValueNode*                 container;  // Pointer to the direct father
    ComplexValueNode*                 rootP;      // So that all children has quick access to its root container
    ::std::vector<ComplexValueNode*>  childV;     // vector of children
 
+   void finish(void)
+   {
+      // Detect vectors?
+   }
+
+
    void add(ComplexValueNode* node)
    {
       childV.push_back(node);
+      rootP->show("");
+   }
+
+   void add(const Type _type, const std::string& _name, const std::string& _containerPath, const std::string& _value = "")
+   {
+     ComplexValueNode* owner;
+
+     LM_T(LmtComplexValue, ("Adding '%s' in '%s'. I am '%s'", _name.c_str(), _containerPath.c_str(), name.c_str()));
+
+     if (type == Leaf)
+        LM_T(LmtComplexValue, ("Adding Leaf '%s', with value '%s' under '%s'", _name.c_str(), value.c_str(), _containerPath.c_str()));
+     else
+       LM_T(LmtComplexValue, ("Adding Struct '%s' under '%s'", _name.c_str(), _containerPath.c_str()));
+
+     if (_containerPath == name)
+       owner = this;
+     else
+     {
+       owner = lookup(_containerPath.c_str());
+
+       if (owner == NULL)
+         LM_RVE(("Cannot find Complex Value container '%s'", _containerPath.c_str()));
+     }
+
+     ComplexValueNode* node = new ComplexValueNode(owner, _containerPath + "/" + _name, _name, _value, owner->childV.size(), _type, owner->level + 1);
+     owner->add(node);
+   }
+
+   ComplexValueNode* lookup(const char* _path, int callNo = 1)
+   {
+     std::vector<std::string> pathV;
+     int                      depth;
+     char*                    lookFor;
+     std::string              nextPath;
+
+     if (callNo == 1)
+     {
+        LM_T(LmtComplexValue, ("--------------------------------------------"));
+        LM_T(LmtComplexValue, ("  Looking for '%s', starting in '%s'", _path, name.c_str()));
+     }
+     else
+     {
+        LM_T(LmtComplexValue, ("  -----   Call %d --------------------", callNo));
+        LM_T(LmtComplexValue, ("  Looking for '%s', now we're in '%s'", _path, name.c_str()));
+
+     }
+
+     depth   = stringSplit(_path, '/', pathV);
+     LM_T(LmtComplexValue, ("'%s' has depth %d", _path, depth));
+     lookFor = (char*) pathV[0].c_str();
+     
+     LM_T(LmtComplexValue, ("Looking for '%s' in '%s' (depth: %d). This time: '%s'", _path, path.c_str(), depth, lookFor));
+
+     for (unsigned int ix = 0; ix < childV.size(); ++ix)
+     {
+        if (childV[ix]->name != lookFor)
+           continue;
+
+        LM_T(LmtComplexValue, ("Found child '%s'", childV[ix]->name.c_str()));
+        if (depth == 1)
+           return childV[ix];
+
+        pathV.erase(pathV.begin());
+
+        nextPath = "";
+        for (unsigned int pix; pix < pathV.size(); ++pix)
+        {
+          nextPath += pathV[pix];
+          if (pix != pathV.size() - 1)
+            nextPath += "/";
+        }
+
+        LM_T(LmtComplexValue, ("'Recursive' call for '%s': path: '%s'", childV[ix]->name.c_str(), nextPath.c_str()));
+        return childV[ix]->lookup(nextPath.c_str(), callNo + 1);
+     }
+
+     return NULL;
    }
 
    void show(std::string indent)
@@ -136,10 +213,22 @@ public:
 
       if (childV.size() != 0)
       {
-         PRINTF("%s%lu children\n", indent.c_str(), childV.size());
+         std::string childrenString;
+
+         for (unsigned long ix = 0; ix < childV.size(); ++ix)
+         {
+            childrenString += childV[ix]->name;
+            if (ix != childV.size() - 1)
+               childrenString += ", ";
+         }
+
+         PRINTF("%s%lu children (%s)\n", indent.c_str(), childV.size(), childrenString.c_str());
+
          for (unsigned long ix = 0; ix < childV.size(); ++ix)
             childV[ix]->show(indent + "  ");
       }
+
+      PRINTF("\n");
    }
 };
 
