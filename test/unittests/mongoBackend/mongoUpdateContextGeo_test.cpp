@@ -45,6 +45,7 @@
 * - appendLocAttribute
 * - updateLocAttribute
 * - deleteLocAttribute
+* - newEntityTwoLocAttributesFail
 * - appendAdditionalLocAttributeFail
 * - notSupportedLocationFail
 *
@@ -238,7 +239,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
 
 /* ****************************************************************************
 *
-*  -
+*  - appendLocAttribute
 */
 TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
 {
@@ -247,7 +248,7 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
 
 /* ****************************************************************************
 *
-*  -
+*  - updateLocAttribute
 */
 TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
 {
@@ -256,7 +257,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
 
 /* ****************************************************************************
 *
-*  -
+*  - deleteLocAttribute
 */
 TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
 {
@@ -265,7 +266,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
 
 /* ****************************************************************************
 *
-*  -
+*  - appendAdditionalLocAttributeFail
 */
 TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
 {
@@ -274,7 +275,16 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
 
 /* ****************************************************************************
 *
-*  -
+*  - newEntityTwoLocAttributesFail
+*/
+TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
+{
+    EXPECT_EQ(0, 1) << "test stub, to be implemented";
+}
+
+/* ****************************************************************************
+*
+*  - notSupportedLocationFail
 */
 TEST(mongoUpdateContextGeoRequest, notSupportedLocationFail)
 {
