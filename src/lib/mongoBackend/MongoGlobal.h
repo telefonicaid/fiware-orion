@@ -219,6 +219,18 @@ extern const char* getSubscribeContextAvailabilityCollectionName(void);
 */
 extern const char* getAssociationsCollectionName(void);
 
+/*****************************************************************************
+*
+* mongoLocationCapable -
+*/
+extern bool mongoLocationCapable(void);
+
+/*****************************************************************************
+*
+* ensureLocationIndex -
+*/
+extern void ensureLocationIndex(void);
+
 /* ****************************************************************************
 *
 * recoverOntimeIntervalThreads -

@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "common/sem.h"
+#include "common/string.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoOntimeintervalOperations.h"
@@ -50,6 +51,8 @@ using namespace mongo;
 * Globals
 */
 static DBClientConnection*  connection;
+static int                  mongoVersionMayor = -1;
+static int                  mongoVersionMinor = -1;
 static char*                entitiesCollectionName                      = NULL;
 static char*                registrationsCollectionName                 = NULL;
 static char*                subscribeContextCollectionName              = NULL;
@@ -81,6 +84,17 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
             LM_RE(false, ("Auth error (db=%s, username=%s, pswd=%s): %s", db, username, passwd, err.c_str()));
         }
     }
+
+    /* Get mongo version with the 'buildinfo' command */
+    BSONObj result;
+    std::string extra;
+    connection->runCommand("admin", BSON("buildinfo" << 1), result);
+    std::string versionString = std::string(result.getStringField("version"));
+    if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra)) {
+        mongoSemGive(__FUNCTION__, "wrong mongo version format");
+        LM_RE(false, ("wrong mongo version format: <%s>", versionString.c_str()));
+    }
+    LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)", versionString.c_str(), mongoVersionMayor, mongoVersionMinor, extra.c_str()));
 
     mongoSemGive(__FUNCTION__, "connecting to mongo");
     return true;
@@ -260,6 +274,28 @@ const char* getSubscribeContextAvailabilityCollectionName(void) {
 */
 const char* getAssociationsCollectionName(void) {
     return assocationsCollectionName;
+}
+
+/*****************************************************************************
+*
+* mongoLocationCapable -
+*/
+bool mongoLocationCapable(void) {
+    /* Geo location based in 2dsphere indexes was introduced in MongoDB 2.4 */
+    return ((mongoVersionMayor == 2) && (mongoVersionMinor >= 4)) || (mongoVersionMayor > 2);
+}
+
+/*****************************************************************************
+*
+* ensureLocationIndex -
+*/
+void ensureLocationIndex(void) {
+    /* Ensure index for entity locations, in the case of using 2.4 */
+    if (mongoLocationCapable()) {
+        std::string index = std::string(ENT_LOCATION) + "." + ENT_LOCATION_COORDS;
+        connection->ensureIndex(getEntitiesCollectionName(), BSON(index << "2dsphere" ));
+        LM_T(LmtMongo, ("ensuring 2dsphere index on %s", index.c_str()));
+    }
 }
 
 /* ****************************************************************************
@@ -457,6 +493,12 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
         }
 
         if (geoScopes == 1) {
+
+            if (!mongoLocationCapable()) {
+                LM_W(("location scope was found but your MongoDB version doesn't support it. Please upgrade MongoDB server to 2.4 or newer"));
+                return false;
+            }
+
             // FIXME P2: current version only support one geolocation scope. If the client includes several ones,
             // only the first is taken into account
             bool inverted = false;
