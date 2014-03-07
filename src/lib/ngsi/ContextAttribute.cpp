@@ -96,6 +96,20 @@ std::string ContextAttribute::getId()
 
 /* ****************************************************************************
 *
+* ContextAttribute::getLocation() -
+*/
+std::string ContextAttribute::getLocation()
+{
+  for (unsigned int ix = 0; ix < metadataVector.size(); ++ix) {
+      if (metadataVector.get(ix)->name == NGSI_MD_LOCATION) {
+          return metadataVector.get(ix)->value;
+      }
+  }
+  return "";
+}
+
+/* ****************************************************************************
+*
 * render - 
 */
 std::string ContextAttribute::render(Format format, std::string indent, bool comma)

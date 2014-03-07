@@ -30,6 +30,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/string.h"
 #include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
 
@@ -288,6 +289,48 @@ static bool legalIdUsage(ContextAttributeVector caV) {
                 ContextAttribute* ca = caV.get(jx);
                 if (attrName == ca->name && attrType == ca->type && ca->getId() != "") {
                     return false;
+                }
+            }
+        }
+    }
+
+    return true;
+
+}
+
+/* ****************************************************************************
+*
+* processLocation -
+*
+* This function process the context attribute vector, searching for an attribute marked with
+* the location metadata. In that case, it fills locAttr, coordLat and coordLOng. If a location
+* attribute is not found, then locAttr is filled with an empty string, i.e. "".
+*
+* This function always return true (no matter if the attribute was found or not), except in an
+* error situation, in which case errorDetail is filled. This can be due to two reasons: ilegal
+* usage of the metadata or parsing error in the attribute value.
+*
+*/
+
+static bool processLocation(ContextAttributeVector caV, std::string& locAttr, double& coordLat, double& coordLong, std::string* errDetail) {
+
+    locAttr = "";
+    for (unsigned ix = 0; ix < caV.size(); ++ix) {
+        ContextAttribute ca = caV.get(ix);
+        MetadataVector mdV = ca.metadataVector;
+        for (unsigned jx = 0; jx < mdV.size(); ++jx) {
+            Metadata md = mdV.get(jx);
+            if (md.name == NGSI_MD_LOCATION) {
+                if (locAttr.length() > 0) {
+                    *errDetail = "You cannot use more than one location attribute when creating an entity (see Orion user manual)";
+                    return false;
+                }
+                else {
+                    if (!string2coords(ca.value, coordLat, coordLong)) {
+                        *errDetail = "coordiates format error (see Orion user manual): " + ca.value;
+                        return false;
+                    }
+                    locAttr = ca.name;
                 }
             }
         }
@@ -703,10 +746,18 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
         return false;
     }
 
-    int now = getCurrentTime();
+    /* Search for a potential location attribute */
+    std::string locAttr;
+    double coordLat;
+    double coordLong;
+    if (!processLocation(attrsV, locAttr, coordLat, coordLong, errDetail)) {
+        return false;
+    }
+
+    int now = getCurrentTime();    
     BSONArrayBuilder attrsToAdd;
     for (unsigned int ix = 0; ix < attrsV.size(); ++ix) {
-        std::string attrId = attrsV.get(ix)->getId();        
+        std::string attrId = attrsV.get(ix)->getId();
 
         BSONObjBuilder bsonAttr;
         bsonAttr.appendElements(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
@@ -733,11 +784,19 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
     }
 
     BSONObj bsonId = e.type == "" ? BSON(ENT_ENTITY_ID << e.id) : BSON(ENT_ENTITY_ID << e.id << ENT_ENTITY_TYPE << e.type);
-    BSONObj insertedDoc = BSON("_id" << bsonId <<
-                               ENT_ATTRS << attrsToAdd.arr() <<
-                               ENT_CREATION_DATE << now <<
-                               ENT_MODIFICATION_DATE << now);
+    BSONObjBuilder insertedDocB;
+    insertedDocB.append("_id", bsonId);
+    insertedDocB.append(ENT_ATTRS, attrsToAdd.arr());
+    insertedDocB.append(ENT_CREATION_DATE, now);
+    insertedDocB.append(ENT_MODIFICATION_DATE,now);
 
+    /* Add location information in the case it was found */
+    if (locAttr.length() > 0) {
+        insertedDocB.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
+                                              ENT_LOCATION_COORDS << BSON_ARRAY(coordLat << coordLong)));
+    }
+
+    BSONObj insertedDoc = insertedDocB.obj();
     try {
         LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getEntitiesCollectionName(), insertedDoc.toString().c_str()));
         mongoSemTake(__FUNCTION__, "insert into EntitiesCollection");
@@ -967,8 +1026,15 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
                 ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);
 
+                // FIXME P4: not sure, but probably we can generalize this when we address
+                // issue https://github.com/telefonicaid/fiware-orion/issues/252
+                Metadata* md;
                 if (caP->getId().length() != 0) {
-                    Metadata* md = new Metadata(NGSI_MD_ID, "string", caP->getId());
+                    md = new Metadata(NGSI_MD_ID, "string", caP->getId());
+                    ca->metadataVector.push_back(md);
+                }                
+                if (caP->getLocation().length() != 0) {
+                    md = new Metadata(NGSI_MD_LOCATION, "string", caP->getLocation());
                     ca->metadataVector.push_back(md);
                 }
 

@@ -70,7 +70,7 @@ static void prepareDatabase(void) {
                      "attrs" << BSON_ARRAY(
                         BSON("name" << "A1" << "type" << "TA1" << "value" << "-5, 2")
                         ) <<
-                     "location" << BSON("attrName" << "A1" << "coords" << BSON_ARRAY(-5 << 2))
+                     "location" << BSON("attrName" << "A1" << "coords" << BSON_ARRAY(-5.0 << 2.0))
                     );
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
@@ -191,11 +191,14 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    EXPECT_STREQ("A3", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
+    EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    EXPECT_EQ(-5, coordX(ent));
+    EXPECT_EQ(2, coordY(ent));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -210,9 +213,6 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    ent.getObjectField("location").getField("attrName");
-    EXPECT_EQ(-5, coordX(ent));
-    EXPECT_EQ(2, coordY(ent));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
     EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -222,11 +222,12 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     BSONObj a3 = getAttr(attrs, "A3", "TA3");
-    EXPECT_STREQ("A1", C_STR_FIELD(a3, "name"));
-    EXPECT_STREQ("TA1", C_STR_FIELD(a3, "type"));
+    EXPECT_STREQ("A3", C_STR_FIELD(a3, "name"));
+    EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("4, -5", C_STR_FIELD(a3, "value"));
     EXPECT_EQ(1360232700, a3.getIntField("creDate"));
     EXPECT_EQ(1360232700, a3.getIntField("modDate"));
+    EXPECT_STREQ("A3", ent.getObjectField("location").getStringField("attrName"));
     EXPECT_EQ(4, coordX(ent));
     EXPECT_EQ(-5, coordY(ent));
 
