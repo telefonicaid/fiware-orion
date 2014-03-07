@@ -75,7 +75,7 @@ static void prepareDatabase(void) {
                         BSON("name" << "pos" << "type" << "location" << "value" << "3, 2") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_A")
                         ) <<
-                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(3 << 2))
+                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(3.0 << 2.0))
                     );
 
   BSONObj B = BSON("_id" << BSON("id" << "B" << "type" << "Point") <<
@@ -83,7 +83,7 @@ static void prepareDatabase(void) {
                         BSON("name" << "pos" << "type" << "location" << "value" << "5, 5") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_B")
                         ) <<
-                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(5 << 5))
+                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(5.0 << 5.0))
                     );
 
   BSONObj C = BSON("_id" << BSON("id" << "C" << "type" << "Point") <<
@@ -91,7 +91,7 @@ static void prepareDatabase(void) {
                         BSON("name" << "pos" << "type" << "location" << "value" << "7, 4") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_C")
                         ) <<
-                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(7 << 4))
+                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(7.0 << 4.0))
                     );
 
   // Entity D hasn't a location attribute (i.e. no location field). This entity will be never returned
