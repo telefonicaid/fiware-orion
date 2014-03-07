@@ -371,7 +371,7 @@ void coords2string(std::string& s, double latitude, double longitude, int decima
 *
 * versionParse -
 */
-bool versionParse(std::string version, int& mayor, int& minor, std::string& extra)
+bool versionParse(std::string version, int& mayor, int& minor, std::string& bugFix)
 {
    char* copy = strdup(version.c_str());
    char* s    = wsStrip(copy);
@@ -403,16 +403,22 @@ bool versionParse(std::string version, int& mayor, int& minor, std::string& extr
 
    //
    // minor number
+   // If no dot is found, no bugFix 'version' is present.
+   // Just zero the 'bugFix' and keep the remaining string in minor.
    //
-   dotP = strchr(s, '.');
-   if (dotP == NULL)
-   {
-      free(copy);
-      return false;
-   }
+   bool bugFixEmpty = false;
 
-   *dotP = 0;
-   ++dotP;
+   dotP = strchr(s, '.');
+   if (dotP != NULL)
+   {
+      *dotP = 0;
+      ++dotP;
+   }
+   else
+   {
+      bugFix = "";
+      bugFixEmpty = true;
+   }
 
    s = wsStrip(s);
    minor = atoi(s);
@@ -420,6 +426,12 @@ bool versionParse(std::string version, int& mayor, int& minor, std::string& extr
    {
       free(copy);
       return false;
+   }
+
+   if (bugFixEmpty == true)
+   {
+     free(copy);
+     return true;
    }
 
    s = dotP;
@@ -430,7 +442,7 @@ bool versionParse(std::string version, int& mayor, int& minor, std::string& extr
    // bugfix
    //
    s = wsStrip(s);
-   extra = s;
+   bugFix = s;
 
    free(copy);
    return true;
