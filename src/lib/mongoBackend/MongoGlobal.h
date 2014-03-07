@@ -223,13 +223,13 @@ extern const char* getAssociationsCollectionName(void);
 *
 * mongoLocationCapable -
 */
-bool mongoLocationCapable();
+extern bool mongoLocationCapable(void);
 
 /*****************************************************************************
 *
 * ensureLocationIndex -
 */
-void ensureLocationIndex();
+extern void ensureLocationIndex(void);
 
 /* ****************************************************************************
 *
