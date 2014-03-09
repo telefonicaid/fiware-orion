@@ -250,18 +250,17 @@ TEST(SubscribeContextAvailabilityRequest, json_noEntityId)
 TEST(SubscribeContextAvailabilityRequest, xml_entityIdTypeAsBothFieldAndAttribute)
 {
   ParseData       reqData;
-  const char*     infile = "ngsi9.subscribeContextAvailabilityRequest.entityIdTypeAsBothFieldAndAttribute.invalid.xml";
+  const char*     inFile  = "ngsi9.subscribeContextAvailabilityRequest.entityIdTypeAsBothFieldAndAttribute.invalid.xml";
+  const char*     outFile = "ngsi9.subscribeContextAvailabilityResponse.entityIdTypeAsBothFieldAndAttribute.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   utInit();
 
-  ci.inFormat      = XML;
-  ci.outFormat     = XML;
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-
-  std::string result = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
-  EXPECT_EQ("OK", result) << "this test should NOT be OK";
+  std::string out = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }
@@ -275,18 +274,17 @@ TEST(SubscribeContextAvailabilityRequest, xml_entityIdTypeAsBothFieldAndAttribut
 TEST(SubscribeContextAvailabilityRequest, xml_entityIdIsPatternAsBothFieldAndAttribute)
 {
   ParseData       reqData;
-  const char*     infile = "ngsi9.subscribeContextAvailabilityRequest.entityIdIsPatternAsBothFieldAndAttribute.invalid.xml";
+  const char*     inFile  = "ngsi9.subscribeContextAvailabilityRequest.entityIdIsPatternAsBothFieldAndAttribute.invalid.xml";
+  const char*     outFile = "ngsi9.subscribeContextAvailabilityResponse.entityIdIsPatternAsBothFieldAndAttribute.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   utInit();
 
-  ci.inFormat      = XML;
-  ci.outFormat     = XML;
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
-
-  std::string result = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
-  EXPECT_EQ("OK", result) << "this test should NOT be OK";
+  std::string out = xmlTreat(testBuf, &ci, &reqData, SubscribeContextAvailability, "subscribeContextAvailabilityRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

@@ -30,6 +30,7 @@
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 #include "rest/restReply.h"
+#include "rest/OrionError.h"
 #include "xmlParse/xmlRegisterContextRequest.h"
 #include "xmlParse/xmlRegisterContextResponse.h"
 #include "xmlParse/xmlDiscoverContextAvailabilityRequest.h"
@@ -240,7 +241,10 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
     return "OK";
 
   reqP->init(parseDataP);
+  ciP->httpStatusCode = SccOk;
   xmlParse(ciP, NULL, father, "", "", reqP->parseVector, parseDataP);
+  if (ciP->httpStatusCode != SccOk)
+    return restErrorReplyGet(ciP, ciP->outFormat, "", payloadWord, ciP->httpStatusCode, ciP->answer);
 
   std::string check = reqP->check(parseDataP, ciP);
   if (check != "OK")

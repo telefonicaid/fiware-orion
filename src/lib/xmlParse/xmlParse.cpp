@@ -120,8 +120,8 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
 
   if (treated == false)
   {
-    char root[1024];
-    char rest[1024];
+    static char root[1024];
+    static char rest[1024];
 
     if (isComplexValuePath(fatherPath.c_str(), root, rest))
     {
@@ -148,6 +148,12 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
         ciP->complexValueContainer->add(orion::ComplexValueNode::Struct, name, rest);
       else if (name != "")
         ciP->complexValueContainer->add(orion::ComplexValueNode::Leaf, name, rest, value);
+    }
+    else
+    {
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer = std::string("Unknown XML field: '") + node->name() + "'";
+      LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), fatherPath.c_str()));
     }
   }
 

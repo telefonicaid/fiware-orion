@@ -14,7 +14,6 @@
 		<attribute>lightstatus</attribute>
 	</attributeList>
 	<duration>PT1M</duration>
-	<subscriptionId>12458896</subscriptionId>
   <restriction>
     <attributeExpression>ATTR_EXPR</attributeExpression>
     <scope>

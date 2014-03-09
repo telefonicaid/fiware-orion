@@ -3,6 +3,6 @@
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Unknown XML field: 'nothing'</details>
+    <details>Unknown XML field: 'isPattern'</details>
   </errorCode>
 </subscribeContextAvailabilityResponse>

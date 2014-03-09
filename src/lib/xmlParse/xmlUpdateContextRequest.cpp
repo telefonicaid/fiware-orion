@@ -344,7 +344,7 @@ XmlNode upcrParseVector[] =
   { "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/type",  contextMetadataType       },
   { "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/value", contextMetadataValue      },
   
-  { "/updateContextRequest/contextElementList/contextElement/domainMetadata/",                      nullTreat            },
+  { "/updateContextRequest/contextElementList/contextElement/domainMetadata",                       nullTreat            },
   { "/updateContextRequest/contextElementList/contextElement/domainMetadata/contextMetadata",       domainMetadata       },
   { "/updateContextRequest/contextElementList/contextElement/domainMetadata/contextMetadata/name",  domainMetadataName   },
   { "/updateContextRequest/contextElementList/contextElement/domainMetadata/contextMetadata/type",  domainMetadataType   },

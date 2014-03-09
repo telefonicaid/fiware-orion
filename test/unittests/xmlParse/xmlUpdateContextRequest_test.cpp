@@ -42,7 +42,6 @@ TEST(xmlUpdateContextRequest, ok)
   ConnectionInfo  ci("/ngsi10/updateContext", "POST", "1.1");
   const char*     fileName = "ngsi10.updateContextRequestWithMetadata.valid.xml";
   ParseData       parseData;
-  std::string     expected = "OK";
   std::string     out;
 
   utInit();
@@ -52,7 +51,7 @@ TEST(xmlUpdateContextRequest, ok)
   ci.inFormat  = XML;
   ci.outFormat = XML;
   out  = xmlTreat(testBuf, &ci, &parseData, UpdateContext, "updateContextRequest", NULL);
-  EXPECT_EQ(expected, out);
+  EXPECT_EQ("OK", out);
 
   utExit();
 }

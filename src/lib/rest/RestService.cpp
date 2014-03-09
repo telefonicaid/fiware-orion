@@ -121,7 +121,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       if (strcasecmp(serviceV[ix].compV[compNo].c_str(), compV[compNo].c_str()) != 0)
       {
         match = false;
-        LM_T(LmtRestCompare, ("ix %d: component %d is not a match ('%s' != '%s')", ix, compNo, compV[compNo].c_str(), serviceV[ix].compV[compNo].c_str()));
         break;
       }
     }

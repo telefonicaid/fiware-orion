@@ -254,6 +254,7 @@ SET (STATIC_LIBS
     ngsiNotify
     jsonParse
     xmlParse
+    parse
     convenience
     serviceRoutines
     convenienceMap

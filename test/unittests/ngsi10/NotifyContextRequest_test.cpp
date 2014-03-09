@@ -48,7 +48,7 @@ TEST(NotifyContextRequest, xml_ok)
   ConnectionInfo         ci("", "POST", "1.1");
   std::string            rendered;
   const char*            infile   = "ngsi10.notifyContextRequest.ok.valid.xml";
-  const char*            outfile  = "ngsi10.notifyContextRequest.ok2.valid.xml";
+  const char*            outfile  = "ngsi10.notifyContextResponse.ok.valid.xml";
   NotifyContextRequest*  ncrP     = &reqData.ncr.res;
 
   utInit();

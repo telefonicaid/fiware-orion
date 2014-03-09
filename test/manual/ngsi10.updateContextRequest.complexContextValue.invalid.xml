@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue>
+            <level1>
+              <value1>1</value1>
+              <level2>
+                <value2>2</value2>
+                <value3>3</value3>
+                <value4>4</value4>
+                <level3>
+                  <value2>vv2</value2>
+                  <value3>vv3</value3>
+                  <value4>vv4</value4>
+                </level3>
+              </level2>
+              <level2again>
+                <value5>5</value5>
+                <value6>6</value6>
+              </level2again>
+            </level1>
+          </contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>
