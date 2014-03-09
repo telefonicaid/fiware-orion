@@ -57,19 +57,20 @@ public:
    ComplexValueNode*                 container;  // Pointer to the direct father
    ComplexValueNode*                 rootP;      // So that all children has quick access to its root container
    ::std::vector<ComplexValueNode*>  childV;     // vector of children
+   ::std::string                     error;      // where 'vectorCheck' signals errors
 
 
-
-   ComplexValueNode(const char* _root);
+   ComplexValueNode(std::string _root);
    ComplexValueNode(ComplexValueNode* _container, std::string _path, std::string _name, std::string _value, int _siblingNo, Type _type, int _level = -1);
 
    const char*        typeName(void);
    void               add(ComplexValueNode* node);
    void               add(const Type _type, const std::string& _name, const std::string& _containerPath, const std::string& _value = "");
-   ComplexValueNode*  lookup(const char* _path, int callNo = 1);
-   void               finish(void);
+   ComplexValueNode*  lookup(const char* _path);
+   ::std::string      finish(void);
    void               shortShow(std::string indent);
    void               show(std::string indent);
+   void               vectorCheck(void);
 };
 
 } // namespace orion

@@ -49,12 +49,12 @@ const char* complexValueRootV[] =
 
 
 
-static bool isComplexValuePath(const char* path, char* root, char* rest)
+static bool isComplexValuePath(const char* path, std::string& root, std::string& rest)
 {
    unsigned int len;
 
-   root[0] = 0;
-   rest[0] = 0;
+   root = "";
+   rest = "";
 
    for (unsigned int ix = 0; ix < sizeof(complexValueRootV) / sizeof(complexValueRootV[0]); ++ix)
    {
@@ -65,16 +65,38 @@ static bool isComplexValuePath(const char* path, char* root, char* rest)
 
       if (strncmp(complexValueRootV[ix], path, len) == 0)
       {
-         if (root != NULL)
-            strcpy(root, complexValueRootV[ix]);
-         if (rest != NULL)
-            strcpy(rest, &path[len]);
+         root = complexValueRootV[ix];
+         rest = &path[len];
 
          return true;
       }
    }
 
    return false;
+}
+
+
+/* ****************************************************************************
+*
+* xmlTypeAttributeGet - 
+*/
+static std::string xmlTypeAttributeGet(xml_node<>* node)
+{
+  std::string type = "";
+
+  for (xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute())
+  {
+    if (attr->name() == std::string("type"))
+    {
+       if (type != "")
+         return "more than one 'type' attribute";
+       type = attr->value();
+    }
+    else
+      return std::string("unknown attribute '") + attr->name() + "'";
+  }
+
+  return type;
 }
 
 
@@ -86,10 +108,7 @@ static bool isComplexValuePath(const char* path, char* root, char* rest)
 void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* parseVector, ParseData* reqDataP)
 {
   if ((node == NULL) || (node->name() == NULL))
-  {
-     LM_M(("NULL node/name for father '%s'", fatherPath.c_str()));
      return;
-  }
 
   if ((node->name()[0] == 0) && (ciP->complexValueContainer == NULL))
      return;
@@ -120,15 +139,24 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
 
   if (treated == false)
   {
-    static char root[1024];
-    static char rest[1024];
+    std::string root;
+    std::string rest;
 
     if (isComplexValuePath(fatherPath.c_str(), root, rest))
     {
-      std::string  name  = node->name();
-      std::string  value = node->value();
+      std::string  name   = node->name();
+      std::string  value  = node->value();
+      std::string  type   = xmlTypeAttributeGet(node);
 
-      if (rest[0] == 0)  // Toplevel
+      if ((type != "") && (type != "vector"))
+      {
+         ciP->httpStatusCode = SccBadRequest;
+         ciP->answer = std::string("Bad XML attribute for '") + node->name() + "': " + type;
+         LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), fatherPath.c_str()));
+         return;
+      }
+
+      if (rest == "")  // Toplevel
       {
         if (ciP->complexValueContainer == NULL) // Toplevel start
         {
@@ -139,21 +167,37 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
         else // Toplevel END
         {
           LM_T(LmtComplexValue, ("Complex value end for '%s'", fatherPath.c_str()));
-          ciP->complexValueContainer->finish();
+          std::string status = ciP->complexValueContainer->finish();
+
           ciP->complexValueContainer = NULL;
+
+          if (status != "")
+          {
+            ciP->httpStatusCode = SccBadRequest;
+            ciP->answer = std::string("complex value error: ") + status;
+            LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), fatherPath.c_str()));
+            return;
+          }
         }
       }
 
       if ((value == " ") && (name != ""))
-        ciP->complexValueContainer->add(orion::ComplexValueNode::Struct, name, rest);
+      {
+         if (type == "vector")
+           ciP->complexValueContainer->add(orion::ComplexValueNode::Vector, name, rest);
+         else
+           ciP->complexValueContainer->add(orion::ComplexValueNode::Struct, name, rest);
+      }
       else if (name != "")
         ciP->complexValueContainer->add(orion::ComplexValueNode::Leaf, name, rest, value);
     }
     else
     {
       ciP->httpStatusCode = SccBadRequest;
-      ciP->answer = std::string("Unknown XML field: '") + node->name() + "'";
+      if (ciP->answer == "")
+        ciP->answer = std::string("Unknown XML field: '") + node->name() + "'";
       LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), fatherPath.c_str()));
+      return;
     }
   }
 

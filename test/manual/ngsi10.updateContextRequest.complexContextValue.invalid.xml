@@ -16,10 +16,10 @@
                 <value2>2</value2>
                 <value3>3</value3>
                 <value4>4</value4>
-                <level3>
-                  <value2>vv2</value2>
-                  <value3>vv3</value3>
-                  <value4>vv4</value4>
+                <level3 type="vector">
+                  <value>vv2</value>
+                  <value>vv3</value>
+                  <value>vv4</value>
                 </level3>
               </level2>
               <level2again>

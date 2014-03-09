@@ -42,9 +42,9 @@ namespace orion
 *
 * ComplexValueNode - constructor for toplevel 'node' 
 */
-ComplexValueNode::ComplexValueNode(const char* _root)
+ComplexValueNode::ComplexValueNode(std::string _root)
 {
-  LM_T(LmtComplexValue2, ("Creating ROOT of ComplexValue tree for '%s'", _root));
+  LM_T(LmtComplexValue, ("Creating ROOT of ComplexValue tree for '%s'", _root.c_str()));
   root       = _root;
   rootP      = this;
   type       = Struct;
@@ -53,7 +53,7 @@ ComplexValueNode::ComplexValueNode(const char* _root)
   name       = "";
   path       = "/";
   siblingNo  = 0;
-  LM_T(LmtComplexValue2, ("Created ROOT of ComplexValue tree for '%s'", root.c_str()));
+  LM_T(LmtComplexValue, ("Created ROOT of ComplexValue tree for '%s'", root.c_str()));
 }
 
 
@@ -99,10 +99,14 @@ const char* ComplexValueNode::typeName(void)
 *
 * finish - 
 */
-void ComplexValueNode::finish(void)
+std::string ComplexValueNode::finish(void)
 {
-  // Detect vectors?
   shortShow("");
+
+  error = "";
+  vectorCheck();
+
+  return error;
 }
 
 
@@ -126,12 +130,12 @@ void ComplexValueNode::add(const Type _type, const std::string& _name, const std
 {
   ComplexValueNode* owner;
    
-  LM_T(LmtComplexValue, ("Adding '%s' in '%s'. I am '%s'", _name.c_str(), _containerPath.c_str(), name.c_str()));
+  LM_T(LmtComplexValueAdd, ("Adding '%s' in '%s'. I am '%s'", _name.c_str(), _containerPath.c_str(), name.c_str()));
 
   if (type == Leaf)
-    LM_T(LmtComplexValue, ("Adding Leaf '%s', with value '%s' under '%s'", _name.c_str(), value.c_str(), _containerPath.c_str()));
+    LM_T(LmtComplexValueAdd, ("Adding Leaf '%s', with value '%s' under '%s'", _name.c_str(), value.c_str(), _containerPath.c_str()));
   else
-    LM_T(LmtComplexValue, ("Adding Struct '%s' under '%s'", _name.c_str(), _containerPath.c_str()));
+    LM_T(LmtComplexValueAdd, ("Adding Struct '%s' under '%s'", _name.c_str(), _containerPath.c_str()));
 
   if (_containerPath == name)
     owner = this;
@@ -153,54 +157,44 @@ void ComplexValueNode::add(const Type _type, const std::string& _name, const std
 *
 * lookup - 
 */
-ComplexValueNode* ComplexValueNode::lookup(const char* _path, int callNo)
+ComplexValueNode* ComplexValueNode::lookup(const char* _path)
 {
-  std::vector<std::string> pathV;
-  int                      depth;
-  char*                    lookFor;
-  std::string              nextPath;
-  
-  if (callNo == 1)
-  {
-    LM_T(LmtComplexValue, ("--------------------------------------------"));
-    LM_T(LmtComplexValue, ("  Looking for '%s', starting in '%s'", _path, name.c_str()));
-  }
-  else
-  {
-    LM_T(LmtComplexValue, ("  -----   Call %d --------------------", callNo));
-    LM_T(LmtComplexValue, ("  Looking for '%s', now we're in '%s'", _path, name.c_str()));
-  }
+   ComplexValueNode*         node = rootP;  // where the lookup is started
+   std::vector<std::string>  pathV;
+   int                       depth;
 
-  depth   = stringSplit(_path, '/', pathV);
-  LM_T(LmtComplexValue, ("'%s' has depth %d", _path, depth));
-  lookFor = (char*) pathV[0].c_str();
-     
-  LM_T(LmtComplexValue, ("Looking for '%s' in '%s' (depth: %d). This time: '%s'", _path, path.c_str(), depth, lookFor));
+   LM_T(LmtComplexValueLookup, ("Looking for '%s'", _path));
+   depth = stringSplit(_path, '/', pathV);
 
-  for (unsigned int ix = 0; ix < childV.size(); ++ix)
-  {
-    if (childV[ix]->name != lookFor)
-      continue;
+   for (int level = 0; level < depth; ++level)
+   {
+      bool found = false;
 
-    LM_T(LmtComplexValue, ("Found child '%s'", childV[ix]->name.c_str()));
-    if (depth == 1)
-      return childV[ix];
+      for (unsigned int ix = 0; ix < node->childV.size(); ++ix)
+      {
+         LM_T(LmtComplexValueLookup, ("Looking for '%s' - comparing with '%s' %d/%d", pathV[level].c_str(), node->childV[ix]->name.c_str(), ix, node->childV.size()));
+         if (node->childV[ix]->name == pathV[level])
+         {
+            found = true;
+            node  = node->childV[ix];
+            LM_T(LmtComplexValueLookup, ("found node of level %d: '%s'", level, node->name.c_str()));
 
-    pathV.erase(pathV.begin());
+            if (level == depth -1)
+              return node;
+            break;
+         }
+         else
+            LM_T(LmtComplexValueLookup, ("Looking for '%s' - '%s' is not a match (%d/%d)", pathV[level].c_str(), node->childV[ix]->name.c_str(), ix, node->childV.size()));
+      }
 
-    nextPath = "";
-    for (unsigned int pix; pix < pathV.size(); ++pix)
-    {
-      nextPath += pathV[pix];
-      if (pix != pathV.size() - 1)
-        nextPath += "/";
-    }
+      if (!found)
+      {
+        LM_T(LmtComplexValueLookup, ("'%s' not found", _path)); 
+        return NULL;
+      }
+   }
 
-    LM_T(LmtComplexValue, ("'Recursive' call for '%s': path: '%s'", childV[ix]->name.c_str(), nextPath.c_str()));
-    return childV[ix]->lookup(nextPath.c_str(), callNo + 1);
-  }
-
-  return NULL;
+   return NULL;
 }
 
 
@@ -211,7 +205,13 @@ ComplexValueNode* ComplexValueNode::lookup(const char* _path, int callNo)
 */
 void ComplexValueNode::shortShow(std::string indent)
 {
-  PRINTF("%s%s\n", indent.c_str(), name.c_str());
+  if (type == Vector)
+    PRINTF("%s%s (vector)\n", indent.c_str(), name.c_str());
+  else if (type == Struct)
+    PRINTF("%s%s (struct)\n", indent.c_str(), name.c_str());
+  else
+    PRINTF("%s%s (%s)\n", indent.c_str(), name.c_str(), value.c_str());
+
   for (unsigned long ix = 0; ix < childV.size(); ++ix)
     childV[ix]->shortShow(indent + "    ");
 }
@@ -258,6 +258,31 @@ void ComplexValueNode::show(std::string indent)
   }
 
   PRINTF("\n");
+}
+
+
+
+/* ****************************************************************************
+*
+* vectorCheck - 
+*/
+void ComplexValueNode::vectorCheck(void)
+{
+  if (type == Vector)
+  {
+    for (unsigned long ix = 1; ix < childV.size(); ++ix)
+    {
+      if (childV[ix]->name != childV[0]->name)
+      {
+        rootP->error = std::string("bad tag-name of vector item: '") + childV[ix]->name + "' (should be '" + childV[0]->name + "')";
+        LM_E((rootP->error.c_str()));
+        return;
+      }
+    }
+  }
+
+  for (unsigned long ix = 0; ix < childV.size(); ++ix)
+    childV[ix]->vectorCheck();
 }
 
 }
