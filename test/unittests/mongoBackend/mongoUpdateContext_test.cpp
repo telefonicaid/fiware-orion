@@ -293,7 +293,7 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     /* Context Element response # 1 */
     EXPECT_EQ("E1", RES_CER(0).entityId.id);
     EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
@@ -1036,7 +1036,7 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     /* Context Element response # 1 */
     EXPECT_EQ("E1", RES_CER(0).entityId.id);
     EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
@@ -1222,7 +1222,7 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     /* Context Element response # 1 */
     EXPECT_EQ("E1", RES_CER(0).entityId.id);
     EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
@@ -1400,7 +1400,7 @@ TEST(mongoUpdateContextRequest, update1EntNAttrSameName)
     /* Context Element response # 1 */
     EXPECT_EQ("E1", RES_CER(0).entityId.id);
     EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
@@ -1584,7 +1584,7 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     /* Context Element response # 1 */
     EXPECT_EQ("E1", RES_CER(0).entityId.id);
     EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
@@ -1776,7 +1776,7 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     /* Context Element response # 1 */
     EXPECT_EQ("E1", RES_CER(0).entityId.id);
     EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA8", RES_CER_ATTR(0, 0)->type);
@@ -2556,7 +2556,7 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     /* Context Element response # 1 */
     EXPECT_EQ("E1", RES_CER(0).entityId.id);
     EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA8", RES_CER_ATTR(0, 0)->type);
@@ -2752,7 +2752,7 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     /* Context Element response # 1 */
     EXPECT_EQ("E1", RES_CER(0).entityId.id);
     EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA8", RES_CER_ATTR(0, 0)->type);
@@ -2945,7 +2945,7 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     /* Context Element response # 1 */
     EXPECT_EQ("E1", RES_CER(0).entityId.id);
     EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A8", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA8", RES_CER_ATTR(0, 0)->type);
@@ -2962,7 +2962,7 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     /* Context Element response # 2 */
     EXPECT_EQ("E2", RES_CER(1).entityId.id);
     EXPECT_EQ("T2", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
     ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A10", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA10", RES_CER_ATTR(1, 0)->type);
@@ -3158,7 +3158,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     /* Context Element response # 1 */
     EXPECT_EQ("E1", RES_CER(0).entityId.id);
     EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
@@ -3868,7 +3868,7 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     /* Context Element response # 1 */
     EXPECT_EQ("E1", RES_CER(0).entityId.id);
     EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
@@ -6001,7 +6001,7 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     /* Context Element response # 1 */
     EXPECT_EQ("E1", RES_CER(0).entityId.id);
     EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
@@ -6174,7 +6174,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     /* Context Element response # 1 */
     EXPECT_EQ("E10", RES_CER(0).entityId.id);
     EXPECT_EQ("T10", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
@@ -6396,7 +6396,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     /* Context Element response # 1 */
     EXPECT_EQ("E10", RES_CER(0).entityId.id);
     EXPECT_EQ("T10", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
@@ -6848,7 +6848,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     /* Context Element response # 1 */
     EXPECT_EQ("E10", RES_CER(0).entityId.id);
     EXPECT_EQ("T10", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
@@ -7084,7 +7084,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     /* Context Element response # 1 */
     EXPECT_EQ("E10", RES_CER(0).entityId.id);
     EXPECT_EQ("T10", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA11", RES_CER_ATTR(0, 0)->type);
@@ -7302,7 +7302,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     /* Context Element response # 1 */
     EXPECT_EQ("E10", RES_CER(0).entityId.id);
     EXPECT_EQ("T10", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
@@ -7519,7 +7519,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     /* Context Element response # 1 */
     EXPECT_EQ("E10", RES_CER(0).entityId.id);
     EXPECT_EQ("T10", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
@@ -7735,7 +7735,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     /* Context Element response # 1 */
     EXPECT_EQ("E10", RES_CER(0).entityId.id);
     EXPECT_EQ("T10", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern) << "wrong entity isPattern (context element response #1)";
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
