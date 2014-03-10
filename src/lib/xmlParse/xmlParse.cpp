@@ -151,7 +151,7 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
       if ((type != "") && (type != "vector"))
       {
          ciP->httpStatusCode = SccBadRequest;
-         ciP->answer = std::string("Bad XML attribute for '") + node->name() + "': " + type;
+         ciP->answer = std::string("Bad value for XML attribute 'type' for '") + node->name() + "': '" + type + "'";
          LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), fatherPath.c_str()));
          return;
       }
