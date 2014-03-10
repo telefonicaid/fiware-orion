@@ -51,6 +51,9 @@
 * - appendAdditionalLocAttributeFail
 * - appendWrongCoordinatesFormatFail
 * - appendNotSupportedLocationFail
+* - updateWrongCoordinatesFormatFail
+* - updateLocationMetadataFail
+* - deleteLocationMetadataFail
 *
 */
 
@@ -559,7 +562,118 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
 */
 TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
 {
-    EXPECT_EQ(0, 1) << "test stub, to be implemented";
+    utInit();
+
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Forge the request (from "inside" to "outside") */
+    ContextElement ce;
+    ContextAttribute ca1, ca2;
+    Metadata md1, md2;
+    ce.entityId.fill("E3", "T3", "false");
+    ca1 = ContextAttribute("A1", "TA1", "2, -4");
+    md1 = Metadata("location", "string", "WSG84");
+    ca1.metadataVector.push_back(&md1);
+    ce.contextAttributeVector.push_back(&ca1);
+    ca2 = ContextAttribute("A2", "TA2", "5, -6");
+    md2 = Metadata("location", "string", "WSG84");
+    ca2.metadataVector.push_back(&md2);
+    ce.contextAttributeVector.push_back(&ca2);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("APPEND");
+
+    /* Prepare mock */
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoUpdateContext(&req, &res);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E3", RES_CER(0).entityId.id);
+    EXPECT_EQ("T3", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
+    EXPECT_EQ("WSG84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+    EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+    ASSERT_EQ(1, RES_CER_ATTR(0, 1)->metadataVector.size());
+    EXPECT_EQ("location", RES_CER_ATTR(0, 1)->metadataVector.get(0)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 1)->metadataVector.get(0)->type);
+    EXPECT_EQ("WSG84", RES_CER_ATTR(0, 1)->metadataVector.get(0)->value);
+    EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("You cannot use more than one location attribute when creating an entity (see Orion user manual)", RES_CER_STATUS(0).details);
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientConnection* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent;
+    std::vector<BSONElement> attrs;
+    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
+    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("creDate"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    BSONObj a1 = getAttr(attrs, "A1", "TA1");
+    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
+    EXPECT_FALSE(a1.hasField("creDate"));
+    EXPECT_FALSE(a1.hasField("modDate"));
+    EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    EXPECT_EQ(-5, coordX(ent));
+    EXPECT_EQ(2, coordY(ent));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
+    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    EXPECT_FALSE(ent.hasField("creDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
+    EXPECT_FALSE(ent.hasField("location"));
+
+    /* Release connection */
+    mongoDisconnect();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -568,7 +682,105 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
 */
 TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
 {
-    EXPECT_EQ(0, 1) << "test stub, to be implemented";
+    utInit();
+
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Forge the request (from "inside" to "outside") */
+    ContextElement ce;
+    ce.entityId.fill("E3", "T3", "false");
+    ContextAttribute ca("A1", "TA1", "invalid");
+    Metadata md("location", "string", "WSG84");
+    ca.metadataVector.push_back(&md);
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("APPEND");
+
+    /* Prepare mock */
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoUpdateContext(&req, &res);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E3", RES_CER(0).entityId.id);
+    EXPECT_EQ("T3", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
+    EXPECT_EQ("WSG84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("coordiates format error (see Orion user manual): invalid", RES_CER_STATUS(0).details);
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientConnection* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent;
+    std::vector<BSONElement> attrs;
+    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
+    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("creDate"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    BSONObj a1 = getAttr(attrs, "A1", "TA1");
+    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
+    EXPECT_FALSE(a1.hasField("creDate"));
+    EXPECT_FALSE(a1.hasField("modDate"));
+    EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    EXPECT_EQ(-5, coordX(ent));
+    EXPECT_EQ(2, coordY(ent));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
+    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    EXPECT_FALSE(ent.hasField("creDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
+    EXPECT_FALSE(ent.hasField("location"));
+
+    /* Release connection */
+    mongoDisconnect();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -577,7 +789,105 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
 */
 TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
 {
-    EXPECT_EQ(0, 1) << "test stub, to be implemented";
+    utInit();
+
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Forge the request (from "inside" to "outside") */
+    ContextElement ce;
+    ce.entityId.fill("E3", "T3", "false");
+    ContextAttribute ca("A1", "TA1", "2, 4");
+    Metadata md("location", "string", "gurugu");
+    ca.metadataVector.push_back(&md);
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("APPEND");
+
+    /* Prepare mock */
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoUpdateContext(&req, &res);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E3", RES_CER(0).entityId.id);
+    EXPECT_EQ("T3", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
+    EXPECT_EQ("gurugu", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("only WSG84 are supported, found: gurugu", RES_CER_STATUS(0).details);
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientConnection* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent;
+    std::vector<BSONElement> attrs;
+    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
+    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("creDate"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    BSONObj a1 = getAttr(attrs, "A1", "TA1");
+    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
+    EXPECT_FALSE(a1.hasField("creDate"));
+    EXPECT_FALSE(a1.hasField("modDate"));
+    EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    EXPECT_EQ(-5, coordX(ent));
+    EXPECT_EQ(2, coordY(ent));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
+    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    EXPECT_FALSE(ent.hasField("creDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
+    EXPECT_FALSE(ent.hasField("location"));
+
+    /* Release connection */
+    mongoDisconnect();
+
+    utExit();
 }
 
 
@@ -587,7 +897,105 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
 */
 TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
 {
-    EXPECT_EQ(0, 1) << "test stub, to be implemented";
+    utInit();
+
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Forge the request (from "inside" to "outside") */
+    ContextElement ce;
+    ce.entityId.fill("E1", "T1", "false");
+    ContextAttribute ca("A5", "TA5", "2, 4");
+    Metadata md("location", "string", "WSG84");
+    ca.metadataVector.push_back(&md);
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("APPEND");
+
+    /* Prepare mock */
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoUpdateContext(&req, &res);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A5", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
+    EXPECT_EQ("WSG84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("action: APPEND - entity: (E1, T1) - offending attribute: A5 - attemp to define a location attribute (A5) when another one has been previously defined (A1)", RES_CER_STATUS(0).details);
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientConnection* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent;
+    std::vector<BSONElement> attrs;
+    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
+    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("creDate"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    BSONObj a1 = getAttr(attrs, "A1", "TA1");
+    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
+    EXPECT_FALSE(a1.hasField("creDate"));
+    EXPECT_FALSE(a1.hasField("modDate"));
+    EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    EXPECT_EQ(-5, coordX(ent));
+    EXPECT_EQ(2, coordY(ent));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
+    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    EXPECT_FALSE(ent.hasField("creDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
+    EXPECT_FALSE(ent.hasField("location"));
+
+    /* Release connection */
+    mongoDisconnect();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -596,7 +1004,105 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
 */
 TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
 {
-    EXPECT_EQ(0, 1) << "test stub, to be implemented";
+    utInit();
+
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Forge the request (from "inside" to "outside") */
+    ContextElement ce;
+    ce.entityId.fill("E2", "T2", "false");
+    ContextAttribute ca("A5", "TA5", "erroneous");
+    Metadata md("location", "string", "WSG84");
+    ca.metadataVector.push_back(&md);
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("APPEND");
+
+    /* Prepare mock */
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoUpdateContext(&req, &res);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E2", RES_CER(0).entityId.id);
+    EXPECT_EQ("T2", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A5", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
+    EXPECT_EQ("WSG84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("action: APPEND - entity: (E2, T2) - offending attribute: A5 - error parsing location attribute, value: <erroneous>", RES_CER_STATUS(0).details);
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientConnection* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent;
+    std::vector<BSONElement> attrs;
+    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
+    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("creDate"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    BSONObj a1 = getAttr(attrs, "A1", "TA1");
+    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
+    EXPECT_FALSE(a1.hasField("creDate"));
+    EXPECT_FALSE(a1.hasField("modDate"));
+    EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    EXPECT_EQ(-5, coordX(ent));
+    EXPECT_EQ(2, coordY(ent));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
+    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    EXPECT_FALSE(ent.hasField("creDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
+    EXPECT_FALSE(ent.hasField("location"));
+
+    /* Release connection */
+    mongoDisconnect();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -604,6 +1110,131 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
 *  - appendNotSupportedLocationFail
 */
 TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
+{
+    utInit();
+
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Forge the request (from "inside" to "outside") */
+    ContextElement ce;
+    ce.entityId.fill("E2", "T2", "false");
+    ContextAttribute ca("A5", "TA5", "8, -9");
+    Metadata md("location", "string", "gurugu");
+    ca.metadataVector.push_back(&md);
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("APPEND");
+
+    /* Prepare mock */
+    TimerMock* timerMock = new TimerMock();
+    ON_CALL(*timerMock, getCurrentTime())
+            .WillByDefault(Return(1360232700));
+    setTimer(timerMock);
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoUpdateContext(&req, &res);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E2", RES_CER(0).entityId.id);
+    EXPECT_EQ("T2", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A5", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
+    EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
+    EXPECT_EQ("gurugu", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("action: APPEND - entity: (E2, T2) - offending attribute: A5 - only WSG84 is supported for location, found: <gurugu>", RES_CER_STATUS(0).details);
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientConnection* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent;
+    std::vector<BSONElement> attrs;
+    ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
+    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("creDate"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    BSONObj a1 = getAttr(attrs, "A1", "TA1");
+    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
+    EXPECT_FALSE(a1.hasField("creDate"));
+    EXPECT_FALSE(a1.hasField("modDate"));
+    EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
+    EXPECT_EQ(-5, coordX(ent));
+    EXPECT_EQ(2, coordY(ent));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
+    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    EXPECT_FALSE(ent.hasField("creDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
+    EXPECT_FALSE(ent.hasField("location"));
+
+    /* Release connection */
+    mongoDisconnect();
+
+    utExit();
+}
+
+/* ****************************************************************************
+*
+*  - updateWrongCoordinatesFormatFail
+*/
+TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
+{
+    EXPECT_EQ(0, 1) << "test stub, to be implemented";
+}
+
+/* ****************************************************************************
+*
+*  - updateLocationMetadataFail
+*/
+TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
+{
+    EXPECT_EQ(0, 1) << "test stub, to be implemented";
+}
+
+/* ****************************************************************************
+*
+*  - deleteLocationMetadataFail
+*/
+TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
 {
     EXPECT_EQ(0, 1) << "test stub, to be implemented";
 }

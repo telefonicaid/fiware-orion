@@ -326,6 +326,11 @@ static bool processLocation(ContextAttributeVector caV, std::string& locAttr, do
                     return false;
                 }
                 else {
+                    if (md.value != LOCATION_WSG84) {
+                        *errDetail = "only WSG84 are supported, found: " + md.value;
+                        return false;
+                    }
+
                     if (!string2coords(ca.value, coordLat, coordLong)) {
                         *errDetail = "coordiates format error (see Orion user manual): " + ca.value;
                         return false;
