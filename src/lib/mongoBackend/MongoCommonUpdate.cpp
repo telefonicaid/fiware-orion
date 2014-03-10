@@ -635,7 +635,8 @@ static bool processContextAttributeVector (ContextElement* ceP,
             ca->metadataVector.push_back(md);
         }
         if (targetAttr->getLocation().length() > 0) {
-            md = new Metadata(NGSI_MD_ID, "string", targetAttr->getLocation());
+            md = new Metadata(NGSI_MD_LOCATION, "string", targetAttr->getLocation());
+            ca->metadataVector.push_back(md);
         }
         cerP->contextElement.contextAttributeVector.push_back(ca);
 
@@ -752,6 +753,23 @@ static bool processContextAttributeVector (ContextElement* ceP,
             if (deleteAttribute(attrs, newAttrs, targetAttr)) {
                 entityModified = true;
                 *attrs = *newAttrs;
+
+                /* Check aspects related with location */
+                if (targetAttr->getLocation().length() > 0 ) {
+                    cerP->statusCode.fill(SccInvalidParameter,
+                                          std::string("action: DELETE") +
+                                          std::string(" - entity: (") + eP->toString() + ")" +
+                                          std::string(" - offending attribute: ") + targetAttr->toString() +
+                                          std::string(" - location attribute has to be defined at creation time, with APPEND"));
+
+                    responseP->contextElementResponseVector.push_back(cerP);
+                    return false;
+                }
+
+                if (locAttr == targetAttr->name) {
+                    locAttr = "";
+                }
+
             }
             else {
                 /* If deleteAttribute() returns false, then that particular attribute has not
@@ -1032,16 +1050,25 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
         /* Now that newAttrs containts the final status of the attributes after processing the whole
          * list of attributes in the ContextElement, update entity attributes in database */
-        BSONObjBuilder updatedEntityBuilder;
-        updatedEntityBuilder.appendArray(ENT_ATTRS, attrs);
-        updatedEntityBuilder.append(ENT_MODIFICATION_DATE, getCurrentTime());
+        BSONObjBuilder updateSet, updateUnset;
+        updateSet.appendArray(ENT_ATTRS, attrs);
+        updateSet.append(ENT_MODIFICATION_DATE, getCurrentTime());
         if (locAttr.length() > 0) {
-            updatedEntityBuilder.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
+            updateSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
                                                            ENT_LOCATION_COORDS << BSON_ARRAY(coordLat << coordLong)));
+        } else {
+            updateUnset.append(ENT_LOCATION, 1);
         }
 
-        /* We use $set to avoid losing the creation date field */
-        BSONObj updatedEntity = BSON("$set" << updatedEntityBuilder.obj());
+        /* We use $set/$unset to avoid doing a global update that will lose the creation date field. Set if always
+           present, unset only if locAttr was erased */
+        BSONObj updatedEntity;
+        if (locAttr.length() > 0) {
+            updatedEntity = BSON("$set" << updateSet.obj());
+        }
+        else {
+            updatedEntity = BSON("$set" << updateSet.obj() << "$unset" << updateUnset.obj());
+        }
         /* Note that the query that we build for updating is slighty different than the query used
          * for selecting the entities to process. In particular, the "no type" branch in the if
          * sentence selects precisely the entity with no type, using the {$exists: false} clause */
