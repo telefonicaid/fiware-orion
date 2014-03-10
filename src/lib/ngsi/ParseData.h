@@ -287,8 +287,13 @@ typedef struct UpdateContextAttributeData
 */
 typedef struct ParseData
 {
-  std::string                                 errorString;
+  ParseData()
+  {
+    lastContextAttribute = NULL;
+  }
 
+  std::string                                 errorString;
+  ContextAttribute*                           lastContextAttribute;
   RegisterContextData                         rcr;
   DiscoverContextAvailabilityData             dcar;
   SubscribeContextAvailabilityData            scar;

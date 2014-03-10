@@ -64,6 +64,7 @@ ComplexValueNode::ComplexValueNode(std::string _root)
 */
 ComplexValueNode::ComplexValueNode(ComplexValueNode* _container, std::string _path, std::string _name, std::string _value, int _siblingNo, Type _type, int _level)
 {
+  LM_T(LmtComplexValue, ("Creating complex value node '%s'", _name.c_str()));
   container = _container;
   rootP     = (level == 1)? container : container->rootP;
   name      = _name;
@@ -73,6 +74,17 @@ ComplexValueNode::ComplexValueNode(ComplexValueNode* _container, std::string _pa
   siblingNo = _siblingNo;
   type      = _type;
   counter   = 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* ComplexValueNode - destructor for all nodes except toplevel
+*/
+ComplexValueNode::~ComplexValueNode()
+{
+   LM_T(LmtComplexValue, ("Destroying node '%s', path '%s'", name.c_str(), path.c_str()));
 }
 
 

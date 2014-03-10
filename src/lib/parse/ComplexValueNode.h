@@ -62,6 +62,7 @@ public:
 
    ComplexValueNode(std::string _root);
    ComplexValueNode(ComplexValueNode* _container, std::string _path, std::string _name, std::string _value, int _siblingNo, Type _type, int _level = -1);
+   ~ComplexValueNode();
 
    const char*        typeName(void);
    void               add(ComplexValueNode* node);

@@ -570,11 +570,23 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
 
         /* No matter if success or fail, we have to include the attribute in the response */
-        ContextAttribute* ca = new ContextAttribute();
-        ca->name = ceP->contextAttributeVector.get(ix)->name;
-        ca->type = ceP->contextAttributeVector.get(ix)->type;
-        if (ceP->contextAttributeVector.get(ix)->getId() != "") {
-            Metadata*  md = new Metadata(NGSI_MD_ID, "string", ceP->contextAttributeVector.get(ix)->getId());
+
+        // FIXME P4: ContextAttribute has a constructor with ContextAttribute* as input
+        //           This constructor might be useful here ...
+
+        ContextAttribute* ca          = new ContextAttribute();
+        ContextAttribute* attributeP  = ceP->contextAttributeVector.get(ix);
+        ca->name = attributeP->name;
+        ca->type = attributeP->type;
+
+        if (attributeP->complexValueP != NULL)
+        {
+          LM_W(("This context attribute has a COMPLEX VALUE - special care is needed (complexValueP at %p)", attributeP->complexValueP));
+          attributeP->complexValueP->shortShow("processContextAttributeVector: ");
+        }
+
+        if (attributeP->getId() != "") {
+            Metadata*  md = new Metadata(NGSI_MD_ID, "string", attributeP->getId());
             ca->metadataVector.push_back(md);
         }
         cerP->contextElement.contextAttributeVector.push_back(ca);
@@ -583,12 +595,12 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
          * "append" it would keep the true value untouched */
         bool actualUpdate = true;
         if (strcasecmp(action.c_str(), "update") == 0) {
-            if (updateAttribute(attrs, newAttrs, ceP->contextAttributeVector.get(ix), &actualUpdate)) {
+            if (updateAttribute(attrs, newAttrs, attributeP, &actualUpdate)) {
                 entityModified = actualUpdate || entityModified;
                 *attrs = *newAttrs;                
             }
             else {
-                ContextAttribute* aP = ceP->contextAttributeVector.get(ix);
+                ContextAttribute* aP = attributeP;
 
                 /* If updateAttribute() returns false, then that particular attribute has not
                  * been found. In this case, we interrupt the processing an early return with
@@ -604,8 +616,8 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
             }
         }
         else if (strcasecmp(action.c_str(), "append") == 0) {
-            if (legalIdUsage(attrs, ceP->contextAttributeVector.get(ix))) {
-                entityModified = appendAttribute(attrs, newAttrs, ceP->contextAttributeVector.get(ix)) || entityModified;
+            if (legalIdUsage(attrs, attributeP)) {
+                entityModified = appendAttribute(attrs, newAttrs, attributeP) || entityModified;
                 *attrs = *newAttrs;
             }
             else {

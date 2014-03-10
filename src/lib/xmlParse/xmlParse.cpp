@@ -105,13 +105,13 @@ static std::string xmlTypeAttributeGet(xml_node<>* node)
 *
 * xmlParse - 
 */
-void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* parseVector, ParseData* reqDataP)
+void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* parseVector, ParseData* parseDataP)
 {
   if ((node == NULL) || (node->name() == NULL))
-     return;
+    return;
 
   if ((node->name()[0] == 0) && (ciP->complexValueContainer == NULL))
-     return;
+    return;
 
   std::string path = fatherPath + "/" + node->name();
 
@@ -126,7 +126,7 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
     {
       int r;
 
-      if ((r = parseVector[ix].treat(node, reqDataP)) != 0)
+      if ((r = parseVector[ix].treat(node, parseDataP)) != 0)
       {
         fprintf(stderr, "parse vector treat function error: %d\n", r);
         LM_E(("parse vector treat function error: %d", r));
@@ -168,7 +168,7 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
         {
           LM_T(LmtComplexValue, ("Complex value end for '%s'", fatherPath.c_str()));
           std::string status = ciP->complexValueContainer->finish();
-
+          parseDataP->lastContextAttribute->complexValueP = ciP->complexValueContainer;
           ciP->complexValueContainer = NULL;
 
           if (status != "")
@@ -205,7 +205,7 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
 
   while (child != NULL)
   {
-    xmlParse(ciP, node, child, indentation + "  ", path, parseVector, reqDataP);
+    xmlParse(ciP, node, child, indentation + "  ", path, parseVector, parseDataP);
     child = child->next_sibling();
   }
 }
@@ -216,7 +216,7 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
 *
 * xmlNullTreat - 
 */
-int nullTreat(xml_node<>* node, ParseData* reqDataP)
+int nullTreat(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtNullNode, ("Not treating node '%s'", node->name()));
   return 0;
