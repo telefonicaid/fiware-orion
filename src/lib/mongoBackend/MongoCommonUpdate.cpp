@@ -602,7 +602,16 @@ static void buildGeneralErrorReponse(ContextElement* ceP, ContextAttribute* ca, 
 * Returns true if entity was actually modified, false otherwise (including fail cases)
 *
 */
-static bool processContextAttributeVector (ContextElement* ceP, std::string action, std::map<string, BSONObj*>* subsToNotify, BSONObj* attrs, BSONObj* newAttrs, ContextElementResponse* cerP, UpdateContextResponse* responseP) {
+static bool processContextAttributeVector (ContextElement* ceP,
+                                           std::string action,
+                                           std::map<string, BSONObj*>* subsToNotify,
+                                           BSONObj* attrs, BSONObj* newAttrs,
+                                           ContextElementResponse* cerP,
+                                           UpdateContextResponse* responseP,
+                                           std::string& locAttr,
+                                           double& coordLat,
+                                           double& coordLong)
+{
 
     EntityId*   eP         = &cerP->contextElement.entityId;
     std::string entityId   = cerP->contextElement.entityId.id;
@@ -612,13 +621,21 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
 
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
 
+        ContextAttribute* targetAttr = ceP->contextAttributeVector.get(ix);
+
         /* No matter if success or fail, we have to include the attribute in the response */
         ContextAttribute* ca = new ContextAttribute();
-        ca->name = ceP->contextAttributeVector.get(ix)->name;
-        ca->type = ceP->contextAttributeVector.get(ix)->type;
-        if (ceP->contextAttributeVector.get(ix)->getId() != "") {
-            Metadata*  md = new Metadata(NGSI_MD_ID, "string", ceP->contextAttributeVector.get(ix)->getId());
+        ca->name = targetAttr->name;
+        ca->type = targetAttr->type;
+        // FIXME P4: not sure, but probably we can generalize this when we address
+        // issue https://github.com/telefonicaid/fiware-orion/issues/252
+        Metadata* md;
+        if (targetAttr->getId().length() > 0) {
+            md = new Metadata(NGSI_MD_ID, "string", targetAttr->getId());
             ca->metadataVector.push_back(md);
+        }
+        if (targetAttr->getLocation().length() > 0) {
+            md = new Metadata(NGSI_MD_ID, "string", targetAttr->getLocation());
         }
         cerP->contextElement.contextAttributeVector.push_back(ca);
 
@@ -626,12 +643,11 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
          * "append" it would keep the true value untouched */
         bool actualUpdate = true;
         if (strcasecmp(action.c_str(), "update") == 0) {
-            if (updateAttribute(attrs, newAttrs, ceP->contextAttributeVector.get(ix), &actualUpdate)) {
+            if (updateAttribute(attrs, newAttrs, targetAttr, &actualUpdate)) {
                 entityModified = actualUpdate || entityModified;
                 *attrs = *newAttrs;                
             }
             else {
-                ContextAttribute* aP = ceP->contextAttributeVector.get(ix);
 
                 /* If updateAttribute() returns false, then that particular attribute has not
                  * been found. In this case, we interrupt the processing an early return with
@@ -639,20 +655,86 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
                 cerP->statusCode.fill(SccInvalidParameter, 
                                       std::string("action: UPDATE") + 
                                       std::string(" - entity: (") + eP->toString() + ")" +
-                                      std::string(" - offending attribute: ") + aP->toString());
+                                      std::string(" - offending attribute: ") + targetAttr->toString());
 
                 responseP->contextElementResponseVector.push_back(cerP);
                 return false;
 
             }
+
+            /* Check aspects related with location */
+            if (targetAttr->getLocation().length() > 0 ) {
+                cerP->statusCode.fill(SccInvalidParameter,
+                                      std::string("action: UPDATE") +
+                                      std::string(" - entity: (") + eP->toString() + ")" +
+                                      std::string(" - offending attribute: ") + targetAttr->toString() +
+                                      std::string(" - location attribute has to be defined at creation time, with APPEND"));
+
+                responseP->contextElementResponseVector.push_back(cerP);
+                return false;
+            }
+
+            if (locAttr == targetAttr->name) {
+                if (!string2coords(targetAttr->value, coordLat, coordLong)) {
+                        cerP->statusCode.fill(SccInvalidParameter,
+                                              std::string("action: UPDATE") +
+                                              std::string(" - entity: (") + eP->toString() + ")" +
+                                              std::string(" - offending attribute: ") + targetAttr->toString() +
+                                              std::string(" - error parsing location attribute, value: <" + targetAttr->value + ">"));
+
+                        responseP->contextElementResponseVector.push_back(cerP);
+                        return false;
+                }
+
+            }
+
+
         }
         else if (strcasecmp(action.c_str(), "append") == 0) {
-            if (legalIdUsage(attrs, ceP->contextAttributeVector.get(ix))) {
-                entityModified = appendAttribute(attrs, newAttrs, ceP->contextAttributeVector.get(ix)) || entityModified;
+            if (legalIdUsage(attrs, targetAttr)) {
+                entityModified = appendAttribute(attrs, newAttrs, targetAttr) || entityModified;
                 *attrs = *newAttrs;
+
+                /* Check aspects related with location */
+                if (targetAttr->getLocation().length() > 0 ) {
+                    if (locAttr.length() > 0) {
+                        cerP->statusCode.fill(SccInvalidParameter,
+                                              std::string("action: APPEND") +
+                                              std::string(" - entity: (") + eP->toString() + ")" +
+                                              std::string(" - offending attribute: ") + targetAttr->toString() +
+                                              std::string(" - attemp to define a location attribute (" + targetAttr->name + ") when another one has been previously defined (" + locAttr + ")"));
+
+                        responseP->contextElementResponseVector.push_back(cerP);
+                        return false;
+                    }
+
+                    if (targetAttr->getLocation() != LOCATION_WSG84) {
+                        cerP->statusCode.fill(SccInvalidParameter,
+                                              std::string("action: APPEND") +
+                                              std::string(" - entity: (") + eP->toString() + ")" +
+                                              std::string(" - offending attribute: ") + targetAttr->toString() +
+                                              std::string(" - only WSG84 is supported for location, found: <" + targetAttr->getLocation() + ">"));
+
+                        responseP->contextElementResponseVector.push_back(cerP);
+                        return false;
+                    }
+
+                    if (!string2coords(targetAttr->value, coordLat, coordLong)) {
+                            cerP->statusCode.fill(SccInvalidParameter,
+                                                  std::string("action: APPEND") +
+                                                  std::string(" - entity: (") + eP->toString() + ")" +
+                                                  std::string(" - offending attribute: ") + targetAttr->toString() +
+                                                  std::string(" - error parsing location attribute, value: <" + targetAttr->value + ">"));
+
+                            responseP->contextElementResponseVector.push_back(cerP);
+                            return false;
+                    }
+                    locAttr = targetAttr->name;
+
+                }
+
             }
             else {
-                ContextAttribute* aP = ceP->contextAttributeVector.get(ix);
 
                 /* If legalIdUsage() returns false, then that particular attribute can not be appended. In this case,
                  * we interrupt the processing an early return with
@@ -660,26 +742,25 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
                 cerP->statusCode.fill(SccInvalidParameter,
                                       std::string("action: APPEND") +
                                       " - entity: (" + eP->toString() + ")" +
-                                      " - offending attribute: " + aP->toString());
+                                      " - offending attribute: " + targetAttr->toString());
 
                 responseP->contextElementResponseVector.push_back(cerP);
                 return false;
             }
         }
         else if (strcasecmp(action.c_str(), "delete") == 0) {
-            if (deleteAttribute(attrs, newAttrs, ceP->contextAttributeVector.get(ix))) {
+            if (deleteAttribute(attrs, newAttrs, targetAttr)) {
                 entityModified = true;
                 *attrs = *newAttrs;
             }
             else {
-                ContextAttribute* aP = ceP->contextAttributeVector.get(ix);
                 /* If deleteAttribute() returns false, then that particular attribute has not
                  * been found. In this case, we interrupt the processing an early return with
                  * a error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter,
                                       std::string("action: DELETE") +
                                       " - entity: (" + eP->toString() + ")" +
-                                      " - offending attribute: " + aP->toString());
+                                      " - offending attribute: " + targetAttr->toString());
 
                 responseP->contextElementResponseVector.push_back(cerP);
                 return false;
@@ -929,7 +1010,22 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
          * subscription id */
         std::map<string, BSONObj*> subsToNotify;
 
-        if (!processContextAttributeVector(ceP, action, &subsToNotify, &attrs, &newAttrs, cerP, responseP)) {
+        /* Is the entity using location? In that case, we fill the locAttr, coordLat and coordLong attributes with that information, otherwise
+         * we fill an empty locAttrs. Any case, processContextAttributeVector uses that information (and eventually modifies) while it
+         * processes the attributes in the updateContext */
+        std::string locAttr = "";
+        double coordLat, coordLong;
+        if (r.hasField(ENT_LOCATION)) {
+            // FIXME P2: potentially, assertion error will happen if the field is not as expected. Although this shouldn't happen
+            // (if happens, it means that somebody has manipulated the DB out-of-band contex broker) a safer way of parsing BSON object
+            // will be needed. This is a general comment, applicable to many places in the mongoBackend code
+            BSONObj loc = r.getObjectField(ENT_LOCATION);
+            locAttr  = loc.getStringField(ENT_LOCATION_ATTRNAME);
+            coordLat  = loc.getField(ENT_LOCATION_COORDS).Array()[0].Double();
+            coordLong = loc.getField(ENT_LOCATION_COORDS).Array()[1].Double();
+        }
+
+        if (!processContextAttributeVector(ceP, action, &subsToNotify, &attrs, &newAttrs, cerP, responseP, locAttr, coordLat, coordLong)) {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
             continue;
         }
@@ -939,6 +1035,11 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         BSONObjBuilder updatedEntityBuilder;
         updatedEntityBuilder.appendArray(ENT_ATTRS, attrs);
         updatedEntityBuilder.append(ENT_MODIFICATION_DATE, getCurrentTime());
+        if (locAttr.length() > 0) {
+            updatedEntityBuilder.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
+                                                           ENT_LOCATION_COORDS << BSON_ARRAY(coordLat << coordLong)));
+        }
+
         /* We use $set to avoid losing the creation date field */
         BSONObj updatedEntity = BSON("$set" << updatedEntityBuilder.obj());
         /* Note that the query that we build for updating is slighty different than the query used
@@ -1029,11 +1130,11 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 // FIXME P4: not sure, but probably we can generalize this when we address
                 // issue https://github.com/telefonicaid/fiware-orion/issues/252
                 Metadata* md;
-                if (caP->getId().length() != 0) {
+                if (caP->getId().length() > 0) {
                     md = new Metadata(NGSI_MD_ID, "string", caP->getId());
                     ca->metadataVector.push_back(md);
-                }                
-                if (caP->getLocation().length() != 0) {
+                }
+                if (caP->getLocation().length() > 0) {
                     md = new Metadata(NGSI_MD_LOCATION, "string", caP->getLocation());
                     ca->metadataVector.push_back(md);
                 }
