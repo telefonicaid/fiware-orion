@@ -27,6 +27,8 @@
 */
 #include <string>
 
+#include "common/Format.h"
+
 
 
 namespace orion
@@ -48,12 +50,11 @@ public:
 
    ::std::string                     root;       // Only for 'top level'
    ::std::string                     path;       // relative path of the node, '/' for 'top level'
-   ::std::string                     name;       // Name of the node. Always valid when from XML, not always when from JDON
+   ::std::string                     name;       // Name of the node. Always valid when from XML, not always when from JSON
    ::std::string                     value;      // Only for leaves
    int                               level;      // Nesting level
    int                               siblingNo;  // Order in nesting level (sibling number)
    Type                              type;       // The type of this node
-   int                               counter;    // Internal variable necessary during parsing
    ComplexValueNode*                 container;  // Pointer to the direct father
    ComplexValueNode*                 rootP;      // So that all children has quick access to its root container
    ::std::vector<ComplexValueNode*>  childV;     // vector of children
@@ -64,14 +65,15 @@ public:
    ComplexValueNode(ComplexValueNode* _container, std::string _path, std::string _name, std::string _value, int _siblingNo, Type _type, int _level = -1);
    ~ComplexValueNode();
 
-   const char*        typeName(void);
-   void               add(ComplexValueNode* node);
-   void               add(const Type _type, const std::string& _name, const std::string& _containerPath, const std::string& _value = "");
+   const char*        typeName(const Type _type);
+   ComplexValueNode*  add(ComplexValueNode* node);
+   ComplexValueNode*  add(const Type _type, const std::string& _name, const std::string& _containerPath, const std::string& _value = "");
    ComplexValueNode*  lookup(const char* _path);
    ::std::string      finish(void);
    void               shortShow(std::string indent);
    void               show(std::string indent);
-   void               vectorCheck(void);
+   void               check(void);
+   ::std::string      render(Format format, std::string indent);
 };
 
 } // namespace orion

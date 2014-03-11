@@ -60,6 +60,7 @@ typedef enum TraceLevels
   LmtComplexValue = 47,
   LmtComplexValueAdd,
   LmtComplexValueLookup,
+  LmtComplexValueRender,
 
   /* RestService and Service (60-79) */
   LmtService     = 60,

@@ -148,6 +148,15 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
       std::string  value  = node->value();
       std::string  type   = xmlTypeAttributeGet(node);
 
+      if (ciP->current != NULL)
+      {
+         if (rest.size() < ciP->current->path.size())
+         {
+           LM_T(LmtComplexValue, ("'%s has ended - going up one level to '%s'", ciP->current->name.c_str(), ciP->current->container->name.c_str()));
+           ciP->current = ciP->current->container;
+         }
+      }
+
       if ((type != "") && (type != "vector"))
       {
          ciP->httpStatusCode = SccBadRequest;
@@ -163,13 +172,21 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
           LM_T(LmtComplexValue, ("Complex value start for '%s'", fatherPath.c_str()));
           ciP->complexValueContainer = new orion::ComplexValueNode(root);
           ciP->complexValueNode.push_back(ciP->complexValueContainer);
+          ciP->current = ciP->complexValueContainer;
         }
         else // Toplevel END
         {
           LM_T(LmtComplexValue, ("Complex value end for '%s'", fatherPath.c_str()));
           std::string status = ciP->complexValueContainer->finish();
+
+          // Pass the ComplexValue tree to the last ContextAttribute
+          // FIXME P2: This method of doing it could be improved
+          //           The thing is that, the XML node is found before the ComplexValue.
           parseDataP->lastContextAttribute->complexValueP = ciP->complexValueContainer;
+          std::string rendered = parseDataP->lastContextAttribute->complexValueP->render(ciP->outFormat, "");
+          LM_T(LmtComplexValueRender, ("*********** Rendered: \n%s", rendered.c_str()));
           ciP->complexValueContainer = NULL;
+          ciP->current = NULL;
 
           if (status != "")
           {
@@ -183,13 +200,13 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
 
       if ((value == " ") && (name != ""))
       {
-         if (type == "vector")
-           ciP->complexValueContainer->add(orion::ComplexValueNode::Vector, name, rest);
-         else
-           ciP->complexValueContainer->add(orion::ComplexValueNode::Struct, name, rest);
+        if (type == "vector")
+          ciP->current = ciP->current->add(orion::ComplexValueNode::Vector, name, rest);
+        else
+          ciP->current = ciP->current->add(orion::ComplexValueNode::Struct, name, rest);
       }
       else if (name != "")
-        ciP->complexValueContainer->add(orion::ComplexValueNode::Leaf, name, rest, value);
+        ciP->current->add(orion::ComplexValueNode::Leaf, name, rest, value);
     }
     else
     {

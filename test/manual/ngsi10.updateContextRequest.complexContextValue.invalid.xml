@@ -26,6 +26,20 @@
                   <value>vv3</value>
                   <value>vv4</value>
                 </level3>
+                <level32 type="vector">
+                  <v2>
+                    <v21>211</v21>
+                    <v22>221</v22>
+                  </v2>
+                  <v2>
+                    <v21>212</v21>
+                    <v22>222</v22>
+                  </v2>
+                  <v2>
+                    <v21>213</v21>
+                    <v22>223</v22>
+                  </v2>
+                </level32>
               </level2>
               <level2again>
                 <value5>5</value5>

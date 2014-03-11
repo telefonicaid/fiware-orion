@@ -127,10 +127,7 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
   if (complexValueP == NULL)
      out += valueTag(indent + "  ", ((format == XML)? "contextValue" : "value"), value, format, commaAfterContextValue);
   else
-  {
-    LM_W(("Complex value to be rendered!!!"));
-    out += indent + "<COMPLEXVALUE></COMPLEXVALUE>\n";
-  }
+    out += complexValueP->render(format, indent);
 
   out += metadataVector.render(format, indent + "  ", false);
   out += endTag(indent, xmlTag, format, comma);
