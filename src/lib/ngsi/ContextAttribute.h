@@ -51,7 +51,7 @@ typedef struct ContextAttribute
   ContextAttribute(ContextAttribute* caP);
   ContextAttribute(std::string _name, std::string _type, std::string _value = "");
 
-  /* Grabbers for metadata to which CB gives an special semantic */
+  /* Grabbers for metadata to which CB gives a special semantic */
   std::string  getId();
   std::string  getLocation();
 

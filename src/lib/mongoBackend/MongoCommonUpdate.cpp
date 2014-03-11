@@ -332,7 +332,7 @@ static bool processLocation(ContextAttributeVector caV, std::string& locAttr, do
                     }
 
                     if (!string2coords(ca.value, coordLat, coordLong)) {
-                        *errDetail = "coordiates format error (see Orion user manual): " + ca.value;
+                        *errDetail = "coordinate format error (see Orion user manual): " + ca.value;
                         return false;
                     }
                     locAttr = ca.name;
@@ -607,15 +607,15 @@ static void buildGeneralErrorReponse(ContextElement* ceP, ContextAttribute* ca, 
 * Returns true if entity was actually modified, false otherwise (including fail cases)
 *
 */
-static bool processContextAttributeVector (ContextElement* ceP,
-                                           std::string action,
-                                           std::map<string, BSONObj*>* subsToNotify,
-                                           BSONObj* attrs, BSONObj* newAttrs,
-                                           ContextElementResponse* cerP,
-                                           UpdateContextResponse* responseP,
-                                           std::string& locAttr,
-                                           double& coordLat,
-                                           double& coordLong)
+static bool processContextAttributeVector (ContextElement*               ceP,
+                                           std::string                   action,
+                                           std::map<string, BSONObj*>*   subsToNotify,
+                                           BSONObj* attrs, BSONObj*      newAttrs,
+                                           ContextElementResponse*       cerP,
+                                           UpdateContextResponse*        responseP,
+                                           std::string&                  locAttr,
+                                           double&                       coordLat,
+                                           double&                       coordLong)
 {
 
     EntityId*   eP         = &cerP->contextElement.entityId;
@@ -629,9 +629,8 @@ static bool processContextAttributeVector (ContextElement* ceP,
         ContextAttribute* targetAttr = ceP->contextAttributeVector.get(ix);
 
         /* No matter if success or fail, we have to include the attribute in the response */
-        ContextAttribute* ca = new ContextAttribute();
-        ca->name = targetAttr->name;
-        ca->type = targetAttr->type;
+        ContextAttribute* ca = new ContextAttribute(targetAttr->name, targetAttr->type);
+
         // FIXME P4: not sure, but probably we can generalize this when we address
         // issue https://github.com/telefonicaid/fiware-orion/issues/252
         Metadata* md;
@@ -656,7 +655,7 @@ static bool processContextAttributeVector (ContextElement* ceP,
             else {
 
                 /* If updateAttribute() returns false, then that particular attribute has not
-                 * been found. In this case, we interrupt the processing an early return with
+                 * been found. In this case, we interrupt the processing and early return with
                  * an error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter, 
                                       std::string("action: UPDATE") + 
@@ -743,7 +742,7 @@ static bool processContextAttributeVector (ContextElement* ceP,
             else {
 
                 /* If legalIdUsage() returns false, then that particular attribute can not be appended. In this case,
-                 * we interrupt the processing an early return with
+                 * we interrupt the processing and early return with
                  * a error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter,
                                       std::string("action: APPEND") +
@@ -771,6 +770,8 @@ static bool processContextAttributeVector (ContextElement* ceP,
                     return false;
                 }
 
+                /* Check aspects related with location. "Nullining" locAttr is the way of specifying
+                 * that location field is no longer used */
                 if (locAttr == targetAttr->name) {
                     locAttr = "";
                 }
@@ -778,7 +779,7 @@ static bool processContextAttributeVector (ContextElement* ceP,
             }
             else {
                 /* If deleteAttribute() returns false, then that particular attribute has not
-                 * been found. In this case, we interrupt the processing an early return with
+                 * been found. In this case, we interrupt the processing and early return with
                  * a error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter,
                                       std::string("action: DELETE") +
