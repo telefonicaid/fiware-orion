@@ -78,4 +78,11 @@ extern void coords2string(std::string& s, double latitude, double longitude, int
 */
 bool versionParse(std::string version, int& mayor, int& minor, std::string& extra);
 
+/* ****************************************************************************
+*
+* atoF - 
+*/
+extern double atoF(const char* string, std::string& errorMsg);
+
+
 #endif
