@@ -31,7 +31,7 @@
 #include "ngsi/MetadataVector.h"
 #include "common/Format.h"
 #include "ngsi/Request.h"
-#include "parse/ComplexValueNode.h"
+#include "parse/CompoundValueNode.h"
 
 #define NGSI_MD_ID "ID"
 
@@ -47,7 +47,7 @@ typedef struct ContextAttribute
   std::string     value;           // Mandatory
   MetadataVector  metadataVector;  // Optional
 
-  orion::ComplexValueNode*  complexValueP;
+  orion::CompoundValueNode*  compoundValueP;
 
   ContextAttribute();
   ContextAttribute(ContextAttribute* caP);

@@ -579,10 +579,10 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
         ca->name = attributeP->name;
         ca->type = attributeP->type;
 
-        if (attributeP->complexValueP != NULL)
+        if (attributeP->compoundValueP != NULL)
         {
-          LM_W(("This context attribute has a COMPLEX VALUE - special care is needed (complexValueP at %p)", attributeP->complexValueP));
-          attributeP->complexValueP->shortShow("processContextAttributeVector: ");
+          LM_W(("This context attribute has a COMPOUND VALUE - special care is needed (compoundValueP at %p)", attributeP->compoundValueP));
+          attributeP->compoundValueP->shortShow("processContextAttributeVector: ");
         }
 
         if (attributeP->getId() != "") {

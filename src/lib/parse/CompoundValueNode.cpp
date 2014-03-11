@@ -31,7 +31,7 @@
 #include "common/string.h"
 #include "common/tag.h"
 
-#include "parse/ComplexValueNode.h"
+#include "parse/CompoundValueNode.h"
 
 
 
@@ -41,9 +41,9 @@ namespace orion
 
 /* ****************************************************************************
 *
-* ComplexValueNode - constructor for toplevel 'node' 
+* CompoundValueNode - constructor for toplevel 'node' 
 */
-ComplexValueNode::ComplexValueNode(std::string _root)
+CompoundValueNode::CompoundValueNode(std::string _root)
 {
   root       = _root;
   rootP      = this;
@@ -59,12 +59,12 @@ ComplexValueNode::ComplexValueNode(std::string _root)
 
 /* ****************************************************************************
 *
-* ComplexValueNode - constructor for all nodes except toplevel
+* CompoundValueNode - constructor for all nodes except toplevel
 */
-ComplexValueNode::ComplexValueNode(ComplexValueNode* _container, std::string _path, std::string _name, std::string _value, int _siblingNo, Type _type, int _level)
+CompoundValueNode::CompoundValueNode(CompoundValueNode* _container, std::string _path, std::string _name, std::string _value, int _siblingNo, Type _type, int _level)
 {
   container = _container;
-  rootP     = (level == 1)? container : container->rootP;
+  rootP     = container->rootP;
   name      = _name;
   value     = _value;
   path      = _path;
@@ -77,11 +77,11 @@ ComplexValueNode::ComplexValueNode(ComplexValueNode* _container, std::string _pa
 
 /* ****************************************************************************
 *
-* ComplexValueNode - destructor for all nodes except toplevel
+* CompoundValueNode - destructor for all nodes except toplevel
 */
-ComplexValueNode::~ComplexValueNode()
+CompoundValueNode::~CompoundValueNode()
 {
-  LM_T(LmtComplexValue, ("Destroying node '%s', path '%s'", name.c_str(), path.c_str()));
+  LM_T(LmtCompoundValue, ("Destroying node '%s', path '%s'", name.c_str(), path.c_str()));
 }
 
 
@@ -90,7 +90,7 @@ ComplexValueNode::~ComplexValueNode()
 *
 * typeName - 
 */
-const char* ComplexValueNode::typeName(const Type _type)
+const char* CompoundValueNode::typeName(const Type _type)
 {
   switch (_type)
   {
@@ -108,7 +108,7 @@ const char* ComplexValueNode::typeName(const Type _type)
 *
 * finish - 
 */
-std::string ComplexValueNode::finish(void)
+std::string CompoundValueNode::finish(void)
 {
   error = "";
 
@@ -123,7 +123,7 @@ std::string ComplexValueNode::finish(void)
 *
 * add - 
 */
-ComplexValueNode* ComplexValueNode::add(ComplexValueNode* node)
+CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
 {
   childV.push_back(node);
   return node;
@@ -135,14 +135,14 @@ ComplexValueNode* ComplexValueNode::add(ComplexValueNode* node)
 *
 * add - 
 */
-ComplexValueNode* ComplexValueNode::add(const Type _type, const std::string& _name, const std::string& _containerPath, const std::string& _value)
+CompoundValueNode* CompoundValueNode::add(const Type _type, const std::string& _name, const std::string& _containerPath, const std::string& _value)
 {
   if (type == Leaf)
-    LM_T(LmtComplexValueAdd, ("Adding Leaf '%s', with value '%s' under '%s'", _name.c_str(), value.c_str(), _containerPath.c_str()));
+    LM_T(LmtCompoundValueAdd, ("Adding Leaf '%s', with value '%s' under '%s'", _name.c_str(), value.c_str(), _containerPath.c_str()));
   else
-     LM_T(LmtComplexValueAdd, ("Adding %s '%s' under '%s'", typeName(_type), _name.c_str(), _containerPath.c_str()));
+     LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s'", typeName(_type), _name.c_str(), _containerPath.c_str()));
 
-  ComplexValueNode* node = new ComplexValueNode(this, _containerPath + "/" + _name, _name, _value, childV.size(), _type, level + 1);
+  CompoundValueNode* node = new CompoundValueNode(this, _containerPath + "/" + _name, _name, _value, childV.size(), _type, level + 1);
 
   return add(node);
 }
@@ -151,55 +151,9 @@ ComplexValueNode* ComplexValueNode::add(const Type _type, const std::string& _na
 
 /* ****************************************************************************
 *
-* lookup - 
-*/
-ComplexValueNode* ComplexValueNode::lookup(const char* _path)
-{
-   ComplexValueNode*         node = rootP;  // where the lookup is started
-   std::vector<std::string>  pathV;
-   int                       depth;
-
-   LM_T(LmtComplexValueLookup, ("Looking for '%s'", _path));
-   depth = stringSplit(_path, '/', pathV);
-
-   for (int level = 0; level < depth; ++level)
-   {
-      bool found = false;
-
-      for (unsigned int ix = 0; ix < node->childV.size(); ++ix)
-      {
-         LM_T(LmtComplexValueLookup, ("Looking for '%s' - comparing with '%s' %d/%d", pathV[level].c_str(), node->childV[ix]->name.c_str(), ix, node->childV.size()));
-         if (node->childV[ix]->name == pathV[level])
-         {
-            found = true;
-            node  = node->childV[ix];
-            LM_T(LmtComplexValueLookup, ("found node of level %d: '%s'", level, node->name.c_str()));
-
-            if (level == depth -1)
-              return node;
-            break;
-         }
-         else
-            LM_T(LmtComplexValueLookup, ("Looking for '%s' - '%s' is not a match (%d/%d)", pathV[level].c_str(), node->childV[ix]->name.c_str(), ix, node->childV.size()));
-      }
-
-      if (!found)
-      {
-        LM_T(LmtComplexValueLookup, ("'%s' not found", _path)); 
-        return NULL;
-      }
-   }
-
-   return NULL;
-}
-
-
-
-/* ****************************************************************************
-*
 * shortShow - 
 */
-void ComplexValueNode::shortShow(std::string indent)
+void CompoundValueNode::shortShow(std::string indent)
 {
   if (rootP == this)
     PRINTF("%s%s (toplevel)\n", indent.c_str(), name.c_str());
@@ -220,7 +174,7 @@ void ComplexValueNode::shortShow(std::string indent)
 *
 * show - 
 */
-void ComplexValueNode::show(std::string indent)
+void CompoundValueNode::show(std::string indent)
 {
   if (root != "")
   {
@@ -264,7 +218,7 @@ void ComplexValueNode::show(std::string indent)
 *
 * check - 
 */
-void ComplexValueNode::check(void)
+void CompoundValueNode::check(void)
 {
   if (type == Vector)
   {
@@ -306,25 +260,25 @@ void ComplexValueNode::check(void)
 *
 * render - 
 */
-std::string ComplexValueNode::render(Format format, std::string indent)
+std::string CompoundValueNode::render(Format format, std::string indent)
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
 
-  if (type == orion::ComplexValueNode::Leaf)
+  if (type == Leaf)
   {
-    std::string  tagName   = (container->type == orion::ComplexValueNode::Vector)? "vector_item" : name;
+    std::string  tagName   = (container->type == Vector)? "vector_item" : name;
 
     out = valueTag(indent, tagName, value, format, jsonComma, false);
   }
-  else if (type == orion::ComplexValueNode::Vector)
+  else if (type == Vector)
   {
     out += startTag(indent, name, "", format, true, false);
     for (unsigned long ix = 0; ix < childV.size(); ++ix)
       out += childV[ix]->render(format, indent + "  ");
     out += endTag(indent, name, format, jsonComma, true, true);
   }
-  else if (type == orion::ComplexValueNode::Struct)
+  else if (type == Struct)
   {
     if (rootP != this)
     {

@@ -42,7 +42,7 @@ ContextAttribute::ContextAttribute()
    name  = "";
    type  = "";
    value = "";
-   complexValueP = NULL;
+   compoundValueP = NULL;
 }
 
 
@@ -58,10 +58,10 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
    type  = caP->type;
    value = caP->value;
 
-   // FIXME P6 - The complexValue tree should probably be copied also ...
+   // FIXME P6 - The compoundValue tree should probably be copied also ...
    //            This constructor is used in 6 different places.
    //            Question is, it is enough with copying the pointer?
-   complexValueP = caP->complexValueP;
+   compoundValueP = caP->compoundValueP;
 
    metadataVector.vec.clear();
 
@@ -85,7 +85,7 @@ ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::st
    type  = _type;
    value = _value;
 
-   complexValueP = NULL;
+   compoundValueP = NULL;
 }
 
 /* ****************************************************************************
@@ -124,10 +124,10 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
   out += valueTag(indent + "  ", "name",         name,  format, true);
   out += valueTag(indent + "  ", "type",         type,  format, true);
 
-  if (complexValueP == NULL)
-     out += valueTag(indent + "  ", ((format == XML)? "contextValue" : "value"), value, format, commaAfterContextValue);
+  if (compoundValueP == NULL)
+    out += valueTag(indent + "  ", ((format == XML)? "contextValue" : "value"), value, format, commaAfterContextValue);
   else
-    out += complexValueP->render(format, indent);
+    out += compoundValueP->render(format, indent);
 
   out += metadataVector.render(format, indent + "  ", false);
   out += endTag(indent, xmlTag, format, comma);
@@ -167,10 +167,10 @@ void ContextAttribute::present(std::string indent, int ix)
   PRINTF("%s  Name:       %s\n", indent.c_str(), name.c_str());
   PRINTF("%s  Type:       %s\n", indent.c_str(), type.c_str());
 
-  if (complexValueP == NULL)
+  if (compoundValueP == NULL)
     PRINTF("%s  Value:      %s\n", indent.c_str(), value.c_str());
   else
-     complexValueP->show(indent);
+    compoundValueP->show(indent);
 
   metadataVector.present("Attribute", indent + "  ");
 }

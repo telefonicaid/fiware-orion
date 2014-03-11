@@ -32,7 +32,7 @@
 #include "common/globals.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/EntityId.h"
-#include "parse/ComplexValueNode.h"
+#include "parse/CompoundValueNode.h"
 #include "rest/ConnectionInfo.h"
 #include "xmlParse/XmlNode.h"
 #include "xmlParse/xmlParse.h"
@@ -40,32 +40,32 @@
 
 /* ****************************************************************************
 *
-* complexValueRoots - 
+* compoundValueRoots - 
 */
-const char* complexValueRootV[] =
+const char* compoundValueRootV[] =
 {
   "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue" 
 };
 
 
 
-static bool isComplexValuePath(const char* path, std::string& root, std::string& rest)
+static bool isCompoundValuePath(const char* path, std::string& root, std::string& rest)
 {
    unsigned int len;
 
    root = "";
    rest = "";
 
-   for (unsigned int ix = 0; ix < sizeof(complexValueRootV) / sizeof(complexValueRootV[0]); ++ix)
+   for (unsigned int ix = 0; ix < sizeof(compoundValueRootV) / sizeof(compoundValueRootV[0]); ++ix)
    {
-      len = strlen(complexValueRootV[ix]);
+      len = strlen(compoundValueRootV[ix]);
 
       if (strlen(path) < len)
           continue;
 
-      if (strncmp(complexValueRootV[ix], path, len) == 0)
+      if (strncmp(compoundValueRootV[ix], path, len) == 0)
       {
-         root = complexValueRootV[ix];
+         root = compoundValueRootV[ix];
          rest = &path[len];
 
          return true;
@@ -110,7 +110,7 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
   if ((node == NULL) || (node->name() == NULL))
     return;
 
-  if ((node->name()[0] == 0) && (ciP->complexValueContainer == NULL))
+  if ((node->name()[0] == 0) && (ciP->compoundValueContainer == NULL))
     return;
 
   std::string path = fatherPath + "/" + node->name();
@@ -142,7 +142,7 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
     std::string root;
     std::string rest;
 
-    if (isComplexValuePath(fatherPath.c_str(), root, rest))
+    if (isCompoundValuePath(fatherPath.c_str(), root, rest))
     {
       std::string  name   = node->name();
       std::string  value  = node->value();
@@ -152,7 +152,7 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
       {
          if (rest.size() < ciP->current->path.size())
          {
-           LM_T(LmtComplexValue, ("'%s has ended - going up one level to '%s'", ciP->current->name.c_str(), ciP->current->container->name.c_str()));
+           LM_T(LmtCompoundValue, ("'%s has ended - going up one level to '%s'", ciP->current->name.c_str(), ciP->current->container->name.c_str()));
            ciP->current = ciP->current->container;
          }
       }
@@ -167,31 +167,31 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
 
       if (rest == "")  // Toplevel
       {
-        if (ciP->complexValueContainer == NULL) // Toplevel start
+        if (ciP->compoundValueContainer == NULL) // Toplevel start
         {
-          LM_T(LmtComplexValue, ("Complex value start for '%s'", fatherPath.c_str()));
-          ciP->complexValueContainer = new orion::ComplexValueNode(root);
-          ciP->complexValueNode.push_back(ciP->complexValueContainer);
-          ciP->current = ciP->complexValueContainer;
+          LM_T(LmtCompoundValue, ("Compound value start for '%s'", fatherPath.c_str()));
+          ciP->compoundValueContainer = new orion::CompoundValueNode(root);
+          ciP->compoundValueNode.push_back(ciP->compoundValueContainer);
+          ciP->current = ciP->compoundValueContainer;
         }
         else // Toplevel END
         {
-          LM_T(LmtComplexValue, ("Complex value end for '%s'", fatherPath.c_str()));
-          std::string status = ciP->complexValueContainer->finish();
+          LM_T(LmtCompoundValue, ("Compound value end for '%s'", fatherPath.c_str()));
+          std::string status = ciP->compoundValueContainer->finish();
 
-          // Pass the ComplexValue tree to the last ContextAttribute
+          // Pass the CompoundValue tree to the last ContextAttribute
           // FIXME P2: This method of doing it could be improved
-          //           The thing is that, the XML node is found before the ComplexValue.
-          parseDataP->lastContextAttribute->complexValueP = ciP->complexValueContainer;
-          std::string rendered = parseDataP->lastContextAttribute->complexValueP->render(ciP->outFormat, "");
-          LM_T(LmtComplexValueRender, ("*********** Rendered: \n%s", rendered.c_str()));
-          ciP->complexValueContainer = NULL;
+          //           The thing is that, the XML node is found before the CompoundValue.
+          parseDataP->lastContextAttribute->compoundValueP = ciP->compoundValueContainer;
+          std::string rendered = parseDataP->lastContextAttribute->compoundValueP->render(ciP->outFormat, "");
+          LM_T(LmtCompoundValueRender, ("*********** Rendered: \n%s", rendered.c_str()));
+          ciP->compoundValueContainer = NULL;
           ciP->current = NULL;
 
           if (status != "")
           {
             ciP->httpStatusCode = SccBadRequest;
-            ciP->answer = std::string("complex value error: ") + status;
+            ciP->answer = std::string("compound value error: ") + status;
             LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), fatherPath.c_str()));
             return;
           }
@@ -201,12 +201,12 @@ void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::st
       if ((value == " ") && (name != ""))
       {
         if (type == "vector")
-          ciP->current = ciP->current->add(orion::ComplexValueNode::Vector, name, rest);
+          ciP->current = ciP->current->add(orion::CompoundValueNode::Vector, name, rest);
         else
-          ciP->current = ciP->current->add(orion::ComplexValueNode::Struct, name, rest);
+          ciP->current = ciP->current->add(orion::CompoundValueNode::Struct, name, rest);
       }
       else if (name != "")
-        ciP->current->add(orion::ComplexValueNode::Leaf, name, rest, value);
+        ciP->current->add(orion::CompoundValueNode::Leaf, name, rest, value);
     }
     else
     {

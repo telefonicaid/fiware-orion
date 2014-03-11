@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-XML Parse Complex Values
+XML Parse Compound Values
 --SHELL-INIT--
 source ../harnessFunctions.sh
 
@@ -31,7 +31,7 @@ brokerStart CB
 --SHELL--
 source ../harnessFunctions.sh
 
-# 1. Complex contextValue without vector
+# 1. Compound contextValue without vector
 echo "1: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
 payload='<updateContextRequest>
@@ -71,7 +71,7 @@ payload='<updateContextRequest>
 </updateContextRequest>'
 curlXml ${url} "${payload}"
 
-# 2. Complex contextValue with vector
+# 2. Compound contextValue with vector
 echo "2: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
 payload='<updateContextRequest>
@@ -111,7 +111,7 @@ payload='<updateContextRequest>
 </updateContextRequest>'
 curlXml ${url} "${payload}"
 
-# 3. Complex contextValue with vector but one of the items have an incorrect tagname
+# 3. Compound contextValue with vector but one of the items have an incorrect tagname
 echo "3: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
 payload='<updateContextRequest>
@@ -151,7 +151,7 @@ payload='<updateContextRequest>
 </updateContextRequest>'
 curlXml ${url} "${payload}"
 
-# 4. Complex contextValue with vector but two type-attributes
+# 4. Compound contextValue with vector but two type-attributes
 echo "4: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
 payload='<updateContextRequest>
@@ -191,7 +191,7 @@ payload='<updateContextRequest>
 </updateContextRequest>'
 curlXml ${url} "${payload}"
 
-# 5. Complex contextValue with vector but type-attribute with value != 'vector'
+# 5. Compound contextValue with vector but type-attribute with value != 'vector'
 echo "5: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
 payload='<updateContextRequest>
@@ -231,7 +231,7 @@ payload='<updateContextRequest>
 </updateContextRequest>'
 curlXml ${url} "${payload}"
 
-# 6. Complex contextValue with vector but with unknown attribute
+# 6. Compound contextValue with vector but with unknown attribute
 echo "6: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
 payload='<updateContextRequest>
@@ -262,6 +262,60 @@ payload='<updateContextRequest>
                 <value6>6</value6>
               </level2again>
             </level1>
+          </contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+curlXml ${url} "${payload}"
+
+# 7. Compound contextValue with vector and contextValue as a vector
+echo "7: +++++++++++++++++++++++++++++++++"
+url='/ngsi10/updateContext'
+payload='<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue type="vector">
+            <item>1</item>
+            <item>2</item>
+            <item>3</item>
+          </contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+curlXml ${url} "${payload}"
+
+# 8. Compound contextValue with struct that has two fields with the same name
+echo "8: +++++++++++++++++++++++++++++++++"
+url='/ngsi10/updateContext'
+payload='<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue>
+            <struct>
+              <int>2</int>
+              <long>21</long>
+              <int>3</int>
+            </struct>
           </contextValue>
         </contextAttribute>
       </contextAttributeList>
@@ -332,7 +386,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 3: +++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 246
+Content-Length: 247
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -341,7 +395,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>complex value error: bad tag-name of vector item: 'value3' (should be 'value')</details>
+    <details>compound value error: bad tag-name of vector item: 'value3' (should be 'value')</details>
   </errorCode>
 </updateContextResponse>
 4: +++++++++++++++++++++++++++++++++
@@ -384,6 +438,49 @@ Date: REGEX(.*)
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
     <details>Bad value for XML attribute 'type' for 'level3': 'unknown attribute 'happy''</details>
+  </errorCode>
+</updateContextResponse>
+7: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 644
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+8: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 233
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>compound value error: duplicated tag-name: 'int' in '/struct/int'</details>
   </errorCode>
 </updateContextResponse>
 --TEARDOWN--

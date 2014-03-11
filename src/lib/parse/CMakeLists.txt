@@ -21,11 +21,11 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    ComplexValueNode.cpp
+    CompoundValueNode.cpp
 )
 
 SET (HEADERS
-    ComplexValueNode.h
+    CompoundValueNode.h
 )
 
 

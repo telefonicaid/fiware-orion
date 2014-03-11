@@ -2,17 +2,17 @@
 <updateContextRequest>
   <unknownField>12</unknownField>
   <contextElementList>
-	  <contextElement>
-	    <entityId type="Room" isPattern="false">
-		    <id>ConferenceRoom</id>
-	    </entityId>
-	    <attributeDomainName>domain1</attributeDomainName>
-	    <contextAttributeList>
-	      <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <attributeDomainName>domain1</attributeDomainName>
+      <contextAttributeList>
+        <contextAttribute>
           <name>temperature</name>
-		      <type>degree</type>
-		      <contextValue>ConferenceRoomTemp</contextValue>
-		    </contextAttribute>
+          <type>degree</type>
+          <contextValue>ConferenceRoomTemp</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
