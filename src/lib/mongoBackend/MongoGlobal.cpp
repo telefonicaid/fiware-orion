@@ -685,6 +685,12 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
         cer->contextElement.entityId.type = STR_FIELD(queryEntity, ENT_ENTITY_TYPE);
         cer->contextElement.entityId.isPattern = "false";
 
+        /* Get the location attribute (if it exists) */
+        std::string locAttr;
+        if (r.hasElement(ENT_LOCATION)) {
+            locAttr = r.getObjectField(ENT_LOCATION).getStringField(ENT_LOCATION_ATTRNAME);
+        }
+
         /* Attributes part */
 
         std::vector<BSONElement> queryAttrV = r.getField(ENT_ATTRS).Array();
@@ -707,6 +713,10 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
                 ContextAttribute* caP = new ContextAttribute(ca.name, ca.type, ca.value);                                
                 if (STR_FIELD(queryAttr, ENT_ATTRS_ID) != "") {
                     Metadata* md = new Metadata(NGSI_MD_ID, "string", STR_FIELD(queryAttr, ENT_ATTRS_ID));
+                    caP->metadataVector.push_back(md);
+                }
+                if (locAttr == ca.name) {
+                    Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WSG84);
                     caP->metadataVector.push_back(md);
                 }
 

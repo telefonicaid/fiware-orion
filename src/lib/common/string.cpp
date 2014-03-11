@@ -344,6 +344,8 @@ bool string2coords(std::string s, double& latitude, double& longitude)
   number1 = wsStrip(number1);
   number2 = wsStrip(number2);
 
+  // FIXME: we need to improve this funtion, atof() return an undefined value without
+  // complaining when the string is not a well-formed double
   latitude  = atof(number1);
   longitude = atof(number2);
 

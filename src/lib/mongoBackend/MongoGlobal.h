@@ -114,6 +114,8 @@ using namespace mongo;
 
 #define EARTH_RADIUS_METERS     6371000
 
+#define LOCATION_WSG84          "WSG84"
+
 /*****************************************************************************
 *
 * Macro to ease extracting fields from BSON objects
