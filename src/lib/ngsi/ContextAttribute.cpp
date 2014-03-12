@@ -90,6 +90,18 @@ ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::st
 
 /* ****************************************************************************
 *
+* ContextAttribute::ContextAttribute -
+*/
+ContextAttribute::ContextAttribute(std::string _name, std::string _type, orion::CompoundValueNode* _compoundValueP)
+{
+  name  = _name;
+  type  = _type;
+
+  compoundValueP = _compoundValueP;
+}
+
+/* ****************************************************************************
+*
 * ContextAttribute::getId() -
 */
 std::string ContextAttribute::getId()

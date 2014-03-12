@@ -56,6 +56,69 @@ bool smartAttrMatch(std::string name1, std::string type1, std::string id1, std::
 
 /* ****************************************************************************
 *
+* compoundValueBson (for arrays) -
+*
+* FIXME: not sure the best way of returning the value, as function return value
+* or as a function parameter (by reference)
+*/
+void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b);  //FIXME: is this normal?
+void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONArrayBuilder& b)
+{
+
+    for (unsigned int ix = 0; ix < children.size(); ++ix) {
+        orion::CompoundValueNode* child = children[ix];
+        if (child->type == orion::CompoundValueNode::Leaf) {
+            b.append(child->value);
+        }
+        else if (child->type == orion::CompoundValueNode::Vector) {
+            BSONArrayBuilder ba;
+            compoundValueBson(child->childV, ba);
+            b.append(ba.arr());
+        }
+        else if (child->type == orion::CompoundValueNode::Struct) {
+            BSONObjBuilder bo;
+            compoundValueBson(child->childV, bo);
+            b.append(bo.obj());
+        }
+        else {
+            // FIXME: error here
+        }
+    }
+
+}
+
+/* ****************************************************************************
+*
+* compoundValueBson (for objects= -
+*
+* FIXME: not sure the best way of returning the value, as function return value
+* or as a function parameter (by reference)
+*/
+void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b)
+{
+    for (unsigned int ix = 0; ix < children.size(); ++ix) {
+        orion::CompoundValueNode* child = children[ix];
+        if (child->type == orion::CompoundValueNode::Leaf) {
+            b.append(child->name, child->value);
+        }
+        else if (child->type == orion::CompoundValueNode::Vector) {
+            BSONArrayBuilder ba;
+            compoundValueBson(child->childV, ba);
+            b.append(child->name, ba.arr());
+        }
+        else if (child->type == orion::CompoundValueNode::Struct) {
+            BSONObjBuilder bo;
+            compoundValueBson(child->childV, bo);
+            b.append(child->name, bo.obj());
+        }
+        else {
+            // FIXME: error here
+        }
+    }
+}
+
+/* ****************************************************************************
+*
 * checkAndUpdate -
 *
 * Add the 'attr' attribute to the BSONObjBuilder (which is passed by reference), doing
@@ -84,11 +147,22 @@ static bool checkAndUpdate (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
     if (smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_TYPE), STR_FIELD(attr, ENT_ATTRS_ID),
                        ca.name, ca.type, ca.getId())) {
         /* Attribute match: update value */
-        newAttr->append(ENT_ATTRS_VALUE, ca.value);
-        updated = true;
+        if (ca.compoundValueP == NULL) {
+            /* Simple value */
+            newAttr->append(ENT_ATTRS_VALUE, ca.value);
+            updated = true;
 
-        /* It was an actual update? */
-        if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value) {            
+            /* It was an actual update? */
+            if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value) {
+                *actualUpdate = true;
+            }
+        }
+        else {  /* Composed value */
+            //newAttr->append(ENT_ATTRS_VALUE, compoundValueBson(ca.compoundValueP).obj());
+
+            // FIXME P6: in the case of composed value, it's more difficult to know if an attribute
+            // has really changed its value (many levels have to be travesed. Until we can develop the
+            // matching logic, we consider actualUpdate always true.
             *actualUpdate = true;
         }
     }
@@ -216,7 +290,12 @@ static bool appendAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
         BSONObjBuilder newAttr;
         newAttr.append(ENT_ATTRS_NAME, caP->name);
         newAttr.append(ENT_ATTRS_TYPE, caP->type);
-        newAttr.append(ENT_ATTRS_VALUE, caP->value);
+        if (caP->compoundValueP == NULL) {
+            newAttr.append(ENT_ATTRS_VALUE, caP->value);
+        }
+        else {
+            //newAttr.append(ENT_ATTRS_VALUE, compoundValueBson(caP->compoundValueP).obj());
+        }
         if (caP->getId() != "") {
             newAttr.append(ENT_ATTRS_ID, caP->getId());
         }
@@ -579,11 +658,13 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
         ca->name = attributeP->name;
         ca->type = attributeP->type;
 
+#if 0
         if (attributeP->compoundValueP != NULL)
         {
           LM_W(("This context attribute has a COMPOUND VALUE - special care is needed (compoundValueP at %p)", attributeP->compoundValueP));
           attributeP->compoundValueP->shortShow("processContextAttributeVector: ");
         }
+#endif
 
         if (attributeP->getId() != "") {
             Metadata*  md = new Metadata(NGSI_MD_ID, "string", attributeP->getId());
@@ -723,9 +804,31 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
         BSONObjBuilder bsonAttr;
         bsonAttr.appendElements(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
                                      ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
-                                     ENT_ATTRS_VALUE << attrsV.get(ix)->value <<
+                                     //FIXME: remove this line at the end //ENT_ATTRS_VALUE << attrsV.get(ix)->value <<
                                      ENT_ATTRS_CREATION_DATE << now <<
                                      ENT_ATTRS_MODIFICATION_DATE << now));
+        if (attrsV.get(ix)->compoundValueP == NULL) {
+            bsonAttr.append(ENT_ATTRS_VALUE, attrsV.get(ix)->value);
+        }
+        else {
+            if (attrsV.get(ix)->compoundValueP->type == orion::CompoundValueNode::Vector) {
+                BSONArrayBuilder b;
+                compoundValueBson(attrsV.get(ix)->compoundValueP->childV, b);
+                bsonAttr.append(ENT_ATTRS_VALUE, b.arr());
+            }
+            else if (attrsV.get(ix)->compoundValueP->type == orion::CompoundValueNode::Struct) {
+                BSONObjBuilder b;
+                compoundValueBson(attrsV.get(ix)->compoundValueP->childV, b);
+                bsonAttr.append(ENT_ATTRS_VALUE, b.obj());
+            }
+            else if (attrsV.get(ix)->compoundValueP->type == orion::CompoundValueNode::Leaf) {
+                // FIXME: implement. Reference to Github issue
+            }
+            else {
+                // FIXME: error here
+            }
+        }
+
         if (attrId.length() == 0) {
             LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
                             attrsV.get(ix)->name.c_str(),
@@ -797,7 +900,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     /* Check that UPDATE or APPEND is not used with attributes with empty value */
     if (strcasecmp(action.c_str(), "update") == 0 || strcasecmp(action.c_str(), "append") == 0) {
         for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
-            if (ceP->contextAttributeVector.get(ix)->value.size() == 0) {
+            if (ceP->contextAttributeVector.get(ix)->value.size() == 0 && ceP->contextAttributeVector.get(ix)->compoundValueP == NULL) {
 
                 ContextAttribute* aP = ceP->contextAttributeVector.get(ix);
                 ContextAttribute* ca = new ContextAttribute(aP);
@@ -805,7 +908,8 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 buildGeneralErrorReponse(ceP, ca, responseP, SccInvalidParameter,                                   
                                    std::string("action: ") + action +
                                       " - entity: (" + en.toString(true) + ")" +
-                                      " - offending attribute: " + aP->toString());
+                                      " - offending attribute: " + aP->toString() +
+                                      " - empty attribute not allowed in APPEND or UPDATE");
                 return;
             }
         }

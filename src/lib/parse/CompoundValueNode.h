@@ -111,7 +111,7 @@ public:
 
 
    // Constructors/Destructors
-   CompoundValueNode(std::string _root);
+   CompoundValueNode(std::string _root = "");   // FIXME to be commented with Ken
    CompoundValueNode(CompoundValueNode* _container, std::string _path, std::string _name, std::string _value, int _siblingNo, Type _type, int _level = -1);
    ~CompoundValueNode();
 
