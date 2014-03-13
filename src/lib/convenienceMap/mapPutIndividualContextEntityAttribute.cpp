@@ -44,7 +44,7 @@ HttpStatusCode mapPutIndividualContextEntityAttribute(std::string entityId, std:
   UpdateContextRequest   ucRequest;
   UpdateContextResponse  ucResponse;
   ContextElement         ce;
-  ContextAttribute       attribute(attributeName, request->type, request->contextValue);
+  ContextAttribute       attribute(attributeName, "", request->contextValue);
 
   ce.entityId.fill(entityId, "", "false");
   ce.contextAttributeVector.push_back(&attribute);
