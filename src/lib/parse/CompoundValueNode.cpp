@@ -302,4 +302,24 @@ std::string CompoundValueNode::render(Format format, std::string indent)
   return out;
 }
 
+
+/* ****************************************************************************
+*
+* clone - 
+*/
+CompoundValueNode* CompoundValueNode::clone(void)
+{
+  LM_T(LmtCompoundValue, ("cloning '%s'", name.c_str()));
+
+  CompoundValueNode* me = (rootP == this)? new CompoundValueNode(root) : new CompoundValueNode(container, path, name, value, siblingNo, type, level);
+
+  for (unsigned int ix = 0; ix < childV.size(); ++ix)
+  {
+    LM_T(LmtCompoundValue, ("Adding child %d for '%s'", ix, name.c_str()));
+    me->add(childV[ix]->clone());
+  }
+
+  return me;
+}
+
 }

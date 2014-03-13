@@ -116,6 +116,7 @@ public:
    CompoundValueNode(CompoundValueNode* _container, std::string _path, std::string _name, std::string _value, int _siblingNo, Type _type, int _level = -1);
    ~CompoundValueNode();
 
+   CompoundValueNode*  clone(void);
    CompoundValueNode*  add(CompoundValueNode* node);
    CompoundValueNode*  add(const Type _type, const std::string& _name, const std::string& _containerPath, const std::string& _value = "");
    void                check(void);
