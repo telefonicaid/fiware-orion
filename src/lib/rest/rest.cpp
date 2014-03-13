@@ -403,6 +403,8 @@ static int connectionTreat
         ciP->httpStatusCode = SccRequestEntityTooLarge;
       }
 
+      ciP->payload[*upload_data_size] = 0;
+
       // All payload received, acknowledge!
       *upload_data_size = 0;
     }
