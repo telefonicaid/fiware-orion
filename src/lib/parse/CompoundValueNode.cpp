@@ -82,6 +82,9 @@ CompoundValueNode::CompoundValueNode(CompoundValueNode* _container, std::string 
 CompoundValueNode::~CompoundValueNode()
 {
   LM_T(LmtCompoundValue, ("Destroying node '%s', path '%s'", name.c_str(), path.c_str()));
+
+  for (unsigned long ix = 0; ix < childV.size(); ++ix)
+    delete childV[ix];
 }
 
 
