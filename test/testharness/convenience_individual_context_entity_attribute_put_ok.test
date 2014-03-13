@@ -72,14 +72,25 @@ EOF
 echo "+++++ 5. query again +++++"
 curl localhost:${BROKER_PORT}/ngsi10/contextEntities/Room1 -s -S --header 'Content-Type: application/xml' | xmllint --format -
 
-echo "+++++ 6. update with JSON +++++"
+echo "+++++ 6. update without type (JSON) +++++"
 (curl localhost:${BROKER_PORT}/ngsi10/contextEntities/Room1/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) <<EOF
 {
   "value": "39"
 }
 EOF
 
-echo "+++++ 7. query only the attribute in JSON +++++"
+echo "+++++ 7. query (JSON) +++++"
+curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+
+echo "+++++ 8. update with type (JSON) +++++"
+(curl localhost:${BROKER_PORT}/ngsi10/contextEntities/Room1/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) <<EOF
+{
+  "type": "temperature",
+  "value": "21"
+}
+EOF
+
+echo "+++++ 9. query (JSON) +++++"
 curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
 
 --REGEXPECT--
@@ -169,14 +180,29 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
     <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </contextElementResponse>
-+++++ 6. update with JSON +++++
-+++++ 7. query only the attribute in JSON +++++
++++++ 6. update without type (JSON) +++++
++++++ 7. query (JSON) +++++
 {
     "attributes": [
         {
             "name": "temperature",
             "type": "centigrade",
             "value": "39"
+        }
+    ],
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
++++++ 8. update with type (JSON) +++++
++++++ 9. query (JSON) +++++
+{
+    "attributes": [
+        {
+            "name": "temperature",
+            "type": "centigrade",
+            "value": "21"
         }
     ],
     "statusCode": {
