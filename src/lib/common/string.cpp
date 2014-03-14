@@ -344,10 +344,23 @@ bool string2coords(std::string s, double& latitude, double& longitude)
   number1 = wsStrip(number1);
   number2 = wsStrip(number2);
 
-  // FIXME: we need to improve this funtion, atof() return an undefined value without
-  // complaining when the string is not a well-formed double
-  latitude  = atof(number1);
-  longitude = atof(number2);
+  std::string err;
+  double oldLatitude = latitude;
+  double oldLongitude = longitude;
+  latitude = atoF(number1, err);
+  if (err.length() > 0) {
+     latitude = oldLatitude; 
+     return false;
+  }
+  else {
+     longitude = atoF(number2, err);
+     if (err.length() > 0) {
+         /* Rollback latitude */
+         latitude = oldLatitude;
+         longitude = oldLongitude;
+         return false;
+     }
+  }
 
   return true;
 }
@@ -473,7 +486,8 @@ double atoF(const char* string, std::string& errorMsg)
    {
       ++cP;
 
-      if (!isdigit(*cP))
+      if (!isdigit(*cP) && (*cP != '.'))
+      // the check on '.' is to allow e.g. '-.7' and '+.7'
       {
          errorMsg = "non-digit after unary minus/plus";
          return 0.0;

@@ -433,8 +433,8 @@ TEST(string, atoF)
   EXPECT_EQ("non-digit after unary minus/plus", e);
 
   d = atoF("-.4", e);
-  EXPECT_EQ(0.0, d);
-  EXPECT_EQ("non-digit after unary minus/plus", e);
+  EXPECT_EQ(-0.4, d);
+  EXPECT_EQ("", e);
 
   d = atoF(".34.0", e);
   EXPECT_EQ(0.0, d);
@@ -453,8 +453,8 @@ TEST(string, atoF)
   EXPECT_EQ("non-digit after unary minus/plus", e);
 
   d = atoF("-.224", e);
-  EXPECT_EQ(0.0, d);
-  EXPECT_EQ("non-digit after unary minus/plus", e);
+  EXPECT_EQ(-0.224, d);
+  EXPECT_EQ("", e);
 
   d = atoF("2-24", e);
   EXPECT_EQ(0.0, d);
