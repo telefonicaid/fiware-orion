@@ -89,10 +89,8 @@ void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONArra
 
 /* ****************************************************************************
 *
-* compoundValueBson (for objects= -
+* compoundValueBson -
 *
-* FIXME: not sure the best way of returning the value, as function return value
-* or as a function parameter (by reference)
 */
 void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b)
 {
@@ -112,10 +110,43 @@ void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjB
             b.append(child->name, bo.obj());
         }
         else {
-            // FIXME: error here
+            LM_E(("Unknown type in compound value"));
         }
     }
 }
+
+/* ****************************************************************************
+*
+* valueBson -
+*
+*/
+void valueBson(ContextAttribute* ca, BSONObjBuilder& bsonAttr) {
+
+    if (ca->compoundValueP == NULL) {
+        bsonAttr.append(ENT_ATTRS_VALUE, ca->value);
+    }
+    else {
+        if (ca->compoundValueP->type == orion::CompoundValueNode::Vector) {
+            BSONArrayBuilder b;
+            compoundValueBson(ca->compoundValueP->childV, b);
+            bsonAttr.append(ENT_ATTRS_VALUE, b.arr());
+        }
+        else if (ca->compoundValueP->type == orion::CompoundValueNode::Struct) {
+            BSONObjBuilder b;
+            compoundValueBson(ca->compoundValueP->childV, b);
+            bsonAttr.append(ENT_ATTRS_VALUE, b.obj());
+        }
+        else if (ca->compoundValueP->type == orion::CompoundValueNode::Leaf) {
+            // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
+            bsonAttr.append(ENT_ATTRS_VALUE, ca->compoundValueP->value);
+        }
+        else {
+            LM_E(("Unknown type in compound value"));
+        }
+    }
+
+}
+
 
 /* ****************************************************************************
 *
@@ -129,59 +160,70 @@ void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjB
 * original value of the attribute was different that the one used in the update (this is
 * important for ONCHANGE notifications).
 */
-static bool checkAndUpdate (BSONObjBuilder* newAttr, BSONObj attr, ContextAttribute ca, bool* actualUpdate) {
+static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttribute ca, bool* actualUpdate) {
 
     bool updated = false;
     *actualUpdate = false;
 
-    newAttr->append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
-    newAttr->append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
+    newAttr.append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
+    newAttr.append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
     /* The hasField() check is needed to preserve compatibility with entities that were created
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_CREATION_DATE)) {
-        newAttr->append(ENT_ATTRS_CREATION_DATE, attr.getIntField(ENT_ATTRS_CREATION_DATE));
+        newAttr.append(ENT_ATTRS_CREATION_DATE, attr.getIntField(ENT_ATTRS_CREATION_DATE));
     }
     if (STR_FIELD(attr, ENT_ATTRS_ID) != "") {
-        newAttr->append(ENT_ATTRS_ID, STR_FIELD(attr, ENT_ATTRS_ID));
+        newAttr.append(ENT_ATTRS_ID, STR_FIELD(attr, ENT_ATTRS_ID));
     }
     if (smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_TYPE), STR_FIELD(attr, ENT_ATTRS_ID),
                        ca.name, ca.type, ca.getId())) {
         /* Attribute match: update value */
-        if (ca.compoundValueP == NULL) {
-            /* Simple value */
-            newAttr->append(ENT_ATTRS_VALUE, ca.value);
-            updated = true;
+        valueBson(&ca, newAttr);
+        updated = true;
 
+        if (ca.compoundValueP == NULL) {
             /* It was an actual update? */
             if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value) {
                 *actualUpdate = true;
             }
         }
-        else {  /* Composed value */
-            //newAttr->append(ENT_ATTRS_VALUE, compoundValueBson(ca.compoundValueP).obj());
-
+        else {
             // FIXME P6: in the case of composed value, it's more difficult to know if an attribute
             // has really changed its value (many levels have to be travesed. Until we can develop the
             // matching logic, we consider actualUpdate always true.
             *actualUpdate = true;
         }
+
     }
     else {
-        /* Attribute doesn't match: value is included "as is" */
+        /* Attribute doesn't match: value is included "as is", taking into account it can be a compound value */
         if (attr.hasField(ENT_ATTRS_VALUE)) {
-            newAttr->append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));                     
+            BSONElement value = attr.getField(ENT_ATTRS_VALUE);
+            if (value.type() == String) {
+                newAttr.append(ENT_ATTRS_VALUE, value.String());
+            }
+            else if (attr.getField(ENT_ATTRS_VALUE).type() == Object) {
+                newAttr.append(ENT_ATTRS_VALUE, value.embeddedObject());
+            }
+            else if (attr.getField(ENT_ATTRS_VALUE).type() == Array) {
+                newAttr.appendArray(ENT_ATTRS_VALUE, value.embeddedObject());
+            }
+            else {
+                LM_E(("unknown BSON type"));
+            }
+
         }
     }
 
     /* In the case of actual update, we update also the modification date; otherwise we include the previous existing one */
     if (*actualUpdate) {
-        newAttr->append(ENT_ATTRS_MODIFICATION_DATE, getCurrentTime());
+        newAttr.append(ENT_ATTRS_MODIFICATION_DATE, getCurrentTime());
     }
     else {
         /* The hasField() check is needed to preserve compatibility with entities that were created
          * in database by a CB instance previous to the support of creation and modification dates */
         if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE)) {
-            newAttr->append(ENT_ATTRS_MODIFICATION_DATE, attr.getIntField(ENT_ATTRS_MODIFICATION_DATE));
+            newAttr.append(ENT_ATTRS_MODIFICATION_DATE, attr.getIntField(ENT_ATTRS_MODIFICATION_DATE));
         }
     }
 
@@ -243,7 +285,7 @@ static bool updateAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
 
         BSONObjBuilder newAttr;
         bool unitActualUpdate = false;
-        if (checkAndUpdate(&newAttr, i.next().embeddedObject(), *caP, &unitActualUpdate) && !updated) {
+        if (checkAndUpdate(newAttr, i.next().embeddedObject(), *caP, &unitActualUpdate) && !updated) {
             updated = true;
         }
         /* If at least one actual update was done at checkAndUpdate() level, then updateAttribute()
@@ -280,7 +322,7 @@ static bool appendAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
 
         BSONObjBuilder newAttr;
         bool attrActualUpdate;
-        updated = checkAndUpdate(&newAttr, i.next().embeddedObject(), *caP, &attrActualUpdate) || updated;
+        updated = checkAndUpdate(newAttr, i.next().embeddedObject(), *caP, &attrActualUpdate) || updated;
         actualUpdate = attrActualUpdate || actualUpdate;
         newAttrsBuilder.append(newAttr.obj());
     }
@@ -290,12 +332,7 @@ static bool appendAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
         BSONObjBuilder newAttr;
         newAttr.append(ENT_ATTRS_NAME, caP->name);
         newAttr.append(ENT_ATTRS_TYPE, caP->type);
-        if (caP->compoundValueP == NULL) {
-            newAttr.append(ENT_ATTRS_VALUE, caP->value);
-        }
-        else {
-            //newAttr.append(ENT_ATTRS_VALUE, compoundValueBson(caP->compoundValueP).obj());
-        }
+        valueBson(caP, newAttr);
         if (caP->getId() != "") {
             newAttr.append(ENT_ATTRS_ID, caP->getId());
         }
@@ -304,7 +341,8 @@ static bool appendAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
         newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
         newAttrsBuilder.append(newAttr.obj());
 
-        *newAttrs = newAttrsBuilder.arr();
+        *newAttrs = newAttrsBuilder.arr();        
+
         return true;
     }
     else {
@@ -803,31 +841,11 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
 
         BSONObjBuilder bsonAttr;
         bsonAttr.appendElements(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
-                                     ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
-                                     //FIXME: remove this line at the end //ENT_ATTRS_VALUE << attrsV.get(ix)->value <<
+                                     ENT_ATTRS_TYPE << attrsV.get(ix)->type <<                                     
                                      ENT_ATTRS_CREATION_DATE << now <<
                                      ENT_ATTRS_MODIFICATION_DATE << now));
-        if (attrsV.get(ix)->compoundValueP == NULL) {
-            bsonAttr.append(ENT_ATTRS_VALUE, attrsV.get(ix)->value);
-        }
-        else {
-            if (attrsV.get(ix)->compoundValueP->type == orion::CompoundValueNode::Vector) {
-                BSONArrayBuilder b;
-                compoundValueBson(attrsV.get(ix)->compoundValueP->childV, b);
-                bsonAttr.append(ENT_ATTRS_VALUE, b.arr());
-            }
-            else if (attrsV.get(ix)->compoundValueP->type == orion::CompoundValueNode::Struct) {
-                BSONObjBuilder b;
-                compoundValueBson(attrsV.get(ix)->compoundValueP->childV, b);
-                bsonAttr.append(ENT_ATTRS_VALUE, b.obj());
-            }
-            else if (attrsV.get(ix)->compoundValueP->type == orion::CompoundValueNode::Leaf) {
-                // FIXME: implement. Reference to Github issue
-            }
-            else {
-                // FIXME: error here
-            }
-        }
+
+        valueBson(attrsV.get(ix), bsonAttr);
 
         if (attrId.length() == 0) {
             LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
@@ -985,7 +1003,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         /* We accumulate the subscriptions in a map. The key of the map is the string representing
          * subscription id */
         std::map<string, BSONObj*> subsToNotify;
-
         if (!processContextAttributeVector(ceP, action, &subsToNotify, &attrs, &newAttrs, cerP, responseP)) {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
             continue;
