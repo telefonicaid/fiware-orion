@@ -171,7 +171,6 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
 
   reqP->present(parseDataP);
 
-  LM_M(("Calling check"));
   res = reqP->check(parseDataP, ciP);
   reqP->present(parseDataP);
 

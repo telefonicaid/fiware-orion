@@ -34,6 +34,7 @@
 #include "jsonParse/jsonNullTreat.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonUpdateContextAvailabilitySubscriptionRequest.h"
+#include "parse/nullTreat.h"
 
 
 
@@ -232,14 +233,17 @@ static std::string subscriptionId(std::string path, std::string value, ParseData
 */
 JsonNode jsonUcasParseVector[] =
 {
+  { "/entities",                           jsonNullTreat        },
   { "/entities/entity",                    entityId             },
   { "/entities/entity/id",                 entityIdId           },
   { "/entities/entity/type",               entityIdType         },
   { "/entities/entity/isPattern",          entityIdIsPattern    },
+  { "/attributes",                         jsonNullTreat        },
   { "/attributes/attribute",               attribute            },
   { "/duration",                           duration             },
   { "/restriction",                        restriction          },
   { "/restriction/attributeExpression",    attributeExpression  },
+  { "/restriction/scopes",                 jsonNullTreat        },
   { "/restriction/scopes/scope",           scope,               },
   { "/restriction/scopes/scope/type",      scopeType            },
   { "/restriction/scopes/scope/value",     scopeValue           },
