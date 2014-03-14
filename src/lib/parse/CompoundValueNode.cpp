@@ -82,6 +82,9 @@ CompoundValueNode::CompoundValueNode(CompoundValueNode* _container, std::string 
 CompoundValueNode::~CompoundValueNode()
 {
   LM_T(LmtCompoundValue, ("Destroying node '%s', path '%s'", name.c_str(), path.c_str()));
+
+  for (unsigned long ix = 0; ix < childV.size(); ++ix)
+    delete childV[ix];
 }
 
 
@@ -137,8 +140,8 @@ CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
 */
 CompoundValueNode* CompoundValueNode::add(const Type _type, const std::string& _name, const std::string& _containerPath, const std::string& _value)
 {
-  if (type == Leaf)
-    LM_T(LmtCompoundValueAdd, ("Adding Leaf '%s', with value '%s' under '%s'", _name.c_str(), value.c_str(), _containerPath.c_str()));
+  if (_type == Leaf)
+    LM_T(LmtCompoundValueAdd, ("Adding Leaf '%s', with value '%s' under '%s'", _name.c_str(), _value.c_str(), _containerPath.c_str()));
   else
      LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s'", typeName(_type), _name.c_str(), _containerPath.c_str()));
 
@@ -297,6 +300,26 @@ std::string CompoundValueNode::render(Format format, std::string indent)
   }
 
   return out;
+}
+
+
+/* ****************************************************************************
+*
+* clone - 
+*/
+CompoundValueNode* CompoundValueNode::clone(void)
+{
+  LM_T(LmtCompoundValue, ("cloning '%s'", name.c_str()));
+
+  CompoundValueNode* me = (rootP == this)? new CompoundValueNode(root) : new CompoundValueNode(container, path, name, value, siblingNo, type, level);
+
+  for (unsigned int ix = 0; ix < childV.size(); ++ix)
+  {
+    LM_T(LmtCompoundValue, ("Adding child %d for '%s'", ix, name.c_str()));
+    me->add(childV[ix]->clone());
+  }
+
+  return me;
 }
 
 }

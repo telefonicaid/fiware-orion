@@ -173,7 +173,7 @@ TEST(SubscribeContextAvailabilityRequest, xml_badEntityId)
 {
   ParseData       reqData;
   const char*     infile  = "ngsi9.subscribeContextAvailabilityRequest.entityId.invalid.xml";
-  const char*     outfile = "ngsi9.subscribeContextAvailabilityResponse.unsupportedEntityAttribute.invalid.xml";
+  const char*     outfile = "ngsi9.subscribeContextAvailabilityResponse.unsupportedEntityAttribute.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
   
   utInit();

@@ -54,14 +54,10 @@ ContextAttribute::ContextAttribute()
 ContextAttribute::ContextAttribute(ContextAttribute* caP)
 {
    LM_T(LmtClone, ("'cloning' a ContextAttribute"));
-   name  = caP->name;
-   type  = caP->type;
-   value = caP->value;
-
-   // FIXME P6 - The compoundValue tree should probably be copied also ...
-   //            This constructor is used in 6 different places.
-   //            Question is, it is enough with copying the pointer?
-   compoundValueP = caP->compoundValueP;
+   name           = caP->name;
+   type           = caP->type;
+   value          = caP->value;
+   compoundValueP = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
 
    metadataVector.vec.clear();
 

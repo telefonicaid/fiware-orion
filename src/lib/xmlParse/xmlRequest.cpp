@@ -176,6 +176,7 @@ static xml_node<>* xmlDocPrepare(char* xml)
   }
   catch (parse_error& e)
   {
+    LM_F(("doc:\n----------------------------------------------\n%s\n------------------------------------", xml));
     LM_RE(NULL, ("PARSE ERROR: %s", e.what()));
   }
 
