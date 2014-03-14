@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "unittest.h"
 
@@ -37,13 +38,14 @@
 TEST(CompoundValueNode, tree)
 {
   orion::CompoundValueNode*  tree  = new orion::CompoundValueNode("XXX");
-  orion::CompoundValueNode*  vec   = new orion::CompoundValueNode(tree, "/vec", "vec", "", 0, orion::CompoundValueNode::Vector, 1);
+  orion::CompoundValueNode*  vec;
   orion::CompoundValueNode*  vecItem;
   char*                      name  = (char*) "vecItem";
 
   utInit();
 
-  tree->add(vec);
+  lmTraceLevelSet(LmtCompoundValueAdd, true);
+  vec = tree->add(orion::CompoundValueNode::Vector, "vec", "/vec", "");
 
   for (int ix = 0; ix < 5; ++ix)
   {
@@ -67,6 +69,7 @@ TEST(CompoundValueNode, tree)
   delete tree;
   delete copy;
 
+  lmTraceLevelSet(LmtCompoundValueAdd, false);
   utExit();
 }
 
@@ -81,9 +84,109 @@ TEST(CompoundValueNode, typeName)
   orion::CompoundValueNode::Type  type[]     = { orion::CompoundValueNode::Struct, orion::CompoundValueNode::Vector, orion::CompoundValueNode::Leaf };
   const char*                     expected[] = { "Struct",                         "Vector",                         "Leaf" };
 
+  utInit();
+
   for (unsigned int ix = 0; ix < sizeof(type) / sizeof(type[0]); ++ix)
-  {
-     EXPECT_STREQ(expected[ix], cvn.typeName(type[ix]));
-  }
+    EXPECT_STREQ(expected[ix], cvn.typeName(type[ix]));
+  EXPECT_STREQ("Unknown", cvn.typeName((orion::CompoundValueNode::Type) 55));
+
+  utExit();
 }
 
+
+
+/* ****************************************************************************
+*
+* vectorInvalidAndOk -
+*/
+TEST(CompoundValueNode, vectorInvalidAndOk)
+{
+  lmTraceLevelSet(LmtCompoundValueAdd, true);
+
+  orion::CompoundValueNode*  tree     = new orion::CompoundValueNode("XXX");
+  orion::CompoundValueNode*  vec      = new orion::CompoundValueNode(tree, "/vec", "vec", "", 0, orion::CompoundValueNode::Vector, 1);
+  orion::CompoundValueNode*  item1    = new orion::CompoundValueNode(vec, std::string("/vec/vecitem1"), "vecitem1",  "a", 0, orion::CompoundValueNode::Leaf, 2);
+  const char*                outFile1 = "ngsi.compoundValue.vector.valid.xml";
+  const char*                outFile2 = "ngsi.compoundValue.vector.valid.json";
+
+  utInit();
+
+  tree->add(vec);
+  vec->add(item1);
+  vec->add(orion::CompoundValueNode::Leaf, "vecitem", "/vec/vecitem", "a");
+
+  tree->finish();
+  EXPECT_STREQ("bad tag-name of vector item: 'vecitem' (should be 'vecitem1')", tree->error.c_str());
+
+  item1->name = "vecitem";
+  tree->finish();
+  EXPECT_STREQ("", tree->error.c_str());
+
+  std::string rendered;
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile1)) << "Error getting test data from '" << outFile1 << "'";
+  rendered = tree->render(XML, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
+  rendered = tree->render(JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+  tree->shortShow("");
+  tree->show("");
+
+  lmTraceLevelSet(LmtCompoundValueAdd, false);
+
+  delete tree;
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* structInvalidAndOk -
+*/
+TEST(CompoundValueNode, structInvalidAndOk)
+{
+  lmTraceLevelSet(LmtCompoundValueAdd, true);
+
+  orion::CompoundValueNode*  tree     = new orion::CompoundValueNode("XXX");
+  orion::CompoundValueNode*  str      = new orion::CompoundValueNode(tree, "/struct", "struct", "", 0, orion::CompoundValueNode::Struct, 1);
+  orion::CompoundValueNode*  item1    = new orion::CompoundValueNode(str, std::string("/struct/structitem"), "structitem", "a", 0, orion::CompoundValueNode::Leaf, 2);
+  orion::CompoundValueNode*  item2    = new orion::CompoundValueNode(str, std::string("/struct/structitem"), "structitem", "a", 1, orion::CompoundValueNode::Leaf, 2);
+  const char*                outFile1 = "ngsi.compoundValue.struct.valid.xml";
+  const char*                outFile2 = "ngsi.compoundValue.struct.valid.json";
+
+  utInit();
+
+  tree->add(str);
+  str->add(item1);
+  str->add(item2);
+
+  tree->finish();
+  EXPECT_STREQ("duplicated tag-name: 'structitem' in '/struct/structitem'", tree->error.c_str());
+
+  item2->name = "structitem2";
+  tree->finish();
+  EXPECT_STREQ("", tree->error.c_str());
+
+  std::string rendered;
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile1)) << "Error getting test data from '" << outFile1 << "'";
+  rendered = tree->render(XML, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
+  rendered = tree->render(JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+  tree->shortShow("");
+  tree->show("");
+
+  delete tree;
+
+  lmTraceLevelSet(LmtCompoundValueAdd, false);
+  utExit();
+}

@@ -140,8 +140,8 @@ CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
 */
 CompoundValueNode* CompoundValueNode::add(const Type _type, const std::string& _name, const std::string& _containerPath, const std::string& _value)
 {
-  if (type == Leaf)
-    LM_T(LmtCompoundValueAdd, ("Adding Leaf '%s', with value '%s' under '%s'", _name.c_str(), value.c_str(), _containerPath.c_str()));
+  if (_type == Leaf)
+    LM_T(LmtCompoundValueAdd, ("Adding Leaf '%s', with value '%s' under '%s'", _name.c_str(), _value.c_str(), _containerPath.c_str()));
   else
      LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s'", typeName(_type), _name.c_str(), _containerPath.c_str()));
 
