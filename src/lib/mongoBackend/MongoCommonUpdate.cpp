@@ -696,14 +696,6 @@ static bool processContextAttributeVector (ContextElement* ceP, std::string acti
         ca->name = attributeP->name;
         ca->type = attributeP->type;
 
-#if 0
-        if (attributeP->compoundValueP != NULL)
-        {
-          LM_W(("This context attribute has a COMPOUND VALUE - special care is needed (compoundValueP at %p)", attributeP->compoundValueP));
-          attributeP->compoundValueP->shortShow("processContextAttributeVector: ");
-        }
-#endif
-
         if (attributeP->getId() != "") {
             Metadata*  md = new Metadata(NGSI_MD_ID, "string", attributeP->getId());
             ca->metadataVector.push_back(md);
