@@ -58,8 +58,6 @@ bool smartAttrMatch(std::string name1, std::string type1, std::string id1, std::
 *
 * compoundValueBson (for arrays) -
 *
-* FIXME: not sure the best way of returning the value, as function return value
-* or as a function parameter (by reference)
 */
 void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b);  //FIXME: is this normal?
 void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONArrayBuilder& b)
@@ -81,7 +79,7 @@ void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONArra
             b.append(bo.obj());
         }
         else {
-            // FIXME: error here
+            LM_E(("Unknown type in compound value"));
         }
     }
 
@@ -181,6 +179,7 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         valueBson(&ca, newAttr);
         updated = true;
 
+        /* It was an actual update? */
         if (ca.compoundValueP == NULL) {
             /* It was an actual update? */
             if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value) {
