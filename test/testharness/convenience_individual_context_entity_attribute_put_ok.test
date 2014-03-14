@@ -41,6 +41,11 @@ echo "+++++ 1. create entity +++++"
       <contextValue>23</contextValue>
     </contextAttribute>
     <contextAttribute>
+      <name>temperature</name>
+      <type>farenheit</type>
+      <contextValue>81</contextValue>
+    </contextAttribute>
+    <contextAttribute>
       <name>pressure</name>
       <type>mmHg</type>
       <contextValue>720</contextValue>
@@ -53,7 +58,7 @@ echo "+++++ 2. put an entity with type +++++"
 (curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperature -s -S --header 'Content-Type: application/xml' -X PUT -d @- | xmllint --format - ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <updateContextAttributeRequest>
-  <type>temperature</type>
+  <type>centigrade</type>
   <contextValue>10</contextValue>
 </updateContextAttributeRequest>
 EOF
@@ -85,8 +90,8 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
 echo "+++++ 8. update with type (JSON) +++++"
 (curl localhost:${BROKER_PORT}/ngsi10/contextEntities/Room1/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) <<EOF
 {
-  "type": "temperature",
-  "value": "21"
+  "type": "farenheit",
+  "value": "99"
 }
 EOF
 
@@ -103,6 +108,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
         <contextAttribute>
           <name>temperature</name>
           <type>centigrade</type>
+          <contextValue/>
+        </contextAttribute>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>farenheit</type>
           <contextValue/>
         </contextAttribute>
         <contextAttribute>
@@ -138,6 +148,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
         <contextValue>10</contextValue>
       </contextAttribute>
       <contextAttribute>
+        <name>temperature</name>
+        <type>farenheit</type>
+        <contextValue>81</contextValue>
+      </contextAttribute>
+      <contextAttribute>
         <name>pressure</name>
         <type>mmHg</type>
         <contextValue>720</contextValue>
@@ -169,6 +184,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
         <contextValue>31</contextValue>
       </contextAttribute>
       <contextAttribute>
+        <name>temperature</name>
+        <type>farenheit</type>
+        <contextValue>31</contextValue>
+      </contextAttribute>
+      <contextAttribute>
         <name>pressure</name>
         <type>mmHg</type>
         <contextValue>720</contextValue>
@@ -188,6 +208,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
             "name": "temperature",
             "type": "centigrade",
             "value": "39"
+        },
+        {
+            "name": "temperature",
+            "type": "farenheit",
+            "value": "39"
         }
     ],
     "statusCode": {
@@ -202,7 +227,12 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
         {
             "name": "temperature",
             "type": "centigrade",
-            "value": "21"
+            "value": "39"
+        },
+        {
+            "name": "temperature",
+            "type": "farenheit",
+            "value": "99"
         }
     ],
     "statusCode": {
