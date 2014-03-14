@@ -1,4 +1,5 @@
 - Fix: the CLI options now coincide with the documentation
 - Fix: Introduced a second semaphore level as additional security measure to ensure all MongoDB driver invocations run in thread-safe mode
 - Fix: Convenience operations now correctly parse context values (Bug #219)
+- Add: It is now possible to update attribute values using a convenience operation without using metadatas.
 - Fix: fixed a bug about incoming buffer pollution 
