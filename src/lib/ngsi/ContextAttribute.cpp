@@ -42,6 +42,7 @@ ContextAttribute::ContextAttribute()
    name  = "";
    type  = "";
    value = "";
+   compoundValueP = NULL;
 }
 
 
@@ -53,9 +54,10 @@ ContextAttribute::ContextAttribute()
 ContextAttribute::ContextAttribute(ContextAttribute* caP)
 {
    LM_T(LmtClone, ("'cloning' a ContextAttribute"));
-   name  = caP->name;
-   type  = caP->type;
-   value = caP->value;
+   name           = caP->name;
+   type           = caP->type;
+   value          = caP->value;
+   compoundValueP = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
 
    metadataVector.vec.clear();
 
@@ -78,6 +80,8 @@ ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::st
    name  = _name;
    type  = _type;
    value = _value;
+
+   compoundValueP = NULL;
 }
 
 /* ****************************************************************************
@@ -115,7 +119,12 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
   out += startTag(indent, xmlTag, jsonTag, format, false, false);
   out += valueTag(indent + "  ", "name",         name,  format, true);
   out += valueTag(indent + "  ", "type",         type,  format, true);
-  out += valueTag(indent + "  ", ((format == XML)? "contextValue" : "value"), value, format, commaAfterContextValue);
+
+  if (compoundValueP == NULL)
+    out += valueTag(indent + "  ", ((format == XML)? "contextValue" : "value"), value, format, commaAfterContextValue);
+  else
+    out += compoundValueP->render(format, indent);
+
   out += metadataVector.render(format, indent + "  ", false);
   out += endTag(indent, xmlTag, format, comma);
 
@@ -153,7 +162,11 @@ void ContextAttribute::present(std::string indent, int ix)
   PRINTF("%sAttribute %d:\n",    indent.c_str(), ix);
   PRINTF("%s  Name:       %s\n", indent.c_str(), name.c_str());
   PRINTF("%s  Type:       %s\n", indent.c_str(), type.c_str());
-  PRINTF("%s  Value:      %s\n", indent.c_str(), value.c_str());
+
+  if (compoundValueP == NULL)
+    PRINTF("%s  Value:      %s\n", indent.c_str(), value.c_str());
+  else
+    compoundValueP->show(indent);
 
   metadataVector.present("Attribute", indent + "  ");
 }

@@ -326,7 +326,7 @@ TEST(RegisterContextRequest, emptyEntityIdList)
 TEST(RegisterContextRequest, entityIdWithEmptyId)
 {
   ParseData       parseData;
-  const char*     inFile  = "ngsi9.registerContextRequest.entityIdWithEmptyId.invalid.xml";
+  const char*     inFile  = "ngsi9.registerContextRequest.entityIdWithEmptyId.valid.xml";
   const char*     outFile = "ngsi9.registerContextResponse.entityIdWithEmptyId.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 

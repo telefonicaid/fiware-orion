@@ -2,6 +2,7 @@
   <subscriptionId>000000000000000000000000</subscriptionId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>Unknown XML field: 'type'</details>
   </errorCode>
 </subscribeContextAvailabilityResponse>

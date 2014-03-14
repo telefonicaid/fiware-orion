@@ -32,8 +32,72 @@
 #include "common/globals.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/EntityId.h"
+#include "parse/CompoundValueNode.h"
+#include "rest/ConnectionInfo.h"
 #include "xmlParse/XmlNode.h"
 #include "xmlParse/xmlParse.h"
+
+
+/* ****************************************************************************
+*
+* compoundValueRoots - 
+*/
+const char* compoundValueRootV[] =
+{
+  "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue" 
+};
+
+
+
+static bool isCompoundValuePath(const char* path, std::string& root, std::string& rest)
+{
+   unsigned int len;
+
+   root = "";
+   rest = "";
+
+   for (unsigned int ix = 0; ix < sizeof(compoundValueRootV) / sizeof(compoundValueRootV[0]); ++ix)
+   {
+      len = strlen(compoundValueRootV[ix]);
+
+      if (strlen(path) < len)
+          continue;
+
+      if (strncmp(compoundValueRootV[ix], path, len) == 0)
+      {
+         root = compoundValueRootV[ix];
+         rest = &path[len];
+
+         return true;
+      }
+   }
+
+   return false;
+}
+
+
+/* ****************************************************************************
+*
+* xmlTypeAttributeGet - 
+*/
+static std::string xmlTypeAttributeGet(xml_node<>* node)
+{
+  std::string type = "";
+
+  for (xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute())
+  {
+    if (attr->name() == std::string("type"))
+    {
+       if (type != "")
+         return "more than one 'type' attribute";
+       type = attr->value();
+    }
+    else
+      return std::string("unknown attribute '") + attr->name() + "'";
+  }
+
+  return type;
+}
 
 
 
@@ -41,15 +105,12 @@
 *
 * xmlParse - 
 */
-void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* parseVector, ParseData* reqDataP)
+void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* parseVector, ParseData* parseDataP)
 {
-  if (node == NULL)
+  if ((node == NULL) || (node->name() == NULL))
     return;
 
-  if (node->name() == NULL)
-    return;
-
-  if (node->name()[0] == 0)
+  if ((node->name()[0] == 0) && (ciP->compoundValueContainer == NULL))
     return;
 
   std::string path = fatherPath + "/" + node->name();
@@ -65,7 +126,7 @@ void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std
     {
       int r;
 
-      if ((r = parseVector[ix].treat(node, reqDataP)) != 0)
+      if ((r = parseVector[ix].treat(node, parseDataP)) != 0)
       {
         fprintf(stderr, "parse vector treat function error: %d\n", r);
         LM_E(("parse vector treat function error: %d", r));
@@ -77,13 +138,91 @@ void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std
   }
 
   if (treated == false)
-    LM_W(("Warning: node '%s' not treated (%s)", path.c_str(), node->name()));
+  {
+    std::string root;
+    std::string rest;
+
+    if (isCompoundValuePath(fatherPath.c_str(), root, rest))
+    {
+      std::string  name   = node->name();
+      std::string  value  = node->value();
+      std::string  type   = xmlTypeAttributeGet(node);
+
+      if (ciP->current != NULL)
+      {
+         if (rest.size() < ciP->current->path.size())
+         {
+           LM_T(LmtCompoundValue, ("'%s has ended - going up one level to '%s'", ciP->current->name.c_str(), ciP->current->container->name.c_str()));
+           ciP->current = ciP->current->container;
+         }
+      }
+
+      if ((type != "") && (type != "vector"))
+      {
+         ciP->httpStatusCode = SccBadRequest;
+         ciP->answer = std::string("Bad value for XML attribute 'type' for '") + node->name() + "': '" + type + "'";
+         LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), fatherPath.c_str()));
+         return;
+      }
+
+      if (rest == "")  // Toplevel
+      {
+        if (ciP->compoundValueContainer == NULL) // Toplevel start
+        {
+          LM_T(LmtCompoundValue, ("Compound value start for '%s'", fatherPath.c_str()));
+          ciP->compoundValueContainer = new orion::CompoundValueNode(root);
+          ciP->compoundValueNode.push_back(ciP->compoundValueContainer);
+          ciP->current = ciP->compoundValueContainer;
+        }
+        else // Toplevel END
+        {
+          LM_T(LmtCompoundValue, ("Compound value end for '%s'", fatherPath.c_str()));
+          std::string status = ciP->compoundValueContainer->finish();
+
+          // Pass the CompoundValue tree to the last ContextAttribute
+          // FIXME P2: This method of doing it could be improved
+          //           The thing is that, the XML node is found before the CompoundValue.
+          parseDataP->lastContextAttribute->compoundValueP = ciP->compoundValueContainer;
+          std::string rendered = parseDataP->lastContextAttribute->compoundValueP->render(ciP->outFormat, "");
+          LM_T(LmtCompoundValueRender, ("*********** Rendered: \n%s", rendered.c_str()));
+          ciP->compoundValueContainer = NULL;
+          ciP->current = NULL;
+
+          if (status != "")
+          {
+            ciP->httpStatusCode = SccBadRequest;
+            ciP->answer = std::string("compound value error: ") + status;
+            LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), fatherPath.c_str()));
+            return;
+          }
+        }
+      }
+
+      if ((value == " ") && (name != ""))
+      {
+        if (type == "vector")
+          ciP->current = ciP->current->add(orion::CompoundValueNode::Vector, name, rest);
+        else
+          ciP->current = ciP->current->add(orion::CompoundValueNode::Struct, name, rest);
+      }
+      else if (name != "")
+        ciP->current->add(orion::CompoundValueNode::Leaf, name, rest, value);
+    }
+    else
+    {
+      ciP->httpStatusCode = SccBadRequest;
+      if (ciP->answer == "")
+        ciP->answer = std::string("Unknown XML field: '") + node->name() + "'";
+      LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), fatherPath.c_str()));
+      return;
+    }
+  }
 
   xml_node<>* child = node->first_node();
 
   while (child != NULL)
   {
-    xmlParse(node, child, indentation + "  ", path, parseVector, reqDataP);
+    xmlParse(ciP, node, child, indentation + "  ", path, parseVector, parseDataP);
     child = child->next_sibling();
   }
 }
@@ -94,7 +233,7 @@ void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std
 *
 * xmlNullTreat - 
 */
-int nullTreat(xml_node<>* node, ParseData* reqDataP)
+int nullTreat(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtNullNode, ("Not treating node '%s'", node->name()));
   return 0;

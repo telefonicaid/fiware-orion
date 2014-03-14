@@ -32,14 +32,15 @@ SET (STATIC_LIBS
     ngsiNotify
     serviceRoutines
     convenienceMap
-    mongoBackend    
+    mongoBackend
     rest
     jsonParse
     xmlParse
+    parse
     convenience
     ngsi9
     ngsi10
-    ngsi    
+    ngsi
     common
     lm
     pa

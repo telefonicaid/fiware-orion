@@ -23,7 +23,7 @@
 * Author: Fermin Galan
 */
 #include "gtest/gtest.h"
-#include "testInit.h"
+#include "unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -38,11 +38,7 @@
 
 #include "mongo/client/dbclient.h"
 
-#include "commonMocks.h"
 
-using ::testing::_;
-using ::testing::Throw;
-using ::testing::Return;
 
 /* ****************************************************************************
 *
@@ -261,6 +257,8 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -272,12 +270,6 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -415,11 +407,8 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
     EXPECT_FALSE(a1nt.hasField("modDate"));
 
-    /* Release connection */
-    mongoDisconnect();
-
     /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 

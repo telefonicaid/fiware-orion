@@ -6,7 +6,6 @@
       </entityId>
       <entityId type="Room" isPattern="false">
         <id>OfficeRoom</id>
-        <isPattern>false</isPattern>
       </entityId>
     </entityIdList>
     <attributeList>

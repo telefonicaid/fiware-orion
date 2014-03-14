@@ -225,6 +225,7 @@ SET (SOURCES
     mongoBackend/mongoNotifyContext_test.cpp
     mongoBackend/mongoNotifyContextAvailability_test.cpp
 
+    parse/CompoundValueNode_test.cpp
     jsonParse/jsonRequest_test.cpp
 
     xmlParse/xmlAppendContextElementRequest_test.cpp
@@ -254,6 +255,7 @@ SET (STATIC_LIBS
     ngsiNotify
     jsonParse
     xmlParse
+    parse
     convenience
     serviceRoutines
     convenienceMap

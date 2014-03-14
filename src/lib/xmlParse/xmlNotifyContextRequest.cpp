@@ -154,6 +154,21 @@ static int entityIdId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
+* attributeDomainName - 
+*/
+static int attributeDomainName(xml_node<>* node, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got an attributeDomainName: '%s'", node->value()));
+
+  parseDataP->ncr.cerP->contextElement.attributeDomainName.set(node->value());
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
 * contextElementResponse - 
 */
 static int contextElementResponse(xml_node<>* node, ParseData* parseDataP)
@@ -220,6 +235,59 @@ static int contextAttributeContextValue(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
+* contextMetadata - 
+*/
+static int contextMetadata(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a metadata"));
+  reqData->ncr.attributeMetadataP = new Metadata();
+  reqData->ncr.attributeP->metadataVector.push_back(reqData->ncr.attributeMetadataP);
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* contextMetadataName - 
+*/
+static int contextMetadataName(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a metadata name '%s'", node->value()));
+  reqData->ncr.attributeMetadataP->name = node->value();
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* contextMetadataType - 
+*/
+static int contextMetadataType(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a metadata type '%s'", node->value()));
+  reqData->ncr.attributeMetadataP->type = node->value();
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* contextMetadataValue - 
+*/
+static int contextMetadataValue(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a metadata value '%s'", node->value()));
+  reqData->ncr.attributeMetadataP->value = node->value();
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
 * statusCodeCode - 
 */
 static int statusCodeCode(xml_node<>* node, ParseData* parseDataP)
@@ -273,11 +341,25 @@ XmlNode ncrParseVector[] =
   { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/entityId",     entityId                },
   { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/entityId/id",  entityIdId              },
 
+  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/attributeDomainName",    attributeDomainName   },
+
   { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList",                               nullTreat },
   { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute",              contextAttribute },
   { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/name",         contextAttributeName },
   { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/type",         contextAttributeType },
   { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/contextValue", contextAttributeContextValue },
+
+  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata",                       nullTreat            },
+  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata",       contextMetadata      },
+  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/name",  contextMetadataName  },
+  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/type",  contextMetadataType  },
+  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/value", contextMetadataValue },
+
+  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/domainMetadata",                       nullTreat },
+  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/domainMetadata/contextMetadata",       nullTreat },
+  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/domainMetadata/contextMetadata/name",  nullTreat },
+  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/domainMetadata/contextMetadata/type",  nullTreat },
+  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/domainMetadata/contextMetadata/value", nullTreat },
 
   { "/notifyContextRequest/contextResponseList/contextElementResponse/statusCode",                nullTreat              },
   { "/notifyContextRequest/contextResponseList/contextElementResponse/statusCode/code",           statusCodeCode         },

@@ -138,10 +138,12 @@ static int contextAttributeType(xml_node<>* node, ParseData* reqData)
 *
 * contextAttributeValue - 
 */
-static int contextAttributeValue(xml_node<>* node, ParseData* reqData)
+static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
 {
+  parseDataP->lastContextAttribute = parseDataP->upcr.attributeP;
+
   LM_T(LmtParse, ("Got an attribute value: '%s'", node->value()));
-  reqData->upcr.attributeP->value = node->value();
+  parseDataP->upcr.attributeP->value = node->value();
   return 0;
 }
 
@@ -344,7 +346,7 @@ XmlNode upcrParseVector[] =
   { "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/type",  contextMetadataType       },
   { "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/value", contextMetadataValue      },
   
-  { "/updateContextRequest/contextElementList/contextElement/domainMetadata/",                      nullTreat            },
+  { "/updateContextRequest/contextElementList/contextElement/domainMetadata",                       nullTreat            },
   { "/updateContextRequest/contextElementList/contextElement/domainMetadata/contextMetadata",       domainMetadata       },
   { "/updateContextRequest/contextElementList/contextElement/domainMetadata/contextMetadata/name",  domainMetadataName   },
   { "/updateContextRequest/contextElementList/contextElement/domainMetadata/contextMetadata/type",  domainMetadataType   },

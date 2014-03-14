@@ -43,7 +43,7 @@ typedef enum TraceLevels
   LmtUrlParse,
   LmtHttpRequest,
   LmtHttpHeaders,
-  LmtHttpDaemon,
+  LmtHttpDaemon = 25,
   LmtHttpUnsupportedHeader,
   LmtMhd,
   LmtSavedResponse,
@@ -55,8 +55,12 @@ typedef enum TraceLevels
   LmtPresent,
   LmtNew,
   LmtTreat,
-  LmtDump,
+  LmtDump  = 45,
   LmtNullNode,
+  LmtCompoundValue,
+  LmtCompoundValueAdd,
+  LmtCompoundValueLookup,
+  LmtCompoundValueRender = 50,
 
   /* RestService and Service (60-79) */
   LmtService     = 60,
