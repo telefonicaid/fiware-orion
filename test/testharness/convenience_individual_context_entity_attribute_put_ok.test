@@ -42,7 +42,7 @@ echo "+++++ 1. create entity +++++"
     </contextAttribute>
     <contextAttribute>
       <name>temperature</name>
-      <type>farenheit</type>
+      <type>Fahrenheit</type>
       <contextValue>81</contextValue>
     </contextAttribute>
     <contextAttribute>
@@ -90,7 +90,7 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
 echo "+++++ 8. update with type (JSON) +++++"
 (curl localhost:${BROKER_PORT}/ngsi10/contextEntities/Room1/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) <<EOF
 {
-  "type": "farenheit",
+  "type": "Fahrenheit",
   "value": "99"
 }
 EOF
@@ -112,7 +112,7 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
         </contextAttribute>
         <contextAttribute>
           <name>temperature</name>
-          <type>farenheit</type>
+          <type>Fahrenheit</type>
           <contextValue/>
         </contextAttribute>
         <contextAttribute>
@@ -149,7 +149,7 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
       </contextAttribute>
       <contextAttribute>
         <name>temperature</name>
-        <type>farenheit</type>
+        <type>Fahrenheit</type>
         <contextValue>81</contextValue>
       </contextAttribute>
       <contextAttribute>
@@ -185,7 +185,7 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
       </contextAttribute>
       <contextAttribute>
         <name>temperature</name>
-        <type>farenheit</type>
+        <type>Fahrenheit</type>
         <contextValue>31</contextValue>
       </contextAttribute>
       <contextAttribute>
@@ -211,7 +211,7 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
         },
         {
             "name": "temperature",
-            "type": "farenheit",
+            "type": "Fahrenheit",
             "value": "39"
         }
     ],
@@ -231,7 +231,7 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
         },
         {
             "name": "temperature",
-            "type": "farenheit",
+            "type": "Fahrenheit",
             "value": "99"
         }
     ],
