@@ -151,7 +151,7 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
 
   try
   {
-    jsonParse(content, reqP->keyword, reqP->parseVector, parseDataP);
+    res = jsonParse(ciP, content, reqP->keyword, reqP->parseVector, parseDataP);
   }
   catch (std::exception &e)
   {
@@ -160,8 +160,18 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
     LM_RE(errorReply, (res.c_str()));
   }
 
+  if (res != "OK")
+  {
+    LM_E(("JSON parse error: %s", res.c_str()));
+    ciP->httpStatusCode = SccBadRequest;
+
+    std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", payloadWord, ciP->httpStatusCode, res);
+    return answer; 
+  }
+
   reqP->present(parseDataP);
 
+  LM_M(("Calling check"));
   res = reqP->check(parseDataP, ciP);
   reqP->present(parseDataP);
 

@@ -1,9 +1,6 @@
-#ifndef JSON_PARSE_H
-#define JSON_PARSE_H
-
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -27,16 +24,20 @@
 */
 #include <string>
 
-#include "jsonParse/JsonNode.h"
-#include "ngsi/ParseData.h"
-#include "rest/ConnectionInfo.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
+#include "parse/nullTreat.h"
 
 
 
 /* ****************************************************************************
 *
-* jsonParse - 
+* jsonNullTreat - 
 */
-extern std::string jsonParse(ConnectionInfo* ciP, const char* content, std::string requestType, JsonNode* parseVector, ParseData* reqDataP);
+std::string jsonNullTreat(std::string path, std::string value, void* reqDataP)
+{
+  LM_T(LmtNullNode, ("Not treating JSON node '%s'", path.c_str()));
 
-#endif
+  return "OK";
+}
