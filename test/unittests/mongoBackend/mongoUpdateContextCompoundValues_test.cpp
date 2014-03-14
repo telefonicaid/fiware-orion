@@ -70,88 +70,105 @@
 */
 
 #define CREATE_COMPOUND1(cv) \
-    orion::CompoundValueNode cv21, cv22, cv23, cv31, cv32, cv41, cv42, cv43, cv44; \
+    orion::CompoundValueNode *cv21, *cv22, *cv23, *cv31, *cv32, *cv41, *cv42, *cv43, *cv44; \
     \
     /* 4th level nodes */ \
-    cv41.type = orion::CompoundValueNode::Leaf; \
-    cv41.value = "x1"; \
+    cv41 = new orion::CompoundValueNode(); \
+    cv41->type = orion::CompoundValueNode::Leaf; \
+    cv41->value = "x1"; \
     \
-    cv42.type = orion::CompoundValueNode::Leaf; \
-    cv42.value = "x2"; \
+    cv42 = new orion::CompoundValueNode(); \
+    cv42->type = orion::CompoundValueNode::Leaf; \
+    cv42->value = "x2"; \
     \
-    cv43.type = orion::CompoundValueNode::Leaf; \
-    cv43.value = "z1"; \
+    cv43 = new orion::CompoundValueNode(); \
+    cv43->type = orion::CompoundValueNode::Leaf; \
+    cv43->value = "z1"; \
     \
-    cv44.type = orion::CompoundValueNode::Leaf; \
-    cv44.value = "z2"; \
+    cv44 = new orion::CompoundValueNode(); \
+    cv44->type = orion::CompoundValueNode::Leaf; \
+    cv44->value = "z2"; \
     \
     /* 3rd level nodes */ \
-    cv31.type = orion::CompoundValueNode::Vector; \
-    cv31.name = "x"; \
-    cv31.childV.push_back(&cv41);  /* x1 */ \
-    cv31.childV.push_back(&cv42);  /* x2 */ \
+    cv31 = new orion::CompoundValueNode(); \
+    cv31->type = orion::CompoundValueNode::Vector; \
+    cv31->name = "x"; \
+    cv31->add(cv41);  /* x1 */ \
+    cv31->add(cv42);  /* x2 */ \
     \
-    cv32.type = orion::CompoundValueNode::Leaf; \
-    cv32.name = "y"; \
-    cv32.value = "3"; \
+    cv32 = new orion::CompoundValueNode(); \
+    cv32->type = orion::CompoundValueNode::Leaf; \
+    cv32->name = "y"; \
+    cv32->value = "3"; \
     \
     /* 2nd level nodes */ \
-    cv21.type = orion::CompoundValueNode::Leaf; \
-    cv21.value = "22"; \
+    cv21 = new orion::CompoundValueNode(); \
+    cv21->type = orion::CompoundValueNode::Leaf; \
+    cv21->value = "22"; \
     \
-    cv22.type = orion::CompoundValueNode::Struct; \
-    cv22.childV.push_back(&cv31);  /* x: [x1, x2] */ \
-    cv22.childV.push_back(&cv32);  /* y: 3 */ \
+    cv22 = new orion::CompoundValueNode(); \
+    cv22->type = orion::CompoundValueNode::Struct; \
+    cv22->add(cv31);  /* x: [x1, x2] */ \
+    cv22->add(cv32);  /* y: 3 */ \
     \
-    cv23.type = orion::CompoundValueNode::Vector; \
-    cv23.childV.push_back(&cv43);  /* z1 */ \
-    cv23.childV.push_back(&cv44);  /* z2 */ \
+    cv23 = new orion::CompoundValueNode(); \
+    cv23->type = orion::CompoundValueNode::Vector; \
+    cv23->add(cv43);  /* z1 */ \
+    cv23->add(cv44);  /* z2 */ \
     \
     /* 1st level node */ \
-    cv.type = orion::CompoundValueNode::Vector; \
-    cv.childV.push_back(&cv21);  /* 22 */ \
-    cv.childV.push_back(&cv22);  /* {x: [x1, x2], y: 3} */ \
-    cv.childV.push_back(&cv23);  /* [z1, z2] */ \
+    cv = new orion::CompoundValueNode(); \
+    cv->type = orion::CompoundValueNode::Vector; \
+    cv->add(cv21);  /* 22 */ \
+    cv->add(cv22);  /* {x: [x1, x2], y: 3} */ \
+    cv->add(cv23);  /* [z1, z2] */ \
     \
-    cv.shortShow("shortShow: "); \
-    cv.show("show: "); \
+    cv->shortShow("shortShow: "); \
+    cv->show("show: "); \
 
 #define CREATE_COMPOUND2(cv) \
-    orion::CompoundValueNode cv21, cv22, cv31, cv32, cv33, cv34; \
+    orion::CompoundValueNode *cv21, *cv22, *cv31, *cv32, *cv33, *cv34; \
     \
     /* 3rd level nodes */ \
-    cv31.type = orion::CompoundValueNode::Leaf; \
-    cv31.name = "x1"; \
-    cv31.value = "a"; \
+    cv31 = new orion::CompoundValueNode(); \
+    cv31->type = orion::CompoundValueNode::Leaf; \
+    cv31->name = "x1"; \
+    cv31->value = "a"; \
     \
-    cv32.type = orion::CompoundValueNode::Leaf; \
-    cv32.name = "x2"; \
-    cv32.value = "b"; \
+    cv32 = new orion::CompoundValueNode(); \
+    cv32->type = orion::CompoundValueNode::Leaf; \
+    cv32->name = "x2"; \
+    cv32->value = "b"; \
     \
-    cv33.type = orion::CompoundValueNode::Leaf; \
-    cv33.value = "y1"; \
+    cv33 = new orion::CompoundValueNode(); \
+    cv33->type = orion::CompoundValueNode::Leaf; \
+    cv33->value = "y1"; \
     \
-    cv34.type = orion::CompoundValueNode::Leaf; \
-    cv34.value = "y2"; \
+    cv34 = new orion::CompoundValueNode(); \
+    cv34->type = orion::CompoundValueNode::Leaf; \
+    cv34->value = "y2"; \
     \
     /* 2nd level nodes */ \
-    cv21.type = orion::CompoundValueNode::Struct; \
-    cv21.name = "x"; \
-    cv21.childV.push_back(&cv31);  /* x1: a */ \
-    cv21.childV.push_back(&cv32);  /* x2: b */ \
+    cv21 = new orion::CompoundValueNode(); \
+    cv21->type = orion::CompoundValueNode::Struct; \
+    cv21->name = "x"; \
+    cv21->add(cv31);  /* x1: a */ \
+    cv21->add(cv32);  /* x2: b */ \
     \
-    cv22.type = orion::CompoundValueNode::Vector; \
-    cv22.name = "y"; \
-    cv22.childV.push_back(&cv33);  /* y1 */ \
-    cv22.childV.push_back(&cv34);  /* y2 */ \
+    cv22 = new orion::CompoundValueNode(); \
+    cv22->type = orion::CompoundValueNode::Vector; \
+    cv22->name = "y"; \
+    cv22->add(cv33);  /* y1 */ \
+    cv22->add(cv34);  /* y2 */ \
     \
     /* 1st level node */ \
-    cv.type = orion::CompoundValueNode::Struct; \
-    cv.childV.push_back(&cv21);  /* x: {x1: a, x2: b} */ \
-    cv.childV.push_back(&cv22);  /* y: [y1, y2] */ \
+    cv = new orion::CompoundValueNode(); \
+    cv->type = orion::CompoundValueNode::Struct; \
+    cv->add(cv21);  /* x: {x1: a, x2: b} */ \
+    cv->add(cv22);  /* y: [y1, y2] */ \
     \
-    cv.shortShow("shortShow: "); \
-    cv.show("show: "); \
+    cv->shortShow("shortShow: "); \
+    cv->show("show: "); \
 
 /* ****************************************************************************
 *
@@ -273,9 +290,9 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E3", "T3", "false");
-    orion::CompoundValueNode cv;
+    orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca("A1", "TA1", &cv);
+    ContextAttribute ca("A1", "TA1", cv);
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
@@ -353,9 +370,9 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E3", "T3", "false");
-    orion::CompoundValueNode cv;
+    orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca("A1", "TA1", &cv);
+    ContextAttribute ca("A1", "TA1", cv);
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
@@ -431,9 +448,9 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E3", "T3", "false");
-    orion::CompoundValueNode cv;
+    orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca1("A1", "TA1", &cv);
+    ContextAttribute ca1("A1", "TA1", cv);
     ContextAttribute ca2("A2", "TA2", "simple2");
     ce.contextAttributeVector.push_back(&ca1);
     ce.contextAttributeVector.push_back(&ca2);
@@ -523,9 +540,9 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E3", "T3", "false");
-    orion::CompoundValueNode cv;
+    orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca1("A1", "TA1", &cv);
+    ContextAttribute ca1("A1", "TA1", cv);
     ContextAttribute ca2("A2", "TA2", "simple2");
     ce.contextAttributeVector.push_back(&ca1);
     ce.contextAttributeVector.push_back(&ca2);
@@ -614,9 +631,9 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    orion::CompoundValueNode cv;
+    orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca("A1", "TA1", &cv);
+    ContextAttribute ca("A1", "TA1", cv);
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
@@ -701,9 +718,9 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    orion::CompoundValueNode cv;
+    orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca("A1", "TA1", &cv);
+    ContextAttribute ca("A1", "TA1", cv);
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
@@ -786,9 +803,9 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1PlusSimpleValu
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    orion::CompoundValueNode cv;
+    orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca1("A1", "TA1", &cv);
+    ContextAttribute ca1("A1", "TA1", cv);
     ContextAttribute ca2("A2", "TA2", "simple2");
     ce.contextAttributeVector.push_back(&ca1);
     ce.contextAttributeVector.push_back(&ca2);
@@ -885,9 +902,9 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2PlusSimpleValu
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    orion::CompoundValueNode cv;
+    orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca1("A1", "TA1", &cv);
+    ContextAttribute ca1("A1", "TA1", cv);
     ContextAttribute ca2("A2", "TA2", "simple2");
     ce.contextAttributeVector.push_back(&ca1);
     ce.contextAttributeVector.push_back(&ca2);
@@ -982,9 +999,9 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundObject)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    orion::CompoundValueNode cv;
+    orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca("AX", "TAX", &cv);
+    ContextAttribute ca("AX", "TAX", cv);
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
@@ -1135,9 +1152,9 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundObje
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    orion::CompoundValueNode cv;
+    orion::CompoundValueNode* cv;
     CREATE_COMPOUND2(cv)
-    ContextAttribute ca("AX", "TAX", &cv);
+    ContextAttribute ca("AX", "TAX", cv);
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
@@ -1289,9 +1306,9 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundVector)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    orion::CompoundValueNode cv;
+    orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca("AX", "TAX", &cv);
+    ContextAttribute ca("AX", "TAX", cv);
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
@@ -1444,9 +1461,9 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundVect
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    orion::CompoundValueNode cv;
+    orion::CompoundValueNode* cv;
     CREATE_COMPOUND1(cv)
-    ContextAttribute ca("AX", "TAX", &cv);
+    ContextAttribute ca("AX", "TAX", cv);
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
