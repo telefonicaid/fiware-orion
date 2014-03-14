@@ -391,8 +391,9 @@ static int connectionTreat
         else
           ciP->payload = static_buffer;
 
-        ciP->payloadSize = *upload_data_size;
-        memcpy(ciP->payload, upload_data, *upload_data_size + 1);
+        ciP->payloadSize = dataLen;
+        memcpy(ciP->payload, upload_data, dataLen);
+        ciP->payload[dataLen] = 0;
       }
       else
       {
