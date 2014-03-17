@@ -69,6 +69,8 @@
 *
 */
 
+//FIXME P10: before merging feature/complex_value, check if there is a more suitable
+// add() or addLeaf() method available
 #define CREATE_COMPOUND1(cv) \
     orion::CompoundValueNode *cv21, *cv22, *cv23, *cv31, *cv32, *cv41, *cv42, *cv43, *cv44; \
     \
@@ -126,6 +128,8 @@
     cv->shortShow("shortShow: "); \
     cv->show("show: "); \
 
+//FIXME P10: before merging feature/complex_value, check if there is a more suitable
+// add() or addLeaf() method available
 #define CREATE_COMPOUND2(cv) \
     orion::CompoundValueNode *cv21, *cv22, *cv31, *cv32, *cv33, *cv34; \
     \
