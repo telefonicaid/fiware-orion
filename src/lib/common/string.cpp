@@ -344,8 +344,23 @@ bool string2coords(std::string s, double& latitude, double& longitude)
   number1 = wsStrip(number1);
   number2 = wsStrip(number2);
 
-  latitude  = atof(number1);
-  longitude = atof(number2);
+  std::string err;
+  double oldLatitude = latitude;
+  double oldLongitude = longitude;
+  latitude = atoF(number1, err);
+  if (err.length() > 0) {
+     latitude = oldLatitude; 
+     return false;
+  }
+  else {
+     longitude = atoF(number2, err);
+     if (err.length() > 0) {
+         /* Rollback latitude */
+         latitude = oldLatitude;
+         longitude = oldLongitude;
+         return false;
+     }
+  }
 
   return true;
 }
@@ -446,4 +461,68 @@ bool versionParse(std::string version, int& mayor, int& minor, std::string& bugF
 
    free(copy);
    return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* atoF - 
+*/
+double atoF(const char* string, std::string& errorMsg)
+{
+   char* cP = (char*) string;
+   int   noOf;
+
+   errorMsg = "";
+
+   if (string[0] == 0)
+   {
+     errorMsg = "empty string";
+     return 0.0;
+   }
+
+   if ((*cP == '-') || (*cP == '+'))
+   {
+      ++cP;
+
+      if (!isdigit(*cP) && (*cP != '.'))
+      // the check on '.' is to allow e.g. '-.7' and '+.7'
+      {
+         errorMsg = "non-digit after unary minus/plus";
+         return 0.0;
+      }
+   }
+
+   // Number of dots
+   noOf = 0;
+   char* tmp = cP;
+   while (*tmp != 0)
+   {
+      if (*tmp == '.')
+      {
+         ++noOf;
+         if (tmp[1] == 0)
+         {
+            errorMsg = "last character in a double cannot be a dot";
+            return 0.0;
+         }
+      }
+
+      ++tmp;
+   }
+
+   if (noOf > 1)
+   {
+      errorMsg = "more than one dot";
+      return 0.0;
+   }
+
+   if (strspn(cP, ".0123456789") != strlen(cP))
+   {
+      errorMsg = "invalid characters in string to convert";
+      return 0.0;
+   }
+
+   return atof(string);
 }

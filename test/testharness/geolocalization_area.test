@@ -50,8 +50,8 @@ echo "0: ++++++++++++++++++++"
           <metadata>
             <contextMetadata>
               <name>location</name>
-              <type>bool</type>
-              <value>true</value>
+              <type>string</type>
+              <value>WSG84</value>
             </contextMetadata>
           </metadata>
         </contextAttribute>
@@ -172,6 +172,13 @@ echo "3: ++++++++++++++++++++"
             <name>location</name>
             <type>centigrade</type>
             <contextValue/>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>

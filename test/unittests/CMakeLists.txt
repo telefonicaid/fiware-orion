@@ -222,6 +222,7 @@ SET (SOURCES
     mongoBackend/mongoUpdateContextAvailabilitySubscription_test.cpp
     mongoBackend/mongoUpdateContextSubscription_test.cpp
     mongoBackend/mongoUpdateContext_test.cpp
+    mongoBackend/mongoUpdateContextGeo_test.cpp
     mongoBackend/mongoUpdateContext_withOnchangeSubscriptions_test.cpp
     mongoBackend/mongoNotifyContext_test.cpp
     mongoBackend/mongoNotifyContextAvailability_test.cpp
