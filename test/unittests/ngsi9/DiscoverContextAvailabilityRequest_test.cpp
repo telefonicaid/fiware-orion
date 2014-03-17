@@ -455,7 +455,7 @@ TEST(DiscoverContextAvailabilityRequest, entityIdTypeAsField_xml)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.EntityIdTypeAsField.invalid.xml";
-  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.EntityIdTypeAsField.invalid.xml";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.EntityIdTypeAsField.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
