@@ -145,6 +145,9 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
     LM_RE(errorReply, ("Sorry, no request treating object found for RequestType %d (%s)", request, requestType(request)));
   }
 
+  if (reqPP != NULL)
+    *reqPP = reqP;
+
   LM_T(LmtParse, ("Treating '%s' request", reqP->keyword.c_str()));
 
   reqP->init(parseDataP);
@@ -173,9 +176,6 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
 
   res = reqP->check(parseDataP, ciP);
   reqP->present(parseDataP);
-
-  if (reqPP != NULL)
-    *reqPP = reqP;
 
   return res;
 }
