@@ -34,6 +34,7 @@
 #include "jsonParse/jsonNullTreat.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonSubscribeContextAvailabilityRequest.h"
+#include "parse/nullTreat.h"
 
 
 
@@ -238,10 +239,12 @@ static std::string scopeValue(std::string path, std::string value, ParseData* re
 */
 JsonNode jsonScarParseVector[] =
 {
+  { "/entities",                           jsonNullTreat        },
   { "/entities/entity",                    entityId             },
   { "/entities/entity/id",                 entityIdId           },
   { "/entities/entity/type",               entityIdType         },
   { "/entities/entity/isPattern",          entityIdIsPattern    },
+  { "/attributes",                         jsonNullTreat        },
   { "/attributes/attribute",               attribute            },
   { "/reference",                          reference            },
   { "/duration",                           duration             },

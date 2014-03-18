@@ -57,7 +57,7 @@ using boost::property_tree::ptree;
 *
 * treat - 
 */
-std::string treat(int type, std::string path, std::string value, JsonNode* parseVector, ParseData* reqDataP)
+std::string treat(ConnectionInfo* ciP, int type, std::string path, std::string value, JsonNode* parseVector, ParseData* reqDataP)
 {
   LM_T(LmtTreat, ("Treating path '%s', value '%s'", path.c_str(), value.c_str()));
 
@@ -72,8 +72,12 @@ std::string treat(int type, std::string path, std::string value, JsonNode* parse
     }
   }
 
-  LM_T(LmtTreat, ("The path '%s' is not treated", path.c_str()));
-  return "OK";
+  ciP->httpStatusCode = SccBadRequest;
+  if (ciP->answer == "")
+    ciP->answer = std::string("JSON Parse Error (unknown field: '") + path.c_str() + "')";
+  LM_W(("ERROR: '%s'", ciP->answer.c_str()));
+
+  return ciP->answer;
 }
 
 /* ****************************************************************************
@@ -103,6 +107,7 @@ static std::string getArrayElementName(std::string arrayName)
 */
 static std::string jsonParse
 (
+   ConnectionInfo*                           ciP,
    boost::property_tree::ptree::value_type&  v,
    std::string                               path,
    JsonNode*                                 parseVector,
@@ -129,14 +134,20 @@ static std::string jsonParse
     path = path + "/" + arrayElementName;
 
   if (value == "")
-    res = treat(1, path, value, parseVector, reqDataP);
+    res = treat(ciP, 1, path, value, parseVector, reqDataP);
   else
-    res = treat(2, path, value, parseVector, reqDataP);
+    res = treat(ciP, 2, path, value, parseVector, reqDataP);
+
+  if (res != "OK")
+  {
+    LM_E(("treat function returned error"));
+    return res;
+  }
 
   boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
   BOOST_FOREACH(boost::property_tree::ptree::value_type &v2, subtree)
   {
-     jsonParse(v2, path, parseVector, reqDataP);
+     jsonParse(ciP, v2, path, parseVector, reqDataP);
   }
 
   return res; // "OK"
@@ -146,7 +157,7 @@ static std::string jsonParse
 *
 * jsonParse - 
 */
-std::string jsonParse(const char* content, std::string requestType, JsonNode* parseVector, ParseData* reqDataP)
+std::string jsonParse(ConnectionInfo* ciP, const char* content, std::string requestType, JsonNode* parseVector, ParseData* reqDataP)
 {
   std::stringstream  ss;
   ptree              tree;
@@ -161,7 +172,9 @@ std::string jsonParse(const char* content, std::string requestType, JsonNode* pa
   // LM_T(LmtParse, ("parsing '%s'", content));
   BOOST_FOREACH(boost::property_tree::ptree::value_type &v, tree.get_child(requestType))
   {
-    jsonParse(v, path, parseVector, reqDataP);
+    std::string res = jsonParse(ciP, v, path, parseVector, reqDataP);
+    if (res != "OK")
+      return res;
   }
 
   return "OK";

@@ -335,6 +335,7 @@ JsonNode jsonNcarParseVector[] =
    { "/contextRegistrationResponses/contextRegistrationResponse/contextRegistration/attributes/attribute/metadatas/metadata/type",   attributeMetadataType    },
    { "/contextRegistrationResponses/contextRegistrationResponse/contextRegistration/attributes/attribute/metadatas/metadata/value",  attributeMetadataValue   },
 
+   { "/contextRegistrationResponses/contextRegistrationResponse/contextRegistration/metadatas",                 jsonNullTreat               },
    { "/contextRegistrationResponses/contextRegistrationResponse/contextRegistration/metadatas/metadata",        registrationMetadata        },
    { "/contextRegistrationResponses/contextRegistrationResponse/contextRegistration/metadatas/metadata/name",   registrationMetadataName    },
    { "/contextRegistrationResponses/contextRegistrationResponse/contextRegistration/metadatas/metadata/type",   registrationMetadataType    },

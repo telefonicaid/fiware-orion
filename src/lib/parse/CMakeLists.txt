@@ -22,10 +22,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
     CompoundValueNode.cpp
+    nullTreat.cpp
 )
 
 SET (HEADERS
     CompoundValueNode.h
+    nullTreat.h
 )
 
 

@@ -48,8 +48,9 @@ static std::string duration(std::string path, std::string value, ParseData* pars
 
   parseDataP->ucsr.res.duration.set(value);
 
+  // The failure is postponed until the 'check' step to not miss the subscriptionId
   if ((s = parseDataP->ucsr.res.duration.check(UpdateContextSubscription, JSON, "", "", 0)) != "OK")
-     LM_RE(s, ("error parsing duration '%s': %s", parseDataP->ucsr.res.duration.get().c_str(), s.c_str()));
+     LM_E(("error parsing duration '%s': %s", parseDataP->ucsr.res.duration.get().c_str(), s.c_str()));
 
   return "OK";
 }
@@ -223,12 +224,15 @@ JsonNode jsonUcsrParseVector[] =
   { "/duration",                                               duration                   },
   { "/restriction",                                            restriction                },
   { "/restriction/attributeExpression",                        attributeExpression        },
+  { "/restriction/scopes",                                     jsonNullTreat              },
   { "/restriction/scopes/scope",                               scope,                     },
   { "/restriction/scopes/scope/type",                          scopeType                  },
   { "/restriction/scopes/scope/value",                         scopeValue                 },
   { "/subscriptionId",                                         subscriptionId             },
+  { "/notifyConditions",                                       jsonNullTreat              },
   { "/notifyConditions/notifyCondition",                       notifyCondition            },
   { "/notifyConditions/notifyCondition/type",                  notifyConditionType        },
+  { "/notifyConditions/notifyCondition/condValues",            jsonNullTreat              },
   { "/notifyConditions/notifyCondition/condValues/condValue",  notifyConditionCondValue   },
   { "/notifyConditions/notifyCondition/restriction",           notifyConditionRestriction },
   { "/throttling",                                             throttling                 },
