@@ -34,6 +34,11 @@
 #include "mongoBackend/MongoGlobal.h"
 
 /* ****************************************************************************
+ * Fordward declarations
+ */
+static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b);
+
+/* ****************************************************************************
 *
 * smartAttrMatch -
 *
@@ -45,7 +50,7 @@
 * (and used from) a global place, maybe as part as the class-refactoring within
 * EntityId or Attribute class methods.
 */
-bool smartAttrMatch(std::string name1, std::string type1, std::string id1, std::string name2, std::string type2, std::string id2) {
+static bool smartAttrMatch(std::string name1, std::string type1, std::string id1, std::string name2, std::string type2, std::string id2) {
     if (type2 == "") {
         return ((name1 == name2) && (id1 == id2));
     }
@@ -59,8 +64,7 @@ bool smartAttrMatch(std::string name1, std::string type1, std::string id1, std::
 * compoundValueBson (for arrays) -
 *
 */
-void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b);  //FIXME: is this normal?
-void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONArrayBuilder& b)
+static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONArrayBuilder& b)
 {
 
     for (unsigned int ix = 0; ix < children.size(); ++ix) {
@@ -90,7 +94,7 @@ void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONArra
 * compoundValueBson -
 *
 */
-void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b)
+static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b)
 {
     for (unsigned int ix = 0; ix < children.size(); ++ix) {
         orion::CompoundValueNode* child = children[ix];
@@ -118,7 +122,7 @@ void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjB
 * valueBson -
 *
 */
-void valueBson(ContextAttribute* ca, BSONObjBuilder& bsonAttr) {
+static void valueBson(ContextAttribute* ca, BSONObjBuilder& bsonAttr) {
 
     if (ca->compoundValueP == NULL) {
         bsonAttr.append(ENT_ATTRS_VALUE, ca->value);
