@@ -52,6 +52,7 @@ typedef struct ContextAttribute
   ContextAttribute();
   ContextAttribute(ContextAttribute* caP);
   ContextAttribute(std::string _name, std::string _type, std::string _value = "");
+  ContextAttribute(std::string _name, std::string _type, orion::CompoundValueNode* _compoundValueP);
 
   std::string  getId();
 
