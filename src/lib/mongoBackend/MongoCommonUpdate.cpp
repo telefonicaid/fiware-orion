@@ -34,7 +34,7 @@
 #include "mongoBackend/MongoGlobal.h"
 
 /* ****************************************************************************
- * Fordward declarations
+ * Forward declarations
  */
 static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, BSONObjBuilder& b);
 
