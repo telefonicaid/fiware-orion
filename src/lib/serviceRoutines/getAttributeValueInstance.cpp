@@ -47,6 +47,7 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   QueryContextResponse     response;
   std::string              entityId      = compV[2];
   std::string              attributeName = compV[4];
+  std::string              valueID       = compV[5];
   EntityId*                eP            = new EntityId(entityId, "", "false");
   StatusCode               sc;
   ContextAttributeResponse car;
@@ -63,8 +64,15 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   else
   {
     ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
+    ContextAttributeVector cav = cerP->contextElement.contextAttributeVector;
 
-    car.contextAttributeVector.push_back(cerP->contextElement.contextAttributeVector.get(0));
+    for (unsigned int i = 0; i < cav.size(); i++)
+    {
+      if (cav.get(i)->getId() == valueID)
+      {
+        car.contextAttributeVector.push_back(cav.get(i));
+      }
+    }
     car.statusCode.fill(&cerP->statusCode);
   }
 
