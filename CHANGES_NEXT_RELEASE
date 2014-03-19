@@ -4,3 +4,5 @@
 - Add: It is now possible to update attribute values using a convenience operation without using metadatas.
 - Fix: Fixed a bug about incoming buffer pollution.
 - Fix: Some unknown incoming URLs were not responded to. Now they are. (Bug #277)
+- Fix: Now the operations GET, POST and PUT work properly with convenience operations 
+over valueID's.
