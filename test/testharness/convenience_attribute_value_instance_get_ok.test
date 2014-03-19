@@ -1,0 +1,181 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# fermin at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Convenience Attribute Value Instance - GET OK
+
+--SHELL-INIT--
+source harnessFunctions.sh
+
+dbInit CB
+brokerStart CB
+
+--SHELL--
+echo "+++++ 1. register an entity +++++"
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+  "attributes" : [
+  {
+    "name" : "temperature",
+    "type" : "centigrade",
+    "value" : "23",
+    "metadatas" : [
+      {
+        "name" : "ID",
+        "type" : "string",
+        "value" : "ground"
+      }
+    ]
+  },
+  {
+    "name" : "temperature",
+    "type" : "centigrade",
+    "value" : "23.5",
+    "metadatas" : [
+      {
+        "name" : "ID",
+        "type" : "string",
+        "value" : "wall"
+      }
+    ]
+  }
+  ]
+}
+EOF
+
+echo "+++++ 2. lookup the entity +++++"
+curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+
+echo "+++++ 3. lookup an attribute by valueID in JSON +++++"
+curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperature/ground -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+
+echo "+++++ 4. lookup an attribute by the other valueID in XML +++++"
+curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperature/wall -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format -
+
+--REGEXPECT--
++++++ 1. register an entity +++++
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "metadatas": [
+                        {
+                            "name": "ID",
+                            "type": "string",
+                            "value": "ground"
+                        }
+                    ],
+                    "name": "temperature",
+                    "type": "centigrade",
+                    "value": ""
+                },
+                {
+                    "metadatas": [
+                        {
+                            "name": "ID",
+                            "type": "string",
+                            "value": "wall"
+                        }
+                    ],
+                    "name": "temperature",
+                    "type": "centigrade",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
++++++ 2. lookup the entity +++++
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "temperature",
+                "type": "centigrade",
+                "value": "23"
+            },
+            {
+                "name": "temperature",
+                "type": "centigrade",
+                "value": "23.5"
+            }
+        ],
+        "id": "Room1",
+        "isPattern": "false",
+        "type": ""
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
++++++ 3. lookup an attribute by valueID in JSON +++++
+{
+    "attributes": [
+        {
+            "metadatas": [
+                {
+                    "name": "ID",
+                    "type": "string",
+                    "value": "ground"
+                }
+            ],
+            "name": "temperature",
+            "type": "centigrade",
+            "value": "23"
+        }
+    ],
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
++++++ 4. lookup an attribute by the other valueID in XML +++++
+<?xml version="1.0"?>
+<contextAttributeResponse>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>temperature</name>
+      <type>centigrade</type>
+      <contextValue>23.5</contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>wall</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</contextAttributeResponse>
+--TEARDOWN--
+source harnessFunctions.sh
+brokerStop CB
