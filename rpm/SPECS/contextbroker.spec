@@ -46,7 +46,7 @@ Using these interfaces, clients can do several operations:
 # Package RPM for tests 
 # -------------------------------------------------------------------------------------------- #
 %package tests
-Requires: %{name}, python, python-flask, nc, curl, libxml2, mongodb
+Requires: %{name}, python, python-flask, nc, curl, libxml2, mongodb, contextbroker 
 Summary: Test suite for %{name}
 
 %description tests
