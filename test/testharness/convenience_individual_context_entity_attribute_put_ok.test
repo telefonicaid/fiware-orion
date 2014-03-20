@@ -201,6 +201,10 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
   </statusCode>
 </contextElementResponse>
 +++++ 6. update without type (JSON) +++++
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
 +++++ 7. query (JSON) +++++
 {
     "attributes": [
@@ -221,6 +225,10 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
     }
 }
 +++++ 8. update with type (JSON) +++++
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
 +++++ 9. query (JSON) +++++
 {
     "attributes": [
