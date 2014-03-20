@@ -62,6 +62,7 @@ static Notifier*            notifier                                    = NULL;
 * Forward declarations
 */
 static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElement& be);
+static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElement& be);
 
 /* ****************************************************************************
 *
@@ -448,6 +449,34 @@ static void processEntitityPatternTrue(BSONArrayBuilder* arrayP, EntityId* enP) 
 
 /* ****************************************************************************
 *
+* addCompoundNode -
+*
+*/
+static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e) {
+    orion::CompoundValueNode* child = new orion::CompoundValueNode();
+    if (e.type() == String) {
+        child->name = e.fieldName();
+        child->type = orion::CompoundValueNode::Leaf;
+        child->value = e.String();
+        cvP->add(child);
+    }
+    else if (e.type() == Object) {
+        child->name = e.fieldName();
+        compoundObjectResponse(child, e);
+        cvP->add(child);
+    }
+    else if (e.type() == Array) {
+        child->name = e.fieldName();
+        compoundVectorResponse(child, e);
+        cvP->add(child);
+    }
+    else {
+        LM_E(("unknown BSON type"));;
+    }
+}
+
+/* ****************************************************************************
+*
 * compoundObjectResponse -
 *
 */
@@ -455,28 +484,8 @@ static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElem
     BSONObj obj = be.embeddedObject();
     cvP->type = orion::CompoundValueNode::Struct;
     for( BSONObj::iterator i = obj.begin(); i.more(); ) {
-        orion::CompoundValueNode* child = new orion::CompoundValueNode();
         BSONElement e = i.next();
-        if (e.type() == String) {
-            child->name = e.fieldName();
-            child->type = orion::CompoundValueNode::Leaf;
-            child->value = e.String();
-            cvP->add(child);
-        }
-        else if (e.type() == Object) {
-            child->name = e.fieldName();
-            compoundObjectResponse(child, e);
-            cvP->add(child);
-        }
-        else if (e.type() == Array) {
-            child->name = e.fieldName();
-            compoundVectorResponse(child, e);
-            cvP->add(child);
-        }
-        else {
-            LM_E(("unknown BSON type"));;
-        }
-
+        addCompoundNode(cvP, e);
     }
 
 }
@@ -489,27 +498,8 @@ static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElem
     std::vector<BSONElement> vec = be.Array();
     cvP->type = orion::CompoundValueNode::Vector;
     for( unsigned int ix = 0; ix < vec.size(); ++ix) {
-        orion::CompoundValueNode* child = new orion::CompoundValueNode();
         BSONElement e = vec[ix];
-        if (e.type() == String) {
-            child->name = e.fieldName();
-            child->type = orion::CompoundValueNode::Leaf;
-            child->value = e.String();
-            cvP->add(child);
-        }
-        else if (e.type() == Object) {
-            child->name = e.fieldName();
-            compoundObjectResponse(child, e);
-            cvP->add(child);
-        }
-        else if (e.type() == Array) {
-            child->name = e.fieldName();
-            compoundVectorResponse(child, e);
-            cvP->add(child);
-        }
-        else {
-            LM_E(("unknown BSON type"));;
-        }
+        addCompoundNode(cvP, e);
 
     }
 }
