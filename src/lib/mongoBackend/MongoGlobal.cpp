@@ -39,6 +39,7 @@
 #include "ngsi/AttributeList.h"
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/Duration.h"
+#include "parse/CompoundValueNode.h"
 
 #include "ngsiNotify/Notifier.h"
 
@@ -55,6 +56,12 @@ static char*                subscribeContextCollectionName              = NULL;
 static char*                subscribeContextAvailabilityCollectionName  = NULL;
 static char*                assocationsCollectionName                   = NULL;
 static Notifier*            notifier                                    = NULL;
+
+/* ****************************************************************************
+*
+* Forward declarations
+*/
+static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElement& be);
 
 /* ****************************************************************************
 *
@@ -441,6 +448,75 @@ static void processEntitityPatternTrue(BSONArrayBuilder* arrayP, EntityId* enP) 
 
 /* ****************************************************************************
 *
+* compoundObjectResponse -
+*
+*/
+static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElement& be) {
+    BSONObj obj = be.embeddedObject();
+    cvP->type = orion::CompoundValueNode::Struct;
+    for( BSONObj::iterator i = obj.begin(); i.more(); ) {
+        orion::CompoundValueNode* child = new orion::CompoundValueNode();
+        BSONElement e = i.next();
+        if (e.type() == String) {
+            child->name = e.fieldName();
+            child->type = orion::CompoundValueNode::Leaf;
+            child->value = e.String();
+            cvP->add(child);
+        }
+        else if (e.type() == Object) {
+            child->name = e.fieldName();
+            compoundObjectResponse(child, e);
+            cvP->add(child);
+        }
+        else if (e.type() == Array) {
+            child->name = e.fieldName();
+            compoundVectorResponse(child, e);
+            cvP->add(child);
+        }
+        else {
+            LM_E(("unknown BSON type"));;
+        }
+
+    }
+
+}
+
+/* ****************************************************************************
+*
+* compoundVectorResponse -
+*/
+static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElement& be) {
+    std::vector<BSONElement> vec = be.Array();
+    cvP->type = orion::CompoundValueNode::Vector;
+    for( unsigned int ix = 0; ix < vec.size(); ++ix) {
+        orion::CompoundValueNode* child = new orion::CompoundValueNode();
+        BSONElement e = vec[ix];
+        if (e.type() == String) {
+            child->name = e.fieldName();
+            child->type = orion::CompoundValueNode::Leaf;
+            child->value = e.String();
+            cvP->add(child);
+        }
+        else if (e.type() == Object) {
+            child->name = e.fieldName();
+            compoundObjectResponse(child, e);
+            cvP->add(child);
+        }
+        else if (e.type() == Array) {
+            child->name = e.fieldName();
+            compoundVectorResponse(child, e);
+            cvP->add(child);
+        }
+        else {
+            LM_E(("unknown BSON type"));;
+        }
+
+    }
+}
+
+
+/* ****************************************************************************
+*
 * entitiesQuery -
 *
 * This method is used by queryContext and subscribeContext (ONCHANGE conditions). It takes
@@ -592,12 +668,14 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
                     caP = new ContextAttribute(ca.name, ca.type, ca.value);
                 }
                 else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Object) {
-                    LM_W(("object compound not yet implemented"));
-                    caP = new ContextAttribute(ca.name, ca.type, NULL);
+                    caP = new ContextAttribute(ca.name, ca.type);
+                    caP->compoundValueP = new orion::CompoundValueNode();
+                    compoundObjectResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
                 }
                 else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Array) {
-                    LM_W(("vector compound not yet implemented"));
-                    caP = new ContextAttribute(ca.name, ca.type, NULL);
+                    caP = new ContextAttribute(ca.name, ca.type);
+                    caP->compoundValueP = new orion::CompoundValueNode();
+                    compoundVectorResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
                 }
                 else {
                     LM_E(("unknown BSON type"));
