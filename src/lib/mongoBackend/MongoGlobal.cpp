@@ -448,7 +448,7 @@ static void processEntitityPatternTrue(BSONArrayBuilder* arrayP, EntityId* enP) 
 * ContextElementResponseVector or error.
 *
 * Note thte includeEmpty argument. This is used if we don't want the result to include empty
-* attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is amited at
+* attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is aimed at
 * subscribeContext case, as empty values can cause problems in the case of federating Context
 * Brokers (the notifyContext is processed as an updateContext and in the latter case, an
 * empty value causes an error)
@@ -578,15 +578,32 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
 
             ca.name = STR_FIELD(queryAttr, ENT_ATTRS_NAME);
             ca.type = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
-            ca.value = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
 
-            if (!includeEmpty && ca.value.length() == 0) {
-                continue;
-            }
-
+            /* Note that includedAttribute decission is based on name and type. Value is set only if
+             * decission is positive */
             if (includedAttribute(ca, &attrL)) {
 
-                ContextAttribute* caP = new ContextAttribute(ca.name, ca.type, ca.value);                                
+                ContextAttribute* caP;
+                if (queryAttr.getField(ENT_ATTRS_VALUE).type() == String) {
+                    ca.value = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
+                    if (!includeEmpty && ca.value.length() == 0) {
+                        continue;
+                    }
+                    caP = new ContextAttribute(ca.name, ca.type, ca.value);
+                }
+                else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Object) {
+                    LM_W(("object compound not yet implemented"));
+                    caP = new ContextAttribute(ca.name, ca.type, NULL);
+                }
+                else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Array) {
+                    LM_W(("vector compound not yet implemented"));
+                    caP = new ContextAttribute(ca.name, ca.type, NULL);
+                }
+                else {
+                    LM_E(("unknown BSON type"));
+                }
+
+                /* Setting ID (if found) */
                 if (STR_FIELD(queryAttr, ENT_ATTRS_ID) != "") {
                     Metadata* md = new Metadata(NGSI_MD_ID, "string", STR_FIELD(queryAttr, ENT_ATTRS_ID));
                     caP->metadataVector.push_back(md);

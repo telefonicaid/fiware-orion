@@ -104,8 +104,50 @@ static void prepareDatabase(void) {
 */
 TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1)
 {
+
+    HttpStatusCode         ms;
+    QueryContextRequest   req;
+    QueryContextResponse  res;
+
+    utInit();
+
+    /* Prepare database */
     prepareDatabase();
-    EXPECT_EQ(1, 0) << "to be implemented";
+
+    /* Forge the request (from "inside" to "outside") */
+    EntityId en("E1", "T1", "false");
+    req.entityIdVector.push_back(&en);
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoQueryContext(&req, &res);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    //EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+    EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
+    EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+    /* Release dynamic memory used by response (mongoBackend allocates it) */
+    res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
