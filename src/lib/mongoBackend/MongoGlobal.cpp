@@ -513,7 +513,7 @@ static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElem
 * a vector with entities and a vector with attributes as input and returns the corresponding
 * ContextElementResponseVector or error.
 *
-* Note thte includeEmpty argument. This is used if we don't want the result to include empty
+* Note the includeEmpty argument. This is used if we don't want the result to include empty
 * attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is aimed at
 * subscribeContext case, as empty values can cause problems in the case of federating Context
 * Brokers (the notifyContext is processed as an updateContext and in the latter case, an
@@ -645,8 +645,8 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
             ca.name = STR_FIELD(queryAttr, ENT_ATTRS_NAME);
             ca.type = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
 
-            /* Note that includedAttribute decission is based on name and type. Value is set only if
-             * decission is positive */
+            /* Note that includedAttribute decision is based on name and type. Value is set only if
+             * decision is positive */
             if (includedAttribute(ca, &attrL)) {
 
                 ContextAttribute* caP;
