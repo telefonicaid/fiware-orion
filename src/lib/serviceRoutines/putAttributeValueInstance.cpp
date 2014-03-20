@@ -79,7 +79,7 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   }
 
 
-  ContextAttribute*               attributeP    = new ContextAttribute(attributeName, "", "false");
+  ContextAttribute*               attributeP    = new ContextAttribute(attributeName, "", upcarP->contextValue);
   ContextElement*                 ceP           = new ContextElement();
 
   // Copy the metadata vector of the input payload
@@ -120,5 +120,5 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
     statusCode.fill(SccReceiverInternalError, "More than one response from putAttributeValueInstance::mongoUpdateContext");
 
   request.release();
-  return statusCode.render(ciP->outFormat, "", false);
+  return statusCode.render(ciP->outFormat, "", false, false);
 }

@@ -176,6 +176,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   LM_E(("Service '%s' not recognized", ciP->url.c_str()));
   ciP->httpStatusCode = SccBadRequest;
   std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("Service not recognized: ") + ciP->url);
+  restReply(ciP, answer);
 
   compV.clear();
   return answer;
