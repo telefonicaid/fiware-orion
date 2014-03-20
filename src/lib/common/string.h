@@ -60,4 +60,10 @@ extern char* i2s(int i, char* placeholder);
 */
 extern std::string parsedUptime(int uptime);
 
+/* ****************************************************************************
+*
+* onlyWs - 
+*/
+extern bool onlyWs(const char* s);
+
 #endif

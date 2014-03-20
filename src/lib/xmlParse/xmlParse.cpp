@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "common/wsStrip.h"
+#include "common/string.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/EntityId.h"
 #include "parse/CompoundValueNode.h"
@@ -103,28 +104,6 @@ static bool treat(xml_node<>* node, std::string path, XmlNode* parseVector, Pars
   }
 
   return false; // Node was not found in the parse vector
-}
-
-
-
-/* ****************************************************************************
-*
-* onlyWs - to lib/common
-*/
-static bool onlyWs(const char* s)
-{
-  if (*s == 0)
-    return false;
-
-  while (*s != 0)
-  {
-    if ((*s != ' ') && (*s != '\t') && (*s != '\n'))
-      return false;
-
-    ++s;
-  }
-
-  return true;
 }
 
 

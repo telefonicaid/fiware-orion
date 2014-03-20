@@ -90,7 +90,7 @@ TEST(compoundValue, updateUnknownPath)
 TEST(compoundValue, updateOneString)
 {
   ParseData                  reqData;
-  const char*                inFile  = "ngsi10.updateContextRequest.updateOneString.invalid.xml";
+  const char*                inFile  = "ngsi10.updateContextRequest.updateOneString.valid.xml";
   ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
@@ -154,7 +154,7 @@ TEST(compoundValue, updateOneString)
 TEST(compoundValue, updateTwoStrings)
 {
   ParseData                  reqData;
-  const char*                inFile  = "ngsi10.updateContextRequest.updateTwoStrings.invalid.xml";
+  const char*                inFile  = "ngsi10.updateContextRequest.updateTwoStrings.valid.xml";
   ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
@@ -231,7 +231,7 @@ TEST(compoundValue, updateTwoStrings)
 TEST(compoundValue, updateTwoItemsSameNameInStruct)
 {
   ParseData       reqData;
-  const char*     inFile  = "ngsi10.updateContextRequest.updateTwoItemsSameNameInStruct.invalid.xml";
+  const char*     inFile  = "ngsi10.updateContextRequest.updateTwoItemsSameNameInStruct.valid.xml";
   const char*     outFile = "ngsi10.updateContextResponse.updateTwoItemsSameNameInStruct.valid.xml";
   ConnectionInfo  ci("/ngsi10/updateContext", "POST", "1.1");
 
@@ -256,7 +256,7 @@ TEST(compoundValue, updateTwoItemsSameNameInStruct)
 TEST(compoundValue, updateContextValueVectorOneItem)
 {
   ParseData                  reqData;
-  const char*                inFile  = "ngsi10.updateContextRequest.updateContextValueVectorOneItem.invalid.xml";
+  const char*                inFile  = "ngsi10.updateContextRequest.updateContextValueVectorOneItem.valid.xml";
   ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
@@ -320,7 +320,7 @@ TEST(compoundValue, updateContextValueVectorOneItem)
 TEST(compoundValue, updateContextValueVectorFiveItems)
 {
   ParseData                  reqData;
-  const char*                inFile  = "ngsi10.updateContextRequest.updateContextValueVectorFiveItems.invalid.xml";
+  const char*                inFile  = "ngsi10.updateContextRequest.updateContextValueVectorFiveItems.valid.xml";
   ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
   ContextAttribute*          caP;
   orion::CompoundValueNode*  cvnRootP;
@@ -389,7 +389,7 @@ TEST(compoundValue, updateContextValueVectorFiveItems)
 TEST(compoundValue, updateContextValueVectorFiveItemsPlusBadOne)
 {
   ParseData       reqData;
-  const char*     inFile  = "ngsi10.updateContextRequest.updateContextValueVectorFiveItemsPlusBadOne.invalid.xml";
+  const char*     inFile  = "ngsi10.updateContextRequest.updateContextValueVectorFiveItemsPlusBadOne.valid.xml";
   const char*     outFile = "ngsi10.updateContextResponse.updateContextValueVectorFiveItemsPlusBadOne.valid.xml";
   ConnectionInfo  ci("/ngsi10/updateContext", "POST", "1.1");
 
@@ -414,8 +414,8 @@ TEST(compoundValue, updateContextValueVectorFiveItemsPlusBadOne)
 TEST(compoundValue, updateTwoStructs)
 {
   ParseData                  reqData;
-  const char*                inFile        = "ngsi10.updateContextRequest.updateTwoStructs.invalid.xml";
-  const char*                renderedFile  = "ngsi.contextAttribute.updateTwoStructsRendered.invalid.xml";
+  const char*                inFile        = "ngsi10.updateContextRequest.updateTwoStructs.valid.xml";
+  const char*                renderedFile  = "ngsi.contextAttribute.updateTwoStructsRendered.valid.xml";
   ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
   ContextAttribute*          caP;
   std::string                rendered;

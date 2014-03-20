@@ -311,3 +311,25 @@ std::string parsedUptime(int uptime)
   sprintf(s, "%d d, %d h, %d m, %d s", days, hours, minutes, seconds);
   return std::string(s);
 }
+
+
+
+/* ****************************************************************************
+*
+* onlyWs - 
+*/
+bool onlyWs(const char* s)
+{
+  if (*s == 0)
+    return false;
+
+  while (*s != 0)
+  {
+    if ((*s != ' ') && (*s != '\t') && (*s != '\n'))
+      return false;
+
+    ++s;
+  }
+
+  return true;
+}
