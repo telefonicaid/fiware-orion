@@ -3,7 +3,7 @@
     "errorCode" : {
       "code" : "400",
       "reasonPhrase" : "Bad Request",
-      "details" : "invalid payload: syntax error in duration string"
+      "details" : "syntax error in duration string"
     }
   }
 }

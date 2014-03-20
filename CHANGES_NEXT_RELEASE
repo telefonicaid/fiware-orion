@@ -1,2 +1,4 @@
 - Fix: the CLI options now coincide with the documentation
 - Fix: Introduced a second semaphore level as additional security measure to ensure all MongoDB driver invocations run in thread-safe mode
+- Fix: Stronger checking of XML/JSON payload request conformance: not only mandatory elements are checked,
+       but also now a parse error is returned if the client tries to use an unrecognized element in any part of the payload.
