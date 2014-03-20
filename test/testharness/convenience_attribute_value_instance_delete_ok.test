@@ -30,7 +30,7 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "+++++ 1. register an entity +++++"
+echo "+++++ 1. creating base entity +++++"
 (curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
   "attributes" : [
@@ -69,7 +69,7 @@ echo "+++++ 3. lookup the entity +++++"
 curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
 
 --REGEXPECT--
-+++++ 1. register an entity +++++
++++++ 1. creating base entity +++++
 {
     "contextResponses": [
         {
