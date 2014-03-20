@@ -61,6 +61,9 @@ typedef enum TraceLevels
   LmtCompoundValueAdd,
   LmtCompoundValueLookup,
   LmtCompoundValueRender = 50,
+  LmtCompoundValueRaw,
+  LmtCompoundValueContainer,
+  LmtCompoundValueStep,
 
   /* RestService and Service (60-79) */
   LmtService     = 60,

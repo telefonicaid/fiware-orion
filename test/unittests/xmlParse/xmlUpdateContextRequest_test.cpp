@@ -28,6 +28,7 @@
 #include "xmlParse/xmlRequest.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
+#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 

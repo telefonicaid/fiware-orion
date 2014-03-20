@@ -133,6 +133,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       std::string response;
 
       LM_T(LmtParsedPayload, ("Parsing payload for URL '%s', method '%s', service vector index: %d", ciP->url.c_str(), ciP->method.c_str(), ix));
+      ciP->parseDataP = &parseData;
       response = payloadParse(ciP, &parseData, &serviceV[ix], &reqP, &jsonReqP);
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
       if (response != "OK")

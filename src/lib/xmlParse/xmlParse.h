@@ -59,4 +59,12 @@ extern int nullTreat(xml_node<>* node, ParseData* reqData);
 struct EntityId;
 extern std::string entityIdParse(RequestType request, xml_node<>* node, EntityId* entityIdP);
 
+
+
+/* ****************************************************************************
+*
+* xmlTypeAttributeGet - 
+*/
+extern std::string xmlTypeAttributeGet(xml_node<>* node);
+
 #endif

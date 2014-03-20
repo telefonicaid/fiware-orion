@@ -29,12 +29,12 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "ngsi/Request.h"
-
 #include "jsonParse/jsonParse.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonUpdateContextElementRequest.h"
 #include "jsonParse/jsonNullTreat.h"
+#include "ngsi/Request.h"
+#include "rest/ConnectionInfo.h"
 
 
 

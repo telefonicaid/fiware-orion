@@ -1,0 +1,7 @@
+<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>compound value error: duplicated tag-name: 's1' in '/'</details>
+  </errorCode>
+</updateContextResponse>

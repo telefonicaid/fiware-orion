@@ -35,6 +35,7 @@
 #include "ngsi9/RegisterContextRequest.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonNullTreat.h"
+#include "rest/ConnectionInfo.h"
 
 
 

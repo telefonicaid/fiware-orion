@@ -1,5 +1,5 @@
-#ifndef REQUEST_DATA_H
-#define REQUEST_DATA_H
+#ifndef PARSE_DATA_H
+#define PARSE_DATA_H
 
 /*
 *

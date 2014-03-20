@@ -43,6 +43,7 @@ ContextAttribute::ContextAttribute()
    type  = "";
    value = "";
    compoundValueP = NULL;
+   typeAttribute  = "";
 }
 
 
@@ -58,6 +59,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
    type           = caP->type;
    value          = caP->value;
    compoundValueP = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
+   typeAttribute  = "";
 
    metadataVector.vec.clear();
 
@@ -82,6 +84,7 @@ ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::st
    value = _value;
 
    compoundValueP = NULL;
+   typeAttribute  = "";
 }
 
 /* ****************************************************************************
@@ -94,6 +97,7 @@ ContextAttribute::ContextAttribute(std::string _name, std::string _type, orion::
   type  = _type;
 
   compoundValueP = _compoundValueP;
+  typeAttribute  = "";
 }
 
 /* ****************************************************************************
@@ -135,7 +139,11 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
   if (compoundValueP == NULL)
     out += valueTag(indent + "  ", ((format == XML)? "contextValue" : "value"), value, format, commaAfterContextValue);
   else
-    out += compoundValueP->render(format, indent);
+  {
+     out += startTag(indent + "  ", "contextValue", "", format, false, false);
+     out += compoundValueP->render(format, indent + "    ");
+     out += endTag(indent + "  ", "contextValue", format, comma);
+  }
 
   out += metadataVector.render(format, indent + "  ", false);
   out += endTag(indent, xmlTag, format, comma);

@@ -24,6 +24,7 @@
 */
 #include <stdio.h>
 
+#include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"

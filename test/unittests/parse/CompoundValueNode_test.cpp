@@ -45,7 +45,7 @@ TEST(CompoundValueNode, tree)
   utInit();
 
   lmTraceLevelSet(LmtCompoundValueAdd, true);
-  vec = tree->add(orion::CompoundValueNode::Vector, "vec", "/vec", "");
+  vec = tree->add(orion::CompoundValueNode::Vector, "vec", "");
 
   for (int ix = 0; ix < 5; ++ix)
   {
@@ -53,7 +53,7 @@ TEST(CompoundValueNode, tree)
     vec->add(vecItem);
   }
 
-  vecItem = vec->add(orion::CompoundValueNode::Leaf, "vecItem6", "/vec", "6");
+  vecItem = vec->add(orion::CompoundValueNode::Leaf, "vecItem6", "6");
 
   ASSERT_EQ(1, tree->childV.size());
   ASSERT_EQ(6, vec->childV.size());
@@ -113,14 +113,14 @@ TEST(CompoundValueNode, vectorInvalidAndOk)
 
   tree->add(vec);
   vec->add(item1);
-  vec->add(orion::CompoundValueNode::Leaf, "vecitem", "/vec/vecitem", "a");
+  vec->add(orion::CompoundValueNode::Leaf, "vecitem", "a");
 
   tree->finish();
   EXPECT_STREQ("bad tag-name of vector item: 'vecitem' (should be 'vecitem1')", tree->error.c_str());
 
   item1->name = "vecitem";
   tree->finish();
-  EXPECT_STREQ("", tree->error.c_str());
+  EXPECT_STREQ("OK", tree->error.c_str());
 
   std::string rendered;
 
@@ -166,11 +166,11 @@ TEST(CompoundValueNode, structInvalidAndOk)
   str->add(item2);
 
   tree->finish();
-  EXPECT_STREQ("duplicated tag-name: 'structitem' in '/struct/structitem'", tree->error.c_str());
+  EXPECT_STREQ("duplicated tag-name: 'structitem' in '/struct'", tree->error.c_str());
 
   item2->name = "structitem2";
   tree->finish();
-  EXPECT_STREQ("", tree->error.c_str());
+  EXPECT_STREQ("OK", tree->error.c_str());
 
   std::string rendered;
 

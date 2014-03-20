@@ -141,7 +141,9 @@ static int contextAttributeType(xml_node<>* node, ParseData* reqData)
 static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
 {
   parseDataP->lastContextAttribute = parseDataP->upcr.attributeP;
-
+  parseDataP->lastContextAttribute->typeAttribute = xmlTypeAttributeGet(node);
+  LM_T(LmtCompoundValue, ("Set parseDataP->lastContextAttribute (type: '%s') to: %p", parseDataP->lastContextAttribute->typeAttribute.c_str(), parseDataP->lastContextAttribute));
+  
   LM_T(LmtParse, ("Got an attribute value: '%s'", node->value()));
   parseDataP->upcr.attributeP->value = node->value();
   return 0;
