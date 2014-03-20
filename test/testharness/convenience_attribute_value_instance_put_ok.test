@@ -145,7 +145,15 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Conte
     }
 }
 +++++ 3. change an attribute by valueID +++++
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
 +++++ 4. change an attribute by the other valueID in XML +++++
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
 +++++ 5. lookup the entity again +++++
 {
     "contextElement": {

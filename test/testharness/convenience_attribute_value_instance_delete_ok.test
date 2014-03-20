@@ -107,6 +107,10 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Conte
     ]
 }
 +++++ 2. delete an attribute by valueID +++++
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
 +++++ 3. lookup the entity +++++
 {
     "contextElement": {
