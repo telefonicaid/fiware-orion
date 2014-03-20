@@ -131,7 +131,18 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
     }
 }
 +++++ 3. delete an attribute by valueID +++++
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
 +++++ 4. lookup the attribute again +++++
+{
+    "statusCode": {
+        "code": "404",
+        "details": "Attribute-ValueID pair: 'temperature-ground'",
+        "reasonPhrase": "No context element found"
+    }
+}
 --TEARDOWN--
 source harnessFunctions.sh
 brokerStop CB
