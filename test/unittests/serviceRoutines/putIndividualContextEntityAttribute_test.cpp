@@ -78,7 +78,7 @@ TEST(putIndividualContextEntityAttribute, json)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity11/attributes/temperature",  "PUT", "1.1");
   const char*    infile      = "ngsi10.updateContextAttributeRequest.putAttribute.valid.json";
-  const char*    outfile     = "ngsi10.updateContextAttributeResponse.ok.invalid.json";
+  const char*    outfile     = "ngsi10.updateContextAttributeResponse.ok.valid.json";
   std::string    out;
   
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";

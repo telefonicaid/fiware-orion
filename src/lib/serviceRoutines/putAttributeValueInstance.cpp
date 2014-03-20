@@ -120,5 +120,5 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
     statusCode.fill(SccReceiverInternalError, "More than one response from putAttributeValueInstance::mongoUpdateContext");
 
   request.release();
-  return statusCode.render(ciP->outFormat, "", false);
+  return statusCode.render(ciP->outFormat, "", false, false);
 }

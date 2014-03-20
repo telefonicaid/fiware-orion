@@ -191,10 +191,14 @@ Date: REGEX(.*)
 }
 4: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 61
+Content-Length: 46
 Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
 5: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 75
@@ -267,10 +271,14 @@ Date: REGEX(.*)
 }
 9: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 61
+Content-Length: 46
 Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "code": "200",
+    "reasonPhrase": "OK"
+}
 --TEARDOWN--
 source ../harnessFunctions.sh
 brokerStop CB
