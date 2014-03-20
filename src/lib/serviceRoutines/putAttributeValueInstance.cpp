@@ -79,7 +79,7 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   }
 
 
-  ContextAttribute*               attributeP    = new ContextAttribute(attributeName, "", "false");
+  ContextAttribute*               attributeP    = new ContextAttribute(attributeName, "", upcarP->contextValue);
   ContextElement*                 ceP           = new ContextElement();
 
   // Copy the metadata vector of the input payload

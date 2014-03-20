@@ -6,4 +6,5 @@
 - Fix: StatusCode is now correctly rendered in JSON when sent as a standalone message (partially fixes issue #225)
 - Fix: Fixed a bug about incoming buffer pollution.
 - Fix: Some unknown incoming URLs were not responded to. Now they are. (Bug #277)
-
+- Fix: Now the operations GET, POST and PUT work properly with convenience operations 
+over valueID's.
