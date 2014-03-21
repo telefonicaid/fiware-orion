@@ -1,6 +1,6 @@
 Summary:          Orion Context Broker
 Name:             contextbroker
-Version:          %{_product_version}
+Version:          %{_broker_version}
 Release:          1%{?dist}
 License:          AGPLv3
 Packager:         Fermín Galán <fermin@tid.es>
@@ -148,7 +148,7 @@ cp scripts/managedb/lastest-updates.py   $RPM_BUILD_ROOT/%{_install_dir}/share
 cp etc/init.d/contextBroker.centos       $RPM_BUILD_ROOT/%{_install_dir}/init.d/%{name}
 cp etc/config/contextBroker              $RPM_BUILD_ROOT/%{_install_dir}/config/%{name}
 
-cp -R test/testharness/*                 $RPM_BUILD_ROOT/%{_install_dir}_tests
+cp -R test/testharness/*.test            $RPM_BUILD_ROOT/%{_install_dir}_tests
 cp scripts/testEnv.sh \
    scripts/testHarness.sh \
    scripts/testDiff.py                   $RPM_BUILD_ROOT/%{_install_dir}_tests
@@ -224,4 +224,6 @@ rm -rf $RPM_BUILD_ROOT
 %files tests
 %defattr(755,%{_owner},%{_owner},755)
 /opt/contextbroker_tests
+
+
 

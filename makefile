@@ -189,8 +189,7 @@ rpm:
 
 	rpmbuild -ba rpm/SPECS/contextBroker.spec \
 		--define '_broker_version $(BROKER_VERSION)' 
-
-
+		
 mock: 
 	mkdir -p ~/rpmbuild/{BUILD,RPMS,S{OURCE,PEC,RPM}S}
 	rm -f ~/rpmbuild/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
