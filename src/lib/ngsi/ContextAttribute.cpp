@@ -39,11 +39,11 @@
 */
 ContextAttribute::ContextAttribute()
 {
-   name  = "";
-   type  = "";
-   value = "";
-   compoundValueP = NULL;
-   typeAttribute  = "";
+   name                  = "";
+   type                  = "";
+   value                 = "";
+   compoundValueP        = NULL;
+   typeFromXmlAttribute  = "";
 }
 
 
@@ -55,11 +55,11 @@ ContextAttribute::ContextAttribute()
 ContextAttribute::ContextAttribute(ContextAttribute* caP)
 {
    LM_T(LmtClone, ("'cloning' a ContextAttribute"));
-   name           = caP->name;
-   type           = caP->type;
-   value          = caP->value;
-   compoundValueP = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
-   typeAttribute  = "";
+   name                  = caP->name;
+   type                  = caP->type;
+   value                 = caP->value;
+   compoundValueP        = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
+   typeFromXmlAttribute  = "";
 
    metadataVector.vec.clear();
 
@@ -79,12 +79,11 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
 */
 ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::string _value)
 {
-   name  = _name;
-   type  = _type;
-   value = _value;
-
-   compoundValueP = NULL;
-   typeAttribute  = "";
+   name                  = _name;
+   type                  = _type;
+   value                 = _value;
+   compoundValueP        = NULL;
+   typeFromXmlAttribute  = "";
 }
 
 /* ****************************************************************************
@@ -93,11 +92,10 @@ ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::st
 */
 ContextAttribute::ContextAttribute(std::string _name, std::string _type, orion::CompoundValueNode* _compoundValueP)
 {
-  name  = _name;
-  type  = _type;
-
-  compoundValueP = _compoundValueP;
-  typeAttribute  = "";
+  name                  = _name;
+  type                  = _type;
+  compoundValueP        = _compoundValueP;
+  typeFromXmlAttribute  = "";
 }
 
 /* ****************************************************************************
