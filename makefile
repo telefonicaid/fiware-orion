@@ -38,6 +38,8 @@ ifndef BROKER_VERSION
 	BROKER_VERSION:=$(shell grep "\#define ORION_VERSION" src/app/contextBroker/version.h | sed -e 's/^.* "//' -e 's/"//')
 endif
 
+# Directory for the rpm stage
+
 # Release ID for the contextBroker-* packages (execept contextBroker-fiware)
 ifndef BROKER_RELEASE
 	BROKER_RELEASE=dev
@@ -184,19 +186,10 @@ install_debug_libs: debug
 
 
 rpm: 
-	mkdir -p ~/rpmbuild/BUILD
-	mkdir -p ~/rpmbuild/RPMS
-	mkdir -p ~/rpmbuild/SOURCES
-	mkdir -p ~/rpmbuild/SPECS
-	mkdir -p ~/rpmbuild/SRPMS
-	rm -f ~/rpmbuild/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	git archive --format tar --prefix=contextBroker-$(BROKER_VERSION)/ HEAD |  gzip >  $(HOME)/rpmbuild/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	rpmbuild -ba rpm/contextBroker.spec \
-		--define 'broker_version $(BROKER_VERSION)' \
-		--define 'broker_release $(BROKER_RELEASE)' \
-		--define 'fiware_version $(FIWARE_VERSION)' \
-		--define 'fiware_release $(FIWARE_RELEASE)' \
-		--define 'build_arch $(BUILD_ARCH)'
+
+	rpmbuild -ba rpm/SPECS/contextBroker.spec \
+		--define '_broker_version $(BROKER_VERSION)' 
+
 
 mock: 
 	mkdir -p ~/rpmbuild/{BUILD,RPMS,S{OURCE,PEC,RPM}S}
