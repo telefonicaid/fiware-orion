@@ -7,4 +7,4 @@
 - Fix: Some unknown incoming URLs were not responded to. Now they are. (Bug #277)
 - Fix: Now the operations GET, POST and PUT work properly with convenience operations over valueID's.
 - Fix: JSON/XML Payload parsing that ended in parse error had a bug resulting in a possible memory leak.
-- Fix: GET Attribute Value Instance now handles non-existen valueIDs correctly.
+- Fix: Convenience operation GET with non-existent valueIDs is now handled correctly.
