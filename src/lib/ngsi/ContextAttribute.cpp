@@ -186,7 +186,7 @@ void ContextAttribute::present(std::string indent, int ix)
   if (compoundValueP == NULL)
     PRINTF("%s  Value:      %s\n", indent.c_str(), value.c_str());
   else
-    compoundValueP->show(indent);
+    compoundValueP->show(indent + "  ");
 
   metadataVector.present("Attribute", indent + "  ");
 }

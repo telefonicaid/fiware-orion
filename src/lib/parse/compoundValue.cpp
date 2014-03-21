@@ -106,12 +106,10 @@ void compoundValueEnd(ConnectionInfo* ciP, std::string path, std::string name, s
   }
   else
   {
-    ciP->compoundValueRoot->show("");
-    ciP->compoundValueRoot->shortShow("");
+    // Give the root pointer of this Compound to the active ContextAttribute
+    parseDataP->lastContextAttribute->compoundValueP = ciP->compoundValueRoot;
   }
 
-  // Now, give the root pointer of this Compound to the active ContextAttribute
-  parseDataP->lastContextAttribute->compoundValueP = ciP->compoundValueRoot;
   ciP->compoundValueRoot = NULL;
   ciP->compoundValueP    = NULL;
   LM_T(LmtCompoundValueContainer, ("Set current container to NULL"));

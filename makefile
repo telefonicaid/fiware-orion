@@ -284,10 +284,6 @@ functional_test: install_debug build_unit_test
 
 test: unit_test functional_test
 
-utest: unit_test
-
-htest: functional_test
-
 coverage: install_coverage
 	# Init coverage
 	echo "Initializing coverage files"
