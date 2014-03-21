@@ -232,6 +232,11 @@ void CompoundValueNode::show(std::string indent)
 /* ****************************************************************************
 *
 * check - 
+*
+* A vector must have all its children with the same name.
+* A struct cannot have two children with the same name.
+*
+* Encountered errors are saved in the 'error' field of the root of the tree (rootP->error).
 */
 void CompoundValueNode::check(void)
 {
@@ -263,8 +268,12 @@ void CompoundValueNode::check(void)
     }
   }
   else
+  {
+    // No check made for Leafs
     return;
+  }
 
+  // 'recursively' call the check method for all children
   for (unsigned long ix = 0; ix < childV.size(); ++ix)
     childV[ix]->check();
 }

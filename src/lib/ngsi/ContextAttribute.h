@@ -47,7 +47,7 @@ typedef struct ContextAttribute
   std::string     value;           // Mandatory
   MetadataVector  metadataVector;  // Optional
 
-  std::string                typeAttribute;
+  std::string                typeFromXmlAttribute;
   orion::CompoundValueNode*  compoundValueP;
 
   ContextAttribute();

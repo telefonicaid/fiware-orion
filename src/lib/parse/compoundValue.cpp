@@ -39,6 +39,14 @@ namespace orion
 /* ****************************************************************************
 *
 * compoundValueStart - 
+*
+* As commented in xmlParse.h
+* This function is called when the first compound node is encountered, so not
+* only must the root be created, but also the first node of the compound tree
+* must be taken care of. This is done by calling compoundValueMiddle.
+*
+* FIXME P7: When the JSON parser calls this function, some modifications
+*           may be needed.
 */
 void compoundValueStart(ConnectionInfo* ciP, std::string path, std::string name, std::string value, std::string root, std::string rest, orion::CompoundValueNode::Type type)
 {
@@ -49,10 +57,17 @@ void compoundValueStart(ConnectionInfo* ciP, std::string path, std::string name,
   LM_T(LmtCompoundValueContainer, ("Set current container to '%s' (%s)", ciP->compoundValueP->path.c_str(), ciP->compoundValueP->name.c_str()));
   ciP->compoundValueRoot = ciP->compoundValueP;
 
+  // In the XML parsing routines, in all context attributes that can accept Compound values,
+  // a pointer to the one where we are right now is saved in ParseData.
+  // 
+  // If this pointer is not set, it is a fatal error and the broker dies, because of the 
+  // following LM_X, that does an exit
+  // It is better to exit here and clearly see the error, than to contiunue and get strange
+  // outputs that will be difficult to trace back to here.
   if (ciP->parseDataP->lastContextAttribute == NULL)
      LM_X(1, ("No pointer to last ContextAttribute"));
 
-  if (ciP->parseDataP->lastContextAttribute->typeAttribute == "vector")
+  if (ciP->parseDataP->lastContextAttribute->typeFromXmlAttribute == "vector")
     ciP->compoundValueP->type = orion::CompoundValueNode::Vector;
 
   ciP->compoundValueVector.push_back(ciP->compoundValueP);
@@ -74,6 +89,8 @@ void compoundValueMiddle(ConnectionInfo* ciP, std::string relPath, std::string n
 
   if ((type == orion::CompoundValueNode::Vector) || (type == orion::CompoundValueNode::Struct))
   {
+    // If we enter a vector or a struct, the container must change (so that we add to this container from now on).
+    // ciP->compoundValueP points to the current compound container
     ciP->compoundValueP = ciP->compoundValueP->add(type, name);
     LM_T(LmtCompoundValueContainer, ("Set current container to '%s' (%s)", ciP->compoundValueP->path.c_str(), ciP->compoundValueP->name.c_str()));
   }
@@ -106,12 +123,14 @@ void compoundValueEnd(ConnectionInfo* ciP, std::string path, std::string name, s
   }
   else
   {
-    ciP->compoundValueRoot->show("");
-    ciP->compoundValueRoot->shortShow("");
+    // Give the root pointer of this Compound to the active ContextAttribute
+    // lastContextAttribute is set in the XML parsing routiunes, to point at the
+    // latest contextAttribute, i.e. the attribute whose 'contextValue' is the
+    // owner of this compound value tree.
+    parseDataP->lastContextAttribute->compoundValueP = ciP->compoundValueRoot;
   }
 
-  // Now, give the root pointer of this Compound to the active ContextAttribute
-  parseDataP->lastContextAttribute->compoundValueP = ciP->compoundValueRoot;
+  // Reset the Compound stuff in ConnectionInfo
   ciP->compoundValueRoot = NULL;
   ciP->compoundValueP    = NULL;
   LM_T(LmtCompoundValueContainer, ("Set current container to NULL"));
