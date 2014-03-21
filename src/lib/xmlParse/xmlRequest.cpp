@@ -211,6 +211,9 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
   }
 
 
+  if (reqPP != NULL)
+    *reqPP = reqP;
+
   //
   // Checking that the payload matches the URL
   //
@@ -248,18 +251,6 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
      LM_E(("check(%s): %s", reqP->keyword.c_str(), check.c_str()));
 
   reqP->present(parseDataP);
-
-  // -----------------------------
-  //
-  // Can't release here ...
-  // reqP->release(parseDataP);
-  //
-  // pass request pointer to father that will know when the free can be executed.
-  //
-  if (reqPP != NULL)
-  {
-    *reqPP = reqP;
-  }
 
   return check;
 }
