@@ -48,7 +48,8 @@ source ../harnessFunctions.sh
 # 0. ok:  No compound value
 echo "0: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
-payload='<updateContextRequest>
+payload='<?xml version="1.0"?>
+<updateContextRequest>
   <contextElementList>
     <contextElement>
       <entityId type="Room" isPattern="false">
@@ -68,9 +69,11 @@ payload='<updateContextRequest>
 curlXml ${url} "${payload}"
 
 #   1. err: unknown path
+#INVALID_XML
 echo "1: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
-payload='<updateContextRequest>
+payload='<?xml version="1.0"?>
+<updateContextRequest>
   <contextElementList>
     <contextElement>
       <entityId type="Room" isPattern="false">
@@ -95,7 +98,8 @@ curlXml ${url} "${payload}"
 #   2. ok:  One string 's1' == 'STRING' as compound value (contextValue is a struct)
 echo "2: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
-payload='<updateContextRequest>
+payload='<?xml version="1.0"?>
+<updateContextRequest>
   <contextElementList>
     <contextElement>
       <entityId type="Room" isPattern="false">
@@ -120,7 +124,8 @@ curlXml ${url} "${payload}"
 #   3. ok:  's1' and 's2' (== 'STRING2')
 echo "3: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
-payload='<updateContextRequest>
+payload='<?xml version="1.0"?>
+<updateContextRequest>
   <contextElementList>
     <contextElement>
       <entityId type="Room" isPattern="false">
@@ -146,7 +151,8 @@ curlXml ${url} "${payload}"
 #   4. err: Two items with same name in struct 's1' + 's2' + 's1'
 echo "4: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
-payload='<updateContextRequest>
+payload='<?xml version="1.0"?>
+<updateContextRequest>
   <contextElementList>
     <contextElement>
       <entityId type="Room" isPattern="false">
@@ -173,7 +179,8 @@ curlXml ${url} "${payload}"
 #   5. ok:  contextValue is a vector with one item
 echo "5: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
-payload='<updateContextRequest>
+payload='<?xml version="1.0"?>
+<updateContextRequest>
   <contextElementList>
     <contextElement>
       <entityId type="Room" isPattern="false">
@@ -198,7 +205,8 @@ curlXml ${url} "${payload}"
 #   6. ok:  contextValue is a vector with five items
 echo "6: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
-payload='<updateContextRequest>
+payload='<?xml version="1.0"?>
+<updateContextRequest>
   <contextElementList>
     <contextElement>
       <entityId type="Room" isPattern="false">
@@ -227,7 +235,8 @@ curlXml ${url} "${payload}"
 #   7. err: contextValue is a vector with five items + one item with a bad name
 echo "7: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
-payload='<updateContextRequest>
+payload='<?xml version="1.0"?>
+<updateContextRequest>
   <contextElementList>
     <contextElement>
       <entityId type="Room" isPattern="false">
@@ -257,7 +266,8 @@ curlXml ${url} "${payload}"
 #   8. ok: two structs with two values each
 echo "8: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
-payload='<updateContextRequest>
+payload='<?xml version="1.0"?>
+<updateContextRequest>
   <contextElementList>
     <contextElement>
       <entityId type="Room" isPattern="false">

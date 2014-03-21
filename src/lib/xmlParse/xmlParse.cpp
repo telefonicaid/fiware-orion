@@ -232,12 +232,12 @@ void xmlParse
 
   if ((isCompound == true) && (ciP->inCompoundValue == false))
   {
-    // We are in a compound, but we werent before.
+    // We are in a compound, but we weren't before.
     // Thus, a new compound is started,
     // I have selected to detect the entrance of a compound when its first XML node appears.
     // I mean, /1/2/3/contextValue could contain a compound value but it could also NOT.
     // We don't enter here (to create the tree) until we encounter a node with a path 'inside'
-    // the copmpound, e.g.:
+    // the compound, e.g.:
     //
     //   /1/2/3/contextValue/firstNodeInCompound
     //
@@ -297,7 +297,7 @@ void xmlParse
     else if ((rest.size() < ciP->compoundValueP->path.size()) && (trimmedValue[0] == 0) && (fatherPath.size() + 1 == path.size()))
     {
       //
-      // A container ended - we have to go up one level to the container of the container that ended
+      // A container ended - we have to go up one level to the container of the container that ended.
       // Only way I can detect this is to compare the length of the path of this node with the path of its container.
       // But it is more complicated than that.
       // This function is called every time a node ends.
@@ -420,7 +420,7 @@ std::string entityIdParse(RequestType requestType, xml_node<>* node, EntityId* e
 * xmlTypeAttributeGet - 
 *
 * This function looks for the presence of the XML attribute 'type'.
-* This attribute is used in Compound Calues to indicate that a container is
+* This attribute is used in Compound Values to indicate that a container is
 * a vector and not a structure.
 * Vectors don't exist in XML, all containers are considered 'structs', but as
 * vectors exist in JSON and we support both formats we need a way to have vectors
