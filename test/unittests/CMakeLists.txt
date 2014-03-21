@@ -98,6 +98,7 @@ SET (SOURCES
     serviceRoutines/postUpdateContextSubscription_test.cpp
     serviceRoutines/putIndividualContextEntity_test.cpp
     serviceRoutines/putIndividualContextEntityAttributes_test.cpp
+    serviceRoutines/putIndividualContextEntityAttribute_test.cpp
     serviceRoutines/postQueryContext_test.cpp
     serviceRoutines/getNgsi10ContextEntityTypes_test.cpp
     serviceRoutines/getNgsi10ContextEntityTypesAttribute_test.cpp

@@ -51,6 +51,7 @@ putIndividualContextEntity.cpp
 postIndividualContextEntity.cpp
 getIndividualContextEntityAttributes.cpp
 putIndividualContextEntityAttributes.cpp
+putIndividualContextEntityAttribute.cpp
 postIndividualContextEntityAttributes.cpp
 deleteIndividualContextEntityAttributes.cpp
 getIndividualContextEntityAttribute.cpp
@@ -112,6 +113,7 @@ putIndividualContextEntity.h
 postIndividualContextEntity.h
 getIndividualContextEntityAttributes.h
 putIndividualContextEntityAttributes.h
+putIndividualContextEntityAttribute.h
 postIndividualContextEntityAttributes.h
 deleteIndividualContextEntityAttributes.h
 getIndividualContextEntityAttribute.h

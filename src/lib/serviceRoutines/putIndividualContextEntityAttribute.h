@@ -1,6 +1,9 @@
+#ifndef PUT_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTE_H
+#define PUT_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTE_H
+
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -20,37 +23,20 @@
 * For those usages not covered by this license please contact with
 * fermin at tid dot es
 *
-* Author: Ken Zangelin
+* Author: TID Developer
 */
 #include <string>
 #include <vector>
 
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-
-#include "convenienceMap/mapDeleteIndividualContextEntityAttributes.h"
-#include "ngsi/ParseData.h"
-#include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
-#include "serviceRoutines/deleteIndividualContextEntityAttributes.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* deleteIndividualContextEntityAttributes - 
+* putIndividualContextEntityAttribute -
 */
-std::string deleteIndividualContextEntityAttributes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
-{
-  std::string  answer;
-  std::string  entityId = compV[2];
-  StatusCode   response;
+extern std::string putIndividualContextEntityAttribute(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'DELETE' request for entityId '%s'", entityId.c_str()));
-
-  ciP->httpStatusCode = mapDeleteIndividualContextEntityAttributes(entityId, &response);
-  answer = response.render(ciP->outFormat, "", false, false);
-  response.release();
-
-  return answer;
-}
+#endif

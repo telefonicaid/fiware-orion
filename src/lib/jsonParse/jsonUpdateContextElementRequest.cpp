@@ -169,7 +169,7 @@ JsonNode jsonUcerParseVector[] =
   { "/attributes/attribute",                           contextAttribute      },
   { "/attributes/attribute/name",                      contextAttributeName  },
   { "/attributes/attribute/type",                      contextAttributeType  },
-  { "/attributes/attribute/contextValue",              contextAttributeValue },
+  { "/attributes/attribute/value",                     contextAttributeValue },
 
   { "/attributes/attribute/metadatas",                 jsonNullTreat         },
   { "/attributes/attribute/metadatas/metadata",        contextMetadata       },

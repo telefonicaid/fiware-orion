@@ -92,6 +92,7 @@ std::string testDataFromFile(char* buffer, int bufSize, const char* fileName)
   close(fd);
   if (nb == -1)
     return std::string("read(") + path + "): " + strerror(errno);
+
   if (nb != sBuf.st_size)
     return std::string("bad size read from ") + path;
   

@@ -175,7 +175,7 @@ echo "9: ++++++++++++++++++++"
     <contextAttribute>
       <name>A1</name>
       <type/>
-      <contextValue>false</contextValue>
+      <contextValue>10</contextValue>
       <metadata>
         <contextMetadata>
           <name>ID</name>

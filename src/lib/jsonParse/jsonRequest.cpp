@@ -97,6 +97,7 @@ static JsonRequest jsonRequest[] =
   { IndividualContextEntity,               "PUT",  "updateContextElementRequest",                   jsonUcerParseVector, jsonUcerInit, jsonUcerCheck,  jsonUcerPresent, jsonUcerRelease },
   { IndividualContextEntity,               "POST", "appendContextElementRequest",                   jsonAcerParseVector, jsonAcerInit, jsonAcerCheck,  jsonAcerPresent, jsonAcerRelease },
   { IndividualContextEntityAttribute,      "POST", "updateContextAttributeRequest",                 jsonUpcarParseVector,jsonUpcarInit,jsonUpcarCheck, jsonUpcarPresent,jsonUpcarRelease},
+  { IndividualContextEntityAttribute,      "PUT",  "updateContextAttributeRequest",                 jsonUpcarParseVector,jsonUpcarInit,jsonUpcarCheck, jsonUpcarPresent,jsonUpcarRelease},
   { IndividualContextEntityAttributes,     "POST", "appendContextElementRequest",                   jsonAcerParseVector, jsonAcerInit, jsonAcerCheck,  jsonAcerPresent, jsonAcerRelease },
   { IndividualContextEntityAttributes,     "PUT",  "updateContextElementRequest",                   jsonUcerParseVector, jsonUcerInit, jsonUcerCheck,  jsonUcerPresent, jsonUcerRelease },
   { AttributeValueInstance,                "PUT",  "updateContextAttributeRequest",                 jsonUpcarParseVector,jsonUpcarInit,jsonUpcarCheck, jsonUpcarPresent,jsonUpcarRelease},
@@ -145,6 +146,9 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
     LM_RE(errorReply, ("Sorry, no request treating object found for RequestType %d (%s)", request, requestType(request)));
   }
 
+  if (reqPP != NULL)
+    *reqPP = reqP;
+
   LM_T(LmtParse, ("Treating '%s' request", reqP->keyword.c_str()));
 
   reqP->init(parseDataP);
@@ -164,9 +168,6 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
 
   res = reqP->check(parseDataP, ciP);
   reqP->present(parseDataP);
-
-  if (reqPP != NULL)
-    *reqPP = reqP;
 
   return res;
 }
