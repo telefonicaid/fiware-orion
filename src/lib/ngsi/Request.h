@@ -27,7 +27,7 @@
 */
 #include <string>
 
-#include "rest/ConnectionInfo.h"
+struct ConnectionInfo;
 
 
 

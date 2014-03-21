@@ -50,9 +50,11 @@ CompoundValueNode::CompoundValueNode(std::string _root)
   type       = Struct;
   container  = this;
   level      = 0;
-  name       = "";
+  name       = "toplevel";
   path       = "/";
   siblingNo  = 0;
+
+  LM_T(LmtCompoundValue, ("Created TOPLEVEL compound node"));
 }
 
 
@@ -71,6 +73,8 @@ CompoundValueNode::CompoundValueNode(CompoundValueNode* _container, std::string 
   level     = container->level + 1;
   siblingNo = _siblingNo;
   type      = _type;
+
+  LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s", name.c_str(), level, siblingNo, typeName(type)));
 }
 
 
@@ -113,7 +117,7 @@ const char* CompoundValueNode::typeName(const Type _type)
 */
 std::string CompoundValueNode::finish(void)
 {
-  error = "";
+  error = "OK";
 
   check();
 
@@ -128,6 +132,11 @@ std::string CompoundValueNode::finish(void)
 */
 CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
 {
+  if (node->type == Leaf)
+     LM_T(LmtCompoundValueAdd, ("Adding Leaf '%s', with value '%s' under '%s' (%s)", node->name.c_str(), node->value.c_str(), node->container->path.c_str(), node->container->name.c_str()));
+  else
+     LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s' (%s)", typeName(node->type), node->name.c_str(), node->container->path.c_str(), node->container->name.c_str()));
+
   childV.push_back(node);
   return node;
 }
@@ -138,14 +147,16 @@ CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
 *
 * add - 
 */
-CompoundValueNode* CompoundValueNode::add(const Type _type, const std::string& _name, const std::string& _containerPath, const std::string& _value)
+CompoundValueNode* CompoundValueNode::add(const Type _type, const std::string& _name, const std::string& _value)
 {
-  if (_type == Leaf)
-    LM_T(LmtCompoundValueAdd, ("Adding Leaf '%s', with value '%s' under '%s'", _name.c_str(), _value.c_str(), _containerPath.c_str()));
-  else
-     LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s'", typeName(_type), _name.c_str(), _containerPath.c_str()));
+  std::string newPath = path;
 
-  CompoundValueNode* node = new CompoundValueNode(this, _containerPath + "/" + _name, _name, _value, childV.size(), _type, level + 1);
+  if (newPath == "/")
+     newPath += _name;
+  else
+     newPath += "/" + _name;
+
+  CompoundValueNode* node = new CompoundValueNode(this, newPath, _name, _value, childV.size(), _type, level + 1);
 
   return add(node);
 }
@@ -194,6 +205,7 @@ void CompoundValueNode::show(std::string indent)
   PRINTF("%slevel:   %d\n", indent.c_str(), level);
   PRINTF("%ssibling: %d\n", indent.c_str(), siblingNo);
   PRINTF("%stype:    %s\n", indent.c_str(), typeName(type));
+  PRINTF("%spath:    %s\n", indent.c_str(), path.c_str());
 
   if (childV.size() != 0)
   {
@@ -220,6 +232,11 @@ void CompoundValueNode::show(std::string indent)
 /* ****************************************************************************
 *
 * check - 
+*
+* A vector must have all its children with the same name.
+* A struct cannot have two children with the same name.
+*
+* Encountered errors are saved in the 'error' field of the root of the tree (rootP->error).
 */
 void CompoundValueNode::check(void)
 {
@@ -243,7 +260,7 @@ void CompoundValueNode::check(void)
       {
         if (childV[ix]->name == childV[ix2]->name)
         {
-          rootP->error = std::string("duplicated tag-name: '") + childV[ix]->name + "' in '" + childV[ix]->path + "'";
+          rootP->error = std::string("duplicated tag-name: '") + childV[ix]->name + "' in '" + path + "'";
           LM_E((rootP->error.c_str()));
           return;
         }
@@ -251,8 +268,12 @@ void CompoundValueNode::check(void)
     }
   }
   else
+  {
+    // No check made for Leafs
     return;
+  }
 
+  // 'recursively' call the check method for all children
   for (unsigned long ix = 0; ix < childV.size(); ++ix)
     childV[ix]->check();
 }

@@ -32,11 +32,13 @@
 #include "logMsg/logMsg.h"
 
 #include "common/Format.h"
+#include "parse/CompoundValueNode.h"
 #include "rest/HttpStatusCode.h"
 #include "rest/mhd.h"
 #include "rest/Verb.h"
 #include "rest/HttpHeaders.h"
-#include "parse/CompoundValueNode.h"
+#include "ngsi/ParseData.h"
+
 
 
 /* ****************************************************************************
@@ -54,12 +56,11 @@ public:
     inFormat               = XML;
     outFormat              = XML;
     httpStatusCode         = SccOk;
-    fractioned             = false;
     callNo                 = 1;
-    requestEntityTooLarge  = false;
     inCompoundValue        = false;
-    compoundValueContainer = NULL;
-    current                = NULL;
+    compoundValueRoot      = NULL;
+    compoundValueP         = NULL;
+    parseDataP             = NULL;
 
     memset(payloadWord, 0, sizeof(payloadWord));
 
@@ -83,14 +84,12 @@ public:
   int                        payloadSize;
   char                       payloadWord[64];
   std::string                answer;
-  bool                       fractioned;
   int                        callNo;
-  bool                       requestEntityTooLarge;
+  ParseData*                 parseDataP;
   bool                       inCompoundValue;
-  orion::CompoundValueNode*  compoundValueContainer;
-  orion::CompoundValueNode*  current;
-
-  ::std::vector<orion::CompoundValueNode*> compoundValueNode;
+  orion::CompoundValueNode*  compoundValueP;    // Points to current node in the tree
+  orion::CompoundValueNode*  compoundValueRoot; // Points to the root of the tree
+  ::std::vector<orion::CompoundValueNode*> compoundValueVector;
 
   // Outgoing
   HttpStatusCode            httpStatusCode;

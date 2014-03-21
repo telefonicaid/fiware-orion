@@ -39,10 +39,11 @@
 */
 ContextAttribute::ContextAttribute()
 {
-   name  = "";
-   type  = "";
-   value = "";
-   compoundValueP = NULL;
+   name                  = "";
+   type                  = "";
+   value                 = "";
+   compoundValueP        = NULL;
+   typeFromXmlAttribute  = "";
 }
 
 
@@ -54,10 +55,11 @@ ContextAttribute::ContextAttribute()
 ContextAttribute::ContextAttribute(ContextAttribute* caP)
 {
    LM_T(LmtClone, ("'cloning' a ContextAttribute"));
-   name           = caP->name;
-   type           = caP->type;
-   value          = caP->value;
-   compoundValueP = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
+   name                  = caP->name;
+   type                  = caP->type;
+   value                 = caP->value;
+   compoundValueP        = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
+   typeFromXmlAttribute  = "";
 
    metadataVector.vec.clear();
 
@@ -77,11 +79,11 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
 */
 ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::string _value)
 {
-   name  = _name;
-   type  = _type;
-   value = _value;
-
-   compoundValueP = NULL;
+   name                  = _name;
+   type                  = _type;
+   value                 = _value;
+   compoundValueP        = NULL;
+   typeFromXmlAttribute  = "";
 }
 
 /* ****************************************************************************
@@ -90,10 +92,10 @@ ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::st
 */
 ContextAttribute::ContextAttribute(std::string _name, std::string _type, orion::CompoundValueNode* _compoundValueP)
 {
-  name  = _name;
-  type  = _type;
-
-  compoundValueP = _compoundValueP;
+  name                  = _name;
+  type                  = _type;
+  compoundValueP        = _compoundValueP;
+  typeFromXmlAttribute  = "";
 }
 
 /* ****************************************************************************
@@ -135,7 +137,11 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
   if (compoundValueP == NULL)
     out += valueTag(indent + "  ", ((format == XML)? "contextValue" : "value"), value, format, commaAfterContextValue);
   else
-    out += compoundValueP->render(format, indent);
+  {
+     out += startTag(indent + "  ", "contextValue", "", format, false, false);
+     out += compoundValueP->render(format, indent + "    ");
+     out += endTag(indent + "  ", "contextValue", format, comma);
+  }
 
   out += metadataVector.render(format, indent + "  ", false);
   out += endTag(indent, xmlTag, format, comma);
@@ -178,7 +184,7 @@ void ContextAttribute::present(std::string indent, int ix)
   if (compoundValueP == NULL)
     PRINTF("%s  Value:      %s\n", indent.c_str(), value.c_str());
   else
-    compoundValueP->show(indent);
+    compoundValueP->show(indent + "  ");
 
   metadataVector.present("Attribute", indent + "  ");
 }

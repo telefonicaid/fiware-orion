@@ -62,7 +62,6 @@ std::string ContextRegistration::render(Format format, std::string indent, bool 
   out += startTag(indent, tag, format, isInVector == false);
   out += entityIdVector.render(format, indent + "  ", true);
   out += contextRegistrationAttributeVector.render(format, indent + "  ", true);
-  LM_M(("Rendering %d metadatas", registrationMetadataVector.size()));
   out += registrationMetadataVector.render(format, indent + "  ", true);
   out += providingApplication.render(format, indent + "  ", false);
   out += endTag(indent, tag, format, comma);

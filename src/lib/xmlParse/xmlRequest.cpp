@@ -196,6 +196,8 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
   xml_node<>*   father    = xmlDocPrepare((char*) content);
   XmlRequest*   reqP      = xmlRequestGet(request, ciP->method);
 
+  ciP->parseDataP = parseDataP;
+
   if (father == NULL)
   {
     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", "unknown", SccBadRequest, "XML Parse Error");

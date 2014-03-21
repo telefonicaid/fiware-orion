@@ -26,6 +26,7 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
 #include "common/Format.h"
 
@@ -97,7 +98,7 @@ public:
    std::vector<CompoundValueNode*>    childV;
 
 
-   // Auxiliar fields for cretion of the tree
+   // Auxiliar fields for creation of the tree
    CompoundValueNode*                 container;
    CompoundValueNode*                 rootP;
    std::string                        error;
@@ -118,12 +119,12 @@ public:
 
    CompoundValueNode*  clone(void);
    CompoundValueNode*  add(CompoundValueNode* node);
-   CompoundValueNode*  add(const Type _type, const std::string& _name, const std::string& _containerPath, const std::string& _value = "");
+   CompoundValueNode*  add(const Type _type, const std::string& _name, const std::string& _value = "");
    void                check(void);
    std::string         finish(void);
    std::string         render(Format format, std::string indent);
 
-   const char*         typeName(const Type _type);
+   static const char*  typeName(const Type _type);
    void                shortShow(std::string indent);
    void                show(std::string indent);
 };

@@ -36,11 +36,11 @@ SET (STATIC_LIBS
     rest
     jsonParse
     xmlParse
-    parse
     convenience
     ngsi9
     ngsi10
     ngsi
+    parse
     common
     lm
     pa

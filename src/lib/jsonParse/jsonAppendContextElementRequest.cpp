@@ -30,11 +30,13 @@
 
 #include "common/globals.h"
 #include "convenience/AppendContextElementRequest.h"
-#include "ngsi/Request.h"
 #include "jsonParse/jsonParse.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonAppendContextElementRequest.h"
 #include "jsonParse/jsonNullTreat.h"
+#include "ngsi/Request.h"
+#include "rest/ConnectionInfo.h"
+
 
 
 /* ****************************************************************************
