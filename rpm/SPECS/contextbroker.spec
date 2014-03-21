@@ -35,7 +35,6 @@ Using these interfaces, clients can do several operations:
 %define _service_name contextbrokerd
 
 ## System folders
-# This is the workspace
 %define _src_project_dir %{_sourcedir}/../../
 %define _install_dir /opt/%{name}
 # _localstatedir is a system var that goes to /var
@@ -85,8 +84,8 @@ cp -R %{_src_project_dir}CMakeLists.txt \
 # Read from BUILD and write into BUILD
 
 echo "[INFO] Building RPM"
-# Execute the make of the makefile -> prepare_release -> release 
-# The make install execute the make also
+
+# Compile the code into the BUILDROOT directory with the architecture x86_64
 make debug DESTDIR=$RPM_BUILD_ROOT BUILD_ARCH=%{build_arch}
 
 # -------------------------------------------------------------------------------------------- #
@@ -95,7 +94,7 @@ make debug DESTDIR=$RPM_BUILD_ROOT BUILD_ARCH=%{build_arch}
 %pre
 # Read from BUILD and write into BUILDROOT
 
-# Creating the user and group
+# Creating the user and group (orion)
 echo "[INFO] Creating %{_owner} user"
 grep ^%{_owner} /etc/passwd
 RET_VAL=$?
@@ -120,13 +119,16 @@ fi
 # -------------------------------------------------------------------------------------------- #
 %install
 # Read from BUILD and write into BUILDROOT
+
 # RPM_BUILD_ROOT = BUILDROOT
 # %{_install_dir}=/opt/contextbroker
 
+echo "[INFO] Installing the %{name}"
 make install_debug DESTDIR=$RPM_BUILD_ROOT
 strip $RPM_BUILD_ROOT/usr/bin/contextBroker
 chmod 555 $RPM_BUILD_ROOT/usr/bin/contextBroker
 
+echo "[INFO] Creating installation directories "
 mkdir -p $RPM_BUILD_ROOT/%{_install_dir}
 mkdir -p $RPM_BUILD_ROOT/%{_install_dir}/bin
 mkdir -p $RPM_BUILD_ROOT/%{_install_dir}/init.d
@@ -136,6 +138,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_install_dir}/share
 mkdir -p $RPM_BUILD_ROOT/%{_install_dir}/config
 mkdir -p $RPM_BUILD_ROOT/%{_install_dir}_tests
 
+echo "[INFO] Copying files into the %{_install_dir}"
 mv $RPM_BUILD_ROOT/usr/bin/contextBroker $RPM_BUILD_ROOT/%{_install_dir}/bin/contextbroker 
 rm -Rf $RPM_BUILD_ROOT/usr
 
@@ -158,6 +161,7 @@ chmod 755 $RPM_BUILD_ROOT/%{_install_dir}/init.d/%{name}
 # post-install section:
 # -------------------------------------------------------------------------------------------- #
 %post
+# This section is executed when the rpm is installed (rpm -i)
 
 echo "[INFO] Configuring application"
 echo "[INFO] Creating links"
@@ -176,7 +180,9 @@ setfacl -d -m o::rx %{_orion_log_dir}
 echo "[INFO] Configuring application service"
 chkconfig --add %{_service_name}
 
+
 # Secure the configuration file to prevent un-authorized access
+echo "[INFO] Securing the configuration file"
 chown %{_owner}:%{_owner} /etc/sysconfig/%{name}
 chmod 600 /etc/sysconfig/%{name}
 cat <<EOMSG
@@ -195,6 +201,7 @@ EOMSG
 # pre-uninstall section:
 # -------------------------------------------------------------------------------------------- #
 %preun
+echo "[INFO] Uninstall the %{name}"
 /etc/init.d/%{_service_name} stop
 /sbin/chkconfig --del %{_service_name}
 
@@ -202,6 +209,7 @@ EOMSG
 # clean section:
 # -------------------------------------------------------------------------------------------- #
 %clean
+echo "[INFO] Cleaning the $RPM_BUILD_ROOT directory"
 rm -rf $RPM_BUILD_ROOT
 
 # -------------------------------------------------------------------------------------------- #
