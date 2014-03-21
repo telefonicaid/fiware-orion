@@ -37,7 +37,6 @@
 
 #include "mongo/client/dbclient.h"
 
-#if 0
 /* ****************************************************************************
 *
 * Tests
@@ -382,4 +381,3 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue2PlusSimpleValue)
 
     utExit();
 }
-#endif
