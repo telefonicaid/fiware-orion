@@ -76,8 +76,7 @@ static void prepareDatabase(void) {
                                                         "y" << "3") <<
                                                    BSON_ARRAY("z1" << "z2")
                                                    )
-                             ) <<
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "val2")
+                             )
                         )
                     );
 
@@ -88,13 +87,40 @@ static void prepareDatabase(void) {
                              "value" << BSON("x" << BSON("x1" << "a" << "x2" << "b") <<
                                              "y" << BSON_ARRAY("y1" << "y2")
                                              )
+                             )
+                        )
+                    );
+
+  BSONObj en3 = BSON("_id" << BSON("id" << "E3" << "type" << "T3") <<
+                     "attrs" << BSON_ARRAY(
+                        BSON("name" << "A3" <<
+                             "type" << "TA3" <<
+                             "value" << BSON_ARRAY("22" <<
+                                                   BSON("x" << BSON_ARRAY("x1" << "x2") <<
+                                                        "y" << "3") <<
+                                                   BSON_ARRAY("z1" << "z2")
+                                                   )
                              ) <<
-                        BSON("name" << "A3" << "type" << "TA3" << "value" << "val3")
+                        BSON("name" << "A3bis" << "type" << "TA3" << "value" << "val3")
+                        )
+                    );
+
+  BSONObj en4 = BSON("_id" << BSON("id" << "E4" << "type" << "T4") <<
+                     "attrs" << BSON_ARRAY(
+                        BSON("name" << "A4" <<
+                             "type" << "TA4" <<
+                             "value" << BSON("x" << BSON("x1" << "a" << "x2" << "b") <<
+                                             "y" << BSON_ARRAY("y1" << "y2")
+                                             )
+                             ) <<
+                        BSON("name" << "A4bis" << "type" << "TA4" << "value" << "val4")
                         )
                     );
 
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(ENTITIES_COLL, en2);
+  connection->insert(ENTITIES_COLL, en3);
+  connection->insert(ENTITIES_COLL, en4);
 
 }
 
@@ -104,8 +130,63 @@ static void prepareDatabase(void) {
 */
 TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1)
 {
+
+    HttpStatusCode         ms;
+    QueryContextRequest   req;
+    QueryContextResponse  res;
+
+    utInit();
+
+    /* Prepare database */
     prepareDatabase();
-    EXPECT_EQ(1, 0) << "to be implemented";
+
+    /* Forge the request (from "inside" to "outside") */
+    EntityId en("E1", "T1", "false");
+    req.entityIdVector.push_back(&en);
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoQueryContext(&req, &res);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(orion::CompoundValueNode::Vector, RES_CER_ATTR(0, 0)->compoundValueP->type);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[0]->type);
+    EXPECT_EQ("22", RES_CER_ATTR(0, 0)->compoundValueP->childV[0]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Vector, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->type);
+    EXPECT_EQ("x", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->name);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->childV[0]->type);
+    EXPECT_EQ("x1", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->childV[0]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->childV[1]->type);
+    EXPECT_EQ("x2", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->childV[1]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->type);
+    EXPECT_EQ("y", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->name);
+    EXPECT_EQ("3", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Vector, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->type);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[0]->type);
+    EXPECT_EQ("z1", RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[0]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[1]->type);
+    EXPECT_EQ("z2", RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[1]->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+    /* Release dynamic memory used by response (mongoBackend allocates it) */
+    res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -114,7 +195,60 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1)
 */
 TEST(mongoQueryContextCompoundValuesRequest, CompoundValue2)
 {
-    EXPECT_EQ(1, 0) << "to be implemented";
+    HttpStatusCode         ms;
+    QueryContextRequest   req;
+    QueryContextResponse  res;
+
+    utInit();
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Forge the request (from "inside" to "outside") */
+    EntityId en("E2", "T2", "false");
+    req.entityIdVector.push_back(&en);
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoQueryContext(&req, &res);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E2", RES_CER(0).entityId.id);
+    EXPECT_EQ("T2", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(orion::CompoundValueNode::Struct, RES_CER_ATTR(0, 0)->compoundValueP->type);
+    EXPECT_EQ(orion::CompoundValueNode::Struct, RES_CER_ATTR(0, 0)->compoundValueP->childV[0]->type);
+    EXPECT_EQ("x", RES_CER_ATTR(0, 0)->compoundValueP->childV[0]->name);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->type);
+    EXPECT_EQ("x1", RES_CER_ATTR(0, 0)->compoundValueP->childV[0]->childV[0]->name);
+    EXPECT_EQ("a", RES_CER_ATTR(0, 0)->compoundValueP->childV[0]->childV[0]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->type);
+    EXPECT_EQ("x2", RES_CER_ATTR(0, 0)->compoundValueP->childV[0]->childV[1]->name);
+    EXPECT_EQ("b", RES_CER_ATTR(0, 0)->compoundValueP->childV[0]->childV[1]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Vector, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->type);
+    EXPECT_EQ("y", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->name);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->type);
+    EXPECT_EQ("y1", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->type);
+    EXPECT_EQ("y2", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+    /* Release dynamic memory used by response (mongoBackend allocates it) */
+    res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -123,7 +257,65 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue2)
 */
 TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1PlusSimpleValue)
 {
-    EXPECT_EQ(1, 0) << "to be implemented";
+    HttpStatusCode         ms;
+    QueryContextRequest   req;
+    QueryContextResponse  res;
+
+    utInit();
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Forge the request (from "inside" to "outside") */
+    EntityId en("E3", "T3", "false");
+    req.entityIdVector.push_back(&en);
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoQueryContext(&req, &res);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E3", RES_CER(0).entityId.id);
+    EXPECT_EQ("T3", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA3", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(orion::CompoundValueNode::Vector, RES_CER_ATTR(0, 0)->compoundValueP->type);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[0]->type);
+    EXPECT_EQ("22", RES_CER_ATTR(0, 0)->compoundValueP->childV[0]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Vector, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->type);
+    EXPECT_EQ("x", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->name);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->childV[0]->type);
+    EXPECT_EQ("x1", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->childV[0]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->childV[1]->type);
+    EXPECT_EQ("x2", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->childV[1]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->type);
+    EXPECT_EQ("y", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->name);
+    EXPECT_EQ("3", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Vector, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->type);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[0]->type);
+    EXPECT_EQ("z1", RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[0]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[1]->type);
+    EXPECT_EQ("z2", RES_CER_ATTR(0, 0)->compoundValueP->childV[2]->childV[1]->value);
+    EXPECT_EQ("A3bis", RES_CER_ATTR(0, 1)->name);
+    EXPECT_EQ("TA3", RES_CER_ATTR(0, 1)->type);
+    EXPECT_EQ("val3", RES_CER_ATTR(0, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+    /* Release dynamic memory used by response (mongoBackend allocates it) */
+    res.contextElementResponseVector.release();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -132,6 +324,62 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1PlusSimpleValue)
 */
 TEST(mongoQueryContextCompoundValuesRequest, CompoundValue2PlusSimpleValue)
 {
-    EXPECT_EQ(1, 0) << "to be implemented";
+    HttpStatusCode         ms;
+    QueryContextRequest   req;
+    QueryContextResponse  res;
+
+    utInit();
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Forge the request (from "inside" to "outside") */
+    EntityId en("E4", "T4", "false");
+    req.entityIdVector.push_back(&en);
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoQueryContext(&req, &res);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E4", RES_CER(0).entityId.id);
+    EXPECT_EQ("T4", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A4", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA4", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(orion::CompoundValueNode::Struct, RES_CER_ATTR(0, 0)->compoundValueP->type);
+    EXPECT_EQ(orion::CompoundValueNode::Struct, RES_CER_ATTR(0, 0)->compoundValueP->childV[0]->type);
+    EXPECT_EQ("x", RES_CER_ATTR(0, 0)->compoundValueP->childV[0]->name);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->type);
+    EXPECT_EQ("x1", RES_CER_ATTR(0, 0)->compoundValueP->childV[0]->childV[0]->name);
+    EXPECT_EQ("a", RES_CER_ATTR(0, 0)->compoundValueP->childV[0]->childV[0]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->type);
+    EXPECT_EQ("x2", RES_CER_ATTR(0, 0)->compoundValueP->childV[0]->childV[1]->name);
+    EXPECT_EQ("b", RES_CER_ATTR(0, 0)->compoundValueP->childV[0]->childV[1]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Vector, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->type);
+    EXPECT_EQ("y", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->name);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->type);
+    EXPECT_EQ("y1", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[0]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Leaf, RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->type);
+    EXPECT_EQ("y2", RES_CER_ATTR(0, 0)->compoundValueP->childV[1]->childV[1]->value);
+    EXPECT_EQ("A4bis", RES_CER_ATTR(0, 1)->name);
+    EXPECT_EQ("TA4", RES_CER_ATTR(0, 1)->type);
+    EXPECT_EQ("val4", RES_CER_ATTR(0, 1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+    /* Release dynamic memory used by response (mongoBackend allocates it) */
+    res.contextElementResponseVector.release();
+
+    utExit();
 }
 #endif
