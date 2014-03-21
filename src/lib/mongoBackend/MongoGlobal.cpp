@@ -452,27 +452,34 @@ static void processEntitityPatternTrue(BSONArrayBuilder* arrayP, EntityId* enP) 
 * addCompoundNode -
 *
 */
-static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e) {
-    orion::CompoundValueNode* child = new orion::CompoundValueNode();
-    if (e.type() == String) {
-        child->name = e.fieldName();
-        child->type = orion::CompoundValueNode::Leaf;
-        child->value = e.String();
-        cvP->add(child);
-    }
-    else if (e.type() == Object) {
-        child->name = e.fieldName();
-        compoundObjectResponse(child, e);
-        cvP->add(child);
-    }
-    else if (e.type() == Array) {
-        child->name = e.fieldName();
-        compoundVectorResponse(child, e);
-        cvP->add(child);
-    }
-    else {
-        LM_E(("unknown BSON type"));;
-    }
+static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
+{
+  if ((e.type() != String) && (e.type() != Object) && (e.type() != Array))
+    LM_RVE(("unknown BSON type"));
+
+  orion::CompoundValueNode* child = new orion::CompoundValueNode();
+  child->name = e.fieldName();
+
+  switch (e.type())
+  {
+  case String:
+    child->type  = orion::CompoundValueNode::Leaf;
+    child->value = e.String();
+    break;
+
+  case Object:
+    compoundObjectResponse(child, e);
+    break;
+
+  case Array:
+    compoundVectorResponse(child, e);
+    break;
+  default:
+    /* We need the default clause to avoid 'enumeration value X not handled in switch' errors due to -Werror=switch at compilation time */
+    break;
+  }
+
+  cvP->add(child);
 }
 
 /* ****************************************************************************
@@ -669,6 +676,7 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
                 }
                 else {
                     LM_E(("unknown BSON type"));
+                    continue;
                 }
 
                 /* Setting ID (if found) */
