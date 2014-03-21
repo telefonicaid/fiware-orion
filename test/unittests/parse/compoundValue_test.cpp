@@ -977,7 +977,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValues)
 }
 
 
-#if 0
+
 /* ****************************************************************************
 *
 * tenCompounds - 
@@ -985,10 +985,23 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValues)
 TEST(compoundValue, tenCompounds)
 {
   ParseData                  reqData;
-  const char*                inFile  = "ngsi10.updateContextRequest.tenCompounds.valid.xml";
-  const char*                outFile = "ngsi10.updateContextRequest.tenCompoundsRendered.valid.xml";
+  const char*                inFile       = "ngsi10.updateContextRequest.tenCompounds.valid.xml";
+  const char*                renderedFile = "ngsi10.updateContextRequest.tenCompoundsRendered.valid.xml";
   ConnectionInfo             ci("/ngsi10/updateContext", "POST", "1.1");
-  ContextAttribute*          caP;
+  UpdateContextRequest*      upcrP;
+  std::string                rendered;
    
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  std::string result = xmlTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+
+  upcrP = &reqData.upcr.res;
+  rendered = upcrP->render(UpdateContext, XML, "");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+  utExit();
 }
-#endif

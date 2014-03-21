@@ -1,4 +1,4 @@
-<vec>
+<vec type="vector">
   <vector_item>a</vector_item>
   <vector_item>a</vector_item>
 </vec>

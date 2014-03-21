@@ -57,10 +57,15 @@ std::string startTag(std::string indent, std::string tagName, Format format, boo
 *
 * startTag -  
 */
-std::string startTag(std::string indent, std::string xmlTag, std::string jsonTag, Format format, bool isVector, bool showTag)
+std::string startTag(std::string indent, std::string xmlTag, std::string jsonTag, Format format, bool isVector, bool showTag, bool isCompoundVector)
 {
   if (format == XML)
+  {
+    if (isCompoundVector)
+      return indent + "<" + xmlTag + " type=\"vector\">\n";
+
     return indent + "<" + xmlTag + ">\n";
+  }
   else if (format == JSON)
   {
     if (isVector && showTag)
