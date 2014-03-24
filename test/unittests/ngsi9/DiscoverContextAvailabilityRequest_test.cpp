@@ -307,7 +307,8 @@ TEST(DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_xml)
 TEST(DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_json)
 {
   ParseData       reqData;
-  const char*     inFile = "ngsi9.discoverContextAvailabilityRequest.unsupportedAttributeForEntityId.invalid.json";
+  const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.unsupportedAttributeForEntityId.invalid.json";
+  const char*     outFile = "ngsi9.discoverContextAvailabilityResponse.unsupportedAttributeForEntityId.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
 
   ci.inFormat  = JSON;
@@ -317,7 +318,8 @@ TEST(DiscoverContextAvailabilityRequest, unsupportedAttributeForEntityId_json)
 
   std::string result = jsonTreat(testBuf, &ci, &reqData, DiscoverContextAvailability, "discoverContextAvailabilityRequest", NULL);
 
-  EXPECT_EQ("OK", result) << "Unsupported Attribute For EntityId";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
+  EXPECT_STREQ(expectedBuf, result.c_str());
 }
 
 

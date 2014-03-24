@@ -2,6 +2,7 @@
   <subscriptionId>000000000000000000000000</subscriptionId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Empty Reference</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>Empty Reference</details>
   </errorCode>
 </subscribeContextAvailabilityResponse>
