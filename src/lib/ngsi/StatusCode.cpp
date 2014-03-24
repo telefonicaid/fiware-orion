@@ -80,7 +80,7 @@ StatusCode::StatusCode(HttpStatusCode _code, std::string _details, std::string _
 *
 * StatusCode::render - 
 */
-std::string StatusCode::render(Format format, std::string indent, bool comma)
+std::string StatusCode::render(Format format, std::string indent, bool comma, bool showTag)
 {
   std::string out  = "";
 
@@ -90,7 +90,7 @@ std::string StatusCode::render(Format format, std::string indent, bool comma)
     details += " - ZERO code set to 500";
   }
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, format, showTag);
   out += valueTag(indent + "  ", "code", code, format, true);
   out += valueTag(indent + "  ", "reasonPhrase", reasonPhrase, format, details != "");
 

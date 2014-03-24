@@ -117,6 +117,7 @@ static XmlRequest xmlRequest[] =
   { IndividualContextEntity,               "POST", "appendContextElementRequest",                  acerParseVector,  acerInit,  acerRelease,  acerPresent,  acerCheck  },
 
   { IndividualContextEntityAttribute,      "POST", "updateContextAttributeRequest",                upcarParseVector, upcarInit, upcarRelease, upcarPresent, upcarCheck },
+  { IndividualContextEntityAttribute,      "PUT",  "updateContextAttributeRequest",                upcarParseVector, upcarInit, upcarRelease, upcarPresent, upcarCheck },
   { AttributeValueInstance,                "PUT",  "updateContextAttributeRequest",                upcarParseVector, upcarInit, upcarRelease, upcarPresent, upcarCheck },
   { IndividualContextEntityAttributes,     "POST", "appendContextElementRequest",                  acerParseVector,  acerInit,  acerRelease,  acerPresent,  acerCheck  },
   { IndividualContextEntityAttributes,     "PUT",  "updateContextElementRequest",                  ucerParseVector,  ucerInit,  ucerRelease,  ucerPresent,  ucerCheck  },
@@ -214,6 +215,9 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
   }
 
 
+  if (reqPP != NULL)
+    *reqPP = reqP;
+
   //
   // Checking that the payload matches the URL
   //
@@ -254,18 +258,6 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
      LM_E(("check(%s): %s", reqP->keyword.c_str(), check.c_str()));
 
   reqP->present(parseDataP);
-
-  // -----------------------------
-  //
-  // Can't release here ...
-  // reqP->release(parseDataP);
-  //
-  // pass request pointer to father that will know when the free can be executed.
-  //
-  if (reqPP != NULL)
-  {
-    *reqPP = reqP;
-  }
 
   return check;
 }
