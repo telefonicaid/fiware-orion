@@ -97,14 +97,15 @@ Date: REGEX(.*)
 }
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 130
+Content-Length: 161
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
         "code": "400",
-        "reasonPhrase": "No entities"
+        "details": "No entities",
+        "reasonPhrase": "Bad Request"
     },
     "subscriptionId": "000000000000000000000000"
 }

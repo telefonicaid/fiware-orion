@@ -57,7 +57,7 @@ using boost::property_tree::ptree;
 *
 * treat - 
 */
-std::string treat(ConnectionInfo* ciP, int type, std::string path, std::string value, JsonNode* parseVector, ParseData* reqDataP)
+static bool treat(ConnectionInfo* ciP, int type, std::string path, std::string value, JsonNode* parseVector, ParseData* reqDataP)
 {
   LM_T(LmtTreat, ("Treating path '%s', value '%s'", path.c_str(), value.c_str()));
 
@@ -68,16 +68,11 @@ std::string treat(ConnectionInfo* ciP, int type, std::string path, std::string v
       LM_T(LmtTreat, ("calling treat %d function for '%s': '%s'", type, path.c_str(), value.c_str()));
       std::string res = parseVector[ix].treat(path, value, reqDataP);
       LM_T(LmtTreat, ("called treat %d function for '%s'. result: '%s'", type, path.c_str(), res.c_str()));
-      return res;
+      return true;
     }
   }
 
-  ciP->httpStatusCode = SccBadRequest;
-  if (ciP->answer == "")
-    ciP->answer = std::string("JSON Parse Error (unknown field: '") + path.c_str() + "')";
-  LM_W(("ERROR: '%s'", ciP->answer.c_str()));
-
-  return ciP->answer;
+  return false;
 }
 
 /* ****************************************************************************
@@ -116,7 +111,7 @@ static std::string jsonParse
 {
   std::string nodeName         = v.first.data();
   std::string value            = v.second.data();
-  std::string res              = "OK";
+  bool        res;
   std::string arrayElementName = getArrayElementName(path);
 
   // If the node name is empty, boost will yield an empty name. This will happen only in the case of a vector.
@@ -138,19 +133,25 @@ static std::string jsonParse
   else
     res = treat(ciP, 2, path, value, parseVector, reqDataP);
 
-  if (res != "OK")
+  if (res == false)
   {
-    LM_E(("treat function returned error"));
-    return res;
+    ciP->httpStatusCode = SccBadRequest;
+    if (ciP->answer == "")
+      ciP->answer = std::string("JSON Parse Error (unknown field: '") + path.c_str() + "')";
+
+    LM_E(("ERROR: '%s'", ciP->answer.c_str()));
+    return ciP->answer;
   }
 
   boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
   BOOST_FOREACH(boost::property_tree::ptree::value_type &v2, subtree)
   {
-     jsonParse(ciP, v2, path, parseVector, reqDataP);
+    std::string out = jsonParse(ciP, v2, path, parseVector, reqDataP);
+    if (out != "OK")
+      return out;
   }
 
-  return res; // "OK"
+  return "OK";
 }
 
 /* ****************************************************************************
@@ -174,7 +175,10 @@ std::string jsonParse(ConnectionInfo* ciP, const char* content, std::string requ
   {
     std::string res = jsonParse(ciP, v, path, parseVector, reqDataP);
     if (res != "OK")
+    {
+      LM_W(("Parse error: '%s'", res.c_str()));
       return res;
+    }
   }
 
   return "OK";

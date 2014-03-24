@@ -97,7 +97,8 @@ std::string SubscribeContextAvailabilityRequest::check(RequestType requestType, 
            ((res = restriction.check(SubscribeContextAvailability, format, indent, predetectedError, restrictions)) != "OK"))
   {
     response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = res;
+    response.errorCode.reasonPhrase = httpStatusCodeString(SccBadRequest);
+    response.errorCode.details      = res;
   }
   else
     return "OK";

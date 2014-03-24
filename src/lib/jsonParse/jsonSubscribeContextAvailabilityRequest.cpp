@@ -250,6 +250,7 @@ JsonNode jsonScarParseVector[] =
   { "/duration",                           duration             },
   { "/restriction",                        restriction          },
   { "/restriction/attributeExpression",    attributeExpression  },
+  { "/restriction/scopes",                 jsonNullTreat        },
   { "/restriction/scopes/scope",           scope,               },
   { "/restriction/scopes/scope/type",      scopeType            },
   { "/restriction/scopes/scope/value",     scopeValue           },
