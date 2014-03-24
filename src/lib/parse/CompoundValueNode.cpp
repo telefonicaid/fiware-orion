@@ -288,7 +288,7 @@ std::string CompoundValueNode::render(Format format, std::string indent)
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
-  std::string  tagName   = (container->type == Vector)? "vector_item" : name;
+  std::string  tagName   = (container->type == Vector)? "item" : name;
 
   if (type == Leaf)
   {
