@@ -111,8 +111,8 @@ static std::string jsonParse
 {
   std::string nodeName         = v.first.data();
   std::string value            = v.second.data();
-  bool        res;
   std::string arrayElementName = getArrayElementName(path);
+  bool        treated;
 
   // If the node name is empty, boost will yield an empty name. This will happen only in the case of a vector.
   // See: http://www.boost.org/doc/libs/1_41_0/doc/html/boost_propertytree/parsers.html#boost_propertytree.parsers.json_parser
@@ -129,11 +129,11 @@ static std::string jsonParse
     path = path + "/" + arrayElementName;
 
   if (value == "")
-    res = treat(ciP, 1, path, value, parseVector, reqDataP);
+    treated = treat(ciP, 1, path, value, parseVector, reqDataP);
   else
-    res = treat(ciP, 2, path, value, parseVector, reqDataP);
+    treated = treat(ciP, 2, path, value, parseVector, reqDataP);
 
-  if (res == false)
+  if (treated == false)
   {
     ciP->httpStatusCode = SccBadRequest;
     if (ciP->answer == "")
