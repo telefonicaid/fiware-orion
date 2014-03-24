@@ -37,18 +37,18 @@
           <name>temperature</name>
           <type>degree</type>
           <contextValue type="vector">
-            <vector_item>1</vector_item>
+            <item>1</item>
           </contextValue>
         </contextAttribute>
         <contextAttribute>
           <name>temperature</name>
           <type>degree</type>
           <contextValue type="vector">
-            <vector_item>1</vector_item>
-            <vector_item>2</vector_item>
-            <vector_item>3</vector_item>
-            <vector_item>4</vector_item>
-            <vector_item>5</vector_item>
+            <item>1</item>
+            <item>2</item>
+            <item>3</item>
+            <item>4</item>
+            <item>5</item>
           </contextValue>
         </contextAttribute>
         <contextAttribute>
@@ -74,22 +74,22 @@
               <level2>
                 <level>3</level>
                 <level3 type="vector">
-                  <vector_item>
+                  <item>
                     <level>5</level>
                     <struct1>
                       <level>6</level>
                       <s1-1>1-1</s1-1>
                       <s1-2>1-2</s1-2>
                     </struct1>
-                  </vector_item>
-                  <vector_item>
+                  </item>
+                  <item>
                     <level>5</level>
                     <struct2>
                       <level>6</level>
                       <s2-1>2-1</s2-1>
                       <s2-2>2-2</s2-2>
                     </struct2>
-                  </vector_item>
+                  </item>
                 </level3>
               </level2>
             </level1>
@@ -106,10 +106,10 @@
           <name>temperature2</name>
           <type>degree</type>
           <contextValue type="vector">
-            <vector_item>I-0</vector_item>
-            <vector_item>I-1</vector_item>
-            <vector_item>I-2</vector_item>
-            <vector_item>I-3</vector_item>
+            <item>I-0</item>
+            <item>I-1</item>
+            <item>I-2</item>
+            <item>I-3</item>
           </contextValue>
         </contextAttribute>
       </contextAttributeList>

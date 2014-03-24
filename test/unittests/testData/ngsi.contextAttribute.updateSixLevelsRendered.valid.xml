@@ -7,22 +7,22 @@
       <level2>
         <level>3</level>
         <level3 type="vector">
-          <vector_item>
+          <item>
             <level>5</level>
             <struct1>
               <level>6</level>
               <s1-1>1-1</s1-1>
               <s1-2>1-2</s1-2>
             </struct1>
-          </vector_item>
-          <vector_item>
+          </item>
+          <item>
             <level>5</level>
             <struct2>
               <level>6</level>
               <s2-1>2-1</s2-1>
               <s2-2>2-2</s2-2>
             </struct2>
-          </vector_item>
+          </item>
         </level3>
       </level2>
     </level1>
