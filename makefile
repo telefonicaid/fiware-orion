@@ -175,7 +175,6 @@ post_install_libs:
 	cp $(CMAKE_BUILD_TYPE)/src/lib/serviceRoutines/libserviceRoutines.a  /usr/local/lib
 
 
-
 # Requires root access, i.e. use 'sudo make install_libs' to install
 install_libs: release
 	make post_install_libs CMAKE_BUILD_TYPE=BUILD_RELEASE
