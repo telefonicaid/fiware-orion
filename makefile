@@ -43,10 +43,15 @@ ifndef BROKER_VERSION
 	BROKER_VERSION:=$(shell grep "\#define ORION_VERSION" src/app/contextBroker/version.h | sed -e 's/^.* "//' -e 's/"//')
 endif
 
+# Directory for the workspace into the develenv machine
+ifndef WORKSPACE
+	WORKSPACE:=(shell pwd)
+endif
+
 # Directory for the rpm stage
 ifndef TOPDIR
-	TOPDIR:=$(shell echo $PWD/rpm)
-endif 
+	TOPDIR=$(WORKSPACE)/rpm
+endif
 
 # Release ID for the contextBroker-* packages (execept contextBroker-fiware)
 ifndef BROKER_RELEASE
