@@ -72,7 +72,7 @@ echo "+++++ 4. lookup the attribute again +++++"
 curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperature/ground -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
 
 --REGEXPECT--
-+++++ 1. register an entity +++++
++++++ 1. create an entity +++++
 {
     "contextResponses": [
         {
