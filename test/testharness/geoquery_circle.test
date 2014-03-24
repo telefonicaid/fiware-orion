@@ -1,0 +1,447 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# fermin at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geo query test (circle)
+
+--SHELL-INIT--
+source harnessFunctions.sh
+
+dbInit CB
+brokerStart CB
+
+--SHELL--
+source harnessFunctions.sh
+
+echo "0: +++++++++ Prepare entities +++++++++++"
+
+# Create entities corresponding to the three cities
+(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="City" isPattern="false">
+        <id>Madrid</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>location</name>
+          <type>coords</type>
+          <contextValue>40.418889, -3.691944</contextValue>
+          <metadata>
+            <contextMetadata>
+              <name>location</name>
+              <type>string</type>
+              <value>WSG84</value>
+            </contextMetadata>
+          </metadata>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+    <contextElement>
+      <entityId type="City" isPattern="false">
+        <id>Alcobendas</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>location</name>
+          <type>coords</type>
+          <contextValue>40.533333, -3.633333</contextValue>
+          <metadata>
+            <contextMetadata>
+              <name>location</name>
+              <type>string</type>
+              <value>WSG84</value>
+            </contextMetadata>
+          </metadata>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+    <contextElement>
+      <entityId type="City" isPattern="false">
+        <id>Leganes</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>location</name>
+          <type>coords</type>
+          <contextValue>40.316667, -3.75</contextValue>
+          <metadata>
+            <contextMetadata>
+              <name>location</name>
+              <type>string</type>
+              <value>WSG84</value>
+            </contextMetadata>
+          </metadata>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>
+EOF
+
+echo "1: ++++++++++ Madrid in 14 kms ++++++++++"
+
+# Query inside 14 kms radius from Madrid center
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="City" isPattern="true">
+          <id>.*</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+  </attributeList>
+  <restriction>
+    <scope>
+      <operationScope>
+        <scopeType>FIWARE_Location</scopeType>
+        <scopeValue>
+          <circle>
+            <center_latitude>40.418889</center_latitude>
+            <center_longitude>-3.691944</center_longitude>
+            <radius>14000</radius>
+          </circle>
+        </scopeValue>
+      </operationScope>
+    </scope>
+  </restriction>
+</queryContextRequest>
+EOF
+
+echo "2: +++++++++++ Madrid in 15 kms +++++++++"
+
+# Query inside 15 kms radius from Madrid center
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="City" isPattern="true">
+          <id>.*</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+  </attributeList>
+  <restriction>
+    <scope>
+      <operationScope>
+        <scopeType>FIWARE_Location</scopeType>
+        <scopeValue>
+          <circle>
+            <center_latitude>40.418889</center_latitude>
+            <center_longitude>-3.691944</center_longitude>
+            <radius>15000</radius>
+          </circle>
+        </scopeValue>
+      </operationScope>
+    </scope>
+  </restriction>
+</queryContextRequest>
+EOF
+
+echo "3: ++++++++++++ Marid out 14 kms ++++++++"
+
+# Query in 14 kms radius outside Madrid center
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="City" isPattern="true">
+          <id>.*</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+  </attributeList>
+  <restriction>
+    <scope>
+      <operationScope>
+        <scopeType>FIWARE_Location</scopeType>
+        <scopeValue>
+          <circle>
+            <center_latitude>40.418889</center_latitude>
+            <center_longitude>-3.691944</center_longitude>
+            <radius>14000</radius>
+            <inverted>true</inverted>
+          </circle>
+        </scopeValue>
+      </operationScope>
+    </scope>
+  </restriction>
+</queryContextRequest>
+EOF
+--REGEXPECT--
+0: +++++++++ Prepare entities +++++++++++
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="City" isPattern="false">
+          <id>Madrid</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue/>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="City" isPattern="false">
+          <id>Alcobendas</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue/>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="City" isPattern="false">
+          <id>Leganes</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue/>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+1: ++++++++++ Madrid in 14 kms ++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="City" isPattern="false">
+          <id>Leganes</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>40.316667, -3.75</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="City" isPattern="false">
+          <id>Madrid</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>40.418889, -3.691944</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+2: +++++++++++ Madrid in 15 kms +++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="City" isPattern="false">
+          <id>Alcobendas</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>40.533333, -3.633333</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="City" isPattern="false">
+          <id>Leganes</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>40.316667, -3.75</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="City" isPattern="false">
+          <id>Madrid</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>40.418889, -3.691944</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+3: ++++++++++++ Marid out 14 kms ++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="City" isPattern="false">
+          <id>Alcobendas</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>40.533333, -3.633333</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+--TEARDOWN--
+source harnessFunctions.sh
+
+brokerStop CB
