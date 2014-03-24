@@ -29,6 +29,11 @@ ifndef INSTALL_DIR
 	INSTALL_DIR=/usr
 endif
 
+# Install into /opt/contextbroker [for delivery RPM installation]
+ifndef INSTALL_DIR_RE
+	INSTALL_DIR_RE=/opt/%{name}
+endif
+
 ifndef CPU_COUNT
 	CPU_COUNT:=$(shell cat /proc/cpuinfo | grep processor | wc -l)
 endif
@@ -39,6 +44,9 @@ ifndef BROKER_VERSION
 endif
 
 # Directory for the rpm stage
+ifndef TOPDIR
+	TOPDIR=$WORKSPACE/rpm
+endif 
 
 # Release ID for the contextBroker-* packages (execept contextBroker-fiware)
 ifndef BROKER_RELEASE
@@ -184,9 +192,18 @@ install_debug_libs: debug
 	make post_install_libs CMAKE_BUILD_TYPE=BUILD_DEBUG
 
 
+rpm_RE: 
+
+	rpmbuild -ba rpm/SPECS/contextbroker.spec \
+		--define '_topdir $(TOPDIR)' \
+		--define '_install_dir $(INSTALL_DIR_RE)' \
+		--define '_broker_version 0.10.1' 
+
 rpm: 
 
-	rpmbuild -ba rpm/SPECS/contextBroker.spec \
+	rpmbuild -ba rpm/SPECS/contextbroker.spec \
+		--define '_topdir $(TOPDIR)' \
+		--define '_install_dir $(INSTALL_DIR)' \
 		--define '_broker_version $(BROKER_VERSION)' 
 		
 mock: 
