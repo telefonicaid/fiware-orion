@@ -45,7 +45,7 @@ endif
 
 # Directory for the workspace into the develenv machine
 ifndef WORKSPACE
-	WORKSPACE:=(shell pwd)
+	WORKSPACE:=$(shell pwd)
 endif
 
 # Directory for the rpm stage
