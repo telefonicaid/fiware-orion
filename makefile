@@ -45,7 +45,7 @@ endif
 
 # Directory for the rpm stage
 ifndef TOPDIR
-	TOPDIR=$WORKSPACE/rpm
+	TOPDIR:=(shell $WORKSPACE/rpm)
 endif 
 
 # Release ID for the contextBroker-* packages (execept contextBroker-fiware)
