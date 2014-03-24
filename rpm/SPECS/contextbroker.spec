@@ -35,11 +35,12 @@ Using these interfaces, clients can do several operations:
 %define _service_name contextbrokerd
 
 ## System folders
-%define _src_project_dir %{_sourcedir}/../../
-%define _install_dir /opt/%{name}
 # _localstatedir is a system var that goes to /var
 %define _orion_log_dir %{_localstatedir}/log/%{name}
-
+%define _src_project_dir %{_sourcedir}/../../
+# The _install_dir is defined into the makefile
+# The _toddir is defined into the makefile
+# The _broker_version is defined into the makefile
 
 # -------------------------------------------------------------------------------------------- #
 # Package RPM for tests 
