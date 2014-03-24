@@ -161,7 +161,7 @@ echo "2: +++++++++++ Madrid in 15 kms +++++++++"
 </queryContextRequest>
 EOF
 
-echo "3: ++++++++++++ Marid out 14 kms ++++++++"
+echo "3: ++++++++++++ Madrid out 14 kms ++++++++"
 
 # Query in 14 kms radius outside Madrid center
 (curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
@@ -410,7 +410,7 @@ EOF
     </contextElementResponse>
   </contextResponseList>
 </queryContextResponse>
-3: ++++++++++++ Marid out 14 kms ++++++++
+3: ++++++++++++ Madrid out 14 kms ++++++++
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
