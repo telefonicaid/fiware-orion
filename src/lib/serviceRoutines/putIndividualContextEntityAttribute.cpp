@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * fermin at tid dot es
 *
-* Author: Ken Zangelin
+* Author: TID Developer
 */
 #include <string>
 #include <vector>
@@ -28,27 +28,27 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenienceMap/mapDeleteIndividualContextEntityAttributes.h"
+#include "convenience/UpdateContextElementResponse.h"
+#include "convenienceMap/mapPutIndividualContextEntityAttribute.h"
 #include "ngsi/ParseData.h"
-#include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
-#include "serviceRoutines/deleteIndividualContextEntityAttributes.h"
+#include "serviceRoutines/putIndividualContextEntityAttribute.h"
 
 
 
 /* ****************************************************************************
 *
-* deleteIndividualContextEntityAttributes - 
+* putIndividualContextEntityAttribute -
 */
-std::string deleteIndividualContextEntityAttributes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string putIndividualContextEntityAttribute(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
 {
   std::string  answer;
-  std::string  entityId = compV[2];
+  std::string  entityId      = compV[2];
+  std::string  attributeName = compV[4];
   StatusCode   response;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'DELETE' request for entityId '%s'", entityId.c_str()));
-
-  ciP->httpStatusCode = mapDeleteIndividualContextEntityAttributes(entityId, &response);
+  LM_T(LmtConvenience, ("CONVENIENCE: got a 'PUT' request for entityId '%s'", entityId.c_str()));
+  ciP->httpStatusCode = mapPutIndividualContextEntityAttribute(entityId, attributeName, &parseDataP->upcar.res, &response);
   answer = response.render(ciP->outFormat, "", false, false);
   response.release();
 

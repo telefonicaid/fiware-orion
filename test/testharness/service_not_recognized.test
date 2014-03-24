@@ -1,4 +1,4 @@
-# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,8 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Convenience Individual Context Entity Attribute - PUT FAILS
-
+Service not recognized
 --SHELL-INIT--
 source harnessFunctions.sh
 
@@ -30,16 +29,19 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "+++++ 1. put an entity +++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes/attr01 -s -S --header 'Content-Type: application/xml' -X PUT -d "<nothing></nothing>" --include
-
+echo "1: +++++++++++++++++++++++++++++"
+curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperature/foo/bar -s -S --header 'Content-Type: application/json' --header 'Accept: application/json'
+echo "2: +++++++++++++++++++++++++++++"
 --REGEXPECT--
-+++++ 1. put an entity +++++
-HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: GET, POST, DELETE
-Date: REGEX(.*)
-
+1: +++++++++++++++++++++++++++++
+{
+  "orionError" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "Service not recognized: /NGSI10/contextEntities/Room1/attributes/temperature/foo/bar"
+  }
+}
+2: +++++++++++++++++++++++++++++
 --TEARDOWN--
 source harnessFunctions.sh
 brokerStop CB

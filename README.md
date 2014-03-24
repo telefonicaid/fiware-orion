@@ -206,7 +206,7 @@ Orion Context Broker is licensed under Affero General Public License (GPL) versi
 
 #### Error at "boost/exception/detail/exception_ptr_base.hpp"
 
-* OS version: CentOS release 6.4
+* OS version: CentOS/RHEL release 6.4
 * GCC version: 4.4.7
 
 You can experience the following error when building the driver:

@@ -47,6 +47,7 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   QueryContextResponse     response;
   std::string              entityId      = compV[2];
   std::string              attributeName = compV[4];
+  std::string              valueID       = compV[5];
   EntityId*                eP            = new EntityId(entityId, "", "false");
   StatusCode               sc;
   ContextAttributeResponse car;
@@ -63,9 +64,31 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   else
   {
     ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
+    ContextAttributeVector cav = cerP->contextElement.contextAttributeVector;
 
-    car.contextAttributeVector.push_back(cerP->contextElement.contextAttributeVector.get(0));
-    car.statusCode.fill(&cerP->statusCode);
+    // FIXME P4: as long as mongoQueryContext() signature is based on NGSI standard operations and that 
+    // standard queryContext doesn't allow specify metadata for attributes (note that it uses xs:string, 
+    // not full fledge attribute types), we cannot pass the ID to mongoBackend so we need to do the for loop 
+    // to grep the right attribute among all the ones returned by mongoQueryContext. However, this involves
+    // a suboptimal query at mongoBackend, which could be improved passing it the ID as a new parameter to
+    // mongoQueryContext() (although breaking the design principle about mongo*() functions follow the NGSI
+    // standard). To think about it.
+    for (unsigned int i = 0; i < cav.size(); i++)
+    {
+      if (cav.get(i)->getId() == valueID)
+      {
+        car.contextAttributeVector.push_back(cav.get(i));
+      }
+    }
+
+    if (cav.size() > 0 && car.contextAttributeVector.size() == 0)
+    {
+       car.statusCode.fill(SccContextElementNotFound, std::string("Attribute-ValueID pair: '") + attributeName + "-" + valueID + "'");
+    }
+    else
+    {
+      car.statusCode.fill(&cerP->statusCode);
+    }
   }
 
   request.release();

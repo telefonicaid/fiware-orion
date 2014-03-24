@@ -99,6 +99,7 @@
 #include "serviceRoutines/badVerbAllFour.h"
 #include "serviceRoutines/getIndividualContextEntityAttributes.h"
 #include "serviceRoutines/putIndividualContextEntityAttributes.h"
+#include "serviceRoutines/putIndividualContextEntityAttribute.h"
 #include "serviceRoutines/postIndividualContextEntityAttributes.h"
 #include "serviceRoutines/deleteIndividualContextEntityAttributes.h"
 #include "serviceRoutines/getIndividualContextEntityAttribute.h"
@@ -271,6 +272,7 @@ RestService restServiceV[] =
   { "*",      IndividualContextEntityAttributes,           4, { "ngsi10", "contextEntities", "*", "attributes"           }, "",                                             badVerbAllFour                            },
 
   { "GET",    IndividualContextEntityAttribute,            5, { "ngsi10", "contextEntities", "*", "attributes", "*"      }, "",                                             getIndividualContextEntityAttribute       },
+  { "PUT",    IndividualContextEntityAttribute,            5, { "ngsi10", "contextEntities", "*", "attributes", "*"      }, "updateContextAttributeRequest",                putIndividualContextEntityAttribute       },
   { "POST",   IndividualContextEntityAttribute,            5, { "ngsi10", "contextEntities", "*", "attributes", "*"      }, "updateContextAttributeRequest",                postIndividualContextEntityAttribute      },
   { "DELETE", IndividualContextEntityAttribute,            5, { "ngsi10", "contextEntities", "*", "attributes", "*"      }, "",                                             deleteIndividualContextEntityAttribute    },
   { "*",      IndividualContextEntityAttribute,            5, { "ngsi10", "contextEntities", "*", "attributes", "*"      }, "",                                             badVerbGetPostDeleteOnly                  },
