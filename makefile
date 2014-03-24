@@ -45,7 +45,7 @@ endif
 
 # Directory for the rpm stage
 ifndef TOPDIR
-	TOPDIR:=$(shell echo $PWD)
+	TOPDIR:=$(shell echo $PWD/rpm)
 endif 
 
 # Release ID for the contextBroker-* packages (execept contextBroker-fiware)
