@@ -288,30 +288,34 @@ std::string CompoundValueNode::render(Format format, std::string indent)
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
+  std::string  tagName   = (container->type == Vector)? "item" : name;
 
   if (type == Leaf)
   {
-    std::string  tagName   = (container->type == Vector)? "vector_item" : name;
-
     out = valueTag(indent, tagName, value, format, jsonComma, false);
   }
-  else if (type == Vector)
+  else if ((type == Vector) && (container != this))
   {
-    out += startTag(indent, name, "", format, true, false);
+    out += startTag(indent, tagName, "", format, true, false, true);
     for (unsigned long ix = 0; ix < childV.size(); ++ix)
       out += childV[ix]->render(format, indent + "  ");
-    out += endTag(indent, name, format, jsonComma, true, true);
+    out += endTag(indent, tagName, format, jsonComma, true, true);
+  }
+  else if ((type == Vector) && (container == this))
+  {
+    for (unsigned long ix = 0; ix < childV.size(); ++ix)
+      out += childV[ix]->render(format, indent);
   }
   else if (type == Struct)
   {
     if (rootP != this)
     {
-      out += startTag(indent, name, "", format, false, false);
+      out += startTag(indent, tagName, "", format, false, false);
 
       for (unsigned long ix = 0; ix < childV.size(); ++ix)
         out += childV[ix]->render(format, indent + "  ");
 
-      out += endTag(indent, name, format, jsonComma, false, true);
+      out += endTag(indent, tagName, format, jsonComma, false, true);
     }
     else
     {

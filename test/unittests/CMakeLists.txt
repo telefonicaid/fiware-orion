@@ -229,6 +229,7 @@ SET (SOURCES
 
     parse/CompoundValueNode_test.cpp
     parse/compoundValue_test.cpp
+    parse/nullTreat_test.cpp
     jsonParse/jsonRequest_test.cpp
 
     xmlParse/xmlAppendContextElementRequest_test.cpp

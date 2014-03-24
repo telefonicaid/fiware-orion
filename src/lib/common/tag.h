@@ -36,7 +36,7 @@
 * startTag -  
 */
 extern std::string startTag(std::string indent, std::string tagName, Format format, bool showTag = true);
-extern std::string startTag(std::string indent, std::string xmlTag, std::string jsonTag, Format format, bool isVector = false, bool showTag = true);
+extern std::string startTag(std::string indent, std::string xmlTag, std::string jsonTag, Format format, bool isVector = false, bool showTag = true, bool isCompoundVector = false);
 
 
 
