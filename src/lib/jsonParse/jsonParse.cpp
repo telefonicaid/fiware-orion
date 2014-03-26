@@ -183,7 +183,7 @@ std::string nodeType(std::string nodeName, std::string value, orion::CompoundVal
      return "Vector";
   }
 
-  LM_E(("Got a JSON object without a name but with a value ('%s') ... ", value.c_str()));
+  // Simple Leaf inside vector
   return "Leaf";
 }
 
@@ -233,6 +233,7 @@ static std::string jsonParse
   {
     // This detects whether we are trying to use an object within an object instead of a one-item array.
     // We don't allow the first case, hence the exception thrown.
+    // However, this restriction is not valid inside Compound Values.
      if ((nodeName != arrayElementName) || (ciP->inCompoundValue == true))
       path = path + "/" + nodeName;
     else
