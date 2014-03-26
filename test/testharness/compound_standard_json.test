@@ -41,7 +41,14 @@ echo "1: +++++++++ create vector compound +++++++++++"
             {
                 "name": "att",
                 "type": "compound",
-                "value": "_V"
+                "value": [
+                   "22",
+                   {
+                      "x": [ "x1", "x2" ],
+                      "y": "3"
+                   },
+                   [ "z1", "z2" ]
+                ]
             }
             ]
         }
@@ -62,7 +69,13 @@ echo "2: +++++++++ create object compound +++++++++++"
             {
                 "name": "att",
                 "type": "compound",
-                "value": "_O"
+                "value": {
+                   "x": {
+                      "x1": "a",
+                      "x2": "b"
+                   },
+                   "y": [ "y1", "y2" ]
+                }
             }
             ]
         }
@@ -196,7 +209,20 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
           <contextAttribute>
             <name>att</name>
             <type>compound</type>
-            <contextValue>_V</contextValue>
+            <contextValue type="vector">
+               <item>22</item>
+               <item>
+                 <x type="vector">
+                   <item>x1</item>
+                   <item>x2</item>
+                 </x>
+                 <y>3</y>
+               </item>
+               <item type="vector">
+                 <item>z1</item>
+                 <item>z2</item>
+               </item>
+            </contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -220,7 +246,16 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
           <contextAttribute>
             <name>att</name>
             <type>compound</type>
-            <contextValue>_O</contextValue>
+            <contextValue>
+               <x>
+                 <x1>a</x1>
+                 <x2>b</x2>
+               </x>
+               <y type="vector">
+                  <item>y1</item>
+                  <item>y2</item>
+               </y>
+            </contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -240,7 +275,14 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
                     {
                         "name": "att",
                         "type": "compound",
-                        "value": "_V"
+                        "value": [
+                           "22",
+                           {
+                              "x": [ "x1", "x2" ],
+                              "y": "3"
+                           },
+                           [ "z1", "z2" ]
+                        ]
                     }
                 ],
                 "id": "EVector",
@@ -263,7 +305,13 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
                     {
                         "name": "att",
                         "type": "compound",
-                        "value": "_O"
+                        "value": {
+                           "x": {
+                              "x1": "a",
+                              "x2": "b"
+                           },
+                           "y": [ "y1", "y2" ]
+                        }
                     }
                 ],
                 "id": "EObject",
@@ -288,7 +336,20 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
       <contextAttribute>
         <name>att</name>
         <type>compound</type>
-        <contextValue>_V</contextValue>
+        <contextValue type="vector">
+           <item>22</item>
+           <item>
+             <x type="vector">
+               <item>x1</item>
+               <item>x2</item>
+             </x>
+             <y>3</y>
+           </item>
+           <item type="vector">
+             <item>z1</item>
+             <item>z2</item>
+           </item>
+        </contextValue>
       </contextAttribute>
     </contextAttributeList>
   </contextElement>
@@ -308,7 +369,16 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
       <contextAttribute>
         <name>att</name>
         <type>compound</type>
-        <contextValue>_O</contextValue>
+        <contextValue>
+           <x>
+             <x1>a</x1>
+             <x2>b</x2>
+           </x>
+           <y type="vector">
+              <item>y1</item>
+              <item>y2</item>
+           </y>
+        </contextValue>
       </contextAttribute>
     </contextAttributeList>
   </contextElement>
@@ -324,7 +394,14 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
             {
                 "name": "att",
                 "type": "compound",
-                "value": "_V"
+                "value": [
+                   "22",
+                   {
+                      "x": [ "x1", "x2" ],
+                      "y": "3"
+                   },
+                   [ "z1", "z2" ]
+                ]
             }
         ],
         "id": "EVector",
@@ -343,7 +420,13 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
             {
                 "name": "att",
                 "type": "compound",
-                "value": "_O"
+                "value": {
+                   "x": {
+                      "x1": "a",
+                      "x2": "b"
+                   },
+                   "y": [ "y1", "y2" ]
+                }
             }
         ],
         "id": "EObject",

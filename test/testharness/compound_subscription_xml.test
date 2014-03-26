@@ -69,7 +69,20 @@ echo "2: ++++++++++ Create the entity attribute with vector value ++++++++++"
         <contextAttribute>
           <name>att</name>
           <type>compound</type>
-          <contextValue>_V</contextValue>
+          <contextValue type="vector">
+             <item>22</item>
+             <item>
+               <x type="vector">
+                 <item>x1</item>
+                 <item>x2</item>
+               </x>
+               <y>3</y>
+             </item>
+             <item type="vector">
+               <item>z1</item>
+               <item>z2</item>
+             </item>
+          </contextValue>
         </contextAttribute>
       </contextAttributeList>
     </contextElement>
@@ -91,7 +104,16 @@ echo "3: ++++++++++ Update the entity attribute with object value ++++++++++"
         <contextAttribute>
           <name>att</name>
           <type>compound</type>
-          <contextValue>_O</contextValue>
+          <contextValue>
+             <x>
+               <x1>a</x1>
+               <x2>b</x2>
+             </x>
+             <y type="vector">
+                <item>y1</item>
+                <item>y2</item>
+             </y>
+          </contextValue>
         </contextAttribute>
       </contextAttributeList>
     </contextElement>
@@ -180,7 +202,20 @@ Content-Type: application/xml
           <contextAttribute>
             <name>att</name>
             <type>compound</type>
-            <contextValue>_V</contextValue>
+            <contextValue type="vector">
+               <item>22</item>
+               <item>
+                 <x type="vector">
+                   <item>x1</item>
+                   <item>x2</item>
+                 </x>
+                 <y>3</y>
+               </item>
+               <item type="vector">
+                 <item>z1</item>
+                 <item>z2</item>
+               </item>
+            </contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -213,7 +248,16 @@ Content-Type: application/xml
           <contextAttribute>
             <name>att</name>
             <type>compound</type>
-            <contextValue>_O</contextValue>
+            <contextValue>
+               <x>
+                 <x1>a</x1>
+                 <x2>b</x2>
+               </x>
+               <y type="vector">
+                  <item>y1</item>
+                  <item>y2</item>
+               </y>
+            </contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
