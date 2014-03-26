@@ -104,9 +104,10 @@ const char* CompoundValueNode::typeName(const Type _type)
   case Leaf:         return "Leaf";
   case Struct:       return "Struct";
   case Vector:       return "Vector";
+  case Unknown:      return "Unknown";
   }
 
-  return "Unknown";
+  return "Not Known";
 }
 
 
@@ -119,6 +120,8 @@ std::string CompoundValueNode::finish(void)
 {
   error = "OK";
 
+  LM_T(LmtCompoundValue, ("Finishing a compound"));
+  shortShow("");
   check();
 
   return error;
@@ -136,6 +139,10 @@ CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
      LM_T(LmtCompoundValueAdd, ("Adding Leaf '%s', with value '%s' under '%s' (%s)", node->name.c_str(), node->value.c_str(), node->container->path.c_str(), node->container->name.c_str()));
   else
      LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s' (%s)", typeName(node->type), node->name.c_str(), node->container->path.c_str(), node->container->name.c_str()));
+
+  node->container = this;
+  node->level     = level + 1;
+  node->siblingNo = childV.size();
 
   childV.push_back(node);
   return node;
@@ -169,8 +176,10 @@ CompoundValueNode* CompoundValueNode::add(const Type _type, const std::string& _
 */
 void CompoundValueNode::shortShow(std::string indent)
 {
-  if (rootP == this)
-    PRINTF("%s%s (toplevel)\n", indent.c_str(), name.c_str());
+  if ((rootP == this) && (type == Vector))
+    PRINTF("%s%s (toplevel vector)\n", indent.c_str(), name.c_str());
+  else if (rootP == this)
+    PRINTF("%s%s (toplevel struct)\n", indent.c_str(), name.c_str());
   else if (type == Vector)
     PRINTF("%s%s (vector)\n", indent.c_str(), name.c_str());
   else if (type == Struct)
@@ -202,10 +211,11 @@ void CompoundValueNode::show(std::string indent)
   if (value != "")
     PRINTF("%svalue:   %s\n", indent.c_str(), value.c_str());
 
-  PRINTF("%slevel:   %d\n", indent.c_str(), level);
-  PRINTF("%ssibling: %d\n", indent.c_str(), siblingNo);
-  PRINTF("%stype:    %s\n", indent.c_str(), typeName(type));
-  PRINTF("%spath:    %s\n", indent.c_str(), path.c_str());
+  PRINTF("%scontainer: %s\n", indent.c_str(), container->name.c_str());
+  PRINTF("%slevel:     %d\n", indent.c_str(), level);
+  PRINTF("%ssibling:   %d\n", indent.c_str(), siblingNo);
+  PRINTF("%stype:      %s\n", indent.c_str(), typeName(type));
+  PRINTF("%spath:      %s\n", indent.c_str(), path.c_str());
 
   if (childV.size() != 0)
   {
@@ -292,10 +302,12 @@ std::string CompoundValueNode::render(Format format, std::string indent)
 
   if (type == Leaf)
   {
+    LM_M(("I am a Leaf"));
     out = valueTag(indent, tagName, value, format, jsonComma, false);
   }
   else if ((type == Vector) && (container != this))
   {
+    LM_M(("I am a Vector"));
     out += startTag(indent, tagName, "", format, true, false, true);
     for (unsigned long ix = 0; ix < childV.size(); ++ix)
       out += childV[ix]->render(format, indent + "  ");
@@ -303,11 +315,21 @@ std::string CompoundValueNode::render(Format format, std::string indent)
   }
   else if ((type == Vector) && (container == this))
   {
+    LM_M(("I am a Vector and my container is TOPLEVEL"));
     for (unsigned long ix = 0; ix < childV.size(); ++ix)
       out += childV[ix]->render(format, indent);
   }
+  else if ((type == Struct) && (container->type == Vector))
+  {
+    LM_M(("I am a Struct and my container is a Vector"));
+    out += startTag(indent, "item", "", format, false, false);
+    for (unsigned long ix = 0; ix < childV.size(); ++ix)
+      out += childV[ix]->render(format, indent + "  ");
+    out += endTag(indent, "item", format, jsonComma, false, true);
+  }
   else if (type == Struct)
   {
+    LM_M(("I am a Struct and my container is NOT a Vector"));
     if (rootP != this)
     {
       out += startTag(indent, tagName, "", format, false, false);

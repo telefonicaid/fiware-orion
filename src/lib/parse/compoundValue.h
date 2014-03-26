@@ -47,7 +47,8 @@ extern void compoundValueStart
    std::string              value,
    std::string              root,
    std::string              rest,
-   CompoundValueNode::Type  type
+   CompoundValueNode::Type  type,
+   bool                     fatherIsVector
 );
 
 
@@ -75,9 +76,6 @@ extern void compoundValueEnd
 (
    ConnectionInfo*  ciP,
    std::string      path,
-   std::string      name,
-   std::string      value,
-   std::string      fatherPath,
    ParseData*       parseDataP
 );
 

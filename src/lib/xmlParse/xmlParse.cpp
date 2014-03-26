@@ -48,7 +48,7 @@
 * The vector 'compoundValueRootV' contains a list of all the paths where we allow
 * a compound value
 */
-const char* compoundValueRootV[] =
+static const char* compoundValueRootV[] =
 {
   "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue"
 };
@@ -264,7 +264,7 @@ void xmlParse
       return;
     }
 
-    orion::compoundValueStart(ciP, path, name, value, root, rest, type);
+    orion::compoundValueStart(ciP, path, name, value, root, rest, type, xmlAttribute == "vector");
   }
   else if ((isCompound == true) && (ciP->inCompoundValue == true))
   {
@@ -298,7 +298,7 @@ void xmlParse
     {
       //
       // A container ended - we have to go up one level to the container of the container that ended.
-      // Only way I can detect this is to compare the length of the path of this node with the path of its container.
+      // Only way I can detect this is to compare the length of the path of this node with the path of current container.
       // But it is more complicated than that.
       // This function is called every time a node ends.
       // Only way I have found to detect a unique end of a container is by 'fatherPath.size() + 1 == path.size()' + 'trimmedValue[0] == 0'
@@ -327,7 +327,7 @@ void xmlParse
     // In case of error ("duplicated item in struct", "not same item name in vector"), ciP->httpStatusCode and ciP->answer
     // are set to reflect the error, that will be taken care of by the caller of this function
     //
-    orion::compoundValueEnd(ciP, path, name, value, fatherPath, parseDataP);
+    orion::compoundValueEnd(ciP, path, parseDataP);
   }
   else if ((isCompound == false) && (ciP->inCompoundValue == false) && (treated == false))
   {

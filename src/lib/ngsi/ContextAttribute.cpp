@@ -138,14 +138,16 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
     out += valueTag(indent + "  ", ((format == XML)? "contextValue" : "value"), value, format, commaAfterContextValue);
   else
   {
-     bool isCompoundVector = false;
+    bool isCompoundVector = false;
 
-     if ((compoundValueP != NULL) && (compoundValueP->type == orion::CompoundValueNode::Vector))
-        isCompoundVector = true;
+    compoundValueP->show("");
 
-     out += startTag(indent + "  ", "contextValue", "", format, false, false, isCompoundVector);
-     out += compoundValueP->render(format, indent + "    ");
-     out += endTag(indent + "  ", "contextValue", format, comma);
+    if ((compoundValueP != NULL) && (compoundValueP->type == orion::CompoundValueNode::Vector))
+      isCompoundVector = true;
+
+    out += startTag(indent + "  ", "contextValue", "", format, false, false, isCompoundVector);
+    out += compoundValueP->render(format, indent + "    ");
+    out += endTag(indent + "  ", "contextValue", format, comma);
   }
 
   out += metadataVector.render(format, indent + "  ", false);
