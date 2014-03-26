@@ -265,7 +265,7 @@ static std::string jsonParse
     bool                            stepUp         = false;
     std::string                     comment;
     
-    LM_M(("nodeName: '%s', nodeValue: '%s'", nodeName.c_str(), nodeValue.c_str()));
+    LM_T(LmtCompoundValue, ("nodeName: '%s', nodeValue: '%s'", nodeName.c_str(), nodeValue.c_str()));
 
     if ((nodeName != "") && (nodeValue != ""))
     {
@@ -324,6 +324,7 @@ static std::string jsonParse
       {
         comment += ", STEPPING UP";
         stepUp = true;
+        LM_T(LmtCompoundValueStep, ("STEPPING UP from '%s' to '%s' (from '%s' to '%s')", ciP->compoundValueP->cname(), ciP->compoundValueP->container->cname(), ciP->compoundValueP->cpath(), ciP->compoundValueP->container->cpath()));
       }
     }
 
@@ -348,7 +349,16 @@ static std::string jsonParse
       //
       if (stepUp)
       {
+        LM_T(LmtCompoundValueStep, ("Old container: '%s' (path: '%s')", ciP->compoundValueP->cname(), ciP->compoundValueP->cpath()));
+
         ciP->compoundValueP = ciP->compoundValueP->container;
+
+        if (ciP->compoundValueP->container->isVector())
+        {
+          LM_T(LmtCompoundValueStep, ("Father of the new container is a vector - I have to step up one step more"));
+          ciP->compoundValueP = ciP->compoundValueP->container;
+        }
+        LM_T(LmtCompoundValueStep, ("New container: '%s' (path: '%s')", ciP->compoundValueP->cname(), ciP->compoundValueP->cpath()));
       }
       else
       {
