@@ -45,9 +45,14 @@ echo "+++++ 1. create an entity +++++"
 </appendContextElementRequest>
 EOF
 
-echo "+++++ 2. delete the entity +++++"
+echo "+++++ 2. lookup the entity +++++"
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X GET | xmllint --format - )
+
+echo "+++++ 3. delete the entity +++++"
 (curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes -s -S --header 'Content-Type: application/xml' -X DELETE | xmllint --format - )
 
+echo "+++++ 4. lookup the entity, but nothing found, as the entity has been just deleted +++++"
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X GET | xmllint --format - )
 
 --REGEXPECT--
 +++++ 1. create an entity +++++
@@ -69,12 +74,46 @@ echo "+++++ 2. delete the entity +++++"
     </contextAttributeResponse>
   </contextResponseList>
 </appendContextElementResponse>
-+++++ 2. delete the entity +++++
++++++ 2. lookup the entity +++++
+<?xml version="1.0"?>
+<contextElementResponse>
+  <contextElement>
+    <entityId type="" isPattern="false">
+      <id>entity01</id>
+    </entityId>
+    <contextAttributeList>
+      <contextAttribute>
+        <name>temperature</name>
+        <type>degree</type>
+        <contextValue>10</contextValue>
+      </contextAttribute>
+    </contextAttributeList>
+  </contextElement>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</contextElementResponse>
++++++ 3. delete the entity +++++
 <?xml version="1.0"?>
 <statusCode>
   <code>200</code>
   <reasonPhrase>OK</reasonPhrase>
 </statusCode>
++++++ 4. lookup the entity, but nothing found, as the entity has been just deleted +++++
+<?xml version="1.0"?>
+<contextElementResponse>
+  <contextElement>
+    <entityId type="" isPattern="false">
+      <id>entity01</id>
+    </entityId>
+  </contextElement>
+  <statusCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Entity id: 'entity01'</details>
+  </statusCode>
+</contextElementResponse>
 --TEARDOWN--
 source harnessFunctions.sh
 brokerStop CB
