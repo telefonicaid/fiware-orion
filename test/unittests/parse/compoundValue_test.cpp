@@ -1336,7 +1336,7 @@ TEST(compoundValue, sixLevels)
 }
 
 
-#if 0
+
 /* ****************************************************************************
 *
 * sixLevelsJson - 
@@ -1390,7 +1390,7 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
   EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue", cvnRootP->root);
+  EXPECT_EQ("/contextElements/contextElement/attributes/attribute/value/", cvnRootP->root);
   
 
   // Now, child 1: level1
@@ -1471,18 +1471,18 @@ TEST(compoundValue, sixLevelsJson)
   // /level1/level2/level3/level4item[0]
   vitemP = level3->childV[0];
 
-  EXPECT_EQ("level4item",                       vitemP->name);
+  EXPECT_EQ("item",                             vitemP->name);
   EXPECT_EQ(orion::CompoundValueNode::Struct,   vitemP->type);
   EXPECT_EQ(2,                                  vitemP->childV.size());
 
   EXPECT_EQ(level3,                             vitemP->container);
   EXPECT_EQ(cvnRootP,                           vitemP->rootP);
 
-  EXPECT_EQ("/level1/level2/level3/level4item", vitemP->path);
+  EXPECT_EQ("/level1/level2/level3/item",       vitemP->path);
   EXPECT_EQ(4,                                  vitemP->level);
   EXPECT_EQ(0,                                  vitemP->siblingNo);
   
-  // /level1/level2/level3/level4item[0]/level
+  // /level1/level2/level3/item[0]/level
   childP = vitemP->childV[0];
 
   EXPECT_EQ("level",                                  childP->name);
@@ -1493,11 +1493,11 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_EQ(vitemP,                                   childP->container);
   EXPECT_EQ(cvnRootP,                                 childP->rootP);
 
-  EXPECT_EQ("/level1/level2/level3/level4item/level", childP->path);
+  EXPECT_EQ("/level1/level2/level3/item/level",       childP->path);
   EXPECT_EQ(5,                                        childP->level);
   EXPECT_EQ(0,                                        childP->siblingNo);
 
-  // /level1/level2/level3/level4item[0]/struct1
+  // /level1/level2/level3/item[0]/struct1
   structP = vitemP->childV[1];
 
   EXPECT_EQ("struct1",                                  structP->name);
@@ -1507,11 +1507,11 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_EQ(vitemP,                                     structP->container);
   EXPECT_EQ(cvnRootP,                                   structP->rootP);
 
-  EXPECT_EQ("/level1/level2/level3/level4item/struct1", structP->path);
+  EXPECT_EQ("/level1/level2/level3/item/struct1",       structP->path);
   EXPECT_EQ(5,                                          structP->level);
   EXPECT_EQ(1,                                          structP->siblingNo);
 
-  // /level1/level2/level3/level4item[0]/struct1/level
+  // /level1/level2/level3/item[0]/struct1/level
   childP = structP->childV[0];
 
   EXPECT_EQ("level",                                          childP->name);
@@ -1522,11 +1522,11 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_EQ(structP,                                          childP->container);
   EXPECT_EQ(cvnRootP,                                         childP->rootP);
 
-  EXPECT_EQ("/level1/level2/level3/level4item/struct1/level", childP->path);
+  EXPECT_EQ("/level1/level2/level3/item/struct1/level",       childP->path);
   EXPECT_EQ(6,                                                childP->level);
   EXPECT_EQ(0,                                                childP->siblingNo);
 
-  // /level1/level2/level3/level4item[0]/struct1/s1-1
+  // /level1/level2/level3/item[0]/struct1/s1-1
   childP = structP->childV[1];
 
   EXPECT_EQ("s1-1" ,                                          childP->name);
@@ -1537,11 +1537,11 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_EQ(structP,                                          childP->container);
   EXPECT_EQ(cvnRootP,                                         childP->rootP);
 
-  EXPECT_EQ("/level1/level2/level3/level4item/struct1/s1-1",  childP->path);
+  EXPECT_EQ("/level1/level2/level3/item/struct1/s1-1",        childP->path);
   EXPECT_EQ(6,                                                childP->level);
   EXPECT_EQ(1,                                                childP->siblingNo);
 
-  // /level1/level2/level3/level4item[0]/struct1/s1-2
+  // /level1/level2/level3/item[0]/struct1/s1-2
   childP = structP->childV[2];
 
   EXPECT_EQ("s1-2" ,                                          childP->name);
@@ -1552,26 +1552,26 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_EQ(structP,                                          childP->container);
   EXPECT_EQ(cvnRootP,                                         childP->rootP);
 
-  EXPECT_EQ("/level1/level2/level3/level4item/struct1/s1-2",  childP->path);
+  EXPECT_EQ("/level1/level2/level3/item/struct1/s1-2",        childP->path);
   EXPECT_EQ(6,                                                childP->level);
   EXPECT_EQ(2,                                                childP->siblingNo);
 
 
-  // /level1/level2/level3/level4item[1]
+  // /level1/level2/level3/item[1]
   vitemP = level3->childV[1];
 
-  EXPECT_EQ("level4item",                       vitemP->name);
+  EXPECT_EQ("item",                             vitemP->name);
   EXPECT_EQ(orion::CompoundValueNode::Struct,   vitemP->type);
   EXPECT_EQ(2,                                  vitemP->childV.size());
 
   EXPECT_EQ(level3,                             vitemP->container);
   EXPECT_EQ(cvnRootP,                           vitemP->rootP);
 
-  EXPECT_EQ("/level1/level2/level3/level4item", vitemP->path);
+  EXPECT_EQ("/level1/level2/level3/item",       vitemP->path);
   EXPECT_EQ(4,                                  vitemP->level);
   EXPECT_EQ(1,                                  vitemP->siblingNo);
   
-  // /level1/level2/level3/level4item[1]/level
+  // /level1/level2/level3/item[1]/level
   childP = vitemP->childV[0];
 
   EXPECT_EQ("level",                                  childP->name);
@@ -1582,11 +1582,11 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_EQ(vitemP,                                   childP->container);
   EXPECT_EQ(cvnRootP,                                 childP->rootP);
 
-  EXPECT_EQ("/level1/level2/level3/level4item/level", childP->path);
+  EXPECT_EQ("/level1/level2/level3/item/level",       childP->path);
   EXPECT_EQ(5,                                        childP->level);
   EXPECT_EQ(0,                                        childP->siblingNo);
 
-  // /level1/level2/level3/level4item[1]/struct2
+  // /level1/level2/level3/item[1]/struct2
   structP = vitemP->childV[1];
 
   EXPECT_EQ("struct2",                                  structP->name);
@@ -1596,11 +1596,11 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_EQ(vitemP,                                     structP->container);
   EXPECT_EQ(cvnRootP,                                   structP->rootP);
 
-  EXPECT_EQ("/level1/level2/level3/level4item/struct2", structP->path);
+  EXPECT_EQ("/level1/level2/level3/item/struct2",       structP->path);
   EXPECT_EQ(5,                                          structP->level);
   EXPECT_EQ(1,                                          structP->siblingNo);
 
-  // /level1/level2/level3/level4item[1]/struct2/level
+  // /level1/level2/level3/item[1]/struct2/level
   childP = structP->childV[0];
 
   EXPECT_EQ("level",                                          childP->name);
@@ -1611,11 +1611,11 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_EQ(structP,                                          childP->container);
   EXPECT_EQ(cvnRootP,                                         childP->rootP);
 
-  EXPECT_EQ("/level1/level2/level3/level4item/struct2/level", childP->path);
+  EXPECT_EQ("/level1/level2/level3/item/struct2/level",       childP->path);
   EXPECT_EQ(6,                                                childP->level);
   EXPECT_EQ(0,                                                childP->siblingNo);
 
-  // /level1/level2/level3/level4item[1]/struct2/s2-1
+  // /level1/level2/level3/item[1]/struct2/s2-1
   childP = structP->childV[1];
 
   EXPECT_EQ("s2-1" ,                                          childP->name);
@@ -1626,11 +1626,11 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_EQ(structP,                                          childP->container);
   EXPECT_EQ(cvnRootP,                                         childP->rootP);
 
-  EXPECT_EQ("/level1/level2/level3/level4item/struct2/s2-1",  childP->path);
+  EXPECT_EQ("/level1/level2/level3/item/struct2/s2-1",        childP->path);
   EXPECT_EQ(6,                                                childP->level);
   EXPECT_EQ(1,                                                childP->siblingNo);
 
-  // /level1/level2/level3/level4item[1]/struct2/s2-2
+  // /level1/level2/level3/item[1]/struct2/s2-2
   childP = structP->childV[2];
 
   EXPECT_EQ("s2-2" ,                                          childP->name);
@@ -1641,13 +1641,12 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_EQ(structP,                                          childP->container);
   EXPECT_EQ(cvnRootP,                                         childP->rootP);
 
-  EXPECT_EQ("/level1/level2/level3/level4item/struct2/s2-2",  childP->path);
+  EXPECT_EQ("/level1/level2/level3/item/struct2/s2-2",        childP->path);
   EXPECT_EQ(6,                                                childP->level);
   EXPECT_EQ(2,                                                childP->siblingNo);
 
   utExit();
 }
-#endif
 
 
 

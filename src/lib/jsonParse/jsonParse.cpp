@@ -58,7 +58,7 @@ using boost::property_tree::ptree;
 
 /* ****************************************************************************
 *
-* compoundValueRoots - 
+* compoundValueRootV - 
 *
 * The vector 'compoundValueRootV' contains a list of all the paths where we allow
 * a compound value

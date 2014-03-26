@@ -121,8 +121,7 @@ std::string CompoundValueNode::finish(void)
   error = "OK";
 
   LM_T(LmtCompoundValue, ("Finishing a compound"));
-  shortShow("");
-  check();
+  check(); // sets 'error' for toplevel node
 
   return error;
 }
