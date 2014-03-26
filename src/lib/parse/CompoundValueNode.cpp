@@ -302,12 +302,12 @@ std::string CompoundValueNode::render(Format format, std::string indent)
 
   if (type == Leaf)
   {
-    LM_M(("I am a Leaf"));
+    LM_T(LmtCompoundValue, ("I am a Leaf"));
     out = valueTag(indent, tagName, value, format, jsonComma, false);
   }
   else if ((type == Vector) && (container != this))
   {
-    LM_M(("I am a Vector"));
+    LM_T(LmtCompoundValue, ("I am a Vector"));
     out += startTag(indent, tagName, "", format, true, false, true);
     for (unsigned long ix = 0; ix < childV.size(); ++ix)
       out += childV[ix]->render(format, indent + "  ");
@@ -315,13 +315,13 @@ std::string CompoundValueNode::render(Format format, std::string indent)
   }
   else if ((type == Vector) && (container == this))
   {
-    LM_M(("I am a Vector and my container is TOPLEVEL"));
+    LM_T(LmtCompoundValue, ("I am a Vector and my container is TOPLEVEL"));
     for (unsigned long ix = 0; ix < childV.size(); ++ix)
       out += childV[ix]->render(format, indent);
   }
   else if ((type == Struct) && (container->type == Vector))
   {
-    LM_M(("I am a Struct and my container is a Vector"));
+    LM_T(LmtCompoundValue, ("I am a Struct and my container is a Vector"));
     out += startTag(indent, "item", "", format, false, false);
     for (unsigned long ix = 0; ix < childV.size(); ++ix)
       out += childV[ix]->render(format, indent + "  ");
@@ -329,7 +329,7 @@ std::string CompoundValueNode::render(Format format, std::string indent)
   }
   else if (type == Struct)
   {
-    LM_M(("I am a Struct and my container is NOT a Vector"));
+    LM_T(LmtCompoundValue, ("I am a Struct and my container is NOT a Vector"));
     if (rootP != this)
     {
       out += startTag(indent, tagName, "", format, false, false);
