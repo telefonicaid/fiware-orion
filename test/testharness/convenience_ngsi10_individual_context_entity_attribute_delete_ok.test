@@ -30,49 +30,51 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "+++++ 1. register an entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
-<?xml version="1.0"?>
-  <registerContextRequest>
-    <contextRegistrationList>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Room" isPattern="false">
-            <id>entity01</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:1028/application</providingApplication>
-      </contextRegistration>
-    </contextRegistrationList>
-    <duration>PT1H</duration>
-    <registrationId></registrationId>
-  </registerContextRequest>
+echo "+++++ 1. create an entity +++++"
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<appendContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>temperature</name>
+      <type>degree</type>
+      <contextValue>10</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>
 EOF
+
 
 echo "+++++ 2. delete the entity attribute +++++"
 (curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes/temperature -s -S --header 'Content-Type: application/xml' -X DELETE | xmllint --format - )
 
 
 --REGEXPECT--
-+++++ 1. register an entity +++++
++++++ 1. create an entity +++++
 <?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
+<appendContextElementResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</appendContextElementResponse>
 +++++ 2. delete the entity attribute +++++
 <?xml version="1.0"?>
 <statusCode>
-  <code>404</code>
-  <reasonPhrase>No context element found</reasonPhrase>
-  <details>entity01</details>
+  <code>200</code>
+  <reasonPhrase>OK</reasonPhrase>
 </statusCode>
 --TEARDOWN--
 source harnessFunctions.sh
