@@ -107,7 +107,7 @@ const char* CompoundValueNode::typeName(const Type _type)
   case Unknown:      return "Unknown";
   }
 
-  return "Not Known";
+  return "Invalid";
 }
 
 

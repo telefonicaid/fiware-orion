@@ -59,7 +59,7 @@ static const char* compoundValueRootV[] =
 *
 * isCompoundValuePath - 
 *
-* This function examines a path to see whether we are inside a compouind value or not.
+* This function examines a path to see whether we are inside a compound value or not.
 * Also, it returned the root of the compound (found in 'compoundValueRootV') and also
 * the 'rest' of the path, i.e. its relative path inside the compound.
 *

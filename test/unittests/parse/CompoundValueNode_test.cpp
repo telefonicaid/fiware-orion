@@ -88,7 +88,7 @@ TEST(CompoundValueNode, typeName)
 
   for (unsigned int ix = 0; ix < sizeof(type) / sizeof(type[0]); ++ix)
     EXPECT_STREQ(expected[ix], cvn.typeName(type[ix]));
-  EXPECT_STREQ("Not Known", cvn.typeName((orion::CompoundValueNode::Type) 55));
+  EXPECT_STREQ("Invalid", cvn.typeName((orion::CompoundValueNode::Type) 55));
 
   utExit();
 }
