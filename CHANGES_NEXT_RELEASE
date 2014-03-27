@@ -1,3 +1,5 @@
+- Add: It is now possible to delete entities using updateContext DELETE with empty attributes list
+- Fix: Fixed convenience operation "DELETE /ngsi10/contextEntities/{EntityID}" (partially fixes issue #225)
 - Fix: The CLI options now coincide with the documentation.
 - Fix: Introduced a second semaphore level as additional security measure to ensure all MongoDB driver invocations run in thread-safe mode.
 - Fix: Convenience operations now correctly parse context values. (Bug #219)

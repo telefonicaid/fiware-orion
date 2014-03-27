@@ -31,12 +31,13 @@ brokerStart CB
 --SHELL--
 source ../harnessFunctions.sh
 
-# 1. GET that fails
-echo "1: +++++++++++++++++++++++++++++"
+echo "1: ++++++++ GET that fails +++++++++++++++++++++"
 curlJsonNoPayload "/NGSI10/contextEntities/ENTITY_ID"
 
-# 2. POST that fails
-echo "2: +++++++++++++++++++++++++++++"
+echo "2: ++++++++ DELETE that fails +++++++++++++++++++++"
+curlJsonNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
+
+echo "3: ++++++++ POST that is OK ++++++++++++++++++++"
 url="/NGSI10/contextEntities/ENTITY_ID"
 payload='{
   "attributeDomainName" : "",
@@ -50,8 +51,7 @@ payload='{
 }'
 curlJson ${url} "${payload}"
 
-# 3. PUT that fails
-echo "3: +++++++++++++++++++++++++++++"
+echo "4: +++++++++ PUT that fails +++++++++++++++++++"
 url="/NGSI10/contextEntities/ENTITY_ID"
 payload='{
   "attributeDomainName" : "",
@@ -65,12 +65,7 @@ payload='{
 }'
 curlJson ${url} "${payload}" "-X PUT"
 
-# 4. DELETE that fails
-echo "4: +++++++++++++++++++++++++++++"
-curlJsonNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
-
-# 5. Register an entity
-echo "5: +++++++++++++++++++++++++++++"
+echo "5: +++++++++ Register an entity +++++++++++++++++"
 url="/NGSI9/registerContext"
 payload='{
     "contextRegistrations": [
@@ -96,12 +91,10 @@ payload='{
 }'
 curlJson ${url} "${payload}"
 
-# 6. GET that is OK
-echo "6: +++++++++++++++++++++++++++++"
+echo "6: ++++++++++++ GET that is OK +++++++++++++++++"
 curlJsonNoPayload "/NGSI10/contextEntities/ENTITY_ID"
 
-# 7. POST that is OK
-echo "7: +++++++++++++++++++++++++++++"
+echo "7: +++++++++++++ PUT that is OK ++++++++++++++++"
 url="/NGSI10/contextEntities/ENTITY_ID"
 payload='{
   "attributeDomainName" : "",
@@ -109,33 +102,17 @@ payload='{
     {
       "name" : "pressure",
       "type" : "clima",
-      "value" : "p23"
-    }
-  ]
-}'
-curlJson ${url} "${payload}"
-
-# 8. PUT that is OK
-echo "8: +++++++++++++++++++++++++++++"
-url="/NGSI10/contextEntities/ENTITY_ID"
-payload='{
-  "attributeDomainName" : "",
-  "attributes" : [
-    {
-      "name" : "temperature",
-      "type" : "degree",
-      "value" : "10"
+      "value" : "p40"
     }
   ]
 }'
 curlJson ${url} "${payload}" "-X PUT"
 
-# 9. DELETE that is OK
-echo "9: +++++++++++++++++++++++++++++"
+echo "8: ++++++++++++++ DELETE that is OK +++++++++++++++"
 curlJsonNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
 
 --REGEXPECT--
-1: +++++++++++++++++++++++++++++
+1: ++++++++ GET that fails +++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 232
 Content-Type: application/json
@@ -153,7 +130,18 @@ Date: REGEX(.*)
         "reasonPhrase": "No context element found"
     }
 }
-2: +++++++++++++++++++++++++++++
+2: ++++++++ DELETE that fails +++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "404",
+    "details": "ENTITY_ID",
+    "reasonPhrase": "No context element found"
+}
+3: ++++++++ POST that is OK ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 264
 Content-Type: application/json
@@ -176,7 +164,7 @@ Date: REGEX(.*)
         }
     ]
 }
-3: +++++++++++++++++++++++++++++
+4: +++++++++ PUT that fails +++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 203
 Content-Type: application/json
@@ -189,17 +177,7 @@ Date: REGEX(.*)
         "reasonPhrase": "request parameter is invalid/not allowed"
     }
 }
-4: +++++++++++++++++++++++++++++
-HTTP/1.1 200 OK
-Content-Length: 46
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "code": "200",
-    "reasonPhrase": "OK"
-}
-5: +++++++++++++++++++++++++++++
+5: +++++++++ Register an entity +++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/json
@@ -209,7 +187,7 @@ Date: REGEX(.*)
     "duration": "PT1H",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
-6: +++++++++++++++++++++++++++++
+6: ++++++++++++ GET that is OK +++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 291
 Content-Type: application/json
@@ -233,7 +211,7 @@ Date: REGEX(.*)
         "reasonPhrase": "OK"
     }
 }
-7: +++++++++++++++++++++++++++++
+7: +++++++++++++ PUT that is OK ++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 264
 Content-Type: application/json
@@ -256,20 +234,7 @@ Date: REGEX(.*)
         }
     ]
 }
-8: +++++++++++++++++++++++++++++
-HTTP/1.1 200 OK
-Content-Length: 203
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "errorCode": {
-        "code": "472",
-        "details": "action: UPDATE - entity: (ENTITY_ID, ) - offending attribute: temperature",
-        "reasonPhrase": "request parameter is invalid/not allowed"
-    }
-}
-9: +++++++++++++++++++++++++++++
+8: ++++++++++++++ DELETE that is OK +++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 46
 Content-Type: application/json
