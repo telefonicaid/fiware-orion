@@ -138,6 +138,8 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
 
   LM_T(LmtParse, ("Treating a JSON request: '%s'", content));
 
+  ciP->parseDataP = parseDataP;
+
   if (reqP == NULL)
   {
     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", requestType(request), SccBadRequest,
@@ -175,6 +177,7 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
 
   reqP->present(parseDataP);
 
+  LM_T(LmtParseCheck, ("Calling check for JSON parsed tree (%s)", ciP->payloadWord));
   res = reqP->check(parseDataP, ciP);
   reqP->present(parseDataP);
 
