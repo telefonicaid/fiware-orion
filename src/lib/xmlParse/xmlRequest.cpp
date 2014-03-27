@@ -253,6 +253,7 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
   if (ciP->httpStatusCode != SccOk)
     return restErrorReplyGet(ciP, ciP->outFormat, "", payloadWord, ciP->httpStatusCode, ciP->answer);
 
+  LM_T(LmtParseCheck, ("Calling check for XML parsed tree (%s)", ciP->payloadWord));
   std::string check = reqP->check(parseDataP, ciP);
   if (check != "OK")
      LM_E(("check(%s): %s", reqP->keyword.c_str(), check.c_str()));

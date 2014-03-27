@@ -1,0 +1,29 @@
+{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom",
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "value": {
+            "s1" : {
+              "x1" : "1",
+              "x2" : "2",
+              "x3" : "3"
+            },
+            "s2" : {
+              "x1" : "1",
+              "x2" : "2",
+              "x3" : "3"
+            }
+          }
+        }
+      ],
+      "attributeDomainName" : "ATTR_DOMAIN_NAME"
+    }
+  ],
+  "updateAction": "APPEND"
+}

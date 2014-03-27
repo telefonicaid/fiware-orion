@@ -44,18 +44,27 @@ namespace orion
 * This function is called when the first compound node is encountered, so not
 * only must the root be created, but also the first node of the compound tree
 * must be taken care of. This is done by calling compoundValueMiddle.
-*
-* FIXME P7: When the JSON parser calls this function, some modifications
-*           may be needed.
 */
-void compoundValueStart(ConnectionInfo* ciP, std::string path, std::string name, std::string value, std::string root, std::string rest, orion::CompoundValueNode::Type type)
+void compoundValueStart
+(
+    ConnectionInfo*                 ciP,
+    std::string                     path,
+    std::string                     name,
+    std::string                     value,
+    std::string                     root,
+    std::string                     rest,
+    orion::CompoundValueNode::Type  type,
+    bool                            fatherIsVector
+)
 {
-  LM_T(LmtCompoundValue, ("Compound START: PATH:'%s', NAME:'%s' (VALUE:%s)", path.c_str(), name.c_str(), value.c_str()));
   ciP->inCompoundValue = true;
 
   ciP->compoundValueP = new orion::CompoundValueNode(root);
   LM_T(LmtCompoundValueContainer, ("Set current container to '%s' (%s)", ciP->compoundValueP->path.c_str(), ciP->compoundValueP->name.c_str()));
   ciP->compoundValueRoot = ciP->compoundValueP;
+
+  if (fatherIsVector)
+    ciP->compoundValueP->type = orion::CompoundValueNode::Vector;
 
   // In the XML parsing routines, in all context attributes that can accept Compound values,
   // a pointer to the one where we are right now is saved in ParseData.
@@ -106,7 +115,7 @@ void compoundValueMiddle(ConnectionInfo* ciP, std::string relPath, std::string n
 *
 * compoundValueEnd - 
 */
-void compoundValueEnd(ConnectionInfo* ciP, std::string path, std::string name, std::string value, std::string fatherPath, ParseData* parseDataP)
+void compoundValueEnd(ConnectionInfo* ciP, std::string path, ParseData* parseDataP)
 {
   LM_T(LmtCompoundValue, ("Compound END:    '%s'", path.c_str()));
 
@@ -119,7 +128,7 @@ void compoundValueEnd(ConnectionInfo* ciP, std::string path, std::string name, s
   {
     ciP->httpStatusCode = SccBadRequest;
     ciP->answer = std::string("compound value error: ") + status;
-    LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), fatherPath.c_str()));
+    LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), path.c_str()));
   }
   else
   {

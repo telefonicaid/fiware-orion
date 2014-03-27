@@ -86,6 +86,7 @@ class CompoundValueNode
 public:
    enum Type
    {
+      Unknown,
       Leaf,
       Struct,
       Vector
@@ -127,6 +128,14 @@ public:
    static const char*  typeName(const Type _type);
    void                shortShow(std::string indent);
    void                show(std::string indent);
+
+   bool                isVector(void)   { return (type == Vector); }
+   bool                isStruct(void)   { return (type == Struct); }
+   bool                isLeaf(void)     { return (type == Leaf);   }
+
+   const char*         cname(void)  { return name.c_str();  };
+   const char*         cvalue(void) { return value.c_str(); };
+   const char*         cpath(void)  { return path.c_str();  };
 };
 
 } // namespace orion

@@ -1,0 +1,29 @@
+{
+  "contextElements" : [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id" : "ConferenceRoom",
+      "attributes" : [
+        {
+          "name"    : "temperature",
+          "type"    : "degree",
+          "value"   : {
+            "s1" : "STRING"
+          }
+        },
+        {
+          "name"    : "temperature2",
+          "type"    : "degree",
+          "value"   : [
+            "I-0",
+            "I-1",
+            "I-2",
+            "I-3"
+          ]
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}
