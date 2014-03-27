@@ -24,6 +24,7 @@
 */
 #include "gtest/gtest.h"
 #include "testInit.h"
+#include "unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -37,12 +38,6 @@
 #include "ngsi10/UpdateContextResponse.h"
 
 #include "mongo/client/dbclient.h"
-
-#include "commonMocks.h"
-
-using ::testing::_;
-using ::testing::Throw;
-using ::testing::Return;
 
 /* ****************************************************************************
 *
@@ -263,6 +258,8 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -274,12 +271,6 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -420,8 +411,7 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -435,6 +425,8 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -446,12 +438,6 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -592,8 +578,7 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -607,6 +592,8 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -618,12 +605,6 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -790,8 +771,7 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -805,6 +785,8 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -816,12 +798,6 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -988,8 +964,7 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -1002,6 +977,8 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabase();
@@ -1017,12 +994,6 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     req.contextElementVector.push_back(&ce1);
     req.contextElementVector.push_back(&ce2);
     req.updateActionType.set("UPDATE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -1176,8 +1147,7 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -1191,6 +1161,8 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -1203,12 +1175,6 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     ce.contextAttributeVector.push_back(&ca2);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -1354,8 +1320,7 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -1369,6 +1334,8 @@ TEST(mongoUpdateContextRequest, update1EntNAttrSameName)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -1381,12 +1348,6 @@ TEST(mongoUpdateContextRequest, update1EntNAttrSameName)
     ce.contextAttributeVector.push_back(&ca2);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -1532,8 +1493,7 @@ TEST(mongoUpdateContextRequest, update1EntNAttrSameName)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -1546,6 +1506,8 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;   
+
+    utInit();
 
     /* Prepare database */
     prepareDatabase();
@@ -1565,12 +1527,6 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     req.contextElementVector.push_back(&ce1);
     req.contextElementVector.push_back(&ce2);
     req.updateActionType.set("UPDATE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -1732,8 +1688,7 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -1747,6 +1702,8 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -1757,12 +1714,6 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -1908,8 +1859,7 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -1923,6 +1873,8 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -1933,12 +1885,6 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -2084,8 +2030,7 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -2099,6 +2044,8 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -2109,12 +2056,6 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -2296,8 +2237,7 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -2311,6 +2251,8 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -2321,12 +2263,6 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -2508,8 +2444,7 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -2522,6 +2457,8 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabase();
@@ -2537,12 +2474,6 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     req.contextElementVector.push_back(&ce1);
     req.contextElementVector.push_back(&ce2);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -2706,8 +2637,7 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -2721,6 +2651,8 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -2733,12 +2665,6 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     ce.contextAttributeVector.push_back(&ca2);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -2893,8 +2819,7 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -2907,6 +2832,8 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabase();
@@ -2926,12 +2853,6 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     req.contextElementVector.push_back(&ce1);
     req.contextElementVector.push_back(&ce2);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -3114,8 +3035,7 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -3129,6 +3049,8 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -3137,12 +3059,6 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
     ce.entityId.fill("E1", "T1", "false");
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -3252,8 +3168,7 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -3267,6 +3182,8 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -3277,12 +3194,6 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -3418,8 +3329,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -3433,6 +3343,8 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -3443,12 +3355,6 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -3584,8 +3490,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -3599,6 +3504,8 @@ TEST(mongoUpdateContextRequest, delete1EntNoType0Attr)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -3607,12 +3514,6 @@ TEST(mongoUpdateContextRequest, delete1EntNoType0Attr)
     ce.entityId.fill("E1", "", "false");
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -3700,8 +3601,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType0Attr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -3715,6 +3615,8 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -3725,12 +3627,6 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -3887,8 +3783,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -3902,6 +3797,8 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -3912,12 +3809,6 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -4074,8 +3965,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -4088,6 +3978,8 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabase();
@@ -4103,12 +3995,6 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     req.contextElementVector.push_back(&ce1);
     req.contextElementVector.push_back(&ce2);
     req.updateActionType.set("DELETE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -4253,8 +4139,7 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 
 }
@@ -4269,6 +4154,8 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -4281,12 +4168,6 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     ce.contextAttributeVector.push_back(&ca2);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -4421,8 +4302,7 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -4435,6 +4315,8 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabase();
@@ -4454,12 +4336,6 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     req.contextElementVector.push_back(&ce1);
     req.contextElementVector.push_back(&ce2);
     req.updateActionType.set("DELETE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -4602,8 +4478,7 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -4617,6 +4492,8 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -4627,12 +4504,6 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -4769,8 +4640,7 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -4784,6 +4654,8 @@ TEST(mongoUpdateContextRequest, createEntity)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -4794,12 +4666,6 @@ TEST(mongoUpdateContextRequest, createEntity)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -4954,8 +4820,7 @@ TEST(mongoUpdateContextRequest, createEntity)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -4969,6 +4834,8 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -4981,12 +4848,6 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -5145,8 +5006,7 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -5159,6 +5019,8 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabase();
@@ -5174,12 +5036,6 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     ce.contextAttributeVector.push_back(&ca2);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -5327,8 +5183,7 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 }
 
 /* ****************************************************************************
@@ -5341,6 +5196,8 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -5351,12 +5208,6 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -5497,8 +5348,7 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -5512,6 +5362,8 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -5522,12 +5374,6 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -5668,8 +5514,7 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -5683,6 +5528,8 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -5693,12 +5540,6 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -5838,8 +5679,7 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -5853,6 +5693,8 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -5863,12 +5705,6 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -6009,8 +5845,7 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -6024,14 +5859,10 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce1, ce2;
@@ -6211,8 +6042,7 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -6226,6 +6056,8 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabase();
 
@@ -6236,12 +6068,6 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -6382,8 +6208,7 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -6397,6 +6222,8 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabaseWithAttributeIds();
 
@@ -6409,12 +6236,6 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -6602,8 +6423,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -6616,6 +6436,8 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabaseWithAttributeIds();
@@ -6631,12 +6453,6 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     ce.contextAttributeVector.push_back(&ca2);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -6828,8 +6644,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -6843,6 +6658,8 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabaseWithAttributeIds();
 
@@ -6855,12 +6672,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -7054,8 +6865,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -7068,6 +6878,8 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabaseWithAttributeIds();
@@ -7083,12 +6895,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     ce.contextAttributeVector.push_back(&ca2);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -7292,8 +7098,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -7307,6 +7112,8 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabaseWithAttributeIds();
 
@@ -7319,12 +7126,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -7512,8 +7313,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -7527,6 +7327,8 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabaseWithAttributeIds();
 
@@ -7537,12 +7339,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -7727,8 +7523,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -7742,6 +7537,8 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     UpdateContextRequest   req;
     UpdateContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabaseWithAttributeIds();
 
@@ -7754,12 +7551,6 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -7941,8 +7732,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -7955,6 +7745,8 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabaseWithAttributeIds();
@@ -7970,12 +7762,6 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     ce.contextAttributeVector.push_back(&ca2);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -8155,8 +7941,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -8170,6 +7955,8 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabase();
@@ -8186,12 +7973,6 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     req.contextElementVector.push_back(&ce1);
     req.contextElementVector.push_back(&ce2);
     req.updateActionType.set("UPDATE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -8341,8 +8122,7 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     /* Release connection */
     mongoDisconnect();
 
-    /* Release mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -8357,6 +8137,8 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;    
+
+    utInit();
 
     /* Set database */
     setupDatabase();
@@ -8386,12 +8168,6 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
             .WillByDefault(Return(cursorMockCsub));
     ON_CALL(*connectionMock, update(_,_,_,_,_))
             .WillByDefault(Throw(e));
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
 
     /* Set MongoDB connection */
     mongoConnect(connectionMock);
@@ -8435,7 +8211,8 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     //delete cursorMockEnt;
     //delete cursorMockCsub;
     delete connectionMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -8449,6 +8226,8 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;    
+
+    utInit();
 
     /* Set database */
     setupDatabase();
@@ -8494,4 +8273,6 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
 
     /* Release mock */
     delete connectionMock;
+
+    utExit();
 }

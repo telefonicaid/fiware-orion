@@ -65,28 +65,28 @@ echo "2: ++++++++++++++++++++"
 <?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>temperature</name>
-                  <type>degree</type>
-                  <contextValue>12</contextValue>
-                </contextAttribute>
+          <type>degree</type>
+          <contextValue>12</contextValue>
+          </contextAttribute>
       </contextAttributeList>
     </contextElement>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>ConferenceRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
-            <name>temperature</name>
-                  <type>degree</type>
-                  <contextValue>14</contextValue>
-                </contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue>14</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
@@ -246,21 +246,21 @@ echo "12: ++++++++++++++++++++"
 <?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p2300</contextValue>
-                </contextAttribute>
-            <contextAttribute>
+          <type>clima</type>
+          <contextValue>p2300</contextValue>
+        </contextAttribute>
+        <contextAttribute>
           <name>lightstatus</name>
-                  <type>light</type>
-                  <contextValue>L23</contextValue>
-                </contextAttribute>
+          <type>light</type>
+          <contextValue>L23</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
@@ -289,21 +289,21 @@ echo "14: ++++++++++++++++++++"
   <contextElementList>
         <contextElement>
           <entityId type="Room" isPattern="false">
-                <id>ConferenceRoom</id>
+            <id>ConferenceRoom</id>
           </entityId>
           <contextAttributeList>
             <contextAttribute>
-          <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p23</contextValue>
-                </contextAttribute>
+              <name>pressure</name>
+              <type>clima</type>
+              <contextValue>p23</contextValue>
+            </contextAttribute>
             <contextAttribute>
-          <name>lightstatus</name>
-                  <type>light</type>
-                  <contextValue>L23</contextValue>
-                </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
+              <name>lightstatus</name>
+              <type>light</type>
+              <contextValue>L23</contextValue>
+            </contextAttribute>
+          </contextAttributeList>
+        </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>
@@ -351,28 +351,28 @@ echo "17: ++++++++++++++++++++"
   <contextElementList>
         <contextElement>
           <entityId type="Room" isPattern="false">
-                <id>OfficeRoom2</id>
+            <id>OfficeRoom2</id>
           </entityId>
           <contextAttributeList>
             <contextAttribute>
-          <name>temperature</name>
-                  <type>degree</type>
-                  <contextValue>12</contextValue>
-                </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
+              <name>temperature</name>
+              <type>degree</type>
+              <contextValue>12</contextValue>
+            </contextAttribute>
+          </contextAttributeList>
+        </contextElement>
         <contextElement>
           <entityId type="Room" isPattern="false">
-                <id>ConferenceRoom2</id>
+            <id>ConferenceRoom2</id>
           </entityId>
           <contextAttributeList>
             <contextAttribute>
-            <name>temperature</name>
-                  <type>degree</type>
-                  <contextValue>14</contextValue>
-                </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
+              <name>temperature</name>
+              <type>degree</type>
+              <contextValue>14</contextValue>
+            </contextAttribute>
+          </contextAttributeList>
+        </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>
