@@ -107,7 +107,7 @@ std::string endTag(std::string indent, std::string tagName, Format format, bool 
 *
 * valueTag -  
 */
-std::string valueTag(std::string indent, std::string tagName, std::string value, Format format, bool showComma, bool isAssociation)
+std::string valueTag(std::string indent, std::string tagName, std::string value, Format format, bool showComma, bool isAssociation, bool isVectorElement)
 {
   if (format == XML)
     return indent + "<" + tagName + ">" + value + "</" + tagName + ">" + "\n";
@@ -116,6 +116,8 @@ std::string valueTag(std::string indent, std::string tagName, std::string value,
   {
     if (isAssociation == true)
       return indent + "\"" + tagName + "\" : " + value + ",\n";
+    else if (isVectorElement == true)
+      return indent + "\"" + value + "\",\n";
     else
       return indent + "\"" + tagName + "\" : \"" + value + "\",\n";
   }
@@ -123,6 +125,8 @@ std::string valueTag(std::string indent, std::string tagName, std::string value,
   {
     if (isAssociation == true)
       return indent + "\"" + tagName + "\" : " + value + "\n";
+    else if (isVectorElement == true)
+      return indent + "\"" + value + "\"\n";
     else
       return indent + "\"" + tagName + "\" : \"" + value + "\"\n";
   }

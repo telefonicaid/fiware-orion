@@ -83,7 +83,20 @@ std::string QueryContextResponse::render(RequestType requestType, Format format,
       out += errorCode.render(format, indent + "  ");
     }
     else 
+    {
+      // Debugging stuff - to be removed before PR
+      if (contextElementResponseVector[0] != NULL)
+      {
+         if (contextElementResponseVector[0]->contextElement.contextAttributeVector[0] != NULL)
+         {
+           if (contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->compoundValueP != NULL)
+             contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->compoundValueP->show("pre: ");
+         }
+      }  
+      // Debugging stuff - ends here
+
       out += contextElementResponseVector.render(QueryContext, format, indent + "  ");
+    }
   }
   else
      out += errorCode.render(format, indent + "  ");

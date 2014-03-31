@@ -54,6 +54,7 @@
 #include "jsonParse/jsonAppendContextElementRequest.h"
 #include "jsonParse/jsonUpdateContextAttributeRequest.h"
 
+#include "parse/compoundValue.h"
 #include "rest/restReply.h"
 
 
@@ -158,6 +159,10 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
   try
   {
     res = jsonParse(ciP, content, reqP->keyword, reqP->parseVector, parseDataP);
+    if (ciP->inCompoundValue == true)
+      orion::compoundValueEnd(ciP, "/end/caught/late", parseDataP);
+    if ((lmTraceIsSet(LmtCompoundValueShow)) && (ciP->compoundValueP != NULL))
+      ciP->compoundValueP->shortShow("after parse: ");
   }
   catch (std::exception &e)
   {

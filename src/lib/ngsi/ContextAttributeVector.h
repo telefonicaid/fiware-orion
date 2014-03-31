@@ -47,9 +47,11 @@ typedef struct ContextAttributeVector
   void               present(std::string indent);
   void               push_back(ContextAttribute* item);
   unsigned int       size(void);
-  ContextAttribute*  get(int ix);
+  ContextAttribute*  get(unsigned int ix);
   void               release(void);
   void               fill(ContextAttributeVector& caV);
+
+  ContextAttribute*  operator[](unsigned int ix)       { if (ix < vec.size()) return vec[ix]; else return NULL; }
 } ContextAttributeVector;
 
 #endif

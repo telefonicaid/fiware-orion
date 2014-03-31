@@ -96,10 +96,11 @@ static std::string contextAttributeType(std::string path, std::string value, Par
 *
 * contextAttributeValue -
 */
-static std::string contextAttributeValue(std::string path, std::string value, ParseData* reqData)
+static std::string contextAttributeValue(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute value: %s", value.c_str()));
-  reqData->acer.attributeP->value = value;
+  parseDataP->lastContextAttribute = parseDataP->acer.attributeP;
+  parseDataP->acer.attributeP->value = value;
   return "OK";
 }
 

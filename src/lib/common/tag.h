@@ -36,7 +36,16 @@
 * startTag -  
 */
 extern std::string startTag(std::string indent, std::string tagName, Format format, bool showTag = true);
-extern std::string startTag(std::string indent, std::string xmlTag, std::string jsonTag, Format format, bool isVector = false, bool showTag = true, bool isCompoundVector = false);
+extern std::string startTag
+(
+    std::string  indent,
+    std::string  xmlTag,
+    std::string  jsonTag,
+    Format       format,
+    bool         isVector         = false,
+    bool         showTag          = true,
+    bool         isCompoundVector = false
+);
 
 
 
@@ -52,7 +61,7 @@ extern std::string endTag(std::string indent, std::string tagName, Format format
 *
 * valueTag -  
 */
-extern std::string valueTag(std::string indent, std::string tagName, std::string value, Format format, bool showComma = false, bool isAssociation = false);
+extern std::string valueTag(std::string indent, std::string tagName, std::string value, Format format, bool showComma = false, bool isAssociation = false, bool isVectorElement = false);
 extern std::string valueTag(std::string indent, std::string tagName, int value,         Format format, bool showComma = false, bool isAssociation = false);
 extern std::string valueTag(std::string indent, std::string xmlTag, std::string jsonTag, std::string value, Format format, bool showComma = false, bool isAssociation = false);
 

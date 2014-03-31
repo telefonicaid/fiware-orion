@@ -183,7 +183,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   </contextResponseList>
 </updateContextResponse>
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 720
+Content-Length: 1087
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -203,18 +203,18 @@ Content-Type: application/xml
             <name>att</name>
             <type>compound</type>
             <contextValue type="vector">
-               <item>22</item>
-               <item>
-                 <x type="vector">
-                   <item>x1</item>
-                   <item>x2</item>
-                 </x>
-                 <y>3</y>
-               </item>
-               <item type="vector">
-                 <item>z1</item>
-                 <item>z2</item>
-               </item>
+              <item>22</item>
+              <item>
+                <x type="vector">
+                  <item>x1</item>
+                  <item>x2</item>
+                </x>
+                <y>3</y>
+              </item>
+              <item type="vector">
+                <item>z1</item>
+                <item>z2</item>
+              </item>
             </contextValue>
           </contextAttribute>
         </contextAttributeList>
@@ -229,7 +229,7 @@ Content-Type: application/xml
 
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 720
+Content-Length: 937
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -249,14 +249,14 @@ Content-Type: application/xml
             <name>att</name>
             <type>compound</type>
             <contextValue>
-               <x>
-                 <x1>a</x1>
-                 <x2>b</x2>
-               </x>
-               <y type="vector">
-                  <item>y1</item>
-                  <item>y2</item>
-               </y>
+              <x>
+                <x1>a</x1>
+                <x2>b</x2>
+              </x>
+              <y type="vector">
+                <item>y1</item>
+                <item>y2</item>
+              </y>
             </contextValue>
           </contextAttribute>
         </contextAttributeList>
