@@ -59,7 +59,7 @@ void compoundValueStart
 {
   ciP->inCompoundValue = true;
 
-  ciP->compoundValueP = new orion::CompoundValueNode(root);
+  ciP->compoundValueP = new orion::CompoundValueNode(root, orion::CompoundValueNode::Struct);
   LM_T(LmtCompoundValueContainer, ("Set current container to '%s' (%s)", ciP->compoundValueP->path.c_str(), ciP->compoundValueP->name.c_str()));
   ciP->compoundValueRoot = ciP->compoundValueP;
 
@@ -135,7 +135,7 @@ void compoundValueEnd(ConnectionInfo* ciP, std::string path, ParseData* parseDat
     // lastContextAttribute is set in the XML parsing routiunes, to point at the
     // latest contextAttribute, i.e. the attribute whose 'contextValue' is the
     // owner of this compound value tree.
-    LM_T(LmtCompoundValue, ("Set compoundValueP for attribute at %p", parseDataP->lastContextAttribute));
+    LM_T(LmtCompoundValue, ("Set compoundValueP (%p) for attribute at %p", ciP->compoundValueRoot, parseDataP->lastContextAttribute));
     parseDataP->lastContextAttribute->compoundValueP = ciP->compoundValueRoot;
   }
 

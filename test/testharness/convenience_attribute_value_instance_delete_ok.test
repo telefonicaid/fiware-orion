@@ -116,6 +116,13 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Conte
     "contextElement": {
         "attributes": [
             {
+                "metadatas": [
+                    {
+                        "name": "ID",
+                        "type": "string",
+                        "value": "wall"
+                    }
+                ],
                 "name": "temperature",
                 "type": "centigrade",
                 "value": "23.5"

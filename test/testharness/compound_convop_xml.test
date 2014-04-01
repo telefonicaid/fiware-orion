@@ -79,57 +79,7 @@ echo "2: +++++++++ create object compound +++++++++++"
 </appendContextElementRequest>
 EOF
 
-echo "3: ++++++++++ query for vector compound in XML ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId isPattern="false">
-          <id>EVector</id>
-        </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>
-EOF
 
-echo "4: ++++++++++ query for object compound in XML ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId isPattern="false">
-          <id>EObject</id>
-        </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>
-EOF
-
-echo "5: ++++++++++ query for vector compound in JSON ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
-    "entities": [
-        {
-            "type": "",
-            "isPattern": "false",
-            "id": "EVector"
-        }
-    ]
-}
-EOF
-
-echo "6: ++++++++++ query for object compound in JSON ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
-    "entities": [
-        {
-            "type": "",
-            "isPattern": "false",
-            "id": "EObject"
-        }
-    ]
-}
-EOF
 
 
 echo "7: ++++++++++ query for vector compound in XML convop ++++++++++"
@@ -183,135 +133,6 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
     </contextAttributeResponse>
   </contextResponseList>
 </appendContextElementResponse>
-3: ++++++++++ query for vector compound in XML ++++++++++
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="" isPattern="false">
-          <id>EVector</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>compound</type>
-            <contextValue type="vector">
-               <item>22</item>
-               <item>
-                 <x type="vector">
-                   <item>x1</item>
-                   <item>x2</item>
-                 </x>
-                 <y>3</y>
-               </item>
-               <item type="vector">
-                 <item>z1</item>
-                 <item>z2</item>
-               </item>
-            </contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
-4: ++++++++++ query for object compound in XML ++++++++++
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="" isPattern="false">
-          <id>EObject</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>att</name>
-            <type>compound</type>
-            <contextValue>
-               <x>
-                 <x1>a</x1>
-                 <x2>b</x2>
-               </x>
-               <y type="vector">
-                  <item>y1</item>
-                  <item>y2</item>
-               </y>
-            </contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
-5: ++++++++++ query for vector compound in JSON ++++++++++
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "att",
-                        "type": "compound",
-                        "value": [
-                           "22",
-                           {
-                              "x": [ "x1", "x2" ],
-                              "y": "3"
-                           },
-                           [ "z1", "z2" ]
-                        ]
-                    }
-                ],
-                "id": "EVector",
-                "isPattern": "false",
-                "type": ""
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-6: ++++++++++ query for object compound in JSON ++++++++++
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "att",
-                        "type": "compound",
-                        "value": {
-                           "x": {
-                              "x1": "a",
-                              "x2": "b"
-                           },
-                           "y": [ "y1", "y2" ]
-                        }
-                    }
-                ],
-                "id": "EObject",
-                "isPattern": "false",
-                "type": ""
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
 7: ++++++++++ query for vector compound in XML convop ++++++++++
 <?xml version="1.0"?>
 <contextElementResponse>
@@ -324,18 +145,18 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
         <name>att</name>
         <type>compound</type>
         <contextValue type="vector">
-           <item>22</item>
-           <item>
-             <x type="vector">
-               <item>x1</item>
-               <item>x2</item>
-             </x>
-             <y>3</y>
-           </item>
-           <item type="vector">
-             <item>z1</item>
-             <item>z2</item>
-           </item>
+          <item>22</item>
+          <item>
+            <x type="vector">
+              <item>x1</item>
+              <item>x2</item>
+            </x>
+            <y>3</y>
+          </item>
+          <item type="vector">
+            <item>z1</item>
+            <item>z2</item>
+          </item>
         </contextValue>
       </contextAttribute>
     </contextAttributeList>
@@ -357,14 +178,14 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
         <name>att</name>
         <type>compound</type>
         <contextValue>
-           <x>
-             <x1>a</x1>
-             <x2>b</x2>
-           </x>
-           <y type="vector">
-              <item>y1</item>
-              <item>y2</item>
-           </y>
+          <x>
+            <x1>a</x1>
+            <x2>b</x2>
+          </x>
+          <y type="vector">
+            <item>y1</item>
+            <item>y2</item>
+          </y>
         </contextValue>
       </contextAttribute>
     </contextAttributeList>
@@ -382,12 +203,18 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
                 "name": "att",
                 "type": "compound",
                 "value": [
-                   "22",
-                   {
-                      "x": [ "x1", "x2" ],
-                      "y": "3"
-                   },
-                   [ "z1", "z2" ]
+                    "22",
+                    {
+                        "x": [
+                            "x1",
+                            "x2"
+                        ],
+                        "y": "3"
+                    },
+                    [
+                        "z1",
+                        "z2"
+                    ]
                 ]
             }
         ],
@@ -408,11 +235,14 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
                 "name": "att",
                 "type": "compound",
                 "value": {
-                   "x": {
-                      "x1": "a",
-                      "x2": "b"
-                   },
-                   "y": [ "y1", "y2" ]
+                    "x": {
+                        "x1": "a",
+                        "x2": "b"
+                    },
+                    "y": [
+                        "y1",
+                        "y2"
+                    ]
                 }
             }
         ],

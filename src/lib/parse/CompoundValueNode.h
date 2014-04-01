@@ -114,7 +114,9 @@ public:
 
 
    // Constructors/Destructors
-   CompoundValueNode(std::string _root = "");   // FIXME P10: 'root' will probably disapear at the end. To be fixed at the end during the cleanup phase on the feature/complex_value branch
+   // FIXME P10: 'root' will probably disapear at the end. To be fixed at the end during the cleanup phase on the feature/complex_value branch
+   CompoundValueNode();
+   CompoundValueNode(std::string _root, Type _type);
    CompoundValueNode(CompoundValueNode* _container, std::string _path, std::string _name, std::string _value, int _siblingNo, Type _type, int _level = -1);
    ~CompoundValueNode();
 

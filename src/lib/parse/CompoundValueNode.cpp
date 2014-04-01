@@ -43,18 +43,38 @@ namespace orion
 *
 * CompoundValueNode - constructor for toplevel 'node' 
 */
-CompoundValueNode::CompoundValueNode(std::string _root)
+CompoundValueNode::CompoundValueNode()
+{
+  root       = "Unset";
+  rootP      = NULL;
+  type       = Unknown;
+  container  = NULL;
+  level      = 0;
+  name       = "Unset";
+  path       = "Unset";
+  siblingNo  = 0;
+
+  LM_T(LmtCompoundValue, ("Created EMPTY compound node"));
+}
+
+
+
+/* ****************************************************************************
+*
+* CompoundValueNode - constructor for toplevel 'node' 
+*/
+CompoundValueNode::CompoundValueNode(std::string _root, Type _type)
 {
   root       = _root;
   rootP      = this;
-  type       = Struct;
+  type       = _type;
   container  = this;
   level      = 0;
   name       = "toplevel";
   path       = "/";
   siblingNo  = 0;
 
-  LM_T(LmtCompoundValue, ("Created TOPLEVEL compound node"));
+  LM_T(LmtCompoundValue, ("Created TOPLEVEL compound node (a %s)", (type == Vector)? "Vector" : "Struct"));
 }
 
 
@@ -138,15 +158,15 @@ std::string CompoundValueNode::finish(void)
 */
 CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
 {
-  if (node->type == Leaf)
-     LM_T(LmtCompoundValueAdd, ("Adding Leaf '%s', with value '%s' under '%s' (%s)", node->name.c_str(), node->value.c_str(), node->container->path.c_str(), node->container->name.c_str()));
-  else
-     LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s' (%s)", typeName(node->type), node->name.c_str(), node->container->path.c_str(), node->container->name.c_str()));
-
   node->container = this;
   node->level     = level + 1;
   node->siblingNo = childV.size();
   node->rootP     = rootP;
+
+  if (node->type == Leaf)
+     LM_T(LmtCompoundValueAdd, ("Adding Leaf '%s', with value '%s' under '%s' (%s)", node->name.c_str(), node->value.c_str(), node->container->path.c_str(), node->container->name.c_str()));
+  else
+     LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s' (%s)", typeName(node->type), node->name.c_str(), node->container->path.c_str(), node->container->name.c_str()));
 
   childV.push_back(node);
   return node;
@@ -364,7 +384,7 @@ CompoundValueNode* CompoundValueNode::clone(void)
 {
   LM_T(LmtCompoundValue, ("cloning '%s'", name.c_str()));
 
-  CompoundValueNode* me = (rootP == this)? new CompoundValueNode(root) : new CompoundValueNode(container, path, name, value, siblingNo, type, level);
+  CompoundValueNode* me = (rootP == this)? new CompoundValueNode(root, type) : new CompoundValueNode(container, path, name, value, siblingNo, type, level);
 
   for (unsigned int ix = 0; ix < childV.size(); ++ix)
   {

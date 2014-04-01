@@ -50,7 +50,8 @@
 */
 static const char* compoundValueRootV[] =
 {
-  "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue"
+  "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue",
+  "/appendContextElementRequest/contextAttributeList/contextAttribute/contextValue"
 };
 
 

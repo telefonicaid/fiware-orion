@@ -55,12 +55,16 @@ ContextAttribute::ContextAttribute()
 */
 ContextAttribute::ContextAttribute(ContextAttribute* caP)
 {
-   LM_T(LmtClone, ("Creating a ContextAttribute: compoundValueP at %p", caP->compoundValueP));
    name                  = caP->name;
    type                  = caP->type;
    value                 = caP->value;
    compoundValueP        = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
    typeFromXmlAttribute  = "";
+
+   LM_T(LmtClone, ("Creating a ContextAttribute: compoundValueP at %p for attribute '%s' at %p",
+                   compoundValueP,
+                   name.c_str(),
+                   this));
 
    metadataVector.vec.clear();
 
@@ -81,7 +85,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
 */
 ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::string _value)
 {
-   LM_T(LmtClone, ("Creating a ContextAttribute, setting its compound to NULL"));
+   LM_T(LmtClone, ("Creating a ContextAttribute '%s':'%s':'%s', setting its compound to NULL", _name.c_str(), _type.c_str(), _value.c_str()));
    name                  = _name;
    type                  = _type;
    value                 = _value;
