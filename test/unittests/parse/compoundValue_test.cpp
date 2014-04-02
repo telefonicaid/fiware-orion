@@ -139,9 +139,7 @@ TEST(compoundValue, updateOneString)
 
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
-  EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue", cvnRootP->root);
-  
+  EXPECT_EQ("/", cvnRootP->path); 
   
   // The child
   childP = cvnRootP->childV[0];
@@ -207,8 +205,6 @@ TEST(compoundValue, updateOneStringJson)
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
   EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/contextElements/contextElement/attributes/attribute/value/", cvnRootP->root);
-  
   
   // The child
   childP = cvnRootP->childV[0];
@@ -270,7 +266,6 @@ TEST(compoundValue, updateTwoStrings)
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
   EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue", cvnRootP->root);
 
   // child 1
   childP = cvnRootP->childV[0];
@@ -349,7 +344,6 @@ TEST(compoundValue, updateTwoStringsJson)
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
   EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/contextElements/contextElement/attributes/attribute/value/", cvnRootP->root);
 
   // child 1
   childP = cvnRootP->childV[0];
@@ -478,9 +472,7 @@ TEST(compoundValue, updateContextValueVectorOneItem)
 
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
-  EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue", cvnRootP->root);
-  
+  EXPECT_EQ("/", cvnRootP->path); 
   
   // The child
   childP = cvnRootP->childV[0];
@@ -542,9 +534,7 @@ TEST(compoundValue, updateContextValueVectorOneItemJson)
 
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
-  EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/contextElements/contextElement/attributes/attribute/value/", cvnRootP->root);
-  
+  EXPECT_EQ("/", cvnRootP->path);  
   
   // The child
   childP = cvnRootP->childV[0];
@@ -607,8 +597,6 @@ TEST(compoundValue, updateContextValueVectorFiveItems)
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
   EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue", cvnRootP->root);
-  
   
   // Child 1-5
   std::string value[] = { "1", "2", "3", "4", "5" };
@@ -674,9 +662,7 @@ TEST(compoundValue, updateContextValueVectorFiveItemsJson)
 
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
-  EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/contextElements/contextElement/attributes/attribute/value/", cvnRootP->root);
-  
+  EXPECT_EQ("/", cvnRootP->path); 
   
   // Child 1-5
   std::string value[] = { "1", "2", "3", "4", "5" };
@@ -774,9 +760,7 @@ TEST(compoundValue, updateTwoStructs)
 
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
-  EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue", cvnRootP->root);
-  
+  EXPECT_EQ("/", cvnRootP->path); 
 
   // Now, child struct 1
   structP = cvnRootP->childV[0];
@@ -925,9 +909,7 @@ TEST(compoundValue, updateTwoStructsJson)
 
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
-  EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/contextElements/contextElement/attributes/attribute/value/", cvnRootP->root);
-  
+  EXPECT_EQ("/", cvnRootP->path); 
 
   // Now, child struct 1
   structP = cvnRootP->childV[0];
@@ -1076,9 +1058,7 @@ TEST(compoundValue, sixLevels)
 
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
-  EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue", cvnRootP->root);
-  
+  EXPECT_EQ("/", cvnRootP->path);  
 
   // Now, child 1: level1
   level1 = cvnRootP->childV[0];
@@ -1698,9 +1678,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValues)
 
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
-  EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue", cvnRootP->root);
-  
+  EXPECT_EQ("/", cvnRootP->path);  
   
   // The child
   childP = cvnRootP->childV[0];
@@ -1740,9 +1718,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValues)
 
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
-  EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue", cvnRootP->root);
-  
+  EXPECT_EQ("/", cvnRootP->path); 
   
   // The children
   const char* value[] = { "I-0", "I-1", "I-2", "I-3" };
@@ -1808,9 +1784,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
-  EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/contextElements/contextElement/attributes/attribute/value/", cvnRootP->root);
-  
+  EXPECT_EQ("/", cvnRootP->path);  
   
   // The child
   childP = cvnRootP->childV[0];
@@ -1850,9 +1824,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
 
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
-  EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/contextElements/contextElement/attributes/attribute/value/", cvnRootP->root);
-  
+  EXPECT_EQ("/", cvnRootP->path);  
   
   // The children
   const char* value[] = { "I-0", "I-1", "I-2", "I-3" };

@@ -26,6 +26,7 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+#include "common/globals.h"
 
 #include "ngsi/ParseData.h"
 #include "parse/CompoundValueNode.h"
@@ -51,7 +52,6 @@ void compoundValueStart
     std::string                     path,
     std::string                     name,
     std::string                     value,
-    std::string                     root,
     std::string                     rest,
     orion::CompoundValueNode::Type  type,
     bool                            fatherIsVector
@@ -59,7 +59,7 @@ void compoundValueStart
 {
   ciP->inCompoundValue = true;
 
-  ciP->compoundValueP = new orion::CompoundValueNode(root, orion::CompoundValueNode::Struct);
+  ciP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Struct);
   LM_T(LmtCompoundValueContainer, ("Set current container to '%s' (%s)", ciP->compoundValueP->path.c_str(), ciP->compoundValueP->name.c_str()));
   ciP->compoundValueRoot = ciP->compoundValueP;
 
@@ -71,10 +71,10 @@ void compoundValueStart
   // 
   // If this pointer is not set, it is a fatal error and the broker dies, because of the 
   // following LM_X, that does an exit
-  // It is better to exit here and clearly see the error, than to contiunue and get strange
+  // It is better to exit here and clearly see the error, than to continue and get strange
   // outputs that will be difficult to trace back to here.
   if (ciP->parseDataP->lastContextAttribute == NULL)
-    LM_X(1, ("No pointer to last ContextAttribute"));
+    orionExitFunction(1, "No pointer to last ContextAttribute");
 
   if (ciP->parseDataP->lastContextAttribute->typeFromXmlAttribute == "vector")
     ciP->compoundValueP->type = orion::CompoundValueNode::Vector;

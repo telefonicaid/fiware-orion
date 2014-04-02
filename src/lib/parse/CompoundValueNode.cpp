@@ -44,8 +44,7 @@ namespace orion
 * CompoundValueNode - constructor for toplevel 'node' 
 */
 CompoundValueNode::CompoundValueNode()
-{
-  root       = "Unset";
+{  
   rootP      = NULL;
   type       = Unknown;
   container  = NULL;
@@ -63,9 +62,8 @@ CompoundValueNode::CompoundValueNode()
 *
 * CompoundValueNode - constructor for toplevel 'node' 
 */
-CompoundValueNode::CompoundValueNode(std::string _root, Type _type)
+CompoundValueNode::CompoundValueNode(Type _type)
 {
-  root       = _root;
   rootP      = this;
   type       = _type;
   container  = this;
@@ -223,11 +221,6 @@ void CompoundValueNode::shortShow(std::string indent)
 */
 void CompoundValueNode::show(std::string indent)
 {
-  if (root != "")
-  {
-    LM_F(("%s", root.c_str()));
-    indent += "  ";
-  }
 
   if (name != "")
     LM_F(("%sname:    %s", indent.c_str(), name.c_str()));
@@ -384,7 +377,7 @@ CompoundValueNode* CompoundValueNode::clone(void)
 {
   LM_T(LmtCompoundValue, ("cloning '%s'", name.c_str()));
 
-  CompoundValueNode* me = (rootP == this)? new CompoundValueNode(root, type) : new CompoundValueNode(container, path, name, value, siblingNo, type, level);
+  CompoundValueNode* me = (rootP == this)? new CompoundValueNode(type) : new CompoundValueNode(container, path, name, value, siblingNo, type, level);
 
   for (unsigned int ix = 0; ix < childV.size(); ++ix)
   {

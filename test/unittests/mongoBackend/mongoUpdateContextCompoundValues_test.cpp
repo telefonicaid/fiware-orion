@@ -77,7 +77,7 @@
     orion::CompoundValueNode*  x;                                                  \
     orion::CompoundValueNode*  leaf;                                               \
                                                                                    \
-    cv = new orion::CompoundValueNode("/test", orion::CompoundValueNode::Vector);  \
+    cv = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);  \
                                                                                    \
     leaf = cv->add(orion::CompoundValueNode::Leaf,    "",    "22");                \
     str  = cv->add(orion::CompoundValueNode::Struct,  "", "");                     \
@@ -103,7 +103,7 @@
     orion::CompoundValueNode*  y;                                                  \
     orion::CompoundValueNode*  leaf;                                               \
                                                                                    \
-    cv = new orion::CompoundValueNode("/test2", orion::CompoundValueNode::Struct); \
+    cv = new orion::CompoundValueNode(orion::CompoundValueNode::Struct); \
                                                                                    \
     x    = cv->add(orion::CompoundValueNode::Struct, "x", "");                     \
     y    = cv->add(orion::CompoundValueNode::Vector, "y", "");                     \

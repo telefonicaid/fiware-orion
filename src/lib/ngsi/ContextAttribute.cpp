@@ -150,9 +150,7 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
     bool isCompoundVector = false;
 
     if ((compoundValueP != NULL) && (compoundValueP->type == orion::CompoundValueNode::Vector))
-      isCompoundVector = true;
-
-    compoundValueP->shortShow("pre-render: ");
+      isCompoundVector = true;    
 
     out += startTag(indent + "  ", "contextValue", "value", format, isCompoundVector, true, isCompoundVector);
     out += compoundValueP->render(format, indent + "    ");

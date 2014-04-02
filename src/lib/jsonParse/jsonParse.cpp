@@ -338,7 +338,7 @@ static std::string jsonParse
 
     if  ((isCompound == true) && (ciP->inCompoundValue == false))
     {
-      orion::compoundValueStart(ciP, path, nodeName, nodeValue, root, rest, type, fatherIsVector);
+      orion::compoundValueStart(ciP, path, nodeName, nodeValue, rest, type, fatherIsVector);
       if ((nodeName == "") && (nodeValue == ""))
       {
         ciP->compoundValueP->name = "item";

@@ -265,7 +265,7 @@ void xmlParse
       return;
     }
 
-    orion::compoundValueStart(ciP, path, name, value, root, rest, type, xmlAttribute == "vector");
+    orion::compoundValueStart(ciP, path, name, value, rest, type, xmlAttribute == "vector");
   }
   else if ((isCompound == true) && (ciP->inCompoundValue == true))
   {

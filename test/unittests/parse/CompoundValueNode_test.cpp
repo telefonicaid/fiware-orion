@@ -37,7 +37,7 @@
 */
 TEST(CompoundValueNode, tree)
 {
-  orion::CompoundValueNode*  tree  = new orion::CompoundValueNode("TREE", orion::CompoundValueNode::Struct);
+  orion::CompoundValueNode*  tree  = new orion::CompoundValueNode(orion::CompoundValueNode::Struct);
   orion::CompoundValueNode*  vec;
   orion::CompoundValueNode*  vecItem;
   char*                      name  = (char*) "vecItem";
@@ -102,7 +102,7 @@ TEST(CompoundValueNode, vectorInvalidAndOk)
 {
   lmTraceLevelSet(LmtCompoundValueAdd, true);
 
-  orion::CompoundValueNode*  tree     = new orion::CompoundValueNode("XXX", orion::CompoundValueNode::Struct);
+  orion::CompoundValueNode*  tree     = new orion::CompoundValueNode(orion::CompoundValueNode::Struct);
   orion::CompoundValueNode*  vec      = new orion::CompoundValueNode(tree, "/vec", "vec", "", 0, orion::CompoundValueNode::Vector, 1);
   orion::CompoundValueNode*  item1    = new orion::CompoundValueNode(vec, std::string("/vec/vecitem1"), "vecitem1",  "a", 0, orion::CompoundValueNode::Leaf, 2);
   const char*                outFile1 = "ngsi.compoundValue.vector.valid.xml";
@@ -151,7 +151,7 @@ TEST(CompoundValueNode, structInvalidAndOk)
 {
   lmTraceLevelSet(LmtCompoundValueAdd, true);
 
-  orion::CompoundValueNode*  tree     = new orion::CompoundValueNode("XXX", orion::CompoundValueNode::Struct);
+  orion::CompoundValueNode*  tree     = new orion::CompoundValueNode(orion::CompoundValueNode::Struct);
   orion::CompoundValueNode*  str      = new orion::CompoundValueNode(tree, "/struct", "struct", "", 0, orion::CompoundValueNode::Struct, 1);
   orion::CompoundValueNode*  item1    = new orion::CompoundValueNode(str, std::string("/struct/structitem"), "structitem", "a", 0, orion::CompoundValueNode::Leaf, 2);
   orion::CompoundValueNode*  item2    = new orion::CompoundValueNode(str, std::string("/struct/structitem"), "structitem", "a", 1, orion::CompoundValueNode::Leaf, 2);
