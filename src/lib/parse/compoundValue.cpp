@@ -129,15 +129,13 @@ void compoundValueEnd(ConnectionInfo* ciP, std::string path, ParseData* parseDat
     ciP->answer = std::string("compound value error: ") + status;
     LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), path.c_str()));
   }
-  else
-  {
-    // Give the root pointer of this Compound to the active ContextAttribute
-    // lastContextAttribute is set in the XML parsing routiunes, to point at the
-    // latest contextAttribute, i.e. the attribute whose 'contextValue' is the
-    // owner of this compound value tree.
-    LM_T(LmtCompoundValue, ("Set compoundValueP (%p) for attribute at %p", ciP->compoundValueRoot, parseDataP->lastContextAttribute));
-    parseDataP->lastContextAttribute->compoundValueP = ciP->compoundValueRoot;
-  }
+
+  // Give the root pointer of this Compound to the active ContextAttribute
+  // lastContextAttribute is set in the XML parsing routiunes, to point at the
+  // latest contextAttribute, i.e. the attribute whose 'contextValue' is the
+  // owner of this compound value tree.
+  LM_T(LmtCompoundValue, ("Set compoundValueP (%p) for attribute at %p", ciP->compoundValueRoot, parseDataP->lastContextAttribute));
+  parseDataP->lastContextAttribute->compoundValueP = ciP->compoundValueRoot;
 
   // Reset the Compound stuff in ConnectionInfo
   ciP->compoundValueRoot = NULL;
