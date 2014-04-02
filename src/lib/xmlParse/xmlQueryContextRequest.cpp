@@ -419,8 +419,8 @@ XmlNode qcrParseVector[] =
   { "/queryContextRequest/restriction/scope/operationScope/scopeValue", scopeValue           },
 
   { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle",                              circle                  },
-  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle/center_latitude",              circleCenterLatitude    },
-  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle/center_longitude",             circleCenterLongitude   },
+  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle/centerLatitude",               circleCenterLatitude    },
+  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle/centerLongitude",              circleCenterLongitude   },
   { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle/radius",                       circleRadius            },
   { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle/inverted",                     circleInverted          },
 

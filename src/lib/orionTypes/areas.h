@@ -99,6 +99,7 @@ public:
   void                  invertedSet(::std::string inverted) { _inverted = inverted;    }
   ::std::string         invertedString(void)                { return _inverted;        }
   void                  vertexAdd(Point* p)                 { vertexList.push_back(p); }
+  void                  release(void)                       { for (unsigned int ix = 0; ix < vertexList.size(); ++ix) delete(vertexList[ix]); vertexList.clear(); }
 };
 
 }

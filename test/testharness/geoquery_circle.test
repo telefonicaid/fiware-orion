@@ -120,8 +120,8 @@ echo "1: ++++++++++ Madrid in 14 kms ++++++++++"
         <scopeType>FIWARE_Location</scopeType>
         <scopeValue>
           <circle>
-            <center_latitude>40.418889</center_latitude>
-            <center_longitude>-3.691944</center_longitude>
+            <centerLatitude>40.418889</centerLatitude>
+            <centerLongitude>-3.691944</centerLongitude>
             <radius>14000</radius>
           </circle>
         </scopeValue>
@@ -150,8 +150,8 @@ echo "2: +++++++++++ Madrid in 15 kms +++++++++"
         <scopeType>FIWARE_Location</scopeType>
         <scopeValue>
           <circle>
-            <center_latitude>40.418889</center_latitude>
-            <center_longitude>-3.691944</center_longitude>
+            <centerLatitude>40.418889</centerLatitude>
+            <centerLongitude>-3.691944</centerLongitude>
             <radius>15000</radius>
           </circle>
         </scopeValue>
@@ -180,8 +180,8 @@ echo "3: ++++++++++++ Madrid out 14 kms ++++++++"
         <scopeType>FIWARE_Location</scopeType>
         <scopeValue>
           <circle>
-            <center_latitude>40.418889</center_latitude>
-            <center_longitude>-3.691944</center_longitude>
+            <centerLatitude>40.418889</centerLatitude>
+            <centerLongitude>-3.691944</centerLongitude>
             <radius>14000</radius>
             <inverted>true</inverted>
           </circle>

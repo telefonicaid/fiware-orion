@@ -79,8 +79,8 @@ qcr='<?xml version="1.0" encoding="UTF-8"?>
         <scopeValue>
           <circle>
             <radius>10</radius>
-            <center_latitude>45</center_latitude>
-            <center_longitude>45</center_longitude>
+            <centerLatitude>45</centerLatitude>
+            <centerLongitude>45</centerLongitude>
             <inverted>0</inverted>
           </circle>
         </scopeValue>
@@ -125,8 +125,8 @@ scr='<?xml version="1.0" encoding="UTF-8"?>
         <scopeValue>
           <circle>
             <radius>11</radius>
-            <center_latitude>55</center_latitude>
-            <center_longitude>55</center_longitude>
+            <centerLatitude>55</centerLatitude>
+            <centerLongitude>55</centerLongitude>
             <inverted>0</inverted>
           </circle>
         </scopeValue>
@@ -161,8 +161,8 @@ ucsr='<?xml version="1.0" encoding="UTF-8"?>
         <scopeValue>
           <circle>
             <radius>12</radius>
-            <center_latitude>65</center_latitude>
-            <center_longitude>65</center_longitude>
+            <centerLatitude>65</centerLatitude>
+            <centerLongitude>65</centerLongitude>
             <inverted>0</inverted>
           </circle>
         </scopeValue>

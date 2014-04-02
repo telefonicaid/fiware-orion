@@ -83,8 +83,8 @@ echo "1: ++++++++++++++++++++"
         <scopeType>FIWARE_Location</scopeType>
         <scopeValue>
           <circle>
-            <center_latitude>40</center_latitude>
-            <center_longitude>20</center_longitude>
+            <centerLatitude>40</centerLatitude>
+            <centerLongitude>20</centerLongitude>
             <radius>5</radius>
           </circle>
         </scopeValue>

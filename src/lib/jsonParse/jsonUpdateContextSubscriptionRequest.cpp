@@ -401,8 +401,8 @@ JsonNode jsonUcsrParseVector[] =
   { "/restriction/scopes/scope/value",                         scopeValue                 },
 
   { "/restriction/scopes/scope/value/circle",                              circle                  },
-  { "/restriction/scopes/scope/value/circle/center_latitude",              circleCenterLatitude    },
-  { "/restriction/scopes/scope/value/circle/center_longitude",             circleCenterLongitude   },
+  { "/restriction/scopes/scope/value/circle/centerLatitude",               circleCenterLatitude    },
+  { "/restriction/scopes/scope/value/circle/centerLongitude",              circleCenterLongitude   },
   { "/restriction/scopes/scope/value/circle/radius",                       circleRadius            },
   { "/restriction/scopes/scope/value/circle/inverted",                     circleInverted          },
 
