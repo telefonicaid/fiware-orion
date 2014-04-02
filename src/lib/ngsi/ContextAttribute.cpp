@@ -220,6 +220,12 @@ void ContextAttribute::present(std::string indent, int ix)
 */
 void ContextAttribute::release(void)
 {
+  if (compoundValueP != NULL)
+  {
+    delete compoundValueP;
+    compoundValueP = NULL;
+  }
+
   metadataVector.release();
 }
 

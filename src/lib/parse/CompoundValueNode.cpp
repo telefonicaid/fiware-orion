@@ -109,6 +109,8 @@ CompoundValueNode::~CompoundValueNode()
 
   for (unsigned long ix = 0; ix < childV.size(); ++ix)
     delete childV[ix];
+
+  childV.clear();
 }
 
 
