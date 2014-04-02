@@ -145,12 +145,6 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
 
@@ -270,12 +264,6 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
 
@@ -383,12 +371,6 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
 
@@ -485,12 +467,6 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
 
@@ -586,12 +562,6 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     ce.contextAttributeVector.push_back(&ca2);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -701,12 +671,6 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
 
@@ -807,12 +771,6 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -916,12 +874,6 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
 
@@ -1022,12 +974,6 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -1130,12 +1076,6 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
 
@@ -1235,12 +1175,6 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
 
@@ -1338,12 +1272,6 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
@@ -1446,12 +1374,6 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
-
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res);
