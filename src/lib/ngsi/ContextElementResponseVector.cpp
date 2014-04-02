@@ -107,9 +107,11 @@ void ContextElementResponseVector::push_back(ContextElementResponse* item)
 *
 * ContextElementResponseVector::get - 
 */
-ContextElementResponse* ContextElementResponseVector::get(int ix)
+ContextElementResponse* ContextElementResponseVector::get(unsigned int ix)
 {
-  return vec[ix];
+  if (ix < vec.size())
+    return vec[ix];
+  return NULL;
 }
 
 

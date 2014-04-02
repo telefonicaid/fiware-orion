@@ -114,11 +114,25 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
     "contextElement": {
         "attributes": [
             {
+                "metadatas": [
+                    {
+                        "name": "ID",
+                        "type": "string",
+                        "value": "ground"
+                    }
+                ],
                 "name": "temperature",
                 "type": "centigrade",
                 "value": "23"
             },
             {
+                "metadatas": [
+                    {
+                        "name": "ID",
+                        "type": "string",
+                        "value": "wall"
+                    }
+                ],
                 "name": "temperature",
                 "type": "centigrade",
                 "value": "23.5"

@@ -65,7 +65,8 @@ using boost::property_tree::ptree;
 */
 static const char* compoundValueRootV[] =
 {
-  "/contextElements/contextElement/attributes/attribute/value/"
+  "/contextElements/contextElement/attributes/attribute/value/",
+  "/attributes/attribute/value/"
 };
 
 
@@ -325,7 +326,11 @@ static std::string jsonParse
       {
         comment += ", STEPPING UP";
         stepUp = true;
-        LM_T(LmtCompoundValueStep, ("STEPPING UP from '%s' to '%s' (from '%s' to '%s')", ciP->compoundValueP->cname(), ciP->compoundValueP->container->cname(), ciP->compoundValueP->cpath(), ciP->compoundValueP->container->cpath()));
+        LM_T(LmtCompoundValueStep, ("STEPPING UP from '%s' to '%s' (from '%s' to '%s')", 
+                                    ciP->compoundValueP->cname(),
+                                    ciP->compoundValueP->container->cname(),
+                                    ciP->compoundValueP->cpath(),
+                                    ciP->compoundValueP->container->cpath()));
       }
     }
 
@@ -333,7 +338,7 @@ static std::string jsonParse
 
     if  ((isCompound == true) && (ciP->inCompoundValue == false))
     {
-      orion::compoundValueStart(ciP, path, nodeName, nodeValue, root, rest, type, fatherIsVector);
+      orion::compoundValueStart(ciP, path, nodeName, nodeValue, rest, type, fatherIsVector);
       if ((nodeName == "") && (nodeValue == ""))
       {
         ciP->compoundValueP->name = "item";
@@ -350,16 +355,21 @@ static std::string jsonParse
       //
       if (stepUp)
       {
-        LM_T(LmtCompoundValueStep, ("Old container: '%s' (path: '%s')", ciP->compoundValueP->cname(), ciP->compoundValueP->cpath()));
-
+        LM_T(LmtCompoundValueStep, (""));
+        LM_T(LmtCompoundValueStep, ("------------- STEP UP -----------------"));
+        LM_T(LmtCompoundValueStep, ("Old current container: '%s' ('%s')", ciP->compoundValueP->cname(), ciP->compoundValueP->cpath()));
         ciP->compoundValueP = ciP->compoundValueP->container;
+        LM_T(LmtCompoundValueStep, ("New current container: '%s' ('%s')", ciP->compoundValueP->cname(), ciP->compoundValueP->cpath()));
 
-        if (ciP->compoundValueP->container->isVector())
+        if (ciP->compoundValueP->isVector() && ciP->compoundValueP->container->isVector())
         {
-          LM_T(LmtCompoundValueStep, ("Father of the new container is a vector - I have to step up one step more"));
+          LM_T(LmtCompoundValueStep, ("New container is a vector and the father of the new container is a vector - I have to step up one step more"));
           ciP->compoundValueP = ciP->compoundValueP->container;
+          LM_T(LmtCompoundValueStep, ("New current container: '%s' ('%s')", ciP->compoundValueP->cname(), ciP->compoundValueP->cpath()));
         }
-        LM_T(LmtCompoundValueStep, ("New container: '%s' (path: '%s')", ciP->compoundValueP->cname(), ciP->compoundValueP->cpath()));
+
+        LM_T(LmtCompoundValueStep, (""));
+        LM_T(LmtCompoundValueStep, (""));
       }
       else
       {

@@ -457,7 +457,7 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
   if ((e.type() != String) && (e.type() != Object) && (e.type() != Array))
     LM_RVE(("unknown BSON type"));
 
-  orion::CompoundValueNode* child = new orion::CompoundValueNode();
+  orion::CompoundValueNode* child = new orion::CompoundValueNode(orion::CompoundValueNode::Struct);
   child->name = e.fieldName();
 
   switch (e.type())
@@ -666,12 +666,12 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
                 }
                 else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Object) {
                     caP = new ContextAttribute(ca.name, ca.type);
-                    caP->compoundValueP = new orion::CompoundValueNode();
+                    caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Struct);
                     compoundObjectResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
                 }
                 else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Array) {
                     caP = new ContextAttribute(ca.name, ca.type);
-                    caP->compoundValueP = new orion::CompoundValueNode();
+                    caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);
                     compoundVectorResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
                 }
                 else {

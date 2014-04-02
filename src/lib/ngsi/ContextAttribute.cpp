@@ -39,11 +39,12 @@
 */
 ContextAttribute::ContextAttribute()
 {
-   name                  = "";
-   type                  = "";
-   value                 = "";
-   compoundValueP        = NULL;
-   typeFromXmlAttribute  = "";
+  LM_T(LmtClone, ("Creating a ContextAttribute 1"));
+  name                  = "";
+  type                  = "";
+  value                 = "";
+  compoundValueP        = NULL;
+  typeFromXmlAttribute  = "";
 }
 
 
@@ -54,14 +55,19 @@ ContextAttribute::ContextAttribute()
 */
 ContextAttribute::ContextAttribute(ContextAttribute* caP)
 {
-   LM_T(LmtClone, ("'cloning' a ContextAttribute"));
    name                  = caP->name;
    type                  = caP->type;
    value                 = caP->value;
    compoundValueP        = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
    typeFromXmlAttribute  = "";
 
+   LM_T(LmtClone, ("Creating a ContextAttribute: compoundValueP at %p for attribute '%s' at %p",
+                   compoundValueP,
+                   name.c_str(),
+                   this));
+
    metadataVector.vec.clear();
+
 
    for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); ++mIx)
    {
@@ -79,6 +85,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
 */
 ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::string _value)
 {
+   LM_T(LmtClone, ("Creating a ContextAttribute '%s':'%s':'%s', setting its compound to NULL", _name.c_str(), _type.c_str(), _value.c_str()));
    name                  = _name;
    type                  = _type;
    value                 = _value;
@@ -92,6 +99,8 @@ ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::st
 */
 ContextAttribute::ContextAttribute(std::string _name, std::string _type, orion::CompoundValueNode* _compoundValueP)
 {
+  LM_T(LmtClone, ("Creating a ContextAttribute, maintaing a pointer to compound value (at %p)", _compoundValueP));
+
   name                  = _name;
   type                  = _type;
   compoundValueP        = _compoundValueP;
@@ -141,11 +150,11 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
     bool isCompoundVector = false;
 
     if ((compoundValueP != NULL) && (compoundValueP->type == orion::CompoundValueNode::Vector))
-      isCompoundVector = true;
+      isCompoundVector = true;    
 
-    out += startTag(indent + "  ", "contextValue", "", format, false, false, isCompoundVector);
+    out += startTag(indent + "  ", "contextValue", "value", format, isCompoundVector, true, isCompoundVector);
     out += compoundValueP->render(format, indent + "    ");
-    out += endTag(indent + "  ", "contextValue", format, comma);
+    out += endTag(indent + "  ", "contextValue", format, comma, isCompoundVector);
   }
 
   out += metadataVector.render(format, indent + "  ", false);
@@ -165,7 +174,14 @@ std::string ContextAttribute::check(RequestType requestType, Format format, std:
   if ((name == "") || (name == "not in use"))
     return "missing attribute name";
 
-  if (requestType != UpdateContext) // FIXME: this is just to make harness test work
+  if (compoundValueP != NULL)
+  {
+    // FIXME P9: Use CompoundValueNode::check here and stop calling it from where it is called right now.
+    //           Also, change CompoundValueNode::check to return std::string
+    return "OK";
+  }
+
+  if (requestType != UpdateContext) // FIXME P9: this is just to make harness test work - what is this?
   {
     if ((value == "") || (value == "not in use"))
       return "missing attribute value";

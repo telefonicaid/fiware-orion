@@ -45,7 +45,6 @@ extern void compoundValueStart
    std::string              path,
    std::string              name,
    std::string              value,
-   std::string              root,
    std::string              rest,
    CompoundValueNode::Type  type,
    bool                     fatherIsVector

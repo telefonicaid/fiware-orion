@@ -43,18 +43,36 @@ namespace orion
 *
 * CompoundValueNode - constructor for toplevel 'node' 
 */
-CompoundValueNode::CompoundValueNode(std::string _root)
+CompoundValueNode::CompoundValueNode()
+{  
+  rootP      = NULL;
+  type       = Unknown;
+  container  = NULL;
+  level      = 0;
+  name       = "Unset";
+  path       = "Unset";
+  siblingNo  = 0;
+
+  LM_T(LmtCompoundValue, ("Created EMPTY compound node"));
+}
+
+
+
+/* ****************************************************************************
+*
+* CompoundValueNode - constructor for toplevel 'node' 
+*/
+CompoundValueNode::CompoundValueNode(Type _type)
 {
-  root       = _root;
   rootP      = this;
-  type       = Struct;
+  type       = _type;
   container  = this;
   level      = 0;
   name       = "toplevel";
   path       = "/";
   siblingNo  = 0;
 
-  LM_T(LmtCompoundValue, ("Created TOPLEVEL compound node"));
+  LM_T(LmtCompoundValue, ("Created TOPLEVEL compound node (a %s)", (type == Vector)? "Vector" : "Struct"));
 }
 
 
@@ -121,6 +139,10 @@ std::string CompoundValueNode::finish(void)
   error = "OK";
 
   LM_T(LmtCompoundValue, ("Finishing a compound"));
+
+  if (lmTraceIsSet(LmtCompoundValueShow))
+    show("");
+
   check(); // sets 'error' for toplevel node
 
   return error;
@@ -134,14 +156,15 @@ std::string CompoundValueNode::finish(void)
 */
 CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
 {
+  node->container = this;
+  node->level     = level + 1;
+  node->siblingNo = childV.size();
+  node->rootP     = rootP;
+
   if (node->type == Leaf)
      LM_T(LmtCompoundValueAdd, ("Adding Leaf '%s', with value '%s' under '%s' (%s)", node->name.c_str(), node->value.c_str(), node->container->path.c_str(), node->container->name.c_str()));
   else
      LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s' (%s)", typeName(node->type), node->name.c_str(), node->container->path.c_str(), node->container->name.c_str()));
-
-  node->container = this;
-  node->level     = level + 1;
-  node->siblingNo = childV.size();
 
   childV.push_back(node);
   return node;
@@ -176,15 +199,15 @@ CompoundValueNode* CompoundValueNode::add(const Type _type, const std::string& _
 void CompoundValueNode::shortShow(std::string indent)
 {
   if ((rootP == this) && (type == Vector))
-    PRINTF("%s%s (toplevel vector)\n", indent.c_str(), name.c_str());
+    LM_F(("%s%s (toplevel vector)", indent.c_str(), name.c_str()));
   else if (rootP == this)
-    PRINTF("%s%s (toplevel struct)\n", indent.c_str(), name.c_str());
+    LM_F(("%s%s (toplevel struct)", indent.c_str(), name.c_str()));
   else if (type == Vector)
-    PRINTF("%s%s (vector)\n", indent.c_str(), name.c_str());
+    LM_F(("%s%s (vector)", indent.c_str(), name.c_str()));
   else if (type == Struct)
-    PRINTF("%s%s (struct)\n", indent.c_str(), name.c_str());
+    LM_F(("%s%s (struct)", indent.c_str(), name.c_str()));
   else
-    PRINTF("%s%s (%s)\n", indent.c_str(), name.c_str(), value.c_str());
+    LM_F(("%s%s (%s)", indent.c_str(), name.c_str(), value.c_str()));
 
   for (unsigned long ix = 0; ix < childV.size(); ++ix)
     childV[ix]->shortShow(indent + "  ");
@@ -198,23 +221,19 @@ void CompoundValueNode::shortShow(std::string indent)
 */
 void CompoundValueNode::show(std::string indent)
 {
-  if (root != "")
-  {
-    PRINTF("%s\n", root.c_str());
-    indent += "  ";
-  }
 
   if (name != "")
-    PRINTF("%sname:    %s\n", indent.c_str(), name.c_str());
+    LM_F(("%sname:    %s", indent.c_str(), name.c_str()));
 
   if (value != "")
-    PRINTF("%svalue:   %s\n", indent.c_str(), value.c_str());
+    LM_F(("%svalue:   %s", indent.c_str(), value.c_str()));
 
-  PRINTF("%scontainer: %s\n", indent.c_str(), container->name.c_str());
-  PRINTF("%slevel:     %d\n", indent.c_str(), level);
-  PRINTF("%ssibling:   %d\n", indent.c_str(), siblingNo);
-  PRINTF("%stype:      %s\n", indent.c_str(), typeName(type));
-  PRINTF("%spath:      %s\n", indent.c_str(), path.c_str());
+  LM_F(("%scontainer: %s", indent.c_str(), container->name.c_str()));
+  LM_F(("%slevel:     %d", indent.c_str(), level));
+  LM_F(("%ssibling:   %d", indent.c_str(), siblingNo));
+  LM_F(("%stype:      %s", indent.c_str(), typeName(type)));
+  LM_F(("%spath:      %s", indent.c_str(), path.c_str()));
+  LM_F(("%srootP:     %s", indent.c_str(), rootP->name.c_str()));
 
   if (childV.size() != 0)
   {
@@ -227,13 +246,13 @@ void CompoundValueNode::show(std::string indent)
         childrenString += ", ";
     }
 
-    PRINTF("%s%lu children (%s)\n", indent.c_str(), childV.size(), childrenString.c_str());
+    LM_F(("%s%lu children (%s)", indent.c_str(), childV.size(), childrenString.c_str()));
 
     for (unsigned long ix = 0; ix < childV.size(); ++ix)
       childV[ix]->show(indent + "  ");
   }
 
-  PRINTF("\n");
+  LM_F((""));
 }
 
 
@@ -301,26 +320,26 @@ std::string CompoundValueNode::render(Format format, std::string indent)
 
   if (type == Leaf)
   {
-    LM_T(LmtCompoundValue, ("I am a Leaf"));
-    out = valueTag(indent, tagName, value, format, jsonComma, false);
+    LM_T(LmtCompoundValueRender, ("I am a Leaf (%s)", name.c_str()));
+    out = valueTag(indent, tagName, value, format, jsonComma, false, container->type == Vector);
   }
   else if ((type == Vector) && (container != this))
   {
-    LM_T(LmtCompoundValue, ("I am a Vector"));
-    out += startTag(indent, tagName, "", format, true, false, true);
+    LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
+    out += startTag(indent, tagName, tagName, format, true, container->type == Struct, true);
     for (unsigned long ix = 0; ix < childV.size(); ++ix)
       out += childV[ix]->render(format, indent + "  ");
     out += endTag(indent, tagName, format, jsonComma, true, true);
   }
   else if ((type == Vector) && (container == this))
   {
-    LM_T(LmtCompoundValue, ("I am a Vector and my container is TOPLEVEL"));
+    LM_T(LmtCompoundValueRender, ("I am a Vector (%s) and my container is TOPLEVEL", name.c_str()));
     for (unsigned long ix = 0; ix < childV.size(); ++ix)
       out += childV[ix]->render(format, indent);
   }
   else if ((type == Struct) && (container->type == Vector))
   {
-    LM_T(LmtCompoundValue, ("I am a Struct and my container is a Vector"));
+    LM_T(LmtCompoundValueRender, ("I am a Struct (%s) and my container is a Vector", name.c_str()));
     out += startTag(indent, "item", "", format, false, false);
     for (unsigned long ix = 0; ix < childV.size(); ++ix)
       out += childV[ix]->render(format, indent + "  ");
@@ -328,10 +347,10 @@ std::string CompoundValueNode::render(Format format, std::string indent)
   }
   else if (type == Struct)
   {
-    LM_T(LmtCompoundValue, ("I am a Struct and my container is NOT a Vector"));
     if (rootP != this)
     {
-      out += startTag(indent, tagName, "", format, false, false);
+      LM_T(LmtCompoundValueRender, ("I am a Struct (%s) and my container is NOT a Vector", name.c_str()));
+      out += startTag(indent, tagName, tagName, format, false, true);
 
       for (unsigned long ix = 0; ix < childV.size(); ++ix)
         out += childV[ix]->render(format, indent + "  ");
@@ -340,6 +359,7 @@ std::string CompoundValueNode::render(Format format, std::string indent)
     }
     else
     {
+      LM_T(LmtCompoundValueRender, ("I am the TREE ROOT (%s)", name.c_str()));
       for (unsigned long ix = 0; ix < childV.size(); ++ix)
         out += childV[ix]->render(format, indent);
     }
@@ -357,7 +377,7 @@ CompoundValueNode* CompoundValueNode::clone(void)
 {
   LM_T(LmtCompoundValue, ("cloning '%s'", name.c_str()));
 
-  CompoundValueNode* me = (rootP == this)? new CompoundValueNode(root) : new CompoundValueNode(container, path, name, value, siblingNo, type, level);
+  CompoundValueNode* me = (rootP == this)? new CompoundValueNode(type) : new CompoundValueNode(container, path, name, value, siblingNo, type, level);
 
   for (unsigned int ix = 0; ix < childV.size(); ++ix)
   {
