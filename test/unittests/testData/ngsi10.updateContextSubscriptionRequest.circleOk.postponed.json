@@ -7,8 +7,8 @@
         "type" : "FIWARE_Location",
         "value" : {
           "circle" : {
-            "center_latitude" : "40",
-            "center_longitude" : "20",
+            "centerLatitude" : "40",
+            "centerLongitude" : "20",
             "radius": "5"
           }
         }

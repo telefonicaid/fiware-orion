@@ -17,8 +17,8 @@
         <scopeValue>
           <circle>
             <radius>10</radius>
-            <center_latitude>45</center_latitude>
-            <center_longitude>45</center_longitude>
+            <centerLatitude>45</centerLatitude>
+            <centerLongitude>45</centerLongitude>
             <inverted>0</inverted>
           </circle>
         </scopeValue>
