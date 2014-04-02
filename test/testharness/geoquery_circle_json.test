@@ -1,0 +1,437 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# fermin at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geo query (circle) JSON test
+
+--SHELL-INIT--
+source harnessFunctions.sh
+
+dbInit CB
+brokerStart CB
+
+--SHELL--
+source harnessFunctions.sh
+
+echo "0: +++++++++ Prepare entities +++++++++++"
+
+# Create entities corresponding to the three cities
+(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+  "contextElements": [
+  {
+    "type": "City",
+    "isPattern": "false",
+    "id": "Madrid",
+    "attributes": [
+    {
+      "name": "location",
+      "type": "coords",
+      "value": "40.418889, -3.691944",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WSG84"
+        }
+      ]
+    }
+    ]
+  },
+  {
+    "type": "City",
+    "isPattern": "false",
+    "id": "Alcobendas",
+    "attributes": [
+    {
+      "name": "location",
+      "type": "coords",
+      "value": "40.533333, -3.633333",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WSG84"
+        }
+      ]
+    }
+    ]
+  },
+  {
+    "type": "City",
+    "isPattern": "false",
+    "id": "Leganes",
+    "attributes": [
+    {
+      "name": "location",
+      "type": "coords",
+      "value": "40.316667, -3.75",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WSG84"
+        }
+      ]
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}
+EOF
+
+echo "1: ++++++++++ Madrid in 14 kms ++++++++++"
+# Query inside 14 kms radius from Madrid center
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "City",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "restriction": {
+        "scopes": [
+            {
+                "type" : "FIWARE_Location",
+                "value" : {
+                  "circle": {
+                    "center_latitude": "40.418889",
+                    "center_longitude": "-3.691944",
+                    "radius": "14000"
+                  }
+                }
+            }
+        ]
+    }
+}
+EOF
+
+echo "2: +++++++++++ Madrid in 15 kms +++++++++"
+# Query inside 15 kms radius from Madrid center
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "City",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "restriction": {
+        "scopes": [
+            {
+                "type" : "FIWARE_Location",
+                "value" : {
+                  "circle": {
+                    "center_latitude": "40.418889",
+                    "center_longitude": "-3.691944",
+                    "radius": "15000"
+                  }
+                }
+            }
+        ]
+    }
+}
+EOF
+
+echo "3: ++++++++++++ Madrid out 14 kms ++++++++"
+# Query in 14 kms radius outside Madrid center
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+  "entities": [
+  {
+    "type": "City",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE_Location",
+      "value" : {
+        "circle": {
+          "center_latitude": "40.418889",
+          "center_longitude": "-3.691944",
+          "radius": "14000",
+          "inverted": "true"
+        }
+      }
+    }
+    ]
+  }
+}
+EOF
+
+--REGEXPECT--
+0: +++++++++ Prepare entities +++++++++++
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "Madrid",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "Alcobendas",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "Leganes",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+1: ++++++++++ Madrid in 14 kms ++++++++++
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "40.316667, -3.75"
+                    }
+                ],
+                "id": "Leganes",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "40.418889, -3.691944"
+                    }
+                ],
+                "id": "Madrid",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+2: +++++++++++ Madrid in 15 kms +++++++++
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "40.533333, -3.633333"
+                    }
+                ],
+                "id": "Alcobendas",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "40.316667, -3.75"
+                    }
+                ],
+                "id": "Leganes",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "40.418889, -3.691944"
+                    }
+                ],
+                "id": "Madrid",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+3: ++++++++++++ Madrid out 14 kms ++++++++
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "40.533333, -3.633333"
+                    }
+                ],
+                "id": "Alcobendas",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+--TEARDOWN--
+source harnessFunctions.sh
+
+brokerStop CB
