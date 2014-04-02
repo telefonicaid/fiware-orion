@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/ScopeVector.h"
