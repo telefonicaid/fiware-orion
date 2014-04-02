@@ -213,6 +213,7 @@ SET (SOURCES
     mongoBackend/mongoDiscoverContextAvailability_test.cpp
     mongoBackend/mongoOntimeintervalOperations_test.cpp
     mongoBackend/mongoQueryContext_test.cpp
+    mongoBackend/mongoQueryContextGeo_test.cpp
     mongoBackend/mongoRegisterContext_test.cpp
     mongoBackend/mongoRegisterContext_update_test.cpp
     mongoBackend/mongoSubscribeContextAvailability_test.cpp
@@ -222,6 +223,7 @@ SET (SOURCES
     mongoBackend/mongoUpdateContextAvailabilitySubscription_test.cpp
     mongoBackend/mongoUpdateContextSubscription_test.cpp
     mongoBackend/mongoUpdateContext_test.cpp
+    mongoBackend/mongoUpdateContextGeo_test.cpp
     mongoBackend/mongoUpdateContext_withOnchangeSubscriptions_test.cpp
     mongoBackend/mongoNotifyContext_test.cpp
     mongoBackend/mongoNotifyContextAvailability_test.cpp

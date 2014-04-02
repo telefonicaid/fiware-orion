@@ -1,0 +1,6 @@
+<queryContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>bad string for circle/inverted: 'not at all'</reasonPhrase>
+  </errorCode>
+</queryContextResponse>

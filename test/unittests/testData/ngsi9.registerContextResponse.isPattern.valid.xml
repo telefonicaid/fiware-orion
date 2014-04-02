@@ -3,6 +3,6 @@
   <registrationId>000000000000000000000000</registrationId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>bad value for 'isPattern'</reasonPhrase>
+    <reasonPhrase>invalid isPattern (boolean) value for entity: 'not false'</reasonPhrase>
   </errorCode>
 </registerContextResponse>

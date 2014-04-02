@@ -123,7 +123,9 @@ HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList
     reqSemTake(__FUNCTION__, "get context-element responses");
     LM_T(LmtMongo, ("Get Notify Context Request operation"));
 
-    if (!entitiesQuery(enV, attrL, cerV, err, true)) {
+    // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
+    Restriction res;
+    if (!entitiesQuery(enV, attrL, res, cerV, err, true)) {
         reqSemGive(__FUNCTION__, "get context-element responses (no entities found)");
         cerV->release();
         LM_RE(SccOk, ((*err).c_str()));

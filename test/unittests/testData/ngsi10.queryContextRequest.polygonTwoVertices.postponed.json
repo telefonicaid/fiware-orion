@@ -1,0 +1,49 @@
+{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "occupancy",
+    "lightstatus"
+  ],
+  "restriction": {
+    "attributeExpression" : "Attribute Expression",
+    "scopes": [
+      {
+        "type" : "FIWARE_Location",
+        "value" : {
+          "polygon" : {
+            "vertices" : [
+              {
+                "longitude" : "10",
+                "latitude"  : "10"
+              },
+              {
+                "longitude" : "30",
+                "latitude"  : "30"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "type" : "t1",
+        "value" : "1"
+      },
+      {
+        "type" : "t2",
+        "value" : "2"
+      }
+    ]
+  }
+}
