@@ -80,7 +80,15 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
         car.contextAttributeVector.push_back(cav.get(i));
       }
     }
-    car.statusCode.fill(&cerP->statusCode);
+
+    if (cav.size() > 0 && car.contextAttributeVector.size() == 0)
+    {
+       car.statusCode.fill(SccContextElementNotFound, std::string("Attribute-ValueID pair: '") + attributeName + "-" + valueID + "'");
+    }
+    else
+    {
+      car.statusCode.fill(&cerP->statusCode);
+    }
   }
 
   request.release();

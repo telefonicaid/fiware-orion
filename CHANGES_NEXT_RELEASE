@@ -1,11 +1,13 @@
 - Add: "geo" queries functionality.
+- Add: It is now possible to delete entities using updateContext DELETE with empty attributes list
+- Fix: Fixed convenience operation "DELETE /ngsi10/contextEntities/{EntityID}" (partially fixes issue #225)
 - Fix: The CLI options now coincide with the documentation.
 - Fix: Introduced a second semaphore level as additional security measure to ensure all MongoDB driver invocations run in thread-safe mode.
 - Fix: Convenience operations now correctly parse context values. (Bug #219)
 - Add: It is now possible to update attribute values using a convenience operation without using metadatas.
-- Fix: fixed a bug about incoming buffer pollution 
 - Fix: StatusCode is now correctly rendered in JSON when sent as a standalone message (partially fixes issue #225)
 - Fix: Fixed a bug about incoming buffer pollution.
 - Fix: Some unknown incoming URLs were not responded to. Now they are. (Bug #277)
 - Fix: Now the operations GET, POST and PUT work properly with convenience operations over valueID's.
 - Fix: JSON/XML Payload parsing that ended in parse error had a bug resulting in a possible memory leak.
+- Fix: Convenience operation GET with non-existent valueIDs is now handled correctly.

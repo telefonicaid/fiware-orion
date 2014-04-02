@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Convenience Individual Context Entity - POST OK
+Convenience Individual Context Entity Attribute - GET OK
 
 --SHELL-INIT--
 source harnessFunctions.sh
@@ -30,64 +30,34 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "+++++ 1. register an entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
-<?xml version="1.0"?>
-  <registerContextRequest>
-    <contextRegistrationList>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Room" isPattern="false">
-            <id>entity01</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:1028/application</providingApplication>
-      </contextRegistration>
-    </contextRegistrationList>
-    <duration>PT1H</duration>
-    <registrationId></registrationId>
-  </registerContextRequest>
-EOF
-
-echo "+++++ 2. add to the entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
+echo "+++++ 1. create an entity +++++"
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
     <contextAttribute>
-      <name>pressure</name>
-      <type>clima</type>
-      <contextValue>p23</contextValue>
+      <name>temperature</name>
+      <type>degree</type>
+      <contextValue>10</contextValue>
     </contextAttribute>
   </contextAttributeList>
 </appendContextElementRequest>
 EOF
 
+echo "+++++ 2. lookup the entity +++++"
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes/temperature -s -S --header 'Content-Type: application/xml' -X GET | xmllint --format - )
 
 --REGEXPECT--
-+++++ 1. register an entity +++++
-<?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
-+++++ 2. add to the entity +++++
++++++ 1. create an entity +++++
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>
         <contextAttribute>
-          <name>pressure</name>
-          <type>clima</type>
+          <name>temperature</name>
+          <type>degree</type>
           <contextValue/>
         </contextAttribute>
       </contextAttributeList>
@@ -98,6 +68,21 @@ EOF
     </contextAttributeResponse>
   </contextResponseList>
 </appendContextElementResponse>
++++++ 2. lookup the entity +++++
+<?xml version="1.0"?>
+<contextAttributeResponse>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>temperature</name>
+      <type>degree</type>
+      <contextValue>10</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</contextAttributeResponse>
 --TEARDOWN--
 source harnessFunctions.sh
 brokerStop CB

@@ -674,6 +674,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
                                       std::string(" - offending attribute: ") + targetAttr->toString() +
                                       std::string(" - location attribute has to be defined at creation time, with APPEND"));
 
+                // FIXME P10: the push_back is always done before return. Thus, why don't do the push_bask in the caller and avoid passing responseP as argument to this function?
                 responseP->contextElementResponseVector.push_back(cerP);
                 return false;
             }
@@ -748,6 +749,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
                                       " - entity: (" + eP->toString() + ")" +
                                       " - offending attribute: " + targetAttr->toString());
 
+                // FIXME P10: the push_back is always done before return. Thus, why don't do the push_bask in the caller and avoid passing responseP as argument to this function?
                 responseP->contextElementResponseVector.push_back(cerP);
                 return false;
             }
@@ -785,6 +787,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
                                       " - entity: (" + eP->toString() + ")" +
                                       " - offending attribute: " + targetAttr->toString());
 
+                // FIXME P10: the push_back is always done before return. Thus, why don't do the push_bask in the caller and avoid passing responseP as argument to this function?
                 responseP->contextElementResponseVector.push_back(cerP);
                 return false;
 
@@ -801,6 +804,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
             std::string err;
             if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, &err)) {
                 cerP->statusCode.fill(SccReceiverInternalError, err);
+                // FIXME P10: the push_back is always done before return. Thus, why don't do the push_bask in the caller and avoid passing responseP as argument to this function?
                 responseP->contextElementResponseVector.push_back(cerP);
                 LM_RE(false, (err.c_str()));
             }
@@ -828,6 +832,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
          * do a 'continue' without setting it. */
         //FIXME P5: this is ugly, our code should be improved to set ceP in a common place for the "happy case"
         cerP->statusCode.fill(SccOk);
+        // FIXME P10: the push_back is always done before return. Thus, why don't do the push_bask in the caller and avoid passing responseP as argument to this function?
         responseP->contextElementResponseVector.push_back(cerP);
     }
 
@@ -929,6 +934,55 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
 
 /* ****************************************************************************
 *
+* removeEntity -
+*
+*/
+static bool removeEntity(std::string entityId, std::string entityType, ContextElementResponse* cerP) {
+
+    const std::string idString = std::string("_id.") + ENT_ENTITY_ID;
+    const std::string typeString = std::string("_id.") + ENT_ENTITY_TYPE;
+
+    DBClientConnection* connection = getMongoConnection();
+
+    BSONObj query;
+    if (entityType == "") {
+        query = BSON(idString << entityId << typeString << BSON("$exists" << false));
+    }
+    else {
+        query = BSON(idString << entityId << typeString << entityType);
+    }
+    try {
+        LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", getEntitiesCollectionName(),
+                           query.toString().c_str()));
+        mongoSemTake(__FUNCTION__, "remove in EntitiesCollection");
+        connection->remove(getEntitiesCollectionName(), query);
+        mongoSemGive(__FUNCTION__, "remove in EntitiesCollection");
+    }
+    catch( const DBException &e ) {
+        mongoSemGive(__FUNCTION__, "remove in EntitiesCollection (mongo db exception)");
+        cerP->statusCode.fill(SccReceiverInternalError,
+           std::string("collection: ") + getEntitiesCollectionName() +
+           " - remove() query: " + query.toString() +
+           " - exception: " + e.what());
+
+        return false;
+    }
+    catch(...) {
+        mongoSemGive(__FUNCTION__, "update in EntitiesCollection (mongo generic exception)");
+        cerP->statusCode.fill(SccReceiverInternalError,
+           std::string("collection: ") + getEntitiesCollectionName() +
+           " - remove() query: " + query.toString() +
+           " - exception: " + "generic");
+
+        return false;
+    }
+
+    cerP->statusCode.fill(SccOk);
+    return true;
+}
+
+/* ****************************************************************************
+*
 * processContextElement -
 *
 */
@@ -1019,6 +1073,13 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         ContextElementResponse* cerP = new ContextElementResponse();
         cerP->contextElement.entityId.fill(entityId, entityType, "false");
 
+        /* If the vector of Context Attributes is empty and the operation was DELETE, then delete the entity */
+        if (strcasecmp(action.c_str(), "delete") == 0 && ceP->contextAttributeVector.size() == 0) {
+            removeEntity(entityId, entityType, cerP);
+            responseP->contextElementResponseVector.push_back(cerP);
+            continue;
+        }
+
         /* We start with the attrs array in the entity document, which is manipulated by the
          * {update|delete|append}Attrsr() function for each one of the attributes in the
          * contextElement being processed. Then, we replace the resulting attrs array in the
@@ -1101,6 +1162,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                " - exception: " + e.what());
 
             responseP->contextElementResponseVector.push_back(cerP);
+            // FIXME P10: why don't 'continue'?
             return;
         }
         catch(...) {
@@ -1112,6 +1174,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                " - exception: " + "generic");
 
             responseP->contextElementResponseVector.push_back(cerP);
+            // FIXME P10: why don't 'continue'?
             return;
         }
 
