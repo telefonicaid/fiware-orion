@@ -1,0 +1,6 @@
+<queryContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>bad string for polygon/inverted: 'cero'</reasonPhrase>
+  </errorCode>
+</queryContextResponse>

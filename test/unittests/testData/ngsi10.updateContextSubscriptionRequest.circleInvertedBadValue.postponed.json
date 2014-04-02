@@ -1,0 +1,39 @@
+{
+  "duration": "P5Y",
+  "restriction": {
+    "attributeExpression" : "AE",
+    "scopes": [
+      {
+        "type" : "FIWARE_Location",
+        "value" : {
+          "circle" : {
+            "centerLatitude" : "40",
+            "centerLongitude" : "20",
+            "radius": "5",
+            "inverted" : "zero"
+          }
+        }
+      },
+      {
+        "type" : "t1",
+        "value" : "1"
+      },
+      {
+        "type" : "t2",
+        "value" : "2"
+      }
+    ]
+  },
+  "subscriptionId": "9212ce4b0c214479be429e21",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [
+        "CondValue1",
+        "CondValue2"
+      ],
+      "restriction": "restriction"
+    }
+  ],
+  "throttling": "P5Y"
+}

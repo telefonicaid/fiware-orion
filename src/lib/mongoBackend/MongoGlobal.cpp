@@ -31,6 +31,7 @@
 
 #include "common/globals.h"
 #include "common/sem.h"
+#include "common/string.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoOntimeintervalOperations.h"
@@ -40,7 +41,7 @@
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/Duration.h"
 #include "parse/CompoundValueNode.h"
-
+#include "ngsi/Restriction.h"
 #include "ngsiNotify/Notifier.h"
 
 using namespace mongo;
@@ -50,6 +51,8 @@ using namespace mongo;
 * Globals
 */
 static DBClientConnection*  connection;
+static int                  mongoVersionMayor = -1;
+static int                  mongoVersionMinor = -1;
 static char*                entitiesCollectionName                      = NULL;
 static char*                registrationsCollectionName                 = NULL;
 static char*                subscribeContextCollectionName              = NULL;
@@ -88,6 +91,17 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
             LM_RE(false, ("Auth error (db=%s, username=%s, pswd=%s): %s", db, username, passwd, err.c_str()));
         }
     }
+
+    /* Get mongo version with the 'buildinfo' command */
+    BSONObj result;
+    std::string extra;
+    connection->runCommand("admin", BSON("buildinfo" << 1), result);
+    std::string versionString = std::string(result.getStringField("version"));
+    if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra)) {
+        mongoSemGive(__FUNCTION__, "wrong mongo version format");
+        LM_RE(false, ("wrong mongo version format: <%s>", versionString.c_str()));
+    }
+    LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)", versionString.c_str(), mongoVersionMayor, mongoVersionMinor, extra.c_str()));
 
     mongoSemGive(__FUNCTION__, "connecting to mongo");
     return true;
@@ -267,6 +281,28 @@ const char* getSubscribeContextAvailabilityCollectionName(void) {
 */
 const char* getAssociationsCollectionName(void) {
     return assocationsCollectionName;
+}
+
+/*****************************************************************************
+*
+* mongoLocationCapable -
+*/
+bool mongoLocationCapable(void) {
+    /* Geo location based in 2dsphere indexes was introduced in MongoDB 2.4 */
+    return ((mongoVersionMayor == 2) && (mongoVersionMinor >= 4)) || (mongoVersionMayor > 2);
+}
+
+/*****************************************************************************
+*
+* ensureLocationIndex -
+*/
+void ensureLocationIndex(void) {
+    /* Ensure index for entity locations, in the case of using 2.4 */
+    if (mongoLocationCapable()) {
+        std::string index = std::string(ENT_LOCATION) + "." + ENT_LOCATION_COORDS;
+        connection->ensureIndex(getEntitiesCollectionName(), BSON(index << "2dsphere" ));
+        LM_T(LmtMongo, ("ensuring 2dsphere index on %s", index.c_str()));
+    }
 }
 
 /* ****************************************************************************
@@ -511,6 +547,78 @@ static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElem
     }
 }
 
+/* *****************************************************************************
+*
+* processAreaScope -
+*
+* Returns true if a location was found, false otherwise
+*/
+static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
+
+    unsigned int geoScopes = 0;
+    for (unsigned int ix = 0; ix < scoV.size(); ++ix) {
+        Scope* sco = scoV.get(ix);        
+
+        if (sco->type == FIWARE_LOCATION) {
+            geoScopes++;
+        }
+
+        if (geoScopes == 1) {
+
+            if (!mongoLocationCapable()) {
+                LM_W(("location scope was found but your MongoDB version doesn't support it. Please upgrade MongoDB server to 2.4 or newer"));
+                return false;
+            }
+
+            // FIXME P2: current version only support one geolocation scope. If the client includes several ones,
+            // only the first is taken into account
+            bool inverted = false;
+
+            BSONObj geoWithin;
+            if (sco->areaType== orion::CircleType) {
+                double radians = sco->circle.radius() / EARTH_RADIUS_METERS;
+                geoWithin = BSON("$centerSphere" << BSON_ARRAY(BSON_ARRAY( sco->circle.center.latitude() << sco->circle.center.longitude()) << radians ));
+                inverted = sco->circle.inverted();
+            }
+            else if (sco->areaType== orion::PolygonType) {
+                BSONArrayBuilder vertex;
+                double x0, y0;
+                for (unsigned int jx = 0; jx < sco->polygon.vertexList.size() ; ++jx) {
+                    double x = sco->polygon.vertexList[jx]->latitude();
+                    double y = sco->polygon.vertexList[jx]->longitude();
+                    if (jx == 0) {
+                        x0 = x;
+                        y0 = y;
+                    }
+                    vertex.append(BSON_ARRAY(x << y));
+                }
+                /* MongoDB query API needs to "close" the polygon with the same point that the initial point */
+                vertex.append(BSON_ARRAY(x0 << y0));
+
+                /* Note that MongoDB query API uses an ugly "double array" structure for coordinates */
+                geoWithin = BSON("$geometry" << BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(vertex.arr())));
+
+                inverted = sco->polygon.inverted();
+            }
+            else {
+                LM_RE(false, ("unknown area type"));
+            }
+
+            if (inverted) {
+                areaQuery = BSON("$not" << BSON("$geoWithin" << geoWithin));
+            }
+            else {
+                areaQuery = BSON("$geoWithin" << geoWithin);
+            }
+        }
+    }
+
+    if (geoScopes > 1) {
+        LM_W(("current version supports only one area scope: %d were found, the first one was used", geoScopes));
+    }
+    return (geoScopes > 0);
+
+}
 
 /* ****************************************************************************
 *
@@ -527,7 +635,7 @@ static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElem
 * empty value causes an error)
 *
 */
-bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty) {
+bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty) {
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -586,6 +694,14 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
          * make the query fail*/
         queryBuilder.append(attrNames, BSON("$in" << attrs.arr()));
     }
+
+    /* Potentially include area scope in the query */
+    BSONObj areaQuery;
+    if (processAreaScope(res.scopeVector, areaQuery)) {
+       std::string locCoords = std::string(ENT_LOCATION) + "." + ENT_LOCATION_COORDS;
+       queryBuilder.append(locCoords, areaQuery);
+    }
+
     BSONObj query = queryBuilder.obj();
 
     /* Do the query on MongoDB */
@@ -640,6 +756,12 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
         cer->contextElement.entityId.type = STR_FIELD(queryEntity, ENT_ENTITY_TYPE);
         cer->contextElement.entityId.isPattern = "false";
 
+        /* Get the location attribute (if it exists) */
+        std::string locAttr;
+        if (r.hasElement(ENT_LOCATION)) {
+            locAttr = r.getObjectField(ENT_LOCATION).getStringField(ENT_LOCATION_ATTRNAME);
+        }
+
         /* Attributes part */
 
         std::vector<BSONElement> queryAttrV = r.getField(ENT_ATTRS).Array();
@@ -682,6 +804,10 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
                 /* Setting ID (if found) */
                 if (STR_FIELD(queryAttr, ENT_ATTRS_ID) != "") {
                     Metadata* md = new Metadata(NGSI_MD_ID, "string", STR_FIELD(queryAttr, ENT_ATTRS_ID));
+                    caP->metadataVector.push_back(md);
+                }
+                if (locAttr == ca.name) {
+                    Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WSG84);
                     caP->metadataVector.push_back(md);
                 }
 
@@ -1000,7 +1126,9 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
     std::string err;
     NotifyContextRequest ncr;
 
-    if (!entitiesQuery(enV, attrL, &ncr.contextElementResponseVector, &err, false)) {
+    // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
+    Restriction res;
+    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false)) {
         ncr.contextElementResponseVector.release();
         LM_RE(false, (err.c_str()));
     }
@@ -1017,7 +1145,8 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
              * Note that in this case we do a query for all the attributes, not restricted to attrV */
             ContextElementResponseVector allCerV;
             AttributeList emptyList;
-            if (!entitiesQuery(enV, emptyList, &allCerV, &err, false)) {
+            // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
+            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false)) {
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
                 LM_RE(false, (err.c_str()));

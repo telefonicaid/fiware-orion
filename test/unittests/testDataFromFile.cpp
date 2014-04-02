@@ -83,10 +83,10 @@ std::string testDataFromFile(char* buffer, int bufSize, const char* fileName)
     return std::string("stat(") + path + "): " + strerror(errno);
 
   if (sBuf.st_size > bufSize)
-     return std::string("buffer too small (") + toString(bufSize) + " bytes): " + toString(sBuf.st_size) + " bytes needed to hold the content of " + path;
+    return std::string("buffer too small (") + toString(bufSize) + " bytes): " + toString(sBuf.st_size) + " bytes needed to hold the content of " + path;
 
   if ((fd = open(path, O_RDONLY)) == -1)
-     return std::string("open(") + path + "): " + strerror(errno);
+    return std::string("open(") + path + "): " + strerror(errno);
 
   nb = read(fd, buffer, sBuf.st_size);
   close(fd);
@@ -94,7 +94,7 @@ std::string testDataFromFile(char* buffer, int bufSize, const char* fileName)
     return std::string("read(") + path + "): " + strerror(errno);
 
   if (nb != sBuf.st_size)
-     return std::string("bad size read from ") + path;
+    return std::string("bad size read from ") + path;
   
   buffer[nb] = 0;
   

@@ -66,7 +66,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
                    name.c_str(),
                    this));
 
-   metadataVector.vec.clear();
+   metadataVector.release();
 
 
    for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); ++mIx)
@@ -115,6 +115,20 @@ std::string ContextAttribute::getId()
 {
   for (unsigned int ix = 0; ix < metadataVector.size(); ++ix) {
       if (metadataVector.get(ix)->name == NGSI_MD_ID) {
+          return metadataVector.get(ix)->value;
+      }
+  }
+  return "";
+}
+
+/* ****************************************************************************
+*
+* ContextAttribute::getLocation() -
+*/
+std::string ContextAttribute::getLocation()
+{
+  for (unsigned int ix = 0; ix < metadataVector.size(); ++ix) {
+      if (metadataVector.get(ix)->name == NGSI_MD_LOCATION) {
           return metadataVector.get(ix)->value;
       }
   }

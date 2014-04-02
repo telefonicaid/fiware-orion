@@ -33,7 +33,8 @@
 #include "ngsi/Request.h"
 #include "parse/CompoundValueNode.h"
 
-#define NGSI_MD_ID "ID"
+#define NGSI_MD_ID       "ID"
+#define NGSI_MD_LOCATION "location"
 
 
 /* ****************************************************************************
@@ -55,7 +56,9 @@ typedef struct ContextAttribute
   ContextAttribute(std::string _name, std::string _type, std::string _value = "");
   ContextAttribute(std::string _name, std::string _type, orion::CompoundValueNode* _compoundValueP);
 
+  /* Grabbers for metadata to which CB gives a special semantic */
   std::string  getId();
+  std::string  getLocation();
 
   std::string  render(Format format, std::string indent, bool comma = false);
   std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);

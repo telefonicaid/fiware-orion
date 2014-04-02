@@ -3,6 +3,6 @@
   <registrationId>000000000000000000000000</registrationId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>bad isDomain value for registration attribute</reasonPhrase>
+    <reasonPhrase>invalid isDomain (boolean) value for registration attribute: 'fallsehh'</reasonPhrase>
   </errorCode>
 </registerContextResponse>
