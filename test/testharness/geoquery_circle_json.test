@@ -117,8 +117,8 @@ echo "1: ++++++++++ Madrid in 14 kms ++++++++++"
                 "type" : "FIWARE_Location",
                 "value" : {
                   "circle": {
-                    "center_latitude": "40.418889",
-                    "center_longitude": "-3.691944",
+                    "centerLatitude": "40.418889",
+                    "centerLongitude": "-3.691944",
                     "radius": "14000"
                   }
                 }
@@ -145,8 +145,8 @@ echo "2: +++++++++++ Madrid in 15 kms +++++++++"
                 "type" : "FIWARE_Location",
                 "value" : {
                   "circle": {
-                    "center_latitude": "40.418889",
-                    "center_longitude": "-3.691944",
+                    "centerLatitude": "40.418889",
+                    "centerLongitude": "-3.691944",
                     "radius": "15000"
                   }
                 }
@@ -173,8 +173,8 @@ echo "3: ++++++++++++ Madrid out 14 kms ++++++++"
       "type" : "FIWARE_Location",
       "value" : {
         "circle": {
-          "center_latitude": "40.418889",
-          "center_longitude": "-3.691944",
+          "centerLatitude": "40.418889",
+          "centerLongitude": "-3.691944",
           "radius": "14000",
           "inverted": "true"
         }
