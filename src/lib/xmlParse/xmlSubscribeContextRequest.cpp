@@ -513,8 +513,8 @@ XmlNode scrParseVector[] =
   { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue",  scopeValue           },
 
   { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle",                              circle                  },
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/center_latitude",              circleCenterLatitude    },
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/center_longitude",             circleCenterLongitude   },
+  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/centerLatitude",               circleCenterLatitude    },
+  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/centerLongitude",              circleCenterLongitude   },
   { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/radius",                       circleRadius            },
   { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/inverted",                     circleInverted          },
 

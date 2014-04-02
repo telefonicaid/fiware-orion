@@ -57,7 +57,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
    type  = caP->type;
    value = caP->value;
 
-   metadataVector.vec.clear();
+   metadataVector.release();
 
    for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); ++mIx)
    {

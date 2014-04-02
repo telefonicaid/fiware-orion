@@ -182,5 +182,5 @@ void Scope::present(std::string indent, int ix)
 */
 void Scope::release(void)
 {
-   /* This method is included for the sake of homogeneity */
+  polygon.release();
 }

@@ -316,26 +316,25 @@ static bool processLocation(ContextAttributeVector caV, std::string& locAttr, do
 
     locAttr = "";
     for (unsigned ix = 0; ix < caV.size(); ++ix) {
-        ContextAttribute ca = caV.get(ix);
-        MetadataVector mdV = ca.metadataVector;
-        for (unsigned jx = 0; jx < mdV.size(); ++jx) {
-            Metadata md = mdV.get(jx);
-            if (md.name == NGSI_MD_LOCATION) {
+        ContextAttribute* caP = caV.get(ix);
+        for (unsigned jx = 0; jx < caP->metadataVector.size(); ++jx) {
+            Metadata* mdP = caP->metadataVector.get(jx);
+            if (mdP->name == NGSI_MD_LOCATION) {
                 if (locAttr.length() > 0) {
                     *errDetail = "You cannot use more than one location attribute when creating an entity (see Orion user manual)";
                     return false;
                 }
                 else {
-                    if (md.value != LOCATION_WSG84) {
-                        *errDetail = "only WSG84 are supported, found: " + md.value;
+                    if (mdP->value != LOCATION_WSG84) {
+                        *errDetail = "only WSG84 are supported, found: " + mdP->value;
                         return false;
                     }
 
-                    if (!string2coords(ca.value, coordLat, coordLong)) {
-                        *errDetail = "coordinate format error (see Orion user manual): " + ca.value;
+                    if (!string2coords(caP->value, coordLat, coordLong)) {
+                        *errDetail = "coordinate format error (see Orion user manual): " + caP->value;
                         return false;
                     }
-                    locAttr = ca.name;
+                    locAttr = caP->name;
                 }
             }
         }

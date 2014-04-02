@@ -350,6 +350,7 @@ bool string2coords(std::string s, double& latitude, double& longitude)
   latitude = atoF(number1, err);
   if (err.length() > 0) {
      latitude = oldLatitude; 
+     free(initial);
      return false;
   }
   else {
@@ -358,10 +359,12 @@ bool string2coords(std::string s, double& latitude, double& longitude)
          /* Rollback latitude */
          latitude = oldLatitude;
          longitude = oldLongitude;
+         free(initial);
          return false;
      }
   }
 
+  free(initial);
   return true;
 }
 

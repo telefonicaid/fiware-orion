@@ -433,8 +433,8 @@ XmlNode ucsrParseVector[] =
   { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue",  scopeValue           },
 
   { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/circle",                              circle                  },
-  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/center_latitude",              circleCenterLatitude    },
-  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/center_longitude",             circleCenterLongitude   },
+  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/centerLatitude",               circleCenterLatitude    },
+  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/centerLongitude",              circleCenterLongitude   },
   { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/radius",                       circleRadius            },
   { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/inverted",                     circleInverted          },
 
