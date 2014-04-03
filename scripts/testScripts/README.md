@@ -37,15 +37,17 @@ http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-conte
      '-v' : verbose mode, by default OFF
 
 * Default execution:
-    $ node accumulatorServer.js
+   ''' $ node accumulatorServer.js
    ### ACCUMULATOR SERVER STARTED ### Thu Feb 27 2014 12:03:41 GMT+0100 (CET)
    Req: 0
    Req: 0
+   '''
 
 
 * Parametrized execution:
-xxx@xlan:~/git/fiware-orion/scripts/testScripts$ node nodeAccumulator.js -s5 -p1030 -ds5 -dp1040 -v
-    Setup ports starting at :  1030
+
+    '''xxx@xlan:~/git/fiware-orion/scripts/testScripts$ node nodeAccumulator.js -s5 -p1030 -ds5 -dp1040 -v
+   Setup ports starting at :  1030
     Setup Delayed ports starting at :  1040
     # Verbosity activated
     ### ACCUMULATOR SERVER  #1 STARTED at port 1030 ### Thu Apr 03 2014 17:00:34 GMT+0200 (CEST)
@@ -60,6 +62,7 @@ xxx@xlan:~/git/fiware-orion/scripts/testScripts$ node nodeAccumulator.js -s5 -p1
     ### ACCUMULATOR Delayed SERVER #5 + STARTED at port 1044 ### Thu Apr 03 2014 17:00:34 GMT+0200 (CEST)
     Req: 0
     Req: 0
+   '''
 
 Now accumulator server is ready to receive requests.
 
