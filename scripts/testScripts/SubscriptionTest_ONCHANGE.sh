@@ -90,9 +90,9 @@ echo " ##########  Suscription test DONE!"
 
 #TIPS 
 #Trigger sample for pressure: 
-#curl -H 'Content-Type: application/xml' -d '<?xml version="1.0" encoding="UTF-8"?><updateContextRequest><contextElementList><contextElement><entityId type="Room" isPattern="false"><id>Room1</id></entityId><contextAttributeList><contextAttribute><name>pressure</name><type>mmHg</type><contextValue>'`date +%N`'</contextValue></contextAttribute></contextAttributeList></contextElement></contextElementList><updateAction>UPDATE</updateAction></updateContextRequest>' orion/NGSI10/updateContext
+#curl -H 'Content-Type: application/xml' -d '<?xml version="1.0" encoding="UTF-8"?><updateContextRequest><contextElementList><contextElement><entityId type="Room" isPattern="false"><id>Room1</id></entityId><contextAttributeList><contextAttribute><name>pressure</name><type>mmHg</type><contextValue>'`date +%N`'</contextValue></contextAttribute></contextAttributeList></contextElement></contextElementList><updateAction>APPEND</updateAction></updateContextRequest>' orion/NGSI10/updateContext
 
 #DEACTIVATE Subscription:
-#curl -H 'Content-Type: application/xml' -d '<?xml version="1.0"?><unsubscribeContextRequest><subscriptionId>530b8d95286043dd1c801939</subscriptionId></unsubscribeContextRequest>' ORION/NGSI10/unsubscribeContext
-
+#curl -H 'Content-Type: application/xml' -d '<?xml version="1.0"?><unsubscribeContextRequest><subscriptionId>SUB_ID</subscriptionId></unsubscribeContextRequest>' ORION/NGSI10/unsubscribeContext
+#Note: SUB_ID is the Id of the subscription to deactivate
 
