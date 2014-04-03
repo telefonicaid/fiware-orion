@@ -61,8 +61,7 @@ http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-conte
     ### ACCUMULATOR Delayed SERVER #4 + STARTED at port 1043 ### Thu Apr 03 2014 17:00:34 GMT+0200 (CEST)
     ### ACCUMULATOR Delayed SERVER #5 + STARTED at port 1044 ### Thu Apr 03 2014 17:00:34 GMT+0200 (CEST)
     Req: 0
-    Req: 0
-  ```
+    Req: 0 ```
 
 Now accumulator server is ready to receive requests.
 
