@@ -27,7 +27,7 @@ echo "#### Subscription ONTIMEINTERVAL test STARTED! #### "
 echo "Date: " $(date +"%m-%d-%Y %H:%M"); 
 
 
-# Default config: 60 subscriptions (delayed by 1 sec) and updated on TIMEINTERVAL 60s and sent to http://127.0.0.1:1028/accumulator server
+# Default config: 60 subscriptions (delayed by 1 sec) on TIMEINTERVAL every 60 seconds and sent to http://127.0.0.1:1028/accumulator server
 #config
 n=0
 max=10

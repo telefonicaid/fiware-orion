@@ -27,7 +27,7 @@ echo "#### Subscription ONCHANGE test STARTED! #### "
 echo "Date: " $(date +"%m-%d-%Y %H:%M"); 
 
 
-# Default config: 100 subscriptions and updated on CHANGE over PRESSURE and sent to http://127.0.0.1:1028/accumulator server
+# Default config: 100 subscriptions on CHANGE over PRESSURE and sent to http://127.0.0.1:1028/accumulator server
 #config
 n=0
 max=10
