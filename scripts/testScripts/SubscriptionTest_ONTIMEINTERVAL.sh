@@ -111,9 +111,13 @@ do
 done
 
 # DONE
-echo " ##########  Suscription test DONE!"
+echo " ##########  Subscription test DONE!"
 
-#DEACTIVATE Subsription
-#curl -H 'Content-Type: application/xml' -d '<?xml version="1.0"?><unsubscribeContextRequest><subscriptionId>530b8d95286043dd1c801939</subscriptionId></unsubscribeContextRequest>' localhost/NGSI10/unsubscribeContext
+#TIPS (Copy&Paste)
+#Trigger sample for temperature at room1:
+#curl -H 'Content-Type: application/xml' -d '<?xml version="1.0" encoding="UTF-8"?><updateContextRequest><contextElementList><contextElement><entityId type="Room" isPattern="false"><id>Room1</id></entityId><contextAttributeList><contextAttribute><name>temperature</name><type>centigrade</type><contextValue>23</contextValue></contextAttribute></contextAttributeList></contextElement></contextElementList><updateAction>APPEND</updateAction></updateContextRequest>' localhost:1026/NGSI10/updateContext
 
+#DEACTIVATE Subscription
+#curl -H 'Content-Type: application/xml' -d '<?xml version="1.0"?><unsubscribeContextRequest><subscriptionId>SUB_ID</subscriptionId></unsubscribeContextRequest>' localhost:1026/NGSI10/unsubscribeContext
+#Note: SUB_ID is the Id of the subscription to deactivate
 
