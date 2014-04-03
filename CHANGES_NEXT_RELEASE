@@ -1,4 +1,5 @@
 - Add: "geo" queries functionality.
+- Add: attribute values can now be not only simple strings but compound expressions with vectors and key-maps
 - Add: It is now possible to delete entities using updateContext DELETE with empty attributes list
 - Fix: Fixed convenience operation "DELETE /ngsi10/contextEntities/{EntityID}" (partially fixes issue #225)
 - Fix: The CLI options now coincide with the documentation.
