@@ -18,11 +18,32 @@
  # For those usages not covered by this license please contact with
  # fermin at tid dot es
 
-# v0.3
+version="Subscription Massive Generator Test ONTIMEINTERVAL v0.0.3"
+
+#CLI options
+
+if [ "$1" == "-u" ]
+then
+  echo Usage: subscriptionTest_ONTIMEINTERVAL.sh endpoint:port amountOfSubscriptions updateTime notificationEndpoint
+  echo EXAMPLE ./subscriptionTest_ONTIMEINTERVAL.sh 127.0.0.1:1026 60 60 http://127.0.0.1:1028/accumulate
+  exit 1
+fi
+if [ "$1" == "--version" ]
+then
+  echo Version: $version
+  exit 1
+fi
+if [ "$1" == "-v" ]
+then
+  echo Verbose mode ON
+  vm=1
+fi
+
+
 # USAGE:  ./subscriptionTest_ONx.sh endpoint:port amountOfSubscriptions updateTime notificationEndpoint
 # EXAMPLE ./subscriptionTest_ONx.sh 127.0.0.1:1026 60 60 http://127.0.0.1:1028/accumulate
 
-# START
+# START info
 echo "#### Subscription ONTIMEINTERVAL test STARTED! #### "
 echo "Date: " $(date +"%m-%d-%Y %H:%M"); 
 
@@ -31,6 +52,7 @@ echo "Date: " $(date +"%m-%d-%Y %H:%M");
 #config
 n=0
 max=10
+vm=0
 
 #sleep time between requests
 stime=1
@@ -41,9 +63,7 @@ subType='ONTIMEINTERVAL'
 #condValue='pressure'
 updateTime=60
 
-
-#Inputs and defaults
-
+#Config options
 if [ "$1" ]; then
     #echo "CB endpoint set to: " $1 ;
     endpoint=$1;

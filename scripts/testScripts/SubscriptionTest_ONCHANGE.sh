@@ -18,11 +18,30 @@
  # For those usages not covered by this license please contact with
  # fermin at tid dot es
 
-# v0.3
-# USAGE:  ./subscriptionTest_ONx.sh endpoint:port amountOfSubscriptions conditionValue notificationEndpoint
-# EXAMPLE ./subscriptionTest_ONx.sh 127.0.0.1:1026 100 pressure http://127.0.0.1:1028/accumulate
+version="Subscription Massive Generator Test ONCHANGE v0.0.3"
 
-# START
+#CLI options
+
+if [ "$1" == "-u" ]
+then
+    echo USAGE:  ./subscriptionTest_ONCHANGE.sh endpoint:port amountOfSubscriptions conditionValue notificationEndpoint
+    echo EXAMPLE ./subscriptionTest_ONCHANGE.sh 127.0.0.1:1026 100 pressure http://127.0.0.1:1028/accumulate
+  exit 1
+fi
+if [ "$1" == "--version" ]
+then
+  echo Version: $version
+  exit 1
+fi
+if [ "$1" == "-v" ]
+then
+  echo Verbose mode ON
+  vm=1
+fi
+
+
+
+# START Info
 echo "#### Subscription ONCHANGE test STARTED! #### "
 echo "Date: " $(date +"%m-%d-%Y %H:%M"); 
 
@@ -40,7 +59,7 @@ notifEp='http://localhost:1028/accumulate'
 subType='ONCHANGE'
 condValue='pressure'
 
-#Inputs and defaults
+#config input
 
 if [ "$1" ]; then
     #echo "CB endpoint set to: " $1 ;
