@@ -27,7 +27,7 @@ echo "#### Subscription ONCHANGE test STARTED! #### "
 echo "Date: " $(date +"%m-%d-%Y %H:%M"); 
 
 
-# Default config: 100 subscriptions on CHANGE over PRESSURE and sent to http://127.0.0.1:1028/accumulator server
+# Default config: Add 100 subscriptions on CHANGE over PRESSURE and sent to http://127.0.0.1:1028/accumulator server
 #config
 n=0
 max=10
@@ -75,27 +75,27 @@ curl $endpoint/version
 
 
 payload='<?xml version="1.0"?>
-    <subscribeContextRequest>
-        <entityIdList>
-            <entityId type="Room" isPattern="false">
-                <id>Room1</id>
-            </entityId>
-        </entityIdList>
-        <attributeList>
-            <attribute>temperature</attribute>
-        </attributeList>
-        <reference>'$notifEp'</reference>
-        <duration>P1M</duration>
-        <notifyConditions>
-            <notifyCondition>
-                <type>'$subType'</type>
-            <condValueList>
-                <condValue>'$condValue'</condValue>
-            </condValueList>
-            </notifyCondition>
-        </notifyConditions>
-        <throttling>PT0S</throttling>
-    </subscribeContextRequest>'
+<subscribeContextRequest>
+    <entityIdList>
+        <entityId type="Room" isPattern="false">
+            <id>Room1</id>
+        </entityId>
+    </entityIdList>
+    <attributeList>
+        <attribute>temperature</attribute>
+    </attributeList>
+    <reference>'$notifEp'</reference>
+    <duration>P1M</duration>
+    <notifyConditions>
+        <notifyCondition>
+            <type>'$subType'</type>
+        <condValueList>
+            <condValue>'$condValue'</condValue>
+        </condValueList>
+        </notifyCondition>
+    </notifyConditions>
+    <throttling>PT0S</throttling>
+</subscribeContextRequest>'
 
 
 

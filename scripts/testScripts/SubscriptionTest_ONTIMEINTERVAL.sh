@@ -27,7 +27,7 @@ echo "#### Subscription ONTIMEINTERVAL test STARTED! #### "
 echo "Date: " $(date +"%m-%d-%Y %H:%M"); 
 
 
-# Default config: 60 subscriptions (delayed by 1 sec) on TIMEINTERVAL every 60 seconds and sent to http://127.0.0.1:1028/accumulator server
+# Default config: Add 60 subscriptions (delayed by 1 sec) on TIMEINTERVAL every 60 seconds. Notification endpoint http://127.0.0.1:1028/accumulator server
 #config
 n=0
 max=10
@@ -75,6 +75,30 @@ echo " - Selected notification endpoint: " $notifEp;
 echo "### Version: "
 curl $endpoint/version
 
+
+payload='<?xml version="1.0"?>
+<subscribeContextRequest>
+    <entityIdList>
+        <entityId type="Room" isPattern="false">
+            <id>Room1</id>
+        </entityId>
+    </entityIdList>
+    <attributeList>
+        <attribute>temperature</attribute>
+    </attributeList>
+    <reference>'$notifEp'</reference>
+    <duration>P1M</duration>
+    <notifyConditions>
+        <notifyCondition>
+            <type>'$subType'</type>
+            <condValueList>
+                <condValue>PT'$updateTime'S</condValue>
+            </condValueList>
+        </notifyCondition>
+    </notifyConditions>
+</subscribeContextRequest>' 
+
+
 while (( $n < $max ))
 do
 	sleep $stime;
@@ -83,7 +107,7 @@ do
 	echo "### Suscription test: " $n; 
 	n=$((n+1))
     echo "###"
-    curl -H 'Content-Type: application/xml' -d '<?xml version="1.0"?><subscribeContextRequest><entityIdList><entityId type="Room" isPattern="false"><id>Room1</id></entityId></entityIdList><attributeList><attribute>temperature</attribute></attributeList><reference>'$notifEp'</reference><duration>P1M</duration><notifyConditions><notifyCondition><type>'$subType'</type><condValueList><condValue>PT'$updateTime'S</condValue></condValueList></notifyCondition></notifyConditions></subscribeContextRequest>' $endpoint/NGSI10/subscribeContext
+    curl -H 'Content-Type: application/xml' -d"$payload"  $endpoint/NGSI10/subscribeContext
 done
 
 # DONE
