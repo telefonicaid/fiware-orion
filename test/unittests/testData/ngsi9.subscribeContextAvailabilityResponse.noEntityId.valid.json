@@ -2,6 +2,7 @@
   "subscriptionId" : "000000000000000000000000",
   "errorCode" : {
     "code" : "400",
-    "reasonPhrase" : "No entities"
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
   }
 }

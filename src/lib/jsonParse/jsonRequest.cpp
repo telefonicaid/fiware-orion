@@ -54,6 +54,7 @@
 #include "jsonParse/jsonAppendContextElementRequest.h"
 #include "jsonParse/jsonUpdateContextAttributeRequest.h"
 
+#include "parse/compoundValue.h"
 #include "rest/restReply.h"
 
 
@@ -138,6 +139,8 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
 
   LM_T(LmtParse, ("Treating a JSON request: '%s'", content));
 
+  ciP->parseDataP = parseDataP;
+
   if (reqP == NULL)
   {
     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", requestType(request), SccBadRequest,
@@ -155,7 +158,11 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
 
   try
   {
-    jsonParse(content, reqP->keyword, reqP->parseVector, parseDataP);
+    res = jsonParse(ciP, content, reqP->keyword, reqP->parseVector, parseDataP);
+    if (ciP->inCompoundValue == true)
+      orion::compoundValueEnd(ciP, "/end/caught/late", parseDataP);
+    if ((lmTraceIsSet(LmtCompoundValueShow)) && (ciP->compoundValueP != NULL))
+      ciP->compoundValueP->shortShow("after parse: ");
   }
   catch (std::exception &e)
   {
@@ -164,8 +171,18 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
     LM_RE(errorReply, (res.c_str()));
   }
 
+  if (res != "OK")
+  {
+    LM_E(("JSON parse error: %s", res.c_str()));
+    ciP->httpStatusCode = SccBadRequest;
+
+    std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", payloadWord, ciP->httpStatusCode, res);
+    return answer; 
+  }
+
   reqP->present(parseDataP);
 
+  LM_T(LmtParseCheck, ("Calling check for JSON parsed tree (%s)", ciP->payloadWord));
   res = reqP->check(parseDataP, ciP);
   reqP->present(parseDataP);
 

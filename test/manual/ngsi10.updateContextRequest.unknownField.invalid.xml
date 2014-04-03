@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <unknownField>12</unknownField>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <attributeDomainName>domain1</attributeDomainName>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue>ConferenceRoomTemp</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>UPDATE</updateAction>
+</updateContextRequest>

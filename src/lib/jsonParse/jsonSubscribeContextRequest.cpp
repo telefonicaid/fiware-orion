@@ -479,19 +479,21 @@ static std::string throttling(std::string path, std::string value, ParseData* pa
 */
 JsonNode jsonScrParseVector[] =
 {
+  { "/entities",                                               jsonNullTreat              },
   { "/entities/entity",                                        entityId                   },
   { "/entities/entity/id",                                     entityIdId                 },
   { "/entities/entity/type",                                   entityIdType               },
   { "/entities/entity/isPattern",                              entityIdIsPattern          },
+  { "/attributes",                                             jsonNullTreat              },
   { "/attributes/attribute",                                   attribute                  },
   { "/reference",                                              reference                  },
   { "/duration",                                               duration                   },
   { "/restriction",                                            restriction                },
   { "/restriction/attributeExpression",                        attributeExpression        },
+  { "/restriction/scopes",                                     jsonNullTreat              },
   { "/restriction/scopes/scope",                               scope,                     },
   { "/restriction/scopes/scope/type",                          scopeType                  },
   { "/restriction/scopes/scope/value",                         scopeValue                 },
-
   { "/restriction/scopes/scope/value/circle",                              circle                  },
   { "/restriction/scopes/scope/value/circle/centerLatitude",               circleCenterLatitude    },
   { "/restriction/scopes/scope/value/circle/centerLongitude",              circleCenterLongitude   },
@@ -505,8 +507,10 @@ JsonNode jsonScrParseVector[] =
   { "/restriction/scopes/scope/value/polygon/vertices/vertice/longitude",  polygonVertexLongitude  },
   { "/restriction/scopes/scope/value/polygon/inverted",                    polygonInverted         },
 
+  { "/notifyConditions",                                       jsonNullTreat              },
   { "/notifyConditions/notifyCondition",                       notifyCondition            },
   { "/notifyConditions/notifyCondition/type",                  notifyConditionType        },
+  { "/notifyConditions/notifyCondition/condValues",            jsonNullTreat              },
   { "/notifyConditions/notifyCondition/condValues/condValue",  notifyConditionCondValue   },
   { "/notifyConditions/notifyCondition/restriction",           notifyConditionRestriction },
   { "/throttling",                                             throttling                 },

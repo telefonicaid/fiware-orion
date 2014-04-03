@@ -35,6 +35,7 @@
 #include "ngsi9/RegisterContextRequest.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonNullTreat.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -165,10 +166,13 @@ static std::string attributeType(std::string path, std::string value, ParseData*
 *
 * attributeValue - 
 */
-static std::string attributeValue(std::string path, std::string value, ParseData* reqDataP)
+static std::string attributeValue(std::string path, std::string value, ParseData* parseDataP)
 {
-  reqDataP->upcr.attributeP->value = value;
-  LM_T(LmtParse, ("Set value to '%s' for a contextElement attribute", reqDataP->upcr.attributeP->value.c_str()));
+  parseDataP->lastContextAttribute = parseDataP->upcr.attributeP;
+  LM_T(LmtCompoundValue, ("Set parseDataP->lastContextAttribute to: %p", parseDataP->lastContextAttribute));
+
+  parseDataP->upcr.attributeP->value = value;
+  LM_T(LmtParse, ("Set value to '%s' for a contextElement attribute", parseDataP->upcr.attributeP->value.c_str()));
 
   return "OK";
 }

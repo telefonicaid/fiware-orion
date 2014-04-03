@@ -96,10 +96,12 @@ static int contextAttributeType(xml_node<>* node, ParseData* reqData)
 *
 * contextAttributeValue - 
 */
-static int contextAttributeValue(xml_node<>* node, ParseData* reqData)
+static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute value: %s", node->value()));
-  reqData->acer.attributeP->value = node->value();
+  parseDataP->lastContextAttribute = parseDataP->acer.attributeP;
+  parseDataP->lastContextAttribute->typeFromXmlAttribute = xmlTypeAttributeGet(node);
+  parseDataP->acer.attributeP->value = node->value();
   return 0;
 }
 

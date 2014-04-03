@@ -62,6 +62,12 @@ extern std::string parsedUptime(int uptime);
 
 /* ****************************************************************************
 *
+* onlyWs - 
+*/
+extern bool onlyWs(const char* s);
+
+/* ****************************************************************************
+*
 * string2coords - 
 */
 extern bool string2coords(std::string s, double& latitude, double& longitude);
@@ -83,6 +89,5 @@ bool versionParse(std::string version, int& mayor, int& minor, std::string& extr
 * atoF - 
 */
 extern double atoF(const char* string, std::string& errorMsg);
-
 
 #endif

@@ -317,6 +317,28 @@ std::string parsedUptime(int uptime)
 
 /* ****************************************************************************
 *
+* onlyWs - 
+*/
+bool onlyWs(const char* s)
+{
+  if (*s == 0)
+    return false;
+
+  while (*s != 0)
+  {
+    if ((*s != ' ') && (*s != '\t') && (*s != '\n'))
+      return false;
+
+    ++s;
+  }
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * string2coords - 
 */
 bool string2coords(std::string s, double& latitude, double& longitude)

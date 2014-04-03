@@ -30,6 +30,7 @@
 #include "XmlNode.h"
 
 #include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
 #include "xmlParse/XmlNode.h"
 
 
@@ -38,7 +39,7 @@
 *
 * xmlParse - 
 */
-extern std::string xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* treatV, ParseData* reqData);
+extern void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* treatV, ParseData* reqData);
 
 
 
@@ -57,5 +58,13 @@ extern int nullTreat(xml_node<>* node, ParseData* reqData);
 #include "ngsi/Request.h"
 struct EntityId;
 extern std::string entityIdParse(RequestType request, xml_node<>* node, EntityId* entityIdP);
+
+
+
+/* ****************************************************************************
+*
+* xmlTypeAttributeGet - 
+*/
+extern std::string xmlTypeAttributeGet(xml_node<>* node);
 
 #endif

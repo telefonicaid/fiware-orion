@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-broker version via REST
+XML Parse IndividualContextEntity
 --SHELL-INIT--
 source ../harnessFunctions.sh
 

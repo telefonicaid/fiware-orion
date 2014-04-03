@@ -1,5 +1,5 @@
-#ifndef REQUEST_DATA_H
-#define REQUEST_DATA_H
+#ifndef PARSE_DATA_H
+#define PARSE_DATA_H
 
 /*
 *
@@ -291,8 +291,13 @@ typedef struct UpdateContextAttributeData
 */
 typedef struct ParseData
 {
-  std::string                                 errorString;
+  ParseData()
+  {
+    lastContextAttribute = NULL;
+  }
 
+  std::string                                 errorString;
+  ContextAttribute*                           lastContextAttribute;
   RegisterContextData                         rcr;
   DiscoverContextAvailabilityData             dcar;
   SubscribeContextAvailabilityData            scar;

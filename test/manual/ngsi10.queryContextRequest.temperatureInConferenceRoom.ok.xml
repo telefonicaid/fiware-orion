@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+	  <entityId type="Room" isPattern="false">
+	    <id>ConferenceRoom</id>   
+	  </entityId>
+  </entityIdList>
+  <attributeList>
+	  <attribute>temperature</attribute>
+  </attributeList>
+</queryContextRequest>

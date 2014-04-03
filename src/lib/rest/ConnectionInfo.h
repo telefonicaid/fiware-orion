@@ -32,10 +32,12 @@
 #include "logMsg/logMsg.h"
 
 #include "common/Format.h"
+#include "parse/CompoundValueNode.h"
 #include "rest/HttpStatusCode.h"
 #include "rest/mhd.h"
 #include "rest/Verb.h"
 #include "rest/HttpHeaders.h"
+#include "ngsi/ParseData.h"
 
 
 
@@ -48,15 +50,17 @@ class ConnectionInfo
 public:
   ConnectionInfo(std::string _url, std::string _method, std::string _version, MHD_Connection* _connection = NULL) : url(_url), method(_method), version(_version)
   {
-    connection            = _connection;
-    payload               = NULL;
-    payloadSize           = 0;
-    inFormat              = XML;
-    outFormat             = XML;
-    httpStatusCode        = SccOk;
-    fractioned            = false;
-    callNo                = 1;
-    requestEntityTooLarge = false;
+    connection             = _connection;
+    payload                = NULL;
+    payloadSize            = 0;
+    inFormat               = XML;
+    outFormat              = XML;
+    httpStatusCode         = SccOk;
+    callNo                 = 1;
+    inCompoundValue        = false;
+    compoundValueRoot      = NULL;
+    compoundValueP         = NULL;
+    parseDataP             = NULL;
 
     memset(payloadWord, 0, sizeof(payloadWord));
 
@@ -67,22 +71,25 @@ public:
     else                           verb = NOVERB;
   }
 
-  MHD_Connection*           connection;
-  Verb                      verb;
-  Format                    inFormat;
-  Format                    outFormat;
-  std::string               url;
-  std::string               method;
-  std::string               version;
-  std::string               charset;
-  HttpHeaders               httpHeaders;
-  char*                     payload;
-  int                       payloadSize;
-  char                      payloadWord[64];
-  std::string               answer;
-  bool                      fractioned;
-  int                       callNo;
-  bool                      requestEntityTooLarge;
+  MHD_Connection*            connection;
+  Verb                       verb;
+  Format                     inFormat;
+  Format                     outFormat;
+  std::string                url;
+  std::string                method;
+  std::string                version;
+  std::string                charset;
+  HttpHeaders                httpHeaders;
+  char*                      payload;
+  int                        payloadSize;
+  char                       payloadWord[64];
+  std::string                answer;
+  int                        callNo;
+  ParseData*                 parseDataP;
+  bool                       inCompoundValue;
+  orion::CompoundValueNode*  compoundValueP;    // Points to current node in the tree
+  orion::CompoundValueNode*  compoundValueRoot; // Points to the root of the tree
+  ::std::vector<orion::CompoundValueNode*> compoundValueVector;
 
   // Outgoing
   HttpStatusCode            httpStatusCode;

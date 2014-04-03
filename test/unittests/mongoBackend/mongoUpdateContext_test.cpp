@@ -23,7 +23,6 @@
 * Author: Fermin Galan
 */
 #include "gtest/gtest.h"
-#include "testInit.h"
 #include "unittest.h"
 
 #include "logMsg/logMsg.h"
@@ -38,6 +37,8 @@
 #include "ngsi10/UpdateContextResponse.h"
 
 #include "mongo/client/dbclient.h"
+
+
 
 /* ****************************************************************************
 *
@@ -412,7 +413,6 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     mongoDisconnect();
 
     utExit();
-
 }
 
 /* ****************************************************************************
@@ -5231,7 +5231,7 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: UPDATE - entity: (E1, T1, false) - offending attribute: A1", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: UPDATE - entity: (E1, T1, false) - offending attribute: A1 - empty attribute not allowed in APPEND or UPDATE", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -5397,7 +5397,7 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: (E1, T1, false) - offending attribute: A8", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: APPEND - entity: (E1, T1, false) - offending attribute: A8 - empty attribute not allowed in APPEND or UPDATE", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string

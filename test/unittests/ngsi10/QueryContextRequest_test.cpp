@@ -304,14 +304,16 @@ TEST(QueryContextRequest, entityIdType_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     infile = "ngsi10.queryContextRequest.entityIdTypeAsField.invalid.xml";
+  const char*     inFile  = "ngsi10.queryContextRequest.entityIdTypeAsField.invalid.xml";
+  const char*     outFile = "ngsi10.queryContextResponse.entityIdTypeAsField.valid.xml";
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ("OK", out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }
@@ -326,14 +328,16 @@ TEST(QueryContextRequest, entityIdIsPattern_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     infile = "ngsi10.queryContextRequest.entityIdIsPatternAsField.invalid.xml";
+  const char*     inFile  = "ngsi10.queryContextRequest.entityIdIsPatternAsField.invalid.xml";
+  const char*     outFile = "ngsi10.queryContextResponse.entityIdIsPatternAsField.valid.xml";
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ("OK", out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }
@@ -348,14 +352,16 @@ TEST(QueryContextRequest, overwriteEntityIdType_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     infile = "ngsi10.queryContextRequest.typeAsField.invalid.xml";
+  const char*     inFile  = "ngsi10.queryContextRequest.typeAsField.invalid.xml";
+  const char*     outFile = "ngsi10.queryContextResponse.typeAsField.valid.xml";
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ("OK", out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }
@@ -370,14 +376,16 @@ TEST(QueryContextRequest, overwriteEntityIdIsPattern_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     infile = "ngsi10.queryContextRequest.isPatternAsField.invalid.xml";
+  const char*     inFile  = "ngsi10.queryContextRequest.isPatternAsField.invalid.xml";
+  const char*     outFile = "ngsi10.queryContextResponse.isPatternAsField.valid.xml";
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   std::string out = xmlTreat(testBuf, &ci, &reqData, QueryContext, "queryContextRequest", NULL);
-  EXPECT_EQ("OK", out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

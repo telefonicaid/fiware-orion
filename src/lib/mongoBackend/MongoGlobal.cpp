@@ -40,8 +40,8 @@
 #include "ngsi/AttributeList.h"
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/Duration.h"
+#include "parse/CompoundValueNode.h"
 #include "ngsi/Restriction.h"
-
 #include "ngsiNotify/Notifier.h"
 
 using namespace mongo;
@@ -59,6 +59,13 @@ static char*                subscribeContextCollectionName              = NULL;
 static char*                subscribeContextAvailabilityCollectionName  = NULL;
 static char*                assocationsCollectionName                   = NULL;
 static Notifier*            notifier                                    = NULL;
+
+/* ****************************************************************************
+*
+* Forward declarations
+*/
+static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElement& be);
+static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElement& be);
 
 /* ****************************************************************************
 *
@@ -478,6 +485,70 @@ static void processEntitityPatternTrue(BSONArrayBuilder* arrayP, EntityId* enP) 
 
 /* ****************************************************************************
 *
+* addCompoundNode -
+*
+*/
+static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
+{
+  if ((e.type() != String) && (e.type() != Object) && (e.type() != Array))
+    LM_RVE(("unknown BSON type"));
+
+  orion::CompoundValueNode* child = new orion::CompoundValueNode(orion::CompoundValueNode::Struct);
+  child->name = e.fieldName();
+
+  switch (e.type())
+  {
+  case String:
+    child->type  = orion::CompoundValueNode::Leaf;
+    child->value = e.String();
+    break;
+
+  case Object:
+    compoundObjectResponse(child, e);
+    break;
+
+  case Array:
+    compoundVectorResponse(child, e);
+    break;
+  default:
+    /* We need the default clause to avoid 'enumeration value X not handled in switch' errors due to -Werror=switch at compilation time */
+    break;
+  }
+
+  cvP->add(child);
+}
+
+/* ****************************************************************************
+*
+* compoundObjectResponse -
+*
+*/
+static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElement& be) {
+    BSONObj obj = be.embeddedObject();
+    cvP->type = orion::CompoundValueNode::Struct;
+    for( BSONObj::iterator i = obj.begin(); i.more(); ) {
+        BSONElement e = i.next();
+        addCompoundNode(cvP, e);
+    }
+
+}
+
+/* ****************************************************************************
+*
+* compoundVectorResponse -
+*/
+static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElement& be) {
+    std::vector<BSONElement> vec = be.Array();
+    cvP->type = orion::CompoundValueNode::Vector;
+    for( unsigned int ix = 0; ix < vec.size(); ++ix) {
+        BSONElement e = vec[ix];
+        addCompoundNode(cvP, e);
+
+    }
+}
+
+/* *****************************************************************************
+*
 * processAreaScope -
 *
 * Returns true if a location was found, false otherwise
@@ -558,7 +629,7 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
 * ContextElementResponseVector or error.
 *
 * Note the includeEmpty argument. This is used if we don't want the result to include empty
-* attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is amited at
+* attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is aimed at
 * subscribeContext case, as empty values can cause problems in the case of federating Context
 * Brokers (the notifyContext is processed as an updateContext and in the latter case, an
 * empty value causes an error)
@@ -702,15 +773,35 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
 
             ca.name = STR_FIELD(queryAttr, ENT_ATTRS_NAME);
             ca.type = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
-            ca.value = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
 
-            if (!includeEmpty && ca.value.length() == 0) {
-                continue;
-            }
-
+            /* Note that includedAttribute decision is based on name and type. Value is set only if
+             * decision is positive */
             if (includedAttribute(ca, &attrL)) {
 
-                ContextAttribute* caP = new ContextAttribute(ca.name, ca.type, ca.value);                                
+                ContextAttribute* caP;
+                if (queryAttr.getField(ENT_ATTRS_VALUE).type() == String) {
+                    ca.value = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
+                    if (!includeEmpty && ca.value.length() == 0) {
+                        continue;
+                    }
+                    caP = new ContextAttribute(ca.name, ca.type, ca.value);
+                }
+                else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Object) {
+                    caP = new ContextAttribute(ca.name, ca.type);
+                    caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Struct);
+                    compoundObjectResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
+                }
+                else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Array) {
+                    caP = new ContextAttribute(ca.name, ca.type);
+                    caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);
+                    compoundVectorResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
+                }
+                else {
+                    LM_E(("unknown BSON type"));
+                    continue;
+                }
+
+                /* Setting ID (if found) */
                 if (STR_FIELD(queryAttr, ENT_ATTRS_ID) != "") {
                     Metadata* md = new Metadata(NGSI_MD_ID, "string", STR_FIELD(queryAttr, ENT_ATTRS_ID));
                     caP->metadataVector.push_back(md);

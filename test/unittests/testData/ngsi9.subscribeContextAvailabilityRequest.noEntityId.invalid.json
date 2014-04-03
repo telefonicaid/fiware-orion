@@ -6,7 +6,6 @@
   ],
   "reference": "http://10.1.1.1:80/test/interfaceNotification",
   "duration": "PT1M",
-  "subscriptionId": "12458896",
   "restriction" : {
     "attributeExpression" : "ATTR_EXPR",
     "scopes" : [

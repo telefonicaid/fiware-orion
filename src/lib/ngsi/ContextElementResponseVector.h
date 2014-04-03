@@ -45,8 +45,10 @@ typedef struct ContextElementResponseVector
   void                     present(std::string indent);
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void);
-  ContextElementResponse*  get(int ix);
+  ContextElementResponse*  get(unsigned int ix);
   void                     release();
+
+  ContextElementResponse*  operator[](unsigned int ix)       { if (ix < vec.size()) return vec[ix]; else return NULL; }
 } ContextElementResponseVector;
 
 #endif

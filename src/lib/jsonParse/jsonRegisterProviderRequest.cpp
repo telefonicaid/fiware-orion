@@ -25,17 +25,17 @@
 #include <string>
 #include <vector>
 
-#include "jsonParse/JsonNode.h"
-#include "jsonParse/jsonNullTreat.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "ngsi/Request.h"
 #include "convenience/RegisterProviderRequest.h"
 #include "jsonParse/jsonParse.h"
 #include "jsonParse/jsonRegisterProviderRequest.h"
+#include "jsonParse/JsonNode.h"
+#include "jsonParse/jsonNullTreat.h"
+#include "ngsi/Request.h"
+#include "rest/ConnectionInfo.h"
 
 
 

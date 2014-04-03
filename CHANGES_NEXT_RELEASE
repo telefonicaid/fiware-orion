@@ -1,4 +1,5 @@
 - Add: "geo" queries functionality.
+- Add: attribute values can now be not only simple strings but compound expressions with vectors and key-maps
 - Add: It is now possible to delete entities using updateContext DELETE with empty attributes list
 - Fix: Fixed convenience operation "DELETE /ngsi10/contextEntities/{EntityID}" (partially fixes issue #225)
 - Fix: The CLI options now coincide with the documentation.
@@ -11,3 +12,5 @@
 - Fix: Now the operations GET, POST and PUT work properly with convenience operations over valueID's.
 - Fix: JSON/XML Payload parsing that ended in parse error had a bug resulting in a possible memory leak.
 - Fix: Convenience operation GET with non-existent valueIDs is now handled correctly.
+- Fix: Stronger checking of XML/JSON payload request conformance: not only mandatory elements are checked,
+       but also now a parse error is returned if the client tries to use an unrecognized element in any part of the payload.

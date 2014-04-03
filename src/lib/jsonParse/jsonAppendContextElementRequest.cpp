@@ -30,11 +30,13 @@
 
 #include "common/globals.h"
 #include "convenience/AppendContextElementRequest.h"
-#include "ngsi/Request.h"
 #include "jsonParse/jsonParse.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonAppendContextElementRequest.h"
 #include "jsonParse/jsonNullTreat.h"
+#include "ngsi/Request.h"
+#include "rest/ConnectionInfo.h"
+
 
 
 /* ****************************************************************************
@@ -94,10 +96,11 @@ static std::string contextAttributeType(std::string path, std::string value, Par
 *
 * contextAttributeValue -
 */
-static std::string contextAttributeValue(std::string path, std::string value, ParseData* reqData)
+static std::string contextAttributeValue(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute value: %s", value.c_str()));
-  reqData->acer.attributeP->value = value;
+  parseDataP->lastContextAttribute = parseDataP->acer.attributeP;
+  parseDataP->acer.attributeP->value = value;
   return "OK";
 }
 

@@ -124,9 +124,11 @@ void ContextAttributeVector::push_back(ContextAttribute* item)
 *
 * ContextAttributeVector::get - 
 */
-ContextAttribute* ContextAttributeVector::get(int ix)
+ContextAttribute* ContextAttributeVector::get(unsigned int ix)
 {
-  return vec[ix];
+  if (ix < vec.size())
+    return vec[ix];
+  return NULL;
 }
 
 

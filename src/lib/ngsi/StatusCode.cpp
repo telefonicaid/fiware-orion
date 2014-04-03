@@ -151,10 +151,10 @@ std::string StatusCode::check(RequestType requestType, Format format, std::strin
 */
 void StatusCode::present(std::string indent)
 {
-   PRINTF("%sCode:            %d",   indent.c_str(), code);
-   PRINTF("%sReasonPhrase:    '%s'", indent.c_str(), reasonPhrase.c_str());
-   PRINTF("%sDetail:          '%s'", indent.c_str(), details.c_str());
-   PRINTF("%sTag:             '%s'", indent.c_str(), tag.c_str());
+   PRINTF("%sCode:            %d\n",   indent.c_str(), code);
+   PRINTF("%sReasonPhrase:    '%s'\n", indent.c_str(), reasonPhrase.c_str());
+   PRINTF("%sDetail:          '%s'\n", indent.c_str(), details.c_str());
+   PRINTF("%sTag:             '%s'\n", indent.c_str(), tag.c_str());
 }
 
 

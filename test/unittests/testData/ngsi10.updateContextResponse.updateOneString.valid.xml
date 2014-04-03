@@ -1,6 +1,4 @@
-<notifyContextRequest>
-  <subscriptionId>012345678901234567890123</subscriptionId>
-  <originator>http://localhost/test</originator>
+<updateContextResponse>
   <contextResponseList>
     <contextElementResponse>
       <contextElement>
@@ -10,21 +8,15 @@
         <contextAttributeList>
           <contextAttribute>
             <name>temperature</name>
-            <type>Room</type>
-            <contextValue>10</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>Room</type>
-            <contextValue>10</contextValue>
+            <type>degree</type>
+            <contextValue/>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
       <statusCode>
         <code>200</code>
-        <reasonPhrase>Ok</reasonPhrase>
-        <details>a</details>
+        <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
-</notifyContextRequest>
+</updateContextResponse>

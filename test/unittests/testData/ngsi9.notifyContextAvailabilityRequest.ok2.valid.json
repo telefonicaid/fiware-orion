@@ -39,11 +39,5 @@
 				"providingApplication": "http://192.168.100.1:70/application"
 			}
 		}
-	],
-
-  "errorCode" : {
-    "code" : "200",
-    "reasonPhrase" : "OK",
-    "details"      : "no details"
-  }
+	]
 }

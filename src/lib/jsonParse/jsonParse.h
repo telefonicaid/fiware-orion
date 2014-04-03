@@ -29,6 +29,7 @@
 
 #include "jsonParse/JsonNode.h"
 #include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -36,6 +37,6 @@
 *
 * jsonParse - 
 */
-extern std::string jsonParse(const char* content, std::string requestType, JsonNode* parseVector, ParseData* reqDataP);
+extern std::string jsonParse(ConnectionInfo* ciP, const char* content, std::string requestType, JsonNode* parseVector, ParseData* reqDataP);
 
 #endif
