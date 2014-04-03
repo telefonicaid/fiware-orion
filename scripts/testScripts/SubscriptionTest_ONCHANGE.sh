@@ -73,22 +73,49 @@ echo " - Selected notification endpoint: " $notifEp;
 echo "### Version: "
 curl $endpoint/version
 
+
+payload='<?xml version="1.0"?>
+    <subscribeContextRequest>
+        <entityIdList>
+            <entityId type="Room" isPattern="false">
+                <id>Room1</id>
+            </entityId>
+        </entityIdList>
+        <attributeList>
+            <attribute>temperature</attribute>
+        </attributeList>
+        <reference>'$notifEp'</reference>
+        <duration>P1M</duration>
+        <notifyConditions>
+            <notifyCondition>
+                <type>'$subType'</type>
+            <condValueList>
+                <condValue>'$condValue'</condValue>
+            </condValueList>
+            </notifyCondition>
+        </notifyConditions>
+        <throttling>PT0S</throttling>
+    </subscribeContextRequest>'
+
+
+
 while (( $n < $max ))
 do
 	sleep $stime;
 	echo "### Timestamp " $n; 
 	date;
-	echo "### Suscription test: " $n; 
+	echo "### Subscription test: " $n;
 	n=$((n+1))
     echo "###"
-    curl -H 'Content-Type: application/xml' -d '<?xml version="1.0"?><subscribeContextRequest><entityIdList><entityId type="Room" isPattern="false"><id>Room1</id></entityId></entityIdList><attributeList><attribute>temperature</attribute></attributeList><reference>'$notifEp'</reference><duration>P1M</duration><notifyConditions><notifyCondition><type>'$subType'</type><condValueList><condValue>'$condValue'</condValue></condValueList></notifyCondition></notifyConditions><throttling>PT0S</throttling></subscribeContextRequest>' $endpoint/NGSI10/subscribeContext
+    curl -H 'Content-Type: application/xml' -d"$payload" $endpoint/NGSI10/subscribeContext
+    
 done
 
 # DONE
-echo " ##########  Suscription test DONE!"
+echo " ##########  Subscription test DONE!"
 
 
-#TIPS 
+#TIPS (Copy&Paste)
 #Trigger sample for pressure: 
 #curl -H 'Content-Type: application/xml' -d '<?xml version="1.0" encoding="UTF-8"?><updateContextRequest><contextElementList><contextElement><entityId type="Room" isPattern="false"><id>Room1</id></entityId><contextAttributeList><contextAttribute><name>pressure</name><type>mmHg</type><contextValue>'`date +%N`'</contextValue></contextAttribute></contextAttributeList></contextElement></contextElementList><updateAction>APPEND</updateAction></updateContextRequest>' orion/NGSI10/updateContext
 
