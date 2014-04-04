@@ -71,12 +71,7 @@ extern void compoundValueMiddle
 *
 * compoundValueEnd - 
 */
-extern void compoundValueEnd
-(
-   ConnectionInfo*  ciP,
-   std::string      path,
-   ParseData*       parseDataP
-);
+extern void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP);
 
 }
 

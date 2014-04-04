@@ -61,35 +61,25 @@ static const char* compoundValueRootV[] =
 * isCompoundValuePath - 
 *
 * This function examines a path to see whether we are inside a compound value or not.
-* Also, it returned the root of the compound (found in 'compoundValueRootV') and also
-* the 'rest' of the path, i.e. its relative path inside the compound.
 *
-* If the path doesn't belong to any compond, FALSE is returned.
+* If the path doesn't belong to any compond, FALSE is returned, else TRUE.
 */
-static bool isCompoundValuePath(const char* path, std::string& root, std::string& rest)
+static bool isCompoundValuePath(const char* path)
 {
-   unsigned int len;
+  unsigned int len;
 
-   root = "";
-   rest = "";
+  for (unsigned int ix = 0; ix < sizeof(compoundValueRootV) / sizeof(compoundValueRootV[0]); ++ix)
+  {
+    len = strlen(compoundValueRootV[ix]);
 
-   for (unsigned int ix = 0; ix < sizeof(compoundValueRootV) / sizeof(compoundValueRootV[0]); ++ix)
-   {
-      len = strlen(compoundValueRootV[ix]);
+    if (strlen(path) < len)
+      continue;
 
-      if (strlen(path) < len)
-         continue;
+    if (strncmp(compoundValueRootV[ix], path, len) == 0)
+      return true;
+  }
 
-      if (strncmp(compoundValueRootV[ix], path, len) == 0)
-      {
-         root = compoundValueRootV[ix];
-         rest = &path[len];
-
-         return true;
-      }
-   }
-
-   return false;
+  return false;
 }
 
 
@@ -129,16 +119,65 @@ static bool treat(xml_node<>* node, std::string path, XmlNode* parseVector, Pars
 
 /* ****************************************************************************
 *
-* xmlTypeFromString - translate ASCII string to orion::CompoundValueNode::Type
+* eatCompound - consume the compound tree
+*
+* Three types of tree nodes here (4 actually);
+*   - toplevel node
+*   - leaf
+*   - object node
+*   - vector node
 */
-orion::CompoundValueNode::Type xmlTypeFromString(std::string xmlAttribute, std::string name, std::string value)
+void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_node<>* node, std::string indent)
 {
-  if (xmlAttribute == "vector")
-    return orion::CompoundValueNode::Vector;
-  else if (onlyWs(value.c_str()) && (name != ""))
-    return orion::CompoundValueNode::Struct;
+  if (containerP == NULL) // toplevel)
+  {
+    std::string xmlAttribute = xmlTypeAttributeGet(node);
+    
+    if (xmlAttribute == "vector")
+      containerP = new CompoundValueNode(orion::CompoundValueNode::Vector);
+    else if (xmlAttribute =="")
+      containerP = new CompoundValueNode(orion::CompoundValueNode::Struct);
+    else
+    {
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer = std::string("Bad value for XML attribute 'type' for '") + node->name() + "': '" + xmlAttribute + "'";
+      LM_W(("ERROR: '%s'", ciP->answer.c_str()));
+      return;
+    }
+    ciP->compoundValueRoot = containerP;
+  }
+  else
+  {
+    std::string value = wsStrip(node->value());
+    std::string name  = wsStrip(node->name());
 
-  return orion::CompoundValueNode::Leaf;
+    if (value == "")  // Object OR Vector
+    {
+      std::string xmlAttribute = xmlTypeAttributeGet(node);
+    
+      if (xmlAttribute == "vector")
+        containerP = containerP->add(orion::CompoundValueNode::Vector, name);
+      else if (xmlAttribute == "")
+        containerP = containerP->add(orion::CompoundValueNode::Struct, name);
+      else
+      {
+        ciP->httpStatusCode = SccBadRequest;
+        ciP->answer = std::string("Bad value for XML attribute 'type' for '") + name + "': '" + xmlAttribute + "'";
+        LM_W(("ERROR: '%s'", ciP->answer.c_str()));
+        return;
+      }
+    }
+    else // String
+      containerP->add(orion::CompoundValueNode::Leaf, name, value);
+  }
+
+  xml_node<>* child = node->first_node();
+  while (child != NULL)
+  {
+    if (child->name()[0] != 0)
+      eatCompound(ciP, containerP, child, indent + "  ");
+    child = child->next_sibling();
+  }
 }
 
 
@@ -150,6 +189,13 @@ orion::CompoundValueNode::Type xmlTypeFromString(std::string xmlAttribute, std::
 * This function is called once (actually it is not that simple) for each node in
 * the tree that the XML parser has built for us.
 * 
+*
+* In the node '<contextValue>', isCompoundValuePath returns TRUE.
+* Under "<contextValue>", we have either a simple string or a Compound Value Tree.
+* In the case of a "simple string" the value of the current node is NON EMPTY,
+* and as the node is treated already in the previous call to 'treat()', no further action is needed.
+*
+* If a node is NOT TREATED and it is NOT a compound, a parse error is issued
 */
 void xmlParse
 (
@@ -162,206 +208,33 @@ void xmlParse
    ParseData*       parseDataP
 )
 {
-  // I have NEVER seen this happen, but I leave it here, just in case ...
-  // [ If it happens and we don't return here, the broker dies with a SIGSEGV. We don't want that ]
-  if ((node == NULL) || (node->name() == NULL))
-    return;
+  std::string  value            = wsStrip(node->value());
+  std::string  name             = wsStrip(node->name());
+  std::string  path             = fatherPath + "/" + name;
+  bool         treated          = treat(node, path, parseVector, parseDataP);
 
-  //
-  // The tree of the XML library we have chosen is a little bit strange.
-  // This here is probably the end of a container,
-  // The end of a container is interesting only when inside a Compound
-  //
-  if ((node->name()[0] == 0) && (ciP->compoundValueP == NULL))
-    return;
-
-  //
-  // Here we have 6 possibilities:
-  //   1. Compound Start
-  //      - isCompound           == true
-  //      - ciP->inCompoundValue == false
-  //   We enter here when an XML tag has been found e.g. under a 'contextValue'
-  //
-  //   2. In the middle of a Compound
-  //      - isCompound           == true
-  //      - ciP->inCompoundValue == true
-  //      Here we will enter as until we get out of e.g. 'contextValue' 
-  //
-  //     2.1 Start of a container, or a leaf
-  //        - node name            != ""
-  //
-  //     2.2. Compound container ends
-  //        - path.len == fatherPath.len + 1
-  //
-  //   3. Compound ends
-  //      - ciP->inCompoundValue == true
-  //      - isCompound           == false
-  //    We enter here if the function isCompoundValuePath says the path is NOT part of a compound
-  //    but, the program logic says we're in one. If so, time to end it.
-  //
-  //   4. Normal treated path
-  //      - isCompound           == false
-  //      - ciP->inCompoundValue == false
-  //      - treated              == true
-  //   This is the normal case and is taken care of by the 'treat' function
-  //
-  //   5. Untreated path that should give a parse error
-  //      - isCompound           == false
-  //      - ciP->inCompoundValue == false
-  //      - treated              == false
-  //   The path is not a compound, nor a path to be treated.
-  //   Only one choice left, the path is unknown and should give a parse error
-  //
-
-  std::string  root;
-  std::string  rest;
-  std::string  path          = fatherPath + "/" + node->name();
-  std::string  name          = node->name();
-  std::string  value         = node->value();
-  bool         isCompound    = isCompoundValuePath(fatherPath.c_str(), root, rest);
-  bool         treated       = treat(node, path, parseVector, parseDataP);
-  std::string  value2        = node->value();
-  char*        trimmedValue  = wsStrip((char*) value2.c_str());
-
-  LM_T(LmtCompoundValue, ("--------------------------------------"));
-  LM_T(LmtCompoundValue, ("fatherPath: '%s'", fatherPath.c_str()));
-  LM_T(LmtCompoundValue, ("path:       '%s'", path.c_str()));
-  LM_T(LmtCompoundValue, ("root:       '%s'", root.c_str()));
-  LM_T(LmtCompoundValue, ("rest:       '%s'", rest.c_str()));
-
-  LM_T(LmtCompoundValueRaw, ("%s: value: '%s'", path.c_str(), trimmedValue));
-
-  if ((isCompound == true) && (ciP->inCompoundValue == false))
+  if (isCompoundValuePath(path.c_str()) && (value == ""))
   {
-    // We are in a compound, but we weren't before.
-    // Thus, a new compound is started,
-    // I have selected to detect the entrance of a compound when its first XML node appears.
-    // I mean, /1/2/3/contextValue could contain a compound value but it could also NOT.
-    // We don't enter here (to create the tree) until we encounter a node with a path 'inside'
-    // the compound, e.g.:
-    //
-    //   /1/2/3/contextValue/firstNodeInCompound
-    //
-    // So, the function 'compoundValueStart' must both create the root node of the tree AND
-    // take care of its first habitant (firstNodeInCompound), which is does by preparing a 
-    // call to compoundValueMiddle (See lib/parse/compoundValue.cpp)
-    //
-    // Both here and in the next 'else if' (the one 'inside' a compound), the node must be checked
-    // for the XML attribute 'vector'
-    //
-    // This is duplicating code, but I don't want to put it inside 'compoundValueStart' because I
-    // intend the JSON parser to use 'compoundValueStart' also.
-    // It would be more code-duplication if I put the XML Attribute stuff inside 'compoundValueStart'
-    //
-    std::string                     xmlAttribute = xmlTypeAttributeGet(node);
-    orion::CompoundValueNode::Type  type         = xmlTypeFromString(xmlAttribute, name, value);
-
-    // The XML attribute 'type' must be either 'vector' or nothing at all
-    if ((xmlAttribute != "vector") && (xmlAttribute != ""))
-    {
-      ciP->httpStatusCode = SccBadRequest;
-      ciP->answer = std::string("Bad value for XML attribute 'type' for '") + node->name() + "': '" + xmlAttribute + "'";
-      LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), fatherPath.c_str()));
-      return;
-    }
-
-    orion::compoundValueStart(ciP, path, name, value, rest, type, xmlAttribute == "vector");
+     eatCompound(ciP, NULL, node, "");
+     compoundValueEnd(ciP, parseDataP);
+     return;
   }
-  else if ((isCompound == true) && (ciP->inCompoundValue == true))
+  else  if (treated == false)
   {
-    //
-    // The path is a compound and we were already in a compound
-    //
-    // First, check whether the node has the XML attribute 'vector', or any other attribute
-    // that wouldresult in an error.
-    //
-    // Then, check what we really got. Did we get the and of a container, or did we get a new node?
-    // The decision details are commented below.
-    // If it was a new node, 'compoundValueMiddle' is called to take care of it.
-    //
-    std::string                     xmlAttribute  = xmlTypeAttributeGet(node);
-    orion::CompoundValueNode::Type  type          = xmlTypeFromString(xmlAttribute, name, value);
-
-    LM_T(LmtCompoundValueStep, ("Step up?  New path:     '%s'", rest.c_str()));
-    LM_T(LmtCompoundValueStep, ("Step up?  Old path:     '%s'", ciP->compoundValueP->path.c_str()));
-    LM_T(LmtCompoundValueStep, ("Step up?  trimmedValue: '%s'", trimmedValue));
-    LM_T(LmtCompoundValueStep, ("Step in?  Name:         '%s'", name.c_str()));
-    
-    // The XML attribute 'type' must be either 'vector' or nothing at all
-    if ((xmlAttribute != "vector") && (xmlAttribute != ""))
-    {
-      ciP->httpStatusCode = SccBadRequest;
-      ciP->answer = std::string("Bad value for XML attribute 'type' for '") + node->name() + "': '" + xmlAttribute + "'";
-      LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), fatherPath.c_str()));
-      return;
-    }
-    else if ((rest.size() < ciP->compoundValueP->path.size()) && (trimmedValue[0] == 0) && (fatherPath.size() + 1 == path.size()))
-    {
-      //
-      // A container ended - we have to go up one level to the container of the container that ended.
-      // Only way I can detect this is to compare the length of the path of this node with the path of current container.
-      // But it is more complicated than that.
-      // This function is called every time a node ends.
-      // Only way I have found to detect a unique end of a container is by 'fatherPath.size() + 1 == path.size()' + 'trimmedValue[0] == 0'
-      // apart from the 'logical' rest.size() < ciP->compoundValueP->path.size().
-      // This is pretty complex, but, it doesn't work any other way ...
-     //
-      ciP->compoundValueP = ciP->compoundValueP->container;
-      LM_T(LmtCompoundValueContainer, ("Set current container to '%s' (%s)  [after stepping up]", ciP->compoundValueP->path.c_str(), ciP->compoundValueP->name.c_str()));
-    }
-    else if (name != "")
-    {
-      // If the name is non-empty, and it is NOT the end of a container, then a new Leaf or container has started
-      orion::compoundValueMiddle(ciP, rest, name, value, type);
-    }
-  }
-  else if ((isCompound == false) && (ciP->inCompoundValue == true))
-  {
-    //
-    // We were is a compound (ciP->inCompoundValue == true) but we no longer are (isCompound == false)
-    // Conclusion? The compound value has ended.
-    // In 'compoundValueEnd', the compound value is checked for errors and in case all is OK,
-    // The XML node that is the owner of the compound (e.g. a 'contextValue') is given the root pointer of the tree.
-    // The current ContextAttribute, whose 'contextValue' is the owner of this compound value tree is set in the
-    // parsing routines.
-    // 
-    // In case of error ("duplicated item in struct", "not same item name in vector"), ciP->httpStatusCode and ciP->answer
-    // are set to reflect the error, that will be taken care of by the caller of this function
-    //
-    orion::compoundValueEnd(ciP, path, parseDataP);
-  }
-  else if ((isCompound == false) && (ciP->inCompoundValue == false) && (treated == false))
-  {
-    //
-    // PARSE ERROR
-    //
-    // This incoming node has a path that the broker is unaware of.
-    // It cannot be treated.
-    // Only choice is to return a parse error and a good description of the error
-    //
     ciP->httpStatusCode = SccBadRequest;
     if (ciP->answer == "")
-      ciP->answer = std::string("Unknown XML field: '") + node->name() + "'";
+      ciP->answer = std::string("Unknown XML field: '") + name.c_str() + "'";
     LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), fatherPath.c_str()));
     return;
   }
-  else if ((isCompound == false) && (ciP->inCompoundValue == false) && (treated == true))
-  {
-    // This is just a trace message.
-    // The actual treatment of the niode was made before, in the call to the 'treat' function.
-    //
-    LM_T(LmtCompoundValue, ("OK:              '%s'", path.c_str()));
-  }
 
-
-  //
   // Recursive calls for all children of this node
-  //
   xml_node<>* child = node->first_node();
-
   while (child != NULL)
   {
-    xmlParse(ciP, node, child, indentation + "  ", path, parseVector, parseDataP);
+    if ((child != NULL) && (child->name() != NULL) && (onlyWs(child->name()) == false))
+      xmlParse(ciP, node, child, indentation + "  ", path, parseVector, parseDataP);
+
     child = child->next_sibling();
   }
 }

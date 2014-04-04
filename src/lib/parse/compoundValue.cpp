@@ -114,9 +114,9 @@ void compoundValueMiddle(ConnectionInfo* ciP, std::string relPath, std::string n
 *
 * compoundValueEnd - 
 */
-void compoundValueEnd(ConnectionInfo* ciP, std::string path, ParseData* parseDataP)
+void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
 {
-  LM_T(LmtCompoundValue, ("Compound END:    '%s'", path.c_str()));
+  LM_T(LmtCompoundValue, ("Compound END"));
 
   // Finish the compound value - error check included
   std::string status = ciP->compoundValueRoot->finish();
@@ -127,7 +127,7 @@ void compoundValueEnd(ConnectionInfo* ciP, std::string path, ParseData* parseDat
   {
     ciP->httpStatusCode = SccBadRequest;
     ciP->answer = std::string("compound value error: ") + status;
-    LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), path.c_str()));
+    LM_W(("ERROR: '%s'", ciP->answer.c_str()));
   }
 
   // Give the root pointer of this Compound to the active ContextAttribute
