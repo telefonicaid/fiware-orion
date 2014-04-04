@@ -213,11 +213,11 @@ void xmlParse
   std::string  path             = fatherPath + "/" + name;
   bool         treated          = treat(node, path, parseVector, parseDataP);
 
-  if (isCompoundValuePath(path.c_str()) && (value == ""))
+  if (isCompoundValuePath(path.c_str()) && (value == "") && (node->first_node() != NULL))
   {
-     eatCompound(ciP, NULL, node, "");
-     compoundValueEnd(ciP, parseDataP);
-     return;
+    eatCompound(ciP, NULL, node, "");
+    compoundValueEnd(ciP, parseDataP);
+    return;
   }
   else  if (treated == false)
   {
