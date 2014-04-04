@@ -127,7 +127,8 @@ TEST(compoundValue, updateOneString)
 
   // Get root of compound value
   cvnRootP = caP->compoundValueP;
-  
+  EXPECT_TRUE(cvnRootP != NULL);
+
   // The root pointer of the root must be the root itself
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
@@ -734,7 +735,6 @@ TEST(compoundValue, updateTwoStructs)
 
   caP = reqData.upcr.res.contextElementVector.get(0)->contextAttributeVector.get(0);
   
-
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
@@ -1321,8 +1321,8 @@ TEST(compoundValue, sixLevels)
 *
 * FIXME P10: I've encountered problems in this test.
 *            Needs to be fixed asap but perhaps not immediately, not to delay
-*            a new release.
-*            The whole Compound Value concept needs thorough testing asap.
+*            the new release.
+*            Try to implement JSON compounds just like the new XML implementation.
 *
 *
 * sixLevelsJson - 

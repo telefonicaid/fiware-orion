@@ -160,7 +160,7 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
   {
     res = jsonParse(ciP, content, reqP->keyword, reqP->parseVector, parseDataP);
     if (ciP->inCompoundValue == true)
-      orion::compoundValueEnd(ciP, "/end/caught/late", parseDataP);
+      orion::compoundValueEnd(ciP, parseDataP);
     if ((lmTraceIsSet(LmtCompoundValueShow)) && (ciP->compoundValueP != NULL))
       ciP->compoundValueP->shortShow("after parse: ");
   }

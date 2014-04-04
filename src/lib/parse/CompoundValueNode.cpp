@@ -225,10 +225,10 @@ void CompoundValueNode::show(std::string indent)
 {
 
   if (name != "")
-    LM_F(("%sname:    %s", indent.c_str(), name.c_str()));
+    LM_F(("%sname:      %s", indent.c_str(), name.c_str()));
 
   if (value != "")
-    LM_F(("%svalue:   %s", indent.c_str(), value.c_str()));
+    LM_F(("%svalue:     %s", indent.c_str(), value.c_str()));
 
   LM_F(("%scontainer: %s", indent.c_str(), container->name.c_str()));
   LM_F(("%slevel:     %d", indent.c_str(), level));

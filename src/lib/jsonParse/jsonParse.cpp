@@ -396,7 +396,7 @@ static std::string jsonParse
   }
   else if ((isCompound == false) && (ciP->inCompoundValue == true))
   {
-    orion::compoundValueEnd(ciP, path, parseDataP);
+    orion::compoundValueEnd(ciP, parseDataP);
     if (ciP->httpStatusCode != SccOk)
       return ciP->answer;
   }
