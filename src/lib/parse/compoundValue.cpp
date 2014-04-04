@@ -117,6 +117,9 @@ void compoundValueMiddle(ConnectionInfo* ciP, std::string relPath, std::string n
 void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
 {
   LM_T(LmtCompoundValue, ("Compound END"));
+  // ciP->compoundValueRoot->show("End: ");
+  // std::string rendered = ciP->compoundValueRoot->render(JSON, "");
+  // LM_M(("RENDERED:\n%s\n", rendered.c_str()));
 
   // Finish the compound value - error check included
   std::string status = ciP->compoundValueRoot->finish();

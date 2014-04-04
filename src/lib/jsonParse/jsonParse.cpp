@@ -55,7 +55,7 @@
 using boost::property_tree::ptree;
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * compoundValueRootV - 
@@ -68,9 +68,50 @@ static const char* compoundValueRootV[] =
   "/contextElements/contextElement/attributes/attribute/value/",
   "/attributes/attribute/value/"
 };
+#endif
 
 
+/* ****************************************************************************
+*
+* compoundRootV - 
+*
+*/
+static const char* compoundRootV[] =
+{
+  "/contextElements/contextElement/attributes/attribute/value",
+  "/attributes/attribute/value"
+};
 
+/* ****************************************************************************
+*
+* isCompoundPath - 
+*
+* This function examines a path to see whether we are inside a compound value or not.
+* Also, it returned the root of the compound (found in 'compoundValueRootV') and also
+* the 'rest' of the path, i.e. its relative path inside the compound.
+*
+* If the path doesn't belong to any compond, FALSE is returned.
+*/
+static bool isCompoundPath(const char* path)
+{
+   unsigned int len;
+
+   for (unsigned int ix = 0; ix < sizeof(compoundRootV) / sizeof(compoundRootV[0]); ++ix)
+   {
+      len = strlen(compoundRootV[ix]);
+
+      if (strlen(path) < len)
+         continue;
+
+      if (strncmp(compoundRootV[ix], path, len) == 0)
+         return true;
+   }
+
+   return false;
+}
+
+
+#if 0
 /* ****************************************************************************
 *
 * isCompoundValuePath - 
@@ -106,6 +147,7 @@ static bool isCompoundValuePath(const char* path, std::string& root, std::string
 
    return false;
 }
+#endif
 
 
 
@@ -189,7 +231,7 @@ std::string nodeType(std::string nodeName, std::string value, orion::CompoundVal
 }
 
 
-
+#if 0
 /* ****************************************************************************
 *
 * dirDepth - 
@@ -206,6 +248,87 @@ static int dirDepth(const char* s)
   }
 
   return slashes;
+}
+#endif
+
+
+/* ****************************************************************************
+*
+* eatCompound - 
+*/
+void eatCompound2(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, boost::property_tree::ptree::value_type& v, std::string indent)
+{
+  std::string  nodeName   = v.first.data();
+  std::string  nodeValue  = v.second.data();
+
+  if ((nodeName != "") && (nodeValue != ""))
+    LM_M(("%s%s (%s)  (LEAF)", indent.c_str(), nodeName.c_str(), nodeValue.c_str()));
+  else if ((nodeName != "") && (nodeValue == ""))
+    LM_M(("%s%s (Container)", indent.c_str(), nodeName.c_str()));
+  else if ((nodeName == "") && (nodeValue == ""))
+    LM_M(("%sNameless Container", indent.c_str()));
+  else if ((nodeName == "") && (nodeValue != ""))
+    LM_M(("%sNoName (%s) (LEAF - father is vector)", indent.c_str(), nodeValue.c_str()));
+
+  boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
+  BOOST_FOREACH(boost::property_tree::ptree::value_type &v2, subtree)
+  {
+    eatCompound2(ciP, containerP, v2, indent + "  " );
+  }  
+}
+
+
+/* ****************************************************************************
+*
+* eatCompound - 
+*/
+void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, boost::property_tree::ptree::value_type& v, std::string indent)
+{
+  std::string  nodeName   = v.first.data();
+  std::string  nodeValue  = v.second.data();
+
+  if (containerP == NULL)
+  {
+    LM_M(("COMPOUND: '%s'", nodeName.c_str()));
+    containerP = new CompoundValueNode(orion::CompoundValueNode::Struct);
+    ciP->compoundValueRoot = containerP;
+  }
+  else
+  {
+    if ((nodeName != "") && (nodeValue != "")) // Named Leaf
+    {
+      containerP->add(orion::CompoundValueNode::Leaf, nodeName, nodeValue);
+      LM_M(("Added leaf '%s' (value: '%s') under '%s'", nodeName.c_str(), nodeValue.c_str(), containerP->cpath()));
+    }
+    else if ((nodeName != "") && (nodeValue == "")) // Named Container
+    {
+      LM_M(("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
+      containerP = containerP->add(orion::CompoundValueNode::Struct, nodeName);
+    }
+    else if ((nodeName == "") && (nodeValue == ""))  // Name-Less container
+    {
+      LM_M(("Adding name-less container under '%s' (parent may be a Vector!)", containerP->cpath()));
+      containerP->type = orion::CompoundValueNode::Vector;
+      containerP = containerP->add(orion::CompoundValueNode::Struct, "item");
+    }
+    else if ((nodeName == "") && (nodeValue != "")) // Name-Less Leaf + its container is a vector
+    {
+      containerP->type = orion::CompoundValueNode::Vector;
+      LM_M(("Set '%s' to be a vector", containerP->cpath()));
+      containerP->add(orion::CompoundValueNode::Leaf, "item", nodeValue);
+      LM_M(("Added a name-less leaf (value: '%s') under '%s'", nodeValue.c_str(), containerP->cpath()));
+    }
+    else
+      LM_M(("IMPOSSIBLE !!!"));
+  }
+
+  boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
+  LM_M(("No of Children: %d", subtree.size()));
+
+  BOOST_FOREACH(boost::property_tree::ptree::value_type &v2, subtree)
+  {
+    eatCompound(ciP, containerP, v2, indent + "  " );
+  }
 }
 
 
@@ -246,6 +369,29 @@ static std::string jsonParse
   treated = treat(ciP, path, nodeValue, parseVector, parseDataP);
 
 
+  if ((isCompoundPath(path.c_str()) == true) && (nodeValue == ""))
+  {
+    std::string s;
+
+    LM_M(("Calling eatCompound for '%s'", path.c_str()));
+    eatCompound(ciP, NULL, v, "");
+    compoundValueEnd(ciP, parseDataP);
+
+    if (ciP->httpStatusCode != SccOk)
+      return ciP->answer;
+
+    return "OK";
+  }
+  else if (treated == false)
+  {
+    ciP->httpStatusCode = SccBadRequest;
+    if (ciP->answer == "")
+      ciP->answer = std::string("JSON Parse Error (unknown field: '") + path.c_str() + "')";
+    LM_E(("ERROR: '%s'", ciP->answer.c_str()));
+    return ciP->answer;
+  }
+
+#if 0
   //
   // Here (just like in xmlParse) we have six possibilities:
   // 1. Compound Start
@@ -400,6 +546,7 @@ static std::string jsonParse
     if (ciP->httpStatusCode != SccOk)
       return ciP->answer;
   }
+#endif
 
   boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
   BOOST_FOREACH(boost::property_tree::ptree::value_type &v2, subtree)
