@@ -262,13 +262,13 @@ void eatCompound2(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, boo
   std::string  nodeValue  = v.second.data();
 
   if ((nodeName != "") && (nodeValue != ""))
-    LM_M(("%s%s (%s)  (LEAF)", indent.c_str(), nodeName.c_str(), nodeValue.c_str()));
+    LM_T(LmtCompoundValue, ("%s%s (%s)  (LEAF)", indent.c_str(), nodeName.c_str(), nodeValue.c_str()));
   else if ((nodeName != "") && (nodeValue == ""))
-    LM_M(("%s%s (Container)", indent.c_str(), nodeName.c_str()));
+    LM_T(LmtCompoundValue, ("%s%s (Container)", indent.c_str(), nodeName.c_str()));
   else if ((nodeName == "") && (nodeValue == ""))
-    LM_M(("%sNameless Container", indent.c_str()));
+    LM_T(LmtCompoundValue, ("%sNameless Container", indent.c_str()));
   else if ((nodeName == "") && (nodeValue != ""))
-    LM_M(("%sNoName (%s) (LEAF - father is vector)", indent.c_str(), nodeValue.c_str()));
+    LM_T(LmtCompoundValue, ("%sNoName (%s) (LEAF - father is vector)", indent.c_str(), nodeValue.c_str()));
 
   boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
   BOOST_FOREACH(boost::property_tree::ptree::value_type &v2, subtree)
@@ -284,12 +284,14 @@ void eatCompound2(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, boo
 */
 void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, boost::property_tree::ptree::value_type& v, std::string indent)
 {
-  std::string  nodeName   = v.first.data();
-  std::string  nodeValue  = v.second.data();
+  std::string                  nodeName     = v.first.data();
+  std::string                  nodeValue    = v.second.data();
+  boost::property_tree::ptree  subtree1     = (boost::property_tree::ptree) v.second;
+  int                          noOfChildren = subtree1.size();
 
   if (containerP == NULL)
   {
-    LM_M(("COMPOUND: '%s'", nodeName.c_str()));
+    LM_T(LmtCompoundValue, ("COMPOUND: '%s'", nodeName.c_str()));
     containerP = new CompoundValueNode(orion::CompoundValueNode::Struct);
     ciP->compoundValueRoot = containerP;
   }
@@ -298,36 +300,39 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, boos
     if ((nodeName != "") && (nodeValue != "")) // Named Leaf
     {
       containerP->add(orion::CompoundValueNode::Leaf, nodeName, nodeValue);
-      LM_M(("Added leaf '%s' (value: '%s') under '%s'", nodeName.c_str(), nodeValue.c_str(), containerP->cpath()));
+      LM_T(LmtCompoundValue, ("Added leaf '%s' (value: '%s') under '%s'", nodeName.c_str(), nodeValue.c_str(), containerP->cpath()));
+    }
+    else if ((nodeName == "") && (nodeValue == "") && (noOfChildren == 0)) // Unnamed Leaf with EMPTY VALUE
+    {
+      LM_T(LmtCompoundValue, ("'Bad' input - looks like a container but it is an EMPTY LEAF - no name, no value"));
+      containerP->add(orion::CompoundValueNode::Leaf, "item", "");
     }
     else if ((nodeName != "") && (nodeValue == "")) // Named Container
     {
-      LM_M(("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
+      LM_T(LmtCompoundValue, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
       containerP = containerP->add(orion::CompoundValueNode::Struct, nodeName);
     }
     else if ((nodeName == "") && (nodeValue == ""))  // Name-Less container
     {
-      LM_M(("Adding name-less container under '%s' (parent may be a Vector!)", containerP->cpath()));
+      LM_T(LmtCompoundValue, ("Adding name-less container under '%s' (parent may be a Vector!)", containerP->cpath()));
       containerP->type = orion::CompoundValueNode::Vector;
       containerP = containerP->add(orion::CompoundValueNode::Struct, "item");
     }
     else if ((nodeName == "") && (nodeValue != "")) // Name-Less Leaf + its container is a vector
     {
       containerP->type = orion::CompoundValueNode::Vector;
-      LM_M(("Set '%s' to be a vector", containerP->cpath()));
+      LM_T(LmtCompoundValue, ("Set '%s' to be a vector", containerP->cpath()));
       containerP->add(orion::CompoundValueNode::Leaf, "item", nodeValue);
-      LM_M(("Added a name-less leaf (value: '%s') under '%s'", nodeValue.c_str(), containerP->cpath()));
+      LM_T(LmtCompoundValue, ("Added a name-less leaf (value: '%s') under '%s'", nodeValue.c_str(), containerP->cpath()));
     }
     else
-      LM_M(("IMPOSSIBLE !!!"));
+      LM_T(LmtCompoundValue, ("IMPOSSIBLE !!!"));
   }
 
   boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
-  LM_M(("No of Children: %d", subtree.size()));
-
   BOOST_FOREACH(boost::property_tree::ptree::value_type &v2, subtree)
   {
-    eatCompound(ciP, containerP, v2, indent + "  " );
+    eatCompound(ciP, containerP, v2, indent + "  ");
   }
 }
 
@@ -373,7 +378,7 @@ static std::string jsonParse
   {
     std::string s;
 
-    LM_M(("Calling eatCompound for '%s'", path.c_str()));
+    LM_T(LmtCompoundValue, ("Calling eatCompound for '%s'", path.c_str()));
     eatCompound(ciP, NULL, v, "");
     compoundValueEnd(ciP, parseDataP);
 
