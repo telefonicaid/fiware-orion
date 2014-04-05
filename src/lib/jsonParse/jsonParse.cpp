@@ -183,32 +183,6 @@ std::string nodeType(std::string nodeName, std::string value, orion::CompoundVal
 *
 * eatCompound - 
 */
-void eatCompound2(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, boost::property_tree::ptree::value_type& v, std::string indent)
-{
-  std::string  nodeName   = v.first.data();
-  std::string  nodeValue  = v.second.data();
-
-  if ((nodeName != "") && (nodeValue != ""))
-    LM_T(LmtCompoundValue, ("%s%s (%s)  (LEAF)", indent.c_str(), nodeName.c_str(), nodeValue.c_str()));
-  else if ((nodeName != "") && (nodeValue == ""))
-    LM_T(LmtCompoundValue, ("%s%s (Container)", indent.c_str(), nodeName.c_str()));
-  else if ((nodeName == "") && (nodeValue == ""))
-    LM_T(LmtCompoundValue, ("%sNameless Container", indent.c_str()));
-  else if ((nodeName == "") && (nodeValue != ""))
-    LM_T(LmtCompoundValue, ("%sNoName (%s) (LEAF - father is vector)", indent.c_str(), nodeValue.c_str()));
-
-  boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
-  BOOST_FOREACH(boost::property_tree::ptree::value_type &v2, subtree)
-  {
-    eatCompound2(ciP, containerP, v2, indent + "  " );
-  }  
-}
-
-
-/* ****************************************************************************
-*
-* eatCompound - 
-*/
 void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, boost::property_tree::ptree::value_type& v, std::string indent)
 {
   std::string                  nodeName     = v.first.data();
