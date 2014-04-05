@@ -1316,14 +1316,8 @@ TEST(compoundValue, sixLevels)
 }
 
 
-#if 1
+
 /* ****************************************************************************
-*
-* FIXME P10: I've encountered problems in this test.
-*            Needs to be fixed asap but perhaps not immediately, not to delay
-*            the new release.
-*            Try to implement JSON compounds just like the new XML implementation.
-*
 *
 * sixLevelsJson - 
 */
@@ -1633,7 +1627,6 @@ TEST(compoundValue, sixLevelsJson)
 
   utExit();
 }
-#endif
 
 
 
