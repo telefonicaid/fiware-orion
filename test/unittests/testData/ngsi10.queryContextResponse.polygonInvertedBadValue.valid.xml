@@ -1,6 +1,7 @@
 <queryContextResponse>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>bad string for polygon/inverted: 'cero'</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>bad string for polygon/inverted: 'cero'</details>
   </errorCode>
 </queryContextResponse>

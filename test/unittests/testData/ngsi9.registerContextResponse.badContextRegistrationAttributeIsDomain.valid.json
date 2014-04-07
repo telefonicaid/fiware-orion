@@ -3,6 +3,7 @@
   "registrationId" : "000000000000000000000000",
   "errorCode" : {
     "code" : "400",
-    "reasonPhrase" : "missing isDomain value for registration attribute"
+    "reasonPhrase" : "Bad Request",
+    "details" : "missing isDomain value for registration attribute"
   }
 }

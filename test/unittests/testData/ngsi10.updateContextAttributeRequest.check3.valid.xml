@@ -1,4 +1,5 @@
 <statusCode>
   <code>400</code>
-  <reasonPhrase>missing metadata name</reasonPhrase>
+  <reasonPhrase>Bad Request</reasonPhrase>
+  <details>missing metadata name</details>
 </statusCode>

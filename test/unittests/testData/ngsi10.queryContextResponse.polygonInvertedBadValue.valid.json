@@ -1,6 +1,7 @@
 {
   "errorCode" : {
     "code" : "400",
-    "reasonPhrase" : "bad string for polygon/inverted: 'zero'"
+    "reasonPhrase" : "Bad Request",
+    "details" : "bad string for polygon/inverted: 'zero'"
   }
 }

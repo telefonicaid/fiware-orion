@@ -50,10 +50,7 @@ UpdateContextAvailabilitySubscriptionResponse::UpdateContextAvailabilitySubscrip
 */
 UpdateContextAvailabilitySubscriptionResponse::UpdateContextAvailabilitySubscriptionResponse(StatusCode& _errorCode)
 {
-  errorCode.code         = _errorCode.code;
-  errorCode.reasonPhrase = _errorCode.reasonPhrase;
-  errorCode.details      = _errorCode.details;
-
+  errorCode.fill(&_errorCode);
   errorCode.tagSet("errorCode");
 }
 
@@ -106,14 +103,12 @@ std::string UpdateContextAvailabilitySubscriptionResponse::check(RequestType req
 
   if (predetectedError != "")
   {
-    errorCode.code         = SccBadRequest;
-    errorCode.reasonPhrase = predetectedError;
+    errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (((res = subscriptionId.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter)) != "OK") ||
            ((res = duration.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))       != "OK"))
   {
-    errorCode.code         = SccBadRequest;
-    errorCode.reasonPhrase = res;
+    errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";

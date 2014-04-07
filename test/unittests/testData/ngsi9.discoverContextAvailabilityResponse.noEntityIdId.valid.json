@@ -1,6 +1,7 @@
 {
   "errorCode" : {
     "code" : "400",
-    "reasonPhrase" : "empty entityId:id"
+    "reasonPhrase" : "Bad Request",
+    "details" : "empty entityId:id"
   }
 }

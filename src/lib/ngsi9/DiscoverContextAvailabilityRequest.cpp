@@ -70,20 +70,17 @@ std::string DiscoverContextAvailabilityRequest::check(RequestType requestType, F
 
   if (predetectedError != "")
   {
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = predetectedError;
+    response.errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (entityIdVector.size() == 0)
   {
-     response.errorCode.code         = SccContextElementNotFound;
-     response.errorCode.reasonPhrase = "No context element found";
+    response.errorCode.fill(SccContextElementNotFound);
   }
   else if (((res = entityIdVector.check(DiscoverContextAvailability, format, indent, predetectedError, restrictions))                      != "OK") ||
            ((res = attributeList.check(DiscoverContextAvailability, format, indent, predetectedError, restrictions))                       != "OK") ||
            ((restrictions != 0) && ((res = restriction.check(DiscoverContextAvailability, format, indent, predetectedError, restrictions)) != "OK")))
   {
-     response.errorCode.code         = SccBadRequest;
-     response.errorCode.reasonPhrase = res;
+    response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";

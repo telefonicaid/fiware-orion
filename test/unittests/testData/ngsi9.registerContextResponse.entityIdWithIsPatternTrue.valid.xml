@@ -3,6 +3,7 @@
   <registrationId>000000000000000000000000</registrationId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>'isPattern' set to true for a registration</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>'isPattern' set to true for a registration</details>
   </errorCode>
 </registerContextResponse>

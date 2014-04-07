@@ -1,6 +1,7 @@
 {
   "errorCode" : {
     "code" : "400",
-    "reasonPhrase" : "PRE Error"
+    "reasonPhrase" : "Bad Request",
+    "details" : "PRE Error"
   }
 }

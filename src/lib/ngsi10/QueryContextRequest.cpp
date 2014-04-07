@@ -81,15 +81,13 @@ std::string QueryContextRequest::check(RequestType requestType, Format format, s
 
   if (predetectedError != "")
   {
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = predetectedError;
+    response.errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (((res = entityIdVector.check(QueryContext, format, indent, predetectedError, 0))         != "OK") ||
            ((res = attributeList.check(QueryContext, format, indent, predetectedError, 0))          != "OK") ||
            ((res = restriction.check(QueryContext, format, indent, predetectedError, restrictions)) != "OK"))
   {
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = res;
+    response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";

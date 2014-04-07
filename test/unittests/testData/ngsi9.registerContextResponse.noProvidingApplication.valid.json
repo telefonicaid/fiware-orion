@@ -3,6 +3,7 @@
   "registrationId" : "000000000000000000000000",
   "errorCode" : {
     "code" : "400",
-    "reasonPhrase" : "no providing application"
+    "reasonPhrase" : "Bad Request",
+    "details" : "no providing application"
   }
 }
