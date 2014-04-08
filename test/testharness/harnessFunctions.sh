@@ -299,8 +299,17 @@ function accumulatorStart()
 function printXmlWithHeaders()
 {
   text=$1
+  encoding=$2
+
   cat headers.out
-  echo "${text}" | xmllint --format -
+
+  if [ "$encoding" == "XML" ]
+  then
+    echo "$text" | xmllint --format -
+  else
+    echo "$text"
+  fi
+
   rm headers.out
 }
 
@@ -339,14 +348,13 @@ function curlIt()
   
   response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" --header "Expect:" ${extraoptions} -d @- ))
   
-  if [ "$encoding" == "XML" ]
+  if [ "$encoding" == "XML" ] || [ "$encoding" == "xml" ]
   then
-    printXmlWithHeaders "${response}"
+    printXmlWithHeaders "${response}" "$encoding"
   elif [ "$encoding" == "JSON" ]
   then
     printJsonWithHeaders "${response}"
   fi
-    
 }
 
 
@@ -403,7 +411,7 @@ function curlNoPayload()
     
   if [ "$encoding" == "XML" ]
   then
-    printXmlWithHeaders "${response}"
+    printXmlWithHeaders "${response}" "$encoding"
   elif [ "$encoding" == "JSON" ]
   then
     printJsonWithHeaders "${response}"
