@@ -151,20 +151,20 @@ static std::string getArrayElementName(std::string arrayName)
 */
 std::string nodeType(std::string nodeName, std::string value, orion::CompoundValueNode::Type* typeP)
 {
-  bool        isStruct         = (nodeName == "") && (value == "");
-  bool        isLeaf           = (nodeName != "") && (value != "");
+  bool        isObject         = (nodeName == "") && (value == "");
+  bool        isString           = (nodeName != "") && (value != "");
   bool        isVector         = (nodeName != "") && (value == "");
 
-  if (isStruct)
+  if (isObject)
   {
-    *typeP = orion::CompoundValueNode::Struct;
-    return "Struct";
+    *typeP = orion::CompoundValueNode::Object;
+    return "Object";
   }
 
-  if (isLeaf)
+  if (isString)
   {
-    *typeP = orion::CompoundValueNode::Leaf;
-    return "Leaf";
+    *typeP = orion::CompoundValueNode::String;
+    return "String";
   }
   
   if (isVector)
@@ -173,8 +173,8 @@ std::string nodeType(std::string nodeName, std::string value, orion::CompoundVal
      return "Vector";
   }
 
-  // Simple Leaf inside vector
-  return "Leaf";
+  // Simple String inside vector
+  return "String";
 }
 
 
@@ -193,38 +193,38 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, boos
   if (containerP == NULL)
   {
     LM_T(LmtCompoundValue, ("COMPOUND: '%s'", nodeName.c_str()));
-    containerP = new CompoundValueNode(orion::CompoundValueNode::Struct);
+    containerP = new CompoundValueNode(orion::CompoundValueNode::Object);
     ciP->compoundValueRoot = containerP;
   }
   else
   {
-    if ((nodeName != "") && (nodeValue != "")) // Named Leaf
+    if ((nodeName != "") && (nodeValue != "")) // Named String
     {
-      containerP->add(orion::CompoundValueNode::Leaf, nodeName, nodeValue);
-      LM_T(LmtCompoundValue, ("Added leaf '%s' (value: '%s') under '%s'", nodeName.c_str(), nodeValue.c_str(), containerP->cpath()));
+      containerP->add(orion::CompoundValueNode::String, nodeName, nodeValue);
+      LM_T(LmtCompoundValue, ("Added string '%s' (value: '%s') under '%s'", nodeName.c_str(), nodeValue.c_str(), containerP->cpath()));
     }
-    else if ((nodeName == "") && (nodeValue == "") && (noOfChildren == 0)) // Unnamed Leaf with EMPTY VALUE
+    else if ((nodeName == "") && (nodeValue == "") && (noOfChildren == 0)) // Unnamed String with EMPTY VALUE
     {
-      LM_T(LmtCompoundValue, ("'Bad' input - looks like a container but it is an EMPTY LEAF - no name, no value"));
-      containerP->add(orion::CompoundValueNode::Leaf, "item", "");
+      LM_T(LmtCompoundValue, ("'Bad' input - looks like a container but it is an EMPTY STRING - no name, no value"));
+      containerP->add(orion::CompoundValueNode::String, "item", "");
     }
     else if ((nodeName != "") && (nodeValue == "")) // Named Container
     {
       LM_T(LmtCompoundValue, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
-      containerP = containerP->add(orion::CompoundValueNode::Struct, nodeName);
+      containerP = containerP->add(orion::CompoundValueNode::Object, nodeName);
     }
     else if ((nodeName == "") && (nodeValue == ""))  // Name-Less container
     {
       LM_T(LmtCompoundValue, ("Adding name-less container under '%s' (parent may be a Vector!)", containerP->cpath()));
       containerP->type = orion::CompoundValueNode::Vector;
-      containerP = containerP->add(orion::CompoundValueNode::Struct, "item");
+      containerP = containerP->add(orion::CompoundValueNode::Object, "item");
     }
-    else if ((nodeName == "") && (nodeValue != "")) // Name-Less Leaf + its container is a vector
+    else if ((nodeName == "") && (nodeValue != "")) // Name-Less String + its container is a vector
     {
       containerP->type = orion::CompoundValueNode::Vector;
       LM_T(LmtCompoundValue, ("Set '%s' to be a vector", containerP->cpath()));
-      containerP->add(orion::CompoundValueNode::Leaf, "item", nodeValue);
-      LM_T(LmtCompoundValue, ("Added a name-less leaf (value: '%s') under '%s'", nodeValue.c_str(), containerP->cpath()));
+      containerP->add(orion::CompoundValueNode::String, "item", nodeValue);
+      LM_T(LmtCompoundValue, ("Added a name-less string (value: '%s') under '%s'", nodeValue.c_str(), containerP->cpath()));
     }
     else
       LM_T(LmtCompoundValue, ("IMPOSSIBLE !!!"));
@@ -261,7 +261,7 @@ static std::string jsonParse
   // See: http://www.boost.org/doc/libs/1_41_0/doc/html/boost_propertytree/parsers.html#boost_propertytree.parsers.json_parser
   if (nodeName != "")
   {
-    // This detects whether we are trying to use an object within an object instead of a one-item array.
+    // This detects whether we are trying to use an object within an object instead of an one-item array.
     // We don't allow the first case, hence the exception thrown.
     // However, this restriction is not valid inside Compound Values.
      if ((nodeName != arrayElementName) || (ciP->inCompoundValue == true))

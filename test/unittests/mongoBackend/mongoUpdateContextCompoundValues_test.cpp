@@ -77,20 +77,20 @@
     orion::CompoundValueNode*  x;                                                  \
     orion::CompoundValueNode*  leaf;                                               \
                                                                                    \
-    cv = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);  \
+    cv = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);           \
                                                                                    \
-    leaf = cv->add(orion::CompoundValueNode::Leaf,    "",    "22");                \
-    str  = cv->add(orion::CompoundValueNode::Struct,  "", "");                     \
-    vec  = cv->add(orion::CompoundValueNode::Vector,  "", "");                     \
+    leaf = cv->add(orion::CompoundValueNode::String,  "",  "22");                  \
+    str  = cv->add(orion::CompoundValueNode::Object,  "",  "");                    \
+    vec  = cv->add(orion::CompoundValueNode::Vector,  "",  "");                    \
                                                                                    \
-    x    = str->add(orion::CompoundValueNode::Vector, "x",    "");                 \
-    leaf = str->add(orion::CompoundValueNode::Leaf,   "y",    "3");                \
+    x    = str->add(orion::CompoundValueNode::Vector, "x", "");                    \
+    leaf = str->add(orion::CompoundValueNode::String, "y", "3");                   \
                                                                                    \
-    leaf = x->add(orion::CompoundValueNode::Leaf,     "", "x1");                   \
-    leaf = x->add(orion::CompoundValueNode::Leaf,     "", "x2");                   \
+    leaf = x->add(orion::CompoundValueNode::String,   "",  "x1");                  \
+    leaf = x->add(orion::CompoundValueNode::String,   "",  "x2");                  \
                                                                                    \
-    leaf = vec->add(orion::CompoundValueNode::Leaf,   "", "z1");                   \
-    leaf = vec->add(orion::CompoundValueNode::Leaf,   "", "z2");                   \
+    leaf = vec->add(orion::CompoundValueNode::String, "",  "z1");                  \
+    leaf = vec->add(orion::CompoundValueNode::String, "",  "z2");                  \
                                                                                    \
     leaf->check();                                                                 \
     cv->shortShow("shortShow1: ");                                                 \
@@ -103,16 +103,16 @@
     orion::CompoundValueNode*  y;                                                  \
     orion::CompoundValueNode*  leaf;                                               \
                                                                                    \
-    cv = new orion::CompoundValueNode(orion::CompoundValueNode::Struct); \
+    cv = new orion::CompoundValueNode(orion::CompoundValueNode::Object); \
                                                                                    \
-    x    = cv->add(orion::CompoundValueNode::Struct, "x", "");                     \
-    y    = cv->add(orion::CompoundValueNode::Vector, "y", "");                     \
+    x    = cv->add(orion::CompoundValueNode::Object, "x",  "");                    \
+    y    = cv->add(orion::CompoundValueNode::Vector, "y",  "");                    \
                                                                                    \
-    leaf = x->add(orion::CompoundValueNode::Leaf,    "x1", "a");                   \
-    leaf = x->add(orion::CompoundValueNode::Leaf,    "x2", "b");                   \
+    leaf = x->add(orion::CompoundValueNode::String,  "x1", "a");                   \
+    leaf = x->add(orion::CompoundValueNode::String,  "x2", "b");                   \
                                                                                    \
-    leaf = y->add(orion::CompoundValueNode::Leaf,    "", "y1");                    \
-    leaf = y->add(orion::CompoundValueNode::Leaf,    "", "y2");                    \
+    leaf = y->add(orion::CompoundValueNode::String,  "",   "y1");                  \
+    leaf = y->add(orion::CompoundValueNode::String,  "",   "y2");                  \
                                                                                    \
     leaf->check();                                                                 \
     cv->shortShow("shortShow2: ");                                                 \

@@ -123,7 +123,7 @@ static bool treat(xml_node<>* node, std::string path, XmlNode* parseVector, Pars
 *
 * Three types of tree nodes here (4 actually);
 *   - toplevel node
-*   - leaf
+*   - string
 *   - object node
 *   - vector node
 */
@@ -136,7 +136,7 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
     if (xmlAttribute == "vector")
       containerP = new CompoundValueNode(orion::CompoundValueNode::Vector);
     else if (xmlAttribute =="")
-      containerP = new CompoundValueNode(orion::CompoundValueNode::Struct);
+      containerP = new CompoundValueNode(orion::CompoundValueNode::Object);
     else
     {
       ciP->httpStatusCode = SccBadRequest;
@@ -158,7 +158,7 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
       if (xmlAttribute == "vector")
         containerP = containerP->add(orion::CompoundValueNode::Vector, name);
       else if (xmlAttribute == "")
-        containerP = containerP->add(orion::CompoundValueNode::Struct, name);
+        containerP = containerP->add(orion::CompoundValueNode::Object, name);
       else
       {
         ciP->httpStatusCode = SccBadRequest;
@@ -168,7 +168,7 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
       }
     }
     else // String
-      containerP->add(orion::CompoundValueNode::Leaf, name, value);
+      containerP->add(orion::CompoundValueNode::String, name, value);
   }
 
   xml_node<>* child = node->first_node();
@@ -296,7 +296,7 @@ std::string entityIdParse(RequestType requestType, xml_node<>* node, EntityId* e
 * This function looks for the presence of the XML attribute 'type'.
 * This attribute is used in Compound Values to indicate that a container is
 * a vector and not a structure.
-* Vectors don't exist in XML, all containers are considered 'structs', but as
+* Vectors don't exist in XML, all containers are considered 'objects', but as
 * vectors exist in JSON and we support both formats we need a way to have vectors
 * in XML.
 * The way we have chosen is to use an XML attribute with the name 'type' and its
@@ -308,7 +308,7 @@ std::string entityIdParse(RequestType requestType, xml_node<>* node, EntityId* e
 * - error string   in all other cases.
 *
 * The following XML attribute is considered an error:
-* - type="struct"
+* - type="object"
 * - vector="yes"
 * - etc, etc.
 */

@@ -59,7 +59,7 @@ void compoundValueStart
 {
   ciP->inCompoundValue = true;
 
-  ciP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Struct);
+  ciP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Object);
   LM_T(LmtCompoundValueContainer, ("Set current container to '%s' (%s)", ciP->compoundValueP->path.c_str(), ciP->compoundValueP->name.c_str()));
   ciP->compoundValueRoot = ciP->compoundValueP;
 
@@ -90,14 +90,14 @@ void compoundValueStart
 *
 * compoundValueMiddle - 
 *
-* containerType: vector/struct/leaf
+* containerType: vector/object/string
 */
 void compoundValueMiddle(ConnectionInfo* ciP, std::string relPath, std::string name, std::string value, orion::CompoundValueNode::Type type)
 {
   LM_T(LmtCompoundValue, ("Compound MIDDLE %s: %s: NAME: '%s', VALUE: '%s'", relPath.c_str(), CompoundValueNode::typeName(type), name.c_str(), value.c_str()));
-  if ((type == orion::CompoundValueNode::Vector) || (type == orion::CompoundValueNode::Struct))
+  if ((type == orion::CompoundValueNode::Vector) || (type == orion::CompoundValueNode::Object))
   {
-    // If we enter a vector or a struct, the container must change (so that we add to this container from now on).
+    // If we enter a vector or an object, the container must change (so that we add to this container from now on).
     // ciP->compoundValueP points to the current compound container
     ciP->compoundValueP = ciP->compoundValueP->add(type, name);
     LM_T(LmtCompoundValueContainer, ("Set current container to '%s' (%s)", ciP->compoundValueP->path.c_str(), ciP->compoundValueP->name.c_str()));
