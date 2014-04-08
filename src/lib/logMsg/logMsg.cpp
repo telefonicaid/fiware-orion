@@ -265,6 +265,7 @@ bool  lmFix                        = false;
 bool  lmAssertAtExit               = false;
 LmxFp lmxFp                        = NULL;
 bool  lmNoTracesToFileIfHookActive = false;
+bool  lmSilent                     = false;
 
 
 
@@ -1457,6 +1458,8 @@ char* lmTextGet(const char* format, ...)
 */
 LmStatus lmOk(char type, int tLev)
 {
+    if (lmSilent == true)
+        return LmsNull;
     if ((type == 'T') && (tLevel[tLev] == false))
         return LmsNull;
     if ((type == 'D') && (lmDebug == false))
