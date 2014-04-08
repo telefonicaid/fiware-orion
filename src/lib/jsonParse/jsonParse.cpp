@@ -262,7 +262,7 @@ static std::string jsonParse
   
   if (treated == false)
   {
-    orion::CompoundValueNode::Type  type           = orion::CompoundValueNode::Leaf;
+    orion::CompoundValueNode::Type  type;
     bool                            fatherIsVector = false;
     bool                            stepUp         = false;
     std::string                     comment;
