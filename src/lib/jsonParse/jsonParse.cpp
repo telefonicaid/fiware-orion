@@ -55,25 +55,22 @@
 using boost::property_tree::ptree;
 
 
-
 /* ****************************************************************************
 *
-* compoundValueRootV - 
+* compoundRootV - 
 *
-* The vector 'compoundValueRootV' contains a list of all the paths where we allow
-* a compound value
 */
-static const char* compoundValueRootV[] =
+static const char* compoundRootV[] =
 {
-  "/contextElements/contextElement/attributes/attribute/value/",
-  "/attributes/attribute/value/"
+  "/contextElements/contextElement/attributes/attribute/value",
+  "/attributes/attribute/value"
 };
 
 
 
 /* ****************************************************************************
 *
-* isCompoundValuePath - 
+* isCompoundPath - 
 *
 * This function examines a path to see whether we are inside a compound value or not.
 * Also, it returned the root of the compound (found in 'compoundValueRootV') and also
@@ -81,27 +78,19 @@ static const char* compoundValueRootV[] =
 *
 * If the path doesn't belong to any compond, FALSE is returned.
 */
-static bool isCompoundValuePath(const char* path, std::string& root, std::string& rest)
+static bool isCompoundPath(const char* path)
 {
    unsigned int len;
 
-   root = "";
-   rest = "";
-
-   for (unsigned int ix = 0; ix < sizeof(compoundValueRootV) / sizeof(compoundValueRootV[0]); ++ix)
+   for (unsigned int ix = 0; ix < sizeof(compoundRootV) / sizeof(compoundRootV[0]); ++ix)
    {
-      len = strlen(compoundValueRootV[ix]);
+      len = strlen(compoundRootV[ix]);
 
       if (strlen(path) < len)
          continue;
 
-      if (strncmp(compoundValueRootV[ix], path, len) == 0)
-      {
-         root = compoundValueRootV[ix];
-         rest = &path[len];
-
+      if (strncmp(compoundRootV[ix], path, len) == 0)
          return true;
-      }
    }
 
    return false;
@@ -192,20 +181,60 @@ std::string nodeType(std::string nodeName, std::string value, orion::CompoundVal
 
 /* ****************************************************************************
 *
-* dirDepth - 
+* eatCompound - 
 */
-static int dirDepth(const char* s)
+void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, boost::property_tree::ptree::value_type& v, std::string indent)
 {
-  int slashes = 0;
+  std::string                  nodeName     = v.first.data();
+  std::string                  nodeValue    = v.second.data();
+  boost::property_tree::ptree  subtree1     = (boost::property_tree::ptree) v.second;
+  int                          noOfChildren = subtree1.size();
 
-  while (*s != 0)
+  if (containerP == NULL)
   {
-    if (*s == '/')
-      ++slashes;
-    ++s;
+    LM_T(LmtCompoundValue, ("COMPOUND: '%s'", nodeName.c_str()));
+    containerP = new CompoundValueNode(orion::CompoundValueNode::Struct);
+    ciP->compoundValueRoot = containerP;
+  }
+  else
+  {
+    if ((nodeName != "") && (nodeValue != "")) // Named Leaf
+    {
+      containerP->add(orion::CompoundValueNode::Leaf, nodeName, nodeValue);
+      LM_T(LmtCompoundValue, ("Added leaf '%s' (value: '%s') under '%s'", nodeName.c_str(), nodeValue.c_str(), containerP->cpath()));
+    }
+    else if ((nodeName == "") && (nodeValue == "") && (noOfChildren == 0)) // Unnamed Leaf with EMPTY VALUE
+    {
+      LM_T(LmtCompoundValue, ("'Bad' input - looks like a container but it is an EMPTY LEAF - no name, no value"));
+      containerP->add(orion::CompoundValueNode::Leaf, "item", "");
+    }
+    else if ((nodeName != "") && (nodeValue == "")) // Named Container
+    {
+      LM_T(LmtCompoundValue, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
+      containerP = containerP->add(orion::CompoundValueNode::Struct, nodeName);
+    }
+    else if ((nodeName == "") && (nodeValue == ""))  // Name-Less container
+    {
+      LM_T(LmtCompoundValue, ("Adding name-less container under '%s' (parent may be a Vector!)", containerP->cpath()));
+      containerP->type = orion::CompoundValueNode::Vector;
+      containerP = containerP->add(orion::CompoundValueNode::Struct, "item");
+    }
+    else if ((nodeName == "") && (nodeValue != "")) // Name-Less Leaf + its container is a vector
+    {
+      containerP->type = orion::CompoundValueNode::Vector;
+      LM_T(LmtCompoundValue, ("Set '%s' to be a vector", containerP->cpath()));
+      containerP->add(orion::CompoundValueNode::Leaf, "item", nodeValue);
+      LM_T(LmtCompoundValue, ("Added a name-less leaf (value: '%s') under '%s'", nodeValue.c_str(), containerP->cpath()));
+    }
+    else
+      LM_T(LmtCompoundValue, ("IMPOSSIBLE !!!"));
   }
 
-  return slashes;
+  boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
+  BOOST_FOREACH(boost::property_tree::ptree::value_type &v2, subtree)
+  {
+    eatCompound(ciP, containerP, v2, indent + "  ");
+  }
 }
 
 
@@ -246,159 +275,26 @@ static std::string jsonParse
   treated = treat(ciP, path, nodeValue, parseVector, parseDataP);
 
 
-  //
-  // Here (just like in xmlParse) we have six possibilities:
-  // 1. Compound Start
-  // 2. In the middle of a Compound
-  //    2.1 Start of a container, or a leaf
-  //    2.2. Compound container ends
-  // 4. Compound ends
-  // 5. Normal treated path
-  // 6. Untreated path that should give a parse error
-  //
-  std::string  root;
-  std::string  rest;  
-  bool         isCompound = isCompoundValuePath(path.c_str(), root, rest);
-  
-  if (treated == false)
+  if ((isCompoundPath(path.c_str()) == true) && (nodeValue == ""))
   {
-    orion::CompoundValueNode::Type  type;
-    bool                            fatherIsVector = false;
-    bool                            stepUp         = false;
-    std::string                     comment;
-    
-    LM_T(LmtCompoundValue, ("nodeName: '%s', nodeValue: '%s'", nodeName.c_str(), nodeValue.c_str()));
+    std::string s;
 
-    if ((nodeName != "") && (nodeValue != ""))
-    {
-      comment = "I am a LEAF";
-      type = orion::CompoundValueNode::Leaf;
-    }
-    else if ((nodeName != "") && (nodeValue == ""))
-    {
-      comment = "I am a STRUCT or VECTOR";
-      type = orion::CompoundValueNode::Struct;
-    }
-    else if ((nodeName == "") && (nodeValue == ""))
-    {
-      comment = "current container is a VECTOR, not a struct";
-      fatherIsVector = true;
-      type = orion::CompoundValueNode::Struct;
-    }
-    else if ((nodeName == "") && (nodeValue != ""))
-    {
-      //
-      // We enter here for simple elements in a vector. E.g.:
-      //
-      // "value": [
-      //   "1",
-      //   "2",
-      //   "3"
-      // ]
-      //
-      // The element "1" is the first time we enter 'compound', so ciP->compoundValueP
-      // doesn't exist yet.
-      // Adding "1" to the vector "value" must be done later (after creating the 
-      // root container - in compoundValueStart).
-      //
-      // In the case of "2" and "3", these simple leaves are just added and we return.
-      //
-      if (ciP->compoundValueP != NULL)
-      {
-        ciP->compoundValueP->add(orion::CompoundValueNode::Leaf, "item", nodeValue);
-        ciP->compoundValueP->type = orion::CompoundValueNode::Vector;
-        return "OK";
-      }
-      else
-      {
-        nodeName       = "item";
-        type           = orion::CompoundValueNode::Leaf;
-        fatherIsVector = true;
-      }
-    }
+    LM_T(LmtCompoundValue, ("Calling eatCompound for '%s'", path.c_str()));
+    eatCompound(ciP, NULL, v, "");
+    compoundValueEnd(ciP, parseDataP);
 
-    if (ciP->compoundValueP != NULL)
-    {
-      int currentDepth = dirDepth(ciP->compoundValueP->path.c_str());
-      int thisDepth    = dirDepth(rest.c_str()) + 1;  // rest has the initial '/' stripped off
-
-      if (thisDepth <= currentDepth)
-      {
-        comment += ", STEPPING UP";
-        stepUp = true;
-        LM_T(LmtCompoundValueStep, ("STEPPING UP from '%s' to '%s' (from '%s' to '%s')", 
-                                    ciP->compoundValueP->cname(),
-                                    ciP->compoundValueP->container->cname(),
-                                    ciP->compoundValueP->cpath(),
-                                    ciP->compoundValueP->container->cpath()));
-      }
-    }
-
-    LM_T(LmtCompoundValue, ("%-70s (name: '%s', value: '%s') - %s", path.c_str(), nodeName.c_str(), nodeValue.c_str(), comment.c_str()));
-
-    if  ((isCompound == true) && (ciP->inCompoundValue == false))
-    {
-      orion::compoundValueStart(ciP, path, nodeName, nodeValue, rest, type, fatherIsVector);
-      if ((nodeName == "") && (nodeValue == ""))
-      {
-        ciP->compoundValueP->name = "item";
-        ciP->compoundValueP->container = ciP->compoundValueP->rootP;
-      }
-    }
-    else if ((isCompound == true) && (ciP->inCompoundValue == true))
-    {
-      //
-      // This is either a NEW Object/Vector/Leaf, or the current container has ended.
-      // If the path of the current object is shorter than the path of the current container,
-      // then we know that we've stepped out of the current container and we have to point
-      // to its father as being the new 'current container'
-      //
-      if (stepUp)
-      {
-        LM_T(LmtCompoundValueStep, (""));
-        LM_T(LmtCompoundValueStep, ("------------- STEP UP -----------------"));
-        LM_T(LmtCompoundValueStep, ("Old current container: '%s' ('%s')", ciP->compoundValueP->cname(), ciP->compoundValueP->cpath()));
-        ciP->compoundValueP = ciP->compoundValueP->container;
-        LM_T(LmtCompoundValueStep, ("New current container: '%s' ('%s')", ciP->compoundValueP->cname(), ciP->compoundValueP->cpath()));
-
-        if (ciP->compoundValueP->isVector() && ciP->compoundValueP->container->isVector())
-        {
-          LM_T(LmtCompoundValueStep, ("New container is a vector and the father of the new container is a vector - I have to step up one step more"));
-          ciP->compoundValueP = ciP->compoundValueP->container;
-          LM_T(LmtCompoundValueStep, ("New current container: '%s' ('%s')", ciP->compoundValueP->cname(), ciP->compoundValueP->cpath()));
-        }
-
-        LM_T(LmtCompoundValueStep, (""));
-        LM_T(LmtCompoundValueStep, (""));
-      }
-      else
-      {
-        if (fatherIsVector)
-          ciP->compoundValueP->type = orion::CompoundValueNode::Vector;
-      }
-
-      if (nodeName != "")
-        orion::compoundValueMiddle(ciP, rest, nodeName, nodeValue, type);
-      else
-      {
-        // This is a vector item, its name must be 'item'
-        orion::compoundValueMiddle(ciP, rest, "item", "", orion::CompoundValueNode::Struct);
-      }
-    }
-    else if ((isCompound == false) && (ciP->inCompoundValue == false))
-    {
-      ciP->httpStatusCode = SccBadRequest;
-      if (ciP->answer == "")
-        ciP->answer = std::string("JSON Parse Error (unknown field: '") + path.c_str() + "')";
-      LM_E(("ERROR: '%s'", ciP->answer.c_str()));
-      return ciP->answer;
-    }
-  }
-  else if ((isCompound == false) && (ciP->inCompoundValue == true))
-  {
-    orion::compoundValueEnd(ciP, path, parseDataP);
     if (ciP->httpStatusCode != SccOk)
       return ciP->answer;
+
+    return "OK";
+  }
+  else if (treated == false)
+  {
+    ciP->httpStatusCode = SccBadRequest;
+    if (ciP->answer == "")
+      ciP->answer = std::string("JSON Parse Error (unknown field: '") + path.c_str() + "')";
+    LM_E(("ERROR: '%s'", ciP->answer.c_str()));
+    return ciP->answer;
   }
 
   boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;

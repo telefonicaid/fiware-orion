@@ -322,7 +322,7 @@ std::string parsedUptime(int uptime)
 bool onlyWs(const char* s)
 {
   if (*s == 0)
-    return false;
+    return true;
 
   while (*s != 0)
   {

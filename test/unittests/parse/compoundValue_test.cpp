@@ -127,7 +127,8 @@ TEST(compoundValue, updateOneString)
 
   // Get root of compound value
   cvnRootP = caP->compoundValueP;
-  
+  EXPECT_TRUE(cvnRootP != NULL);
+
   // The root pointer of the root must be the root itself
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
@@ -734,7 +735,6 @@ TEST(compoundValue, updateTwoStructs)
 
   caP = reqData.upcr.res.contextElementVector.get(0)->contextAttributeVector.get(0);
   
-
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
@@ -1316,14 +1316,8 @@ TEST(compoundValue, sixLevels)
 }
 
 
-#if 0
+
 /* ****************************************************************************
-*
-* FIXME P10: I've encountered problems in this test.
-*            Needs to be fixed asap but perhaps not immediately, not to delay
-*            a new release.
-*            The whole Compound Value concept needs thorough testing asap.
-*
 *
 * sixLevelsJson - 
 */
@@ -1363,7 +1357,7 @@ TEST(compoundValue, sixLevelsJson)
 
   // Get root of compound value
   cvnRootP = caP->compoundValueP;
-    EXPECT_TRUE(cvnRootP != NULL);
+  EXPECT_TRUE(cvnRootP != NULL);
 
   // The root pointer of the root must be the root itself
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
@@ -1377,7 +1371,6 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_EQ(0, cvnRootP->level);
   EXPECT_EQ(0, cvnRootP->siblingNo);
   EXPECT_EQ("/", cvnRootP->path);
-  EXPECT_EQ("/contextElements/contextElement/attributes/attribute/value/", cvnRootP->root);
   
 
   // Now, child 1: level1
@@ -1634,7 +1627,6 @@ TEST(compoundValue, sixLevelsJson)
 
   utExit();
 }
-#endif
 
 
 

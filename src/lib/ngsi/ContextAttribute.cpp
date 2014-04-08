@@ -66,9 +66,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
                    name.c_str(),
                    this));
 
-   metadataVector.release();
-
-
+   // Cloning metadata
    for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); ++mIx)
    {
       LM_T(LmtClone, ("Copying metadata %d", mIx));
