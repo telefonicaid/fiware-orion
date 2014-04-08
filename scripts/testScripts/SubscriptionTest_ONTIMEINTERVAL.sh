@@ -24,8 +24,11 @@ version="Subscription Massive Generator Test ONTIMEINTERVAL v0.0.3"
 
 if [ "$1" == "-u" ]
 then
-  echo Usage: subscriptionTest_ONTIMEINTERVAL.sh endpoint:port amountOfSubscriptions updateTime notificationEndpoint
-  echo EXAMPLE ./subscriptionTest_ONTIMEINTERVAL.sh 127.0.0.1:1026 60 60 http://127.0.0.1:1028/accumulate
+  echo Usage:  ./subscriptionTest_ONTIMEINTERVAL.sh [ -u (usage)], [-v (verbose)] and [ --version (version)]
+  echo Usage:  subscriptionTest_ONTIMEINTERVAL.sh  [-u (usage)]
+  echo Usage:  subscriptionTest_ONTIMEINTERVAL.sh  [--version (version)]
+  echo Usage:  subscriptionTest_ONTIMEINTERVAL.sh [-v (verbose)] [<endpoint port>] [<amount of subscriptions>] [<update time>] [<notification endpoint>]
+  echo Example ./subscriptionTest_ONTIMEINTERVAL.sh 127.0.0.1:1026 60 60 http://127.0.0.1:1028/accumulate
   exit 1
 fi
 if [ "$1" == "--version" ]

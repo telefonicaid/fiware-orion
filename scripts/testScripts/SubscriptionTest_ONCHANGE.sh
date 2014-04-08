@@ -24,8 +24,11 @@ version="Subscription Massive Generator Test ONCHANGE v0.0.3"
 
 if [ "$1" == "-u" ]
 then
-    echo USAGE:  ./subscriptionTest_ONCHANGE.sh endpoint:port amountOfSubscriptions conditionValue notificationEndpoint
-    echo EXAMPLE ./subscriptionTest_ONCHANGE.sh 127.0.0.1:1026 100 pressure http://127.0.0.1:1028/accumulate
+  echo Usage:  ./subscriptionTest_ONCHANGE.sh [ -u (usage)], [-v (verbose)] and [ --version (version)]
+  echo Usage:  subscriptionTest_ONCHANGE.sh  [-u (usage)]
+  echo Usage:  subscriptionTest_ONCHANGE.sh  [--version (version)]
+  echo Usage:  subscriptionTest_ONCHANGE.sh [-v (verbose)] [<endpoint port>] [<amount of subscriptions>] [<condition value>] [<notification endpoint>]
+  echo Example ./subscriptionTest_ONCHANGE.sh 127.0.0.1:1026 100 pressure http://127.0.0.1:1028/accumulate
   exit 1
 fi
 if [ "$1" == "--version" ]
