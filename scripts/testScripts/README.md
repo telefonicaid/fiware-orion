@@ -23,12 +23,12 @@ http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-conte
 * How I use it:
 
     So if it's not installed just need to "yum install nodejs"
-    By default the server will listen at ports 1028,1029,1030 and 1031 (The last one has a intentional delay of two seconds)
+    By default the server will listen at ports 1028, 1029, 1030 and 1031 (The last one has an intentional delay of two seconds)
     Make sure your machine ports allows traffic on these ports.
     
     ```
     If you need to use different ports or different amount of servers just specify the parameter you need:
-       $ > noode nodeAccumulator.js [-u -v --version --silence -s -p -ds -dp]
+       $ > node nodeAccumulator.js [-u -v --version --silence -s -p -ds -dp]
     where:
      '-u' : Shows this usage info
      '-sX' : amount of servers to run. '-d5'' will launch 5 servers
