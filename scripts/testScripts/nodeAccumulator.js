@@ -64,9 +64,9 @@ process.argv.forEach(function (val, index, array) {
 				"for modify the configuration use: > noode nodeAccumulator.js [-u -v --version --silence -s -p -ds -dp] \n" +
 				" \n - Params \n" +
 				" '-u' : Shows this usage info \n" +
-				" '-sX' : amount of servers to run. '-d5'' will launch 5 servers \n"+
+				" '-sX' : amount of servers to run (without delay). '-d5' will launch 5 servers \n"+
 				" '-pX' : Port Server, X is the first port number to setup the server, the rest of listener servers will be added in the next port numbers \n"+
-				" '-dsY' : amount of delayed servers tu run.  \n"+
+				" '-dsY' : amount of delayed servers tu run with delay. '-ds3' will launch 3 servers  \n"+
 				" '-dpY' : Port Delayed Server, Y is the first port number to setup the Delayed server, the rest of listener servers will be added in the next port numbers \n"+
 				" '--silence' : no info showed in log \n" +
 				" '--version' : shows the version of this script \n"+

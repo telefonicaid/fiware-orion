@@ -31,9 +31,9 @@ http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-conte
        $ > node nodeAccumulator.js [-u -v --version --silence -s -p -ds -dp]
     where:
      '-u' : Shows this usage info
-     '-sX' : amount of servers to run. '-d5'' will launch 5 servers
+     '-sX' : amount of servers to run (without delay). '-d5' will launch 5 servers
      '-pX' : Port Server, X is the first port number to setup the server, the rest of listener servers will be added in the next port numbers
-     '-dsY' : amount of delayed servers tu run.
+     '-dsY' : amount of servers tu run with delay. '-ds3' will launch 3 servers with delay
      '-dpY' : Port Delayed Server, Y is the first port number to setup the Delayed server, the rest of listener servers will be added in the next port numbers
      '--silence' : no info showed in log
      '--version' : shows the version of this script
