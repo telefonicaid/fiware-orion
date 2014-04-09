@@ -18,55 +18,77 @@
  # For those usages not covered by this license please contact with
  # fermin at tid dot es
 
-version="Subscription Massive Generator Test ONTIMEINTERVAL v0.0.3"
+
+# Config
+version="Subscription Massive Generator Test ONTIMEINTERVAL v0.0.4";
+
+
+# version
+#
+function version()
+{
+    echo Version: $version
+    exit $1
+}
+
+# usage
+#
+function usage()
+{
+    echo  "Usage info:  ./subscriptionTest_ONTIMEINTERVAL.sh [ -u (usage)], [-v (verbose)] and [ --version (version)]
+      subscriptionTest_ONTIMEINTERVAL.sh  [-u (usage)]
+      subscriptionTest_ONTIMEINTERVAL.sh  [--version (version)]
+      subscriptionTest_ONTIMEINTERVAL.sh [-v (verbose)] [<endpoint port>] [<amount of subscriptions>] [<update time>] [<notification endpoint>]
+    "
+    echo "Example of use:
+      ./subscriptionTest_ONTIMEINTERVAL.sh 127.0.0.1:1026 60 60 http://127.0.0.1:1028/accumulate
+    "
+    echo "Default config when launched without configuration:
+      - default endpoint:  127.0.0.1:1026
+      - default amount of subs:  10
+      - default update time (s):  60
+      - default notification endpoint:  http://127.0.0.1:1028/accumulate
+    "
+    exit $1
+}
 
 #CLI options
-
 if [ "$1" == "-u" ]
 then
-  echo Usage:  ./subscriptionTest_ONTIMEINTERVAL.sh [ -u (usage)], [-v (verbose)] and [ --version (version)]
-  echo Usage:  subscriptionTest_ONTIMEINTERVAL.sh  [-u (usage)]
-  echo Usage:  subscriptionTest_ONTIMEINTERVAL.sh  [--version (version)]
-  echo Usage:  subscriptionTest_ONTIMEINTERVAL.sh [-v (verbose)] [<endpoint port>] [<amount of subscriptions>] [<update time>] [<notification endpoint>]
-  echo Example ./subscriptionTest_ONTIMEINTERVAL.sh 127.0.0.1:1026 60 60 http://127.0.0.1:1028/accumulate
+  usage
   exit 1
 fi
+
 if [ "$1" == "--version" ]
 then
-  echo Version: $version
+  version
   exit 1
 fi
+
 if [ "$1" == "-v" ]
 then
-  echo Verbose mode ON
+  echo "Verbose mode ON"
   vm=1
+  shift
 fi
-
-
-# USAGE:  ./subscriptionTest_ONx.sh endpoint:port amountOfSubscriptions updateTime notificationEndpoint
-# EXAMPLE ./subscriptionTest_ONx.sh 127.0.0.1:1026 60 60 http://127.0.0.1:1028/accumulate
 
 # START info
 echo "#### Subscription ONTIMEINTERVAL test STARTED! #### "
-echo "Date: " $(date +"%m-%d-%Y %H:%M"); 
+echo "Date: " $(date +"%m-%d-%Y %H:%M");
 
-
-# Default config: Add 60 subscriptions (delayed by 1 sec) on TIMEINTERVAL every 60 seconds. Notification endpoint http://127.0.0.1:1028/accumulator server
-#config
+# Default config: Add 10 subscriptions on CHANGE over PRESSURE and sent to http://127.0.0.1:1028/accumulator server
 n=0
 max=10
-vm=0
 
-#sleep time between requests
+# Sleep time between requests
 stime=1
 
-#TestScenario
+# TestScenario
 notifEp='http://127.0.0.1:1028/accumulate'
 subType='ONTIMEINTERVAL'
-#condValue='pressure'
 updateTime=60
 
-#Config options
+# Config options
 if [ "$1" ]; then
     #echo "CB endpoint set to: " $1 ;
     endpoint=$1;
@@ -95,7 +117,7 @@ echo " - Selected amount of subs: " $max;
 echo " - Selected uptate every (s): " $updateTime;
 echo " - Selected notification endpoint: " $notifEp;
 
-echo "### Version: "
+echo "### Endpoint Version: "
 curl $endpoint/version
 
 
@@ -120,7 +142,6 @@ payload='<?xml version="1.0"?>
         </notifyCondition>
     </notifyConditions>
 </subscribeContextRequest>' 
-
 
 while (( $n < $max ))
 do

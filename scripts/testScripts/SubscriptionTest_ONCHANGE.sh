@@ -18,39 +18,62 @@
  # For those usages not covered by this license please contact with
  # fermin at tid dot es
 
-version="Subscription Massive Generator Test ONCHANGE v0.0.3"
+version="Subscription Massive Generator Test ONCHANGE v0.0.4"
+
+# version
+#
+function version()
+{
+    echo Version: $version
+    exit $1
+}
+
+# usage
+#
+function usage()
+{
+    echo  "./subscriptionTest_ONCHANGE.sh [ -u (usage)], [-v (verbose)] and [ --version (version)]
+      subscriptionTest_ONCHANGE.sh  [-u (usage)]
+      subscriptionTest_ONCHANGE.sh  [--version (version)]
+      subscriptionTest_ONCHANGE.sh [-v (verbose)] [<endpoint port>] [<amount of subscriptions>] [<update time>] [<notification endpoint>]
+    "
+    echo "Example of use:
+      ./subscriptionTest_ONCHANGE.sh 127.0.0.1:1026 100 pressure http://127.0.0.1:1028/accumulate
+    "
+    echo "Default config when launched without configuration:
+      - default endpoint:  127.0.0.1:1026
+      - default amount of subs:  10
+      - default condition Value: pressure
+      - default notification endpoint:  http://127.0.0.1:1028/accumulate
+    "
+}
+
 
 #CLI options
-
 if [ "$1" == "-u" ]
 then
-  echo Usage:  ./subscriptionTest_ONCHANGE.sh [ -u (usage)], [-v (verbose)] and [ --version (version)]
-  echo Usage:  subscriptionTest_ONCHANGE.sh  [-u (usage)]
-  echo Usage:  subscriptionTest_ONCHANGE.sh  [--version (version)]
-  echo Usage:  subscriptionTest_ONCHANGE.sh [-v (verbose)] [<endpoint port>] [<amount of subscriptions>] [<condition value>] [<notification endpoint>]
-  echo Example ./subscriptionTest_ONCHANGE.sh 127.0.0.1:1026 100 pressure http://127.0.0.1:1028/accumulate
+  usage
   exit 1
 fi
+
 if [ "$1" == "--version" ]
 then
-  echo Version: $version
+  version
   exit 1
 fi
+
 if [ "$1" == "-v" ]
 then
-  echo Verbose mode ON
+  echo "Verbose mode ON"
   vm=1
+  shift
 fi
-
-
 
 # START Info
 echo "#### Subscription ONCHANGE test STARTED! #### "
 echo "Date: " $(date +"%m-%d-%Y %H:%M"); 
 
-
-# Default config: Add 100 subscriptions on CHANGE over PRESSURE and sent to http://127.0.0.1:1028/accumulator server
-#config
+# Default config: Add 10 subscriptions on CHANGE over PRESSURE and sent to http://127.0.0.1:1028/accumulator server
 n=0
 max=10
 
@@ -62,7 +85,7 @@ notifEp='http://localhost:1028/accumulate'
 subType='ONCHANGE'
 condValue='pressure'
 
-#config input
+# Config input
 
 if [ "$1" ]; then
     #echo "CB endpoint set to: " $1 ;
@@ -92,7 +115,7 @@ echo " - Selected amount of subs: " $max;
 echo " - Selected condition Value: " $condValue;
 echo " - Selected notification endpoint: " $notifEp;
 
-echo "### Version: "
+echo "### Endpoint Version: "
 curl $endpoint/version
 
 
@@ -119,8 +142,6 @@ payload='<?xml version="1.0"?>
     <throttling>PT0S</throttling>
 </subscribeContextRequest>'
 
-
-
 while (( $n < $max ))
 do
 	sleep $stime;
@@ -135,7 +156,6 @@ done
 
 # DONE
 echo " ##########  Subscription test DONE!"
-
 
 #TIPS (Copy&Paste)
 #Trigger sample for pressure: 
