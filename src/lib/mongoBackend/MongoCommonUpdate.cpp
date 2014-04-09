@@ -892,7 +892,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
             }
         }
         else {
-            cerP->statusCode.fill(SccInvalidParameter, std::string("unknown actionType") + action);
+            cerP->statusCode.fill(SccInvalidParameter, std::string("unknown actionType: '") + action + "'");
             LM_RE(false, ("Unknown actionType '%s'. This is a bug in the parsing layer checking!", action.c_str()));
         }
 
@@ -1262,7 +1262,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
             responseP->contextElementResponseVector.push_back(cerP);
             continue;
-            //return;
         }
         catch(...) {
             mongoSemGive(__FUNCTION__, "update in EntitiesCollection (mongo generic exception)");
@@ -1274,7 +1273,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
             responseP->contextElementResponseVector.push_back(cerP);
             continue;
-            //return;
         }
 
 #if 0

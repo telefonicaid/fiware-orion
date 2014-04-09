@@ -8128,17 +8128,16 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
 
 /* ****************************************************************************
 *
-* firstTrue -
+* firstTimeTrue -
 *
-* This function (which uses the global variable 'first') is used in some mocks
-* that need to emulate more() function in the following way: first call to the
-* function is true, second and further calls are false
+* This function is used in some mocks that need to emulate more() function in the 
+* following way: first call to the function is true, second and further calls are false
 */
-bool first = true;
-bool firstTrue(void)
+bool firstTimeTrue(void)
 {
-    if (first) {
-        first = false;
+    static bool firstTime = true;
+    if (firstTime) {
+        firstTime = false;
         return true;
     }
     else {
@@ -8176,7 +8175,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     DBClientCursorMock* cursorMockEnt = new DBClientCursorMock(connectionMock, "", 0, 0, 0);
     DBClientCursorMock* cursorMockCsub = new DBClientCursorMock(connectionMock, "", 0, 0, 0);
     ON_CALL(*cursorMockEnt, more())
-            .WillByDefault(Invoke(firstTrue));
+            .WillByDefault(Invoke(firstTimeTrue));
     ON_CALL(*cursorMockEnt, next())
             .WillByDefault(Return(fakeEn));
     ON_CALL(*cursorMockCsub, more())
