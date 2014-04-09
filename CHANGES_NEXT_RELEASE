@@ -1,0 +1,1 @@
+- Fix:  All responses with StatusCode now have the 'reasonPhrase' in accordance with the 'code' (Issue 242)
