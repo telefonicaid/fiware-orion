@@ -411,7 +411,7 @@
 &lt;contextAttribute&gt;&lt;name&gt;pressure&lt;/name&gt;&lt;type&gt;mmHg&lt;/type&gt;&#xd;
   &lt;contextValue&gt;${PRESS}&lt;/contextValue&gt;&lt;/contextAttribute&gt;&lt;/contextAttributeList&gt;&#xd;
 &lt;/contextElement&gt;&lt;/contextElementList&gt;&#xd;
-&lt;updateAction&gt;UPDATE&lt;/updateAction&gt;&#xd;
+&lt;updateAction&gt;APPEND&lt;/updateAction&gt;&#xd;
 &lt;/updateContextRequest&gt;</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
@@ -506,7 +506,7 @@
 		{&quot;name&quot;: &quot;temperature&quot;,&quot;type&quot;: &quot;centigrade&quot;,&quot;value&quot;: &quot;${TEMP}&quot;},&#xd;
 		{&quot;name&quot;: &quot;pressure&quot;,&quot;type&quot;: &quot;mmHg&quot;,&quot;value&quot;: &quot;${PRESS}&quot;}]&#xd;
 	}],&#xd;
-	&quot;updateAction&quot;: &quot;UPDATE&quot;}&#xd;
+	&quot;updateAction&quot;: &quot;APPEND&quot;}&#xd;
 &#xd;
 </stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
