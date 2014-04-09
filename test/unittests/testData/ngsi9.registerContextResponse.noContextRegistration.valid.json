@@ -2,6 +2,7 @@
   "registrationId" : "000000000000000000000000",
   "errorCode" : {
     "code" : "400",
-    "reasonPhrase" : "Empty Context Registration List"
+    "reasonPhrase" : "Bad Request",
+    "details" : "Empty Context Registration List"
   }
 }

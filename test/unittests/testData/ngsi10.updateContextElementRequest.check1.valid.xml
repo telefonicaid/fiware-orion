@@ -1,6 +1,7 @@
 <updateContextElementResponse>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>PRE Error</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>PRE Error</details>
   </errorCode>
 </updateContextElementResponse>

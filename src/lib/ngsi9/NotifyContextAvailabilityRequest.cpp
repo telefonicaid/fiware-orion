@@ -78,14 +78,12 @@ std::string NotifyContextAvailabilityRequest::check(RequestType requestType, For
 
   if (predetectedError != "")
   {
-    response.responseCode.code         = SccBadRequest;
-    response.responseCode.reasonPhrase = predetectedError;
+    response.responseCode.fill(SccBadRequest, predetectedError);
   }
   else if (((res = subscriptionId.check(QueryContext, format, indent, predetectedError, 0))                    != "OK") ||
            ((res = contextRegistrationResponseVector.check(QueryContext, format, indent, predetectedError, 0)) != "OK"))
   {
-    response.responseCode.code         = SccBadRequest;
-    response.responseCode.reasonPhrase = res;
+    response.responseCode.fill(SccBadRequest, res);
   }
   else
     return "OK";

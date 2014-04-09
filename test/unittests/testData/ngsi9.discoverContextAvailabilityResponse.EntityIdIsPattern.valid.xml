@@ -1,6 +1,7 @@
 <discoverContextAvailabilityResponse>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>invalid isPattern (boolean) value for entity: 'fahlse'</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>invalid isPattern (boolean) value for entity: 'fahlse'</details>
   </errorCode>
 </discoverContextAvailabilityResponse>

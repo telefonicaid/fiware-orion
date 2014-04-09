@@ -29,6 +29,7 @@
 
 #include "common/string.h"
 #include "common/wsStrip.h"
+#include "common/globals.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
 #include "rest/restReply.h"
@@ -542,11 +543,11 @@ void restInit(RestService* _restServiceV, IpVersion _ipVersion, const char* _bin
      strncpy(bindIPv6, bindIPv6, MAX_LEN_IP - 1);
 
 
-  // Starting REST intrerface
+  // Starting REST interface
   int r;
   if ((r = restStart(_ipVersion)) != 0)
   {
     fprintf(stderr, "restStart: error %d\n", r);
-    LM_X(1, ("restStart: error %d", r));
+    orionExitFunction(1, "restStart: error");
   }
 }

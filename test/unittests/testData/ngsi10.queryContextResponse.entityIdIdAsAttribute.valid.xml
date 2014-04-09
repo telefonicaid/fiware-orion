@@ -1,6 +1,7 @@
 <queryContextResponse>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>unsupported attribute for EntityId</details>
   </errorCode>
 </queryContextResponse>

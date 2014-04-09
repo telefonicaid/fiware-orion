@@ -137,7 +137,7 @@ Date: REGEX(.*)
 </notifyContextAvailabilityResponse>
 2: ***********************************
 HTTP/1.1 200 OK
-Content-Length: 193
+Content-Length: 228
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -145,7 +145,8 @@ Date: REGEX(.*)
 <notifyContextAvailabilityResponse>
   <responseCode>
     <code>400</code>
-    <reasonPhrase>bad length (24 chars expected)</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>bad length (24 chars expected)</details>
   </responseCode>
 </notifyContextAvailabilityResponse>
 3: ***********************************

@@ -3,6 +3,7 @@
   <registrationId>000000000000000000000000</registrationId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Empty entityIdVector</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>Empty entityIdVector</details>
   </errorCode>
 </registerContextResponse>

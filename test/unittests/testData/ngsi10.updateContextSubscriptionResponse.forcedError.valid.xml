@@ -3,7 +3,8 @@
     <subscriptionId>12345</subscriptionId>
     <errorCode>
       <code>400</code>
-      <reasonPhrase>FORCED ERROR</reasonPhrase>
+      <reasonPhrase>Bad Request</reasonPhrase>
+      <details>FORCED ERROR</details>
     </errorCode>
   </subscribeError>
 </updateContextSubscriptionResponse>

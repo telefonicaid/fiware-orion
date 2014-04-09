@@ -306,7 +306,7 @@ static int statusCodeCode(xml_node<>* node, ParseData* parseDataP)
 static int statusCodeReasonPhrase(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a statusCode reasonPhrase: '%s'", node->value()));
-  parseDataP->ncr.cerP->statusCode.reasonPhrase = node->value();
+  parseDataP->ncr.cerP->statusCode.reasonPhrase = node->value(); // OK - parsing step
   return 0;
 }
 

@@ -1,6 +1,7 @@
 {
   "errorCode" : {
     "code" : "400",
-    "reasonPhrase" : "too few vertices for a polygon"
+    "reasonPhrase" : "Bad Request",
+    "details" : "too few vertices for a polygon"
   }
 }

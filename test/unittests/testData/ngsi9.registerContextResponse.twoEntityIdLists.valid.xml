@@ -3,6 +3,7 @@
   <registrationId>000000000000000000000000</registrationId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Got an entityIdList when one was present already</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>Got an entityIdList when one was present already</details>
   </errorCode>
 </registerContextResponse>

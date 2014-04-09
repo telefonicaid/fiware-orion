@@ -213,7 +213,7 @@ static std::string statusCodeCode(std::string path, std::string value, ParseData
 static std::string statusCodeReasonPhrase(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a statusCode reasonPhrase: '%s'", value.c_str()));
-  parseDataP->ncr.cerP->statusCode.reasonPhrase = value;
+  parseDataP->ncr.cerP->statusCode.reasonPhrase = value; // OK - parsing step reading reasonPhrase
   return "OK";
 }
 

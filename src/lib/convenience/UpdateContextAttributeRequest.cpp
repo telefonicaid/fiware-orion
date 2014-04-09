@@ -82,18 +82,15 @@ std::string UpdateContextAttributeRequest::check(RequestType requestType, Format
 
   if (predetectedError != "")
   {
-    response.code         = SccBadRequest;
-    response.reasonPhrase = predetectedError;
+    response.fill(SccBadRequest, predetectedError);
   }
   else if (contextValue == "")
   {
-    response.code         = SccBadRequest;
-    response.reasonPhrase = "empty context value";
+    response.fill(SccBadRequest, "empty context value");
   }
   else if ((res = metadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
   {
-    response.code         = SccBadRequest;
-    response.reasonPhrase = res;
+    response.fill(SccBadRequest, res);
   }
   else
     return "OK";

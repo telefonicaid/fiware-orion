@@ -3,7 +3,8 @@
     <subscriptionId>111222333444555666777888</subscriptionId>
     <errorCode>
       <code>400</code>
-      <reasonPhrase>Radius zero for a circle area</reasonPhrase>
+      <reasonPhrase>Bad Request</reasonPhrase>
+      <details>Radius zero for a circle area</details>
     </errorCode>
   </subscribeError>
 </updateContextSubscriptionResponse>

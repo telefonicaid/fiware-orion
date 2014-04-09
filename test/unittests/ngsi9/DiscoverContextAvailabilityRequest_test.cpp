@@ -899,9 +899,9 @@ TEST(DiscoverContextAvailabilityRequest, parseError_json)
 
 /* ****************************************************************************
 *
-* emptyAttributeName - 
+* emptyAttributeName_json - 
 */
-TEST(DiscoverContextAvailabilityRequest, emptyAttributeName)
+TEST(DiscoverContextAvailabilityRequest, emptyAttributeName_json)
 {
   ParseData       reqData;
   const char*     inFile  = "ngsi9.discoverContextAvailabilityRequest.emptyAttributeName.invalid.json";

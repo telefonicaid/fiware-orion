@@ -3,7 +3,8 @@
     "subscriptionId" : "9212ce4b0c214479be429e2b",
     "errorCode" : {
       "code" : "400",
-      "reasonPhrase" : "syntax error in duration string"
+      "reasonPhrase" : "Bad Request",
+      "details" : "syntax error in duration string"
     }
   }
 }

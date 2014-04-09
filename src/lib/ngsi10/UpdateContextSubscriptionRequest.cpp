@@ -88,9 +88,8 @@ std::string UpdateContextSubscriptionRequest::check(RequestType requestType, For
 
   if (predetectedError != "")
   {
-    response.subscribeError.subscriptionId         = subscriptionId;
-    response.subscribeError.errorCode.code         = SccBadRequest;
-    response.subscribeError.errorCode.reasonPhrase = predetectedError;
+    response.subscribeError.subscriptionId = subscriptionId;
+    response.subscribeError.errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (((res = duration.check(UpdateContextSubscription, format, indent, predetectedError, counter))              != "OK") ||
            ((res = restriction.check(UpdateContextSubscription, format, indent, predetectedError, restrictions))      != "OK") ||
@@ -98,9 +97,8 @@ std::string UpdateContextSubscriptionRequest::check(RequestType requestType, For
            ((res = notifyConditionVector.check(UpdateContextSubscription, format, indent, predetectedError, counter)) != "OK") ||
            ((res = throttling.check(UpdateContextSubscription, format, indent, predetectedError, counter))            != "OK"))
   {
-    response.subscribeError.subscriptionId         = subscriptionId;
-    response.subscribeError.errorCode.code         = SccBadRequest;
-    response.subscribeError.errorCode.reasonPhrase = res;
+    response.subscribeError.subscriptionId = subscriptionId;
+    response.subscribeError.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";

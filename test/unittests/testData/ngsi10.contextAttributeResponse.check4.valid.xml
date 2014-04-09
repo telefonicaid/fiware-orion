@@ -13,6 +13,7 @@
   </contextAttributeList>
   <statusCode>
     <code>400</code>
-    <reasonPhrase>missing attribute name</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>missing attribute name</details>
   </statusCode>
 </contextAttributeResponse>
