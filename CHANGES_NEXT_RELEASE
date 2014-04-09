@@ -1,0 +1,1 @@
+- Fix: every Context Element gets its corresponding Context Element Response when precessing updateContext operations (previous versions could interrup in the middle if the procesing of one Context Element results in error)
