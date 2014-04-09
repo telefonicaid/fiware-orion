@@ -8126,6 +8126,17 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
 
 }
 
+bool first = true;
+bool firstTrue(void)
+{
+    if (first) {
+        first = false;
+        return true;
+    }
+    else {
+        return false;
+    }
+}
 
 /* ****************************************************************************
 *
@@ -8157,7 +8168,8 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     DBClientCursorMock* cursorMockEnt = new DBClientCursorMock(connectionMock, "", 0, 0, 0);
     DBClientCursorMock* cursorMockCsub = new DBClientCursorMock(connectionMock, "", 0, 0, 0);
     ON_CALL(*cursorMockEnt, more())
-            .WillByDefault(Return(true));
+            //.WillByDefault(Return(true));
+            .WillByDefault(Invoke(firstTrue));
     ON_CALL(*cursorMockEnt, next())
             .WillByDefault(Return(fakeEn));
     ON_CALL(*cursorMockCsub, more())
