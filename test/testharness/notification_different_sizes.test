@@ -26,7 +26,7 @@ Notifications of different sizes
 source harnessFunctions.sh
 
 dbInit CB
-brokerStart CB
+brokerStart CB 183
 accumulatorStart
 
 # Taking into account that the notification size depends on (but is not exactly equal to)
@@ -142,11 +142,11 @@ curl localhost:9997/number -s -S
 
 # The log has to show exactly 1 case of static buffer usage
 echo "** Static buffer usages:"
-grep "Sending to HTTP server: sending static message of" /tmp/contextBrokerLog | wc -l
+grep "Sending to HTTP server" /tmp/contextBrokerLog | grep "sending static message of" | wc -l
 
 # The log has to show exactly 2 cases of dynamic buffer usage
 echo "** Dynamic buffer usages:"
-grep "Sending to HTTP server: sending dynamic message of" /tmp/contextBrokerLog | wc -l
+grep "Sending to HTTP server" /tmp/contextBrokerLog | grep "sending dynamic message of" | wc -l
 
 # The log has to show exactly 1 error about notification too large
 echo "** Too large errors:"
@@ -219,9 +219,9 @@ Date: REGEX(.*)
 ** Too large errors:
 1
 ** Notification sizes:
- sendHttpSocket: Sending to HTTP server: sending static message of 19879 bytes to HTTP server
- sendHttpSocket: Sending to HTTP server: sending dynamic message of 21879 bytes to HTTP server
- sendHttpSocket: Sending to HTTP server: sending dynamic message of 8100881 bytes to HTTP server
+ sendHttpSocket: Sending to HTTP server 1: sending static message of 19879 bytes to HTTP server
+ sendHttpSocket: Sending to HTTP server 2: sending dynamic message of 21879 bytes to HTTP server
+ sendHttpSocket: Sending to HTTP server 3: sending dynamic message of 8100881 bytes to HTTP server
 --TEARDOWN--
 source harnessFunctions.sh
 cp /tmp/contextBrokerLog /tmp/contextBrokerLog.notification_different_sizes
