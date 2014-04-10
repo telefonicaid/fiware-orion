@@ -131,14 +131,17 @@ std::string sendHttpSocket
    bool            waitForResponse
 )
 {  
-  char         buffer[TAM_BUF];
-  char         response[TAM_BUF];
-  char         preContent[TAM_BUF];
-  char         msgStatic[MAX_STA_MSG_SIZE];
-  char*        what       = (char*) "static";
-  char*        msgDynamic = NULL;
-  char*        msg        = msgStatic;   // by default, use the static buffer
-  std::string  result;
+  char                       buffer[TAM_BUF];
+  char                       response[TAM_BUF];
+  char                       preContent[TAM_BUF];
+  char                       msgStatic[MAX_STA_MSG_SIZE];
+  char*                      what       = (char*) "static";
+  char*                      msgDynamic = NULL;
+  char*                      msg        = msgStatic;   // by default, use the static buffer
+  std::string                result;
+  static unsigned long long  callNo     = 0;
+
+  ++callNo;
 
   // Preconditions check
   if (port == 0)        LM_RE("error", ("port is ZERO"));
@@ -200,7 +203,7 @@ std::string sendHttpSocket
     sprintf(msg, "%s\n", preContent);
   }
 
-  /* We add a final newline (I guess that HTTP protocol needs it) */
+  /* We add a final newline (I guess that the HTTP protocol needs it) */
   strcat(msg, "\n");
 
   int fd = socketHttpConnect(ip, port); // Connecting to HTTP server
@@ -211,8 +214,8 @@ std::string sendHttpSocket
   int nb;
   int sz = strlen(msg);
 
-  LM_T(LmtClientOutputPayload, ("Sending to HTTP server: sending %s message of %d bytes to HTTP server", what, sz));
-  LM_T(LmtClientOutputPayload, ("Sending to HTTP server payload:\n%s", msg));
+  LM_T(LmtClientOutputPayload, ("Sending (msg #%lu) %s message of %d bytes to HTTP server", callNo, what, sz));
+  LM_T(LmtClientOutputPayloadView, ("Payload to HTTP server:\n%s", msg));
   nb = send(fd, msg, sz, 0);
   if (msgDynamic != NULL) {
       free (msgDynamic);

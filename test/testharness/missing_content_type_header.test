@@ -29,74 +29,94 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type:' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>
-EOF
-echo "1: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/x-www-form-encoded' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>
-EOF
-echo "2: ++++++++++++++++++++"
-#Check that the ending "; charset=..." works (for XML)
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml; charset=UTF-8' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList/>
-</queryContextRequest>
-EOF
+source harnessFunctions.sh
 
+echo "1: ++++++++++++++++++++"
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='<queryContextRequest>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
+  </entityIdList>
+  <attributeList/>
+</queryContextRequest>'
+curlIt "xml" "$url" "$payload" "Content-Type:"
+
+echo "2: ++++++++++++++++++++"
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
+  </entityIdList>
+  <attributeList/>
+</queryContextRequest>'
+curlIt "xml" "$url" "$payload" "Content-Type: application/x-www-form-encoded"
+
+
+echo "3: ++++++++++++++++++++"
+# Check that the ending "; charset=..." works (for XML)
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
+  </entityIdList>
+  <attributeList/>
+</queryContextRequest>'
+curlIt "XML" "$url" "$payload" "Content-Type: application/xml; charset=UTF-8"
+
+
+echo "4: ++++++++++++++++++++"
 # FIXME P10: enable this test once the tested functionality gets implemented (including REGEXPECT)
-#Check that the ending "; charset=..." works (for JSON)
-#(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json; charset=UTF-8' -d @- | xmllint --format -) <<EOF
-#{
-#	"entities": [
-#		{
-#			"type": "Room",
-#			"isPattern": "false",
-#			"id": "OfficeRoom"
-#		},
-#	],
-#	"attributes": [ ]
-#}
-#EOF
+# Check that the ending "; charset=..." works (for JSON)
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json; charset=UTF-8' -d @-) << EOF
+{
+	"entities": [
+		{
+			"type": "Room",
+			"isPattern": "false",
+			"id": "OfficeRoom"
+		}
+	],
+	"attributes": [ ]
+}
+EOF
 
 --REGEXPECT--
-<?xml version="1.0"?>
-<orionError>
-  <code>415</code>
-  <reasonPhrase>Unsupported Media Type</reasonPhrase>
-  <details>Content-Type header not used, default application/octet-stream is not supported</details>
-</orionError>
 1: ++++++++++++++++++++
-<?xml version="1.0"?>
-<orionError>
-  <code>415</code>
-  <reasonPhrase>Unsupported Media Type</reasonPhrase>
-  <details>not supported content type: application/x-www-form-encoded</details>
-</orionError>
+HTTP/1.1 415 Unsupported Media Type
+Connection: close
+Content-Length: 0
+Date: REGEX(.*)
+
+
 2: ++++++++++++++++++++
+HTTP/1.1 415 Unsupported Media Type
+Connection: close
+Content-Length: 0
+Date: REGEX(.*)
+
+
+3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+4: ++++++++++++++++++++
 <queryContextResponse>
   <errorCode>
     <code>404</code>

@@ -180,6 +180,11 @@ static xml_node<>* xmlDocPrepare(char* xml)
     LM_F(("doc:\n----------------------------------------------\n%s\n------------------------------------", xml));
     LM_RE(NULL, ("PARSE ERROR: %s", e.what()));
   }
+  catch (...)
+  {
+    LM_F(("doc:\n----------------------------------------------\n%s\n------------------------------------", xml));
+    LM_RE(NULL, ("GENERIC ERROR during doc.parse"));
+  }
 
   xml_node<>* father = doc.first_node();
 

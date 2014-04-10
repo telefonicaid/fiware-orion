@@ -80,10 +80,29 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
     /* The first argument to true is to use autoreconnect */
     connection = new DBClientConnection(true);
 
-    if (!connection->connect(host, err)) {
-        mongoSemGive(__FUNCTION__, "connecting to mongo failed");
-        LM_RE(false, ("MongoDB connection fails: '%s'", err.c_str()));
+    bool connected = false;
+    int  retries   = 100;
+
+    for (int tryNo = 0; tryNo < retries; ++tryNo)
+    {
+      if (connection->connect(host, err))
+      {
+        connected = true;
+        break;
+      }
+
+      if (tryNo == 0)
+        LM_W(("Cannot connect to mongo - doing %d retries with a one second interval", retries));
+      else
+        LM_VVVVV(("Try %d connecting to mongo failed", tryNo));
+
+      sleep(1);
     }
+
+    mongoSemGive(__FUNCTION__, "connecting to mongo failed");
+
+    if (connected == false)
+      LM_RE(false, ("MongoDB connection failed, after %d retries: '%s'", retries, err.c_str()));
 
     if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0) {
         if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err)) {
