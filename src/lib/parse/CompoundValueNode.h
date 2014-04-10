@@ -48,16 +48,16 @@ namespace orion
 *                Also, when creating the tree from mongo BSON, there will often
 *                be no 'name', just like the case of JSON payload parsing.
 *
-* o type         There are only three types of nodes: Vectors, Structs and Leafs.
-*                The root node is somehow special, but is always either Vector or Struct.
+* o type         There are only three types of nodes: Vectors, Objects and Strings.
+*                The root node is somehow special, but is always either Vector or Object.
 *
-* o value        The value of a Leaf in the tree. Always stored as a string, as the
+* o value        The value of a String in the tree. Always stored as a string, as the
 *                payload always comes in as a string.
 *
-* o childV       A vector of the children of a Vector or Struct.
+* o childV       A vector of the children of a Vector or Object.
 *                Contains pointers to CompoundValueNode.
 *
-* o container    A pointer to the father of the node. The father is the Struct/Vector node
+* o container    A pointer to the father of the node. The father is the Object/Vector node
 *                that owns this node.
 *
 * o rootP        A pointer to the owner of the entire tree
@@ -66,16 +66,10 @@ namespace orion
 *                the 'check' phase.
 *                FIXME P1: May be removed if the check function is modified.
 *
-* o root         This field is used only by the owner of the entire tree.
-*                It contains the absolute path of the payload node that is the owner of the tree.
-*                Note that this path is not the same if the payload comes in JSON instead of XML.
-*                FIXME P5: To be removed, as ContextValue points directly to the root node.
-*
 * o path         Absolute path of the node in the tree.
 *                Used for error messages, e.g. duplicated tag-name in a struct.
 *
 * o level        The depth or nesting level in which this node lives.
-*                FIXME P1: this field is not used and can be removed.
 *
 * o siblingNo:   This field is used for rendering JSON. It tells us whether a comma should
 *                be added after a field (a comma is added unless the sibling number is
@@ -87,8 +81,8 @@ public:
    enum Type
    {
       Unknown,
-      Leaf,
-      Struct,
+      String,
+      Object,
       Vector
    };
 
@@ -130,8 +124,8 @@ public:
    void                show(std::string indent);
 
    bool                isVector(void)   { return (type == Vector); }
-   bool                isStruct(void)   { return (type == Struct); }
-   bool                isLeaf(void)     { return (type == Leaf);   }
+   bool                isObject(void)   { return (type == Object); }
+   bool                isString(void)   { return (type == String); }
 
    const char*         cname(void)  { return name.c_str();  };
    const char*         cvalue(void) { return value.c_str(); };

@@ -70,7 +70,7 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
 
     for (unsigned int ix = 0; ix < children.size(); ++ix) {
         orion::CompoundValueNode* child = children[ix];
-        if (child->type == orion::CompoundValueNode::Leaf) {
+        if (child->type == orion::CompoundValueNode::String) {
             b.append(child->value);
         }
         else if (child->type == orion::CompoundValueNode::Vector) {
@@ -78,7 +78,7 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
             compoundValueBson(child->childV, ba);
             b.append(ba.arr());
         }
-        else if (child->type == orion::CompoundValueNode::Struct) {
+        else if (child->type == orion::CompoundValueNode::Object) {
             BSONObjBuilder bo;
             compoundValueBson(child->childV, bo);
             b.append(bo.obj());
@@ -99,7 +99,7 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
 {
     for (unsigned int ix = 0; ix < children.size(); ++ix) {
         orion::CompoundValueNode* child = children[ix];
-        if (child->type == orion::CompoundValueNode::Leaf) {
+        if (child->type == orion::CompoundValueNode::String) {
             b.append(child->name, child->value);
         }
         else if (child->type == orion::CompoundValueNode::Vector) {
@@ -107,7 +107,7 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
             compoundValueBson(child->childV, ba);
             b.append(child->name, ba.arr());
         }
-        else if (child->type == orion::CompoundValueNode::Struct) {
+        else if (child->type == orion::CompoundValueNode::Object) {
             BSONObjBuilder bo;
             compoundValueBson(child->childV, bo);
             b.append(child->name, bo.obj());
@@ -134,12 +134,12 @@ static void valueBson(ContextAttribute* ca, BSONObjBuilder& bsonAttr) {
             compoundValueBson(ca->compoundValueP->childV, b);
             bsonAttr.append(ENT_ATTRS_VALUE, b.arr());
         }
-        else if (ca->compoundValueP->type == orion::CompoundValueNode::Struct) {
+        else if (ca->compoundValueP->type == orion::CompoundValueNode::Object) {
             BSONObjBuilder b;
             compoundValueBson(ca->compoundValueP->childV, b);
             bsonAttr.append(ENT_ATTRS_VALUE, b.obj());
         }
-        else if (ca->compoundValueP->type == orion::CompoundValueNode::Leaf) {
+        else if (ca->compoundValueP->type == orion::CompoundValueNode::String) {
             // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
             bsonAttr.append(ENT_ATTRS_VALUE, ca->compoundValueP->value);
         }

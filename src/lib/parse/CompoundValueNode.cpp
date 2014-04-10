@@ -72,7 +72,7 @@ CompoundValueNode::CompoundValueNode(Type _type)
   path       = "/";
   siblingNo  = 0;
 
-  LM_T(LmtCompoundValue, ("Created TOPLEVEL compound node (a %s)", (type == Vector)? "Vector" : "Struct"));
+  LM_T(LmtCompoundValue, ("Created TOPLEVEL compound node (a %s)", (type == Vector)? "Vector" : "Object"));
 }
 
 
@@ -121,8 +121,8 @@ const char* CompoundValueNode::typeName(const Type _type)
 {
   switch (_type)
   {
-  case Leaf:         return "Leaf";
-  case Struct:       return "Struct";
+  case String:       return "String";
+  case Object:       return "Object";
   case Vector:       return "Vector";
   case Unknown:      return "Unknown";
   }
@@ -163,8 +163,8 @@ CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
   node->siblingNo = childV.size();
   node->rootP     = rootP;
 
-  if (node->type == Leaf)
-     LM_T(LmtCompoundValueAdd, ("Adding Leaf '%s', with value '%s' under '%s' (%s)", node->name.c_str(), node->value.c_str(), node->container->path.c_str(), node->container->name.c_str()));
+  if (node->type == String)
+     LM_T(LmtCompoundValueAdd, ("Adding String '%s', with value '%s' under '%s' (%s)", node->name.c_str(), node->value.c_str(), node->container->path.c_str(), node->container->name.c_str()));
   else
      LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s' (%s)", typeName(node->type), node->name.c_str(), node->container->path.c_str(), node->container->name.c_str()));
 
@@ -203,11 +203,11 @@ void CompoundValueNode::shortShow(std::string indent)
   if ((rootP == this) && (type == Vector))
     LM_F(("%s%s (toplevel vector)", indent.c_str(), name.c_str()));
   else if (rootP == this)
-    LM_F(("%s%s (toplevel struct)", indent.c_str(), name.c_str()));
+    LM_F(("%s%s (toplevel object)", indent.c_str(), name.c_str()));
   else if (type == Vector)
     LM_F(("%s%s (vector)", indent.c_str(), name.c_str()));
-  else if (type == Struct)
-    LM_F(("%s%s (struct)", indent.c_str(), name.c_str()));
+  else if (type == Object)
+    LM_F(("%s%s (object)", indent.c_str(), name.c_str()));
   else
     LM_F(("%s%s (%s)", indent.c_str(), name.c_str(), value.c_str()));
 
@@ -264,7 +264,7 @@ void CompoundValueNode::show(std::string indent)
 * check - 
 *
 * A vector must have all its children with the same name.
-* A struct cannot have two children with the same name.
+* An object cannot have two children with the same name.
 *
 * Encountered errors are saved in the 'error' field of the root of the tree (rootP->error).
 */
@@ -282,7 +282,7 @@ void CompoundValueNode::check(void)
       }
     }
   }
-  else if (type == Struct)
+  else if (type == Object)
   {
     for (unsigned long ix = 0; ix < childV.size() - 1; ++ix)
     {
@@ -299,7 +299,7 @@ void CompoundValueNode::check(void)
   }
   else
   {
-    // No check made for Leafs
+    // No check made for Strings
     return;
   }
 
@@ -320,15 +320,15 @@ std::string CompoundValueNode::render(Format format, std::string indent)
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
   std::string  tagName   = (container->type == Vector)? "item" : name;
 
-  if (type == Leaf)
+  if (type == String)
   {
-    LM_T(LmtCompoundValueRender, ("I am a Leaf (%s)", name.c_str()));
+    LM_T(LmtCompoundValueRender, ("I am a String (%s)", name.c_str()));
     out = valueTag(indent, tagName, value, format, jsonComma, false, container->type == Vector);
   }
   else if ((type == Vector) && (container != this))
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
-    out += startTag(indent, tagName, tagName, format, true, container->type == Struct, true);
+    out += startTag(indent, tagName, tagName, format, true, container->type == Object, true);
     for (unsigned long ix = 0; ix < childV.size(); ++ix)
       out += childV[ix]->render(format, indent + "  ");
     out += endTag(indent, tagName, format, jsonComma, true, true);
@@ -339,19 +339,19 @@ std::string CompoundValueNode::render(Format format, std::string indent)
     for (unsigned long ix = 0; ix < childV.size(); ++ix)
       out += childV[ix]->render(format, indent);
   }
-  else if ((type == Struct) && (container->type == Vector))
+  else if ((type == Object) && (container->type == Vector))
   {
-    LM_T(LmtCompoundValueRender, ("I am a Struct (%s) and my container is a Vector", name.c_str()));
+    LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is a Vector", name.c_str()));
     out += startTag(indent, "item", "", format, false, false);
     for (unsigned long ix = 0; ix < childV.size(); ++ix)
       out += childV[ix]->render(format, indent + "  ");
     out += endTag(indent, "item", format, jsonComma, false, true);
   }
-  else if (type == Struct)
+  else if (type == Object)
   {
     if (rootP != this)
     {
-      LM_T(LmtCompoundValueRender, ("I am a Struct (%s) and my container is NOT a Vector", name.c_str()));
+      LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is NOT a Vector", name.c_str()));
       out += startTag(indent, tagName, tagName, format, false, true);
 
       for (unsigned long ix = 0; ix < childV.size(); ++ix)

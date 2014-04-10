@@ -133,7 +133,7 @@ TEST(compoundValue, updateOneString)
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
   // The root should be a struct in this test case
-  EXPECT_EQ(orion::CompoundValueNode::Struct, cvnRootP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object, cvnRootP->type);
 
   // The root should have exactly one child
   EXPECT_EQ(1, cvnRootP->childV.size());
@@ -145,17 +145,17 @@ TEST(compoundValue, updateOneString)
   // The child
   childP = cvnRootP->childV[0];
 
-  EXPECT_EQ("s1",                            childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,  childP->type);
-  EXPECT_EQ("STRING",                        childP->value);
-  EXPECT_EQ(0,                               childP->childV.size());
+  EXPECT_EQ("s1",                              childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
+  EXPECT_EQ("STRING",                          childP->value);
+  EXPECT_EQ(0,                                 childP->childV.size());
 
-  EXPECT_EQ(cvnRootP,                        childP->container);
-  EXPECT_EQ(cvnRootP,                        childP->rootP);
+  EXPECT_EQ(cvnRootP,                          childP->container);
+  EXPECT_EQ(cvnRootP,                          childP->rootP);
 
-  EXPECT_EQ("/s1",                           childP->path);
-  EXPECT_EQ(1,                               childP->level);
-  EXPECT_EQ(0,                               childP->siblingNo);
+  EXPECT_EQ("/s1",                             childP->path);
+  EXPECT_EQ(1,                                 childP->level);
+  EXPECT_EQ(0,                                 childP->siblingNo);
 
   utExit();
 }
@@ -198,7 +198,7 @@ TEST(compoundValue, updateOneStringJson)
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
   // The root should be a struct in this test case
-  EXPECT_EQ(orion::CompoundValueNode::Struct, cvnRootP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object, cvnRootP->type);
 
   // The root should have exactly one child
   EXPECT_EQ(1, cvnRootP->childV.size());
@@ -210,17 +210,17 @@ TEST(compoundValue, updateOneStringJson)
   // The child
   childP = cvnRootP->childV[0];
 
-  EXPECT_EQ("s1",                            childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,  childP->type);
-  EXPECT_EQ("STRING",                        childP->value);
-  EXPECT_EQ(0,                               childP->childV.size());
+  EXPECT_EQ("s1",                              childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
+  EXPECT_EQ("STRING",                          childP->value);
+  EXPECT_EQ(0,                                 childP->childV.size());
 
-  EXPECT_EQ(cvnRootP,                        childP->container);
-  EXPECT_EQ(cvnRootP,                        childP->rootP);
+  EXPECT_EQ(cvnRootP,                          childP->container);
+  EXPECT_EQ(cvnRootP,                          childP->rootP);
 
-  EXPECT_EQ("/s1",                           childP->path);
-  EXPECT_EQ(1,                               childP->level);
-  EXPECT_EQ(0,                               childP->siblingNo);
+  EXPECT_EQ("/s1",                             childP->path);
+  EXPECT_EQ(1,                                 childP->level);
+  EXPECT_EQ(0,                                 childP->siblingNo);
 
   utExit();
 }
@@ -259,7 +259,7 @@ TEST(compoundValue, updateTwoStrings)
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
   // The root should be a struct in this test case
-  EXPECT_EQ(orion::CompoundValueNode::Struct, cvnRootP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object, cvnRootP->type);
 
   // The root should have exactly two children
   EXPECT_EQ(2, cvnRootP->childV.size());
@@ -271,32 +271,32 @@ TEST(compoundValue, updateTwoStrings)
   // child 1
   childP = cvnRootP->childV[0];
 
-  EXPECT_EQ("s1",                            childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,  childP->type);
-  EXPECT_EQ("STRING",                        childP->value);
-  EXPECT_EQ(0,                               childP->childV.size());
+  EXPECT_EQ("s1",                              childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
+  EXPECT_EQ("STRING",                          childP->value);
+  EXPECT_EQ(0,                                 childP->childV.size());
 
-  EXPECT_EQ(cvnRootP,                        childP->container);
-  EXPECT_EQ(cvnRootP,                        childP->rootP);
+  EXPECT_EQ(cvnRootP,                          childP->container);
+  EXPECT_EQ(cvnRootP,                          childP->rootP);
 
-  EXPECT_EQ("/s1",                           childP->path);
-  EXPECT_EQ(1,                               childP->level);
-  EXPECT_EQ(0,                               childP->siblingNo);
+  EXPECT_EQ("/s1",                             childP->path);
+  EXPECT_EQ(1,                                 childP->level);
+  EXPECT_EQ(0,                                 childP->siblingNo);
 
   // child 2
   childP = cvnRootP->childV[1];
 
-  EXPECT_EQ("s2",                            childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,  childP->type);
-  EXPECT_EQ("STRING",                        childP->value);
-  EXPECT_EQ(0,                               childP->childV.size());
+  EXPECT_EQ("s2",                              childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
+  EXPECT_EQ("STRING",                          childP->value);
+  EXPECT_EQ(0,                                 childP->childV.size());
 
-  EXPECT_EQ(cvnRootP,                        childP->container);
-  EXPECT_EQ(cvnRootP,                        childP->rootP);
+  EXPECT_EQ(cvnRootP,                          childP->container);
+  EXPECT_EQ(cvnRootP,                          childP->rootP);
 
-  EXPECT_EQ("/s2",                           childP->path);
-  EXPECT_EQ(1,                               childP->level);
-  EXPECT_EQ(1,                               childP->siblingNo);
+  EXPECT_EQ("/s2",                             childP->path);
+  EXPECT_EQ(1,                                 childP->level);
+  EXPECT_EQ(1,                                 childP->siblingNo);
 
   utExit();
 }
@@ -337,7 +337,7 @@ TEST(compoundValue, updateTwoStringsJson)
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
   // The root should be a struct in this test case
-  EXPECT_EQ(orion::CompoundValueNode::Struct, cvnRootP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object, cvnRootP->type);
 
   // The root should have exactly two children
   EXPECT_EQ(2, cvnRootP->childV.size());
@@ -349,32 +349,32 @@ TEST(compoundValue, updateTwoStringsJson)
   // child 1
   childP = cvnRootP->childV[0];
 
-  EXPECT_EQ("s1",                            childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,  childP->type);
-  EXPECT_EQ("STRING",                        childP->value);
-  EXPECT_EQ(0,                               childP->childV.size());
+  EXPECT_EQ("s1",                              childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
+  EXPECT_EQ("STRING",                          childP->value);
+  EXPECT_EQ(0,                                 childP->childV.size());
 
-  EXPECT_EQ(cvnRootP,                        childP->container);
-  EXPECT_EQ(cvnRootP,                        childP->rootP);
+  EXPECT_EQ(cvnRootP,                          childP->container);
+  EXPECT_EQ(cvnRootP,                          childP->rootP);
 
-  EXPECT_EQ("/s1",                           childP->path);
-  EXPECT_EQ(1,                               childP->level);
-  EXPECT_EQ(0,                               childP->siblingNo);
+  EXPECT_EQ("/s1",                             childP->path);
+  EXPECT_EQ(1,                                 childP->level);
+  EXPECT_EQ(0,                                 childP->siblingNo);
 
   // child 2
   childP = cvnRootP->childV[1];
 
-  EXPECT_EQ("s2",                            childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,  childP->type);
-  EXPECT_EQ("STRING",                        childP->value);
-  EXPECT_EQ(0,                               childP->childV.size());
+  EXPECT_EQ("s2",                              childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
+  EXPECT_EQ("STRING",                          childP->value);
+  EXPECT_EQ(0,                                 childP->childV.size());
 
-  EXPECT_EQ(cvnRootP,                        childP->container);
-  EXPECT_EQ(cvnRootP,                        childP->rootP);
+  EXPECT_EQ(cvnRootP,                          childP->container);
+  EXPECT_EQ(cvnRootP,                          childP->rootP);
 
-  EXPECT_EQ("/s2",                           childP->path);
-  EXPECT_EQ(1,                               childP->level);
-  EXPECT_EQ(1,                               childP->siblingNo);
+  EXPECT_EQ("/s2",                             childP->path);
+  EXPECT_EQ(1,                                 childP->level);
+  EXPECT_EQ(1,                                 childP->siblingNo);
 
   utExit();
 }
@@ -478,17 +478,17 @@ TEST(compoundValue, updateContextValueVectorOneItem)
   // The child
   childP = cvnRootP->childV[0];
 
-  EXPECT_EQ("vecitem",                       childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,  childP->type);
-  EXPECT_EQ("1",                             childP->value);
-  EXPECT_EQ(0,                               childP->childV.size());
+  EXPECT_EQ("vecitem",                         childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
+  EXPECT_EQ("1",                               childP->value);
+  EXPECT_EQ(0,                                 childP->childV.size());
 
-  EXPECT_EQ(cvnRootP,                        childP->container);
-  EXPECT_EQ(cvnRootP,                        childP->rootP);
+  EXPECT_EQ(cvnRootP,                          childP->container);
+  EXPECT_EQ(cvnRootP,                          childP->rootP);
 
-  EXPECT_EQ("/vecitem",                      childP->path);
-  EXPECT_EQ(1,                               childP->level);
-  EXPECT_EQ(0,                               childP->siblingNo);
+  EXPECT_EQ("/vecitem",                        childP->path);
+  EXPECT_EQ(1,                                 childP->level);
+  EXPECT_EQ(0,                                 childP->siblingNo);
 
   utExit();
 }
@@ -540,17 +540,17 @@ TEST(compoundValue, updateContextValueVectorOneItemJson)
   // The child
   childP = cvnRootP->childV[0];
 
-  EXPECT_EQ("item",                          childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,  childP->type);
-  EXPECT_EQ("1",                             childP->value);
-  EXPECT_EQ(0,                               childP->childV.size());
+  EXPECT_EQ("item",                            childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
+  EXPECT_EQ("1",                               childP->value);
+  EXPECT_EQ(0,                                 childP->childV.size());
 
-  EXPECT_EQ(cvnRootP,                        childP->container);
-  EXPECT_EQ(cvnRootP,                        childP->rootP);
+  EXPECT_EQ(cvnRootP,                          childP->container);
+  EXPECT_EQ(cvnRootP,                          childP->rootP);
 
-  EXPECT_EQ("/item",                         childP->path);
-  EXPECT_EQ(1,                               childP->level);
-  EXPECT_EQ(0,                               childP->siblingNo);
+  EXPECT_EQ("/item",                           childP->path);
+  EXPECT_EQ(1,                                 childP->level);
+  EXPECT_EQ(0,                                 childP->siblingNo);
 
   utExit();
 }
@@ -605,17 +605,17 @@ TEST(compoundValue, updateContextValueVectorFiveItems)
   {
     childP = cvnRootP->childV[childIx];
 
-    EXPECT_EQ("vecitem",                       childP->name);
-    EXPECT_EQ(orion::CompoundValueNode::Leaf,  childP->type);
-    EXPECT_EQ(value[childIx],                  childP->value);
-    EXPECT_EQ(0,                               childP->childV.size());
+    EXPECT_EQ("vecitem",                         childP->name);
+    EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
+    EXPECT_EQ(value[childIx],                    childP->value);
+    EXPECT_EQ(0,                                 childP->childV.size());
 
-    EXPECT_EQ(cvnRootP,                        childP->container);
-    EXPECT_EQ(cvnRootP,                        childP->rootP);
+    EXPECT_EQ(cvnRootP,                          childP->container);
+    EXPECT_EQ(cvnRootP,                          childP->rootP);
 
-    EXPECT_EQ("/vecitem",                      childP->path);
-    EXPECT_EQ(1,                               childP->level);
-    EXPECT_EQ(childIx,                         childP->siblingNo);
+    EXPECT_EQ("/vecitem",                        childP->path);
+    EXPECT_EQ(1,                                 childP->level);
+    EXPECT_EQ(childIx,                           childP->siblingNo);
   }
 
   utExit();
@@ -671,17 +671,17 @@ TEST(compoundValue, updateContextValueVectorFiveItemsJson)
   {
     childP = cvnRootP->childV[childIx];
 
-    EXPECT_EQ("item",                          childP->name);
-    EXPECT_EQ(orion::CompoundValueNode::Leaf,  childP->type);
-    EXPECT_EQ(value[childIx],                  childP->value);
-    EXPECT_EQ(0,                               childP->childV.size());
+    EXPECT_EQ("item",                            childP->name);
+    EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
+    EXPECT_EQ(value[childIx],                    childP->value);
+    EXPECT_EQ(0,                                 childP->childV.size());
 
-    EXPECT_EQ(cvnRootP,                        childP->container);
-    EXPECT_EQ(cvnRootP,                        childP->rootP);
+    EXPECT_EQ(cvnRootP,                          childP->container);
+    EXPECT_EQ(cvnRootP,                          childP->rootP);
 
-    EXPECT_EQ("/item",                         childP->path);
-    EXPECT_EQ(1,                               childP->level);
-    EXPECT_EQ(childIx,                         childP->siblingNo);
+    EXPECT_EQ("/item",                           childP->path);
+    EXPECT_EQ(1,                                 childP->level);
+    EXPECT_EQ(childIx,                           childP->siblingNo);
   }
 
   utExit();
@@ -753,7 +753,7 @@ TEST(compoundValue, updateTwoStructs)
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
   // The root should be a 'struct' in this test case
-  EXPECT_EQ(orion::CompoundValueNode::Struct, cvnRootP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object, cvnRootP->type);
 
   // The root should have two children
   EXPECT_EQ(2, cvnRootP->childV.size());
@@ -766,7 +766,7 @@ TEST(compoundValue, updateTwoStructs)
   structP = cvnRootP->childV[0];
 
   EXPECT_EQ("struct1",                         structP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Struct,  structP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object,  structP->type);
   EXPECT_EQ(2,                                 structP->childV.size());
 
   EXPECT_EQ(cvnRootP,                          structP->container);
@@ -780,33 +780,33 @@ TEST(compoundValue, updateTwoStructs)
   // Child 1 of struct1
   childP = structP->childV[0];
 
-  EXPECT_EQ("s1-1",                            childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,    childP->type);
-  EXPECT_EQ("1-1",                             childP->value);
-  EXPECT_EQ(0,                                 childP->childV.size());
+  EXPECT_EQ("s1-1",                              childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,    childP->type);
+  EXPECT_EQ("1-1",                               childP->value);
+  EXPECT_EQ(0,                                   childP->childV.size());
 
-  EXPECT_EQ(structP,                           childP->container);
-  EXPECT_EQ(cvnRootP,                          childP->rootP);
+  EXPECT_EQ(structP,                             childP->container);
+  EXPECT_EQ(cvnRootP,                            childP->rootP);
 
-  EXPECT_EQ("/struct1/s1-1",                   childP->path);
-  EXPECT_EQ(2,                                 childP->level);
-  EXPECT_EQ(0,                                 childP->siblingNo);
+  EXPECT_EQ("/struct1/s1-1",                     childP->path);
+  EXPECT_EQ(2,                                   childP->level);
+  EXPECT_EQ(0,                                   childP->siblingNo);
 
 
   // Child 2 of struct1
   childP = cvnRootP->childV[0]->childV[1];
 
-  EXPECT_EQ("s1-2",                            childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,    childP->type);
-  EXPECT_EQ("1-2",                             childP->value);
-  EXPECT_EQ(0,                                 childP->childV.size());
+  EXPECT_EQ("s1-2",                              childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,    childP->type);
+  EXPECT_EQ("1-2",                               childP->value);
+  EXPECT_EQ(0,                                   childP->childV.size());
 
-  EXPECT_EQ(structP,                           childP->container);
-  EXPECT_EQ(cvnRootP,                          childP->rootP);
+  EXPECT_EQ(structP,                             childP->container);
+  EXPECT_EQ(cvnRootP,                            childP->rootP);
 
-  EXPECT_EQ("/struct1/s1-2",                   childP->path);
-  EXPECT_EQ(2,                                 childP->level);
-  EXPECT_EQ(1,                                 childP->siblingNo);
+  EXPECT_EQ("/struct1/s1-2",                     childP->path);
+  EXPECT_EQ(2,                                   childP->level);
+  EXPECT_EQ(1,                                   childP->siblingNo);
 
 
 
@@ -814,7 +814,7 @@ TEST(compoundValue, updateTwoStructs)
   structP = cvnRootP->childV[1];
 
   EXPECT_EQ("struct2",                         structP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Struct,  structP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object,  structP->type);
   EXPECT_EQ(2,                                 structP->childV.size());
 
   EXPECT_EQ(cvnRootP,                          structP->container);
@@ -827,33 +827,33 @@ TEST(compoundValue, updateTwoStructs)
   // Child 1 of struct2
   childP = cvnRootP->childV[1]->childV[0];
 
-  EXPECT_EQ("s2-1",                            childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,    childP->type);
-  EXPECT_EQ("2-1",                             childP->value);
-  EXPECT_EQ(0,                                 childP->childV.size());
+  EXPECT_EQ("s2-1",                              childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,    childP->type);
+  EXPECT_EQ("2-1",                               childP->value);
+  EXPECT_EQ(0,                                   childP->childV.size());
 
-  EXPECT_EQ(structP,                           childP->container);
-  EXPECT_EQ(cvnRootP,                          childP->rootP);
+  EXPECT_EQ(structP,                             childP->container);
+  EXPECT_EQ(cvnRootP,                            childP->rootP);
 
-  EXPECT_EQ("/struct2/s2-1",                   childP->path);
-  EXPECT_EQ(2,                                 childP->level);
-  EXPECT_EQ(0,                                 childP->siblingNo);
+  EXPECT_EQ("/struct2/s2-1",                     childP->path);
+  EXPECT_EQ(2,                                   childP->level);
+  EXPECT_EQ(0,                                   childP->siblingNo);
 
 
   // Child 2 of struct2
   childP = cvnRootP->childV[1]->childV[1];
 
-  EXPECT_EQ("s2-2",                            childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,    childP->type);
-  EXPECT_EQ("2-2",                             childP->value);
-  EXPECT_EQ(0,                                 childP->childV.size());
+  EXPECT_EQ("s2-2",                              childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,    childP->type);
+  EXPECT_EQ("2-2",                               childP->value);
+  EXPECT_EQ(0,                                   childP->childV.size());
 
-  EXPECT_EQ(structP,                           childP->container);
-  EXPECT_EQ(cvnRootP,                          childP->rootP);
+  EXPECT_EQ(structP,                             childP->container);
+  EXPECT_EQ(cvnRootP,                            childP->rootP);
 
-  EXPECT_EQ("/struct2/s2-2",                   childP->path);
-  EXPECT_EQ(2,                                 childP->level);
-  EXPECT_EQ(1,                                 childP->siblingNo);
+  EXPECT_EQ("/struct2/s2-2",                     childP->path);
+  EXPECT_EQ(2,                                   childP->level);
+  EXPECT_EQ(1,                                   childP->siblingNo);
 
   utExit();
 }
@@ -902,7 +902,7 @@ TEST(compoundValue, updateTwoStructsJson)
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
   // The root should be a 'struct' in this test case
-  EXPECT_EQ(orion::CompoundValueNode::Struct, cvnRootP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object, cvnRootP->type);
 
   // The root should have two children
   EXPECT_EQ(2, cvnRootP->childV.size());
@@ -915,7 +915,7 @@ TEST(compoundValue, updateTwoStructsJson)
   structP = cvnRootP->childV[0];
 
   EXPECT_EQ("struct1",                         structP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Struct,  structP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object,  structP->type);
   EXPECT_EQ(2,                                 structP->childV.size());
 
   EXPECT_EQ(cvnRootP,                          structP->container);
@@ -928,33 +928,33 @@ TEST(compoundValue, updateTwoStructsJson)
   // Child 1 of struct1
   childP = structP->childV[0];
 
-  EXPECT_EQ("s1-1",                            childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,    childP->type);
-  EXPECT_EQ("1-1",                             childP->value);
-  EXPECT_EQ(0,                                 childP->childV.size());
+  EXPECT_EQ("s1-1",                              childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,    childP->type);
+  EXPECT_EQ("1-1",                               childP->value);
+  EXPECT_EQ(0,                                   childP->childV.size());
 
-  EXPECT_EQ(structP,                           childP->container);
-  EXPECT_EQ(cvnRootP,                          childP->rootP);
+  EXPECT_EQ(structP,                             childP->container);
+  EXPECT_EQ(cvnRootP,                            childP->rootP);
 
-  EXPECT_EQ("/struct1/s1-1",                   childP->path);
-  EXPECT_EQ(2,                                 childP->level);
-  EXPECT_EQ(0,                                 childP->siblingNo);
+  EXPECT_EQ("/struct1/s1-1",                     childP->path);
+  EXPECT_EQ(2,                                   childP->level);
+  EXPECT_EQ(0,                                   childP->siblingNo);
 
 
   // Child 2 of struct1
   childP = cvnRootP->childV[0]->childV[1];
 
-  EXPECT_EQ("s1-2",                            childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,    childP->type);
-  EXPECT_EQ("1-2",                             childP->value);
-  EXPECT_EQ(0,                                 childP->childV.size());
+  EXPECT_EQ("s1-2",                              childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,    childP->type);
+  EXPECT_EQ("1-2",                               childP->value);
+  EXPECT_EQ(0,                                   childP->childV.size());
 
-  EXPECT_EQ(structP,                           childP->container);
-  EXPECT_EQ(cvnRootP,                          childP->rootP);
+  EXPECT_EQ(structP,                             childP->container);
+  EXPECT_EQ(cvnRootP,                            childP->rootP);
 
-  EXPECT_EQ("/struct1/s1-2",                   childP->path);
-  EXPECT_EQ(2,                                 childP->level);
-  EXPECT_EQ(1,                                 childP->siblingNo);
+  EXPECT_EQ("/struct1/s1-2",                     childP->path);
+  EXPECT_EQ(2,                                   childP->level);
+  EXPECT_EQ(1,                                   childP->siblingNo);
 
 
 
@@ -962,7 +962,7 @@ TEST(compoundValue, updateTwoStructsJson)
   structP = cvnRootP->childV[1];
 
   EXPECT_EQ("struct2",                         structP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Struct,  structP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object,  structP->type);
   EXPECT_EQ(2,                                 structP->childV.size());
 
   EXPECT_EQ(cvnRootP,                          structP->container);
@@ -975,33 +975,33 @@ TEST(compoundValue, updateTwoStructsJson)
   // Child 1 of struct2
   childP = cvnRootP->childV[1]->childV[0];
 
-  EXPECT_EQ("s2-1",                            childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,    childP->type);
-  EXPECT_EQ("2-1",                             childP->value);
-  EXPECT_EQ(0,                                 childP->childV.size());
+  EXPECT_EQ("s2-1",                              childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,    childP->type);
+  EXPECT_EQ("2-1",                               childP->value);
+  EXPECT_EQ(0,                                   childP->childV.size());
 
-  EXPECT_EQ(structP,                           childP->container);
-  EXPECT_EQ(cvnRootP,                          childP->rootP);
+  EXPECT_EQ(structP,                             childP->container);
+  EXPECT_EQ(cvnRootP,                            childP->rootP);
 
-  EXPECT_EQ("/struct2/s2-1",                   childP->path);
-  EXPECT_EQ(2,                                 childP->level);
-  EXPECT_EQ(0,                                 childP->siblingNo);
+  EXPECT_EQ("/struct2/s2-1",                     childP->path);
+  EXPECT_EQ(2,                                   childP->level);
+  EXPECT_EQ(0,                                   childP->siblingNo);
 
 
   // Child 2 of struct2
   childP = cvnRootP->childV[1]->childV[1];
 
-  EXPECT_EQ("s2-2",                            childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,    childP->type);
-  EXPECT_EQ("2-2",                             childP->value);
-  EXPECT_EQ(0,                                 childP->childV.size());
+  EXPECT_EQ("s2-2",                              childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,    childP->type);
+  EXPECT_EQ("2-2",                               childP->value);
+  EXPECT_EQ(0,                                   childP->childV.size());
 
-  EXPECT_EQ(structP,                           childP->container);
-  EXPECT_EQ(cvnRootP,                          childP->rootP);
+  EXPECT_EQ(structP,                             childP->container);
+  EXPECT_EQ(cvnRootP,                            childP->rootP);
 
-  EXPECT_EQ("/struct2/s2-2",                   childP->path);
-  EXPECT_EQ(2,                                 childP->level);
-  EXPECT_EQ(1,                                 childP->siblingNo);
+  EXPECT_EQ("/struct2/s2-2",                     childP->path);
+  EXPECT_EQ(2,                                   childP->level);
+  EXPECT_EQ(1,                                   childP->siblingNo);
 
   utExit();
 }
@@ -1051,7 +1051,7 @@ TEST(compoundValue, sixLevels)
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
   // The root should be a 'struct' in this test case
-  EXPECT_EQ(orion::CompoundValueNode::Struct, cvnRootP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object, cvnRootP->type);
 
   // The root should have one child
   EXPECT_EQ(1, cvnRootP->childV.size());
@@ -1064,7 +1064,7 @@ TEST(compoundValue, sixLevels)
   level1 = cvnRootP->childV[0];
 
   EXPECT_EQ("level1",                          level1->name);
-  EXPECT_EQ(orion::CompoundValueNode::Struct,  level1->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object,  level1->type);
   EXPECT_EQ("",                                level1->value);
   EXPECT_EQ(2,                                 level1->childV.size());
 
@@ -1079,7 +1079,7 @@ TEST(compoundValue, sixLevels)
   childP = level1->childV[0];
 
   EXPECT_EQ("level",                           childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,    childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
   EXPECT_EQ("2",                               childP->value);
   EXPECT_EQ(0,                                 childP->childV.size());
 
@@ -1095,7 +1095,7 @@ TEST(compoundValue, sixLevels)
   level2 = level1->childV[1];
 
   EXPECT_EQ("level2",                          level2->name);
-  EXPECT_EQ(orion::CompoundValueNode::Struct,  level2->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object,  level2->type);
   EXPECT_EQ(2,                                 level2->childV.size());
 
   EXPECT_EQ(level1,                            level2->container);
@@ -1110,7 +1110,7 @@ TEST(compoundValue, sixLevels)
   childP = level2->childV[0];
 
   EXPECT_EQ("level",                           childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,    childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
   EXPECT_EQ("3",                               childP->value);
   EXPECT_EQ(0,                                 childP->childV.size());
 
@@ -1139,7 +1139,7 @@ TEST(compoundValue, sixLevels)
   vitemP = level3->childV[0];
 
   EXPECT_EQ("level4item",                       vitemP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Struct,   vitemP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object,   vitemP->type);
   EXPECT_EQ(2,                                  vitemP->childV.size());
 
   EXPECT_EQ(level3,                             vitemP->container);
@@ -1153,7 +1153,7 @@ TEST(compoundValue, sixLevels)
   childP = vitemP->childV[0];
 
   EXPECT_EQ("level",                                  childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,           childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,         childP->type);
   EXPECT_EQ("5",                                      childP->value);
   EXPECT_EQ(0,                                        childP->childV.size());
 
@@ -1168,7 +1168,7 @@ TEST(compoundValue, sixLevels)
   structP = vitemP->childV[1];
 
   EXPECT_EQ("struct1",                                  structP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Struct,           structP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object,           structP->type);
   EXPECT_EQ(3,                                          structP->childV.size());
 
   EXPECT_EQ(vitemP,                                     structP->container);
@@ -1182,7 +1182,7 @@ TEST(compoundValue, sixLevels)
   childP = structP->childV[0];
 
   EXPECT_EQ("level",                                          childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,                   childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,                 childP->type);
   EXPECT_EQ("6",                                              childP->value);
   EXPECT_EQ(0,                                                childP->childV.size());
 
@@ -1197,7 +1197,7 @@ TEST(compoundValue, sixLevels)
   childP = structP->childV[1];
 
   EXPECT_EQ("s1-1" ,                                          childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,                   childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,                 childP->type);
   EXPECT_EQ("1-1",                                            childP->value);
   EXPECT_EQ(0,                                                childP->childV.size());
 
@@ -1212,7 +1212,7 @@ TEST(compoundValue, sixLevels)
   childP = structP->childV[2];
 
   EXPECT_EQ("s1-2" ,                                          childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,                   childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,                 childP->type);
   EXPECT_EQ("1-2",                                            childP->value);
   EXPECT_EQ(0,                                                childP->childV.size());
 
@@ -1228,7 +1228,7 @@ TEST(compoundValue, sixLevels)
   vitemP = level3->childV[1];
 
   EXPECT_EQ("level4item",                       vitemP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Struct,   vitemP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object,   vitemP->type);
   EXPECT_EQ(2,                                  vitemP->childV.size());
 
   EXPECT_EQ(level3,                             vitemP->container);
@@ -1242,7 +1242,7 @@ TEST(compoundValue, sixLevels)
   childP = vitemP->childV[0];
 
   EXPECT_EQ("level",                                  childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,           childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,         childP->type);
   EXPECT_EQ("5",                                      childP->value);
   EXPECT_EQ(0,                                        childP->childV.size());
 
@@ -1257,7 +1257,7 @@ TEST(compoundValue, sixLevels)
   structP = vitemP->childV[1];
 
   EXPECT_EQ("struct2",                                  structP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Struct,           structP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object,           structP->type);
   EXPECT_EQ(3,                                          structP->childV.size());
 
   EXPECT_EQ(vitemP,                                     structP->container);
@@ -1271,7 +1271,7 @@ TEST(compoundValue, sixLevels)
   childP = structP->childV[0];
 
   EXPECT_EQ("level",                                          childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,                   childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,                 childP->type);
   EXPECT_EQ("6",                                              childP->value);
   EXPECT_EQ(0,                                                childP->childV.size());
 
@@ -1286,7 +1286,7 @@ TEST(compoundValue, sixLevels)
   childP = structP->childV[1];
 
   EXPECT_EQ("s2-1" ,                                          childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,                   childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,                 childP->type);
   EXPECT_EQ("2-1",                                            childP->value);
   EXPECT_EQ(0,                                                childP->childV.size());
 
@@ -1301,7 +1301,7 @@ TEST(compoundValue, sixLevels)
   childP = structP->childV[2];
 
   EXPECT_EQ("s2-2" ,                                          childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,                   childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,                 childP->type);
   EXPECT_EQ("2-2",                                            childP->value);
   EXPECT_EQ(0,                                                childP->childV.size());
 
@@ -1363,7 +1363,7 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
   // The root should be a 'struct' in this test case
-  EXPECT_EQ(orion::CompoundValueNode::Struct, cvnRootP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object, cvnRootP->type);
 
   // The root should have one child
   EXPECT_EQ(1, cvnRootP->childV.size());
@@ -1377,7 +1377,7 @@ TEST(compoundValue, sixLevelsJson)
   level1 = cvnRootP->childV[0];
 
   EXPECT_EQ("level1",                          level1->name);
-  EXPECT_EQ(orion::CompoundValueNode::Struct,  level1->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object,  level1->type);
   EXPECT_EQ("",                                level1->value);
   EXPECT_EQ(2,                                 level1->childV.size());
 
@@ -1392,7 +1392,7 @@ TEST(compoundValue, sixLevelsJson)
   childP = level1->childV[0];
 
   EXPECT_EQ("level",                           childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,    childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
   EXPECT_EQ("2",                               childP->value);
   EXPECT_EQ(0,                                 childP->childV.size());
 
@@ -1408,7 +1408,7 @@ TEST(compoundValue, sixLevelsJson)
   level2 = level1->childV[1];
 
   EXPECT_EQ("level2",                          level2->name);
-  EXPECT_EQ(orion::CompoundValueNode::Struct,  level2->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object,  level2->type);
   EXPECT_EQ(2,                                 level2->childV.size());
 
   EXPECT_EQ(level1,                            level2->container);
@@ -1423,7 +1423,7 @@ TEST(compoundValue, sixLevelsJson)
   childP = level2->childV[0];
 
   EXPECT_EQ("level",                           childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,    childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
   EXPECT_EQ("3",                               childP->value);
   EXPECT_EQ(0,                                 childP->childV.size());
 
@@ -1452,7 +1452,7 @@ TEST(compoundValue, sixLevelsJson)
   vitemP = level3->childV[0];
 
   EXPECT_EQ("item",                             vitemP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Struct,   vitemP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object,   vitemP->type);
   EXPECT_EQ(2,                                  vitemP->childV.size());
 
   EXPECT_EQ(level3,                             vitemP->container);
@@ -1466,7 +1466,7 @@ TEST(compoundValue, sixLevelsJson)
   childP = vitemP->childV[0];
 
   EXPECT_EQ("level",                                  childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,           childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,         childP->type);
   EXPECT_EQ("5",                                      childP->value);
   EXPECT_EQ(0,                                        childP->childV.size());
 
@@ -1481,7 +1481,7 @@ TEST(compoundValue, sixLevelsJson)
   structP = vitemP->childV[1];
 
   EXPECT_EQ("struct1",                                  structP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Struct,           structP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object,           structP->type);
   EXPECT_EQ(3,                                          structP->childV.size());
 
   EXPECT_EQ(vitemP,                                     structP->container);
@@ -1495,7 +1495,7 @@ TEST(compoundValue, sixLevelsJson)
   childP = structP->childV[0];
 
   EXPECT_EQ("level",                                          childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,                   childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,                 childP->type);
   EXPECT_EQ("6",                                              childP->value);
   EXPECT_EQ(0,                                                childP->childV.size());
 
@@ -1510,7 +1510,7 @@ TEST(compoundValue, sixLevelsJson)
   childP = structP->childV[1];
 
   EXPECT_EQ("s1-1" ,                                          childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,                   childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,                 childP->type);
   EXPECT_EQ("1-1",                                            childP->value);
   EXPECT_EQ(0,                                                childP->childV.size());
 
@@ -1525,7 +1525,7 @@ TEST(compoundValue, sixLevelsJson)
   childP = structP->childV[2];
 
   EXPECT_EQ("s1-2" ,                                          childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,                   childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,                 childP->type);
   EXPECT_EQ("1-2",                                            childP->value);
   EXPECT_EQ(0,                                                childP->childV.size());
 
@@ -1541,7 +1541,7 @@ TEST(compoundValue, sixLevelsJson)
   vitemP = level3->childV[1];
 
   EXPECT_EQ("item",                             vitemP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Struct,   vitemP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object,   vitemP->type);
   EXPECT_EQ(2,                                  vitemP->childV.size());
 
   EXPECT_EQ(level3,                             vitemP->container);
@@ -1555,7 +1555,7 @@ TEST(compoundValue, sixLevelsJson)
   childP = vitemP->childV[0];
 
   EXPECT_EQ("level",                                  childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,           childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,         childP->type);
   EXPECT_EQ("5",                                      childP->value);
   EXPECT_EQ(0,                                        childP->childV.size());
 
@@ -1570,7 +1570,7 @@ TEST(compoundValue, sixLevelsJson)
   structP = vitemP->childV[1];
 
   EXPECT_EQ("struct2",                                  structP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Struct,           structP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object,           structP->type);
   EXPECT_EQ(3,                                          structP->childV.size());
 
   EXPECT_EQ(vitemP,                                     structP->container);
@@ -1584,7 +1584,7 @@ TEST(compoundValue, sixLevelsJson)
   childP = structP->childV[0];
 
   EXPECT_EQ("level",                                          childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,                   childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,                 childP->type);
   EXPECT_EQ("6",                                              childP->value);
   EXPECT_EQ(0,                                                childP->childV.size());
 
@@ -1599,7 +1599,7 @@ TEST(compoundValue, sixLevelsJson)
   childP = structP->childV[1];
 
   EXPECT_EQ("s2-1" ,                                          childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,                   childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,                 childP->type);
   EXPECT_EQ("2-1",                                            childP->value);
   EXPECT_EQ(0,                                                childP->childV.size());
 
@@ -1614,7 +1614,7 @@ TEST(compoundValue, sixLevelsJson)
   childP = structP->childV[2];
 
   EXPECT_EQ("s2-2" ,                                          childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,                   childP->type);
+  EXPECT_EQ(orion::CompoundValueNode::String,                 childP->type);
   EXPECT_EQ("2-2",                                            childP->value);
   EXPECT_EQ(0,                                                childP->childV.size());
 
@@ -1663,7 +1663,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValues)
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
   // The root should be a struct in this test case
-  EXPECT_EQ(orion::CompoundValueNode::Struct, cvnRootP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object, cvnRootP->type);
 
   // The root should have exactly one child
   EXPECT_EQ(1, cvnRootP->childV.size());
@@ -1675,17 +1675,17 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValues)
   // The child
   childP = cvnRootP->childV[0];
 
-  EXPECT_EQ("s1",                            childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,  childP->type);
-  EXPECT_EQ("STRING",                        childP->value);
-  EXPECT_EQ(0,                               childP->childV.size());
+  EXPECT_EQ("s1",                              childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
+  EXPECT_EQ("STRING",                          childP->value);
+  EXPECT_EQ(0,                                 childP->childV.size());
 
-  EXPECT_EQ(cvnRootP,                        childP->container);
-  EXPECT_EQ(cvnRootP,                        childP->rootP);
+  EXPECT_EQ(cvnRootP,                          childP->container);
+  EXPECT_EQ(cvnRootP,                          childP->rootP);
 
-  EXPECT_EQ("/s1",                           childP->path);
-  EXPECT_EQ(1,                               childP->level);
-  EXPECT_EQ(0,                               childP->siblingNo);
+  EXPECT_EQ("/s1",                             childP->path);
+  EXPECT_EQ(1,                                 childP->level);
+  EXPECT_EQ(0,                                 childP->siblingNo);
 
 
   // 
@@ -1718,17 +1718,17 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValues)
   {
     childP = cvnRootP->childV[ix];
 
-    EXPECT_EQ("item",                          childP->name);
-    EXPECT_EQ(orion::CompoundValueNode::Leaf,  childP->type);
-    EXPECT_EQ(value[ix],                       childP->value);
-    EXPECT_EQ(0,                               childP->childV.size());
+    EXPECT_EQ("item",                            childP->name);
+    EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
+    EXPECT_EQ(value[ix],                         childP->value);
+    EXPECT_EQ(0,                                 childP->childV.size());
 
-    EXPECT_EQ(cvnRootP,                        childP->container);
-    EXPECT_EQ(cvnRootP,                        childP->rootP);
+    EXPECT_EQ(cvnRootP,                          childP->container);
+    EXPECT_EQ(cvnRootP,                          childP->rootP);
 
-    EXPECT_EQ("/item",                         childP->path);
-    EXPECT_EQ(1,                               childP->level);
-    EXPECT_EQ(ix,                              childP->siblingNo);
+    EXPECT_EQ("/item",                           childP->path);
+    EXPECT_EQ(1,                                 childP->level);
+    EXPECT_EQ(ix,                                childP->siblingNo);
   }
 
   utExit();
@@ -1769,7 +1769,7 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
   EXPECT_EQ(cvnRootP, cvnRootP->rootP);
 
   // The root should be a struct in this test case
-  EXPECT_EQ(orion::CompoundValueNode::Struct, cvnRootP->type);
+  EXPECT_EQ(orion::CompoundValueNode::Object, cvnRootP->type);
 
   // The root should have exactly one child
   EXPECT_EQ(1, cvnRootP->childV.size());
@@ -1781,17 +1781,17 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
   // The child
   childP = cvnRootP->childV[0];
 
-  EXPECT_EQ("s1",                            childP->name);
-  EXPECT_EQ(orion::CompoundValueNode::Leaf,  childP->type);
-  EXPECT_EQ("STRING",                        childP->value);
-  EXPECT_EQ(0,                               childP->childV.size());
+  EXPECT_EQ("s1",                              childP->name);
+  EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
+  EXPECT_EQ("STRING",                          childP->value);
+  EXPECT_EQ(0,                                 childP->childV.size());
 
-  EXPECT_EQ(cvnRootP,                        childP->container);
-  EXPECT_EQ(cvnRootP,                        childP->rootP);
+  EXPECT_EQ(cvnRootP,                          childP->container);
+  EXPECT_EQ(cvnRootP,                          childP->rootP);
 
-  EXPECT_EQ("/s1",                           childP->path);
-  EXPECT_EQ(1,                               childP->level);
-  EXPECT_EQ(0,                               childP->siblingNo);
+  EXPECT_EQ("/s1",                             childP->path);
+  EXPECT_EQ(1,                                 childP->level);
+  EXPECT_EQ(0,                                 childP->siblingNo);
 
 
   // 
@@ -1824,17 +1824,17 @@ TEST(compoundValue, updateOneStringAndOneVectorInSeparateContextValuesJson)
   {
     childP = cvnRootP->childV[ix];
 
-    EXPECT_EQ("item",                          childP->name);
-    EXPECT_EQ(orion::CompoundValueNode::Leaf,  childP->type);
-    EXPECT_EQ(value[ix],                       childP->value);
-    EXPECT_EQ(0,                               childP->childV.size());
+    EXPECT_EQ("item",                            childP->name);
+    EXPECT_EQ(orion::CompoundValueNode::String,  childP->type);
+    EXPECT_EQ(value[ix],                         childP->value);
+    EXPECT_EQ(0,                                 childP->childV.size());
 
-    EXPECT_EQ(cvnRootP,                        childP->container);
-    EXPECT_EQ(cvnRootP,                        childP->rootP);
+    EXPECT_EQ(cvnRootP,                          childP->container);
+    EXPECT_EQ(cvnRootP,                          childP->rootP);
 
-    EXPECT_EQ("/item",                         childP->path);
-    EXPECT_EQ(1,                               childP->level);
-    EXPECT_EQ(ix,                              childP->siblingNo);
+    EXPECT_EQ("/item",                           childP->path);
+    EXPECT_EQ(1,                                 childP->level);
+    EXPECT_EQ(ix,                                childP->siblingNo);
   }
 
   utExit();
