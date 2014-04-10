@@ -131,15 +131,15 @@ std::string sendHttpSocket
    bool            waitForResponse
 )
 {  
-  char         buffer[TAM_BUF];
-  char         response[TAM_BUF];
-  char         preContent[TAM_BUF];
-  char         msgStatic[MAX_STA_MSG_SIZE];
-  char*        what       = (char*) "static";
-  char*        msgDynamic = NULL;
-  char*        msg        = msgStatic;   // by default, use the static buffer
-  std::string  result;
-  static int   callNo     = 0;
+  char                       buffer[TAM_BUF];
+  char                       response[TAM_BUF];
+  char                       preContent[TAM_BUF];
+  char                       msgStatic[MAX_STA_MSG_SIZE];
+  char*                      what       = (char*) "static";
+  char*                      msgDynamic = NULL;
+  char*                      msg        = msgStatic;   // by default, use the static buffer
+  std::string                result;
+  static unsigned long long  callNo     = 0;
 
   ++callNo;
 
@@ -214,8 +214,8 @@ std::string sendHttpSocket
   int nb;
   int sz = strlen(msg);
 
-  LM_T(LmtClientOutputPayload, ("Sending to HTTP server %d: sending %s message of %d bytes to HTTP server", callNo, what, sz));
-  // LM_T(LmtClientOutputPayload, ("Sending to HTTP server payload:\n%s", msg));
+  LM_T(LmtClientOutputPayload, ("Sending (msg #%lu) %s message of %d bytes to HTTP server", callNo, what, sz));
+  LM_T(LmtClientOutputPayloadView, ("Payload to HTTP server:\n%s", msg));
   nb = send(fd, msg, sz, 0);
   if (msgDynamic != NULL) {
       free (msgDynamic);

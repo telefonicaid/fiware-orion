@@ -95,6 +95,7 @@ typedef enum TraceLevels
   LmtClientInputPayload,
   LmtClientOutputPayload, // 183: IMPORTANT for harness test notification_different_sizes.test
   LmtPartialPayload,
+  LmtClientOutputPayloadView,
 
   /* Semaphores (200-201) */
   LmtReqSem = 200,
