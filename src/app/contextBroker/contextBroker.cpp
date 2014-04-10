@@ -493,8 +493,6 @@ void daemonize(void)
 */
 void sigHandler(int sigNo)
 {
-  int fd;
-
   LM_F(("In sigHandler - caught signal %d", sigNo));
 
   switch (sigNo)
@@ -502,19 +500,6 @@ void sigHandler(int sigNo)
   case SIGINT:
   case SIGTERM:
     LM_X(1, ("Received signal %d", sigNo));
-    break;
-
-  case SIGUSR1:
-    fd = lmFirstDiskFileDescriptor();
-    LM_F(("Caught SIGUSR1 - inhibiting logs (on fd %d) until SIGUSR2 arrives", fd));
-    lmFdUnregister(fd);
-    close(fd);
-    LM_F(("Caught SIGUSR1 - this message should not be seen in log file, only on stdout"));
-    break;
-
-  case SIGUSR2:
-    lmPathRegister(paLogDir, "DEF", "DEF", NULL);
-    LM_F(("Caught SIGUSR2 - log goes on"));
     break;
   }
 }
@@ -598,8 +583,6 @@ int main(int argC, char* argV[])
 {
   signal(SIGINT,  sigHandler);
   signal(SIGTERM, sigHandler);
-  signal(SIGUSR1, sigHandler);
-  signal(SIGUSR2, sigHandler);
 
   atexit(exitFunc);
 
