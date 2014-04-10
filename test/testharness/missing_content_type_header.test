@@ -92,17 +92,27 @@ EOF
 1: ++++++++++++++++++++
 HTTP/1.1 415 Unsupported Media Type
 Connection: close
-Content-Length: 0
+Content-Length: 201
+Content-Type: application/xml
 Date: REGEX(.*)
 
-
+<orionError>
+  <code>415</code>
+  <reasonPhrase>Unsupported Media Type</reasonPhrase>
+  <details>Content-Type header not used, default application/octet-stream is not supported</details>
+</orionError>
 2: ++++++++++++++++++++
 HTTP/1.1 415 Unsupported Media Type
 Connection: close
-Content-Length: 0
+Content-Length: 180
+Content-Type: application/xml
 Date: REGEX(.*)
 
-
+<orionError>
+  <code>415</code>
+  <reasonPhrase>Unsupported Media Type</reasonPhrase>
+  <details>not supported content type: application/x-www-form-encoded</details>
+</orionError>
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 155

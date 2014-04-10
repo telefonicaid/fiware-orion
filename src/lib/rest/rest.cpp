@@ -266,21 +266,24 @@ static void requestCompleted
 
 /* ****************************************************************************
 *
-* formatCheck - 
+* outFormatCheck - 
 */
-static int formatCheck(ConnectionInfo* ciP)
+static int outFormatCheck(ConnectionInfo* ciP)
 {
-  ciP->inFormat   = formatParse(ciP->httpHeaders.contentType, NULL);
   ciP->outFormat  = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
-
   if (ciP->outFormat == NOFORMAT)
   {
     /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
-    ciP->answer         = "";
     ciP->httpStatusCode = SccNotAcceptable;
+    ciP->answer = restErrorReplyGet(ciP,
+                                    XML,
+                                    "",
+                                    "OrionError",
+                                    SccNotAcceptable,
+                                    std::string("acceptable formats: 'application/xml, application/json'. Accept header in request: '") + ciP->httpHeaders.accept + "'");
 
-    ciP->httpHeader.push_back("Content-Type");
-    ciP->httpHeaderValue.push_back("application/xml, application/json");
+    ciP->outFormat      = XML; // We use XML as default format
+    ciP->httpStatusCode = SccNotAcceptable;
 
     return 1;
   }
@@ -316,9 +319,10 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   // Case 2
   if (ciP->httpHeaders.contentType == "")
   {
-    ciP->answer = "";
+    std::string details = "Content-Type header not used, default application/octet-stream is not supported";
     ciP->httpStatusCode = SccUnsupportedMediaType;
-
+    ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
+    ciP->httpStatusCode = SccUnsupportedMediaType;
     return 1;
   }
 
@@ -329,9 +333,10 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   // Case 4
   if ((ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
   {
-    ciP->answer = "";
+    std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
-
+    ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
+    ciP->httpStatusCode = SccUnsupportedMediaType;
     return 1;
   }
 
@@ -384,11 +389,23 @@ static int connectionTreat
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
 
-    if ((formatCheck(ciP) != 0) || (contentTypeCheck(ciP) != 0))
+    ciP->outFormat  = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
+    if (ciP->outFormat == NOFORMAT)
+      ciP->outFormat = XML; // XML is default output format
+
+    if (contentTypeCheck(ciP) != 0)
     {
-      LM_W(("Error in out-format or content-type"));
-      restReply(ciP, "");
+      LM_W(("Error in Content-Type"));
+      restReply(ciP, ciP->answer);
     }
+    else if (outFormatCheck(ciP) != 0)
+    {
+      LM_W(("Bad Accepted Out-Format (in Accept header)"));
+      restReply(ciP, ciP->answer);
+    }
+    else
+      ciP->inFormat = formatParse(ciP->httpHeaders.contentType, NULL);
+
     return MHD_YES;
   }
 

@@ -29,6 +29,16 @@
 #   source ../../scripts/testEnv.sh
 # fi
 
+if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
+then
+  echo
+  echo '-----------------------------------------------------------'
+  echo "Test Environment missing - please source scripts/testEnv.sh"
+  echo '-----------------------------------------------------------'
+  echo
+  exit 1
+fi
+
 
 
 # ------------------------------------------------------------------------------

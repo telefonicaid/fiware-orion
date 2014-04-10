@@ -47,10 +47,10 @@ payload='<?xml version="1.0"?>
 curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept:"
 echo "1: ++++++++++++++++++++"
 
-# This test will always fail
+# This test fails due to error in payload parsing
 url="localhost:${BROKER_PORT}/NGSI10/queryContext"
 payload='no meaningful payload (failing tests)'
-curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: text/plain"
+curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: application/xml"
 echo "2: ++++++++++++++++++++"
 
 # This test that explicit "Accept: application/xml" is ok
@@ -189,12 +189,17 @@ Date: REGEX(.*)
   </errorCode>
 </queryContextResponse>
 1: ++++++++++++++++++++
-HTTP/1.1 406 Not Acceptable
-Connection: close
-Content-Length: 0
-Content-Type: application/xml, application/json
+HTTP/1.1 200 OK
+Content-Length: 126
+Content-Type: application/xml
 Date: REGEX(.*)
 
+<?xml version="1.0"?>
+<orionError>
+  <code>400</code>
+  <reasonPhrase>Bad Request</reasonPhrase>
+  <details>XML Parse Error</details>
+</orionError>
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 155
@@ -237,17 +242,29 @@ Date: REGEX(.*)
 5: ++++++++++++++++++++
 HTTP/1.1 406 Not Acceptable
 Connection: close
-Content-Length: 0
-Content-Type: application/xml, application/json
+Content-Length: 221
+Content-Type: application/xml
 Date: REGEX(.*)
 
+<?xml version="1.0"?>
+<orionError>
+  <code>406</code>
+  <reasonPhrase>Not Acceptable</reasonPhrase>
+  <details>acceptable formats: 'application/xml, application/json'. Accept header in request: 'text/plain, image/jpeg'</details>
+</orionError>
 6: ++++++++++++++++++++
 HTTP/1.1 406 Not Acceptable
 Connection: close
-Content-Length: 0
-Content-Type: application/xml, application/json
+Content-Length: 236
+Content-Type: application/xml
 Date: REGEX(.*)
 
+<?xml version="1.0"?>
+<orionError>
+  <code>406</code>
+  <reasonPhrase>Not Acceptable</reasonPhrase>
+  <details>acceptable formats: 'application/xml, application/json'. Accept header in request: 'text/plain, image/jpeg; charset=UTF-8'</details>
+</orionError>
 7: ++++++++++++++++++++
 {
   "errorCode" : {
