@@ -172,6 +172,12 @@ post_install_libs:
 	cp src/lib/serviceRoutines/*.h /usr/local/include/contextBroker/serviceRoutines
 	cp $(CMAKE_BUILD_TYPE)/src/lib/serviceRoutines/libserviceRoutines.a  /usr/local/lib
 
+	cd /usr/local/include/contextBroker  && rm -rf orionTypes && mkdir -p orionTypes
+	cp src/lib/orionTypes/*.h /usr/local/include/contextBroker/orionTypes
+	
+	cd /usr/local/include/contextBroker  && rm -rf parse && mkdir -p parse
+	cp src/lib/parse/*.h /usr/local/include/contextBroker/parse
+	cp $(CMAKE_BUILD_TYPE)/src/lib/parse/libparse.a  /usr/local/lib
 
 
 # Requires root access, i.e. use 'sudo make install_libs' to install
