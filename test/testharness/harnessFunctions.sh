@@ -29,6 +29,16 @@
 #   source ../../scripts/testEnv.sh
 # fi
 
+if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
+then
+  echo
+  echo '-----------------------------------------------------------'
+  echo "Test Environment missing - please source scripts/testEnv.sh"
+  echo '-----------------------------------------------------------'
+  echo
+  exit 1
+fi
+
 
 
 # ------------------------------------------------------------------------------
@@ -322,8 +332,17 @@ function printXmlWithHeaders()
 function printJsonWithHeaders()
 {
   text=$1
+  encoding=$2
+
   cat headers.out
-  echo "${text}" | python -mjson.tool
+
+  if [ "$encoding" == "JSON" ]
+  then
+    echo "${text}" | python -mjson.tool
+  else
+    echo "${text}"
+  fi
+
   rm headers.out
 }
 
@@ -351,9 +370,9 @@ function curlIt()
   if [ "$encoding" == "XML" ] || [ "$encoding" == "xml" ]
   then
     printXmlWithHeaders "${response}" "$encoding"
-  elif [ "$encoding" == "JSON" ]
+  elif [ "$encoding" == "JSON" ] || [ "$encoding" == "json" ]
   then
-    printJsonWithHeaders "${response}"
+    printJsonWithHeaders "${response}" "$encoding"
   fi
 }
 
@@ -414,7 +433,7 @@ function curlNoPayload()
     printXmlWithHeaders "${response}" "$encoding"
   elif [ "$encoding" == "JSON" ]
   then
-    printJsonWithHeaders "${response}"
+    printJsonWithHeaders "${response}" "$encoding"
   fi
 }
 

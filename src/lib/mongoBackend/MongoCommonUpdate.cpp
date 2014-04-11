@@ -280,12 +280,12 @@ static bool checkAndDelete (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
 * important for ONCHANGE notifications)
 *
 */
-static bool updateAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute* caP, bool* actualUpdate) {
+static bool updateAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute* caP, bool& actualUpdate) {
 
     BSONArrayBuilder newAttrsBuilder;
-    *actualUpdate = false;
+    actualUpdate = false;
     bool updated = false;
-    for( BSONObj::iterator i = attrs->begin(); i.more(); ) {
+    for( BSONObj::iterator i = attrs.begin(); i.more(); ) {
 
         BSONObjBuilder newAttr;
         bool unitActualUpdate = false;
@@ -295,12 +295,12 @@ static bool updateAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
         /* If at least one actual update was done at checkAndUpdate() level, then updateAttribute()
          * actual update is true */
         if (unitActualUpdate == true) {
-            *actualUpdate = true;
+            actualUpdate = true;
         }
 
         newAttrsBuilder.append(newAttr.obj());
     }
-    *newAttrs = newAttrsBuilder.arr();
+    newAttrs = newAttrsBuilder.arr();
 
     return updated;
 
@@ -315,14 +315,14 @@ static bool updateAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
 * false othewise (i.e. when the new value equals to the existing one)
 *
 */
-static bool appendAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute* caP) {
+static bool appendAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute* caP) {
 
     /* In the current version (and until we close old issue 33)
      * APPEND with existing attribute equals to UPDATE */
     BSONArrayBuilder newAttrsBuilder;
     bool updated = false;
     bool actualUpdate = false;
-    for( BSONObj::iterator i = attrs->begin(); i.more(); ) {
+    for( BSONObj::iterator i = attrs.begin(); i.more(); ) {
 
         BSONObjBuilder newAttr;
         bool attrActualUpdate;
@@ -345,12 +345,12 @@ static bool appendAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
         newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
         newAttrsBuilder.append(newAttr.obj());
 
-        *newAttrs = newAttrsBuilder.arr();        
+        newAttrs = newAttrsBuilder.arr();
 
         return true;
     }
     else {
-        *newAttrs = newAttrsBuilder.arr();
+        newAttrs = newAttrsBuilder.arr();
         return actualUpdate;
     }
 
@@ -365,11 +365,11 @@ static bool appendAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
 * name
 *
 */
-static bool legalIdUsage(BSONObj* attrs, ContextAttribute* caP) {
+static bool legalIdUsage(BSONObj& attrs, ContextAttribute* caP) {
 
     if (caP->getId() == "") {
         /* Attribute attempting to append hasn't ID. Thus, no attribute with same name can have ID in attrs */
-        for( BSONObj::iterator i = attrs->begin(); i.more(); ) {
+        for( BSONObj::iterator i = attrs.begin(); i.more(); ) {
             BSONObj attr = i.next().embeddedObject();
             if (STR_FIELD(attr, ENT_ATTRS_NAME) == caP->name && STR_FIELD(attr, ENT_ATTRS_TYPE) == caP->type && STR_FIELD(attr, ENT_ATTRS_ID) != "") {
                 return false;
@@ -379,7 +379,7 @@ static bool legalIdUsage(BSONObj* attrs, ContextAttribute* caP) {
     }
     else {
         /* Attribute attempting to append has ID. Thus, no attribute with same name cannot have ID in attrs */
-        for( BSONObj::iterator i = attrs->begin(); i.more(); ) {
+        for( BSONObj::iterator i = attrs.begin(); i.more(); ) {
             BSONObj attr = i.next().embeddedObject();
             if (STR_FIELD(attr, ENT_ATTRS_NAME) == caP->name && STR_FIELD(attr, ENT_ATTRS_TYPE) == caP->type && STR_FIELD(attr, ENT_ATTRS_ID) == "") {
                 return false;
@@ -472,10 +472,10 @@ static bool processLocation(ContextAttributeVector caV, std::string& locAttr, do
 * Returns true if an attribute was deleted, false otherwise
 *
 */
-static bool deleteAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute* caP) {
+static bool deleteAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute* caP) {
     BSONArrayBuilder newAttrsBuilder;
     bool deleted = false;
-    for( BSONObj::iterator i = attrs->begin(); i.more(); ) {
+    for( BSONObj::iterator i = attrs.begin(); i.more(); ) {
 
         BSONObjBuilder newAttr;
         if (checkAndDelete(&newAttr, i.next().embeddedObject(), *caP) && !deleted) {
@@ -485,7 +485,7 @@ static bool deleteAttribute(BSONObj* attrs, BSONObj* newAttrs, ContextAttribute*
             newAttrsBuilder.append(newAttr.obj());
         }
     }
-    *newAttrs = newAttrsBuilder.arr();
+    newAttrs = newAttrsBuilder.arr();
 
     return deleted;
 }
@@ -729,9 +729,8 @@ static void buildGeneralErrorReponse(ContextElement* ceP, ContextAttribute* ca, 
 static bool processContextAttributeVector (ContextElement*               ceP,
                                            std::string                   action,
                                            std::map<string, BSONObj*>*   subsToNotify,
-                                           BSONObj* attrs, BSONObj*      newAttrs,
+                                           BSONObj&                      attrs,
                                            ContextElementResponse*       cerP,
-                                           UpdateContextResponse*        responseP,
                                            std::string&                  locAttr,
                                            double&                       coordLat,
                                            double&                       coordLong)
@@ -742,6 +741,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
     std::string entityType = cerP->contextElement.entityId.type;
 
     bool entityModified = false;
+    BSONObj newAttrs;
 
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
 
@@ -767,9 +767,9 @@ static bool processContextAttributeVector (ContextElement*               ceP,
          * "append" it would keep the true value untouched */
         bool actualUpdate = true;
         if (strcasecmp(action.c_str(), "update") == 0) {
-            if (updateAttribute(attrs, newAttrs, targetAttr, &actualUpdate)) {
+            if (updateAttribute(attrs, newAttrs, targetAttr, actualUpdate)) {
                 entityModified = actualUpdate || entityModified;
-                *attrs = *newAttrs;                
+                attrs = newAttrs;
             }
             else {
                 /* If updateAttribute() returns false, then that particular attribute has not
@@ -779,8 +779,6 @@ static bool processContextAttributeVector (ContextElement*               ceP,
                                       std::string("action: UPDATE") + 
                                       std::string(" - entity: (") + eP->toString() + ")" +
                                       std::string(" - offending attribute: ") + targetAttr->toString());
-
-                responseP->contextElementResponseVector.push_back(cerP);
                 return false;
 
             }
@@ -792,9 +790,6 @@ static bool processContextAttributeVector (ContextElement*               ceP,
                                       std::string(" - entity: (") + eP->toString() + ")" +
                                       std::string(" - offending attribute: ") + targetAttr->toString() +
                                       std::string(" - location attribute has to be defined at creation time, with APPEND"));
-
-                // FIXME P10: the push_back is always done before return. Thus, why don't do the push_bask in the caller and avoid passing responseP as argument to this function?
-                responseP->contextElementResponseVector.push_back(cerP);
                 return false;
             }
 
@@ -805,8 +800,6 @@ static bool processContextAttributeVector (ContextElement*               ceP,
                                               std::string(" - entity: (") + eP->toString() + ")" +
                                               std::string(" - offending attribute: ") + targetAttr->toString() +
                                               std::string(" - error parsing location attribute, value: <" + targetAttr->value + ">"));
-
-                        responseP->contextElementResponseVector.push_back(cerP);
                         return false;
                 }
 
@@ -817,7 +810,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
         else if (strcasecmp(action.c_str(), "append") == 0) {
             if (legalIdUsage(attrs, targetAttr)) {
                 entityModified = appendAttribute(attrs, newAttrs, targetAttr) || entityModified;
-                *attrs = *newAttrs;
+                attrs = newAttrs;
 
                 /* Check aspects related with location */
                 if (targetAttr->getLocation().length() > 0 ) {
@@ -827,8 +820,6 @@ static bool processContextAttributeVector (ContextElement*               ceP,
                                               std::string(" - entity: (") + eP->toString() + ")" +
                                               std::string(" - offending attribute: ") + targetAttr->toString() +
                                               std::string(" - attemp to define a location attribute (" + targetAttr->name + ") when another one has been previously defined (" + locAttr + ")"));
-
-                        responseP->contextElementResponseVector.push_back(cerP);
                         return false;
                     }
 
@@ -838,8 +829,6 @@ static bool processContextAttributeVector (ContextElement*               ceP,
                                               std::string(" - entity: (") + eP->toString() + ")" +
                                               std::string(" - offending attribute: ") + targetAttr->toString() +
                                               std::string(" - only WSG84 is supported for location, found: <" + targetAttr->getLocation() + ">"));
-
-                        responseP->contextElementResponseVector.push_back(cerP);
                         return false;
                     }
 
@@ -849,8 +838,6 @@ static bool processContextAttributeVector (ContextElement*               ceP,
                                                   std::string(" - entity: (") + eP->toString() + ")" +
                                                   std::string(" - offending attribute: ") + targetAttr->toString() +
                                                   std::string(" - error parsing location attribute, value: <" + targetAttr->value + ">"));
-
-                            responseP->contextElementResponseVector.push_back(cerP);
                             return false;
                     }
                     locAttr = targetAttr->name;
@@ -867,16 +854,13 @@ static bool processContextAttributeVector (ContextElement*               ceP,
                                       std::string("action: APPEND") +
                                       " - entity: (" + eP->toString() + ")" +
                                       " - offending attribute: " + targetAttr->toString());
-
-                // FIXME P10: the push_back is always done before return. Thus, why don't do the push_bask in the caller and avoid passing responseP as argument to this function?
-                responseP->contextElementResponseVector.push_back(cerP);
                 return false;
             }
         }
         else if (strcasecmp(action.c_str(), "delete") == 0) {
             if (deleteAttribute(attrs, newAttrs, targetAttr)) {
                 entityModified = true;
-                *attrs = *newAttrs;
+                attrs = newAttrs;
 
                 /* Check aspects related with location */
                 if (targetAttr->getLocation().length() > 0 ) {
@@ -885,8 +869,6 @@ static bool processContextAttributeVector (ContextElement*               ceP,
                                           std::string(" - entity: (") + eP->toString() + ")" +
                                           std::string(" - offending attribute: ") + targetAttr->toString() +
                                           std::string(" - location attribute has to be defined at creation time, with APPEND"));
-
-                    responseP->contextElementResponseVector.push_back(cerP);
                     return false;
                 }
 
@@ -905,15 +887,13 @@ static bool processContextAttributeVector (ContextElement*               ceP,
                                       std::string("action: DELETE") +
                                       " - entity: (" + eP->toString() + ")" +
                                       " - offending attribute: " + targetAttr->toString());
-
-                // FIXME P10: the push_back is always done before return. Thus, why don't do the push_bask in the caller and avoid passing responseP as argument to this function?
-                responseP->contextElementResponseVector.push_back(cerP);
                 return false;
 
             }
         }
         else {
-            LM_RE(false, ("Unknown updateContext action '%s'. This is a bug in the parsing layer checking!", action.c_str()));
+            cerP->statusCode.fill(SccInvalidParameter, std::string("unknown actionType: '") + action + "'");
+            LM_RE(false, ("Unknown actionType '%s'. This is a bug in the parsing layer checking!", action.c_str()));
         }
 
         /* Add those ONCHANGE subscription triggered by the just processed attribute. Note that
@@ -923,8 +903,6 @@ static bool processContextAttributeVector (ContextElement*               ceP,
             std::string err;
             if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, &err)) {
                 cerP->statusCode.fill(SccReceiverInternalError, err);
-                // FIXME P10: the push_back is always done before return. Thus, why don't do the push_bask in the caller and avoid passing responseP as argument to this function?
-                responseP->contextElementResponseVector.push_back(cerP);
                 LM_RE(false, (err.c_str()));
             }
         }
@@ -949,10 +927,8 @@ static bool processContextAttributeVector (ContextElement*               ceP,
     if (!entityModified) {
         /* In this case, there wasn't any failure, but ceP was not set. We need to do it ourselves, as the function caller will
          * do a 'continue' without setting it. */
-        //FIXME P5: this is ugly, our code should be improved to set ceP in a common place for the "happy case"
+        //FIXME P5: this is ugly, our code should be improved to set cerP in a common place for the "happy case"
         cerP->statusCode.fill(SccOk);
-        // FIXME P10: the push_back is always done before return. Thus, why don't do the push_bask in the caller and avoid passing responseP as argument to this function?
-        responseP->contextElementResponseVector.push_back(cerP);
     }
 
     return entityModified;
@@ -1210,7 +1186,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
          * easy using the Mongod driver BSON API. Note that we need to use newAttrs given that attrs is
          * BSONObj, which is an inmutable type. FIXME P6: try to improve this */
         BSONObj attrs = r.getField(ENT_ATTRS).embeddedObject();
-        BSONObj newAttrs;
 
         /* We accumulate the subscriptions in a map. The key of the map is the string representing
          * subscription id */
@@ -1231,12 +1206,13 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             coordLong = loc.getField(ENT_LOCATION_COORDS).Array()[1].Double();
         }
 
-        if (!processContextAttributeVector(ceP, action, &subsToNotify, &attrs, &newAttrs, cerP, responseP, locAttr, coordLat, coordLong)) {
+        if (!processContextAttributeVector(ceP, action, &subsToNotify, attrs, cerP, locAttr, coordLat, coordLong)) {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
+            responseP->contextElementResponseVector.push_back(cerP);
             continue;
         }
 
-        /* Now that newAttrs containts the final status of the attributes after processing the whole
+        /* Now that attrs containts the final status of the attributes after processing the whole
          * list of attributes in the ContextElement, update entity attributes in database */
         BSONObjBuilder updateSet, updateUnset;
         updateSet.appendArray(ENT_ATTRS, attrs);
@@ -1276,6 +1252,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             mongoSemGive(__FUNCTION__, "update in EntitiesCollection");
         }
         catch( const DBException &e ) {
+            LM_M(("inside exception handling"));
             mongoSemGive(__FUNCTION__, "update in EntitiesCollection (mongo db exception)");
             cerP->statusCode.fill(SccReceiverInternalError,
                std::string("collection: ") + getEntitiesCollectionName() +
@@ -1284,8 +1261,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                " - exception: " + e.what());
 
             responseP->contextElementResponseVector.push_back(cerP);
-            // FIXME P10: why don't 'continue'?
-            return;
+            continue;
         }
         catch(...) {
             mongoSemGive(__FUNCTION__, "update in EntitiesCollection (mongo generic exception)");
@@ -1296,8 +1272,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                " - exception: " + "generic");
 
             responseP->contextElementResponseVector.push_back(cerP);
-            // FIXME P10: why don't 'continue'?
-            return;
+            continue;
         }
 
 #if 0
