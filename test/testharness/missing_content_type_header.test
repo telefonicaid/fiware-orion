@@ -73,7 +73,7 @@ curlIt "XML" "$url" "$payload" "Content-Type: application/xml; charset=UTF-8"
 
 
 echo "4: ++++++++++++++++++++"
-# FIXME P10: enable this test once the tested functionality gets implemented (including REGEXPECT)
+# FIXME P6: curlIt should be used, but cannot be until the issue #317 is implemented
 # Check that the ending "; charset=..." works (for JSON)
 (curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json; charset=UTF-8' -d @-) << EOF
 {
