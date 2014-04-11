@@ -280,7 +280,7 @@ static int outFormatCheck(ConnectionInfo* ciP)
                                     "",
                                     "OrionError",
                                     SccNotAcceptable,
-                                    std::string("acceptable formats: 'application/xml, application/json'. Accept header in request: '") + ciP->httpHeaders.accept + "'");
+                                    std::string("acceptable MIME types: 'application/xml, application/json'. Accept header in request: '") + ciP->httpHeaders.accept + "'");
 
     ciP->outFormat      = XML; // We use XML as default format
     ciP->httpStatusCode = SccNotAcceptable;

@@ -242,7 +242,7 @@ Date: REGEX(.*)
 5: ++++++++++++++++++++
 HTTP/1.1 406 Not Acceptable
 Connection: close
-Content-Length: 221
+Content-Length: 224
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -250,12 +250,12 @@ Date: REGEX(.*)
 <orionError>
   <code>406</code>
   <reasonPhrase>Not Acceptable</reasonPhrase>
-  <details>acceptable formats: 'application/xml, application/json'. Accept header in request: 'text/plain, image/jpeg'</details>
+  <details>acceptable MIME types: 'application/xml, application/json'. Accept header in request: 'text/plain, image/jpeg'</details>
 </orionError>
 6: ++++++++++++++++++++
 HTTP/1.1 406 Not Acceptable
 Connection: close
-Content-Length: 236
+Content-Length: 239
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -263,7 +263,7 @@ Date: REGEX(.*)
 <orionError>
   <code>406</code>
   <reasonPhrase>Not Acceptable</reasonPhrase>
-  <details>acceptable formats: 'application/xml, application/json'. Accept header in request: 'text/plain, image/jpeg; charset=UTF-8'</details>
+  <details>acceptable MIME types: 'application/xml, application/json'. Accept header in request: 'text/plain, image/jpeg; charset=UTF-8'</details>
 </orionError>
 7: ++++++++++++++++++++
 {
