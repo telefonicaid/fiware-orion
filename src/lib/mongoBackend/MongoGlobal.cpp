@@ -46,6 +46,18 @@
 
 using namespace mongo;
 
+
+
+/* ****************************************************************************
+*
+* RECONNECT_RETRIES - number of retries after connect
+* RECONNECT_DELAY   - number of millisecs to sleep between retries
+*/
+#define RECONNECT_RETRIES 100
+#define RECONNECT_DELAY   1000  // One second
+
+
+
 /* ****************************************************************************
 *
 * Globals
@@ -81,7 +93,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
     connection = new DBClientConnection(true);
 
     bool connected = false;
-    int  retries   = 100;
+    int  retries   = RECONNECT_RETRIES;
 
     for (int tryNo = 0; tryNo < retries; ++tryNo)
     {
@@ -92,11 +104,11 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
       }
 
       if (tryNo == 0)
-        LM_W(("Cannot connect to mongo - doing %d retries with a one second interval", retries));
+        LM_W(("Cannot connect to mongo - doing %d retries with a %d microsecond interval", retries, RECONNECT_DELAY));
       else
         LM_VVVVV(("Try %d connecting to mongo failed", tryNo));
 
-      sleep(1);
+      usleep(RECONNECT_DELAY * 1000); // usleep accepts microseconds
     }
 
     if (connected == false)
