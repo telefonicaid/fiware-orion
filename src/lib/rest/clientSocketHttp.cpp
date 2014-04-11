@@ -59,37 +59,37 @@ int socketHttpConnect(std::string host, unsigned short port)
   char                port_str[10];
 
 
- LM_VVV(("Generic Connect to: '%s'  port: '%d'", host.c_str(), port));
+  LM_VVV(("Generic Connect to: '%s'  port: '%d'", host.c_str(), port));
 
- memset(&hints, 0, sizeof(struct addrinfo));
- hints.ai_socktype = SOCK_STREAM;
- hints.ai_protocol = 0;
+  memset(&hints, 0, sizeof(struct addrinfo));
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_protocol = 0;
 
- if (ipVersionUsed == IPV4) 
- {
-   hints.ai_family = AF_INET;
-   LM_VVV(("Allow IPv4 only"));
- }
- else if (ipVersionUsed == IPV6)
- {
-   hints.ai_family = AF_INET6;
-   LM_VVV(("Allow  IPv6 only"));
- }
- else 
- {
-   hints.ai_family = AF_UNSPEC;
-   LM_VVV(("Allow IPv4 or IPv6"));
- }
+  if (ipVersionUsed == IPV4) 
+  {
+    hints.ai_family = AF_INET;
+    LM_VVV(("Allow IPv4 only"));
+  }
+  else if (ipVersionUsed == IPV6)
+  {
+    hints.ai_family = AF_INET6;
+    LM_VVV(("Allow  IPv6 only"));
+  }
+  else 
+  {
+    hints.ai_family = AF_UNSPEC;
+    LM_VVV(("Allow IPv4 or IPv6"));
+  }
 
- snprintf(port_str, sizeof(port_str), "%d" , port);
+  snprintf(port_str, sizeof(port_str), "%d" , port);
 
- if ((status = getaddrinfo(host.c_str(), port_str, &hints, &peer)) != 0) {
-     LM_RE(-1, ("getaddrinfo('%s'): %s", host.c_str(), strerror(errno)));
-}
+  if ((status = getaddrinfo(host.c_str(), port_str, &hints, &peer)) != 0) {
+    LM_RE(-1, ("getaddrinfo('%s'): %s", host.c_str(), strerror(errno)));
+  }
 
   if ((fd = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol)) == -1) {
-     LM_RE(-1, ("socket: %s", strerror(errno)));
-}
+    LM_RE(-1, ("socket: %s", strerror(errno)));
+  }
 
   if (connect(fd, peer->ai_addr, peer->ai_addrlen) == -1)
   {
@@ -131,14 +131,17 @@ std::string sendHttpSocket
    bool            waitForResponse
 )
 {  
-  char         buffer[TAM_BUF];
-  char         response[TAM_BUF];
-  char         preContent[TAM_BUF];
-  char         msgStatic[MAX_STA_MSG_SIZE];
-  char*        what       = (char*) "static";
-  char*        msgDynamic = NULL;
-  char*        msg        = msgStatic;   // by default, use the static buffer
-  std::string  result;
+  char                       buffer[TAM_BUF];
+  char                       response[TAM_BUF];
+  char                       preContent[TAM_BUF];
+  char                       msgStatic[MAX_STA_MSG_SIZE];
+  char*                      what       = (char*) "static";
+  char*                      msgDynamic = NULL;
+  char*                      msg        = msgStatic;   // by default, use the static buffer
+  std::string                result;
+  static unsigned long long  callNo = 0;
+
+  ++callNo;
 
   // Preconditions check
   if (port == 0)        LM_RE("error", ("port is ZERO"));
@@ -211,8 +214,8 @@ std::string sendHttpSocket
   int nb;
   int sz = strlen(msg);
 
-  LM_T(LmtClientOutputPayload, ("Sending to HTTP server: sending %s message of %d bytes to HTTP server", what, sz));
-  LM_T(LmtClientOutputPayload, ("Sending to HTTP server payload:\n%s", msg));
+  LM_T(LmtClientOutputPayload, ("Sending message %lu to HTTP server: sending %s message of %d bytes to HTTP server", callNo, what, sz));
+  LM_T(LmtClientOutputPayloadDump, ("Sending to HTTP server payload:\n%s", msg));
   nb = send(fd, msg, sz, 0);
   if (msgDynamic != NULL) {
       free (msgDynamic);
