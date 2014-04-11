@@ -99,10 +99,11 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
       sleep(1);
     }
 
-    mongoSemGive(__FUNCTION__, "connecting to mongo failed");
-
     if (connected == false)
+    {
+      mongoSemGive(__FUNCTION__, "connecting to mongo failed");
       LM_RE(false, ("MongoDB connection failed, after %d retries: '%s'", retries, err.c_str()));
+    }
 
     if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0) {
         if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err)) {
