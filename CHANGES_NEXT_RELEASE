@@ -1,4 +1,6 @@
-- Fix:  All responses with StatusCode now have the 'reasonPhrase' in accordance with the 'code' (Issue 242)
+- Fix:  All responses with StatusCode now have the 'reasonPhrase' in accordance with the 'code' (Issue 242).
 - Fix:  Every Context Element gets its corresponding Context Element Response when processing updateContext operations
-        (previous version was interrupted in the middle if the processing if one Context Element resulted in error)
-
+        (previous version was interrupted in the middle if the processing if one Context Element resulted in error).
+- Fix:  Requests with unacceptable Content-Type (HTTP header) get a "415 Unsupported Media Type" and a descriptive payload 'orionError'.
+        Requests with unsupported 'Accept' format (HTTP header) get a "406 Not Acceptable" and a descriptive payload 'orionError'.
+        Requests with "both 415 and 406" get a "415 Unsupported Media Type" and a descriptive payload 'orionError' in XML. (Issue #48)

@@ -172,12 +172,16 @@ static Format wantedOutputSupported(std::string acceptList, std::string* charset
 
   free(copy);
 
+  bool xml  = false;
+  bool json = false;
+
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
      char* s;
 
      //
      // charset embedded in 'Accept' header?
+     // We read it but we don't do anything with it ...
      //
      if ((s = strstr((char*) vec[ix].c_str(), ";")) != NULL)
      {
@@ -195,17 +199,14 @@ static Format wantedOutputSupported(std::string acceptList, std::string* charset
      }
 
      std::string format = vec[ix].c_str();
-     if (format == "*/*")              return XML;
-     if (format == "*/xml")            return XML;
-     if (format == "application/*")    return XML;
-     if (format == "application/xml")  return XML;
-     if (format == "application/json") return JSON;
-     if (format == "*/json")           return JSON;
+     if (format == "*/*")              xml  = true;
+     if (format == "*/xml")            xml  = true;
+     if (format == "application/*")    xml  = true;
+     if (format == "application/xml")  xml  = true;
+     if (format == "application/json") json = true;
+     if (format == "*/json")           json = true;
      
-     if ((acceptTextXml == true) && (format == "text/xml"))  return XML;
-
-     // Here we put in cases for JSON, TEXT etc ...
-
+     if ((acceptTextXml == true) && (format == "text/xml"))  xml = true;
 
      //
      // Resetting charset
@@ -213,6 +214,11 @@ static Format wantedOutputSupported(std::string acceptList, std::string* charset
      if (charsetP != NULL)
         *charsetP = "";
   }
+
+  if (xml == true)
+    return XML;
+  else if (json == true)
+    return JSON;
 
   LM_RE(NOFORMAT, ("No valid 'Accept-format' found"));
 }
@@ -260,21 +266,24 @@ static void requestCompleted
 
 /* ****************************************************************************
 *
-* formatCheck - 
+* outFormatCheck - 
 */
-static int formatCheck(ConnectionInfo* ciP)
+static int outFormatCheck(ConnectionInfo* ciP)
 {
-  ciP->inFormat   = formatParse(ciP->httpHeaders.contentType, NULL);
   ciP->outFormat  = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
-
   if (ciP->outFormat == NOFORMAT)
   {
     /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
-    ciP->answer         = restErrorReplyGet(ciP, XML, "", "OrionError", SccNotAcceptable,
-                                            std::string("acceptable types: 'application/xml' but Accept header in request was: '") + ciP->httpHeaders.accept + "'");
     ciP->httpStatusCode = SccNotAcceptable;
+    ciP->answer = restErrorReplyGet(ciP,
+                                    XML,
+                                    "",
+                                    "OrionError",
+                                    SccNotAcceptable,
+                                    std::string("acceptable MIME types: 'application/xml, application/json'. Accept header in request: '") + ciP->httpHeaders.accept + "'");
 
     ciP->outFormat      = XML; // We use XML as default format
+    ciP->httpStatusCode = SccNotAcceptable;
 
     return 1;
   }
@@ -297,25 +306,37 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   std::string details = "";
 
   //
-  // Three cases:
+  // Four cases:
   //   1. If there is no payload, the Content-Type is not interesting
   //   2. Payload present but no Content-Type 
-  //   3. Content-Type present but not supported
+  //   3. text/xml used and acceptTextXml is setto true (iotAgent only)
+  //   4. Content-Type present but not supported
 
+  // Case 1
   if (ciP->httpHeaders.contentLength == 0)
-    details = "";
-  else if (ciP->httpHeaders.contentType == "")
-    details = "Content-Type header not used, default application/octet-stream is not supported";
-  else if ((acceptTextXml == true) && (ciP->httpHeaders.contentType == "text/xml"))
-    details = "";
-  else if ((ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
-     details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
+    return 0;
 
-  if (details != "")
+  // Case 2
+  if (ciP->httpHeaders.contentType == "")
   {
-    ciP->answer         = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
+    std::string details = "Content-Type header not used, default application/octet-stream is not supported";
     ciP->httpStatusCode = SccUnsupportedMediaType;
+    ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
+    ciP->httpStatusCode = SccUnsupportedMediaType;
+    return 1;
+  }
 
+  // Case 3
+  if ((acceptTextXml == true) && (ciP->httpHeaders.contentType == "text/xml"))
+    return 0;
+
+  // Case 4
+  if ((ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
+  {
+    std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
+    ciP->httpStatusCode = SccUnsupportedMediaType;
+    ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
+    ciP->httpStatusCode = SccUnsupportedMediaType;
     return 1;
   }
 
@@ -368,8 +389,22 @@ static int connectionTreat
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
 
-    if ((formatCheck(ciP) != 0) || (contentTypeCheck(ciP) != 0))
-      LM_W(("Error in out-format or content-type"));
+    ciP->outFormat  = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
+    if (ciP->outFormat == NOFORMAT)
+      ciP->outFormat = XML; // XML is default output format
+
+    if (contentTypeCheck(ciP) != 0)
+    {
+      LM_W(("Error in Content-Type"));
+      restReply(ciP, ciP->answer);
+    }
+    else if (outFormatCheck(ciP) != 0)
+    {
+      LM_W(("Bad Accepted Out-Format (in Accept header)"));
+      restReply(ciP, ciP->answer);
+    }
+    else
+      ciP->inFormat = formatParse(ciP->httpHeaders.contentType, NULL);
 
     return MHD_YES;
   }

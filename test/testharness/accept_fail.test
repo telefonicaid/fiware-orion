@@ -38,19 +38,19 @@ url="localhost:${BROKER_PORT}/NGSI10/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
   <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
   </entityIdList>
   <attributeList/>
 </queryContextRequest>'
-curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept:"
+curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept:"
 echo "1: ++++++++++++++++++++"
 
-# This test will always fail
+# This test fails due to error in payload parsing
 url="localhost:${BROKER_PORT}/NGSI10/queryContext"
 payload='no meaningful payload (failing tests)'
-curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain"
+curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: application/xml"
 echo "2: ++++++++++++++++++++"
 
 # This test that explicit "Accept: application/xml" is ok
@@ -64,7 +64,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </entityIdList>
   <attributeList/>
 </queryContextRequest>'
-curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: application/xml"
 echo "3: ++++++++++++++++++++"
 
 # This test uses a list in Accept which a valid type is found is ok
@@ -78,7 +78,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </entityIdList>
   <attributeList/>
 </queryContextRequest>'
-curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, application/xml"
+curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: text/plain, application/xml"
 echo "4: ++++++++++++++++++++"
 
 # This test uses a list in Accept which a valid type is found is ok (with extra encoding after ";")
@@ -92,100 +92,91 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </entityIdList>
   <attributeList/>
 </queryContextRequest>'
-curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, application/xml; charset=UTF-8"
+curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: text/plain, application/xml; charset=UTF-8"
 echo "5: ++++++++++++++++++++"
 
-# This test uses a list in Accept which no valid types
+# This test uses a list in Accept with no valid type
 url="localhost:${BROKER_PORT}/NGSI10/queryContext"
 payload='no meaningful payload (failing tests)'
-curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, image/jpeg"
+curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: text/plain, image/jpeg"
 echo "6: ++++++++++++++++++++"
 
-# This test uses a list in Accept which no valid type (with extra encoding after ";")
+# This test uses a list in Accept with no valid type (with extra encoding after ";")
 url="localhost:${BROKER_PORT}/NGSI10/queryContext"
 payload='no meaningful payload (failing tests)'
-curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: text/plain, image/jpeg; charset=UTF-8"
+curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: text/plain, image/jpeg; charset=UTF-8"
 echo "7: ++++++++++++++++++++"
 
-# FIXME P10: enable this test once the tested functionality gets implemented (including REGEXPECT)
-# This test that explicit "Accept: application/json" is ok
-#(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | xmllint --format -) <<EOF
-#{
-#	"entities": [
-#		{
-#			"type": "Room",
-#			"isPattern": "false",
-#			"id": "OfficeRoom"
-#		},
-#	],
-#	"attributes": [ ]
-#}
-#EOF
-#echo "8: ++++++++++++++++++++"
+# This test verifies that explicit "Accept: application/json" is ok
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='{
+	"entities": [
+		{
+			"type": "Room",
+			"isPattern": "false",
+			"id": "OfficeRoom"
+		}
+	]
+}'
+curlIt "JSON" "$url" "$payload" 'Content-Type: application/json' 'Accept: application/json'
+echo "8: ++++++++++++++++++++"
 
-# FIXME P10: enable this test once the tested functionality gets implemented (including REGEXPECT)
 # This test that Accept preference is correctly taken into account (JSON preferred to XML)
-#(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json, application/xml' -d @- | xmllint --format -) <<EOF
-#{
-#	"entities": [
-#		{
-#			"type": "Room",
-#			"isPattern": "false",
-#			"id": "OfficeRoom"
-#		},
-#	],
-#	"attributes": [ ]
-#}
-#EOF
-#echo "9: ++++++++++++++++++++"
+# FIXME P6: Once issue #317 is fixed - move this test to use curlIt
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json, application/xml' -d @-) <<EOF
+{
+	"entities": [
+		{
+			"type": "Room",
+			"isPattern": "false",
+			"id": "OfficeRoom"
+		}
+	]
+}
+EOF
+echo "9: ++++++++++++++++++++"
 
-# FIXME P10: enable this test once the tested functionality gets implemented (including REGEXPECT)
 # This test that Accept preference is correctly taken into account (XML preferred to JSON)
-#(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml, application/json' -d @- | xmllint --format -) <<EOF
-# Note the "<-" in the following line, this is a way of "skipping" fragment generation by xmlExtractor.py while this step is activated
-#<-?xml version="1.0" encoding="UTF-8"?>
-#<queryContextRequest>
-#  <entityIdList>
-#        <entityId type="Room" isPattern="false">
-#          <id>OfficeRoom</id>
-#        </entityId>
-#  </entityIdList>
-#  <attributeList/>
-#</queryContextRequest>
-#EOF
-#echo "10: ++++++++++++++++++++"
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
+  </entityIdList>
+</queryContextRequest>'
+curlIt "XML" "$url" "$payload" 'Content-Type: application/xml' 'Accept: application/xml, application/json'
+echo "10: ++++++++++++++++++++"
 
-# FIXME P10: enable this test once the tested functionality gets implemented (including REGEXPECT)
 # Cross Accept/Content-Type XML/JSON test (only a weird client will do this, but it is theoretically possible)
-#(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/xml' -d @- | xmllint --format -) <<EOF
-#{
-#	"entities": [
-#		{
-#			"type": "Room",
-#			"isPattern": "false",
-#			"id": "OfficeRoom"
-#		},
-#	],
-#	"attributes": [ ]
-#}
-#EOF
-#echo "11: ++++++++++++++++++++"
+# FIXME P6: Once issue #317 is fixed - move this test to use curlIt
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/xml' -d @- | xmllint --format -) <<EOF
+{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ]
+}
+EOF
+echo "11: ++++++++++++++++++++"
 
-# FIXME P10: enable this test once the tested functionality gets implemented (including REGEXPECT)
 # Cross Accept/Content-Type JSON/XML test (only a weird client will do this, but it is theoretically possible)
-#(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/json' -d @- | xmllint --format -) <<EOF
-# Note the "<-" in the following line, this is a way of "skipping" fragment generation by xmlExtractor.py while this step is activated
-#<-?xml version="1.0" encoding="UTF-8"?>
-#<queryContextRequest>
-#  <entityIdList>
-#        <entityId type="Room" isPattern="false">
-#          <id>OfficeRoom</id>
-#        </entityId>
-#  </entityIdList>
-#  <attributeList/>
-#</queryContextRequest>
-#EOF
-#echo "12: ++++++++++++++++++++"
+# FIXME P6: Once issue #317 is fixed - move this test to use curlIt
+(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/json' -d @-) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
+  </entityIdList>
+</queryContextRequest>
+EOF
+echo "12: ++++++++++++++++++++"
 
 --REGEXPECT--
 HTTP/1.1 200 OK
@@ -201,16 +192,16 @@ Date: REGEX(.*)
   </errorCode>
 </queryContextResponse>
 1: ++++++++++++++++++++
-HTTP/1.1 406 Not Acceptable
-Content-Length: 196
+HTTP/1.1 200 OK
+Content-Length: 126
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <orionError>
-  <code>406</code>
-  <reasonPhrase>Not Acceptable</reasonPhrase>
-  <details>acceptable types: 'application/xml' but Accept header in request was: 'text/plain'</details>
+  <code>400</code>
+  <reasonPhrase>Bad Request</reasonPhrase>
+  <details>XML Parse Error</details>
 </orionError>
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -253,7 +244,8 @@ Date: REGEX(.*)
 </queryContextResponse>
 5: ++++++++++++++++++++
 HTTP/1.1 406 Not Acceptable
-Content-Length: 208
+Connection: close
+Content-Length: 224
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -261,11 +253,12 @@ Date: REGEX(.*)
 <orionError>
   <code>406</code>
   <reasonPhrase>Not Acceptable</reasonPhrase>
-  <details>acceptable types: 'application/xml' but Accept header in request was: 'text/plain, image/jpeg'</details>
+  <details>acceptable MIME types: 'application/xml, application/json'. Accept header in request: 'text/plain, image/jpeg'</details>
 </orionError>
 6: ++++++++++++++++++++
 HTTP/1.1 406 Not Acceptable
-Content-Length: 223
+Connection: close
+Content-Length: 239
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -273,9 +266,56 @@ Date: REGEX(.*)
 <orionError>
   <code>406</code>
   <reasonPhrase>Not Acceptable</reasonPhrase>
-  <details>acceptable types: 'application/xml' but Accept header in request was: 'text/plain, image/jpeg; charset=UTF-8'</details>
+  <details>acceptable MIME types: 'application/xml, application/json'. Accept header in request: 'text/plain, image/jpeg; charset=UTF-8'</details>
 </orionError>
 7: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+8: ++++++++++++++++++++
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+9: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+10: ++++++++++++++++++++
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+11: ++++++++++++++++++++
+{
+  "errorCode" : {
+    "code" : "404",
+    "reasonPhrase" : "No context element found"
+  }
+}
+12: ++++++++++++++++++++
 --TEARDOWN--
 source harnessFunctions.sh
 brokerStop CB
