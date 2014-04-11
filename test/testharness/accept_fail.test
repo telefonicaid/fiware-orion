@@ -47,10 +47,10 @@ payload='<?xml version="1.0"?>
 curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept:"
 echo "1: ++++++++++++++++++++"
 
-# This test will always fail
+# This test fails due to error in payload parsing
 url="localhost:${BROKER_PORT}/NGSI10/queryContext"
 payload='no meaningful payload (failing tests)'
-curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: text/plain"
+curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: application/xml"
 echo "2: ++++++++++++++++++++"
 
 # This test that explicit "Accept: application/xml" is ok
@@ -108,8 +108,8 @@ curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: text/pla
 echo "7: ++++++++++++++++++++"
 
 # This test verifies that explicit "Accept: application/json" is ok
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @-) <<EOF
-{
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='{
 	"entities": [
 		{
 			"type": "Room",
@@ -117,11 +117,12 @@ echo "7: ++++++++++++++++++++"
 			"id": "OfficeRoom"
 		}
 	]
-}
-EOF
+}'
+curlIt "JSON" "$url" "$payload" 'Content-Type: application/json' 'Accept: application/json'
 echo "8: ++++++++++++++++++++"
 
 # This test that Accept preference is correctly taken into account (JSON preferred to XML)
+# FIXME P6: Once issue #317 is fixed - move this test to use curlIt
 (curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json, application/xml' -d @-) <<EOF
 {
 	"entities": [
@@ -136,19 +137,20 @@ EOF
 echo "9: ++++++++++++++++++++"
 
 # This test that Accept preference is correctly taken into account (XML preferred to JSON)
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml, application/json' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">
       <id>OfficeRoom</id>
     </entityId>
   </entityIdList>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+curlIt "XML" "$url" "$payload" 'Content-Type: application/xml' 'Accept: application/xml, application/json'
 echo "10: ++++++++++++++++++++"
 
 # Cross Accept/Content-Type XML/JSON test (only a weird client will do this, but it is theoretically possible)
+# FIXME P6: Once issue #317 is fixed - move this test to use curlIt
 (curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/xml' -d @- | xmllint --format -) <<EOF
 {
   "entities": [
@@ -163,6 +165,7 @@ EOF
 echo "11: ++++++++++++++++++++"
 
 # Cross Accept/Content-Type JSON/XML test (only a weird client will do this, but it is theoretically possible)
+# FIXME P6: Once issue #317 is fixed - move this test to use curlIt
 (curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/json' -d @-) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
@@ -189,12 +192,17 @@ Date: REGEX(.*)
   </errorCode>
 </queryContextResponse>
 1: ++++++++++++++++++++
-HTTP/1.1 406 Not Acceptable
-Connection: close
-Content-Length: 0
-Content-Type: application/xml, application/json
+HTTP/1.1 200 OK
+Content-Length: 126
+Content-Type: application/xml
 Date: REGEX(.*)
 
+<?xml version="1.0"?>
+<orionError>
+  <code>400</code>
+  <reasonPhrase>Bad Request</reasonPhrase>
+  <details>XML Parse Error</details>
+</orionError>
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 155
@@ -237,23 +245,40 @@ Date: REGEX(.*)
 5: ++++++++++++++++++++
 HTTP/1.1 406 Not Acceptable
 Connection: close
-Content-Length: 0
-Content-Type: application/xml, application/json
+Content-Length: 224
+Content-Type: application/xml
 Date: REGEX(.*)
 
+<?xml version="1.0"?>
+<orionError>
+  <code>406</code>
+  <reasonPhrase>Not Acceptable</reasonPhrase>
+  <details>acceptable MIME types: 'application/xml, application/json'. Accept header in request: 'text/plain, image/jpeg'</details>
+</orionError>
 6: ++++++++++++++++++++
 HTTP/1.1 406 Not Acceptable
 Connection: close
-Content-Length: 0
-Content-Type: application/xml, application/json
+Content-Length: 239
+Content-Type: application/xml
 Date: REGEX(.*)
 
+<?xml version="1.0"?>
+<orionError>
+  <code>406</code>
+  <reasonPhrase>Not Acceptable</reasonPhrase>
+  <details>acceptable MIME types: 'application/xml, application/json'. Accept header in request: 'text/plain, image/jpeg; charset=UTF-8'</details>
+</orionError>
 7: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
-  "errorCode" : {
-    "code" : "404",
-    "reasonPhrase" : "No context element found"
-  }
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
 }
 8: ++++++++++++++++++++
 <queryContextResponse>
@@ -263,6 +288,11 @@ Date: REGEX(.*)
   </errorCode>
 </queryContextResponse>
 9: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>

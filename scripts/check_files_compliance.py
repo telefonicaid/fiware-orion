@@ -123,7 +123,7 @@ def supported_extension(root, file):
     if file.endswith('.py') or file.endswith('.cpp') or file.endswith('.h') or file.endswith('.xml')\
         or file.endswith('.json') or file.endswith('.test') or file.endswith('.vtest') or file.endswith('.txt')\
         or file.endswith('.sh') or file == 'makefile' or file == 'Makefile' or file.endswith('.spec') \
-        or file.endswith('.cfg') or file.endswith('.DISABLED') or file.endswith('.xtest') or file.endswith('.centos'):
+        or file.endswith('.cfg') or file.endswith('.DISABLED') or file.endswith('.xtest') or file.endswith('.centos') or file.endswith('.js'):
         return True
 
     if 'config' in root and file == 'contextBroker':

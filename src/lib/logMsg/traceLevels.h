@@ -93,8 +93,9 @@ typedef enum TraceLevels
   LmtServiceInputPayload = 180,
   LmtServiceOutPayload,
   LmtClientInputPayload,
-  LmtClientOutputPayload,
+  LmtClientOutputPayload = 183, // Very important for harness test notification_different_sizes
   LmtPartialPayload,
+  LmtClientOutputPayloadDump,
 
   /* Semaphores (200-201) */
   LmtReqSem = 200,
