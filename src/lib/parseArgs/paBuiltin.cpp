@@ -118,6 +118,7 @@ PaiArgument paBuiltin[] =
  { "",           paSystem,        "!SYSTEM",          PaStr,    PaHid,      0,  PaNL,  PaNL,  "system",                      PAI_REST },
  { "",           paVisual,        "!VISUAL",          PaStr,    PaHid,      0,  PaNL,  PaNL,  "visual",                      PAI_REST },
  { "-t",         paTraceV,        "TRACE",            PaStr,    PaOpt,      0,  PaNL,  PaNL,  "trace level",                 PAI_REST_IN_USAGE },
+ { "--silent",   &paSilent,       "SILENT",           PaBool,   PaOpt,      F,     T,     F,  "silent mode",                 PAI_REST_IN_USAGE },
  { "-v",         &paVerbose,      "VERBOSE",          PaBool,   PaOpt,      F,     T,     F,  "verbose mode",                PAI_REST_IN_USAGE },
  { "-vv",        &paVerbose2,     "VERBOSE2",         PaBool,   PaOpt,      F,     T,     F,  "verbose2 mode",               PAI_REST_IN_USAGE },
  { "-vvv",       &paVerbose3,     "VERBOSE3",         PaBool,   PaOpt,      F,     T,     F,  "verbose3 mode",               PAI_REST_IN_USAGE },
