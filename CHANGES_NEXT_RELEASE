@@ -4,4 +4,5 @@
 - Fix:  Requests with unacceptable Content-Type (HTTP header) get a "415 Unsupported Media Type" and a descriptive payload 'orionError'.
         Requests with unsupported 'Accept' format (HTTP header) get a "406 Not Acceptable" and a descriptive payload 'orionError'.
         Requests with "both 415 and 406" get a "415 Unsupported Media Type" and a descriptive payload 'orionError' in XML. (Issue #48)
-- Add:  Command line option '--silent' to suppress all log messages except errors.
+- Add:  Command line option '--silent' to suppress all log messages except errors. (Issue #291)
+- Fix:  The broker now performs retries to connect to mongodb at startup. (Issue #308)
