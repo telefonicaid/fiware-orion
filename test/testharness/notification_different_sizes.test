@@ -26,7 +26,7 @@ Notifications of different sizes
 source harnessFunctions.sh
 
 dbInit CB
-brokerStart CB
+brokerStart CB 183
 accumulatorStart
 
 # Taking into account that the notification size depends on (but is not exactly equal to)
@@ -142,11 +142,11 @@ curl localhost:9997/number -s -S
 
 # The log has to show exactly 1 case of static buffer usage
 echo "** Static buffer usages:"
-grep "Sending to HTTP server: sending static message of" /tmp/contextBrokerLog | wc -l
+grep "to HTTP server: sending static message of" /tmp/contextBrokerLog | wc -l
 
 # The log has to show exactly 2 cases of dynamic buffer usage
 echo "** Dynamic buffer usages:"
-grep "Sending to HTTP server: sending dynamic message of" /tmp/contextBrokerLog | wc -l
+grep "to HTTP server: sending dynamic message of" /tmp/contextBrokerLog | wc -l
 
 # The log has to show exactly 1 error about notification too large
 echo "** Too large errors:"
@@ -155,7 +155,7 @@ grep "HTTP request to send is too large" /tmp/contextBrokerLog | wc -l
 # Notification sizes. Note that if don't use the cut, some character in the log line prologue
 # breaks the test harness: @, :, [, ], ~, /, (, ), etc.
 echo "** Notification sizes:"
-grep "Sending to HTTP server" /tmp/contextBrokerLog | awk -F\] '{ print $2 }'
+grep "to HTTP server" /tmp/contextBrokerLog | awk -F\] '{ print $2 }'
 
 --REGEXPECT--
 HTTP/1.1 200 OK
@@ -219,9 +219,9 @@ Date: REGEX(.*)
 ** Too large errors:
 1
 ** Notification sizes:
- sendHttpSocket: Sending to HTTP server: sending static message of 19879 bytes to HTTP server
- sendHttpSocket: Sending to HTTP server: sending dynamic message of 21879 bytes to HTTP server
- sendHttpSocket: Sending to HTTP server: sending dynamic message of 8100881 bytes to HTTP server
+ sendHttpSocket: Sending message 1 to HTTP server: sending static message of 19879 bytes to HTTP server
+ sendHttpSocket: Sending message 2 to HTTP server: sending dynamic message of 21879 bytes to HTTP server
+ sendHttpSocket: Sending message 3 to HTTP server: sending dynamic message of 8100881 bytes to HTTP server
 --TEARDOWN--
 source harnessFunctions.sh
 cp /tmp/contextBrokerLog /tmp/contextBrokerLog.notification_different_sizes
