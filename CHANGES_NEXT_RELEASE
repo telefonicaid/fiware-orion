@@ -6,3 +6,4 @@
         Requests with "both 415 and 406" get a "415 Unsupported Media Type" and a descriptive payload 'orionError' in XML. (Issue #48)
 - Add:  Command line option '--silent' to suppress all log messages except errors. (Issue #291)
 - Fix:  The broker now performs retries to connect to mongodb at startup. (Issue #308)
+- Fix:  Rendering of context attribute responses when there are metadatas present now renders correctly (Issue #323).
