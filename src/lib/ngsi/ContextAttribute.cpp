@@ -166,7 +166,7 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
 
     out += startTag(indent + "  ", "contextValue", "value", format, isCompoundVector, true, isCompoundVector);
     out += compoundValueP->render(format, indent + "    ");
-    out += endTag(indent + "  ", "contextValue", format, comma, isCompoundVector);
+    out += endTag(indent + "  ", "contextValue", format, commaAfterContextValue, isCompoundVector);
   }
 
   out += metadataVector.render(format, indent + "  ", false);
