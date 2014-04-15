@@ -2436,12 +2436,12 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
 #define CLEANUP(str, s) \
 { \
     if (str != NULL)                       \
-        perror(str);                   \
+        perror(str);                       \
     close(fd);                             \
     fclose(fP);                            \
     lseek(fds[index].fd, fdPos, SEEK_SET); \
     if (lrV != NULL)                       \
-        ::free((void*) lrV);                 \
+        ::free((void*) lrV);               \
     lrV = NULL;                            \
     unlink(tmpName);                       \
     return s;                              \
@@ -2464,7 +2464,10 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
                 len = strlen(line);
                 flock(fd, LOCK_EX);
                 if (write(fd, line, len) != len)
-                    CLEANUP("write", LmsWrite);
+                {
+                  flock(fd, LOCK_UN);
+                  CLEANUP("write", LmsWrite);
+                }
                 flock(fd, LOCK_UN);
             }
 
@@ -2481,7 +2484,10 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
                 snprintf(buf, sizeof(buf), "Cleared at %s\n", tm);
                 flock(fd, LOCK_EX);
                 if (write(fd, buf, strlen(buf)) != (int) strlen(buf))
-                    CLEANUP("write", LmsWrite);
+                {
+                  flock(fd, LOCK_UN);
+                  CLEANUP("write", LmsWrite);
+                }
                 flock(fd, LOCK_UN);
             }
 
