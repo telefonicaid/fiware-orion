@@ -309,16 +309,10 @@ function accumulatorStart()
 function printXmlWithHeaders()
 {
   text=$1
-  encoding=$2
 
   cat headers.out
 
-  if [ "$encoding" == "XML" ]
-  then
-    echo "$text" | xmllint --format -
-  else
-    echo "$text"
-  fi
+  echo "$text" | xmllint --format -
 
   rm headers.out
 }
@@ -332,16 +326,10 @@ function printXmlWithHeaders()
 function printJsonWithHeaders()
 {
   text=$1
-  encoding=$2
 
   cat headers.out
 
-  if [ "$encoding" == "JSON" ]
-  then
-    echo "${text}" | python -mjson.tool
-  else
-    echo "${text}"
-  fi
+  echo "${text}" | python -mjson.tool
 
   rm headers.out
 }
@@ -350,13 +338,13 @@ function printJsonWithHeaders()
 
 # ------------------------------------------------------------------------------
 #
-# curlIt - 
+# curlIt- 
 #
 # URL: You also have to specify host, port
 # 
 function curlIt()
 {
-  encoding=$1
+  outFormat=$1
   url=$2
   payload=$3
   contenttype=$4
@@ -367,12 +355,12 @@ function curlIt()
   
   response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" --header "Expect:" ${extraoptions} -d @- ))
   
-  if [ "$encoding" == "XML" ] || [ "$encoding" == "xml" ]
+  if [ "$outFormat" == "XML" ] || [ "$outFormat" == "xml" ]
   then
-    printXmlWithHeaders "${response}" "$encoding"
-  elif [ "$encoding" == "JSON" ] || [ "$encoding" == "json" ]
+    printXmlWithHeaders "${response}"
+  elif [ "$outFormat" == "JSON" ] || [ "$outFormat" == "json" ]
   then
-    printJsonWithHeaders "${response}" "$encoding"
+    printJsonWithHeaders "${response}"
   fi
 }
 
@@ -418,7 +406,7 @@ function curlJson()
 #
 function curlNoPayload()
 {
-  encoding=$1
+  outFormat=$1
   url=$2
   extraoptions=$3
   contenttype=$4
@@ -428,12 +416,12 @@ function curlNoPayload()
   
   response=$(curl localhost:${BROKER_PORT}${url} ${params} ${extraoptions} --header "${contenttype}" --header "${accept}")
     
-  if [ "$encoding" == "XML" ]
+  if [ "$outFormat" == "XML" ] || [ "$outFormat" == "xml" ]
   then
-    printXmlWithHeaders "${response}" "$encoding"
-  elif [ "$encoding" == "JSON" ]
+    printXmlWithHeaders "${response}"
+  elif [ "$outFormat" == "JSON" ] || [ "$outFormat" == "json" ]
   then
-    printJsonWithHeaders "${response}" "$encoding"
+    printJsonWithHeaders "${response}"
   fi
 }
 

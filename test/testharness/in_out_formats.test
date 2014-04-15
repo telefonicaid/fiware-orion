@@ -87,47 +87,47 @@ echo '================================================================='
 echo
 
 echo "1.1: Unrecognized Content-Type, Accepts ONLY JSON: 415, response in JSON"
-curlIt "xml" "$url" "$payload" "$contentTypeText" "$acceptJson"
+curlIt "JSON" "$url" "$payload" "$contentTypeText" "$acceptJson"
 echo '================================================================='
 echo
 
 echo "1.2: Unrecognized Content-Type, Accepts ONLY XML: 415, response in XML"
-curlIt "xml" "$url" "$payload" "$contentTypeText" "$acceptXml"
+curlIt "XML" "$url" "$payload" "$contentTypeText" "$acceptXml"
 echo '================================================================='
 echo
 
 echo "1.3: Unrecognized Content-Type, Accepts BOTH JSON and XML: 415, response in XML"
-curlIt "xml" "$url" "$payload" "$contentTypeText" "$acceptBoth"
+curlIt "XML" "$url" "$payload" "$contentTypeText" "$acceptBoth"
 echo '================================================================='
 echo
 
 echo "1.4: Unrecognized Content-Type, Accepts text/plain: 415, response in XML"
-curlIt "xml" "$url" "$payload" "$contentTypeText" "$acceptText"
+curlIt "XML" "$url" "$payload" "$contentTypeText" "$acceptText"
 echo '================================================================='
 echo
 
 echo "1.5: Unrecognized Content-Type, Accepts NOTHING: 415, response in XML"
-curlIt "xml" "$url" "$payload" "$contentTypeText" "$acceptNothing"
+curlIt "XML" "$url" "$payload" "$contentTypeText" "$acceptNothing"
 echo '================================================================='
 echo
 
 echo "2.1: Content-Type OK, Accepts ONLY JSON: 200, response in JSON"
-curlIt "xml" "$url" "$payload" "$contentTypeXml" "$acceptJson"
+curlIt "JSON" "$url" "$payload" "$contentTypeXml" "$acceptJson"
 echo '================================================================='
 echo
 
 echo "2.2: Content-Type OK, Accepts ONLY XML: 200, response in XML"
-curlIt "xml" "$url" "$payload" "$contentTypeXml" "$acceptXml"
+curlIt "XML" "$url" "$payload" "$contentTypeXml" "$acceptXml"
 echo '================================================================='
 echo
 
 echo "2.3: Content-Type OK, Accepts BOTH JSON and XML: 200, response in XML"
-curlIt "xml" "$url" "$payload" "$contentTypeXml" "$acceptBoth"
+curlIt "XML" "$url" "$payload" "$contentTypeXml" "$acceptBoth"
 echo '================================================================='
 echo
 
 echo "2.4: Content-Type OK, Accepts text/plain: 406, Response in XML"
-curlIt "xml" "$url" "$payload" "$contentTypeXml" "$acceptText"
+curlIt "XML" "$url" "$payload" "$contentTypeXml" "$acceptText"
 echo '================================================================='
 echo
 
@@ -197,11 +197,11 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "orionError" : {
-    "code" : "415",
-    "reasonPhrase" : "Unsupported Media Type",
-    "details" : "not supported content type: text/plain"
-  }
+    "orionError": {
+        "code": "415",
+        "details": "not supported content type: text/plain",
+        "reasonPhrase": "Unsupported Media Type"
+    }
 }
 =================================================================
 
@@ -212,6 +212,7 @@ Content-Length: 160
 Content-Type: application/xml
 Date: REGEX(.*)
 
+<?xml version="1.0"?>
 <orionError>
   <code>415</code>
   <reasonPhrase>Unsupported Media Type</reasonPhrase>
@@ -226,6 +227,7 @@ Content-Length: 160
 Content-Type: application/xml
 Date: REGEX(.*)
 
+<?xml version="1.0"?>
 <orionError>
   <code>415</code>
   <reasonPhrase>Unsupported Media Type</reasonPhrase>
@@ -240,6 +242,7 @@ Content-Length: 160
 Content-Type: application/xml
 Date: REGEX(.*)
 
+<?xml version="1.0"?>
 <orionError>
   <code>415</code>
   <reasonPhrase>Unsupported Media Type</reasonPhrase>
@@ -254,6 +257,7 @@ Content-Length: 160
 Content-Type: application/xml
 Date: REGEX(.*)
 
+<?xml version="1.0"?>
 <orionError>
   <code>415</code>
   <reasonPhrase>Unsupported Media Type</reasonPhrase>
@@ -268,26 +272,26 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "Room",
-        "isPattern" : "false",
-        "id" : "OfficeRoom",
-        "attributes" : [
-          {
-            "name" : "temperature",
-            "type" : "degree",
-            "value" : "12"
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "degree",
+                        "value": "12"
+                    }
+                ],
+                "id": "OfficeRoom",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
 }
 =================================================================
 
@@ -297,6 +301,7 @@ Content-Length: 640
 Content-Type: application/xml
 Date: REGEX(.*)
 
+<?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
     <contextElementResponse>
@@ -327,6 +332,7 @@ Content-Length: 640
 Content-Type: application/xml
 Date: REGEX(.*)
 
+<?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
     <contextElementResponse>
@@ -358,6 +364,7 @@ Content-Length: 212
 Content-Type: application/xml
 Date: REGEX(.*)
 
+<?xml version="1.0"?>
 <orionError>
   <code>406</code>
   <reasonPhrase>Not Acceptable</reasonPhrase>

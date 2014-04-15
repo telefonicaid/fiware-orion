@@ -43,6 +43,8 @@
 #include <sys/time.h>           /* gettimeofday                              */
 #include <time.h>               /* time, gmtime_r, ...                       */
 #include <sys/timeb.h>          /* timeb, ftime, ...                         */
+#include <sys/file.h>           /* flock                                     */
+
 #include "logMsg/time.h" //
 
 // We have a problem of cross-dependency between au and logMsg
@@ -1536,15 +1538,21 @@ LmStatus lmFdRegister(int fd, const char* format, const char* timeFormat, const 
     
     if ((fd >= 0) && (strcmp(info, "stdout") != 0))
     {
-        strftime(dt, 256, "%A %d %h %H:%M:%S %Y", &tmP);
-        snprintf(startMsg, sizeof(startMsg),
-                   "%s log\n-----------------\nStarted %s\nCleared at ...\n",
-                   progName, dt);
+      strftime(dt, 256, "%A %d %h %H:%M:%S %Y", &tmP);
+      snprintf(startMsg, sizeof(startMsg),
+               "%s log\n-----------------\nStarted %s\nCleared at ...\n",
+               progName, dt);
 
-        sz = strlen(startMsg);
+      sz = strlen(startMsg);
 
-        if (write(fd, startMsg, sz) != sz)
-            return LmsWrite;
+      flock(fd, LOCK_EX);
+      if (write(fd, startMsg, sz) != sz)
+      {
+        flock(fd, LOCK_UN);
+        return LmsWrite;
+      }
+      
+      flock(fd, LOCK_UN);
     }
 
     fds[index].fd    = fd;
@@ -1768,17 +1776,12 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
 
         sz = strlen(line);
         
+        flock(fds[i].fd, LOCK_EX);
         if (fds[i].write != NULL)
-            fds[i].write(line);
+          fds[i].write(line);
         else
-        {
-           ssize_t ans = write(fds[i].fd, line, sz);
-           ans = 0;
-           if ( ans > 0 )
-           {
-               // Nothing to do if write fails since we cannot "log" ;)
-           }
-        }
+          write(fds[i].fd, line, sz);
+        flock(fds[i].fd, LOCK_UN);
     }
     
     ++logLines;
@@ -2138,25 +2141,33 @@ LmStatus lmReopen(int index)
             strftime(tm, 80, TIME_FORMAT_DEF, &tmP);
 
             snprintf(buf, sizeof(buf), "Cleared at %s  (a reopen ...)\n",tm);
+            flock(fd, LOCK_EX);
             if (write(fd, buf, strlen(buf)) != (int) strlen(buf))
             {
-                s = LmsWrite;
-                free(line);
-                break;
+              s = LmsWrite;
+              free(line);
+              flock(fd, LOCK_UN);
+              break;
             }   
+
+            flock(fd, LOCK_UN);
             ++newLogLines;
             free(line);
             break;
         }
         
+        flock(fd, LOCK_EX);
         if ((nb = write(fd, line, len)) != len)
         {
-            s = LmsWrite;
-            free(line);
-            break;
+          flock(fd, LOCK_UN);
+          s = LmsWrite;
+          free(line);
+          break;
         }
         else
-            ++newLogLines;
+          ++newLogLines;
+
+        flock(fd, LOCK_UN);
     }
 
     if (fd != -1)
@@ -2451,8 +2462,10 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
             if (strncmp(line, "Cleared at", 10) != 0)
             {
                 len = strlen(line);
+                flock(fd, LOCK_EX);
                 if (write(fd, line, len) != len)
                     CLEANUP("write", LmsWrite);
+                flock(fd, LOCK_UN);
             }
 
             if (newLogLines == 2)
@@ -2466,8 +2479,10 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
                 strftime(tm, 80, TIME_FORMAT_DEF, &tmP);
                 
                 snprintf(buf, sizeof(buf), "Cleared at %s\n", tm);
+                flock(fd, LOCK_EX);
                 if (write(fd, buf, strlen(buf)) != (int) strlen(buf))
                     CLEANUP("write", LmsWrite);
+                flock(fd, LOCK_UN);
             }
 
             ++newLogLines;
