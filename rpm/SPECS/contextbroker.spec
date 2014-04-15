@@ -11,7 +11,7 @@ Requires(post):   /sbin/chkconfig, /usr/sbin/useradd
 Requires(preun):  /sbin/chkconfig, /sbin/service
 Requires(postun): /sbin/service
 Requires:         libstdc++, boost-thread, boost-filesystem, libmicrohttpd 
-BuildRequires:    gcc, make, gcc-c++, libmicrohttpd-devel, boost-devel
+BuildRequires:    gcc, make, cmake, scons, gcc-c++, libmicrohttpd-devel, boost-devel
 Group:            Applications/Engineering
 Vendor:           Telefónica I+D
 
@@ -138,6 +138,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_install_dir}/doc
 mkdir -p $RPM_BUILD_ROOT/%{_install_dir}/share
 mkdir -p $RPM_BUILD_ROOT/%{_install_dir}/config
 mkdir -p $RPM_BUILD_ROOT/%{_install_dir}_tests
+mkdir -p $RPM_BUILD_ROOT/var/run/contextbroker
 
 echo "[INFO] Copying files into the %{_install_dir}"
 mv $RPM_BUILD_ROOT/usr/bin/contextBroker $RPM_BUILD_ROOT/%{_install_dir}/bin/contextbroker 
@@ -194,8 +195,6 @@ configuration.
 Note that if you have a previously existing '/etc/sysconfig/%{name}' it
 has been renamed to %{_install_dir}/config/%{name}.orig-$DATE.
 
-After configuring /etc/sysconfig/%{name} execute 'chkconfig %{name} on' to
-enable %{name} after a reboot.
 EOMSG
 
 # -------------------------------------------------------------------------------------------- #
@@ -218,7 +217,8 @@ rm -rf $RPM_BUILD_ROOT
 # -------------------------------------------------------------------------------------------- #
 %files
 %defattr(755,%{_owner},%{_owner},755)
-/opt/contextbroker
+%{_install_dir}
+/var/run/contextbroker
 
 
 #%files test
