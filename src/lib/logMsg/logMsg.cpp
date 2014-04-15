@@ -32,6 +32,7 @@
 #include <string.h>             /* strncat, strdup, memset                   */
 #include <stdarg.h>             /* va_start, va_arg, va_end                  */
 #include <stdlib.h>             /* atoi                                      */
+#include <semaphore.h>          /* sem_init, sem_wait, sem_post              */
 
 #if !defined(__APPLE__)
 #include <malloc.h>             /* free                                      */
@@ -43,7 +44,6 @@
 #include <sys/time.h>           /* gettimeofday                              */
 #include <time.h>               /* time, gmtime_r, ...                       */
 #include <sys/timeb.h>          /* timeb, ftime, ...                         */
-#include <sys/file.h>           /* flock                                     */
 
 #include "logMsg/time.h" //
 
@@ -70,6 +70,32 @@ static bool  lmOutHookActive = false;
 static void* lmOutHookParam  = NULL;
 char*        progName;               /* needed for messages (and by lmLib) */
 char         progNameV[512];         /* where to store progName            */
+
+
+static sem_t sem;
+
+static void semInit(void)
+{
+  sem_init(&sem, 0, 1);
+}
+
+static void semTake(void)
+{
+  static int firstTime = 1;
+
+  if (firstTime == 1)
+  {
+    semInit();
+    firstTime = 0;
+  }
+
+  sem_wait(&sem);
+}
+
+static void semGive(void)
+{
+  sem_post(&sem);
+}
 
 
 
@@ -1545,14 +1571,8 @@ LmStatus lmFdRegister(int fd, const char* format, const char* timeFormat, const 
 
       sz = strlen(startMsg);
 
-      flock(fd, LOCK_EX);
       if (write(fd, startMsg, sz) != sz)
-      {
-        flock(fd, LOCK_UN);
         return LmsWrite;
-      }
-      
-      flock(fd, LOCK_UN);
     }
 
     fds[index].fd    = fd;
@@ -1726,6 +1746,8 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
     
     memset(format, 0, sizeof(format));
 
+    semTake();
+
     if ((type != 'H') && lmOutHook && lmOutHookActive == true)
     {
         time_t secondsNow = time(NULL);
@@ -1776,12 +1798,10 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
 
         sz = strlen(line);
         
-        flock(fds[i].fd, LOCK_EX);
         if (fds[i].write != NULL)
           fds[i].write(line);
         else
           write(fds[i].fd, line, sz);
-        flock(fds[i].fd, LOCK_UN);
     }
     
     ++logLines;
@@ -1804,6 +1824,8 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
     }
     else if ((type == 'X') || (type == 'x'))
     {
+        semGive();
+
         if (exitFunction != NULL)
             exitFunction(tLev, exitInput, text, (char*) stre);
 
@@ -1831,6 +1853,7 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
                 if ((s = lmClear(i, keepLines, lastLines)) != LmsOk)
                 {
                     free(line);
+                    semGive();
                     return s;
                 }
             }
@@ -1838,6 +1861,7 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
     }
 
     free(line);
+    semGive();
     return LmsOk;
 }
 
@@ -2141,33 +2165,26 @@ LmStatus lmReopen(int index)
             strftime(tm, 80, TIME_FORMAT_DEF, &tmP);
 
             snprintf(buf, sizeof(buf), "Cleared at %s  (a reopen ...)\n",tm);
-            flock(fd, LOCK_EX);
             if (write(fd, buf, strlen(buf)) != (int) strlen(buf))
             {
               s = LmsWrite;
               free(line);
-              flock(fd, LOCK_UN);
               break;
             }   
 
-            flock(fd, LOCK_UN);
             ++newLogLines;
             free(line);
             break;
         }
         
-        flock(fd, LOCK_EX);
         if ((nb = write(fd, line, len)) != len)
         {
-          flock(fd, LOCK_UN);
           s = LmsWrite;
           free(line);
           break;
         }
         else
           ++newLogLines;
-
-        flock(fd, LOCK_UN);
     }
 
     if (fd != -1)
@@ -2370,11 +2387,15 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
         return LmsFopen;
     }
 
+    semTake();
     rewind(fP);
 
     lrV = (LineRemove*) malloc(sizeof(LineRemove) * (logLines + 4));
     if (lrV == NULL)
-        return LmsMalloc;
+    {
+      semGive();
+      return LmsMalloc;
+    }
 
     initialLrv = lrV;
     memset(lrV, 0, sizeof(LineRemove) * (logLines + 4));
@@ -2430,6 +2451,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
         fclose(fP);
         lseek(fds[index].fd, fdPos, SEEK_SET);
         ::free((char*) lrV);
+        semGive();
         return LmsOpen;
     }
 
@@ -2444,6 +2466,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
         ::free((void*) lrV);               \
     lrV = NULL;                            \
     unlink(tmpName);                       \
+    semGive();                             \
     return s;                              \
 }
 
@@ -2462,13 +2485,10 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
             if (strncmp(line, "Cleared at", 10) != 0)
             {
                 len = strlen(line);
-                flock(fd, LOCK_EX);
                 if (write(fd, line, len) != len)
                 {
-                  flock(fd, LOCK_UN);
                   CLEANUP("write", LmsWrite);
                 }
-                flock(fd, LOCK_UN);
             }
 
             if (newLogLines == 2)
@@ -2482,13 +2502,10 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
                 strftime(tm, 80, TIME_FORMAT_DEF, &tmP);
                 
                 snprintf(buf, sizeof(buf), "Cleared at %s\n", tm);
-                flock(fd, LOCK_EX);
                 if (write(fd, buf, strlen(buf)) != (int) strlen(buf))
                 {
-                  flock(fd, LOCK_UN);
                   CLEANUP("write", LmsWrite);
                 }
-                flock(fd, LOCK_UN);
             }
 
             ++newLogLines;
@@ -2515,6 +2532,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
     if (fds[index].fd == -1)
     {
         fds[index].state = Free;
+        semGive();
         return LmsOpen;
     }
         
@@ -2523,6 +2541,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
     logLines = newLogLines;
     LOG_OUT(("Set logLines to %d", logLines));
     free(line);
+    semGive();
     return LmsOk;
 }
 
@@ -2747,4 +2766,15 @@ int lmFirstDiskFileDescriptor(void)
     }
 
     return -1;
+}
+
+
+
+/* ****************************************************************************
+*
+* lmLogLinesGet - 
+*/
+int lmLogLinesGet(void)
+{
+  return logLines;
 }

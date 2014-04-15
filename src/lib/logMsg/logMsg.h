@@ -1637,4 +1637,12 @@ extern long lmLogLineGet
 */
 extern void lmCleanProgName(void);
 
+
+
+/* ****************************************************************************
+*
+* lmLogLinesGet - 
+*/
+extern int lmLogLinesGet(void);
+
 #endif
