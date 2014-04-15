@@ -145,6 +145,36 @@ TEST(commonGlobals, parse8601)
 
    secs = parse8601("P3Y1M1DT1H1M11S");
    EXPECT_EQ(threeYearsOneMonthOneDayOneHourOneMinuteAndElevenSeconds, secs) << "parse error for 'P3Y1M1DT1H1M11S'";
+
+   //
+   // Errors
+   //
+   secs = parse8601("");
+   EXPECT_EQ(-1, secs);
+
+   secs = parse8601("Q1");
+   EXPECT_EQ(-1, secs);
+
+   secs = parse8601("P");
+   EXPECT_EQ(-1, secs);
+
+   secs = parse8601("Px");
+   EXPECT_EQ(-1, secs);
+
+   secs = parse8601("P4");
+   EXPECT_EQ(-1, secs);
+
+   secs = parse8601("P4Y1");
+   EXPECT_EQ(-1, secs);
+
+   secs = parse8601("PT4Y");
+   EXPECT_EQ(-1, secs);
+
+   secs = parse8601("PT99Y");
+   EXPECT_EQ(-1, secs);
+
+   secs = parse8601("PY99");
+   EXPECT_EQ(-1, secs);
 }
 
 
