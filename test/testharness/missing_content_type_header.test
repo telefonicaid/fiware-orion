@@ -74,20 +74,19 @@ curlIt "XML" "$url" "$payload" "Content-Type: application/xml; charset=UTF-8"
 
 
 echo "4: ++++++++++++++++++++"
-# FIXME P6: curlIt should be used, but cannot be until the issue #317 is implemented
 # Check that the ending "; charset=..." works (for JSON)
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json; charset=UTF-8' -d @-) << EOF
-{
-	"entities": [
-		{
-			"type": "Room",
-			"isPattern": "false",
-			"id": "OfficeRoom"
-		}
-	],
-	"attributes": [ ]
-}
-EOF
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [ ]
+}'
+curlIt "XML" "$url" "$payload" 'Content-Type: application/json; charset=UTF-8'
 
 --REGEXPECT--
 1: ++++++++++++++++++++
@@ -97,6 +96,7 @@ Content-Length: 201
 Content-Type: application/xml
 Date: REGEX(.*)
 
+<?xml version="1.0"?>
 <orionError>
   <code>415</code>
   <reasonPhrase>Unsupported Media Type</reasonPhrase>
@@ -109,6 +109,7 @@ Content-Length: 180
 Content-Type: application/xml
 Date: REGEX(.*)
 
+<?xml version="1.0"?>
 <orionError>
   <code>415</code>
   <reasonPhrase>Unsupported Media Type</reasonPhrase>
@@ -128,6 +129,12 @@ Date: REGEX(.*)
   </errorCode>
 </queryContextResponse>
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
     <code>404</code>

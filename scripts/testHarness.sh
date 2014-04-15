@@ -146,8 +146,14 @@ function init_test
             echo "Errors were seen with the shell initialization script"
             echo "STDOUT:"
             cat $TEST_SHELL_INIT.stdout
+            echo "================================================================================"
+            echo
+            echo
             echo "STDERROR:"
             cat $TEST_SHELL_INIT.stderr
+            echo "================================================================================"
+            echo
+            echo
             exit 2
         fi
     fi

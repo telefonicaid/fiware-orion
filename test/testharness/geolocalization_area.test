@@ -210,4 +210,3 @@ echo "3: ++++++++++++++++++++"
 source harnessFunctions.sh
 
 brokerStop CB
-accumulatorStop
