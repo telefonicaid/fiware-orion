@@ -205,11 +205,11 @@ rpm_RE:
 		--define '_broker_version 0.10.1' 
 
 rpm: 
-
+	Modified_broker_version=$(shell echo $(BROKER_VERSION) | sed -e 's/-/_/g')
 	rpmbuild -ba rpm/SPECS/contextbroker.spec \
 		--define '_topdir $(TOPDIR)' \
 		--define '_install_dir $(INSTALL_DIR)' \
-		--define '_broker_version $(BROKER_VERSION)' 
+		--define '_broker_version $(Modified_broker_version)' 
 		
 mock: 
 	mkdir -p ~/rpmbuild/{BUILD,RPMS,S{OURCE,PEC,RPM}S}
