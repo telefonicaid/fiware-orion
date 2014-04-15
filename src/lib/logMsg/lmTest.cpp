@@ -22,6 +22,13 @@
 *
 * Author: Ken Zangelin
 */
+
+/* ****************************************************************************
+*
+* Compilation:
+*  g++  -g    lmTest.cpp   -o lmTest -I ../ -L ../../../BUILD_DEBUG/src/lib/parseArgs/ -lpa -L ../../../BUILD_DEBUG/src/lib/logMsg/ -llm -lpthread
+
+*/
 #include <pthread.h>
 
 #include "parseArgs/parseArgs.h"
