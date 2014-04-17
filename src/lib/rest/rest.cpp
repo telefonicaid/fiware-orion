@@ -231,11 +231,6 @@ static Format wantedOutputSupported(std::string acceptList, std::string* charset
 */
 static void serve(ConnectionInfo* ciP)
 {
-  if (ciP->payload == NULL)
-    LM_T(LmtService, ("Serving request %s %s without payload", ciP->method.c_str(), ciP->url.c_str()));
-  else
-    LM_T(LmtService, ("Serving request %s %s with %lu bytes of payload", ciP->method.c_str(), ciP->url.c_str(), ciP->httpHeaders.contentLength));
-
   restService(ciP, restServiceV);
 }
 
@@ -471,75 +466,92 @@ static int connectionTreat
 *
 * restStart - 
 */
-static int restStart(IpVersion ipVersion)
+static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
-  int ret;
-
   if (port == 0)
      LM_RE(1, ("Please call restInit before starting the REST service"));
 
   if ((ipVersion == IPV4) || (ipVersion == IPDUAL)) 
   { 
-    // Code for IPv4 stack
-    ret = inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr));
-    if (ret != 1) {
+    memset(&sad, 0, sizeof(sad));
+    if (inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr)) != 1)
       LM_RE(2, ("V4 inet_pton fail for %s", bindIp));
-    }
 
-    LM_V(("IPv4 port: %d", port));
     sad.sin_family = AF_INET;
     sad.sin_port   = htons(port);
 
-    LM_V(("Starting http daemon on IPv4 %s port %d", bindIp, port));
-    mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY
-                               htons(port),
-                               NULL,
-                               NULL,
-                               connectionTreat,
-                               NULL,
-                               MHD_OPTION_NOTIFY_COMPLETED,
-                               requestCompleted,
-                               NULL,
-                               MHD_OPTION_CONNECTION_MEMORY_LIMIT,
-                               2 * PAYLOAD_SIZE,
-                               MHD_OPTION_SOCK_ADDR, (struct sockaddr*) &sad,
-                               MHD_OPTION_END);
-  
-    if (mhdDaemon == NULL)
-       LM_RE(3, ("MHD_start_daemon failed"));
+    if ((httpsKey != NULL) && (httpsCertificate != NULL))
+    {
+      mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_SSL, // MHD_USE_SELECT_INTERNALLY
+                                   htons(port),
+                                   NULL,
+                                   NULL,
+                                   connectionTreat,                     NULL,
+                                   MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
+                                   MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
+                                   MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                   MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
+                                   MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
+                                   MHD_OPTION_END);
+    }
+    else
+    {
+      LM_V(("Starting HTTP daemon on IPv4 %s port %d", bindIp, port));
+      mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY
+                                   htons(port),
+                                   NULL,
+                                   NULL,
+                                   connectionTreat,                     NULL,
+                                   MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                   MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
+                                   MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
+                                   MHD_OPTION_END);
+    }
 
+    if (mhdDaemon == NULL)
+      LM_RE(3, ("MHD_start_daemon failed"));
   }  
 
   if ((ipVersion == IPV6) || (ipVersion == IPDUAL))
   { 
-    // Code for IPv6 stack
-    ret = inet_pton(AF_INET6, bindIPv6, &(sad_v6.sin6_addr.s6_addr));
-    if (ret != 1) {
+    memset(&sad_v6, 0, sizeof(sad_v6));
+    if (inet_pton(AF_INET6, bindIPv6, &(sad_v6.sin6_addr.s6_addr)) != 1)
       LM_RE(1, ("V6 inet_pton fail for %s", bindIPv6));
-    }
 
     sad_v6.sin6_family = AF_INET6;
     sad_v6.sin6_port = htons(port);
 
-    LM_V(("Starting http daemon on IPv6 %s port %d", bindIPv6, port));
-
-    mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6,
-                               htons(port),
-                               NULL,
-                               NULL,
-                               connectionTreat,
-                               NULL,
-                               MHD_OPTION_NOTIFY_COMPLETED,
-                               requestCompleted,
-                               NULL,
-                               MHD_OPTION_CONNECTION_MEMORY_LIMIT,
-                               2 * PAYLOAD_SIZE,
-                               MHD_OPTION_SOCK_ADDR, (struct sockaddr*) &sad_v6,
-                               MHD_OPTION_END);
+    if ((httpsKey != NULL) && (httpsCertificate != NULL))
+    {
+      LM_V(("Starting HTTPS daemon on IPv6 %s port %d", bindIPv6, port));
+      mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6 | MHD_USE_SSL,
+                                      htons(port),
+                                      NULL,
+                                      NULL,
+                                      connectionTreat,                     NULL,
+                                      MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
+                                      MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
+                                      MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                      MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
+                                      MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
+                                      MHD_OPTION_END);
+    }
+    else
+    {
+      LM_V(("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
+      mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6,
+                                      htons(port),
+                                      NULL,
+                                      NULL,
+                                      connectionTreat,                     NULL,
+                                      MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                      MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
+                                      MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
+                                      MHD_OPTION_END);
+    }
 
     if (mhdDaemon_v6 == NULL)
-       LM_RE(1, ("MHD_start_daemon_v6 failed"));
-
+      LM_RE(1, ("MHD_start_daemon_v6 failed"));
   }
 
   return 0;
@@ -555,8 +567,21 @@ static int restStart(IpVersion ipVersion)
 *           argument _acceptTextXml that was added for iotAgent only.
 *           See Issue #256
 */
-void restInit(RestService* _restServiceV, IpVersion _ipVersion, const char* _bindAddress, unsigned short _port, RestServeFunction _serveFunction, bool _acceptTextXml)
+void restInit
+(
+  RestService*       _restServiceV,
+  IpVersion          _ipVersion,
+  const char*        _bindAddress,
+  unsigned short     _port,
+  const char*        _httpsKey,
+  const char*        _httpsCertificate,
+  RestServeFunction  _serveFunction,
+  bool               _acceptTextXml
+)
 {
+  const char* key  = _httpsKey;
+  const char* cert = _httpsCertificate;
+
   port          = _port;
   restServiceV  = _restServiceV;
   ipVersionUsed = _ipVersion;
@@ -580,7 +605,7 @@ void restInit(RestService* _restServiceV, IpVersion _ipVersion, const char* _bin
 
   // Starting REST interface
   int r;
-  if ((r = restStart(_ipVersion)) != 0)
+  if ((r = restStart(_ipVersion, key, cert)) != 0)
   {
     fprintf(stderr, "restStart: error %d\n", r);
     orionExitFunction(1, "restStart: error");

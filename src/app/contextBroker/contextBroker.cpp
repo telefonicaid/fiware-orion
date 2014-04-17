@@ -22,6 +22,32 @@
 *
 * Author: Ken Zangelin
 */
+
+/* ****************************************************************************
+*
+* Some notes on HTTPS
+*
+* Lots of info found in http://www.gnu.org/software/libmicrohttpd/tutorial.html
+*
+* When https is used, the broker must be started with options '-key' and '-cert'.
+* Both these two options have a file path associated to it:
+*   -key:  path to a file containing the private key for the server
+*   -cert: path to a file containing  a certificate describing the server in human readable tokens
+*
+* These files are generated before starting the broker:
+* 
+* o private key:
+*     % openssl genrsa -out server.key 1024
+*
+* o certificate:
+*     % openssl req -days 365 -out server.pem -new -x509 -key server.key
+*
+* After creating these two files, the context broker can be started like this:
+*   % contextBroker -fg -https -key server.key -cert server.pem
+*
+* The clients need to use the 'server.pem' file in the request:
+* curl --cacert server.pem
+*/
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -143,7 +169,9 @@ bool            ngsi9Only;
 bool            harakiri;
 bool            useOnlyIPv4;
 bool            useOnlyIPv6;
-
+char            httpsKeyFile[1024];
+char            httpsCertFile[1024];
+bool            https;
 
 
 #define PIDPATH _i "/tmp/contextBroker.pid"
@@ -153,24 +181,27 @@ bool            useOnlyIPv6;
 */
 PaArgument paArgs[] =
 {
-  { "-fg",          &fg,           "FOREGROUND",   PaBool,   PaOpt, false,          false,  true,  "don't start as daemon"           },
-  { "-localIp",     bindAddress,   "LOCALIP",      PaString, PaOpt, _i "0.0.0.0",   PaNL,   PaNL,  "IP to receive new connections"   },
-  { "-port",        &port,         "PORT",         PaInt,    PaOpt, 1026,           PaNL,   PaNL,  "port to receive new connections" },
-  { "-pidpath",      pidPath,      "PID_PATH",     PaString, PaOpt, PIDPATH,        PaNL,   PaNL,  "pid file path"                   },
+  { "-fg",          &fg,           "FOREGROUND",      PaBool,   PaOpt, false,          false,  true,  "don't start as daemon"                },
+  { "-localIp",     bindAddress,   "LOCALIP",         PaString, PaOpt, _i "0.0.0.0",   PaNL,   PaNL,  "IP to receive new connections"        },
+  { "-port",        &port,         "PORT",            PaInt,    PaOpt, 1026,           PaNL,   PaNL,  "port to receive new connections"      },
+  { "-pidpath",      pidPath,      "PID_PATH",        PaString, PaOpt, PIDPATH,        PaNL,   PaNL,  "pid file path"                        },
 
-  { "-dbhost",      dbHost,        "DB_HOST",      PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "database host"                   },
-  { "-dbuser",      user,          "DB_USER",      PaString, PaOpt, _i "",          PaNL,   PaNL,  "database user"                   },
-  { "-dbpwd",       pwd,           "DB_PASSWORD",  PaString, PaOpt, _i "",          PaNL,   PaNL,  "database password"               },
-  { "-db",          dbName,        "DB",           PaString, PaOpt, _i "orion",     PaNL,   PaNL,  "database name"                   },
+  { "-dbhost",      dbHost,        "DB_HOST",         PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "database host"                        },
+  { "-dbuser",      user,          "DB_USER",         PaString, PaOpt, _i "",          PaNL,   PaNL,  "database user"                        },
+  { "-dbpwd",       pwd,           "DB_PASSWORD",     PaString, PaOpt, _i "",          PaNL,   PaNL,  "database password"                    },
+  { "-db",          dbName,        "DB",              PaString, PaOpt, _i "orion",     PaNL,   PaNL,  "database name"                        },
 
-  { "-fwdHost",     fwdHost,       "FWD_HOST",     PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "host for forwarding NGSI9 regs"  },
-  { "-fwdPort",     &fwdPort,      "FWD_PORT",     PaInt,    PaOpt, 0,              0,      65000, "port for forwarding NGSI9 regs"  },
-  { "-ngsi9",       &ngsi9Only,    "CONFMAN",      PaBool,   PaOpt, false,          false,  true,  "run as Configuration Manager"    },
-  { "-ipv4",        &useOnlyIPv4,  "USEIPV4",      PaBool,   PaOpt, false,          false,  true,  "use ip v4 only"                  },
-  { "-ipv6",        &useOnlyIPv6,  "USEIPV6",      PaBool,   PaOpt, false,          false,  true,  "use ip v6 only"                  },
-  { "-harakiri",    &harakiri,     "HARAKIRI",     PaBool,   PaHid, false,          false,  true,  "commits harakiri on request"     },
+  { "-fwdHost",     fwdHost,       "FWD_HOST",        PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "host for forwarding NGSI9 regs"       },
+  { "-fwdPort",     &fwdPort,      "FWD_PORT",        PaInt,    PaOpt, 0,              0,      65000, "port for forwarding NGSI9 regs"       },
+  { "-ngsi9",       &ngsi9Only,    "CONFMAN",         PaBool,   PaOpt, false,          false,  true,  "run as Configuration Manager"         },
+  { "-ipv4",        &useOnlyIPv4,  "USEIPV4",         PaBool,   PaOpt, false,          false,  true,  "use ip v4 only"                       },
+  { "-ipv6",        &useOnlyIPv6,  "USEIPV6",         PaBool,   PaOpt, false,          false,  true,  "use ip v6 only"                       },
+  { "-harakiri",    &harakiri,     "HARAKIRI",        PaBool,   PaHid, false,          false,  true,  "commits harakiri on request"          },
 
-
+  { "-https",       &https,        "HTTPS",           PaBool,   PaOpt, false,          false,  true,  "use the https 'protocol'"             },
+  { "-key",         httpsKeyFile,  "HTTPS_KEY_FILE",  PaString, PaOpt, _i "",          PaNL,   PaNL,  "private server key file (for https)"  },
+  { "-cert",        httpsCertFile, "HTTPS_CERT_FILE", PaString, PaOpt, _i "",          PaNL,   PaNL,  "certificate key file (for https)"     },
+  
   PA_END_OF_ARGS
 };
 
@@ -577,6 +608,44 @@ static void mongoInit(const char* dbHost, std::string dbName, const char* user, 
 
 /* ****************************************************************************
 *
+* loadFile - 
+*/
+static int loadFile(char* path, char* out, int outSize)
+{
+  struct stat  statBuf;
+  int          nb;
+  int          fd = open(path, O_RDONLY);
+
+  if (fd == -1)
+    LM_RE(-1, ("error opening '%s': %s", path, strerror(errno)));
+
+  if (stat(path, &statBuf) != 0)
+  {
+    close(fd);
+    LM_RE(-1, ("error 'stating' '%s': %s", path, strerror(errno)));
+  }
+
+  if (statBuf.st_size > outSize)
+  {
+    close(fd);
+    LM_RE(-1, ("file '%s' is TOO BIG - max size %d bytes", path, outSize));
+  }
+
+  nb = read(fd, out, statBuf.st_size);
+  close(fd);
+
+  if (nb == -1)
+    LM_RE(-1, ("error reading from '%s': %s", path, strerror(errno)));
+  if (nb != statBuf.st_size)
+    LM_RE(-1, ("bad size read from from '%s': %d, wanted %d", path, nb, statBuf.st_size));
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
 * main - 
 */
 int main(int argC, char* argV[])
@@ -621,6 +690,14 @@ int main(int argC, char* argV[])
   if (useOnlyIPv6 && useOnlyIPv4)
     LM_X(1, ("-ipv4 and -ipv6 can not be activated at the same time. They are incompatible"));
 
+  if (https)
+  {
+    if (httpsKeyFile[0] == 0)
+      LM_X(1, ("when option '-https' is used, option '-key' is mandatory"));
+    if (httpsCertFile[0] == 0)
+      LM_X(1, ("when option '-https' is used, option '-cert' is mandatory"));
+  }  
+
   if (fg == false)
     daemonize();
 
@@ -634,7 +711,26 @@ int main(int argC, char* argV[])
   orionInit(orionExit, ORION_VERSION);
   mongoInit(dbHost, dbName, user, pwd);
   contextBrokerInit(ngsi9Only);
-  restInit(rsP, ipVersion, bindAddress, port);
+
+  if (https)
+  {
+    char* httpsPrivateServerKey = (char*) malloc(2048);
+    char* httpsCertificate      = (char*) malloc(2048);
+    
+    if (loadFile(httpsKeyFile, httpsPrivateServerKey, 2048) != 0)
+      LM_X(1, ("Error loading private server key from '%s'", httpsKeyFile));
+    if (loadFile(httpsCertFile, httpsCertificate, 2048) != 0)
+      LM_X(1, ("Error loading certificate from '%s'", httpsCertFile));
+
+    LM_V(("httpsKeyFile:  '%s'", httpsKeyFile));
+    LM_V(("httpsCertFile: '%s'", httpsCertFile));
+
+    restInit(rsP, ipVersion, bindAddress, port, httpsPrivateServerKey, httpsCertificate);
+    free(httpsPrivateServerKey);
+    free(httpsCertificate);
+  }
+  else
+    restInit(rsP, ipVersion, bindAddress, port);
 
   while (1)
     sleep(10);

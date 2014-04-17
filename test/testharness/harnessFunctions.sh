@@ -80,6 +80,7 @@ function localBrokerStart()
   role=$1
   traceLevels=$2
   ipVersion=$3
+  extraParams="$4"
   IPvOption=""
 
   if [ "$ipVersion" == "IPV4" ]
@@ -93,12 +94,12 @@ function localBrokerStart()
   if [ "$role" == "CB" ]
   then
     port=$BROKER_PORT
-    CB_START_CMD="contextBroker -vvvvv -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME}     -t $traceLevels $IPvOption"
+    CB_START_CMD="contextBroker -vvvvv -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME} -t $traceLevels $IPvOption $extraParams"
   elif [ "$role" == "CM" ]
   then
     mkdir -p /tmp/configManager
     port=$CM_PORT
-    CB_START_CMD="contextBroker -harakiri -port ${CM_PORT}     -pidpath ${BROKER_PID_FILE_AUX} -db ${BROKER_DATABASE_AUX_NAME} -t $traceLevels -fwdPort ${BROKER_PORT} -logDir /tmp/configManager -ngsi9 "
+    CB_START_CMD="contextBroker -harakiri -port ${CM_PORT}     -pidpath ${BROKER_PID_FILE_AUX} -db ${BROKER_DATABASE_AUX_NAME} -t $traceLevels -fwdPort ${BROKER_PORT} -logDir /tmp/configManager -ngsi9 $extraParams"
   fi
 
   if [ "$VALGRIND" == "" ]; then
@@ -149,7 +150,7 @@ function localBrokerStop
       sleep 1
       running_broker=$(ps -fe | grep contextBroker | grep $port | wc -l)
       if [ $running_broker -ne 0 ]; then
-        echo "Existing contextBroker is inmortal, can not be killed!"
+        echo "Existing contextBroker is immortal, can not be killed!"
         exit 1
       fi
     fi
@@ -167,6 +168,7 @@ function brokerStart()
   role=$1
   traceLevels=$2
   ipVersion=$3
+  extraParams="$4"
 
   if [ "$role" == "" ]
   then
@@ -180,7 +182,7 @@ function brokerStart()
   fi
 
   localBrokerStop $role
-  localBrokerStart $role $traceLevels $ipVersion
+  localBrokerStart $role $traceLevels $ipVersion "$extraParams"
 }
 
 
@@ -251,7 +253,7 @@ function accumulatorStop()
 
       if [ $running_app -ne 0 ]
       then
-        echo "Existing accumulator-server.py is inmortal, can not be killed!"
+        echo "Existing accumulator-server.py is immortal, can not be killed!"
         exit 1
       fi
     fi
@@ -350,7 +352,7 @@ function curlIt()
   contenttype=$4
   accept=$5
   extraoptions=$6
-  
+
   params="-s -S --dump-header headers.out"
   
   response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" --header "Expect:" ${extraoptions} -d @- ))
