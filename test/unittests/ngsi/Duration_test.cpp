@@ -77,7 +77,4 @@ TEST(Duration, isEmpty)
 
    d.set("");
    EXPECT_EQ(true, d.isEmpty());
-
-   d.set("not in use");
-   EXPECT_EQ(true, d.isEmpty());
 }
