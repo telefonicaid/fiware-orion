@@ -1,5 +1,5 @@
 Summary:          Orion Context Broker
-Name:             contextbroker
+Name:             contextBroker
 Version:          %{_broker_version}
 Release:          1%{?dist}
 License:          AGPLv3
@@ -31,12 +31,12 @@ Using these interfaces, clients can do several operations:
   updated from applications, so queries are resolved based on that information.
 
 ## Project information
-%define _owner contextbroker
-%define _service_name contextbrokerd
+%define _owner orion
+%define _service_name contextBroker
 
 ## System folders
 # _localstatedir is a system var that goes to /var
-%define _orion_log_dir %{_localstatedir}/log/%{name}
+%define _orion_log_dir %{_localstatedir}/log/contextBroker
 %define _src_project_dir %{_sourcedir}/../../
 # The _install_dir is defined into the makefile
 # The _toddir is defined into the makefile
@@ -46,7 +46,7 @@ Using these interfaces, clients can do several operations:
 # Package RPM for tests 
 # -------------------------------------------------------------------------------------------- #
 %package tests
-Requires: %{name}, python, python-flask, nc, curl, libxml2, mongodb, contextbroker 
+Requires: %{name}, python, python-flask, nc, curl, libxml2, mongodb, contextBroker 
 Summary: Test suite for %{name}
 
 %description tests
@@ -122,7 +122,7 @@ fi
 # Read from BUILD and write into BUILDROOT
 
 # RPM_BUILD_ROOT = BUILDROOT
-# %{_install_dir}=/opt/contextbroker
+# %{_install_dir}=/opt/contextBroker
 
 echo "[INFO] Installing the %{name}"
 make install_debug DESTDIR=$RPM_BUILD_ROOT
@@ -138,10 +138,10 @@ mkdir -p $RPM_BUILD_ROOT/%{_install_dir}/doc
 mkdir -p $RPM_BUILD_ROOT/%{_install_dir}/share
 mkdir -p $RPM_BUILD_ROOT/%{_install_dir}/config
 mkdir -p $RPM_BUILD_ROOT/%{_install_dir}_tests
-mkdir -p $RPM_BUILD_ROOT/var/run/contextbroker
+mkdir -p $RPM_BUILD_ROOT/var/log/contextBroker
 
 echo "[INFO] Copying files into the %{_install_dir}"
-mv $RPM_BUILD_ROOT/usr/bin/contextBroker $RPM_BUILD_ROOT/%{_install_dir}/bin/contextbroker 
+mv $RPM_BUILD_ROOT/usr/bin/contextBroker $RPM_BUILD_ROOT/%{_install_dir}/bin/contextBroker 
 rm -Rf $RPM_BUILD_ROOT/usr
 
 cp LICENSE                               $RPM_BUILD_ROOT/%{_install_dir}/doc
@@ -169,8 +169,8 @@ echo "[INFO] Configuring application"
 echo "[INFO] Creating links"
 ln -s %{_install_dir}/init.d/%{name} /etc/init.d/%{_service_name}
 ln -s %{_install_dir}/config/%{name} /etc/sysconfig/%{name}
-ln -s %{_install_dir}/bin/contextbroker /usr/bin/contextbroker
-ls -s %{_install_dir}/doc /usr/share/doc/contextbroker
+ln -s %{_install_dir}/bin/contextBroker /usr/bin/contextBroker
+ls -s %{_install_dir}/doc /usr/share/doc/contextBroker
 
 echo "[INFO] Creating log directory"
 mkdir -p %{_orion_log_dir}
@@ -204,6 +204,13 @@ EOMSG
 echo "[INFO] Uninstall the %{name}"
 /etc/init.d/%{_service_name} stop
 /sbin/chkconfig --del %{_service_name}
+echo "[INFO] Deleting links"
+rm /etc/init.d/%{_service_name} \
+   /etc/sysconfig/%{name} \
+   /usr/bin/contextBroker \
+   /usr/share/doc/contextBroker
+echo "[INFO] Deleting the %{name} folder"
+rm -rf %{_install_dir}
 
 # -------------------------------------------------------------------------------------------- #
 # Clean section:
@@ -218,13 +225,13 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(755,%{_owner},%{_owner},755)
 %{_install_dir}
-/var/run/contextbroker
+/var/log/contextBroker
 
 
 #%files test
 %files tests
 %defattr(755,%{_owner},%{_owner},755)
-/opt/contextbroker_tests
+/opt/contextBroker_tests
 
 
 # -------------------------------------------------------------------------------------------- #

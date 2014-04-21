@@ -46,7 +46,7 @@
 . /etc/rc.d/init.d/functions
 
 PARAM=$1
-NAME=contextbroker
+NAME=contextBroker
 EXECUTABLE=/usr/bin/${NAME}
 
 # Load the environment
