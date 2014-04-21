@@ -49,8 +49,8 @@ static std::string entityId(std::string path, std::string value, ParseData* reqD
   reqDataP->scar.entityIdP = new EntityId();
 
   LM_T(LmtNew, ("New entityId at %p", reqDataP->scar.entityIdP));
-  reqDataP->scar.entityIdP->id        = "not in use";
-  reqDataP->scar.entityIdP->type      = "not in use";
+  reqDataP->scar.entityIdP->id        = "";
+  reqDataP->scar.entityIdP->type      = "";
   reqDataP->scar.entityIdP->isPattern = "false";
 
   reqDataP->scar.res.entityIdVector.push_back(reqDataP->scar.entityIdP);

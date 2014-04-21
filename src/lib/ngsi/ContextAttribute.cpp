@@ -183,7 +183,7 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
 */
 std::string ContextAttribute::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
-  if ((name == "") || (name == "not in use"))
+  if (name == "")
     return "missing attribute name";
 
   if (compoundValueP != NULL)
@@ -193,11 +193,8 @@ std::string ContextAttribute::check(RequestType requestType, Format format, std:
     return "OK";
   }
 
-  if (requestType != UpdateContext) // FIXME P9: this is just to make harness test work - what is this?
-  {
-    if ((value == "") || (value == "not in use"))
-      return "missing attribute value";
-  }
+  if (value == "")
+    return "missing attribute value";
 
   return "OK";
 }

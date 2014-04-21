@@ -67,8 +67,8 @@ static std::string entityId(std::string path, std::string value, ParseData* reqD
 
   reqDataP->rcr.entityIdP = new EntityId();
 
-  reqDataP->rcr.entityIdP->id        = "not in use";
-  reqDataP->rcr.entityIdP->type      = "not in use";
+  reqDataP->rcr.entityIdP->id        = "";
+  reqDataP->rcr.entityIdP->type      = "";
   reqDataP->rcr.entityIdP->isPattern = "false";
 
   reqDataP->rcr.crP->entityIdVector.push_back(reqDataP->rcr.entityIdP);
@@ -135,7 +135,7 @@ static std::string crAttribute(std::string path, std::string value, ParseData* r
 {
   LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
 
-  reqDataP->rcr.attributeP = new ContextRegistrationAttribute("not in use", "not in use");
+  reqDataP->rcr.attributeP = new ContextRegistrationAttribute("", "");
 
   reqDataP->rcr.crP->contextRegistrationAttributeVector.push_back(reqDataP->rcr.attributeP);
 
@@ -199,9 +199,9 @@ static std::string craMetadata(std::string path, std::string value, ParseData* r
 
   reqDataP->rcr.attributeMetadataP = new Metadata();
 
-  reqDataP->rcr.attributeMetadataP->type  = "not in use";
-  reqDataP->rcr.attributeMetadataP->name  = "not in use";
-  reqDataP->rcr.attributeMetadataP->value = "not in use";
+  reqDataP->rcr.attributeMetadataP->type  = "";
+  reqDataP->rcr.attributeMetadataP->name  = "";
+  reqDataP->rcr.attributeMetadataP->value = "";
 
   reqDataP->rcr.attributeP->metadataVector.push_back(reqDataP->rcr.attributeMetadataP);
 
@@ -261,9 +261,9 @@ static std::string regMetadata(std::string path, std::string value, ParseData* r
   LM_T(LmtParse, ("Creating a reg metadata"));
 
   reqDataP->rcr.registrationMetadataP = new Metadata();
-  reqDataP->rcr.registrationMetadataP->type  = "not in use";
-  reqDataP->rcr.registrationMetadataP->name  = "not in use";
-  reqDataP->rcr.registrationMetadataP->value = "not in use";
+  reqDataP->rcr.registrationMetadataP->type  = "";
+  reqDataP->rcr.registrationMetadataP->name  = "";
+  reqDataP->rcr.registrationMetadataP->value = "";
   reqDataP->rcr.crP->registrationMetadataVector.push_back(reqDataP->rcr.registrationMetadataP);
 
   return "OK";

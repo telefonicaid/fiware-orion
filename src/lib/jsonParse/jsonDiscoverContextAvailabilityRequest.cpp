@@ -49,8 +49,8 @@ static std::string entityId(std::string path, std::string value, ParseData* reqD
   reqDataP->dcar.entityIdP = new EntityId();
 
   LM_T(LmtNew, ("New entityId at %p", reqDataP->dcar.entityIdP));
-  reqDataP->dcar.entityIdP->id        = "not in use";
-  reqDataP->dcar.entityIdP->type      = "not in use";
+  reqDataP->dcar.entityIdP->id        = "";
+  reqDataP->dcar.entityIdP->type      = "";
   reqDataP->dcar.entityIdP->isPattern = "false";
 
   reqDataP->dcar.res.entityIdVector.push_back(reqDataP->dcar.entityIdP);
@@ -173,8 +173,8 @@ static std::string operationScope(std::string path, std::string value, ParseData
   
   reqDataP->dcar.scopeP = new Scope();
   reqDataP->dcar.res.restriction.scopeVector.push_back(reqDataP->dcar.scopeP);
-  reqDataP->dcar.scopeP->type  = "not in use";
-  reqDataP->dcar.scopeP->value = "not in use";
+  reqDataP->dcar.scopeP->type  = "";
+  reqDataP->dcar.scopeP->value = "";
 
   return "OK";
 }

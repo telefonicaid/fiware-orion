@@ -52,7 +52,7 @@ std::string AttributeDomainName::check(RequestType requestType, Format format, s
 */
 bool AttributeDomainName::isEmpty(void)
 {
-  if ((string == "") || (string == "not in use"))
+  if (string == "")
     return true;
 
   return false;
