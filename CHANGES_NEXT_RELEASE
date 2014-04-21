@@ -7,3 +7,4 @@
 - Add:  Nre command line option '--silent', to suppress all log messages except errors. (Issue #291)
 - Fix:  The broker now performs retries when connecting to mongodb at startup. (Issue #308)
 - Fix:  Responses containing context attributes with *compound values* AND metadata is now correctly rendered (Issue #323).
+- Fix:  Now it is possible to have 'not in use' as a valid context value.
