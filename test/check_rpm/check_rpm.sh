@@ -134,4 +134,4 @@ else
 fi 
 echo ""
 
-echo "############ Check RPM Stage completed! ############"
+_logStage "############ Check RPM Stage completed! ############"
