@@ -50,7 +50,7 @@ function verboseMsg()
 #
 function usage()
 {
-  echo usage: $0 '[-host <host>] [-port <p>] [-v (verbose)] [-lint (use xmllint)] [-cop <convenience operation>] [-X <method>] [-en <entityId>] [-attr (attributeName)] [-id <reg/sub id>] [-json (in and out-format in JSON)] [-informat (in-format)] [-outformat (out-format)] [-table <table to debug>] <operation> <data file>'
+  echo usage: $0 '[-host <host>] [-port <p>] [-v (verbose)] [-lint (use xmllint)] [-cop <convenience operation>] [-X <method>] [-en <entityId>] [-attr (attributeName)] [-id <reg/sub id>] [-json (in and out-format in JSON)] [-informat (in-format)] [-outformat (out-format)] [-table <table to debug>] [--https] <operation> <data file>'
 
   verbose=1
   verboseMsg "Operations:"
@@ -97,7 +97,8 @@ id=""
 entityId=""
 attributeName=""
 table=""
-
+protocol='http'
+cert=""
 
 
 # -----------------------------------------------------------------------------
@@ -109,6 +110,7 @@ do
   if   [ "$1" == "-u" ];         then usage;
   elif [ "$1" == "-v" ];         then verbose=on; CURL_VERBOSE='-vvvvv'
   elif [ "$1" == "-lint" ];      then useXmlLint=1;
+  elif [ "$1" == "--https" ];    then protocol='https'; cert='--cacert ../../security/localhost.pem';
   elif [ "$1" == "-host" ];      then host=$2;                        shift;
   elif [ "$1" == "-port" ];      then port=$2;                        shift;
   elif [ "$1" == "-cop" ];       then convOp=$2;                      shift;
@@ -303,11 +305,11 @@ verboseMsg Creating curl command
 
 if [ "$operation" == "conv" ]
 then
-  echo Convenience operation: $convOp
-  url="$host:$port/${cop[$convOp]}"
+  echo Convenience $protocol operation: $convOp
+  url=${protocol}"://$host:$port/${cop[$convOp]}"
 else
-  echo Normal operation: $operation
-  url="$host:$port/${op[$operation]}"
+  echo Normal $protocol operation: $operation
+  url=${protocol}"://$host:$port/${op[$operation]}"
 fi
 verboseMsg "URL: '"$url"'"
 
@@ -337,11 +339,11 @@ fi
 #
 if [ "$useXmlLint" == 1 ]
 then
-  (curl $url --header "$IN_FORMAT" --header "$OUT_FORMAT" $CURL_VERBOSE -X $method -d @- | xmllint --format -) << EOF
+  (curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" $CURL_VERBOSE -X $method $cert -d @- | xmllint --format -) << EOF
 $(echo $data)
 EOF
 else
-  (curl $url --header "$IN_FORMAT" --header "$OUT_FORMAT" $CURL_VERBOSE -X $method -d @-) << EOF
+  (curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" $CURL_VERBOSE -X $method $cert -d @-) << EOF
 $(echo $data)
 EOF
 fi
