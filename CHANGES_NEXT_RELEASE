@@ -8,3 +8,6 @@
 - Fix:  The broker now performs retries when connecting to mongodb at startup. (Issue #308)
 - Fix:  Responses containing context attributes with *compound values* AND metadata is now correctly rendered (Issue #323).
 - Fix:  Now it is possible to have 'not in use' as a valid context value.
+- Add:  The broker now supports https, see CLI options '-https', '-cert' and '-key'
+- Fix:  The ISO8601 parser has been improved. (Issue #231)
+- Fix:  An important bug in the log trace library has been fixed. This fix *may* solve 'strange errors' (Issue #313)
