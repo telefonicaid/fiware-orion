@@ -27,9 +27,9 @@ HTTPS simple test
 source harnessFunctions.sh
 
 dbInit CB
-extraParams="-https -key ${PWD}/../../security/localhost.key -cert ${PWD}/../../security/localhost.pem"
+${PWD}/../../scripts/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
+extraParams="-https -key /tmp/harnessTest.key -cert /tmp/harnessTest.pem"
 brokerStart CB 0-255 IPV4 "$extraParams"
-
 --SHELL--
 source harnessFunctions.sh
 
@@ -59,7 +59,7 @@ payload='<?xml version="1.0"?>
   <duration>PT1H</duration>
 </registerContextRequest>'
 
-curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: application/xml" "--cacert $PWD/../../security/localhost.pem"
+curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: application/xml" "--cacert /tmp/harnessTest.pem"
 echo
 echo
 
@@ -80,7 +80,7 @@ payload='<?xml version="1.0"?>
   </attributeList>
 </discoverContextAvailabilityRequest>'
 
-curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: application/xml" "--cacert $PWD/../../security/localhost.pem"
+curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: application/xml" "--cacert /tmp/harnessTest.pem"
 
 --REGEXPECT--
 +++ 1: Register a Sensor of temperature
@@ -127,3 +127,4 @@ Date: REGEX(.*)
 --TEARDOWN--
 source harnessFunctions.sh
 brokerStop CB
+rm -f /tmp/harnessTest.key /tmp/harnessTest.pem

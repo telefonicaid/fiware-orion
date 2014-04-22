@@ -32,7 +32,7 @@
 * When https is used, the broker must be started with options '-key' and '-cert'.
 * Both these two options have a file path associated to it:
 *   -key:  path to a file containing the private key for the server
-*   -cert: path to a file containing  a certificate describing the server in human readable tokens
+*   -cert: path to a file containing a certificate describing the server in human readable tokens
 *
 * These files are generated before starting the broker:
 * 
@@ -47,6 +47,10 @@
 *
 * The clients need to use the 'server.pem' file in the request:
 * curl --cacert server.pem
+*
+*
+* To override the security added with the certificate, curl can always be called using the
+* CLI option '--insecure'.
 */
 #include <stdio.h>
 #include <unistd.h>
