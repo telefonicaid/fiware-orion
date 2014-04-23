@@ -29,6 +29,8 @@ SET (SOURCES
     orionReply.cpp
     OrionError.cpp
     HttpStatusCode.cpp
+    coap.cpp
+    nethelper.c
 )
 
 SET (HEADERS
@@ -43,6 +45,8 @@ SET (HEADERS
     orionReply.h
     OrionError.h
     HttpStatusCode.h
+    coap.h
+    nethelper.h
 )
 
 
