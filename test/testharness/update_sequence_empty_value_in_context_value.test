@@ -52,11 +52,27 @@ EOF
 --REGEXPECT--
 <?xml version="1.0"?>
 <updateContextResponse>
-  <errorCode>
-    <code>400</code>
-    <reasonPhrase>Bad Request</reasonPhrase>
-    <details>missing attribute value</details>
-  </errorCode>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>472</code>
+        <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
+        <details>action: APPEND - entity: (OfficeRoom, Room, false) - offending attribute: pressure - empty attribute not allowed in APPEND or UPDATE</details>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
 </updateContextResponse>
 --TEARDOWN--
 source harnessFunctions.sh
