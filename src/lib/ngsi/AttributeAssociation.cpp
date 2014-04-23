@@ -58,10 +58,10 @@ std::string AttributeAssociation::render(Format format, std::string indent, bool
 */
 std::string AttributeAssociation::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
-  if ((source == "") || (source == "not in use"))
+  if (source == "")
     return "empty source";
 
-  if ((target == "") || (target == "not in use"))
+  if (target == "")
     return "empty target";
 
   return "OK";

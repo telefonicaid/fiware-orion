@@ -115,7 +115,7 @@ std::string EntityId::render(Format format, std::string indent, bool comma, bool
 */
 std::string EntityId::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
-  if ((id == "") || (id == "not in use"))
+  if (id == "")
     return "empty entityId:id";
 
   if (!isTrue(isPattern) && !isFalse(isPattern) && isPattern != "")

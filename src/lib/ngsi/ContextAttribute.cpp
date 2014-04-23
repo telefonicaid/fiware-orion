@@ -183,7 +183,7 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
 */
 std::string ContextAttribute::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
-  if ((name == "") || (name == "not in use"))
+  if (name == "")
     return "missing attribute name";
 
   if (compoundValueP != NULL)
@@ -193,11 +193,15 @@ std::string ContextAttribute::check(RequestType requestType, Format format, std:
     return "OK";
   }
 
-  if (requestType != UpdateContext) // FIXME P9: this is just to make harness test work - what is this?
+  // For ngsi10 updateContextRequest, the check of empty context attribute values is made by
+  // the mongoBackend layer, thus is skipped here.
+  // The reason is that in a later stage we have more info to return to the caller in case of errors
+  if (requestType != UpdateContext) // FIXME P9: Issue "old95" about moving checkings from mongoBackend to "external layers" in general
   {
-    if ((value == "") || (value == "not in use"))
+    if (value == "")
       return "missing attribute value";
   }
+  
 
   return "OK";
 }

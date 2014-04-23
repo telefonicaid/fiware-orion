@@ -97,7 +97,7 @@ std::string Duration::get(void)
 */
 bool Duration::isEmpty(void)
 {
-  if ((string == "") || (string == "not in use"))
+  if (string == "")
     return true;
 
   return false;
