@@ -148,6 +148,10 @@ static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
   
   LM_T(LmtParse, ("Got an attribute value: '%s'", node->value()));
   parseDataP->upcr.attributeP->value = node->value();
+
+  if (parseDataP->upcr.attributeP->value == " ")
+    parseDataP->upcr.attributeP->value = "";
+
   return 0;
 }
 

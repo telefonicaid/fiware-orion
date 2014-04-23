@@ -272,6 +272,9 @@ void CompoundValueNode::check(void)
 {
   if (type == Vector)
   {
+    if (childV.size() == 0)
+      return;
+
     for (unsigned long ix = 1; ix < childV.size(); ++ix)
     {
       if (childV[ix]->name != childV[0]->name)
@@ -284,6 +287,9 @@ void CompoundValueNode::check(void)
   }
   else if (type == Object)
   {
+    if (childV.size() == 0)
+      return;
+
     for (unsigned long ix = 0; ix < childV.size() - 1; ++ix)
     {
       for (unsigned long ix2 = ix + 1; ix2 < childV.size(); ++ix2)
