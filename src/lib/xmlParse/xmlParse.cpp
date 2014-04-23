@@ -215,6 +215,21 @@ void xmlParse
 
   if (isCompoundValuePath(path.c_str()) && (value == "") && (node->first_node() != NULL))
   {
+    //
+    // Count children (to avoid false compounds because of just en empty sttribute value)
+    // 
+    xml_node<>* child    = node->first_node();
+    int         children = 0;
+    while (child != NULL)
+    {
+      if (child->name()[0] != 0)
+        ++children;
+      child = child->next_sibling();
+    }
+    
+    if (children == 0) // NOT a compound value
+      return;
+
     eatCompound(ciP, NULL, node, "");
     compoundValueEnd(ciP, parseDataP);
     return;

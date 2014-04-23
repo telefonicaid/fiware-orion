@@ -275,7 +275,9 @@ static std::string jsonParse
   treated = treat(ciP, path, nodeValue, parseVector, parseDataP);
 
 
-  if ((isCompoundPath(path.c_str()) == true) && (nodeValue == ""))
+  boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
+  int                         noOfChildren = subtree.size();
+  if ((isCompoundPath(path.c_str()) == true) && (nodeValue == "") && (noOfChildren != 0))
   {
     std::string s;
 
@@ -297,7 +299,10 @@ static std::string jsonParse
     return ciP->answer;
   }
 
-  boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
+  if (noOfChildren == 0)
+    return "OK";
+
+  subtree = (boost::property_tree::ptree) v.second;
   BOOST_FOREACH(boost::property_tree::ptree::value_type &v2, subtree)
   {
     std::string out = jsonParse(ciP, v2, path, parseVector, parseDataP);

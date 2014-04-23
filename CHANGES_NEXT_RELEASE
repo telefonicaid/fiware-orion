@@ -4,10 +4,11 @@
 - Fix:  Requests with unacceptable Content-Type (HTTP header) get a "415 Unsupported Media Type" and a descriptive payload 'orionError'.
         Requests with unsupported 'Accept' format (HTTP header) get a "406 Not Acceptable" and a descriptive payload 'orionError'.
         Requests with "both 415 and 406" get a "415 Unsupported Media Type" and a descriptive payload 'orionError' in XML. (Issue #48)
-- Add:  Nre command line option '--silent', to suppress all log messages except errors. (Issue #291)
+- Add:  New command line option '--silent', to suppress all log messages except errors. (Issue #291)
 - Fix:  The broker now performs retries when connecting to mongodb at startup. (Issue #308)
 - Fix:  Responses containing context attributes with *compound values* AND metadata is now correctly rendered (Issue #323).
 - Fix:  Now it is possible to have 'not in use' as a valid context value.
 - Add:  The broker now supports https, see CLI options '-https', '-cert' and '-key'
 - Fix:  The ISO8601 parser has been improved. (Issue #231)
 - Fix:  An important bug in the log trace library has been fixed. This fix *may* solve 'strange errors' (Issue #313)
+- Fix:  Fixed a bug about empty context attribute values, probably introduced when compound values were invented.
