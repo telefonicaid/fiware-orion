@@ -140,7 +140,6 @@ static int contextAttributeType(xml_node<>* node, ParseData* reqData)
 */
 static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
 {
-  LM_M(("contextAttributeValue: '%s'", node->value()));
   parseDataP->lastContextAttribute = parseDataP->upcr.attributeP;
   parseDataP->lastContextAttribute->typeFromXmlAttribute = xmlTypeAttributeGet(node);
   LM_T(LmtCompoundValue, ("Set parseDataP->lastContextAttribute (type: '%s') to: %p",
@@ -151,10 +150,7 @@ static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
   parseDataP->upcr.attributeP->value = node->value();
 
   if (parseDataP->upcr.attributeP->value == " ")
-  {
-    LM_M(("Changed SPACE to NOTHING"));
     parseDataP->upcr.attributeP->value = "";
-  }
 
   return 0;
 }
