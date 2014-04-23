@@ -30,11 +30,13 @@
 
 #include "common/globals.h"
 #include "convenience/AppendContextElementRequest.h"
-#include "ngsi/Request.h"
 #include "jsonParse/jsonParse.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonAppendContextElementRequest.h"
 #include "jsonParse/jsonNullTreat.h"
+#include "ngsi/Request.h"
+#include "rest/ConnectionInfo.h"
+
 
 
 /* ****************************************************************************
@@ -94,10 +96,11 @@ static std::string contextAttributeType(std::string path, std::string value, Par
 *
 * contextAttributeValue -
 */
-static std::string contextAttributeValue(std::string path, std::string value, ParseData* reqData)
+static std::string contextAttributeValue(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute value: %s", value.c_str()));
-  reqData->acer.attributeP->value = value;
+  parseDataP->lastContextAttribute = parseDataP->acer.attributeP;
+  parseDataP->acer.attributeP->value = value;
   return "OK";
 }
 
@@ -223,11 +226,11 @@ JsonNode jsonAcerParseVector[] =
   { "/attributes/attribute/type",                    contextAttributeType  },
   { "/attributes/attribute/value",                   contextAttributeValue },
 
-  { "/attributes/attribute/metadata",                jsonNullTreat         },
-  { "/attributes/attribute/metadata/metadata",       contextMetadata       },
-  { "/attributes/attribute/metadata/metadata/name",  contextMetadataName   },
-  { "/attributes/attribute/metadata/metadata/type",  contextMetadataType   },
-  { "/attributes/attribute/metadata/metadata/value", contextMetadataValue  },
+  { "/attributes/attribute/metadatas",                jsonNullTreat         },
+  { "/attributes/attribute/metadatas/metadata",       contextMetadata       },
+  { "/attributes/attribute/metadatas/metadata/name",  contextMetadataName   },
+  { "/attributes/attribute/metadatas/metadata/type",  contextMetadataType   },
+  { "/attributes/attribute/metadatas/metadata/value", contextMetadataValue  },
 
   { "/metadatas",                                    jsonNullTreat         },
   { "/metadatas/metadata",                           domainMetadata        },

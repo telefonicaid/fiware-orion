@@ -98,6 +98,7 @@ SET (SOURCES
     serviceRoutines/postUpdateContextSubscription_test.cpp
     serviceRoutines/putIndividualContextEntity_test.cpp
     serviceRoutines/putIndividualContextEntityAttributes_test.cpp
+    serviceRoutines/putIndividualContextEntityAttribute_test.cpp
     serviceRoutines/postQueryContext_test.cpp
     serviceRoutines/getNgsi10ContextEntityTypes_test.cpp
     serviceRoutines/getNgsi10ContextEntityTypesAttribute_test.cpp
@@ -212,6 +213,8 @@ SET (SOURCES
     mongoBackend/mongoDiscoverContextAvailability_test.cpp
     mongoBackend/mongoOntimeintervalOperations_test.cpp
     mongoBackend/mongoQueryContext_test.cpp
+    mongoBackend/mongoQueryContextCompoundValues_test.cpp
+    mongoBackend/mongoQueryContextGeo_test.cpp
     mongoBackend/mongoRegisterContext_test.cpp
     mongoBackend/mongoRegisterContext_update_test.cpp
     mongoBackend/mongoSubscribeContextAvailability_test.cpp
@@ -221,10 +224,15 @@ SET (SOURCES
     mongoBackend/mongoUpdateContextAvailabilitySubscription_test.cpp
     mongoBackend/mongoUpdateContextSubscription_test.cpp
     mongoBackend/mongoUpdateContext_test.cpp
+    mongoBackend/mongoUpdateContextGeo_test.cpp
     mongoBackend/mongoUpdateContext_withOnchangeSubscriptions_test.cpp
+    mongoBackend/mongoUpdateContextCompoundValues_test.cpp
     mongoBackend/mongoNotifyContext_test.cpp
     mongoBackend/mongoNotifyContextAvailability_test.cpp
 
+    parse/CompoundValueNode_test.cpp
+    parse/compoundValue_test.cpp
+    parse/nullTreat_test.cpp
     jsonParse/jsonRequest_test.cpp
 
     xmlParse/xmlAppendContextElementRequest_test.cpp
@@ -254,6 +262,7 @@ SET (STATIC_LIBS
     ngsiNotify
     jsonParse
     xmlParse
+    parse
     convenience
     serviceRoutines
     convenienceMap

@@ -72,14 +72,15 @@ echo "13: ++++++++++++++++++++"
 
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 150
+Content-Length: 181
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
         "code": "400",
-        "reasonPhrase": "Empty Context Registration List"
+        "details": "Empty Context Registration List",
+        "reasonPhrase": "Bad Request"
     },
     "registrationId": "000000000000000000000000"
 }
@@ -97,27 +98,29 @@ Date: REGEX(.*)
 }
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 130
+Content-Length: 161
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
         "code": "400",
-        "reasonPhrase": "No entities"
+        "details": "No entities",
+        "reasonPhrase": "Bad Request"
     },
     "subscriptionId": "000000000000000000000000"
 }
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 130
+Content-Length: 161
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
         "code": "400",
-        "reasonPhrase": "No entities"
+        "details": "No entities",
+        "reasonPhrase": "Bad Request"
     },
     "subscriptionId": "000000000000000000000000"
 }
@@ -136,14 +139,15 @@ Date: REGEX(.*)
 }
 5: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 81
+Content-Length: 112
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
         "code": "400",
-        "reasonPhrase": "No entities"
+        "details": "No entities",
+        "reasonPhrase": "Bad Request"
     }
 }
 6: ++++++++++++++++++++

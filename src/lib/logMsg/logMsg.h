@@ -237,6 +237,10 @@ typedef struct LogMsg
 
 #ifdef LM_NO_V
 #define LM_V(s)
+#define LM_VV(s)
+#define LM_VVV(s)
+#define LM_VVVV(s)
+#define LM_VVVVV(s)
 #define LM_V2(s)
 #define LM_V3(s)
 #define LM_V4(s)
@@ -249,7 +253,7 @@ typedef struct LogMsg
 */
 #define LM_V(s)                                                            \
 do {                                                                       \
-  if (lmOk('V', 0) == LmsOk)                                               \
+  if ((!lmSilent) && lmOk('V', 0) == LmsOk)                                \
   {                                                                        \
     char* text;                                                            \
                                                                            \
@@ -263,7 +267,7 @@ do {                                                                       \
 
 #define LM_V2(s)                                                           \
 do {                                                                       \
-  if (lmOk('2', 0) == LmsOk)                                               \
+  if ((!lmSilent) && lmOk('2', 0) == LmsOk)                                \
   {                                                                        \
     char* text;                                                            \
                                                                            \
@@ -278,7 +282,7 @@ do {                                                                       \
 
 #define LM_V3(s)                                                           \
 do {                                                                       \
-  if (lmOk('3', 0) == LmsOk)                                               \
+  if ((!lmSilent) && lmOk('3', 0) == LmsOk)                                \
   {                                                                        \
     char* text;                                                            \
                                                                            \
@@ -293,9 +297,11 @@ do {                                                                       \
 
 #define LM_V4(s)                                                           \
 do {                                                                       \
-  if (lmOk('4', 0) == LmsOk)                                               \
+  if ((!lmSilent) && lmOk('4', 0) == LmsOk)                                \
   {                                                                        \
-    if ((char* text = lmTextGet s) != NULL)                                \
+    char* text;                                                            \
+                                                                           \
+    if ((text = lmTextGet s) != NULL)                                      \
     {                                                                      \
       lmOut(text, '4', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
       ::free(text);                                                        \
@@ -306,7 +312,7 @@ do {                                                                       \
 
 #define LM_V5(s)                                                           \
 do {                                                                       \
-  if (lmOk('5', 0) == LmsOk)                                               \
+  if ((!lmSilent) && lmOk('5', 0) == LmsOk)                                \
   {                                                                        \
     char* text;                                                            \
                                                                            \
@@ -320,7 +326,7 @@ do {                                                                       \
 
 #define LM_LV(s)                                                                 \
 do {                                                                             \
-  if (lmOk('V', 0) == LmsOk)                                                     \
+  if ((!lmSilent) && lmOk('V', 0) == LmsOk)                                      \
   {                                                                              \
     char* text;                                                                  \
                                                                                  \
@@ -340,10 +346,9 @@ do {                                                                            
 #endif
 
 /* ****************************************************************************
- *
- * LM_LM - log message ( only local ) // Not hoock function
- */
-
+*
+* LM_LM - log message ( only local ) // No hook function
+*/
 #define LM_LM(s)                                                                 \
 do {                                                                             \
   if ((char* text = lmTextGet s) != NULL)                                        \
@@ -354,10 +359,9 @@ do {                                                                            
 } while (0)
 
 /* ****************************************************************************
- *
- * LM_LW - log warning message ( only local ) // Not hoock function
- */
-
+*
+* LM_LW - log warning message ( only local ) // No hook function
+*/
 #define LM_LW(s)                                                               \
 do {                                                                           \
   if ((char* text = lmTextGet s) != NULL)                                      \
@@ -380,7 +384,7 @@ do {                                                                           \
 do {                                                                      \
   char* text;                                                             \
                                                                           \
-  if ((text = lmTextGet s) != NULL)                                       \
+  if ((!lmSilent) && (text = lmTextGet s) != NULL)                        \
   {                                                                       \
     lmOut(text, 'M', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
     ::free(text);                                                         \
@@ -400,7 +404,7 @@ do {                                                                      \
 do {                                                                      \
   char* text;                                                             \
                                                                           \
-  if ((text = lmTextGet s) != NULL)                                       \
+  if ((!lmSilent) && (text = lmTextGet s) != NULL)                        \
   {                                                                       \
     lmOut(text, 'H', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
     ::free(text);                                                         \
@@ -420,7 +424,7 @@ do {                                                                      \
 do {                                                                     \
   char* text;                                                            \
                                                                          \
-  if ((text = lmTextGet s) != NULL)                                      \
+  if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
   {                                                                      \
     lmOut(text, 'S', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
     ::free(text);                                                        \
@@ -460,7 +464,7 @@ do {                                                                   \
 do {                                                                     \
   char* text;                                                            \
                                                                          \
-  if ((text = lmTextGet s) != NULL)                                      \
+  if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
   {                                                                      \
     lmOut(text, 'W', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
     ::free(text);                                                        \
@@ -801,7 +805,7 @@ do {                                                                     \
 */
 #define LM_TODO(s)                                                         \
 do {                                                                       \
-  if (lmOk('t', 0) == LmsOk)                                               \
+  if ((!lmSilent) && (lmOk('t', 0) == LmsOk))                              \
   {                                                                        \
     char* text;                                                            \
                                                                            \
@@ -823,7 +827,7 @@ do {                                                                       \
 do {                                                                     \
   char* text;                                                            \
                                                                          \
-  if ((text = lmTextGet s) != NULL)                                      \
+  if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
   {                                                                      \
     lmOut(text, 'd', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
     ::free(text);                                                        \
@@ -840,7 +844,7 @@ do {                                                                     \
 do {                                                                     \
   char* text;                                                            \
                                                                          \
-  if ((text = lmTextGet s) != NULL)                                      \
+  if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
   {                                                                      \
     lmOut(text, 'F', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
     ::free(text);                                                        \
@@ -857,7 +861,7 @@ do {                                                                     \
 do {                                                                     \
   char* text;                                                            \
                                                                          \
-  if ((text = lmTextGet s) != NULL)                                      \
+  if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
   {                                                                      \
     lmOut(text, 'B', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
     ::free(text);                                                        \
@@ -874,7 +878,7 @@ do {                                                                     \
 do {                                                                          \
   char* text;                                                                 \
                                                                               \
-  if (lmOk('T', tLev) == LmsOk)                                               \
+  if ((!lmSilent) && lmOk('T', tLev) == LmsOk)                                \
   {                                                                           \
     if ((text = lmTextGet s) != NULL)                                         \
     {                                                                         \
@@ -886,7 +890,7 @@ do {                                                                          \
 
 #define LM_LT(tLev, s)                                                               \
 do {                                                                                 \
-  if (lmOk('T', tLev) == LmsOk)                                                      \
+  if ((!lmSilent) && lmOk('T', tLev) == LmsOk)                                       \
   {                                                                                  \
     char* text;                                                                      \
                                                                                      \
@@ -908,7 +912,7 @@ do {                                                                            
 do {                                                                       \
   char* text;                                                              \
                                                                            \
-  if (lmOk('D', 0) == LmsOk)                                               \
+  if ((!lmSilent) && lmOk('D', 0) == LmsOk)                                \
   {                                                                        \
     if ((text = lmTextGet s) != NULL)                                      \
     {                                                                      \
@@ -928,7 +932,7 @@ do {                                                                       \
 do {                                                                  \
   char* text;                                                         \
                                                                       \
-  if ((text = lmTextGet s) != NULL)                                   \
+  if ((!lmSilent) && (text = lmTextGet s) != NULL)                    \
   {                                                                   \
     lmOut(text, 'R', __FILE__, __LINE__, NULL, 0, NULL);              \
     ::free(text);                                                     \
@@ -1085,7 +1089,7 @@ do {                                                                         \
 do {                                                                     \
   char* text;                                                            \
                                                                          \
-  if ((text = lmTextGet s) != NULL)                                      \
+  if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
   {                                                                      \
     lmOut(text, 'W', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
     if (lmxFp != NULL) lmxFp(xCode, text);                               \
@@ -1103,7 +1107,7 @@ do {                                                                     \
 do {                                                                     \
   char* text;                                                            \
                                                                          \
-  if ((text = lmTextGet s) != NULL)                                      \
+  if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
   {                                                                      \
     lmOut(text, 'M', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL); \
     if (lmxFp != NULL) lmxFp(xCode, text);                               \
@@ -1122,7 +1126,7 @@ do {                                                                     \
 do {                                                                       \
   char* text;                                                              \
                                                                            \
-  if (lmOk('V', 0) == LmsOk)                                               \
+  if ((!lmSilent) && lmOk('V', 0) == LmsOk)                                \
   {                                                                        \
     if ((text = lmTextGet s) != NULL)                                      \
     {                                                                      \
@@ -1143,7 +1147,7 @@ do {                                                                       \
 do {                                                                       \
   char* text;                                                              \
                                                                            \
-  if (lmOk('D', 0) == LmsOk)                                               \
+  if ((!lmSilent) && lmOk('D', 0) == LmsOk)                                \
   {                                                                        \
     if ((text = lmTextGet s) != NULL)                                      \
     {                                                                      \
@@ -1164,7 +1168,7 @@ do {                                                                       \
 do {                                                                          \
   char* text;                                                                 \
                                                                               \
-  if (lmOk('T', tLev) == LmsOk)                                               \
+  if ((!lmSilent) && lmOk('T', tLev) == LmsOk)                                \
   {                                                                           \
     if ((text = lmTextGet s) != NULL)                                         \
     {                                                                         \
@@ -1198,6 +1202,7 @@ extern bool lmReads;
 extern bool lmWrites;
 extern bool lmAssertAtExit;
 extern bool lmNoTracesToFileIfHookActive;
+extern bool lmSilent;
 
 
 
@@ -1631,5 +1636,13 @@ extern long lmLogLineGet
 * lmCleanProgName - 
 */
 extern void lmCleanProgName(void);
+
+
+
+/* ****************************************************************************
+*
+* lmLogLinesGet - 
+*/
+extern int lmLogLinesGet(void);
 
 #endif

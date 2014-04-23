@@ -29,6 +29,10 @@
 
 #include "ngsi/Request.h"
 #include "common/Format.h"
+#include "orionTypes/areas.h"
+
+using namespace orion;
+
 
 /* ****************************************************************************
 *
@@ -49,6 +53,10 @@ typedef struct Scope
 {
   std::string  type;    // Mandatory
   std::string  value;   // Mandatory
+
+  orion::AreaType     areaType;
+  orion::Circle       circle;
+  orion::Polygon      polygon;
 
   Scope();
   Scope(std::string _type, std::string _value);

@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <stdio.h>
+#include <string.h>
 #include <string>
 
 #include "common/globals.h"

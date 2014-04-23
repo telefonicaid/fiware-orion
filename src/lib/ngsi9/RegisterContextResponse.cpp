@@ -132,14 +132,12 @@ std::string RegisterContextResponse::check(RequestType requestType, Format forma
 
   if (predetectedError != "")
   {
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = predetectedError;
+    response.errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (((res = duration.check(RegisterResponse, format, indent, predetectedError, counter))       != "OK") ||
            ((res = registrationId.check(RegisterResponse, format, indent, predetectedError, counter)) != "OK"))
   {
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = res;
+    response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";

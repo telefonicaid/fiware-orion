@@ -40,8 +40,9 @@
 */
 Scope::Scope()
 {
-  type  = "";
-  value = "";
+  type     = "";
+  value    = "";
+  areaType = orion::NoArea;
 }
 
 
@@ -85,13 +86,51 @@ std::string Scope::render(Format format, std::string indent, bool notLastInVecto
 */
 std::string Scope::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
 {
-  LM_T(LmtScope, ("type == '%s'", type.c_str()));
+  if (type == "FIWARE_Location")
+  {
+    if (areaType == orion::CircleType)
+    {
+      if (circle.radiusString() == "0")
+        return "Radius zero for a circle area";
+      else if (circle.radiusString() == "")
+        return "Missing radius for circle area";
+      else if (circle.invertedString() != "")
+      {
+        if (!isTrue(circle.invertedString()) && !isFalse(circle.invertedString()))
+          return "bad value for circle/inverted: '" + circle.invertedString() + "'";
+      }
+      else if (circle.center.latitudeString() == "")
+        return "Missing latitude for circle center";
+      else if (circle.center.longitudeString() == "")
+        return "Missing longitude for circle center";
+    }
+    else if (areaType == orion::PolygonType)
+    {
+      if (polygon.vertexList.size() < 3)
+        return "too few vertices for a polygon";
+      else if (polygon.invertedString() != "")
+      {
+        if (!isTrue(polygon.invertedString()) && !isFalse(polygon.invertedString()))
+          return "bad value for polygon/inverted: '" + polygon.invertedString() + "'";
+      }
 
-  if ((type == "") || (type == "not in use"))
-    return "Empty type in restriction scope";
+      for (unsigned int ix = 0; ix < polygon.vertexList.size(); ++ix)
+      {
+        if (polygon.vertexList[ix]->latitudeString() == "")
+          return std::string("missing latitude value for polygon vertex");
+        if (polygon.vertexList[ix]->longitudeString() == "")
+          return std::string("missing longitude value for polygon vertex");
+      }
+    }
+  }
+  else
+  {
+    if ((type == "") || (type == "not in use"))
+      return "Empty type in restriction scope";
 
-  if ((value == "") || (value == "not in use"))
-    return "Empty value in restriction scope";
+    if ((value == "") || (value == "not in use"))
+      return "Empty value in restriction scope";
+  }
 
   return "OK";
 }
@@ -110,7 +149,29 @@ void Scope::present(std::string indent, int ix)
     PRINTF("%sScope %d:\n",    indent.c_str(), ix);
 
   PRINTF("%s  Type:     %s\n", indent.c_str(), type.c_str());
-  PRINTF("%s  Value:    %s\n", indent.c_str(), value.c_str());
+
+  if (areaType == orion::NoArea)
+    PRINTF("%s  Value:    %s\n", indent.c_str(), value.c_str());
+  else if (areaType == orion::CircleType)
+  {
+    PRINTF("%s  FI-WARE Circle Area:\n", indent.c_str());
+    PRINTF("%s    Radius:     %s\n", indent.c_str(), circle.radiusString().c_str());
+    PRINTF("%s    Longitude:  %s\n", indent.c_str(), circle.center.longitudeString().c_str());
+    PRINTF("%s    Latitude:   %s\n", indent.c_str(), circle.center.latitudeString().c_str());
+    PRINTF("%s    Inverted:   %s\n", indent.c_str(), circle.invertedString().c_str());
+  }
+  else if (areaType == orion::PolygonType)
+  {
+    PRINTF("%s  FI-WARE Polygon Area (%lu vertices):\n", indent.c_str(), polygon.vertexList.size());
+
+    PRINTF("%s    Inverted:   %s\n", indent.c_str(), polygon.invertedString().c_str());
+    for (unsigned int ix = 0; ix < polygon.vertexList.size(); ++ix)
+    {
+      PRINTF("%s    Vertex %d\n", indent.c_str(), ix);
+      PRINTF("%s      Longitude:  %s\n", indent.c_str(), polygon.vertexList[ix]->longitudeString().c_str());
+      PRINTF("%s      Latitude:   %s\n", indent.c_str(), polygon.vertexList[ix]->latitudeString().c_str());
+    }
+  }
 }
 
 
@@ -121,5 +182,5 @@ void Scope::present(std::string indent, int ix)
 */
 void Scope::release(void)
 {
-   /* This method is included for the sake of homogeneity */
+  polygon.release();
 }

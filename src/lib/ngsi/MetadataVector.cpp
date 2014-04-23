@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"

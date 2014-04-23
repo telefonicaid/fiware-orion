@@ -71,6 +71,8 @@ extern void restInit
    IpVersion         _ipVersion,
    const char*       _bindAddress,
    unsigned short    _port,
+   const char*       _httpsKey      = NULL,
+   const char*       _httpsCert     = NULL,
    RestServeFunction _serveFunction = NULL,
    bool              _acceptTextXml = false
 );

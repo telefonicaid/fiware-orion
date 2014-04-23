@@ -54,6 +54,7 @@
 #include "jsonParse/jsonAppendContextElementRequest.h"
 #include "jsonParse/jsonUpdateContextAttributeRequest.h"
 
+#include "parse/compoundValue.h"
 #include "rest/restReply.h"
 
 
@@ -97,6 +98,7 @@ static JsonRequest jsonRequest[] =
   { IndividualContextEntity,               "PUT",  "updateContextElementRequest",                   jsonUcerParseVector, jsonUcerInit, jsonUcerCheck,  jsonUcerPresent, jsonUcerRelease },
   { IndividualContextEntity,               "POST", "appendContextElementRequest",                   jsonAcerParseVector, jsonAcerInit, jsonAcerCheck,  jsonAcerPresent, jsonAcerRelease },
   { IndividualContextEntityAttribute,      "POST", "updateContextAttributeRequest",                 jsonUpcarParseVector,jsonUpcarInit,jsonUpcarCheck, jsonUpcarPresent,jsonUpcarRelease},
+  { IndividualContextEntityAttribute,      "PUT",  "updateContextAttributeRequest",                 jsonUpcarParseVector,jsonUpcarInit,jsonUpcarCheck, jsonUpcarPresent,jsonUpcarRelease},
   { IndividualContextEntityAttributes,     "POST", "appendContextElementRequest",                   jsonAcerParseVector, jsonAcerInit, jsonAcerCheck,  jsonAcerPresent, jsonAcerRelease },
   { IndividualContextEntityAttributes,     "PUT",  "updateContextElementRequest",                   jsonUcerParseVector, jsonUcerInit, jsonUcerCheck,  jsonUcerPresent, jsonUcerRelease },
   { AttributeValueInstance,                "PUT",  "updateContextAttributeRequest",                 jsonUpcarParseVector,jsonUpcarInit,jsonUpcarCheck, jsonUpcarPresent,jsonUpcarRelease},
@@ -137,6 +139,8 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
 
   LM_T(LmtParse, ("Treating a JSON request: '%s'", content));
 
+  ciP->parseDataP = parseDataP;
+
   if (reqP == NULL)
   {
     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", requestType(request), SccBadRequest,
@@ -145,13 +149,16 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
     LM_RE(errorReply, ("Sorry, no request treating object found for RequestType %d (%s)", request, requestType(request)));
   }
 
+  if (reqPP != NULL)
+    *reqPP = reqP;
+
   LM_T(LmtParse, ("Treating '%s' request", reqP->keyword.c_str()));
 
   reqP->init(parseDataP);
 
   try
   {
-    jsonParse(content, reqP->keyword, reqP->parseVector, parseDataP);
+    res = jsonParse(ciP, content, reqP->keyword, reqP->parseVector, parseDataP);
   }
   catch (std::exception &e)
   {
@@ -159,14 +166,32 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
     LM_E(("JSON Parse Error: '%s'", e.what()));
     LM_RE(errorReply, (res.c_str()));
   }
+  catch (...)
+  {
+    std::string errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, std::string("JSON Generic Error"));
+    LM_E(("JSON Generic Error during jsonParse"));
+    LM_RE(errorReply, (res.c_str()));
+  }
+
+  if (res != "OK")
+  {
+    LM_E(("JSON parse error: %s", res.c_str()));
+    ciP->httpStatusCode = SccBadRequest;
+
+    std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", payloadWord, ciP->httpStatusCode, res);
+    return answer; 
+  }
+
+  if (ciP->inCompoundValue == true)
+    orion::compoundValueEnd(ciP, parseDataP);
+  if ((lmTraceIsSet(LmtCompoundValueShow)) && (ciP->compoundValueP != NULL))
+    ciP->compoundValueP->shortShow("after parse: ");
 
   reqP->present(parseDataP);
 
+  LM_T(LmtParseCheck, ("Calling check for JSON parsed tree (%s)", ciP->payloadWord));
   res = reqP->check(parseDataP, ciP);
   reqP->present(parseDataP);
-
-  if (reqPP != NULL)
-    *reqPP = reqP;
 
   return res;
 }

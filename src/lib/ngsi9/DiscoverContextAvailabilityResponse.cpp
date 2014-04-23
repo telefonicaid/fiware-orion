@@ -61,10 +61,7 @@ DiscoverContextAvailabilityResponse::~DiscoverContextAvailabilityResponse()
 */
 DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(StatusCode& _errorCode)
 {
-  errorCode.code         = _errorCode.code;
-  errorCode.reasonPhrase = _errorCode.reasonPhrase;
-  errorCode.details      = _errorCode.details;
-
+  errorCode.fill(&_errorCode);
   errorCode.tagSet("errorCode");
 }
 

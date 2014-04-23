@@ -58,7 +58,9 @@ std::string ContextAttributeVector::render(RequestType request, Format format, s
 
   if (vec.size() == 0)
   {
-     if ((request == IndividualContextEntityAttribute) || (request == AttributeValueInstance) || (request == IndividualContextEntityAttributes))
+     if (((request == IndividualContextEntityAttribute)
+         || (request == AttributeValueInstance)
+         || (request == IndividualContextEntityAttributes)) && format == XML)
       return indent + "<contextAttributeList></contextAttributeList>\n";
 
     return "";
@@ -122,9 +124,11 @@ void ContextAttributeVector::push_back(ContextAttribute* item)
 *
 * ContextAttributeVector::get - 
 */
-ContextAttribute* ContextAttributeVector::get(int ix)
+ContextAttribute* ContextAttributeVector::get(unsigned int ix)
 {
-  return vec[ix];
+  if (ix < vec.size())
+    return vec[ix];
+  return NULL;
 }
 
 

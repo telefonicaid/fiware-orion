@@ -121,7 +121,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       if (strcasecmp(serviceV[ix].compV[compNo].c_str(), compV[compNo].c_str()) != 0)
       {
         match = false;
-        LM_T(LmtRestCompare, ("ix %d: component %d is not a match ('%s' != '%s')", ix, compNo, compV[compNo].c_str(), serviceV[ix].compV[compNo].c_str()));
         break;
       }
     }
@@ -134,6 +133,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       std::string response;
 
       LM_T(LmtParsedPayload, ("Parsing payload for URL '%s', method '%s', service vector index: %d", ciP->url.c_str(), ciP->method.c_str(), ix));
+      ciP->parseDataP = &parseData;
       response = payloadParse(ciP, &parseData, &serviceV[ix], &reqP, &jsonReqP);
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
       if (response != "OK")
@@ -177,6 +177,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   LM_E(("Service '%s' not recognized", ciP->url.c_str()));
   ciP->httpStatusCode = SccBadRequest;
   std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("Service not recognized: ") + ciP->url);
+  restReply(ciP, answer);
 
   compV.clear();
   return answer;

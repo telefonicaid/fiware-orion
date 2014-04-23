@@ -2,6 +2,7 @@
   "subscriptionId" : "012345678901234567890123",
   "errorCode" : {
     "code" : "400",
-    "reasonPhrase" : "bad value for 'isPattern'"
+    "reasonPhrase" : "Bad Request",
+    "details" : "invalid isPattern (boolean) value for entity: '2'"
   }
 }

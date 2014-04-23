@@ -80,7 +80,7 @@ StatusCode::StatusCode(HttpStatusCode _code, std::string _details, std::string _
 *
 * StatusCode::render - 
 */
-std::string StatusCode::render(Format format, std::string indent, bool comma)
+std::string StatusCode::render(Format format, std::string indent, bool comma, bool showTag)
 {
   std::string out  = "";
 
@@ -90,7 +90,7 @@ std::string StatusCode::render(Format format, std::string indent, bool comma)
     details += " - ZERO code set to 500";
   }
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, tag, format, showTag);
   out += valueTag(indent + "  ", "code", code, format, true);
   out += valueTag(indent + "  ", "reasonPhrase", reasonPhrase, format, details != "");
 
@@ -151,10 +151,10 @@ std::string StatusCode::check(RequestType requestType, Format format, std::strin
 */
 void StatusCode::present(std::string indent)
 {
-   PRINTF("%sCode:            %d",   indent.c_str(), code);
-   PRINTF("%sReasonPhrase:    '%s'", indent.c_str(), reasonPhrase.c_str());
-   PRINTF("%sDetail:          '%s'", indent.c_str(), details.c_str());
-   PRINTF("%sTag:             '%s'", indent.c_str(), tag.c_str());
+   PRINTF("%sCode:            %d\n",   indent.c_str(), code);
+   PRINTF("%sReasonPhrase:    '%s'\n", indent.c_str(), reasonPhrase.c_str());
+   PRINTF("%sDetail:          '%s'\n", indent.c_str(), details.c_str());
+   PRINTF("%sTag:             '%s'\n", indent.c_str(), tag.c_str());
 }
 
 

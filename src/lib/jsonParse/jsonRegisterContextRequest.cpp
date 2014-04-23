@@ -35,6 +35,7 @@
 #include "ngsi9/RegisterContextRequest.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonNullTreat.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -114,10 +115,10 @@ static std::string entityIdIsPattern(std::string path, std::string value, ParseD
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
   if (!isTrue(value) && !isFalse(value))
-    return "bad 'isPattern' value: '" + value + "'";
+    return "invalid isPattern (boolean) value for entity: '" + value + "'";
 
   if (isTrue(value))
-    return "isPattern set to TRUE for a registerContext request - this is nonsense ...";
+    return "isPattern set to true for a registration";
 
   reqDataP->rcr.entityIdP->isPattern = value;
 
@@ -178,7 +179,7 @@ static std::string craType(std::string path, std::string value, ParseData* reqDa
 static std::string craIsDomain(std::string path, std::string value, ParseData* reqDataP)
 {
   if (!isTrue(value) && !isFalse(value))
-    return "bad 'isDomain' value: '" + value + "'";
+    return "invalid isDomain (boolean) value for context registration attribute: '" + value + "'";
 
   reqDataP->rcr.attributeP->isDomain = value;
   LM_T(LmtParse, ("Set 'isDomain' to '%s' for a contextRegistrationAttribute", reqDataP->rcr.attributeP->isDomain.c_str()));

@@ -87,8 +87,7 @@ std::string SubscribeContextAvailabilityRequest::check(RequestType requestType, 
 
   if (predetectedError != "")
   {
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = predetectedError;
+    response.errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (((res = entityIdVector.check(SubscribeContextAvailability, format, indent, predetectedError, counter))   != "OK") ||
            ((res = attributeList.check(SubscribeContextAvailability, format, indent, predetectedError, counter))    != "OK") ||
@@ -96,8 +95,7 @@ std::string SubscribeContextAvailabilityRequest::check(RequestType requestType, 
            ((res = duration.check(SubscribeContextAvailability, format, indent, predetectedError, counter))         != "OK") ||
            ((res = restriction.check(SubscribeContextAvailability, format, indent, predetectedError, restrictions)) != "OK"))
   {
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = res;
+    response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";

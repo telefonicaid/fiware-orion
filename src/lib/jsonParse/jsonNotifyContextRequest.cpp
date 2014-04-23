@@ -118,7 +118,8 @@ static std::string entityIdIsPattern(std::string path, std::string value, ParseD
   parseDataP->ncr.cerP->contextElement.entityId.isPattern = value;
 
   if (!isTrue(value) && !isFalse(value))
-    LM_W(("bad 'isPattern' value: '%s'", value.c_str()));
+    return "invalid isPattern (boolean) value for entity: '" + value + "'";
+
 
   return "OK";
 }
@@ -212,7 +213,7 @@ static std::string statusCodeCode(std::string path, std::string value, ParseData
 static std::string statusCodeReasonPhrase(std::string path, std::string value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a statusCode reasonPhrase: '%s'", value.c_str()));
-  parseDataP->ncr.cerP->statusCode.reasonPhrase = value;
+  parseDataP->ncr.cerP->statusCode.reasonPhrase = value; // OK - parsing step reading reasonPhrase
   return "OK";
 }
 
@@ -345,32 +346,39 @@ JsonNode jsonNcrParseVector[] =
 {
    { "/subscriptionId",                           subscriptionId         },
    { "/originator",                               originator             },
-   { "/contextResponses/contextResponse",         contextResponse        },
+
+   { "/contextResponses",                                           jsonNullTreat          },
+   { "/contextResponses/contextResponse",                           contextResponse        },
+   { "/contextResponses/contextResponse/contextElement",            jsonNullTreat          },
    { "/contextResponses/contextResponse/contextElement/id",         entityIdId             },
    { "/contextResponses/contextResponse/contextElement/type",       entityIdType           },
    { "/contextResponses/contextResponse/contextElement/isPattern",  entityIdIsPattern      },
 
    { "/contextResponses/contextResponse/contextElement/attributeDomainName",  attributeDomainName      },
 
+   { "/contextResponses/contextResponse/contextElement/attributes",                 jsonNullTreat          },
    { "/contextResponses/contextResponse/contextElement/attributes/attribute",       attribute              },
    { "/contextResponses/contextResponse/contextElement/attributes/attribute/name",  attributeName          },
    { "/contextResponses/contextResponse/contextElement/attributes/attribute/type",  attributeType          },
    { "/contextResponses/contextResponse/contextElement/attributes/attribute/value", attributeValue         },
 
+   { "/contextResponses/contextResponse/contextElement/attributes/attribute/metadatas",                 jsonNullTreat            },
    { "/contextResponses/contextResponse/contextElement/attributes/attribute/metadatas/metadata",        attributeMetadata        },
    { "/contextResponses/contextResponse/contextElement/attributes/attribute/metadatas/metadata/name",   attributeMetadataName    },
    { "/contextResponses/contextResponse/contextElement/attributes/attribute/metadatas/metadata/type",   attributeMetadataType    },
    { "/contextResponses/contextResponse/contextElement/attributes/attribute/metadatas/metadata/value",  attributeMetadataValue   },
 
+   { "/contextResponses/contextResponse/contextElement/metadatas",                 jsonNullTreat         },
    { "/contextResponses/contextResponse/contextElement/metadatas/metadata",        domainMetadata        },
    { "/contextResponses/contextResponse/contextElement/metadatas/metadata/name",   domainMetadataName    },
    { "/contextResponses/contextResponse/contextElement/metadatas/metadata/type",   domainMetadataType    },
    { "/contextResponses/contextResponse/contextElement/metadatas/metadata/value",  domainMetadataValue   },
 
 
-   { "/contextResponses/contextResponse/statusCode/code",            statusCodeCode },
+   { "/contextResponses/contextResponse/statusCode",                 jsonNullTreat          },
+   { "/contextResponses/contextResponse/statusCode/code",            statusCodeCode         },
    { "/contextResponses/contextResponse/statusCode/reasonPhrase",    statusCodeReasonPhrase },
-   { "/contextResponses/contextResponse/statusCode/details",         statusCodeDetails },
+   { "/contextResponses/contextResponse/statusCode/details",         statusCodeDetails      },
 
    { "LAST", NULL }
 };

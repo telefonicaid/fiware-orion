@@ -136,6 +136,7 @@ int paLogSetup(void)
 		/* lmBug     = false; */
 		lmReads    = false;
 		lmWrites   = false;
+		lmSilent   = false;
 
 		lmTraceSet((char*) "");
 

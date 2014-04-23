@@ -1,0 +1,347 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# fermin at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Convop query compound values by attribute (XML)
+--SHELL-INIT--
+source harnessFunctions.sh
+
+dbInit CB
+brokerStart CB
+
+--SHELL--
+echo "1: +++++++++ create vector compound +++++++++++"
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<appendContextElementRequest>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>att</name>
+      <type>T</type>
+      <contextValue type="vector">
+        <item>22</item>
+        <item>
+          <x type="vector">
+            <item>x1</item>
+            <item>x2</item>
+          </x>
+          <y>3</y>
+        </item>
+        <item type="vector">
+          <item>z1</item>
+          <item>z2</item>
+        </item>
+      </contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>ground</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+    <contextAttribute>
+      <name>att</name>
+      <type>T</type>
+      <contextValue type="vector">
+        <item>23</item>
+        <item>
+          <x type="vector">
+            <item>x3</item>
+            <item>x4</item>
+          </x>
+          <y>4</y>
+        </item>
+        <item type="vector">
+          <item>z3</item>
+          <item>z4</item>
+        </item>
+      </contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>wall</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>
+EOF
+
+echo "2: +++++++++ create object compound +++++++++++"
+(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<appendContextElementRequest>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>att</name>
+      <type>T</type>
+      <contextValue>
+        <x>
+          <x1>a</x1>
+          <x2>b</x2>
+        </x>
+        <y type="vector">
+          <item>y1</item>
+          <item>y2</item>
+        </y>
+      </contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>ground</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+    <contextAttribute>
+      <name>att</name>
+      <type>T</type>
+      <contextValue>
+        <x>
+          <x1>c</x1>
+          <x2>d</x2>
+        </x>
+        <y type="vector">
+          <item>y3</item>
+          <item>y4</item>
+        </y>
+      </contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>wall</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>
+EOF
+
+echo "3: ++++++++++ query for vector compound by attribute ++++++++++"
+curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector/attributes/att -s -S --header 'Accept: application/xml' | xmllint --format -
+
+echo "4: ++++++++++ query for object compound by attribute ++++++++++"
+curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector/attributes/att -s -S --header 'Accept: application/xml' | xmllint --format -
+
+--REGEXPECT--
+1: +++++++++ create vector compound +++++++++++
+<?xml version="1.0"?>
+<appendContextElementResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>att</name>
+          <type>T</type>
+          <contextValue/>
+          <metadata>
+            <contextMetadata>
+              <name>ID</name>
+              <type>string</type>
+              <value>ground</value>
+            </contextMetadata>
+          </metadata>
+        </contextAttribute>
+        <contextAttribute>
+          <name>att</name>
+          <type>T</type>
+          <contextValue/>
+          <metadata>
+            <contextMetadata>
+              <name>ID</name>
+              <type>string</type>
+              <value>wall</value>
+            </contextMetadata>
+          </metadata>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</appendContextElementResponse>
+2: +++++++++ create object compound +++++++++++
+<?xml version="1.0"?>
+<appendContextElementResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>att</name>
+          <type>T</type>
+          <contextValue/>
+          <metadata>
+            <contextMetadata>
+              <name>ID</name>
+              <type>string</type>
+              <value>ground</value>
+            </contextMetadata>
+          </metadata>
+        </contextAttribute>
+        <contextAttribute>
+          <name>att</name>
+          <type>T</type>
+          <contextValue/>
+          <metadata>
+            <contextMetadata>
+              <name>ID</name>
+              <type>string</type>
+              <value>wall</value>
+            </contextMetadata>
+          </metadata>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</appendContextElementResponse>
+3: ++++++++++ query for vector compound by attribute ++++++++++
+<?xml version="1.0"?>
+<contextAttributeResponse>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>att</name>
+      <type>T</type>
+      <contextValue type="vector">
+        <item>22</item>
+        <item>
+          <x type="vector">
+            <item>x1</item>
+            <item>x2</item>
+          </x>
+          <y>3</y>
+        </item>
+        <item type="vector">
+          <item>z1</item>
+          <item>z2</item>
+        </item>
+      </contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>ground</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+    <contextAttribute>
+      <name>att</name>
+      <type>T</type>
+      <contextValue type="vector">
+        <item>23</item>
+        <item>
+          <x type="vector">
+            <item>x3</item>
+            <item>x4</item>
+          </x>
+          <y>4</y>
+        </item>
+        <item type="vector">
+          <item>z3</item>
+          <item>z4</item>
+        </item>
+      </contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>wall</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</contextAttributeResponse>
+4: ++++++++++ query for object compound by attribute ++++++++++
+<?xml version="1.0"?>
+<contextAttributeResponse>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>att</name>
+      <type>T</type>
+      <contextValue type="vector">
+        <item>22</item>
+        <item>
+          <x type="vector">
+            <item>x1</item>
+            <item>x2</item>
+          </x>
+          <y>3</y>
+        </item>
+        <item type="vector">
+          <item>z1</item>
+          <item>z2</item>
+        </item>
+      </contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>ground</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+    <contextAttribute>
+      <name>att</name>
+      <type>T</type>
+      <contextValue type="vector">
+        <item>23</item>
+        <item>
+          <x type="vector">
+            <item>x3</item>
+            <item>x4</item>
+          </x>
+          <y>4</y>
+        </item>
+        <item type="vector">
+          <item>z3</item>
+          <item>z4</item>
+        </item>
+      </contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>wall</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</contextAttributeResponse>
+--TEARDOWN--
+source harnessFunctions.sh
+brokerStop CB

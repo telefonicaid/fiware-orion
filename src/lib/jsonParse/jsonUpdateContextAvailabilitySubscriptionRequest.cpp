@@ -34,6 +34,7 @@
 #include "jsonParse/jsonNullTreat.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonUpdateContextAvailabilitySubscriptionRequest.h"
+#include "parse/nullTreat.h"
 
 
 
@@ -97,7 +98,11 @@ static std::string entityIdIsPattern(std::string path, std::string value, ParseD
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
   if (!isTrue(value) && !isFalse(value))
-    LM_W(("bad 'isPattern' value: '%s'", value.c_str()));
+  {
+    LM_E(("invalid isPattern (boolean) value for entity: '%s'", value.c_str()));
+    reqDataP->errorString = "invalid isPattern (boolean) value for entity: '" + value + "'";
+    return "invalid isPattern (boolean) value for entity: '" + value + "'";
+  }
 
   reqDataP->ucas.entityIdP->isPattern = value;
 
@@ -232,14 +237,17 @@ static std::string subscriptionId(std::string path, std::string value, ParseData
 */
 JsonNode jsonUcasParseVector[] =
 {
+  { "/entities",                           jsonNullTreat        },
   { "/entities/entity",                    entityId             },
   { "/entities/entity/id",                 entityIdId           },
   { "/entities/entity/type",               entityIdType         },
   { "/entities/entity/isPattern",          entityIdIsPattern    },
+  { "/attributes",                         jsonNullTreat        },
   { "/attributes/attribute",               attribute            },
   { "/duration",                           duration             },
   { "/restriction",                        restriction          },
   { "/restriction/attributeExpression",    attributeExpression  },
+  { "/restriction/scopes",                 jsonNullTreat        },
   { "/restriction/scopes/scope",           scope,               },
   { "/restriction/scopes/scope/type",      scopeType            },
   { "/restriction/scopes/scope/value",     scopeValue           },

@@ -64,8 +64,7 @@ std::string UpdateContextElementRequest::render(RequestType requestType, Format 
 -
 *   else if ((res = attributeDomainName.check(AppendContextElement, format, indent, predetectedError, counter)) != "OK")
 *   {
-*     response.errorCode.code         = SccBadRequest;
-*     response.errorCode.reasonPhrase = res;
+*     response.errorCode.fill(SccBadRequest, res);
 *   }
 *
 */
@@ -76,13 +75,11 @@ std::string UpdateContextElementRequest::check(RequestType requestType, Format f
 
    if (predetectedError != "")
    {
-     response.errorCode.code         = SccBadRequest;
-     response.errorCode.reasonPhrase = predetectedError;
+     response.errorCode.fill(SccBadRequest, predetectedError);
    }
    else if ((res = contextAttributeVector.check(UpdateContextElement, format, indent, predetectedError, counter)) != "OK")
    {
-     response.errorCode.code         = SccBadRequest;
-     response.errorCode.reasonPhrase = res;
+     response.errorCode.fill(SccBadRequest, res);
    }
    else
      return "OK";

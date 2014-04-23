@@ -2,6 +2,7 @@
   <subscriptionId>000000000000000000000000</subscriptionId>
   <statusCode>
     <code>400</code>
-    <reasonPhrase>Forced Error</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>Forced Error</details>
   </statusCode>
 </unsubscribeContextAvailabilityResponse>

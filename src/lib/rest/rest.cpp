@@ -29,6 +29,7 @@
 
 #include "common/string.h"
 #include "common/wsStrip.h"
+#include "common/globals.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
 #include "rest/restReply.h"
@@ -171,12 +172,16 @@ static Format wantedOutputSupported(std::string acceptList, std::string* charset
 
   free(copy);
 
+  bool xml  = false;
+  bool json = false;
+
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
      char* s;
 
      //
      // charset embedded in 'Accept' header?
+     // We read it but we don't do anything with it ...
      //
      if ((s = strstr((char*) vec[ix].c_str(), ";")) != NULL)
      {
@@ -194,17 +199,14 @@ static Format wantedOutputSupported(std::string acceptList, std::string* charset
      }
 
      std::string format = vec[ix].c_str();
-     if (format == "*/*")              return XML;
-     if (format == "*/xml")            return XML;
-     if (format == "application/*")    return XML;
-     if (format == "application/xml")  return XML;
-     if (format == "application/json") return JSON;
-     if (format == "*/json")           return JSON;
+     if (format == "*/*")              xml  = true;
+     if (format == "*/xml")            xml  = true;
+     if (format == "application/*")    xml  = true;
+     if (format == "application/xml")  xml  = true;
+     if (format == "application/json") json = true;
+     if (format == "*/json")           json = true;
      
-     if ((acceptTextXml == true) && (format == "text/xml"))  return XML;
-
-     // Here we put in cases for JSON, TEXT etc ...
-
+     if ((acceptTextXml == true) && (format == "text/xml"))  xml = true;
 
      //
      // Resetting charset
@@ -212,6 +214,11 @@ static Format wantedOutputSupported(std::string acceptList, std::string* charset
      if (charsetP != NULL)
         *charsetP = "";
   }
+
+  if (xml == true)
+    return XML;
+  else if (json == true)
+    return JSON;
 
   LM_RE(NOFORMAT, ("No valid 'Accept-format' found"));
 }
@@ -224,11 +231,6 @@ static Format wantedOutputSupported(std::string acceptList, std::string* charset
 */
 static void serve(ConnectionInfo* ciP)
 {
-  if (ciP->payload == NULL)
-    LM_T(LmtService, ("Serving request %s %s without payload", ciP->method.c_str(), ciP->url.c_str()));
-  else
-    LM_T(LmtService, ("Serving request %s %s with %lu bytes of payload", ciP->method.c_str(), ciP->url.c_str(), ciP->httpHeaders.contentLength));
-
   restService(ciP, restServiceV);
 }
 
@@ -259,21 +261,24 @@ static void requestCompleted
 
 /* ****************************************************************************
 *
-* formatCheck - 
+* outFormatCheck - 
 */
-static int formatCheck(ConnectionInfo* ciP)
+static int outFormatCheck(ConnectionInfo* ciP)
 {
-  ciP->inFormat   = formatParse(ciP->httpHeaders.contentType, NULL);
   ciP->outFormat  = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
-
   if (ciP->outFormat == NOFORMAT)
   {
     /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
-    ciP->answer         = restErrorReplyGet(ciP, XML, "", "OrionError", SccNotAcceptable,
-                                            std::string("acceptable types: 'application/xml' but Accept header in request was: '") + ciP->httpHeaders.accept + "'");
     ciP->httpStatusCode = SccNotAcceptable;
+    ciP->answer = restErrorReplyGet(ciP,
+                                    XML,
+                                    "",
+                                    "OrionError",
+                                    SccNotAcceptable,
+                                    std::string("acceptable MIME types: 'application/xml, application/json'. Accept header in request: '") + ciP->httpHeaders.accept + "'");
 
     ciP->outFormat      = XML; // We use XML as default format
+    ciP->httpStatusCode = SccNotAcceptable;
 
     return 1;
   }
@@ -296,25 +301,37 @@ static int contentTypeCheck(ConnectionInfo* ciP)
   std::string details = "";
 
   //
-  // Three cases:
+  // Four cases:
   //   1. If there is no payload, the Content-Type is not interesting
   //   2. Payload present but no Content-Type 
-  //   3. Content-Type present but not supported
+  //   3. text/xml used and acceptTextXml is setto true (iotAgent only)
+  //   4. Content-Type present but not supported
 
+  // Case 1
   if (ciP->httpHeaders.contentLength == 0)
-    details = "";
-  else if (ciP->httpHeaders.contentType == "")
-    details = "Content-Type header not used, default application/octet-stream is not supported";
-  else if ((acceptTextXml == true) && (ciP->httpHeaders.contentType == "text/xml"))
-    details = "";
-  else if ((ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
-     details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
+    return 0;
 
-  if (details != "")
+  // Case 2
+  if (ciP->httpHeaders.contentType == "")
   {
-    ciP->answer         = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
+    std::string details = "Content-Type header not used, default application/octet-stream is not supported";
     ciP->httpStatusCode = SccUnsupportedMediaType;
+    ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
+    ciP->httpStatusCode = SccUnsupportedMediaType;
+    return 1;
+  }
 
+  // Case 3
+  if ((acceptTextXml == true) && (ciP->httpHeaders.contentType == "text/xml"))
+    return 0;
+
+  // Case 4
+  if ((ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
+  {
+    std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
+    ciP->httpStatusCode = SccUnsupportedMediaType;
+    ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
+    ciP->httpStatusCode = SccUnsupportedMediaType;
     return 1;
   }
 
@@ -367,8 +384,22 @@ static int connectionTreat
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
 
-    if ((formatCheck(ciP) != 0) || (contentTypeCheck(ciP) != 0))
-      LM_W(("Error in out-format or content-type"));
+    ciP->outFormat  = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
+    if (ciP->outFormat == NOFORMAT)
+      ciP->outFormat = XML; // XML is default output format
+
+    if (contentTypeCheck(ciP) != 0)
+    {
+      LM_W(("Error in Content-Type"));
+      restReply(ciP, ciP->answer);
+    }
+    else if (outFormatCheck(ciP) != 0)
+    {
+      LM_W(("Bad Accepted Out-Format (in Accept header)"));
+      restReply(ciP, ciP->answer);
+    }
+    else
+      ciP->inFormat = formatParse(ciP->httpHeaders.contentType, NULL);
 
     return MHD_YES;
   }
@@ -435,75 +466,92 @@ static int connectionTreat
 *
 * restStart - 
 */
-static int restStart(IpVersion ipVersion)
+static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
-  int ret;
-
   if (port == 0)
      LM_RE(1, ("Please call restInit before starting the REST service"));
 
   if ((ipVersion == IPV4) || (ipVersion == IPDUAL)) 
   { 
-    // Code for IPv4 stack
-    ret = inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr));
-    if (ret != 1) {
+    memset(&sad, 0, sizeof(sad));
+    if (inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr)) != 1)
       LM_RE(2, ("V4 inet_pton fail for %s", bindIp));
-    }
 
-    LM_V(("IPv4 port: %d", port));
     sad.sin_family = AF_INET;
     sad.sin_port   = htons(port);
 
-    LM_V(("Starting http daemon on IPv4 %s port %d", bindIp, port));
-    mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY
-                               htons(port),
-                               NULL,
-                               NULL,
-                               connectionTreat,
-                               NULL,
-                               MHD_OPTION_NOTIFY_COMPLETED,
-                               requestCompleted,
-                               NULL,
-                               MHD_OPTION_CONNECTION_MEMORY_LIMIT,
-                               2 * PAYLOAD_SIZE,
-                               MHD_OPTION_SOCK_ADDR, (struct sockaddr*) &sad,
-                               MHD_OPTION_END);
-  
-    if (mhdDaemon == NULL)
-       LM_RE(3, ("MHD_start_daemon failed"));
+    if ((httpsKey != NULL) && (httpsCertificate != NULL))
+    {
+      mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_SSL, // MHD_USE_SELECT_INTERNALLY
+                                   htons(port),
+                                   NULL,
+                                   NULL,
+                                   connectionTreat,                     NULL,
+                                   MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
+                                   MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
+                                   MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                   MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
+                                   MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
+                                   MHD_OPTION_END);
+    }
+    else
+    {
+      LM_V(("Starting HTTP daemon on IPv4 %s port %d", bindIp, port));
+      mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY
+                                   htons(port),
+                                   NULL,
+                                   NULL,
+                                   connectionTreat,                     NULL,
+                                   MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                   MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
+                                   MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
+                                   MHD_OPTION_END);
+    }
 
+    if (mhdDaemon == NULL)
+      LM_RE(3, ("MHD_start_daemon failed"));
   }  
 
   if ((ipVersion == IPV6) || (ipVersion == IPDUAL))
   { 
-    // Code for IPv6 stack
-    ret = inet_pton(AF_INET6, bindIPv6, &(sad_v6.sin6_addr.s6_addr));
-    if (ret != 1) {
+    memset(&sad_v6, 0, sizeof(sad_v6));
+    if (inet_pton(AF_INET6, bindIPv6, &(sad_v6.sin6_addr.s6_addr)) != 1)
       LM_RE(1, ("V6 inet_pton fail for %s", bindIPv6));
-    }
 
     sad_v6.sin6_family = AF_INET6;
     sad_v6.sin6_port = htons(port);
 
-    LM_V(("Starting http daemon on IPv6 %s port %d", bindIPv6, port));
-
-    mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6,
-                               htons(port),
-                               NULL,
-                               NULL,
-                               connectionTreat,
-                               NULL,
-                               MHD_OPTION_NOTIFY_COMPLETED,
-                               requestCompleted,
-                               NULL,
-                               MHD_OPTION_CONNECTION_MEMORY_LIMIT,
-                               2 * PAYLOAD_SIZE,
-                               MHD_OPTION_SOCK_ADDR, (struct sockaddr*) &sad_v6,
-                               MHD_OPTION_END);
+    if ((httpsKey != NULL) && (httpsCertificate != NULL))
+    {
+      LM_V(("Starting HTTPS daemon on IPv6 %s port %d", bindIPv6, port));
+      mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6 | MHD_USE_SSL,
+                                      htons(port),
+                                      NULL,
+                                      NULL,
+                                      connectionTreat,                     NULL,
+                                      MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
+                                      MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
+                                      MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                      MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
+                                      MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
+                                      MHD_OPTION_END);
+    }
+    else
+    {
+      LM_V(("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
+      mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6,
+                                      htons(port),
+                                      NULL,
+                                      NULL,
+                                      connectionTreat,                     NULL,
+                                      MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
+                                      MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
+                                      MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
+                                      MHD_OPTION_END);
+    }
 
     if (mhdDaemon_v6 == NULL)
-       LM_RE(1, ("MHD_start_daemon_v6 failed"));
-
+      LM_RE(1, ("MHD_start_daemon_v6 failed"));
   }
 
   return 0;
@@ -519,8 +567,21 @@ static int restStart(IpVersion ipVersion)
 *           argument _acceptTextXml that was added for iotAgent only.
 *           See Issue #256
 */
-void restInit(RestService* _restServiceV, IpVersion _ipVersion, const char* _bindAddress, unsigned short _port, RestServeFunction _serveFunction, bool _acceptTextXml)
+void restInit
+(
+  RestService*       _restServiceV,
+  IpVersion          _ipVersion,
+  const char*        _bindAddress,
+  unsigned short     _port,
+  const char*        _httpsKey,
+  const char*        _httpsCertificate,
+  RestServeFunction  _serveFunction,
+  bool               _acceptTextXml
+)
 {
+  const char* key  = _httpsKey;
+  const char* cert = _httpsCertificate;
+
   port          = _port;
   restServiceV  = _restServiceV;
   ipVersionUsed = _ipVersion;
@@ -542,11 +603,11 @@ void restInit(RestService* _restServiceV, IpVersion _ipVersion, const char* _bin
      strncpy(bindIPv6, bindIPv6, MAX_LEN_IP - 1);
 
 
-  // Starting REST intrerface
+  // Starting REST interface
   int r;
-  if ((r = restStart(_ipVersion)) != 0)
+  if ((r = restStart(_ipVersion, key, cert)) != 0)
   {
     fprintf(stderr, "restStart: error %d\n", r);
-    LM_X(1, ("restStart: error %d", r));
+    orionExitFunction(1, "restStart: error");
   }
 }

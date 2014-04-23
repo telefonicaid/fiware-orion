@@ -34,6 +34,7 @@
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonUpdateContextAttributeRequest.h"
 #include "jsonParse/jsonNullTreat.h"
+#include "rest/ConnectionInfo.h"
 
 
 

@@ -37,6 +37,7 @@
 #include "ngsi/AttributeList.h"
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/ConditionValueList.h"
+#include "ngsi/Restriction.h"
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "ngsi9/RegisterContextRequest.h"
@@ -73,6 +74,9 @@ using namespace mongo;
 #define ENT_ATTRS_MODIFICATION_DATE  "modDate"
 #define ENT_CREATION_DATE            "creDate"
 #define ENT_MODIFICATION_DATE        "modDate"
+#define ENT_LOCATION                 "location"
+#define ENT_LOCATION_ATTRNAME        "attrName"
+#define ENT_LOCATION_COORDS          "coords"
 
 #define CSUB_EXPIRATION         "expiration"
 #define CSUB_LASTNOTIFICATION   "lastNotification"
@@ -107,6 +111,10 @@ using namespace mongo;
 #define ASSOC_ATTRS             "attrs"
 #define ASSOC_ATTRS_SOURCE      "src"
 #define ASSOC_ATTRS_TARGET      "tgt"
+
+#define EARTH_RADIUS_METERS     6371000
+
+#define LOCATION_WSG84          "WSG84"
 
 /*****************************************************************************
 *
@@ -213,6 +221,18 @@ extern const char* getSubscribeContextAvailabilityCollectionName(void);
 */
 extern const char* getAssociationsCollectionName(void);
 
+/*****************************************************************************
+*
+* mongoLocationCapable -
+*/
+extern bool mongoLocationCapable(void);
+
+/*****************************************************************************
+*
+* ensureLocationIndex -
+*/
+extern void ensureLocationIndex(void);
+
 /* ****************************************************************************
 *
 * recoverOntimeIntervalThreads -
@@ -242,7 +262,7 @@ extern bool includedAttribute(ContextAttribute attr, AttributeList* attrsV);
 * entitiesQuery -
 *
 */
-extern bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty);
+extern bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty);
 
 /* ****************************************************************************
 *

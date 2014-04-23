@@ -1,6 +1,7 @@
 {
   "errorCode" : {
     "code" : "400",
-    "reasonPhrase" : "bad value for 'isPattern'"
+    "reasonPhrase" : "Bad Request",
+    "details" : "invalid isPattern (boolean) value for entity: 'fralse'"
   }
 }

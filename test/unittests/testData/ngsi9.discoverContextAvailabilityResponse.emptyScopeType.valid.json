@@ -1,6 +1,7 @@
 {
   "errorCode" : {
     "code" : "400",
-    "reasonPhrase" : "Empty type in restriction scope"
+    "reasonPhrase" : "Bad Request",
+    "details" : "Empty type in restriction scope"
   }
 }

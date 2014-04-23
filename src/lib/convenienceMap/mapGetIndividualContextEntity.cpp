@@ -61,7 +61,7 @@ HttpStatusCode mapGetIndividualContextEntity(std::string entityId, ContextElemen
 
    std::vector<ContextAttribute*> attrV = qcResponse.contextElementResponseVector.get(0)->contextElement.contextAttributeVector.vec;
    for (unsigned int ix = 0; ix < attrV.size() ; ++ix) {
-       ContextAttribute* ca = new ContextAttribute(attrV[ix]->name, attrV[ix]->type, attrV[ix]->value);
+       ContextAttribute* ca = new ContextAttribute(attrV[ix]);
        response->contextElement.contextAttributeVector.push_back(ca);
    }
    response->statusCode.fill(&qcResponse.contextElementResponseVector.get(0)->statusCode);

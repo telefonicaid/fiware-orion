@@ -34,6 +34,18 @@ def validation_error(input_line, ref_line):
     exit(1)
 
 
+def line_count(file_name):
+    input = open(file_name, 'r')
+    lines = 0
+
+    for input_line in input.readlines():
+        lines = lines + 1
+
+    input.close()
+    return lines
+
+
+
 def diff_files(input_file, ref_file):
 
     input = open(input_file, 'r')
@@ -89,6 +101,21 @@ def main():
     else:
         if not os.path.exists(options.ref_file):
             parser.error("Reference file %s does not exist" % options.ref_file)
+
+    ilines = line_count(options.input_file)
+    rlines = line_count(options.ref_file)
+
+    if ilines == 0:
+        print "VALIDATION ERROR: input file is EMPTY"
+        exit(1)
+
+    if rlines == 0:
+        print "VALIDATION ERROR: reference file is EMPTY"
+        exit(1)
+
+    if not ilines == rlines:
+        print "VALIDATION ERROR: input file and reference file have different line count"
+        exit(1)
 
     diff_files(options.input_file, options.ref_file)
 

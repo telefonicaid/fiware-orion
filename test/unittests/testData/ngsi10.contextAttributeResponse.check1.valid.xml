@@ -8,6 +8,7 @@
   </contextAttributeList>
   <statusCode>
     <code>400</code>
-    <reasonPhrase>PRE ERROR</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>PRE ERROR</details>
   </statusCode>
 </contextAttributeResponse>

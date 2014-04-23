@@ -1,6 +1,7 @@
 {
   "errorCode" : {
     "code" : "400",
-    "reasonPhrase" : "Empty attribute expression"
+    "reasonPhrase" : "Bad Request",
+    "details" : "Empty attribute expression"
   }
 }

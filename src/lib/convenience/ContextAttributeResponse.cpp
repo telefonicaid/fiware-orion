@@ -65,14 +65,12 @@ std::string ContextAttributeResponse::check(RequestType requestType, Format form
 
    if (predetectedError != "")
    {
-     statusCode.code         = SccBadRequest;
-     statusCode.reasonPhrase = predetectedError;
+     statusCode.fill(SccBadRequest, predetectedError);
    }
    else if ((res = contextAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
    {
      LM_E(("contextAttributeVector::check flags an error: '%s'", res.c_str()));
-     statusCode.code         = SccBadRequest;
-     statusCode.reasonPhrase = res;
+     statusCode.fill(SccBadRequest, res);
 
      //
      // If this ContextAttributeResponse is part of an IndividualContextEntity, the complete rendered 
@@ -82,7 +80,7 @@ std::string ContextAttributeResponse::check(RequestType requestType, Format form
        return res;
    }
    else 
-      return "OK";
+     return "OK";
 
    return render(requestType, format, indent);
 }

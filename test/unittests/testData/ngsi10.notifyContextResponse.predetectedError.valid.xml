@@ -1,6 +1,7 @@
 <notifyContextResponse>
   <responseCode>
     <code>400</code>
-    <reasonPhrase>predetected error</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>predetected error</details>
   </responseCode>
 </notifyContextResponse>

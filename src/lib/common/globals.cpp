@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <time.h>
+#include <string>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -75,9 +76,7 @@ void orionInit(OrionExitFunction exitFunction, const char* version)
 */
 bool isTrue(const std::string& s)
 {
-  if (strcasecmp(s.c_str(), "true") == 0)
-    return true;
-  if (strcasecmp(s.c_str(), "yes") == 0)
+  if ((s == "true") || (s == "1"))
     return true;
 
   return false;
@@ -91,9 +90,7 @@ bool isTrue(const std::string& s)
 */
 bool isFalse(const std::string& s)
 {
-  if (strcasecmp(s.c_str(), "false") == 0)
-    return true;
-  if (strcasecmp(s.c_str(), "no") == 0)
+  if ((s == "false") || (s == "0"))
     return true;
 
   return false;
@@ -177,7 +174,7 @@ long long toSeconds(int value, char what, bool dayPart)
 long long parse8601(std::string s)
 {
     if (s == "")
-        return 0;
+        return -1;
 
     char*      duration    = strdup(s.c_str());
     char*      toFree      = duration;
@@ -194,10 +191,21 @@ long long parse8601(std::string s)
     ++duration;
     start = duration;
 
+    if (*duration == 0)
+    {
+      free(toFree);
+      return -1;
+    }
+
+    bool digitsPending = false;
+
     while (*duration != 0)
     {
       if (isdigit(*duration))
+      {
         ++duration;
+        digitsPending = true;
+      }
       else if ((dayPart == true) && ((*duration == 'Y') || (*duration == 'M') || (*duration == 'D') || (*duration == 'W')))
       {
         char what = *duration;
@@ -212,6 +220,7 @@ long long parse8601(std::string s)
         }
 
         accumulated += toSeconds(value, what, dayPart);
+        digitsPending = false;
         ++duration;
         start = duration;
       }
@@ -220,6 +229,7 @@ long long parse8601(std::string s)
         dayPart = false;
         ++duration;
         start = duration;
+        digitsPending = false;
       }
       else if ((dayPart == false) && ((*duration == 'H') || (*duration == 'M') || (*duration == 'S')))
       {
@@ -229,6 +239,7 @@ long long parse8601(std::string s)
         int value = atoi(start);
 
         accumulated += toSeconds(value, what, dayPart);
+        digitsPending = false;
         ++duration;
         start = duration;
       }
@@ -240,6 +251,9 @@ long long parse8601(std::string s)
     }
 
     free(toFree);
+
+    if (digitsPending == true)
+      return -1;
 
     return accumulated;
 }

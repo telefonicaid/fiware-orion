@@ -141,7 +141,6 @@ static int operationScope(xml_node<>* node, ParseData* reqDataP)
 static int scopeType(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a scopeType: '%s'", node->value()));
-
   reqDataP->dcar.scopeP->type = node->value();
   return 0;
 }
@@ -155,9 +154,7 @@ static int scopeType(xml_node<>* node, ParseData* reqDataP)
 static int scopeValue(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a scopeValue: '%s'", node->value()));
-
   reqDataP->dcar.scopeP->value = node->value();
-
   return 0;
 }
 

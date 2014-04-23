@@ -34,6 +34,7 @@
 #include "jsonParse/jsonNullTreat.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonSubscribeContextAvailabilityRequest.h"
+#include "parse/nullTreat.h"
 
 
 
@@ -97,7 +98,7 @@ static std::string entityIdIsPattern(std::string path, std::string value, ParseD
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
   if (!isTrue(value) && !isFalse(value))
-    return "bad 'isPattern' value: '" + value + "'";
+    return "invalid isPattern (boolean) value for entity: '" + value + "'";
 
   reqDataP->scar.entityIdP->isPattern = value;
 
@@ -209,9 +210,7 @@ static std::string scope(std::string path, std::string value, ParseData* reqData
 static std::string scopeType(std::string path, std::string value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a scope type: '%s'", value.c_str()));
-
   reqDataP->scar.scopeP->type = value;
-
   return "OK";
 }
 
@@ -224,9 +223,7 @@ static std::string scopeType(std::string path, std::string value, ParseData* req
 static std::string scopeValue(std::string path, std::string value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a scope value: '%s'", value.c_str()));
-
   reqDataP->scar.scopeP->value = value;
-
   return "OK";
 }
 
@@ -238,15 +235,18 @@ static std::string scopeValue(std::string path, std::string value, ParseData* re
 */
 JsonNode jsonScarParseVector[] =
 {
+  { "/entities",                           jsonNullTreat        },
   { "/entities/entity",                    entityId             },
   { "/entities/entity/id",                 entityIdId           },
   { "/entities/entity/type",               entityIdType         },
   { "/entities/entity/isPattern",          entityIdIsPattern    },
+  { "/attributes",                         jsonNullTreat        },
   { "/attributes/attribute",               attribute            },
   { "/reference",                          reference            },
   { "/duration",                           duration             },
   { "/restriction",                        restriction          },
   { "/restriction/attributeExpression",    attributeExpression  },
+  { "/restriction/scopes",                 jsonNullTreat        },
   { "/restriction/scopes/scope",           scope,               },
   { "/restriction/scopes/scope/type",      scopeType            },
   { "/restriction/scopes/scope/value",     scopeValue           },

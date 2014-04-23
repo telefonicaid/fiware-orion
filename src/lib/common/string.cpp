@@ -32,6 +32,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/string.h"
+#include "common/wsStrip.h"
 
 #define DEFAULT_HTTP_PORT 80
 
@@ -310,4 +311,243 @@ std::string parsedUptime(int uptime)
 
   sprintf(s, "%d d, %d h, %d m, %d s", days, hours, minutes, seconds);
   return std::string(s);
+}
+
+
+
+/* ****************************************************************************
+*
+* onlyWs - 
+*/
+bool onlyWs(const char* s)
+{
+  if (*s == 0)
+    return true;
+
+  while (*s != 0)
+  {
+    if ((*s != ' ') && (*s != '\t') && (*s != '\n'))
+      return false;
+
+    ++s;
+  }
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* string2coords - 
+*/
+bool string2coords(std::string s, double& latitude, double& longitude)
+{
+  char* initial = strdup(s.c_str());
+  char* cP      = initial;
+  char* comma;
+  char* number1;
+  char* number2;
+
+  cP = wsStrip(cP);
+
+  comma = strchr(cP, ',');
+  if (comma == NULL)
+  {
+    free(initial);
+    return false;
+  }
+  *comma = 0;
+  ++comma;
+
+  number1 = cP;
+  number2 = comma;
+
+  number1 = wsStrip(number1);
+  number2 = wsStrip(number2);
+
+  std::string err;
+  double oldLatitude = latitude;
+  double oldLongitude = longitude;
+  latitude = atoF(number1, err);
+  if (err.length() > 0) {
+     latitude = oldLatitude; 
+     free(initial);
+     return false;
+  }
+  else {
+     longitude = atoF(number2, err);
+     if (err.length() > 0) {
+         /* Rollback latitude */
+         latitude = oldLatitude;
+         longitude = oldLongitude;
+         free(initial);
+         return false;
+     }
+  }
+
+  free(initial);
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* coords2string - 
+*/
+void coords2string(std::string& s, double latitude, double longitude, int decimals)
+{
+  char buf[256];
+  char format[32];
+
+  snprintf(format, sizeof(format), "%%.%df, %%.%df", decimals, decimals);
+  snprintf(buf,    sizeof(buf),    format,           latitude, longitude);
+
+  s = buf;
+}
+
+/* ****************************************************************************
+*
+* versionParse -
+*/
+bool versionParse(std::string version, int& mayor, int& minor, std::string& bugFix)
+{
+   char* copy = strdup(version.c_str());
+   char* s    = wsStrip(copy);
+   char* dotP;
+
+
+   //
+   // mayor number
+   //
+   dotP = strchr(s, '.');
+   if (dotP == NULL)
+   {
+      free(copy);
+      return false;
+   }
+
+   *dotP = 0;
+   ++dotP;
+
+   s = wsStrip(s);
+   mayor = atoi(s);
+   if (strspn(s, "0123456789") != strlen(s))
+   {
+      free(copy);
+      return false;
+   }
+   s = dotP;
+
+
+   //
+   // minor number
+   // If no dot is found, no bugFix 'version' is present.
+   // Just zero the 'bugFix' and keep the remaining string in minor.
+   //
+   bool bugFixEmpty = false;
+
+   dotP = strchr(s, '.');
+   if (dotP != NULL)
+   {
+      *dotP = 0;
+      ++dotP;
+   }
+   else
+   {
+      bugFix = "";
+      bugFixEmpty = true;
+   }
+
+   s = wsStrip(s);
+   minor = atoi(s);
+   if (strspn(s, "0123456789") != strlen(s))
+   {
+      free(copy);
+      return false;
+   }
+
+   if (bugFixEmpty == true)
+   {
+     free(copy);
+     return true;
+   }
+
+   s = dotP;
+
+
+
+   //
+   // bugfix
+   //
+   s = wsStrip(s);
+   bugFix = s;
+
+   free(copy);
+   return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* atoF - 
+*/
+double atoF(const char* string, std::string& errorMsg)
+{
+   char* cP = (char*) string;
+   int   noOf;
+
+   errorMsg = "";
+
+   if (string[0] == 0)
+   {
+     errorMsg = "empty string";
+     return 0.0;
+   }
+
+   if ((*cP == '-') || (*cP == '+'))
+   {
+      ++cP;
+
+      if (!isdigit(*cP) && (*cP != '.'))
+      // the check on '.' is to allow e.g. '-.7' and '+.7'
+      {
+         errorMsg = "non-digit after unary minus/plus";
+         return 0.0;
+      }
+   }
+
+   // Number of dots
+   noOf = 0;
+   char* tmp = cP;
+   while (*tmp != 0)
+   {
+      if (*tmp == '.')
+      {
+         ++noOf;
+         if (tmp[1] == 0)
+         {
+            errorMsg = "last character in a double cannot be a dot";
+            return 0.0;
+         }
+      }
+
+      ++tmp;
+   }
+
+   if (noOf > 1)
+   {
+      errorMsg = "more than one dot";
+      return 0.0;
+   }
+
+   if (strspn(cP, ".0123456789") != strlen(cP))
+   {
+      errorMsg = "invalid characters in string to convert";
+      return 0.0;
+   }
+
+   return atof(string);
 }

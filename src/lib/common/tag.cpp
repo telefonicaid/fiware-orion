@@ -57,10 +57,15 @@ std::string startTag(std::string indent, std::string tagName, Format format, boo
 *
 * startTag -  
 */
-std::string startTag(std::string indent, std::string xmlTag, std::string jsonTag, Format format, bool isVector, bool showTag)
+std::string startTag(std::string indent, std::string xmlTag, std::string jsonTag, Format format, bool isVector, bool showTag, bool isCompoundVector)
 {
   if (format == XML)
+  {
+    if (isCompoundVector)
+      return indent + "<" + xmlTag + " type=\"vector\">\n";
+
     return indent + "<" + xmlTag + ">\n";
+  }
   else if (format == JSON)
   {
     if (isVector && showTag)
@@ -102,7 +107,7 @@ std::string endTag(std::string indent, std::string tagName, Format format, bool 
 *
 * valueTag -  
 */
-std::string valueTag(std::string indent, std::string tagName, std::string value, Format format, bool showComma, bool isAssociation)
+std::string valueTag(std::string indent, std::string tagName, std::string value, Format format, bool showComma, bool isAssociation, bool isVectorElement)
 {
   if (format == XML)
     return indent + "<" + tagName + ">" + value + "</" + tagName + ">" + "\n";
@@ -111,6 +116,8 @@ std::string valueTag(std::string indent, std::string tagName, std::string value,
   {
     if (isAssociation == true)
       return indent + "\"" + tagName + "\" : " + value + ",\n";
+    else if (isVectorElement == true)
+      return indent + "\"" + value + "\",\n";
     else
       return indent + "\"" + tagName + "\" : \"" + value + "\",\n";
   }
@@ -118,6 +125,8 @@ std::string valueTag(std::string indent, std::string tagName, std::string value,
   {
     if (isAssociation == true)
       return indent + "\"" + tagName + "\" : " + value + "\n";
+    else if (isVectorElement == true)
+      return indent + "\"" + value + "\"\n";
     else
       return indent + "\"" + tagName + "\" : \"" + value + "\"\n";
   }

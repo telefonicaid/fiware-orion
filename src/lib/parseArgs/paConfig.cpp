@@ -108,6 +108,8 @@ bool       paBug                 = false;
 bool       paBuf                 = false;
 bool       paDoubt               = false;
 
+bool       paSilent              = false;
+
 bool       paMsgsToStdout        = true;
 bool       paMsgsToStderr        = false;
 char       paPid[16];
@@ -542,6 +544,8 @@ int paConfig(const char* item, const void* value, const void* value2)
 		paBuf = (bool) val;
 	else if (strcmp(item, "doubt mode") == 0)
 		paDoubt = (bool) val;
+	else if (strcmp(item, "silent mode") == 0)
+		paSilent = (bool) val;
 	else if (strcmp(item, "version") == 0)
 	{
 		if (paExecVersion != NULL)
@@ -702,7 +706,8 @@ int paConfigActions(bool preTreat)
 	lmBug           = paBug;
 	lmDoubt         = paDoubt;
 	lmBuf           = paBuf;
-    lmAssertAtExit  = paAssertAtExit;
+	lmAssertAtExit  = paAssertAtExit;
+	lmSilent        = paSilent;
 
 	if (preTreat)
 		lmTraceSet(paTracelevels);
