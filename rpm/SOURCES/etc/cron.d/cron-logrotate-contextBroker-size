@@ -1,0 +1,2 @@
+# cron job to test and execute log rotate by size.
+*/30 * * * * orion logrotate  /etc/sysconfig/logrotate-contextBroker-size

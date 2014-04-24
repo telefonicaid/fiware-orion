@@ -35,7 +35,7 @@ Packager:   Fermín Galán <fermin@tid.es>
 URL:        http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-context-broker
 Source:     %{name}-%{broker_version}.tar.gz
 BuildRoot: /var/tmp/%{name}-buildroot
-Requires:  libstdc++, boost-thread, boost-filesystem, libmicrohttpd
+Requires:  libstdc++, boost-thread, boost-filesystem, libmicrohttpd, logrotate
 Buildrequires: gcc, cmake, gcc-c++, libmicrohttpd-devel, boost-devel
 Requires(pre): shadow-utils
 
@@ -54,6 +54,7 @@ Using these interfaces, clients can do several operations:
 if [ -d $RPM_BUILD_ROOT/usr ]; then
    rm -rf $RPM_BUILD_ROOT
 fi
+
 %setup
 
 %pre
@@ -93,6 +94,7 @@ EOMSG
 
 %clean
 rm -rf $RPM_BUILD_ROOT
+rm -rf %{_builddir}
 
 %build
 #FIXME There is an open issue with "make release" malfunction. Until get fixed, we will build in debug mode
@@ -103,6 +105,8 @@ make debug DESTDIR=$RPM_BUILD_ROOT BUILD_ARCH=%{build_arch}
 #FIXME There is an open issue with "make release" malfunction. Until get fixed, we will build in debug mode
 #make install DESTDIR=$RPM_BUILD_ROOT
 make install_debug DESTDIR=$RPM_BUILD_ROOT
+cp -R %{_sourcedir}/etc $RPM_BUILD_ROOT
+
 # rpmbuild seems to do the strip step automatically. However, this would fail after chmod, so we "manually" do
 # it as part of our install script
 strip $RPM_BUILD_ROOT/usr/bin/contextBroker

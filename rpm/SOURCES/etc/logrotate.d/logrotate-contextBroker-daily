@@ -1,0 +1,10 @@
+/var/log/contextBroker/contextBrokerLog 
+/var/log/contextBroker/contextBrokerLog.old 
+{
+      daily
+      rotate 7
+      copytruncate
+      compress
+      notifempty
+      missingok
+}
