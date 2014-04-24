@@ -1,9 +1,9 @@
 #ifndef CANTCOAP_H
 #define CANTCOAP_H
 
+#include <vector>
 #include "cantcoap.h"
 #include "uthash.h"
-
 // for mbed compatibility
 //#define failGracefully exit
 
@@ -14,18 +14,20 @@ class Coap
     typedef int (*ResourceCallback)(CoapPDU *pdu, int sockfd, struct sockaddr_storage *recvFrom);
 
     // resource URIs here
-    const char *gURIA = "/test";
+    //const char *gURIA = "/test";
 
-    const char *gURIList[] = {
-      gURIA,
-    };
+//    const char *gURIList[] = {
+//      "/test"
+//    };
 
     // URIs mapped to callback functions here
-    const ResourceCallback gCallbacks[] = {
-      gTestCallback
-    };
+//    ResourceCallback gCallbacks[] = {
+//      gTestCallback
+//    };
 
-    const int gNumResources = 1;
+//    std::vector<ResourceCallback> gCallbacks;
+
+    static const int gNumResources = 1;
 
 
 
@@ -38,7 +40,10 @@ class Coap
     };
 
   public:
-    Coap();
+    Coap()
+    {
+//      gCallbacks.push_back(gTestCallback);
+    }
 
     // callback functions defined here
     int gTestCallback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom);

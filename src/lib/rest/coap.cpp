@@ -16,9 +16,9 @@
 #include "nethelper.h"
 
 
-Coap::Coap()
-{
-}
+//Coap::Coap()
+//{
+//}
 
 int Coap::gTestCallback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom) {
   socklen_t addrLen = sizeof(struct sockaddr_in);
@@ -119,7 +119,7 @@ int Coap::run(int argc, char **argv) {
   }
 
   // iterate through returned structure to see what we got
-  printAddressStructures(bindAddr);
+  //printAddressStructures(bindAddr);
 
   // setup socket
   int sockfd = socket(bindAddr->ai_family,bindAddr->ai_socktype,bindAddr->ai_protocol);
@@ -131,15 +131,16 @@ int Coap::run(int argc, char **argv) {
     perror(NULL);
     exit(5);
   }
-  printAddress(bindAddr);
+  //printAddress(bindAddr);
 
   // setup URI callbacks using uthash hash table
   struct URIHashEntry *entry = NULL, *directory = NULL, *hash = NULL;
   for(int i=0; i<gNumResources; i++) {
     // create new hash structure to bind URI and callback
     entry = (struct URIHashEntry*)malloc(sizeof(struct URIHashEntry));
-    entry->uri = gURIList[i];
-    entry->callback = gCallbacks[i];
+    //entry->uri = gURIList[i];
+    entry->uri = "/coaptest";
+    //entry->callback = this->gTestCallback;
     // add hash structure to hash table, note that key is the URI
     HASH_ADD_KEYPTR(hh, directory, entry->uri, strlen(entry->uri), entry);
   }
@@ -208,7 +209,8 @@ int Coap::run(int argc, char **argv) {
       HASH_FIND_STR(directory,uriBuffer,hash);
       if(hash) {
         DBG("Hash id is %d.", hash->id);
-        hash->callback(recvPDU,sockfd,&recvAddr);
+        //hash->callback(recvPDU,sockfd,&recvAddr);
+        this->gTestCallback(recvPDU,sockfd,&recvAddr);
         continue;
       } else {
         DBG("Hash not found.");
@@ -224,14 +226,6 @@ int Coap::run(int argc, char **argv) {
     }
 
   }
-
-    // free the hash table contents
-   /*
-    HASH_ITER(hh, users, s, tmp) {
-      HASH_DEL(users, s);
-      free(s);
-    }
-   */
 
   return 0;
 }

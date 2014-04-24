@@ -46,7 +46,8 @@ int setupAddress(
 
 	// check if host is numeric
 	int hostIsNumeric = 1;
-	for(unsigned int i=0; i<strlen(host); i++) {
+  unsigned int i;
+  for(i=0; i<strlen(host); i++) {
 		if(host[i]>'9'||host[i]<'.') {
 			hostIsNumeric = 0;
 			break;
@@ -55,8 +56,8 @@ int setupAddress(
 
 	// check if port is numeric
 	int portIsNumeric = 1;
-	for(unsigned int i=0; i<strlen(port); i++) {
-		if(port[i]>'9'||port[i]<'.') {
+  for(i=0; i<strlen(port); i++) {
+    if(port[i]>'9'||port[i]<'.') {
 			portIsNumeric = 0;
 			break;
 		}
