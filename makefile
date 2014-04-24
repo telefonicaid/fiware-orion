@@ -29,28 +29,22 @@ ifndef INSTALL_DIR
 	INSTALL_DIR=/usr
 endif
 
-# Install into /opt/contextbroker [for delivery RPM installation]
-ifndef INSTALL_DIR_RE
-	INSTALL_DIR_RE=/opt/%{name}
-endif
-
 ifndef CPU_COUNT
 	CPU_COUNT:=$(shell cat /proc/cpuinfo | grep processor | wc -l)
 endif
 
-# Version for the contextBroker-* packages (except contextBroker-fiware)
-ifndef BROKER_VERSION
-	BROKER_VERSION:=$(shell grep "\#define ORION_VERSION" src/app/contextBroker/version.h | sed -e 's/^.* "//' -e 's/"//')
-endif
-
-# Directory for the workspace into the develenv machine
-ifndef WORKSPACE
-	WORKSPACE:=$(shell pwd)
+ifndef FIWARE_WORKSPACE
+	FIWARE_WORKSPACE:=$(shell pwd)
 endif
 
 # Directory for the rpm stage
 ifndef TOPDIR
-	TOPDIR=$(WORKSPACE)/rpm
+	TOPDIR=$(FIWARE_WORKSPACE)/rpm
+endif
+
+# Version for the contextBroker-* packages (except contextBroker-fiware)
+ifndef BROKER_VERSION
+	BROKER_VERSION:=$(shell grep "\#define ORION_VERSION" src/app/contextBroker/version.h | sed -e 's/^.* "//' -e 's/"//' | sed -e 's/-/_/g')
 endif
 
 # Release ID for the contextBroker-* packages (execept contextBroker-fiware)
@@ -194,6 +188,7 @@ post_install_libs:
 	cp src/lib/parse/*.h /usr/local/include/contextBroker/parse
 	cp $(CMAKE_BUILD_TYPE)/src/lib/parse/libparse.a  /usr/local/lib
 
+
 # Requires root access, i.e. use 'sudo make install_libs' to install
 install_libs: release
 	make post_install_libs CMAKE_BUILD_TYPE=BUILD_RELEASE
@@ -203,21 +198,17 @@ install_debug_libs: debug
 	make post_install_libs CMAKE_BUILD_TYPE=BUILD_DEBUG
 
 
-rpm_RE: 
-
-	rpmbuild -ba /home/vagrant/workspace/fiware-orion/rpm/SPECS/contextbroker.spec \
-		--define '_topdir /home/vagrant/workspace/fiware-orion/rpm' \
-		--define '_install_dir $(INSTALL_DIR_RE)' \
-		--define '_broker_version 0.10.1' 
-
 rpm: 
-#	Modified_broker_version=$(shell echo $(BROKER_VERSION) | sed -e 's/-/_/g')
-	rpmbuild -ba /home/vagrant/workspace/fiware-orion/rpm/SPECS/contextbroker.spec \
-		--define '_topdir /home/vagrant/workspace/fiware-orion/rpm' \
-		--define '_install_dir $(INSTALL_DIR)' \
-		--define '_broker_version $(BROKER_VERSION)'
-		# --define '_broker_version $(Modified_broker_version)' 
-		
+	rm -f rpm/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
+	git archive --format tar --prefix=contextBroker-$(BROKER_VERSION)/ HEAD |  gzip >  rpm/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
+	rpmbuild -ba rpm/SPECS/contextBroker.spec \
+		--define '_topdir $(TOPDIR)' \
+		--define 'broker_version $(BROKER_VERSION)' \
+		--define 'broker_release $(BROKER_RELEASE)' \
+		--define 'fiware_version $(FIWARE_VERSION)' \
+		--define 'fiware_release $(FIWARE_RELEASE)' \
+		--define 'build_arch $(BUILD_ARCH)'
+
 mock: 
 	mkdir -p ~/rpmbuild/{BUILD,RPMS,S{OURCE,PEC,RPM}S}
 	rm -f ~/rpmbuild/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz

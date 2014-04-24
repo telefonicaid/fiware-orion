@@ -1,23 +1,43 @@
-Summary:          Orion Context Broker
-Name:             contextBroker
-Version:          %{_broker_version}
-Release:          1%{?dist}
-License:          AGPLv3
-Packager:         Fermín Galán <fermin@tid.es>
-BuildRoot:        %{_topdir}/BUILDROOT/
-BuildArch:        x86_64
-Requires(pre):    shadow-utils
-Requires(post):   /sbin/chkconfig, /usr/sbin/useradd
-Requires(preun):  /sbin/chkconfig, /sbin/service
-Requires(postun): /sbin/service
-Requires:         libstdc++, boost-thread, boost-filesystem, libmicrohttpd 
-BuildRequires:    gcc, make, cmake, scons, gcc-c++, libmicrohttpd-devel, boost-devel
-Group:            Applications/Engineering
-Vendor:           Telefónica I+D
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# fermin at tid dot es
 
+%define name contextBroker
+%define owner orion 
 
 # Don't byte compile python code
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
+
+Summary:   Orion Context Broker
+Name:      %{name}
+Version:   %{broker_version}
+Release:   %{broker_release}
+License:   AGPLv3
+Group:     Applications/Engineering
+Vendor:     Telefónica I+D
+Packager:   Fermín Galán <fermin@tid.es>
+URL:        http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-context-broker
+Source:     %{name}-%{broker_version}.tar.gz
+BuildRoot: /var/tmp/%{name}-buildroot
+Requires:  libstdc++, boost-thread, boost-filesystem, libmicrohttpd
+Buildrequires: gcc, cmake, gcc-c++, libmicrohttpd-devel, boost-devel
+Requires(pre): shadow-utils
 
 %description
 The Orion Context Broker is an implementation of NGSI9 and NGSI10 interfaces. 
@@ -30,163 +50,30 @@ Using these interfaces, clients can do several operations:
 * Query context information. The Orion Context Broker stores context information
   updated from applications, so queries are resolved based on that information.
 
-## Project information
-%define _owner orion
-%define _service_name contextBroker
-
-## System folders
-# _localstatedir is a system var that goes to /var
-%define _orion_log_dir %{_localstatedir}/log/%{name}
-%define _src_project_dir %{_sourcedir}/../../
-# The _install_dir is defined into the makefile
-# The _toddir is defined into the makefile
-# The _broker_version is defined into the makefile
-
-# -------------------------------------------------------------------------------------------- #
-# Package RPM for tests 
-# -------------------------------------------------------------------------------------------- #
-%package tests
-Requires: %{name}, python, python-flask, nc, curl, libxml2, contextBroker 
-Summary: Test suite for %{name}
-
-%description tests
-Test suite for %{name}
-
-# -------------------------------------------------------------------------------------------- #
-# Prep section, setup macro:
-# -------------------------------------------------------------------------------------------- #
 %prep
-# Read from SOURCE and write into BUILD
-
-echo "[INFO] Preparing installation"
-
-## Create the rpm/BUILDROOT folder
-rm -Rf $RPM_BUILD_ROOT && mkdir -p $RPM_BUILD_ROOT
-
-## Copy src files
-cp -R %{_src_project_dir}CMakeLists.txt \
-      %{_src_project_dir}ContributionPolicy.txt \
-      %{_src_project_dir}etc \
-      %{_src_project_dir}LICENSE \
-      %{_src_project_dir}makefile \
-      %{_src_project_dir}README.md \
-      %{_src_project_dir}scripts \
-      %{_src_project_dir}src \
-      %{_src_project_dir}test \
-      %{_builddir}
-
-# Copy service files
-#cp -R %{_src_project_dir}etc %{buildroot}
-
-# -------------------------------------------------------------------------------------------- #
-# Build section:
-# -------------------------------------------------------------------------------------------- #
-%build
-# Read from BUILD and write into BUILD
-
-echo "[INFO] Building RPM"
-
-# Compile the code into the BUILDROOT directory with the architecture x86_64
-make debug DESTDIR=$RPM_BUILD_ROOT BUILD_ARCH=%{build_arch}
-
-# -------------------------------------------------------------------------------------------- #
-# Pre-install section:
-# -------------------------------------------------------------------------------------------- #
-%pre
-# Read from BUILD and write into BUILDROOT
-
-# Creating the user and group (orion)
-echo "[INFO] Creating %{_owner} user"
-grep ^%{_owner} /etc/passwd
-RET_VAL=$?
-if [ "$RET_VAL" != "0" ]; then
-      /usr/sbin/useradd -s "/bin/bash" -d %{_install_dir} %{_owner}
-      RET_VAL=$?
-      if [ "$RET_VAL" != "0" ]; then
-         echo "[ERROR] Unable create %{_owner} user" \
-         exit $RET_VAL
-      fi
+if [ -d $RPM_BUILD_ROOT/usr ]; then
+   rm -rf $RPM_BUILD_ROOT
 fi
+%setup
 
+%pre
+getent group %{owner} >/dev/null || groupadd -r %{owner}
+getent passwd %{owner} >/dev/null || useradd -r -g %{owner} -m -d /opt/orion -s /bin/bash -c 'Orion account' %{owner}
 # Backup previous sysconfig file (if any)
 DATE=$(date "+%Y-%m-%d")
-if [ -f "$RPM_BUILD_ROOT/%{_install_dir}/config/%{name}" ]; then
-   mv $RPM_BUILD_ROOT/%{_install_dir}/config/%{name} $RPM_BUILD_ROOT/%{_install_dir}/config/%{name}.orig-$DATE
-   chown %{_owner}:%{_owner} $RPM_BUILD_ROOT/%{_install_dir}/config/%{name}.orig-$DATE
+if [ -f "/etc/sysconfig/%{name}" ]; then
+   cp /etc/sysconfig/%{name} /etc/sysconfig/%{name}.orig-$DATE
+   chown %{owner}:%{owner} /etc/sysconfig/%{name}.orig-$DATE
 fi
+exit 0
 
-# -------------------------------------------------------------------------------------------- #
-# Pre-install section:
-# -------------------------------------------------------------------------------------------- #
-%install
-# Read from BUILD and write into BUILDROOT
-
-# RPM_BUILD_ROOT = BUILDROOT
-# %{_install_dir}=/opt/%{name}
-
-echo "[INFO] Installing the %{name}"
-make install_debug DESTDIR=$RPM_BUILD_ROOT
-strip $RPM_BUILD_ROOT/usr/bin/%{name}
-chmod 555 $RPM_BUILD_ROOT/usr/bin/%{name}
-
-echo "[INFO] Creating installation directories "
-mkdir -p $RPM_BUILD_ROOT/%{_install_dir}
-mkdir -p $RPM_BUILD_ROOT/%{_install_dir}/bin
-mkdir -p $RPM_BUILD_ROOT/%{_install_dir}/init.d
-mkdir -p $RPM_BUILD_ROOT/%{_install_dir}/profile.d
-mkdir -p $RPM_BUILD_ROOT/%{_install_dir}/doc
-mkdir -p $RPM_BUILD_ROOT/%{_install_dir}/share
-mkdir -p $RPM_BUILD_ROOT/%{_install_dir}/config
-mkdir -p $RPM_BUILD_ROOT/%{_install_dir}_tests
-mkdir -p $RPM_BUILD_ROOT/var/log/%{name}
-
-echo "[INFO] Copying files into the %{_install_dir}"
-rsync -Pav $RPM_BUILD_ROOT/usr/bin/%{name} $RPM_BUILD_ROOT/%{_install_dir}/bin/%{name} 
-rm -Rf $RPM_BUILD_ROOT/usr
-
-cp LICENSE                               $RPM_BUILD_ROOT/%{_install_dir}/doc
-cp scripts/managedb/garbage-collector.py $RPM_BUILD_ROOT/%{_install_dir}/share
-cp scripts/managedb/lastest-updates.py   $RPM_BUILD_ROOT/%{_install_dir}/share
-cp etc/init.d/contextBroker.centos       $RPM_BUILD_ROOT/%{_install_dir}/init.d/%{_service_name}
-cp etc/config/%{name}                    $RPM_BUILD_ROOT/%{_install_dir}/config/%{name}
-
-cp -R test/testharness/*.test            $RPM_BUILD_ROOT/%{_install_dir}_tests
-cp scripts/testEnv.sh \
-   scripts/testHarness.sh \
-   scripts/testDiff.py                   $RPM_BUILD_ROOT/%{_install_dir}_tests
-cp scripts/accumulator-server.py         $RPM_BUILD_ROOT/%{_install_dir}_tests
-
-chmod 755 $RPM_BUILD_ROOT/%{_install_dir}/init.d/%{name}
-
-
-# -------------------------------------------------------------------------------------------- #
-# Post-install section:
-# -------------------------------------------------------------------------------------------- #
 %post
-# This section is executed when the rpm is installed (rpm -i)
-
-echo "[INFO] Configuring application"
-mkdir -p /usr/share/doc/%{name}
-echo "[INFO] Creating links"
-ln -s %{_install_dir}/init.d/%{_service_name} /etc/init.d/%{_service_name}
-ln -s %{_install_dir}/config/%{name} /etc/sysconfig/%{name}
-ln -s %{_install_dir}/bin/%{name} /usr/bin/%{name}
-ls -s %{_install_dir}/doc /usr/share/doc/%{name}
-
-echo "[INFO] Creating log directory"
-mkdir -p %{_orion_log_dir}
-chown %{_owner}:%{_owner} %{_orion_log_dir}
-chmod g+s %{_orion_log_dir}
-setfacl -d -m g::rwx %{_orion_log_dir}
-setfacl -d -m o::rx %{_orion_log_dir}
-    
-echo "[INFO] Configuring application service"
-chkconfig --add %{_service_name}
-
-
+DATE=$(date "+%Y-%m-%d")
+/sbin/chkconfig --add %{name}
+mkdir -p /var/log/%{name}
+chown -R %{owner}:%{owner} /var/log/%{name}
 # Secure the configuration file to prevent un-authorized access
-echo "[INFO] Securing the configuration file"
-chown %{_owner}:%{_owner} /etc/sysconfig/%{name}
+chown %{owner}:%{owner} /etc/sysconfig/%{name}
 chmod 600 /etc/sysconfig/%{name}
 cat <<EOMSG
 contextBroker requires additional configuration before the service can be
@@ -194,51 +81,84 @@ started. Edit '/etc/sysconfig/%{name}' to provide the needed database
 configuration.
 
 Note that if you have a previously existing '/etc/sysconfig/%{name}' it
-has been renamed to %{_install_dir}/config/%{name}.orig-$DATE.
+has been renamed to /etc/sysconfig/%{name}.orig-$DATE.
 
+After configuring /etc/sysconfig/%{name} execute 'chkconfig %{name} on' to
+enable %{name} after a reboot.
 EOMSG
 
-# -------------------------------------------------------------------------------------------- #
-# Pre-uninstall section:
-# -------------------------------------------------------------------------------------------- #
 %preun
-echo "[INFO] Uninstall the %{name}"
-/etc/init.d/%{_service_name} stop
-/sbin/chkconfig --del %{_service_name}
-echo "[INFO] Deleting links"
-rm /etc/init.d/%{_service_name} \
-   /etc/sysconfig/%{name} \
-   /usr/bin/%{name} 
-rm -rf /usr/share/doc/%{name} &> /dev/null
-echo "[INFO] Deleting the %{name} folder"
-rm -rf %{_install_dir} &> /dev/null
-echo "[INFO] %{name} Uninstalled"
+/etc/init.d/%{name} stop
+/sbin/chkconfig --del %{name}
 
-# -------------------------------------------------------------------------------------------- #
-# Clean section:
-# -------------------------------------------------------------------------------------------- #
 %clean
-echo "[INFO] Cleaning the $RPM_BUILD_ROOT directory"
 rm -rf $RPM_BUILD_ROOT
 
-# -------------------------------------------------------------------------------------------- #
-# Files to add to the RPM 
-# -------------------------------------------------------------------------------------------- #
-%files
-%defattr(755,%{_owner},%{_owner},755)
-%{_install_dir}
-/var/log/%{name}
+%build
+#FIXME There is an open issue with "make release" malfunction. Until get fixed, we will build in debug mode
+#make release DESTDIR=$RPM_BUILD_ROOT BUILD_ARCH=%{build_arch}
+make debug DESTDIR=$RPM_BUILD_ROOT BUILD_ARCH=%{build_arch}
 
+%install
+#FIXME There is an open issue with "make release" malfunction. Until get fixed, we will build in debug mode
+#make install DESTDIR=$RPM_BUILD_ROOT
+make install_debug DESTDIR=$RPM_BUILD_ROOT
+# rpmbuild seems to do the strip step automatically. However, this would fail after chmod, so we "manually" do
+# it as part of our install script
+strip $RPM_BUILD_ROOT/usr/bin/contextBroker
+chmod 555 $RPM_BUILD_ROOT/usr/bin/contextBroker
+mkdir -p $RPM_BUILD_ROOT/var/%{name}
+mkdir -p $RPM_BUILD_ROOT/etc/init.d
+mkdir -p $RPM_BUILD_ROOT/etc/profile.d
+mkdir -p $RPM_BUILD_ROOT/usr/share/contextBroker/tests
+mkdir -p $RPM_BUILD_ROOT/usr/share/doc/contextBroker
+cp -r test/testharness/* $RPM_BUILD_ROOT/usr/share/contextBroker/tests
+cp LICENSE $RPM_BUILD_ROOT/usr/share/doc/contextBroker
+cp scripts/testEnv.sh scripts/testHarness.sh scripts/testDiff.py $RPM_BUILD_ROOT/usr/share/contextBroker/tests 
+cp scripts/accumulator-server.py $RPM_BUILD_ROOT/usr/share/contextBroker/tests 
+cp scripts/managedb/garbage-collector.py $RPM_BUILD_ROOT/usr/share/contextBroker
+cp scripts/managedb/lastest-updates.py $RPM_BUILD_ROOT/usr/share/contextBroker
+cp etc/init.d/contextBroker.centos $RPM_BUILD_ROOT/etc/init.d/%{name}
+chmod 755 $RPM_BUILD_ROOT/etc/init.d/%{name}
+mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
+cp etc/config/contextBroker $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
-#%files test
-%files tests
-%defattr(755,%{_owner},%{_owner},755)
-/opt/contextBroker_tests
+echo "%%defattr(-, root, root, - )" > MANIFEST
+(cd %{buildroot}; find . -type f -or -type l | sed -e s/^.// -e /^$/d) >>MANIFEST
 
+grep -v "tests" MANIFEST > MANIFEST.broker
+grep "tests" MANIFEST > MANIFEST.broker-tests
 
-# -------------------------------------------------------------------------------------------- #
-# Changelog section 
-# -------------------------------------------------------------------------------------------- #
+%files -f MANIFEST.broker
+
+%changelog
+
+%package tests
+Requires: %{name}, python, python-flask, nc, curl, libxml2, mongodb
+Summary: Test suite for %{name}
+%description tests
+Test suite for %{name}
+
+#%files tests
+%files tests -f MANIFEST.broker-tests
+
+%package -n %{name}-fiware
+Requires: %{name} = %{broker_version}-%{broker_release}, %{name}-tests = %{broker_version}-%{broker_release}
+Summary: FI-WARE NGSI Broker - Telefónica I+D Implementation
+Version: %{fiware_version}
+Release: %{fiware_release}
+%description -n %{name}-fiware
+The Orion Context Broker is an implementation of the NGSI9 and NGSI10 interfaces. 
+Using these interfaces, clients can do several operations:
+* Register context producer applications, e.g. a temperature sensor within a room.
+* Update context information, e.g. send updates of temperature.
+* Being notified when changes on context information take place (e.g. the
+  temperature has changed) or with a given frecuency (e.g. get the temperature
+  each minute).
+* Query context information. The Orion Context Broker stores context information
+  updated from applications, so queries are resolved based on that information.
+
+%files -n %{name}-fiware
 
 %changelog
 * Wed Apr 09 2014 Fermin Galan <fermin@tid.es> 0.11.0-1 (FIWARE-3.3.3-1)
