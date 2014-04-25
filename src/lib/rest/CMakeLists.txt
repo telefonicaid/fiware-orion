@@ -60,3 +60,4 @@ include_directories("${RAPIDXML_INCLUDE}")
 # Library declaration
 # -----------------------------------------------------------------
 ADD_LIBRARY(rest STATIC ${SOURCES} ${HEADERS})
+target_link_libraries (rest cantcoap)

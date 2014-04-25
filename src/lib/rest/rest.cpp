@@ -41,7 +41,7 @@
 
 #include <netdb.h>
 
-
+#include "coap.h"
 
 /* ****************************************************************************
 *
@@ -470,6 +470,10 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 {
   if (port == 0)
      LM_RE(1, ("Please call restInit before starting the REST service"));
+
+  Coap* coapDaemon = new Coap();
+
+  coapDaemon->run(3, NULL);
 
   if ((ipVersion == IPV4) || (ipVersion == IPDUAL)) 
   { 
