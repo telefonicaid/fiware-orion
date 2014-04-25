@@ -13,22 +13,22 @@
 #include "nethelper.h"
 
 
-#define INFO(...) printf(__VA_ARGS__); printf("\r\n")
-#define ERR(...) printf(__VA_ARGS__); printf("\r\n")
+//#define INFO(...) printf(__VA_ARGS__); printf("\r\n")
+//#define ERR(...) printf(__VA_ARGS__); printf("\r\n")
 
-#define DEBUG 1
+//#define DEBUG 1
 
-#ifdef DEBUG
-	#define DBG(...) fprintf(stderr,__VA_ARGS__); fprintf(stderr,"\r\n")
-	#define DBGX(...) fprintf(stderr,__VA_ARGS__);
-#else
-	#define DBG(...) {};
-	#define DBGX(...) {};
-#endif
+//#ifdef DEBUG
+//	#define DBG(...) fprintf(stderr,__VA_ARGS__); fprintf(stderr,"\r\n")
+//	#define DBGX(...) fprintf(stderr,__VA_ARGS__);
+//#else
+//	#define DBG(...) {};
+//	#define DBGX(...) {};
+//#endif
 
 int setupAddress(
-	char *host,
-	char *port,
+  const char *host,
+  const char *port,
 	struct addrinfo **output,
 	int socktype,
 	int protocolFamily

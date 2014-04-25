@@ -6,8 +6,8 @@ extern "C"
 #endif
 
 int setupAddress(
-	char *host,
-	char *port,
+  const char *host,
+  const char *port,
 	struct addrinfo **output,
 	int socktype,
 	int protocolFamily

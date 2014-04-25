@@ -1,5 +1,5 @@
-#ifndef CANTCOAP_H
-#define CANTCOAP_H
+#ifndef COAP_H
+#define COAP_H
 
 #include <vector>
 #include "cantcoap.h"
@@ -39,6 +39,11 @@ class Coap
         UT_hash_handle hh;
     };
 
+    int setupAddress(const char *host, const char *port, struct addrinfo **output, int socktype, int protocolFamily);
+    void printAddressStructures(struct addrinfo *addr);
+    void printAddress(struct addrinfo *addr);
+    int gTestCallback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom);
+
   public:
     Coap()
     {
@@ -46,10 +51,9 @@ class Coap
     }
 
     // callback functions defined here
-    int gTestCallback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom);
 
     int run(int argc, char **argv);
 };
 
-#endif // CANTCOAP_H
+#endif // COAP_H
 
