@@ -1,7 +1,7 @@
 # Orion Context Broker
 
 This is the code repository for the Orion Context Broker, a C++ implementation of the NGSI9/10 REST API binding
-developed as a part of the FI-WARE project.
+developed as a part of the FI-WARE platform.
 
 You find all the information on Orion Context Broker in its page in the FI-WARE Catalogue:
 
