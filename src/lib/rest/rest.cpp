@@ -76,6 +76,7 @@ IpVersion                        ipVersionUsed         = IPDUAL;
 
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
+static Coap*                     coapDaemon            = NULL;
 static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
 __thread char                    static_buffer[STATIC_BUFFER_SIZE];
@@ -238,7 +239,7 @@ static void serve(ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* requestCompleted - 
+* requestCompleted -
 */
 static void requestCompleted
 (
@@ -256,7 +257,6 @@ static void requestCompleted
   delete(ciP);
   *con_cls = NULL;
 }
-
 
 
 /* ****************************************************************************
@@ -461,7 +461,6 @@ static int connectionTreat
 }
 
 
-
 /* ****************************************************************************
 *
 * restStart - 
@@ -471,11 +470,8 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
   if (port == 0)
      LM_RE(1, ("Please call restInit before starting the REST service"));
 
-  Coap* coapDaemon = new Coap();
 
-  coapDaemon->run(3, NULL);
-
-  if ((ipVersion == IPV4) || (ipVersion == IPDUAL)) 
+  if ((ipVersion == IPV4) || (ipVersion == IPDUAL))
   { 
     memset(&sad, 0, sizeof(sad));
     if (inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr)) != 1)
@@ -510,6 +506,10 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_END);
+
+      LM_V(("Starting CoAP daemon on IPv4 %s port %d", bindIp, port));
+
+      coapDaemon->run(bindIp, port);
     }
 
     if (mhdDaemon == NULL)
@@ -606,6 +606,7 @@ void restInit
   if ((_ipVersion == IPV6) || (_ipVersion == IPDUAL))
      strncpy(bindIPv6, bindIPv6, MAX_LEN_IP - 1);
 
+  coapDaemon = new Coap();
 
   // Starting REST interface
   int r;
