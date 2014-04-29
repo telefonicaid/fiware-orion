@@ -231,7 +231,7 @@
         </contextAttribute>
         <contextAttribute>
           <name>ICMIndoorHumidityAverage</name>
-          <type>%</type>
+          <type>percent</type>
           <contextValue>53.11</contextValue>
           <metadata>
             <contextMetadata>
@@ -344,7 +344,7 @@
         </contextAttribute>
         <contextAttribute>
           <name>ICMIndoorHumidityAverage</name>
-          <type>%</type>
+          <type>percent</type>
           <contextValue>51.9</contextValue>
           <metadata>
             <contextMetadata>
@@ -555,7 +555,7 @@
         </contextAttribute>
         <contextAttribute>
           <name>ICMIndoorHumidityAverage</name>
-          <type>%</type>
+          <type>percent</type>
           <contextValue>42.6</contextValue>
           <metadata>
             <contextMetadata>
@@ -802,7 +802,7 @@
         </contextAttribute>
         <contextAttribute>
           <name>ICMIndoorHumidityAverage</name>
-          <type>%</type>
+          <type>percent</type>
           <contextValue>39.95</contextValue>
           <metadata>
             <contextMetadata>
