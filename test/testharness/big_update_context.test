@@ -263,7 +263,7 @@ brokerStart CB
         </contextAttribute>
         <contextAttribute>
           <name>ICMIndoorHumidityAverage</name>
-          <type>%</type>
+          <type>percent</type>
           <contextValue>53.11</contextValue>
           <metadata>
             <contextMetadata>
@@ -376,7 +376,7 @@ brokerStart CB
         </contextAttribute>
         <contextAttribute>
           <name>ICMIndoorHumidityAverage</name>
-          <type>%</type>
+          <type>percent</type>
           <contextValue>51.9</contextValue>
           <metadata>
             <contextMetadata>
@@ -587,7 +587,7 @@ brokerStart CB
         </contextAttribute>
         <contextAttribute>
           <name>ICMIndoorHumidityAverage</name>
-          <type>%</type>
+          <type>percent</type>
           <contextValue>42.6</contextValue>
           <metadata>
             <contextMetadata>
@@ -834,7 +834,7 @@ brokerStart CB
         </contextAttribute>
         <contextAttribute>
           <name>ICMIndoorHumidityAverage</name>
-          <type>%</type>
+          <type>percent</type>
           <contextValue>39.95</contextValue>
           <metadata>
             <contextMetadata>
@@ -1182,7 +1182,7 @@ EOF
           </contextAttribute>
           <contextAttribute>
             <name>ICMIndoorHumidityAverage</name>
-            <type>%</type>
+            <type>percent</type>
             <contextValue/>
           </contextAttribute>
           <contextAttribute>
@@ -1240,7 +1240,7 @@ EOF
           </contextAttribute>
           <contextAttribute>
             <name>ICMIndoorHumidityAverage</name>
-            <type>%</type>
+            <type>percent</type>
             <contextValue/>
           </contextAttribute>
           <contextAttribute>
@@ -1338,7 +1338,7 @@ EOF
           </contextAttribute>
           <contextAttribute>
             <name>ICMIndoorHumidityAverage</name>
-            <type>%</type>
+            <type>percent</type>
             <contextValue/>
           </contextAttribute>
           <contextAttribute>
@@ -1451,7 +1451,7 @@ EOF
           </contextAttribute>
           <contextAttribute>
             <name>ICMIndoorHumidityAverage</name>
-            <type>%</type>
+            <type>percent</type>
             <contextValue/>
           </contextAttribute>
           <contextAttribute>
