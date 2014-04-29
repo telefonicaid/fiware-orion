@@ -17,6 +17,7 @@
 #include <math.h>
 #include <string>
 #include <boost/thread.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 int Coap::gTestCallback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom) {
   socklen_t addrLen = sizeof(struct sockaddr_in);
@@ -99,33 +100,30 @@ void Coap::worker()
 
 }
 
-int Coap::run(const char *host, unsigned short port)
+void Coap::serve(const char *host, const char *port)
 {
   // Buffers for UDP and URIs
   char buffer[BUFFER_SIZE];
   char uriBuffer[URI_BUFFER_SIZE];
   int  recvURILen = 0;
   int  ret = 0;
-  char portChar[6];
-  snprintf(portChar, 6, "%hd", port);
 
   // Prepare binding address
   LM_V(("Setting up bind address"));
   struct addrinfo *bindAddr = NULL;
   struct addrinfo hints;
 
-  memset(&hints,0x00,sizeof(struct addrinfo));
+  memset(&hints, 0x00, sizeof(struct addrinfo));
   hints.ai_flags      = 0;
   hints.ai_socktype   = SOCK_DGRAM;
   hints.ai_flags     |= AI_NUMERICSERV;
   hints.ai_family     = PF_INET; // ipv4, PF_INET6 for ipv6 or PF_UNSPEC to let OS decide
 
-  int error = getaddrinfo(host,portChar,&hints,&bindAddr);
+  int error = getaddrinfo(host, port, &hints, &bindAddr);
   if (error) {
-    LM_V(("Error getting address info: %s.",gai_strerror(error)));
-    return error;
+    LM_V(("Error getting address info: %s.", gai_strerror(error)));
+    return;
   }
-  //**********
 
   // Setting up the UDP socket
   int sd = socket(bindAddr->ai_family,bindAddr->ai_socktype,bindAddr->ai_protocol);
@@ -148,8 +146,6 @@ int Coap::run(const char *host, unsigned short port)
   // reuse the same PDU
   CoapPDU *recvPDU = new CoapPDU((uint8_t*)buffer, BUFFER_SIZE, BUFFER_SIZE);
 
-  //boost::thread workerThread(&Coap::worker, this);
-
   // just block and handle one packet at a time in a single thread
   // you're not going to use this code for a production system are you ;)
   LM_V(("Listening for packets..."));
@@ -158,7 +154,7 @@ int Coap::run(const char *host, unsigned short port)
     ret = recvfrom(sd, &buffer, BUFFER_SIZE, 0, (sockaddr*)&recvAddr, &recvAddrLen);
     if (ret == -1) {
       LM_V(("Error receiving data"));
-      return -1;
+      return;
     }
 
     // print src address
@@ -207,8 +203,19 @@ int Coap::run(const char *host, unsigned short port)
     }
 
   }
+}
 
-  //workerThread.join();
+int Coap::run(const char *host, unsigned short port)
+{
+  char* portString = new char[6];
+  snprintf(portString, 6, "%hd", port);
+
+  boost::thread *coapServerThread = new boost::thread(boost::bind(&Coap::serve, this, host, portString));
+
+  coapServerThread->get_id();
+
+  // Main thread waits for this coap thread? NO
+  //workerThread->join();
   return 0;
 }
 

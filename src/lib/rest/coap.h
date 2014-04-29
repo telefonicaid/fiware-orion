@@ -12,6 +12,7 @@ class Coap
 
     int  gTestCallback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom);
     void worker();
+    void serve(const char *host, const char *port);
 
     void printAddressStructures(struct addrinfo *addr);
     void printAddress(struct addrinfo *addr);
