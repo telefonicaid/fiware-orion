@@ -76,7 +76,7 @@ echo "1: ++++++++++++++++++++"
             <metadata>
                <contextMetadata>
                   <name>ID</name>
-                  <type>string</name>
+                  <type>string</type>
                   <value>floor</value>
                </contextMetadata>
             </metadata>
@@ -88,7 +88,7 @@ echo "1: ++++++++++++++++++++"
             <metadata>
                <contextMetadata>
                   <name>ID</name>
-                  <type>string</name>
+                  <type>string</type>
                   <value>ceiling</value>
                </contextMetadata>
             </metadata>
