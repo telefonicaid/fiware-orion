@@ -508,7 +508,6 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_END);
 
       LM_V(("Starting CoAP daemon on IPv4 %s port %d", bindIp, port));
-
       coapDaemon->run(bindIp, port);
     }
 

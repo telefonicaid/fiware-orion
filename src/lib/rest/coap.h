@@ -10,17 +10,19 @@ class Coap
     static const int BUFFER_SIZE     = 500;
     static const int URI_BUFFER_SIZE = 32;
 
-    int  gTestCallback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom);
-    void worker();
-    void serve(const char *host, const char *port);
+    char           *host;
+    char           *portString;
+    unsigned short  port;
+
+    void buildHttpRequest(CoapPDU *request);
+    int  callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom);
+    void serve();
 
     void printAddressStructures(struct addrinfo *addr);
     void printAddress(struct addrinfo *addr);
 
   public:
-
-
-    int  run(const char *host, unsigned short port);
+    int  run(const char *_host, unsigned short _port);
 };
 
 #endif // COAP_H

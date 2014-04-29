@@ -5,6 +5,7 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #define __USE_POSIX 1
 #include <netdb.h>
 #include <netinet/in.h>
@@ -13,20 +14,110 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <sys/time.h>
 #include <math.h>
 #include <string>
+#include <string.h>
+
+#include <curl/curl.h>
+
 #include <boost/thread.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-int Coap::gTestCallback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom) {
+void Coap::buildHttpRequest(CoapPDU * request)
+{
+  char*     url                          = NULL;
+  int       recvURILen                   = 0;
+  CURL*     curl                         = curl_easy_init();
+  char      uriBuffer[URI_BUFFER_SIZE];
+  CURLcode  res;
+
+  if (curl)
+  {
+    // Prepare headers
+    struct curl_slist *headers = NULL;
+    CoapPDU::CoapOption* options = request->getOptions();
+    int numOptions = request->getNumOptions();
+    for(int i = 0; i < numOptions ; i++) {
+      //LM_V(("OPTION (%d/%d)", i + 1, numOptions));
+      //LM_V(("   Option number (delta): %hu (%hu)",options[i].optionNumber,options[i].optionDelta));
+      switch(options[i].optionNumber) {
+        default:
+        //case CoapPDU::COAP_OPTION_ACCEPT:
+          char* buffer = new char[options[i].optionValueLength];
+          memcpy(buffer, options[i].optionValuePointer, options[i].optionValueLength);
+          headers = curl_slist_append(headers, "Accept: application/json");
+          break;
+          //case CoapPDU::COAP_OPTION_CONTENT_FORMAT:
+          //headers = curl_slist_append(headers, "Content-Type: application/json");
+          //break;
+      }
+    }
+    res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER,headers);
+
+
+    // Prepare URL
+    request->getURI(uriBuffer, URI_BUFFER_SIZE, &recvURILen);
+    url = new char[strlen(host) + recvURILen];
+    strcat(url, host);
+    if (recvURILen > 0)
+      strncat(url, uriBuffer, recvURILen);
+
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_PORT, port);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L); // Allow redirection (?)
+
+
+    // Set HTTP verb
+    std::string httpVerb = "";
+
+    switch(request->getCode()) {
+      case CoapPDU::COAP_POST:
+        httpVerb = "POST";
+        break;
+      case CoapPDU::COAP_PUT:
+        httpVerb = "PUT";
+        break;
+      case CoapPDU::COAP_DELETE:
+        httpVerb = "DELETE";
+        break;
+      case CoapPDU::COAP_EMPTY:
+      case CoapPDU::COAP_GET:
+      default:
+        httpVerb = "GET";
+        break;
+    }
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, httpVerb.c_str());
+
+    LM_V(("I got a HTTP verb %s", httpVerb.c_str()));
+    // Set contents
+    u_int8_t* payload = request->getPayloadCopy();
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payload);
+
+    res = curl_easy_perform(curl);
+    if (res != CURLE_OK)
+    {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+    }
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+  }
+}
+
+int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom) {
   socklen_t addrLen = sizeof(struct sockaddr_in);
   if (recvFrom->ss_family == AF_INET6) {
     addrLen = sizeof(struct sockaddr_in6);
   }
-  LM_V(("gTestCallback function called"));
 
-  //  prepare appropriate response
+  // Prepare request for MHD in HTTP
+  buildHttpRequest(request);
+
+  // Send request acting as proxy
+
+  // Receive response
+
+  // Prepare appropriate response in CoAP
   CoapPDU *response = new CoapPDU();
   response->setVersion(1);
   response->setMessageID(request->getMessageID());
@@ -76,14 +167,7 @@ int Coap::gTestCallback(CoapPDU *request, int sockfd, struct sockaddr_storage *r
   };
 
   // send the packet
-  ssize_t sent = sendto(
-    sockfd,
-    response->getPDUPointer(),
-    response->getPDULength(),
-    0,
-    (sockaddr*)recvFrom,
-    addrLen
-  );
+  ssize_t sent = sendto(sockfd, response->getPDUPointer(), response->getPDULength(), 0, (sockaddr*)recvFrom, addrLen);
   if (sent<0) {
     LM_V(("Error sending packet: %ld.",sent));
     perror(NULL);
@@ -95,12 +179,7 @@ int Coap::gTestCallback(CoapPDU *request, int sockfd, struct sockaddr_storage *r
   return 0;
 }
 
-void Coap::worker()
-{
-
-}
-
-void Coap::serve(const char *host, const char *port)
+void Coap::serve()
 {
   // Buffers for UDP and URIs
   char buffer[BUFFER_SIZE];
@@ -108,20 +187,27 @@ void Coap::serve(const char *host, const char *port)
   int  recvURILen = 0;
   int  ret = 0;
 
+  // storage for handling receive address
+  struct sockaddr_storage recvAddr;
+  socklen_t               recvAddrLen = sizeof(struct sockaddr_storage);
+  //struct sockaddr_in      *v4Addr;
+  //struct sockaddr_in6     *v6Addr;
+  //char                    straddr[INET6_ADDRSTRLEN];
+
   // Prepare binding address
-  LM_V(("Setting up bind address"));
   struct addrinfo *bindAddr = NULL;
   struct addrinfo hints;
 
+  LM_V(("Setting up bind address"));
   memset(&hints, 0x00, sizeof(struct addrinfo));
   hints.ai_flags      = 0;
   hints.ai_socktype   = SOCK_DGRAM;
   hints.ai_flags     |= AI_NUMERICSERV;
   hints.ai_family     = PF_INET; // ipv4, PF_INET6 for ipv6 or PF_UNSPEC to let OS decide
 
-  int error = getaddrinfo(host, port, &hints, &bindAddr);
+  int error = getaddrinfo(host, portString, &hints, &bindAddr);
   if (error) {
-    LM_V(("Error getting address info: %s.", gai_strerror(error)));
+    LM_V(("Could not start CoAP server: Error getting address info: %s.", gai_strerror(error)));
     return;
   }
 
@@ -129,27 +215,17 @@ void Coap::serve(const char *host, const char *port)
   int sd = socket(bindAddr->ai_family,bindAddr->ai_socktype,bindAddr->ai_protocol);
 
   // Binding socket
-  LM_V(("Binding socket"));
   if (bind(sd,bindAddr->ai_addr,bindAddr->ai_addrlen)!=0) {
-    LM_V(("Error binding socket"));
+    LM_V(("Could not start CoAP server: Error binding socket"));
     perror(NULL);
-    exit(5);
+    return;
   }
-
-  // storage for handling receive address
-  struct sockaddr_storage recvAddr;
-  socklen_t recvAddrLen = sizeof(struct sockaddr_storage);
-  struct sockaddr_in *v4Addr;
-  struct sockaddr_in6 *v6Addr;
-  char straddr[INET6_ADDRSTRLEN];
 
   // reuse the same PDU
   CoapPDU *recvPDU = new CoapPDU((uint8_t*)buffer, BUFFER_SIZE, BUFFER_SIZE);
 
-  // just block and handle one packet at a time in a single thread
-  // you're not going to use this code for a production system are you ;)
   LM_V(("Listening for packets..."));
-  while(1) {
+  while (1) {
     // receive packet
     ret = recvfrom(sd, &buffer, BUFFER_SIZE, 0, (sockaddr*)&recvAddr, &recvAddrLen);
     if (ret == -1) {
@@ -158,17 +234,17 @@ void Coap::serve(const char *host, const char *port)
     }
 
     // print src address
-    switch (recvAddr.ss_family) {
-      case AF_INET:
-        v4Addr = (struct sockaddr_in*)&recvAddr;
-        LM_V(("Got packet from %s:%d",inet_ntoa(v4Addr->sin_addr),ntohs(v4Addr->sin_port)));
-      break;
+//    switch (recvAddr.ss_family) {
+//      case AF_INET:
+//        v4Addr = (struct sockaddr_in*)&recvAddr;
+//        LM_V(("Got packet from %s:%d", inet_ntoa(v4Addr->sin_addr), ntohs(v4Addr->sin_port)));
+//      break;
 
-      case AF_INET6:
-        v6Addr = (struct sockaddr_in6*)&recvAddr;
-        LM_V(("Got packet from %s:%d",inet_ntop(AF_INET6,&v6Addr->sin6_addr,straddr,sizeof(straddr)),ntohs(v6Addr->sin6_port)));
-      break;
-    }
+//      case AF_INET6:
+//        v6Addr = (struct sockaddr_in6*)&recvAddr;
+//        LM_V(("Got packet from %s:%d",inet_ntop(AF_INET6, &v6Addr->sin6_addr, straddr, sizeof(straddr)), ntohs(v6Addr->sin6_port)));
+//      break;
+//    }
 
     // validate packet
     if (ret > BUFFER_SIZE) {
@@ -176,46 +252,61 @@ void Coap::serve(const char *host, const char *port)
       continue;
     }
     recvPDU->setPDULength(ret);
-    if (recvPDU->validate()!=1) {
+    if (recvPDU->validate() != 1) {
       LM_V(("Malformed CoAP packet"));
       continue;
     }
     LM_V(("Valid CoAP PDU received"));
-    recvPDU->printHuman();
+    //recvPDU->printHuman();
 
-    // depending on what this is, maybe call callback function
-    if (recvPDU->getURI(uriBuffer, URI_BUFFER_SIZE, &recvURILen)!=0) {
+    // Treat URI
+    if (recvPDU->getURI(uriBuffer, URI_BUFFER_SIZE, &recvURILen) != 0) {
       LM_V(("Error retrieving URI"));
       continue;
     }
+
     if (recvURILen == 0) {
       LM_V(("There is no URI associated with this Coap PDU"));
     } else {
-      this->gTestCallback(recvPDU,sd,&recvAddr);
+      // Invoke a callback thread
+      boost::thread *workerThread = new boost::thread(boost::bind(&Coap::callback, this, recvPDU, sd, &recvAddr));
+      workerThread->get_id();
+
+      // Wait for thread to finnish (like using no threads at all) for now
+      workerThread->join();
+
+      // Old call
+      //callback(recvPDU, sd, &recvAddr);
       continue;
     }
 
     // no URI, handle cases
 
     // code == 0, no payload, this is a ping request, send RST
-    if (recvPDU->getPDULength()  ==  0 && recvPDU->getCode()  ==  0) {
+    if ((recvPDU->getPDULength() == 0) && (recvPDU->getCode() == 0)) {
       LM_V(("CoAP ping request"));
     }
 
   }
 }
 
-int Coap::run(const char *host, unsigned short port)
+int Coap::run(const char *_host, unsigned short _port)
 {
   char* portString = new char[6];
-  snprintf(portString, 6, "%hd", port);
+  snprintf(portString, 6, "%hd", _port);
 
-  boost::thread *coapServerThread = new boost::thread(boost::bind(&Coap::serve, this, host, portString));
+  this->port = _port;
+  this->host = new char[strlen(_host)];
+  strcpy(this->host, _host);
+  this->portString = new char[strlen(portString)];
+  strcpy(this->portString, portString);
+
+  boost::thread *coapServerThread = new boost::thread(boost::bind(&Coap::serve, this));
 
   coapServerThread->get_id();
 
   // Main thread waits for this coap thread? NO
-  //workerThread->join();
+  //coapServerThread->join();
   return 0;
 }
 
@@ -228,16 +319,13 @@ void Coap::printAddressStructures(struct addrinfo *addr) {
       case AF_INET:
         printf("IPv4");
       break;
-
       case AF_INET6:
         printf("IPv6");
       break;
-
       default:
         printf("Unknown address family");
       break;
     }
-
     switch (addr->ai_socktype) {
       case SOCK_DGRAM:
         printf(", UDP");
@@ -272,7 +360,6 @@ void Coap::printAddressStructures(struct addrinfo *addr) {
       break;
     }
     printf(" ");
-
       addr = addr->ai_next;
    }
 }
