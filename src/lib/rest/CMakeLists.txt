@@ -61,3 +61,4 @@ include_directories("${RAPIDXML_INCLUDE}")
 # -----------------------------------------------------------------
 ADD_LIBRARY(rest STATIC ${SOURCES} ${HEADERS})
 target_link_libraries (rest cantcoap)
+target_link_libraries (rest curl)
