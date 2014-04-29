@@ -12,3 +12,5 @@
 - Fix:  The ISO8601 parser has been improved. (Issue #231)
 - Fix:  An important bug in the log trace library has been fixed. This fix *may* solve 'strange errors' (Issue #313)
 - Fix:  Fixed a bug about empty context attribute values, probably introduced when compound values were invented (release 0.11.0).
+- Fix:  Fixed the bug for failing long requests (Issue #333)
+- Fix:  Changed the string for associations from 'Include Assciations' to 'IncludeAssociations' (small part of issue #334)

@@ -34,7 +34,7 @@ source harnessFunctions.sh
 url="/NGSI9/registerContext"
 payload='<?xml version="1.0"?>
 <registerContextRequest>
-<contextRegistrationList>
+  <contextRegistrationList>
     <contextRegistration>
       <entityIdList>
         <entityId type="TemperatureSensor" isPattern="false">
@@ -50,7 +50,7 @@ payload='<?xml version="1.0"?>
       <providingApplication>http://myHomeGateway22.org</providingApplication>
     </contextRegistration>
   </contextRegistrationList>
-        <duration>PT1H</duration>
+  <duration>PT1H</duration>
   <registrationId></registrationId>
 </registerContextRequest>'
 curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
@@ -60,7 +60,7 @@ echo "1: ++++++++++++++++++++"
 url="/NGSI9/registerContext"
 payload='<?xml version="1.0"?>
 <registerContextRequest>
-<contextRegistrationList>
+  <contextRegistrationList>
     <contextRegistration>
       <registrationMetadata>
         <contextMetadata>
@@ -106,12 +106,12 @@ payload='<?xml version="1.0"?>
     <attribute>indoorTemperature</attribute>
   </attributeList>
   <restriction>
-      <scope>
-        <operationScope>
-          <scopeType>Include Associations</scopeType>
-          <scopeValue>SOURCES</scopeValue>
-        </operationScope>     
-      </scope>
+    <scope>
+      <operationScope>
+        <scopeType>IncludeAssociations</scopeType>
+        <scopeValue>SOURCES</scopeValue>
+      </operationScope>     
+    </scope>
   </restriction>
 </discoverContextAvailabilityRequest>'
 curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"

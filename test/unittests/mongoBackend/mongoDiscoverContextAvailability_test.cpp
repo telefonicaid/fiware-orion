@@ -33,6 +33,7 @@
 #include "mongoBackend/mongoDiscoverContextAvailability.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/EntityId.h"
+#include "ngsi/Scope.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 
@@ -1849,7 +1850,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, sourceAssociations)
   EntityId en("E2", "T2");
   req.entityIdVector.push_back(&en);
   req.attributeList.push_back("A1");
-  Scope sc("Include Associations", "SOURCES");
+  Scope sc(SCOPE_TYPE_ASSOC, "SOURCES");
   req.restriction.scopeVector.push_back(&sc);
 
   /* Prepare mock */
@@ -1928,7 +1929,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, targetAssociations)
     EntityId en("E1", "T1");
     req.entityIdVector.push_back(&en);
     req.attributeList.push_back("A4");
-    Scope sc("Include Associations", "TARGETS");
+    Scope sc(SCOPE_TYPE_ASSOC, "TARGETS");
     req.restriction.scopeVector.push_back(&sc);
 
     /* Prepare mock */
@@ -2064,7 +2065,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDBQueryAssociationFail)
     EntityId en("E1", "T1");
     req.entityIdVector.push_back(&en);
     req.attributeList.push_back("A4");
-    Scope sc("Include Associations", "TARGETS");
+    Scope sc(SCOPE_TYPE_ASSOC, "TARGETS");
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
