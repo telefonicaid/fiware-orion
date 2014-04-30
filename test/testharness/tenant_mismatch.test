@@ -81,7 +81,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>'
-curlXml2 ${url} "${payload}" "x-fiware-tenant: fg"
+curlXml2 ${url} "${payload}" "fiware-tenant: fg"
 
 echo "++++++++++++++++++++"
 --REGEXPECT--

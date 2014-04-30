@@ -100,7 +100,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "connection") == 0)      headerP->connection     = value;
   else if (strcasecmp(key.c_str(), "content-type") == 0)    headerP->contentType    = value;
   else if (strcasecmp(key.c_str(), "content-length") == 0)  headerP->contentLength  = atoi(value);
-  else if (strcasecmp(key.c_str(), "x-fiware-tenant") == 0) headerP->tenant         = value;
+  else if (strcasecmp(key.c_str(), "fiware-tenant") == 0)   headerP->tenant         = value;
   else
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
 
