@@ -721,6 +721,57 @@ static void buildGeneralErrorReponse(ContextElement* ceP, ContextAttribute* ca, 
 
 /* ****************************************************************************
 *
+* isCustomMetadata -
+*
+* Check that the parameter is a right custom metadata, i.e. one metadata without
+* an special semantic to be interpreted by the context broker itself
+*
+* FIXME P2: this function probably could be moved to another place "closer" to metadtta
+*/
+static bool isCustomMetadata(std::string md) {
+    if (md != NGSI_MD_ID &&
+        md != NGSI_MD_LOCATION &&
+        md != NGSI_MD_CREDATE &&
+        md != NGSI_MD_MODDATE) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+/* ****************************************************************************
+*
+* setResponseMetadata -
+*
+*/
+static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes) {
+
+    Metadata* md;
+
+    /* Not custom */
+    if (caReq->getId().length() > 0) {
+        md = new Metadata(NGSI_MD_ID, "string", caReq->getId());
+        caRes->metadataVector.push_back(md);
+    }
+    if (caReq->getLocation().length() > 0) {
+        md = new Metadata(NGSI_MD_LOCATION, "string", caReq->getLocation());
+        caRes->metadataVector.push_back(md);
+    }
+
+    /* Custom (just "mirroring" in the response) */
+    for (unsigned int ix = 0; ix < caReq->metadataVector.size(); ++ix) {
+        Metadata* mdReq = caReq->metadataVector.get(ix);
+        if (isCustomMetadata(mdReq->name)) {
+            md = new Metadata(mdReq->name, mdReq->type, mdReq->value);
+            caRes->metadataVector.push_back(md);
+        }
+    }
+
+}
+
+/* ****************************************************************************
+*
 * processContextAttributeVector -
 *
 * Returns true if entity was actually modified, false otherwise (including fail cases)
@@ -749,18 +800,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
 
         /* No matter if success or fail, we have to include the attribute in the response */
         ContextAttribute* ca = new ContextAttribute(targetAttr->name, targetAttr->type);
-
-        // FIXME P4: not sure, but probably we can generalize this when we address
-        // issue https://github.com/telefonicaid/fiware-orion/issues/252
-        Metadata* md;
-        if (targetAttr->getId().length() > 0) {
-            md = new Metadata(NGSI_MD_ID, "string", targetAttr->getId());
-            ca->metadataVector.push_back(md);
-        }
-        if (targetAttr->getLocation().length() > 0) {
-            md = new Metadata(NGSI_MD_LOCATION, "string", targetAttr->getLocation());
-            ca->metadataVector.push_back(md);
-        }
+        setResponseMetadata(targetAttr, ca);
         cerP->contextElement.contextAttributeVector.push_back(ca);
 
         /* actualUpdate could be changed to false in the "update" case. For "delete" and
@@ -984,6 +1024,20 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
                             attrsV.get(ix)->type.c_str(),
                             attrsV.get(ix)->value.c_str(),
                             attrId.c_str()));
+        }        
+
+        /* Custom metadata */
+        BSONArrayBuilder mdToAdd;
+        for (unsigned int jx = 0; jx < attrsV.get(ix)->metadataVector.size(); ++jx) {
+            Metadata* md = attrsV.get(ix)->metadataVector.get(jx);
+            if (isCustomMetadata(md->name)) {
+                mdToAdd.append(BSON("name" << md->name << "type" << md->type << "value" << md->value));
+                LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
+                                md->name.c_str(), md->type.c_str(), md->value.c_str()));
+            }
+        }
+        if (mdToAdd.len() > 0) {
+            bsonAttr.append(ENT_ATTRS_MD, mdToAdd.arr());
         }
         attrsToAdd.append(bsonAttr.obj());
 
@@ -1076,7 +1130,7 @@ static bool removeEntity(std::string entityId, std::string entityType, ContextEl
 
     cerP->statusCode.fill(SccOk);
     return true;
-}
+} 
 
 /* ****************************************************************************
 *
@@ -1317,20 +1371,8 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             cerP->contextElement.entityId.fill(en.id, en.type, "false");
             for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                 ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
-                ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);
-
-                // FIXME P4: not sure, but probably we can generalize this when we address
-                // issue https://github.com/telefonicaid/fiware-orion/issues/252
-                Metadata* md;
-                if (caP->getId().length() > 0) {
-                    md = new Metadata(NGSI_MD_ID, "string", caP->getId());
-                    ca->metadataVector.push_back(md);
-                }
-                if (caP->getLocation().length() > 0) {
-                    md = new Metadata(NGSI_MD_LOCATION, "string", caP->getLocation());
-                    ca->metadataVector.push_back(md);
-                }
-
+                ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);                
+                setResponseMetadata(caP, ca);
                 cerP->contextElement.contextAttributeVector.push_back(ca);
             }
 
