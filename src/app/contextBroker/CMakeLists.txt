@@ -34,6 +34,7 @@ SET (STATIC_LIBS
     convenienceMap
     mongoBackend
     rest
+    restCoap
     jsonParse
     xmlParse
     convenience

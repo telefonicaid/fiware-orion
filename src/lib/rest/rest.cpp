@@ -34,6 +34,8 @@
 #include "rest/rest.h"
 #include "rest/restReply.h"
 
+#include "restCoap/coap.h"
+
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/select.h>
@@ -41,7 +43,6 @@
 
 #include <netdb.h>
 
-#include "coap.h"
 
 /* ****************************************************************************
 *

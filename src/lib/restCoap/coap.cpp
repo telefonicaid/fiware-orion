@@ -23,51 +23,50 @@
 #include <boost/thread.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-void Coap::buildHttpRequest(CoapPDU * request)
+
+/* ****************************************************************************
+*
+* writeMemoryCallback -
+*/
+static size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
+{
+  size_t realsize = size * nmemb;
+  MemoryStruct *mem = (MemoryStruct *)userp;
+
+  mem->memory = (char*)realloc(mem->memory, mem->size + realsize + 1);
+  if(mem->memory == NULL) {
+    LM_V(("Not enough memory (realloc returned NULL)\n"));
+    return 0;
+  }
+
+  memcpy(&(mem->memory[mem->size]), contents, realsize);
+  mem->size += realsize;
+  mem->memory[mem->size] = 0;
+
+  return realsize;
+}
+
+
+/* ****************************************************************************
+*
+* buildHttpRequest -
+*/
+void Coap::sendHttpRequest(CoapPDU * request, MemoryStruct* chunk)
 {
   char*     url                          = NULL;
   int       recvURILen                   = 0;
   CURL*     curl                         = curl_easy_init();
-  char      uriBuffer[URI_BUFFER_SIZE];
   CURLcode  res;
+  char      uriBuffer[URI_BUFFER_SIZE];
 
   if (curl)
   {
-    // Prepare headers
-    struct curl_slist *headers = NULL;
-    CoapPDU::CoapOption* options = request->getOptions();
-    int numOptions = request->getNumOptions();
-    for(int i = 0; i < numOptions ; i++) {
-      //LM_V(("OPTION (%d/%d)", i + 1, numOptions));
-      //LM_V(("   Option number (delta): %hu (%hu)",options[i].optionNumber,options[i].optionDelta));
-      switch(options[i].optionNumber) {
-        default:
-        //case CoapPDU::COAP_OPTION_ACCEPT:
-          char* buffer = new char[options[i].optionValueLength];
-          memcpy(buffer, options[i].optionValuePointer, options[i].optionValueLength);
-          headers = curl_slist_append(headers, "Accept: application/json");
-          break;
-          //case CoapPDU::COAP_OPTION_CONTENT_FORMAT:
-          //headers = curl_slist_append(headers, "Content-Type: application/json");
-          //break;
-      }
-    }
-    res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER,headers);
+    // Allocate to hold HTTP response
+    chunk = new MemoryStruct;
+    chunk->memory = (char*)malloc(1); // will grow as needed
+    chunk->size = 0; // no data at this point
 
-
-    // Prepare URL
-    request->getURI(uriBuffer, URI_BUFFER_SIZE, &recvURILen);
-    url = new char[strlen(host) + recvURILen];
-    strcat(url, host);
-    if (recvURILen > 0)
-      strncat(url, uriBuffer, recvURILen);
-
-    curl_easy_setopt(curl, CURLOPT_URL, url);
-    curl_easy_setopt(curl, CURLOPT_PORT, port);
-    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L); // Allow redirection (?)
-
-
-    // Set HTTP verb
+    // --- Set HTTP verb
     std::string httpVerb = "";
 
     switch(request->getCode()) {
@@ -87,41 +86,141 @@ void Coap::buildHttpRequest(CoapPDU * request)
         break;
     }
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, httpVerb.c_str());
+    LM_V(("Got an HTTP %s", httpVerb.c_str()));
 
-    LM_V(("I got a HTTP verb %s", httpVerb.c_str()));
-    // Set contents
+
+    // --- Prepare headers
+    struct curl_slist *headers = NULL;
+    CoapPDU::CoapOption* options = request->getOptions();
+    int numOptions = request->getNumOptions();
+    for (int i = 0; i < numOptions ; i++)
+    {
+      switch (options[i].optionNumber)
+      {
+        case CoapPDU::COAP_OPTION_URI_PATH:
+        {
+          char buffer[options[i].optionValueLength + 1];
+          memcpy(&buffer, options[i].optionValuePointer, options[i].optionValueLength);
+          buffer[options[i].optionValueLength] = '\0';
+          LM_V(("Got URI_PATH option: '%s'", buffer));
+          break;
+        }
+        case CoapPDU::COAP_OPTION_CONTENT_FORMAT:
+        {
+          std::string string = "Content-type: ";
+          char buffer[options[i].optionValueLength + 1];
+          memcpy(&buffer, options[i].optionValuePointer, options[i].optionValueLength);
+          buffer[options[i].optionValueLength] = '\0';
+          string += buffer;
+          headers = curl_slist_append(headers, string.c_str());
+          LM_V(("Got CONTENT-FORMAT option: '%s'", string.c_str()));
+          break;
+        }
+        case CoapPDU::COAP_OPTION_ACCEPT:
+        {
+          std::string string = "Accept: ";
+          char buffer[options[i].optionValueLength + 1];
+          memcpy(&buffer, options[i].optionValuePointer, options[i].optionValueLength);
+          buffer[options[i].optionValueLength] = '\0';
+          string += buffer;
+          headers = curl_slist_append(headers, string.c_str());
+          LM_V(("Got ACCEPT option: '%s'", string.c_str()));
+          break;
+        }
+        default:
+        {
+          char buffer[options[i].optionValueLength + 1];
+          memcpy(&buffer, options[i].optionValuePointer, options[i].optionValueLength);
+          buffer[options[i].optionValueLength] = '\0';
+          LM_V(("Got unknown option: '%s'", buffer));
+          break;
+        }
+      }
+    }
+
+
+    // --- Prepare URL
+    request->getURI(uriBuffer, URI_BUFFER_SIZE, &recvURILen);
+    url = new char[strlen(host) + recvURILen];
+    strcpy(url, host);
+    if (recvURILen > 0)
+      strncat(url, uriBuffer, recvURILen);
+
+    // --- Set contents
     u_int8_t* payload = request->getPayloadCopy();
+
+
+    // --- Prepare CURL handle with obtained options
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_PORT, port);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L); // Allow redirection (?)
+    curl_easy_setopt(curl, CURLOPT_HEADER, 1); // Activate include the header in the body output
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); // Put headers in place
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)chunk); // Custom data for response handling
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payload);
 
+
+    // --- Do HTTP Request
     res = curl_easy_perform(curl);
     if (res != CURLE_OK)
     {
       fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
     }
 
+
+    // --- Barf out
+    LM_V(("CHUNK:\n%s", chunk->memory));
+
+
+
+    // --- Cleanup curl environment
     curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
   }
 }
 
-int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom) {
+
+
+/* ****************************************************************************
+*
+* callback -
+*/
+void Coap::http2Coap(MemoryStruct *http, CoapPDU *coap)
+{
+
+}
+
+
+
+/* ****************************************************************************
+*
+* callback -
+*/
+int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom)
+{
+  MemoryStruct* httpResponse = NULL; // Will contain HTTP Response
+
   socklen_t addrLen = sizeof(struct sockaddr_in);
   if (recvFrom->ss_family == AF_INET6) {
     addrLen = sizeof(struct sockaddr_in6);
   }
 
-  // Prepare request for MHD in HTTP
-  buildHttpRequest(request);
+  // Prepare for and send request to MHD in HTTP
+  sendHttpRequest(request, httpResponse);
+  if (httpResponse == NULL)
+  {
+    // Could not get an answer
+  }
 
-  // Send request acting as proxy
-
-  // Receive response
+  CoapPDU *coapResponse = new CoapPDU();
+  // Parse header
+  http2Coap(httpResponse, coapResponse);
 
   // Prepare appropriate response in CoAP
-  CoapPDU *response = new CoapPDU();
-  response->setVersion(1);
-  response->setMessageID(request->getMessageID());
-  response->setToken(request->getTokenPointer(),request->getTokenLength());
+  coapResponse->setVersion(1);
+  coapResponse->setMessageID(request->getMessageID());
+  coapResponse->setToken(request->getTokenPointer(),request->getTokenLength());
   //response->setToken((uint8_t*)"\1\16",2);
   char *payload = (char*)"This is a mundanely worded test payload.";
 
@@ -131,19 +230,19 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
       // makes no sense, send RST
     break;
     case CoapPDU::COAP_GET:
-      response->setCode(CoapPDU::COAP_CONTENT);
-      response->setContentFormat(CoapPDU::COAP_CONTENT_FORMAT_TEXT_PLAIN);
-      response->setPayload((uint8_t*)payload,strlen(payload));
+      coapResponse->setCode(CoapPDU::COAP_CONTENT);
+      coapResponse->setContentFormat(CoapPDU::COAP_CONTENT_FORMAT_TEXT_PLAIN);
+      coapResponse->setPayload((uint8_t*)payload,strlen(payload));
     break;
     case CoapPDU::COAP_POST:
-      response->setCode(CoapPDU::COAP_CREATED);
+      coapResponse->setCode(CoapPDU::COAP_CREATED);
     break;
     case CoapPDU::COAP_PUT:
-      response->setCode(CoapPDU::COAP_CHANGED);
+      coapResponse->setCode(CoapPDU::COAP_CHANGED);
     break;
     case CoapPDU::COAP_DELETE:
-      response->setCode(CoapPDU::COAP_DELETED);
-      response->setPayload((uint8_t*)"DELETE OK",9);
+      coapResponse->setCode(CoapPDU::COAP_DELETED);
+      coapResponse->setPayload((uint8_t*)"DELETE OK",9);
     break;
     default:
     break;
@@ -152,10 +251,10 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
   // type
   switch(request->getType()) {
     case CoapPDU::COAP_CONFIRMABLE:
-      response->setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
+      coapResponse->setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
     break;
     case CoapPDU::COAP_NON_CONFIRMABLE:
-      response->setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
+      coapResponse->setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
     break;
     case CoapPDU::COAP_ACKNOWLEDGEMENT:
     break;
@@ -167,8 +266,8 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
   };
 
   // send the packet
-  ssize_t sent = sendto(sockfd, response->getPDUPointer(), response->getPDULength(), 0, (sockaddr*)recvFrom, addrLen);
-  if (sent<0) {
+  ssize_t sent = sendto(sockfd, coapResponse->getPDUPointer(), coapResponse->getPDULength(), 0, (sockaddr*)recvFrom, addrLen);
+  if (sent < 0) {
     LM_V(("Error sending packet: %ld.",sent));
     perror(NULL);
     return 1;
@@ -179,6 +278,12 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
   return 0;
 }
 
+
+
+/* ****************************************************************************
+*
+* serve -
+*/
 void Coap::serve()
 {
   // Buffers for UDP and URIs
@@ -290,6 +395,12 @@ void Coap::serve()
   }
 }
 
+
+
+/* ****************************************************************************
+*
+* run -
+*/
 int Coap::run(const char *_host, unsigned short _port)
 {
   char* portString = new char[6];

@@ -21,28 +21,11 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    rest.cpp
-    restReply.cpp
-    RestService.cpp
-    Verb.cpp
-    clientSocketHttp.cpp
-    orionReply.cpp
-    OrionError.cpp
-    HttpStatusCode.cpp
+    coap.cpp
 )
 
 SET (HEADERS
-    ConnectionInfo.h
-    HttpHeaders.h
-    mhd.h
-    rest.h
-    restReply.h
-    RestService.h
-    Verb.h
-    clientSocketHttp.h
-    orionReply.h
-    OrionError.h
-    HttpStatusCode.h
+    coap.h
 )
 
 
@@ -55,4 +38,6 @@ include_directories("${RAPIDXML_INCLUDE}")
 
 # Library declaration
 # -----------------------------------------------------------------
-ADD_LIBRARY(rest STATIC ${SOURCES} ${HEADERS})
+ADD_LIBRARY(restCoap STATIC ${SOURCES} ${HEADERS})
+target_link_libraries (restCoap cantcoap)
+target_link_libraries (restCoap curl)
