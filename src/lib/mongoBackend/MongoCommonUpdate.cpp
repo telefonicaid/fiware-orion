@@ -1252,7 +1252,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             mongoSemGive(__FUNCTION__, "update in EntitiesCollection");
         }
         catch( const DBException &e ) {
-            LM_M(("inside exception handling"));
             mongoSemGive(__FUNCTION__, "update in EntitiesCollection (mongo db exception)");
             cerP->statusCode.fill(SccReceiverInternalError,
                std::string("collection: ") + getEntitiesCollectionName() +

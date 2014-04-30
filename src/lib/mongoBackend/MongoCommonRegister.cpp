@@ -317,7 +317,7 @@ static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONOb
 *
 * processRegisterContext -
 *
-* This function has a slight different behaviour depending on whether the id
+* This function has a slightly different behaviour depending on whether the id
 * parameter is null (new registration case) or not null (update case), in
 * particular:
 *

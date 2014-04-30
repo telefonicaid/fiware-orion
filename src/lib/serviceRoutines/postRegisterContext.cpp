@@ -128,8 +128,6 @@ std::string postRegisterContext(ConnectionInfo* ciP, int components, std::vector
 {
   RegisterContextResponse  rcr;
 
-  LM_M(("Tenant: %s", ciP->tenant.c_str()));
-
   if (fwdPort != 0)
   {
     registerContextForward(ciP, parseDataP, &rcr);

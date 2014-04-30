@@ -168,8 +168,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       ciP->tenant = compV[0];
     }
-    else
-      ciP->tenant = "";
 
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
