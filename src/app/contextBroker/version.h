@@ -28,6 +28,6 @@
 
 
 
-#define ORION_VERSION "0.12.0"
+#define ORION_VERSION "0.12.0-next"
 
 #endif
