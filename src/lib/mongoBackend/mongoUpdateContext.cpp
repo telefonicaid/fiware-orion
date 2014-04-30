@@ -42,7 +42,7 @@
 *
 * mongoUpdateContext - 
 */
-HttpStatusCode mongoUpdateContext(UpdateContextRequest* requestP, UpdateContextResponse* responseP)
+HttpStatusCode mongoUpdateContext(UpdateContextRequest* requestP, UpdateContextResponse* responseP, std::string tenant)
 {
     reqSemTake(__FUNCTION__, "ngsi10 update request");
 

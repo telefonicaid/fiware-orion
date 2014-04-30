@@ -33,6 +33,6 @@
 *
 * mongoNofityContextAvailability -
 */
-extern HttpStatusCode mongoNotifyContextAvailability(NotifyContextAvailabilityRequest* requestP, NotifyContextAvailabilityResponse* responseP);
+extern HttpStatusCode mongoNotifyContextAvailability(NotifyContextAvailabilityRequest* requestP, NotifyContextAvailabilityResponse* responseP, std::string tenant = "");
 
 #endif

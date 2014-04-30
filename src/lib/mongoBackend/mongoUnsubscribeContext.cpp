@@ -38,7 +38,7 @@
 *
 * mongoUnsubscribeContext - 
 */
-HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, UnsubscribeContextResponse* responseP)
+HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, UnsubscribeContextResponse* responseP, std::string tenant)
 {
     reqSemTake(__FUNCTION__, "ngsi10 unsubscribe request");
 

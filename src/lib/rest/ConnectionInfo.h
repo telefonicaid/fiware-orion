@@ -79,6 +79,7 @@ public:
   std::string                method;
   std::string                version;
   std::string                charset;
+  std::string                tenant;
   HttpHeaders                httpHeaders;
   char*                      payload;
   int                        payloadSize;

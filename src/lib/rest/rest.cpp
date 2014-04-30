@@ -100,6 +100,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "connection") == 0)      headerP->connection     = value;
   else if (strcasecmp(key.c_str(), "content-type") == 0)    headerP->contentType    = value;
   else if (strcasecmp(key.c_str(), "content-length") == 0)  headerP->contentLength  = atoi(value);
+  else if (strcasecmp(key.c_str(), "x-fiware-tenant") == 0) headerP->tenant         = value;
   else
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
 
@@ -383,7 +384,8 @@ static int connectionTreat
     *con_cls = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
-
+    LM_T(LmtTenant, ("HTTP tenant: '%s' (URL tenant: '%s'%s)", ciP->httpHeaders.tenant.c_str(), ciP->tenant.c_str()));
+    ciP->tenant     = ciP->httpHeaders.tenant;
     ciP->outFormat  = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
       ciP->outFormat = XML; // XML is default output format

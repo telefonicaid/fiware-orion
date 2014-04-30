@@ -152,6 +152,25 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     LM_T(LmtService, ("Treating service %s %s", serviceV[ix].verb.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
     statisticsUpdate(serviceV[ix].request, ciP->inFormat);
+
+    // Tenant to connectionInfo
+    if (serviceV[ix].compV[0] == "*")
+    {
+      LM_T(LmtTenant, ("URL tenant: '%s'", compV[0].c_str()));
+      if ((ciP->tenant != "") && (ciP->tenant != compV[0]))
+      {
+        OrionError  e(SccBadRequest, "Unmatching tenants in HTTP header / URL path: (" + ciP->tenant + " vs " + compV[0] + ")");
+        std::string reply = e.render(ciP->outFormat, "");
+        restReply(ciP, reply);
+
+        return reply;
+      }
+
+      ciP->tenant = compV[0];
+    }
+    else
+      ciP->tenant = "";
+
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
     if (reqP != NULL)

@@ -39,7 +39,7 @@
 *
 * mongoSubscribeContext - 
 */
-HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, SubscribeContextResponse* responseP, Format inFormat)
+HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, SubscribeContextResponse* responseP, Format inFormat, std::string tenant)
 {
     reqSemTake(__FUNCTION__, "ngsi10 subscribe request");
 
