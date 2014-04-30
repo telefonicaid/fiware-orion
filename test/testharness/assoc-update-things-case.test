@@ -60,7 +60,7 @@ echo "1: ++++++++++++++++++++"
 url="/NGSI9/registerContext"
 payload='<?xml version="1.0"?>
 <registerContextRequest>
-<contextRegistrationList>
+  <contextRegistrationList>
     <contextRegistration>
       <registrationMetadata>
         <contextMetadata>
@@ -68,17 +68,17 @@ payload='<?xml version="1.0"?>
           <type>Association</type>
           <value>
             <entityAssociation>
-                                                        <sourceEntityId type="TemperatureSensor" isPattern="false">
+              <sourceEntityId type="TemperatureSensor" isPattern="false">
                 <id>Sensor5</id>      
               </sourceEntityId>
-                                                        <targetEntityId type="House" isPattern="false">
+              <targetEntityId type="House" isPattern="false">
                 <id>house_3</id>      
               </targetEntityId>
             </entityAssociation>
             <AttributeAssociationList>
               <AttributeAssociation>
-                    <sourceAttribute>measurement</sourceAttribute>
-                    <targetAttribute>indoorTemperature</targetAttribute>
+                <sourceAttribute>measurement</sourceAttribute>
+                <targetAttribute>indoorTemperature</targetAttribute>
               </AttributeAssociation>
             </AttributeAssociationList>
           </value>
@@ -87,7 +87,7 @@ payload='<?xml version="1.0"?>
       <providingApplication>http://www.fi-ware.eu/NGSI/association</providingApplication>
     </contextRegistration>
   </contextRegistrationList>
-        <duration>PT1H</duration>
+  <duration>PT1H</duration>
   <registrationId></registrationId>
 </registerContextRequest>'
 curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
@@ -103,15 +103,15 @@ payload='<?xml version="1.0"?>
     </entityId>
   </entityIdList>
   <attributeList>
-                <attribute>measurement</attribute>
+    <attribute>measurement</attribute>
   </attributeList>
   <restriction>
-      <scope>
-        <operationScope>
-          <scopeType>Include Associations</scopeType>
-          <scopeValue>TARGETS</scopeValue>
-        </operationScope>
-      </scope>
+    <scope>
+      <operationScope>
+        <scopeType>IncludeAssociations</scopeType>
+        <scopeValue>TARGETS</scopeValue>
+      </operationScope>
+    </scope>
   </restriction>
 </discoverContextAvailabilityRequest>'
 curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"

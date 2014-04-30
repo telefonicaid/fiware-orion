@@ -186,7 +186,7 @@ std::string ContextAttribute::check(RequestType requestType, Format format, std:
   if (name == "")
     return "missing attribute name";
 
-  if (compoundValueP != NULL)
+  if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0))
   {
     // FIXME P9: Use CompoundValueNode::check here and stop calling it from where it is called right now.
     //           Also, change CompoundValueNode::check to return std::string
