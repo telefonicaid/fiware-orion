@@ -21,12 +21,12 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-XML Parse Post RegisterContext
+Tenant URL not found when tenants not activated
 --SHELL-INIT--
 source harnessFunctions.sh
 
 dbInit CB
-brokerStart CB
+brokerStart CB 0-255 IPV4
 
 --SHELL--
 source harnessFunctions.sh
@@ -83,10 +83,10 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </registerContextRequest>'
 curlXml2 ${url} "${payload}" "fiware-tenant: fg"
 
-echo "++++++++++++++++++++"
+
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 167
+Content-Length: 156
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -94,9 +94,8 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Unmatching tenants in HTTP header / URL path: (fg vs kz)</details>
+  <details>service '/kz/NGSI9/registerContext' not found</details>
 </orionError>
-++++++++++++++++++++
 --TEARDOWN--
 source harnessFunctions.sh
 brokerStop CB

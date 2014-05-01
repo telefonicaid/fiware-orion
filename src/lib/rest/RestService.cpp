@@ -157,18 +157,17 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     if (serviceV[ix].compV[0] == "*")
     {
       LM_T(LmtTenant, ("URL tenant: '%s'", compV[0].c_str()));
-      if ((ciP->tenant != "") && (ciP->tenant != compV[0]))
-      {
-        OrionError  e(SccBadRequest, "Unmatching tenants in HTTP header / URL path: (" + ciP->tenant + " vs " + compV[0] + ")");
-        std::string reply = e.render(ciP->outFormat, "");
-        restReply(ciP, reply);
-
-        return reply;
-      }
-
-      ciP->tenant = compV[0];
+      ciP->tenantFromUrl = compV[0];
     }
 
+    if (multitenant == "url")
+      ciP->tenant = ciP->tenantFromUrl;
+    else if (multitenant == "header")
+      ciP->tenant = ciP->tenantFromHttpHeader;
+    else // multitenant == "off"
+      ciP->tenant = "";
+
+    LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
     if (reqP != NULL)

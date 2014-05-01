@@ -52,4 +52,4 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-https' (use the https 'protocol')]
                       [option '-key' <private server key file (for https)>]
                       [option '-cert' <certificate key file (for https)>]
-                     
+                      [option '-multitenant' <tenancy mode (off|url|header)>]

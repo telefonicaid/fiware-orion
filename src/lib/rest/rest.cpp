@@ -73,7 +73,7 @@ static bool                      acceptTextXml         = false;
 static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
 static char                      bindIPv6[MAX_LEN_IP]  = "::";
 IpVersion                        ipVersionUsed         = IPDUAL;
-
+std::string                      multitenant           = "off";
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
@@ -384,9 +384,9 @@ static int connectionTreat
     *con_cls = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
-    LM_T(LmtTenant, ("HTTP tenant: '%s' (URL tenant: '%s'%s)", ciP->httpHeaders.tenant.c_str(), ciP->tenant.c_str()));
-    ciP->tenant     = ciP->httpHeaders.tenant;
-    ciP->outFormat  = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
+    ciP->tenantFromHttpHeader = ciP->httpHeaders.tenant;
+    LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));
+    ciP->outFormat            = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
       ciP->outFormat = XML; // XML is default output format
 
@@ -575,6 +575,7 @@ void restInit
   IpVersion          _ipVersion,
   const char*        _bindAddress,
   unsigned short     _port,
+  std::string        _multitenant,
   const char*        _httpsKey,
   const char*        _httpsCertificate,
   RestServeFunction  _serveFunction,
@@ -589,6 +590,7 @@ void restInit
   ipVersionUsed = _ipVersion;
   serveFunction = (_serveFunction != NULL)? _serveFunction : serve;
   acceptTextXml = _acceptTextXml;
+  multitenant   = _multitenant;
 
   strncpy(bindIp, LOCAL_IP_V4, MAX_LEN_IP - 1);
   strncpy(bindIPv6, LOCAL_IP_V6, MAX_LEN_IP - 1);

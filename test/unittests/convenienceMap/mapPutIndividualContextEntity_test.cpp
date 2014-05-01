@@ -36,6 +36,7 @@
 #include "mongoBackend/mongoRegisterContext.h"
 #include "ngsi9/RegisterContextResponse.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
+#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
@@ -81,6 +82,7 @@ TEST(mapPutIndividualContextEntity, updateOkAndError)
   HttpStatusCode                ms;
   UpdateContextElementRequest   request;
   UpdateContextElementResponse  response;
+  ConnectionInfo                ci;
 
   utInit();
 
@@ -88,18 +90,18 @@ TEST(mapPutIndividualContextEntity, updateOkAndError)
   request.attributeDomainName.set("ad");
 
   // OK
-  ms = mapPutIndividualContextEntity("MPICE", &request, &response);
+  ms = mapPutIndividualContextEntity("MPICE", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(200, response.errorCode.code);
 
   // Not found
-  ms = mapPutIndividualContextEntity("MPICE2", &request, &response);
+  ms = mapPutIndividualContextEntity("MPICE2", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(404, response.errorCode.code);
 
   // Cleanup
   StatusCode sCode;
-  mapDeleteIndividualContextEntity("MPICE", &sCode);
+  mapDeleteIndividualContextEntity("MPICE", &sCode, &ci);
 
   utExit();
 }
