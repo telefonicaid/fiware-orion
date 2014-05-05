@@ -1,16 +1,16 @@
 #!/bin/bash
 #
-# contextbroker         Start/Stop the Context Broker
+# contextBroker         Start/Stop the Context Broker
 #
 # chkconfig: 2345 99 60
 # description: Orion Context Broker
 ### BEGIN INIT INFO
-# Provides: contextbroker
+# Provides: contextBroker
 # Required-Start: $local_fs $syslog
 # Required-Stop: $local_fs $syslog
 # Default-Start:  345
 # Default-Stop: 90
-# Short-Description: run contextbroker
+# Short-Description: run contextBroker
 # Description: The Origion Context Broker is an implementation of the NGSI9 and NGSI10 interfaces. 
 # Using these interfaces, clients can do several operations:
 # * Register context producer applications, e.g. a temperature sensor within a room.
@@ -80,7 +80,7 @@ else
             -db ${BROKER_DATABASE_NAME} \
             -dbuser ${BROKER_DATABASE_USER} \
             -dbpwd ${BROKER_DATABASE_PASSWORD} \
-            ${BROKER_EXTRA_OPS} "
+            ${BROKER_EXTRA_OPS}"
 fi
 
 broker_start()
@@ -88,10 +88,10 @@ broker_start()
     printf "%-50s" "Starting ${NAME}..."
     if [[ -x ${EXECUTABLE} ]]; then
         su $BROKER_USER -c "${EXECUTABLE} ${BROKER_OPTS} &> /dev/null "
-        #daemon --user ${BROKER_USER} --pidfile ${BROKER_PID_FILE} bash -c "${EXECUTABLE} ${BROKER_OPTS} "
         sleep 2 # wait some time to leave contextbroker start
         PID=$(cat ${BROKER_PID_FILE})
         if [[ -z "${PID}" ]]; then
+            printf "%s" "pidfile not found"
             printf "%s\n" "$(failure)" 
             exit 1
         else
