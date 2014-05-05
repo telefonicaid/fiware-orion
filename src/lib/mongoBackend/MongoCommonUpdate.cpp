@@ -150,6 +150,106 @@ static void valueBson(ContextAttribute* ca, BSONObjBuilder& bsonAttr) {
 
 }
 
+/* ****************************************************************************
+*
+* isCustomMetadata -
+*
+* Check that the parameter is a right custom metadata, i.e. one metadata without
+* an special semantic to be interpreted by the context broker itself
+*
+* FIXME P2: this function probably could be moved to another place "closer" to metadtta
+*/
+static bool isCustomMetadata(std::string md) {
+    if (md != NGSI_MD_ID &&
+        md != NGSI_MD_LOCATION &&
+        md != NGSI_MD_CREDATE &&
+        md != NGSI_MD_MODDATE) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+/* ****************************************************************************
+*
+* hasMetadata -
+*
+* Check if a metadata is include in a (request) ContextAttribute
+*/
+static bool hasMetadata(std::string name, std::string type, ContextAttribute ca) {
+
+    for (unsigned int ix = 0; ix < ca.metadataVector.size() ; ++ix) {
+        Metadata* md = ca.metadataVector.get(ix);
+        /* Note that, different from entity types or attribute types, for attribute metadata we don't consider empty type
+         * as a wildcard in order to keep things simpler */
+        if ((md->name == name) && (md->type == type)) {
+            return true;
+        }
+    }
+    return false;
+
+}
+
+
+/* ****************************************************************************
+*
+* matchMetadata -
+*
+* Returns if two metadata has the same name and type, taking into account that
+* could not be present
+*/
+static bool matchMetadata(BSONObj& md1, BSONObj& md2) {
+
+    if (md1.hasField(ENT_ATTRS_MD_TYPE)) {
+        return md2.hasField(ENT_ATTRS_MD_TYPE) &&
+               md1.getStringField(ENT_ATTRS_MD_TYPE) == md2.getStringField(ENT_ATTRS_MD_TYPE) &&
+               md1.getStringField(ENT_ATTRS_MD_NAME) == md2.getStringField(ENT_ATTRS_MD_NAME);
+    }
+    else {
+        return !md2.hasField(ENT_ATTRS_MD_TYPE) &&
+               md1.getStringField(ENT_ATTRS_MD_NAME) == md2.getStringField(ENT_ATTRS_MD_NAME);
+    }
+
+}
+
+/* ****************************************************************************
+*
+* equalMetadataVectors -
+*
+* Given two vectors with the same metadata names-types, check that all the values
+* are equal, returning false otherwise.
+*
+* Arguments are passed by reference to avoid "heavy" copies
+*/
+static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2) {
+
+
+    bool found = false;
+    for( BSONObj::iterator i1 = mdV1.begin(); i1.more(); ) {
+        BSONObj md1 = i1.next().embeddedObject();
+        for( BSONObj::iterator i2 = mdV2.begin(); i2.more(); ) {
+            BSONObj md2 = i2.next().embeddedObject();
+            /* Check metadata match */
+            if (matchMetadata(md1, md2)) {
+                if (md1.getStringField(ENT_ATTRS_MD_VALUE) != md2.getStringField(ENT_ATTRS_MD_VALUE)) {
+                    return false;
+                }
+                else {
+                    found = true;
+                    continue;  // loop in i2
+                }
+            }
+        }
+        if (found) {
+            /* Shortcut for early passing to the next attribute in i1 */
+            found = false;
+            continue; // loop in i1
+        }
+    }
+    return true;
+
+}
 
 /* ****************************************************************************
 *
@@ -180,27 +280,78 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
     }
     if (smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_TYPE), STR_FIELD(attr, ENT_ATTRS_ID),
                        ca.name, ca.type, ca.getId())) {
+
         /* Attribute match: update value */
         valueBson(&ca, newAttr);
         updated = true;
 
+        /* Update metadata */
+        // FIXME: move to a separate function?
+        BSONArrayBuilder mdNewVBuilder;
+
+        /* First add the metadata comming in the request */
+        for (unsigned int ix = 0; ix < ca.metadataVector.size() ; ++ix) {
+            Metadata* md = ca.metadataVector.get(ix);
+            /* Skip not custom metadata */
+            if (isCustomMetadata(md->name)) {
+                continue;
+            }
+            if (md->type == "") {
+                mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md->name << ENT_ATTRS_MD_VALUE << md->value));
+            }
+            else {
+                mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md->name << ENT_ATTRS_MD_TYPE << md->type << ENT_ATTRS_MD_VALUE << md->value));
+            }
+
+        }
+
+        /* Second, for each metadata previously in the metadata vector but _not included in the request_, add it as is */
+        unsigned int mdVSize = 0;
+        BSONObj mdV;
+        if (attr.hasField(ENT_ATTRS_MD)) {
+            mdV = attr.getField(ENT_ATTRS_MD).embeddedObject();
+            for( BSONObj::iterator i = mdV.begin(); i.more(); ) {
+                BSONObj md = i.next().embeddedObject();
+                mdVSize++;
+                if (!hasMetadata(md.getStringField(ENT_ATTRS_MD_NAME), md.getStringField(ENT_ATTRS_MD_TYPE), ca)) {
+                    if (md.hasField(ENT_ATTRS_MD_TYPE)) {
+                        mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
+                                           ENT_ATTRS_MD_TYPE << md.getStringField(ENT_ATTRS_MD_TYPE) <<
+                                           ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
+                    }
+                    else {
+                        mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
+                                           ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
+                    }
+                }
+            }
+        }
+
+        unsigned int mdNewVSize = mdNewVBuilder.len();
+        BSONObj mdNewV = mdNewVBuilder.arr();
+        if (mdNewVSize > 0) {
+            newAttr.appendArray(ENT_ATTRS_MD, mdNewV);
+        }
+
         /* It was an actual update? */
         if (ca.compoundValueP == NULL) {
             /* It was an actual update? */
-            if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value) {
+            if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value || mdNewVSize != mdVSize || !equalMetadataVectors(mdV, mdNewV)) {
                 *actualUpdate = true;
             }
         }
         else {
             // FIXME P6: in the case of composed value, it's more difficult to know if an attribute
-            // has really changed its value (many levels have to be travesed. Until we can develop the
+            // has really changed its value (many levels have to be travesed). Until we can develop the
             // matching logic, we consider actualUpdate always true.
             *actualUpdate = true;
         }
 
     }
     else {
-        /* Attribute doesn't match: value is included "as is", taking into account it can be a compound value */
+        /* Attribute doesn't match */
+
+        /* Value is included "as is", taking into account it can be a compound value */
         if (attr.hasField(ENT_ATTRS_VALUE)) {
             BSONElement value = attr.getField(ENT_ATTRS_VALUE);
             if (value.type() == String) {
@@ -216,6 +367,28 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
                 LM_E(("unknown BSON type"));
             }
 
+        }
+
+        /* Metadata is included as is */
+        // FIXME: move to a separate function?
+        if (attr.hasField(ENT_ATTRS_MD)) {
+            BSONArrayBuilder mdNewVBuilder;
+            BSONObj mdV = attr.getField(ENT_ATTRS_MD).embeddedObject();
+            for( BSONObj::iterator i = mdV.begin(); i.more(); ) {
+                BSONObj md = i.next().embeddedObject();
+                if (md.hasField(ENT_ATTRS_MD_TYPE)) {
+                    mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
+                                       ENT_ATTRS_MD_TYPE << md.getStringField(ENT_ATTRS_MD_TYPE) <<
+                                       ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
+                }
+                else {
+                    mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
+                                       ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
+                }
+            }
+            if (mdNewVBuilder.len() > 0) {
+                newAttr.appendArray(ENT_ATTRS_MD, mdNewVBuilder.arr());
+            }
         }
     }
 
@@ -721,27 +894,6 @@ static void buildGeneralErrorReponse(ContextElement* ceP, ContextAttribute* ca, 
 
 /* ****************************************************************************
 *
-* isCustomMetadata -
-*
-* Check that the parameter is a right custom metadata, i.e. one metadata without
-* an special semantic to be interpreted by the context broker itself
-*
-* FIXME P2: this function probably could be moved to another place "closer" to metadtta
-*/
-static bool isCustomMetadata(std::string md) {
-    if (md != NGSI_MD_ID &&
-        md != NGSI_MD_LOCATION &&
-        md != NGSI_MD_CREDATE &&
-        md != NGSI_MD_MODDATE) {
-        return true;
-    }
-    else {
-        return false;
-    }
-}
-
-/* ****************************************************************************
-*
 * setResponseMetadata -
 *
 */
@@ -762,7 +914,7 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
     /* Custom (just "mirroring" in the response) */
     for (unsigned int ix = 0; ix < caReq->metadataVector.size(); ++ix) {
         Metadata* mdReq = caReq->metadataVector.get(ix);
-        if (isCustomMetadata(mdReq->name)) {
+        if (!isCustomMetadata(mdReq->name)) {
             md = new Metadata(mdReq->name, mdReq->type, mdReq->value);
             caRes->metadataVector.push_back(md);
         }
@@ -1030,7 +1182,7 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
         BSONArrayBuilder mdToAdd;
         for (unsigned int jx = 0; jx < attrsV.get(ix)->metadataVector.size(); ++jx) {
             Metadata* md = attrsV.get(ix)->metadataVector.get(jx);
-            if (isCustomMetadata(md->name)) {
+            if (!isCustomMetadata(md->name)) {
                 mdToAdd.append(BSON("name" << md->name << "type" << md->type << "value" << md->value));
                 LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
                                 md->name.c_str(), md->type.c_str(), md->value.c_str()));
