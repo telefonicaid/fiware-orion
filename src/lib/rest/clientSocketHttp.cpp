@@ -128,6 +128,7 @@ std::string sendHttpSocket
    std::string     resource,
    std::string     content_type,
    std::string     content,
+   bool            useRush,
    bool            waitForResponse
 )
 {  
@@ -135,11 +136,14 @@ std::string sendHttpSocket
   char                       response[TAM_BUF];
   char                       preContent[TAM_BUF];
   char                       msgStatic[MAX_STA_MSG_SIZE];
-  char*                      what       = (char*) "static";
-  char*                      msgDynamic = NULL;
-  char*                      msg        = msgStatic;   // by default, use the static buffer
+  char*                      what               = (char*) "static";
+  char*                      msgDynamic         = NULL;
+  char*                      msg                = msgStatic;   // by default, use the static buffer
+  std::string                rushHeaderIP       = "";
+  unsigned short             rushHeaderPort     = 0;
+  std::string                rushHttpHeaders    = "";
+  static unsigned long long  callNo             = 0;
   std::string                result;
-  static unsigned long long  callNo = 0;
 
   ++callNo;
 
@@ -150,6 +154,37 @@ std::string sendHttpSocket
   if (resource.empty()) LM_RE("error", ("resource is empty"));
   if ((content_type.empty()) && (!content.empty())) LM_RE("error", ("Content-Type is empty but there is actual content"));
   if ((!content_type.empty()) && (content.empty())) LM_RE("error", ("there is actual content but Content-Type is empty"));
+
+  //
+  // Rush
+  // Every call to sendHttpSocket specifies whether RUSH should be used or not.
+  // But, this depends also on how the broker was started, so here the 'useRush'
+  // parameter is cancelled in case the broker was started without rush.
+  //
+  // IF rush is to be used, the IP/port is stored id rushHeaderIP/rushHeaderPort and
+  // after that, the host and port of rush is set as ip/port for the message, that is
+  // now sent to rush instead of to its final destination.
+  // Also, a few HTTP headers for rush nust be setup.
+  //
+  if (useRush)
+  {
+    if ((rushPort == 0) || (rushHost == ""))
+      useRush = false;
+    else
+    {
+      char portAsString[16];
+
+      rushHeaderIP   = ip;
+      rushHeaderPort = port;
+      ip             = rushHost;
+      port           = rushPort;
+
+      sprintf(portAsString, "%d", rushHeaderPort);
+      rushHttpHeaders = "X-relayer-host: " + rushHeaderIP + ":" + portAsString + "\n";
+
+      // if (https) rushHttpHeaders += "X-relayer-protocol: https\n";
+    }
+  }
 
   // Buffers clear
   memset(buffer, 0, TAM_BUF);
@@ -163,6 +198,9 @@ std::string sendHttpSocket
            "Host: %s:%d\n"
            "Accept: application/xml, application/json\n",
            verb.c_str(), resource.c_str(), versionGet(), ip.c_str(), (int) port);
+
+  if (useRush)
+    strcat(preContent, rushHttpHeaders.c_str());
 
   if (!content.empty())
   {

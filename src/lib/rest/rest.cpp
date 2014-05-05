@@ -73,7 +73,8 @@ static bool                      acceptTextXml         = false;
 static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
 static char                      bindIPv6[MAX_LEN_IP]  = "::";
 IpVersion                        ipVersionUsed         = IPDUAL;
-
+std::string                      rushHost              = "";
+unsigned short                   rushPort              = 0;
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
@@ -573,6 +574,8 @@ void restInit
   IpVersion          _ipVersion,
   const char*        _bindAddress,
   unsigned short     _port,
+  std::string        _rushHost,
+  unsigned short     _rushPort,
   const char*        _httpsKey,
   const char*        _httpsCertificate,
   RestServeFunction  _serveFunction,
@@ -587,6 +590,8 @@ void restInit
   ipVersionUsed = _ipVersion;
   serveFunction = (_serveFunction != NULL)? _serveFunction : serve;
   acceptTextXml = _acceptTextXml;
+  rushHost      = _rushHost;
+  rushPort      = _rushPort;
 
   strncpy(bindIp, LOCAL_IP_V4, MAX_LEN_IP - 1);
   strncpy(bindIPv6, LOCAL_IP_V6, MAX_LEN_IP - 1);

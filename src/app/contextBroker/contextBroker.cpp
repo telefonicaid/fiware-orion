@@ -176,6 +176,8 @@ bool            useOnlyIPv6;
 char            httpsKeyFile[1024];
 char            httpsCertFile[1024];
 bool            https;
+char            rush[256];
+
 
 
 #define PIDPATH _i "/tmp/contextBroker.pid"
@@ -205,7 +207,9 @@ PaArgument paArgs[] =
   { "-https",       &https,        "HTTPS",           PaBool,   PaOpt, false,          false,  true,  "use the https 'protocol'"             },
   { "-key",         httpsKeyFile,  "HTTPS_KEY_FILE",  PaString, PaOpt, _i "",          PaNL,   PaNL,  "private server key file (for https)"  },
   { "-cert",        httpsCertFile, "HTTPS_CERT_FILE", PaString, PaOpt, _i "",          PaNL,   PaNL,  "certificate key file (for https)"     },
-  
+
+  { "-rush",        rush,          "RUSH",            PaString, PaOpt, _i "",          PaNL,   PaNL,  "rush host (IP:port)"                  },
+
   PA_END_OF_ARGS
 };
 
@@ -650,10 +654,41 @@ static int loadFile(char* path, char* out, int outSize)
 
 /* ****************************************************************************
 *
+* rushParse - parse rush host and port feom CLI argument
+*
+* The '-rush' CLI argument has the format "host:port" and this function
+* splits that argument into rushHost and rushPort.
+* If there is a syntax error in the argument, the function exists the program
+* with an error message
+*/
+static void rushParse(char* rush, std::string* rushHostP, unsigned short* rushPortP)
+{
+  char* colon = strchr(rush, ':');
+
+  if (colon == NULL)
+    LM_X(1, ("Bad syntax of '-rush' value: '%s' (wanted: 'host:port')"));
+
+  *colon = 0;
+  ++colon;
+
+  *rushHostP = rush;
+  *rushPortP = atoi(colon);
+
+  if ((*rushHostP == "") || (*rushPortP == 0))
+    LM_X(1, ("Bad syntax of '-rush' value: '%s' (wanted: 'host:port')"));
+}
+
+
+
+/* ****************************************************************************
+*
 * main - 
 */
 int main(int argC, char* argV[])
 {
+  unsigned short rushPort;
+  std::string    rushHost;
+
   signal(SIGINT,  sigHandler);
   signal(SIGTERM, sigHandler);
 
@@ -716,6 +751,9 @@ int main(int argC, char* argV[])
   mongoInit(dbHost, dbName, user, pwd);
   contextBrokerInit(ngsi9Only);
 
+  if (rush[0] != 0)
+    rushParse(rush, &rushHost, &rushPort);
+
   if (https)
   {
     char* httpsPrivateServerKey = (char*) malloc(2048);
@@ -729,12 +767,12 @@ int main(int argC, char* argV[])
     LM_V(("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_V(("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, httpsPrivateServerKey, httpsCertificate);
+    restInit(rsP, ipVersion, bindAddress, port, rushHost, rushPort, httpsPrivateServerKey, httpsCertificate);
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
-    restInit(rsP, ipVersion, bindAddress, port);
+    restInit(rsP, ipVersion, bindAddress, port, rushHost, rushPort);
 
   while (1)
     sleep(10);
