@@ -21,12 +21,12 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Erroneous tenant url names
+Erroneous tenant URL names
 --SHELL-INIT--
 source harnessFunctions.sh
 
 dbInit CB
-brokerStart CB 0 IPV4 -multitenant url
+brokerStart CB 0 IPV4 -multitenant header
 
 --SHELL--
 source harnessFunctions.sh
@@ -81,34 +81,32 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     <registrationId></registrationId>
   </registerContextRequest>'
 
+URL="/NGSI9/registerContext"
+
 # OK
 echo "1: ++++++++++"
-url="/_kz-0123456789012345/NGSI9/registerContext"
-curlXml ${url} "${payload}"
+curlXml2 $URL "$payload" "fiware-tenant: _kz-0123456789012345"
 echo
 echo
 
 
 # 2. Long tenant name
-url="/kz12345678901234567890/NGSI9/registerContext"
 echo "2: ++++++++++"
-curlXml ${url} "${payload}"
+curlXml2 $URL "$payload" "fiware-tenant: kz12345678901234567890"
 echo
 echo
 
 
 # 3. Bad character in tenant name
-url="/kz+fg/NGSI9/registerContext"
 echo "3: ++++++++++"
-curlXml ${url} "${payload}"
+curlXml2 $URL "$payload" "fiware-tenant: kz+fg"
 echo
 echo
 
 
 # 4. Reserved name in tenant name
-url="/log/NGSI9/registerContext"
 echo "4: ++++++++++"
-curlXml ${url} "${payload}"
+curlXml2 $URL "$payload" "fiware-tenant: log"
 --REGEXPECT--
 1: ++++++++++
 HTTP/1.1 200 OK
