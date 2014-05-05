@@ -50,7 +50,7 @@ function verboseMsg()
 #
 function usage()
 {
-  echo usage: $0 '[-host <host>] [-port <p>] [-v (verbose)] [-lint (use xmllint)] [-cop <convenience operation>] [-X <method>] [-en <entityId>] [-attr (attributeName)] [-id <reg/sub id>] [-json (in and out-format in JSON)] [-informat (in-format)] [-outformat (out-format)] [-table <table to debug>] [--https] <operation> <data file>'
+  echo usage: $0 '[-host <host>] [-port <p>] [-v (verbose)] [-lint (use xmllint)] [-cop <convenience operation>] [-X <method>] [--tenant <tenant>] [--httpTenant <tenant>] [-en <entityId>] [-attr (attributeName)] [-id <reg/sub id>] [-json (in and out-format in JSON)] [-informat (in-format)] [-outformat (out-format)] [-table <table to debug>] [--https] <operation> <data file>'
 
   verbose=1
   verboseMsg "Operations:"
@@ -99,6 +99,9 @@ attributeName=""
 table=""
 protocol='http'
 cert=""
+tenant=""
+httpTenant=""
+
 
 
 # -----------------------------------------------------------------------------
@@ -107,21 +110,23 @@ cert=""
 #
 while [ "$#" != 0 ]
 do
-  if   [ "$1" == "-u" ];         then usage;
-  elif [ "$1" == "-v" ];         then verbose=on; CURL_VERBOSE='-vvvvv'
-  elif [ "$1" == "-lint" ];      then useXmlLint=1;
-  elif [ "$1" == "--https" ];    then protocol='https'; cert='--cacert ../../security/localhost.pem';
-  elif [ "$1" == "-host" ];      then host=$2;                        shift;
-  elif [ "$1" == "-port" ];      then port=$2;                        shift;
-  elif [ "$1" == "-cop" ];       then convOp=$2;                      shift;
-  elif [ "$1" == "-X" ];         then method=$2;                      shift;
-  elif [ "$1" == "-en" ];        then entityId=$2;                    shift;
-  elif [ "$1" == "-attr" ];      then attributeName=$2;               shift;
-  elif [ "$1" == "-id" ];        then id=$2;                          shift;
-  elif [ "$1" == "-json" ];      then IN_FORMAT="Content-Type: application/json"; OUT_FORMAT="Accept: application/json";
-  elif [ "$1" == "-informat" ];  then IN_FORMAT="Content-Type: $2";   shift;
-  elif [ "$1" == "-outformat" ]; then OUT_FORMAT="Accept: $2";        shift;
-  elif [ "$1" == "-table" ];     then table=$2;                       shift;
+  if   [ "$1" == "-u" ];           then usage;
+  elif [ "$1" == "-v" ];           then verbose=on; CURL_VERBOSE='-vvvvv'
+  elif [ "$1" == "-lint" ];        then useXmlLint=1;
+  elif [ "$1" == "--https" ];      then protocol='https'; cert='--cacert ../../security/localhost.pem';
+  elif [ "$1" == "--tenant" ];     then tenant=$2;                      shift;
+  elif [ "$1" == "--httpTenant" ]; then httpTenant=$2;                  shift;
+  elif [ "$1" == "-host" ];        then host=$2;                        shift;
+  elif [ "$1" == "-port" ];        then port=$2;                        shift;
+  elif [ "$1" == "-cop" ];         then convOp=$2;                      shift;
+  elif [ "$1" == "-X" ];           then method=$2;                      shift;
+  elif [ "$1" == "-en" ];          then entityId=$2;                    shift;
+  elif [ "$1" == "-attr" ];        then attributeName=$2;               shift;
+  elif [ "$1" == "-id" ];          then id=$2;                          shift;
+  elif [ "$1" == "-json" ];        then IN_FORMAT="Content-Type: application/json"; OUT_FORMAT="Accept: application/json";
+  elif [ "$1" == "-informat" ];    then IN_FORMAT="Content-Type: $2";   shift;
+  elif [ "$1" == "-outformat" ];   then OUT_FORMAT="Accept: $2";        shift;
+  elif [ "$1" == "-table" ];       then table=$2;                       shift;
   else
     if   [ "$operation" == "" ];       then operation=$1;
     elif [ "$dataFile"  == "" ];       then dataFile=$1;
@@ -306,10 +311,19 @@ verboseMsg Creating curl command
 if [ "$operation" == "conv" ]
 then
   echo Convenience $protocol operation: $convOp
-  url=${protocol}"://$host:$port/${cop[$convOp]}"
+  if [ "$tenant" != "" ]
+  then
+    url=${protocol}"://$host:$port/$tenant/${cop[$convOp]}"
+  else
+    url=${protocol}"://$host:$port/${cop[$convOp]}"
+  fi
 else
-  echo Normal $protocol operation: $operation
-  url=${protocol}"://$host:$port/${op[$operation]}"
+  if [ "$tenant" != "" ]
+  then
+    url=${protocol}"://$host:$port/$tenant/${op[$operation]}"
+  else
+    url=${protocol}"://$host:$port/${op[$operation]}"
+  fi
 fi
 verboseMsg "URL: '"$url"'"
 
@@ -331,19 +345,20 @@ fi
 
 
 
+echo CURL: curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" --header "fiware-tenant: $httpTenant" $CURL_VERBOSE -X $method $cert
 # -----------------------------------------------------------------------------
 #
 # curl
 #
 # Always call curl with '-d "$data"' ?
 #
-if [ "$useXmlLint" == 1 ]
+if [ "$useXmlLint" == 1 ] 
 then
-  (curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" $CURL_VERBOSE -X $method $cert -d @- | xmllint --format -) << EOF
+  (curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" --header "fiware-tenant: $httpTenant" $CURL_VERBOSE -X $method $cert -d @- | xmllint --format -) << EOF
 $(echo $data)
 EOF
 else
-  (curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" $CURL_VERBOSE -X $method $cert -d @-) << EOF
+  (curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" --header "fiware-tenant: $httpTenant" $CURL_VERBOSE -X $method $cert -d @-) << EOF
 $(echo $data)
 EOF
 fi

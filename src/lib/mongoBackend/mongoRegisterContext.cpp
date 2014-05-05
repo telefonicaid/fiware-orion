@@ -44,7 +44,7 @@ using namespace mongo;
 *
 * mongoRegisterContext - 
 */
-HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterContextResponse* responseP)
+HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterContextResponse* responseP, std::string tenant)
 {    
     reqSemTake(__FUNCTION__, "ngsi9 register request");
 

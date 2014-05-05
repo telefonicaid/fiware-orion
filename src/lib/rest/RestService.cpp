@@ -152,6 +152,22 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     LM_T(LmtService, ("Treating service %s %s", serviceV[ix].verb.c_str(), ciP->url.c_str())); // Sacred - used in 'heavyTest'
     statisticsUpdate(serviceV[ix].request, ciP->inFormat);
+
+    // Tenant to connectionInfo
+    if (serviceV[ix].compV[0] == "*")
+    {
+      LM_T(LmtTenant, ("URL tenant: '%s'", compV[0].c_str()));
+      ciP->tenantFromUrl = compV[0];
+    }
+
+    if (multitenant == "url")
+      ciP->tenant = ciP->tenantFromUrl;
+    else if (multitenant == "header")
+      ciP->tenant = ciP->tenantFromHttpHeader;
+    else // multitenant == "off"
+      ciP->tenant = "";
+
+    LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
     if (reqP != NULL)

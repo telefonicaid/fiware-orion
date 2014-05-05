@@ -317,14 +317,14 @@ static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONOb
 *
 * processRegisterContext -
 *
-* This function has a slight different behaviour depending on whether and id
+* This function has a slightly different behaviour depending on whether the id
 * parameter is null (new registration case) or not null (update case), in
 * particular:
 *
 * - In the new registration case, the _id is generated and insert() is used to
-*   put the document in the DB
-* - In the update case, the _id is set with the one in the argument and update() is
-*   used to put the document in the DB
+*   put the document in the DB.
+* - In the update case, the _id is set according to the argument 'id' and update() is
+*   used to put the document in the DB.
 *
 */
 HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, RegisterContextResponse* responseP, OID* id)

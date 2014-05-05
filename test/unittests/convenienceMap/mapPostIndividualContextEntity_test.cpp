@@ -33,6 +33,7 @@
 #include "mongoBackend/mongoRegisterContext.h"
 #include "ngsi9/RegisterContextResponse.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
+#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
@@ -84,10 +85,11 @@ TEST(mapPostIndividualContextEntity, emptyDb)
   HttpStatusCode                ms;
   AppendContextElementRequest   request;
   AppendContextElementResponse  response;
+  ConnectionInfo                ci;
 
   utInit();
 
-  ms = mapPostIndividualContextEntity("MPICE", &request, &response);
+  ms = mapPostIndividualContextEntity("MPICE", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk, response.errorCode.code);
   EXPECT_EQ("OK", response.errorCode.reasonPhrase);
@@ -107,13 +109,14 @@ TEST(mapPostIndividualContextEntity, found)
   HttpStatusCode                ms;
   AppendContextElementRequest   request;
   AppendContextElementResponse  response;
+  ConnectionInfo                ci;
 
   utInit();
   prepareDatabase("MPICE", "ttt");
 
   request.attributeDomainName.set("ad");
 
-  ms = mapPostIndividualContextEntity("MPICE", &request, &response);
+  ms = mapPostIndividualContextEntity("MPICE", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(200, response.errorCode.code);
 
@@ -131,13 +134,14 @@ TEST(mapPostIndividualContextEntity, newEntity)
   HttpStatusCode                ms;
   AppendContextElementRequest   request;
   AppendContextElementResponse  response;
+  ConnectionInfo                ci;
 
   utInit();
   prepareDatabase("MPICE", "ttt");
 
   request.attributeDomainName.set("ad");
 
-  ms = mapPostIndividualContextEntity("MPICE2", &request, &response);
+  ms = mapPostIndividualContextEntity("MPICE2", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk, response.errorCode.code);
   EXPECT_STREQ("OK", response.errorCode.reasonPhrase.c_str());

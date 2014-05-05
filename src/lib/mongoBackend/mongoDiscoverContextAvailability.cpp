@@ -241,7 +241,7 @@ static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAva
 *
 * mongoDiscoverContextAvailability - 
 */
-HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP)
+HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, std::string tenant)
 {
   reqSemTake(__FUNCTION__, "mongo ngsi9 discovery request");
 

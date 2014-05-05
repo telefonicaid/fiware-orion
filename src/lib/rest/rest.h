@@ -49,7 +49,8 @@ typedef enum IpVersion
 *
 * ipVersionUsed - 
 */
-extern IpVersion  ipVersionUsed;  
+extern IpVersion    ipVersionUsed;  
+extern std::string  multitenant;
 
 
 
@@ -71,6 +72,7 @@ extern void restInit
    IpVersion         _ipVersion,
    const char*       _bindAddress,
    unsigned short    _port,
+   std::string       _multitenant   = "off",
    const char*       _httpsKey      = NULL,
    const char*       _httpsCert     = NULL,
    RestServeFunction _serveFunction = NULL,

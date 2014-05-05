@@ -352,11 +352,17 @@ function curlIt()
   contenttype=$4
   accept=$5
   extraoptions=$6
+  httpTenant=$7
 
   params="-s -S --dump-header headers.out"
   
-  response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" --header "Expect:" ${extraoptions} -d @- ))
-  
+  if [ "$extraoptions" == "" ] && [ "$httpTenant" != "" ]
+  then
+    response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" --header "Expect:" --header "$httpTenant" -d @- ))
+  else
+    response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" --header "Expect:" ${extraoptions} -d @- ))
+  fi
+
   if [ "$outFormat" == "XML" ] || [ "$outFormat" == "xml" ]
   then
     printXmlWithHeaders "${response}"
@@ -383,6 +389,14 @@ function curlXml()
   curlIt "XML" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/xml" "Accept: application/xml" "${extraoptions}"
 }
 
+function curlXml2()
+{
+  url=$1
+  payload=$2
+  tenant=$3
+  
+  curlIt "XML" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/xml" "Accept: application/xml" "" "$tenant"
+}
 
 
 # ------------------------------------------------------------------------------
