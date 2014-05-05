@@ -1138,8 +1138,6 @@ int main(int argC, char* argV[])
   mongoInit(dbHost, dbName, user, pwd);
   contextBrokerInit(ngsi9Only);
 
-  LM_M(("Tenant mode: %s", mtenant));
-
   if (https)
   {
     char* httpsPrivateServerKey = (char*) malloc(2048);

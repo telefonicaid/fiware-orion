@@ -86,7 +86,6 @@ function localBrokerStart()
   shift
 
   extraParams=$*
-  echo extraParams 2:$extraParams >> /tmp/extraParams
 
   IPvOption=""
 
@@ -181,7 +180,6 @@ function brokerStart()
   shift
 
   extraParams=$*
-  echo extraParams:$extraParams > /tmp/extraParams
 
   if [ "$role" == "" ]
   then

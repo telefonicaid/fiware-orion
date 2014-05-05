@@ -88,13 +88,17 @@ static std::string tenantCheck(std::string tenant)
   if ((tenant == "ngsi9") || (tenant == "NGSI9") || (tenant == "ngsi10") || (tenant == "NGSI10") || 
       (tenant == "log") || (tenant == "version") || (tenant == "statistics") || (tenant == "leak") || (tenant == "exit"))
   {
+    LM_E(("tenant name coincides with Orion reserved name: '%s'", tenant.c_str()));
     return "tenant name coincides with Orion reserved name";
   }
 
   char* name = (char*) tenant.c_str();
 
   if (strlen(name) > 20)
+  {
+    LM_E(("bad length - a tenant name can be max 20 characters long (length: %d)", strlen(name)));
     return "bad length - a tenant name can be max 20 characters long";
+  }
 
   while (*name != 0)
   {
@@ -204,7 +208,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     // A tenant string must not be longer that 20 characters and may only contain
     // hyphens, underscores and alphanumeric characters.
     //
-    LM_M(("multitenant mode: '%s', Checking tenant: '%s'", multitenant.c_str(), ciP->tenant.c_str()));
     std::string result;
     if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
     {
@@ -215,8 +218,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       restReply(ciP, response);
       return response;
     }
-    else
-      LM_M(("tenant name '%s' is OK", ciP->tenant.c_str()));
 
     LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
