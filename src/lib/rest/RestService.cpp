@@ -81,6 +81,39 @@ std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService
 
 /* ****************************************************************************
 *
+* tenantCheck - 
+*/
+static std::string tenantCheck(std::string tenant)
+{
+  if ((tenant == "ngsi9") || (tenant == "NGSI9") || (tenant == "ngsi10") || (tenant == "NGSI10") || 
+      (tenant == "log") || (tenant == "version") || (tenant == "statistics") || (tenant == "leak") || (tenant == "exit"))
+  {
+    return "tenant name coincides with Orion reserved name";
+  }
+
+  char* name = (char*) tenant.c_str();
+
+  if (strlen(name) > 20)
+    return "bad length - a tenant name can be max 20 characters long";
+
+  while (*name != 0)
+  {
+    if ((!isalnum(*name)) && (*name != '-') && (*name != '_'))
+    {
+      LM_E(("offending character: %c", *name));
+      return "bad character in tenant name - only hyphen, underscore and alphanumeric characters are allowed";
+    }
+
+    ++name;
+  }
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
 * restService - 
 */
 std::string restService(ConnectionInfo* ciP, RestService* serviceV)
@@ -166,6 +199,24 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       ciP->tenant = ciP->tenantFromHttpHeader;
     else // multitenant == "off"
       ciP->tenant = "";
+
+    //
+    // A tenant string must not be longer that 20 characters and may only contain
+    // hyphens, underscores and alphanumeric characters.
+    //
+    LM_M(("multitenant mode: '%s', Checking tenant: '%s'", multitenant.c_str(), ciP->tenant.c_str()));
+    std::string result;
+    if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
+    {
+      OrionError   error(SccBadRequest, "tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain hyphens, underscores and alphanumeric characters)");
+      std::string  response = error.render(ciP->outFormat, "");
+
+      LM_E(("tenant name error: %s", result.c_str()));
+      restReply(ciP, response);
+      return response;
+    }
+    else
+      LM_M(("tenant name '%s' is OK", ciP->tenant.c_str()));
 
     LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
