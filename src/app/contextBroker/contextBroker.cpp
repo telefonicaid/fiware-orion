@@ -215,7 +215,7 @@ PaArgument paArgs[] =
 
 /* ****************************************************************************
 *
-* restServiceV - vector of REST services for the context broker
+* restService* - vectors of REST services for the context broker
 *
 * This vector matches an incoming REST service, using the path of the URL, to a function
 * to treat the incoming request.
@@ -232,6 +232,15 @@ PaArgument paArgs[] =
 *   std::string   payloadWord - first word in the payload for the request (to verify that the payload matches the URL). If empty, no check is performed)
 *   RestTreat     treat       - Function pointer to the function to treat the incoming REST request
 *
+*/
+
+
+/* ****************************************************************************
+*
+* restServiceMTenant - services for BROKER (ngsi9/10) and tenants 
+*
+* This service vector (configuration) is used if the broker is started with
+* the the -multitenant option (but not the -ngsi9 option)
 */
 RestService restServiceMTenant[] =
 {
@@ -477,6 +486,13 @@ RestService restServiceMTenant[] =
 
 
 
+/* ****************************************************************************
+*
+* restServiceV - services for BROKER (ngsi9/10) without tenants
+*
+* This is the default service vector, that is used if the broker is started without
+* the -ngsi9 and -multitenant options 
+*/
 RestService restServiceV[] =
 {
   // NGSI-9 Requests
@@ -618,6 +634,15 @@ RestService restServiceV[] =
 };
 
 
+
+/* ****************************************************************************
+*
+* restServiceNgsi9 - services for CONF MAN without tenants
+*
+* This service vector (configuration) is used if the broker is started as
+* CONFIGURATION MANAGER (using the -ngsi9 option) and without using the
+* -multitenant option. 
+*/
 RestService restServiceNgsi9[] =
 {
   // NGSI-9 Requests
@@ -704,6 +729,14 @@ RestService restServiceNgsi9[] =
 
 
 
+/* ****************************************************************************
+*
+* restServiceNgsi9MTenant - services for CONF MAN with tenants
+*
+* This service vector (configuration) is used if the broker is started as
+* CONFIGURATION MANAGER (using the -ngsi9 option) and also with the
+* -multitenant option.
+*/
 RestService restServiceNgsi9MTenant[] =
 {
   // NGSI-9 Requests
@@ -1091,15 +1124,12 @@ int main(int argC, char* argV[])
   if (fg == false)
     daemonize();
 
-  RestService* rsP;
-
-  if      (ngsi9Only  && multitenant == "off") rsP = restServiceNgsi9;
-  else if (ngsi9Only  && multitenant != "off") rsP = restServiceNgsi9MTenant;
-  else if (!ngsi9Only && multitenant != "off") rsP = restServiceMTenant;
-  else                                         rsP = restServiceV;
+  RestService* rsP = restServiceV;
+  if      (ngsi9Only  && multitenant == "url") rsP = restServiceNgsi9MTenant;
+  else if (!ngsi9Only && multitenant == "url") rsP = restServiceMTenant;
+  else if (ngsi9Only)                          rsP = restServiceNgsi9;
 
   IpVersion    ipVersion = IPDUAL;
-
   if      (useOnlyIPv4)    ipVersion = IPV4;
   else if (useOnlyIPv6)    ipVersion = IPV6;
 
