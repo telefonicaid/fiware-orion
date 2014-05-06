@@ -138,7 +138,7 @@ grep "tests" MANIFEST > MANIFEST.broker-tests
 %changelog
 
 %package tests
-Requires: %{name}, python, python-flask, nc, curl, libxml2, mongodb
+Requires: %{name}, python, python-flask, nc, curl, libxml2, mongo-10gen 
 Summary: Test suite for %{name}
 %description tests
 Test suite for %{name}
