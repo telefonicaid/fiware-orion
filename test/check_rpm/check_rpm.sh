@@ -29,7 +29,7 @@ if [[ -z ${WORKSPACE} ]]; then
 fi
 
 # Define the color log
-source ${WORKSPACE}/test/check_rpm/scripts/colors_shell.sh
+source ${WORKSPACE}/test/check_rpm/colors_shell.sh
 
 _logStage "######## Executing the Check RPM Stage ... ########"
 echo ""
@@ -47,12 +47,11 @@ fi
 echo ""
 
 ## Install RPM of contextBroker
-cd /home/vagrant/workspace/fiware-orion/rpm/RPMS/x86_64
-# cd ${WORKSPACE}/rpm/RPMS/x86_64
+cd ${WORKSPACE}/rpm/RPMS/x86_64
 
 _logStage "######## Installing RPM contextBroker ... ########"
 # Install ONLY the contextBroker RPM (no the tests RPM)
-ls contextBroker*.rpm | grep -v test | xargs sudo rpm -Uvh
+ls contextBroker*.rpm | grep -v contextBroker-fiware | xargs sudo rpm -Uvh
 if [[ $? -eq 0 ]]; then
 	_logOk ".............. contextBroker RPM installed .............."
 else
@@ -138,7 +137,7 @@ echo ""
 
 ## Uninstall the contextBroker RPM
 _logStage "######## Uninstall the contextBroker RPM ########"
-sudo rpm -e contextBroker &> /dev/null
+sudo rpm -e contextBroker contextBroker-tests &> /dev/null
 result=$?
 if [[ $result -ne 0 ]]; then 
 	_logError ".............. Uninstall failed .............."
