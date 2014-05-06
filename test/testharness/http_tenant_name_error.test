@@ -83,7 +83,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 
 URL="/NGSI9/registerContext"
 
-# OK
+# 1. OK
 echo "1: ++++++++++"
 curlXml2 $URL "$payload" "fiware-tenant: _kz-0123456789012345"
 echo
@@ -107,6 +107,14 @@ echo
 # 4. Reserved name in tenant name
 echo "4: ++++++++++"
 curlXml2 $URL "$payload" "fiware-tenant: log"
+echo
+echo
+
+
+# 5. Reserved name (strange case) in tenant name
+echo "5: ++++++++++"
+curlXml2 $URL "$payload" "fiware-tenant: LoG"
+
 --REGEXPECT--
 1: ++++++++++
 HTTP/1.1 200 OK
@@ -150,6 +158,20 @@ Date: REGEX(.*)
 
 
 4: ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 263
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<orionError>
+  <code>400</code>
+  <reasonPhrase>Bad Request</reasonPhrase>
+  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain hyphens, underscores and alphanumeric characters)</details>
+</orionError>
+
+
+5: ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 263
 Content-Type: application/xml

@@ -85,8 +85,15 @@ std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService
 */
 static std::string tenantCheck(std::string tenant)
 {
-  if ((tenant == "ngsi9") || (tenant == "NGSI9") || (tenant == "ngsi10") || (tenant == "NGSI10") || 
-      (tenant == "log") || (tenant == "version") || (tenant == "statistics") || (tenant == "leak") || (tenant == "exit"))
+  const char* ctenant = tenant.c_str();
+
+  if ((strcasecmp(ctenant, "ngsi9")       == 0) ||
+      (strcasecmp(ctenant, "ngsi10")      == 0) ||
+      (strcasecmp(ctenant, "log")         == 0) ||
+      (strcasecmp(ctenant, "version")     == 0) ||
+      (strcasecmp(ctenant, "statistics")  == 0) ||
+      (strcasecmp(ctenant, "leak")        == 0) ||
+      (strcasecmp(ctenant, "exit")        == 0))
   {
     LM_E(("tenant name coincides with Orion reserved name: '%s'", tenant.c_str()));
     return "tenant name coincides with Orion reserved name";

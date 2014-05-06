@@ -81,7 +81,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     <registrationId></registrationId>
   </registerContextRequest>'
 
-# OK
+# 1. OK
 echo "1: ++++++++++"
 url="/_kz-0123456789012345/NGSI9/registerContext"
 curlXml ${url} "${payload}"
@@ -108,6 +108,14 @@ echo
 # 4. Reserved name in tenant name
 url="/log/NGSI9/registerContext"
 echo "4: ++++++++++"
+curlXml ${url} "${payload}"
+echo
+echo
+
+
+# 5. Reserved name (strange case) in tenant name
+url="/log/NgSi9/registerContext"
+echo "5: ++++++++++"
 curlXml ${url} "${payload}"
 --REGEXPECT--
 1: ++++++++++
@@ -152,6 +160,20 @@ Date: REGEX(.*)
 
 
 4: ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 263
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<orionError>
+  <code>400</code>
+  <reasonPhrase>Bad Request</reasonPhrase>
+  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain hyphens, underscores and alphanumeric characters)</details>
+</orionError>
+
+
+5: ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 263
 Content-Type: application/xml
