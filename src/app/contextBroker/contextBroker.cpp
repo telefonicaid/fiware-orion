@@ -1156,7 +1156,7 @@ int main(int argC, char* argV[])
     free(httpsCertificate);
   }
   else
-    restInit(rsP, ipVersion, bindAddress, port);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant);
 
   while (1)
     sleep(10);

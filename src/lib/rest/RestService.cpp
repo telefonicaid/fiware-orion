@@ -81,6 +81,50 @@ std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService
 
 /* ****************************************************************************
 *
+* tenantCheck - 
+*/
+static std::string tenantCheck(std::string tenant)
+{
+  const char* ctenant = tenant.c_str();
+
+  if ((strcasecmp(ctenant, "ngsi9")       == 0) ||
+      (strcasecmp(ctenant, "ngsi10")      == 0) ||
+      (strcasecmp(ctenant, "log")         == 0) ||
+      (strcasecmp(ctenant, "version")     == 0) ||
+      (strcasecmp(ctenant, "statistics")  == 0) ||
+      (strcasecmp(ctenant, "leak")        == 0) ||
+      (strcasecmp(ctenant, "exit")        == 0))
+  {
+    LM_E(("tenant name coincides with Orion reserved name: '%s'", tenant.c_str()));
+    return "tenant name coincides with Orion reserved name";
+  }
+
+  char* name = (char*) tenant.c_str();
+
+  if (strlen(name) > 20)
+  {
+    LM_E(("bad length - a tenant name can be max 20 characters long (length: %d)", strlen(name)));
+    return "bad length - a tenant name can be max 20 characters long";
+  }
+
+  while (*name != 0)
+  {
+    if ((!isalnum(*name)) && (*name != '-') && (*name != '_'))
+    {
+      LM_E(("offending character: %c", *name));
+      return "bad character in tenant name - only hyphen, underscore and alphanumeric characters are allowed";
+    }
+
+    ++name;
+  }
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
 * restService - 
 */
 std::string restService(ConnectionInfo* ciP, RestService* serviceV)
@@ -166,6 +210,21 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       ciP->tenant = ciP->tenantFromHttpHeader;
     else // multitenant == "off"
       ciP->tenant = "";
+
+    //
+    // A tenant string must not be longer that 20 characters and may only contain
+    // hyphens, underscores and alphanumeric characters.
+    //
+    std::string result;
+    if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
+    {
+      OrionError   error(SccBadRequest, "tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain hyphens, underscores and alphanumeric characters)");
+      std::string  response = error.render(ciP->outFormat, "");
+
+      LM_E(("tenant name error: %s", result.c_str()));
+      restReply(ciP, response);
+      return response;
+    }
 
     LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);

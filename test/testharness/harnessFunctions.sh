@@ -80,7 +80,13 @@ function localBrokerStart()
   role=$1
   traceLevels=$2
   ipVersion=$3
-  extraParams="$4"
+
+  shift
+  shift
+  shift
+
+  extraParams=$*
+
   IPvOption=""
 
   if [ "$ipVersion" == "IPV4" ]
@@ -168,7 +174,12 @@ function brokerStart()
   role=$1
   traceLevels=$2
   ipVersion=$3
-  extraParams="$4"
+
+  shift
+  shift
+  shift
+
+  extraParams=$*
 
   if [ "$role" == "" ]
   then
@@ -182,7 +193,7 @@ function brokerStart()
   fi
 
   localBrokerStop $role
-  localBrokerStart $role $traceLevels $ipVersion "$extraParams"
+  localBrokerStart $role $traceLevels $ipVersion $extraParams
 }
 
 
