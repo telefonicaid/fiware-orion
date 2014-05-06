@@ -258,6 +258,49 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2) {
 
 /* ****************************************************************************
 *
+* bsonCustomMetadataToBson -
+*
+* Generates the BSON for metadata to be inserted in database for a given atribute.
+* If there is no custom metadata, then it returns false (true otherwise).
+*
+*/
+static bool bsonCustomMetadataToBson(BSONObj& newMdV, BSONObj& attr) {
+
+    if (attr.hasField(ENT_ATTRS_MD)) {
+        BSONArrayBuilder mdNewVBuilder;
+        BSONObj mdV = attr.getField(ENT_ATTRS_MD).embeddedObject();
+        unsigned int mdVSize = 0;
+        for( BSONObj::iterator i = mdV.begin(); i.more(); ) {
+            BSONObj md = i.next().embeddedObject();
+            mdVSize++;
+            if (md.hasField(ENT_ATTRS_MD_TYPE)) {
+                mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
+                                   ENT_ATTRS_MD_TYPE << md.getStringField(ENT_ATTRS_MD_TYPE) <<
+                                   ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
+            }
+            else {
+                mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
+                                   ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
+            }
+        }
+        LM_M(("mdVSize: %d", mdVSize));
+        if (mdVSize > 0) {
+            newMdV = mdNewVBuilder.arr();
+            LM_M(("metadata inside: %s", mdV.toString().c_str()));
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
+}
+
+
+/* ****************************************************************************
+*
 * checkAndUpdate -
 *
 * Add the 'attr' attribute to the BSONObjBuilder (which is passed by reference), doing
@@ -378,25 +421,10 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         }
 
         /* Metadata is included as is */
-        // FIXME: move to a separate function?
-        if (attr.hasField(ENT_ATTRS_MD)) {
-            BSONArrayBuilder mdNewVBuilder;
-            BSONObj mdV = attr.getField(ENT_ATTRS_MD).embeddedObject();
-            for( BSONObj::iterator i = mdV.begin(); i.more(); ) {
-                BSONObj md = i.next().embeddedObject();
-                if (md.hasField(ENT_ATTRS_MD_TYPE)) {
-                    mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
-                                       ENT_ATTRS_MD_TYPE << md.getStringField(ENT_ATTRS_MD_TYPE) <<
-                                       ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
-                }
-                else {
-                    mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
-                                       ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
-                }
-            }
-            if (mdNewVBuilder.len() > 0) {
-                newAttr.appendArray(ENT_ATTRS_MD, mdNewVBuilder.arr());
-            }
+        BSONObj mdV;
+        if (bsonCustomMetadataToBson(mdV, attr)) {
+            LM_M(("metadata found %s", mdV.toString().c_str()));
+            newAttr.appendArray(ENT_ATTRS_MD, mdV);
         }
     }
 
@@ -433,6 +461,15 @@ static bool checkAndDelete (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
         newAttr->append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
         newAttr->append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
         newAttr->append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
+
+        /* Custom metadata */
+        LM_M(("process delete: %s", STR_FIELD(attr, ENT_ATTRS_NAME).c_str()));
+        BSONObj mdV;
+        if (bsonCustomMetadataToBson(mdV, attr)) {
+            LM_M(("metadata found %s", mdV.toString().c_str()));
+            newAttr->appendArray(ENT_ATTRS_MD, mdV);
+        }
+
         /* The hasField() check is needed to preserve compatibility with entities that were created
          * in database by a CB instance previous to the support of creation and modification dates */
         if (attr.hasField(ENT_ATTRS_CREATION_DATE)) {
@@ -489,6 +526,37 @@ static bool updateAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
 
 /* ****************************************************************************
 *
+* contextAttributeCustomMetadataToBson -
+*
+* Generates the BSON for metadata to be inserted in database for a given atribute.
+* If there is no custom metadata, then it returns false (true otherwise).
+*
+*/
+static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute* ca) {
+
+    BSONArrayBuilder mdToAdd;
+    unsigned int mdToAddSize;
+    for (unsigned int ix = 0; ix < ca->metadataVector.size(); ++ix) {
+        Metadata* md = ca->metadataVector.get(ix);
+        if (!isCustomMetadata(md->name)) {
+            mdToAddSize++;
+            mdToAdd.append(BSON("name" << md->name << "type" << md->type << "value" << md->value));
+            LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
+                            md->name.c_str(), md->type.c_str(), md->value.c_str()));
+        }
+    }
+    if (mdToAddSize > 0) {
+        mdV = mdToAdd.arr();
+        return true;
+    }
+    else {
+        return false;
+    }
+
+}
+
+/* ****************************************************************************
+*
 * appendAttribute -
 *
 * In the case of "actual append", it always return true
@@ -521,9 +589,14 @@ static bool appendAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
         if (caP->getId() != "") {
             newAttr.append(ENT_ATTRS_ID, caP->getId());
         }
+        BSONObj mdV;
+        if (contextAttributeCustomMetadataToBson(mdV, caP)) {
+            newAttr.appendArray(ENT_ATTRS_MD, mdV);
+        }
+
         int now = getCurrentTime();
         newAttr.append(ENT_ATTRS_CREATION_DATE, now);
-        newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
+        newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);        
         newAttrsBuilder.append(newAttr.obj());
 
         newAttrs = newAttrsBuilder.arr();
@@ -1187,17 +1260,9 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
         }        
 
         /* Custom metadata */
-        BSONArrayBuilder mdToAdd;
-        for (unsigned int jx = 0; jx < attrsV.get(ix)->metadataVector.size(); ++jx) {
-            Metadata* md = attrsV.get(ix)->metadataVector.get(jx);
-            if (!isCustomMetadata(md->name)) {
-                mdToAdd.append(BSON("name" << md->name << "type" << md->type << "value" << md->value));
-                LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
-                                md->name.c_str(), md->type.c_str(), md->value.c_str()));
-            }
-        }
-        if (mdToAdd.len() > 0) {
-            bsonAttr.append(ENT_ATTRS_MD, mdToAdd.arr());
+        BSONObj mdV;
+        if (contextAttributeCustomMetadataToBson(mdV, attrsV.get(ix))) {
+            bsonAttr.appendArray(ENT_ATTRS_MD, mdV);
         }
         attrsToAdd.append(bsonAttr.obj());
 
