@@ -203,12 +203,12 @@ static bool matchMetadata(BSONObj& md1, BSONObj& md2) {
 
     if (md1.hasField(ENT_ATTRS_MD_TYPE)) {
         return md2.hasField(ENT_ATTRS_MD_TYPE) &&
-               md1.getStringField(ENT_ATTRS_MD_TYPE) == md2.getStringField(ENT_ATTRS_MD_TYPE) &&
-               md1.getStringField(ENT_ATTRS_MD_NAME) == md2.getStringField(ENT_ATTRS_MD_NAME);
+               STR_FIELD(md1, ENT_ATTRS_MD_TYPE) == STR_FIELD(md2, ENT_ATTRS_MD_TYPE) &&
+               STR_FIELD(md1, ENT_ATTRS_MD_NAME) == STR_FIELD(md2, ENT_ATTRS_MD_NAME);
     }
     else {
         return !md2.hasField(ENT_ATTRS_MD_TYPE) &&
-               md1.getStringField(ENT_ATTRS_MD_NAME) == md2.getStringField(ENT_ATTRS_MD_NAME);
+               STR_FIELD(md1, ENT_ATTRS_MD_NAME) == STR_FIELD(md2, ENT_ATTRS_MD_NAME);
     }
 
 }
@@ -231,11 +231,15 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2) {
         for( BSONObj::iterator i2 = mdV2.begin(); i2.more(); ) {
             BSONObj md2 = i2.next().embeddedObject();
             /* Check metadata match */
+            LM_M(("comparing md1: <%s> <%s> <%s>", md1.getStringField(ENT_ATTRS_MD_NAME), md1.getStringField(ENT_ATTRS_MD_TYPE), md1.getStringField(ENT_ATTRS_MD_VALUE)));
+            LM_M(("comparing md2: <%s> <%s> <%s>", md2.getStringField(ENT_ATTRS_MD_NAME), md2.getStringField(ENT_ATTRS_MD_TYPE), md2.getStringField(ENT_ATTRS_MD_VALUE)));
             if (matchMetadata(md1, md2)) {
-                if (md1.getStringField(ENT_ATTRS_MD_VALUE) != md2.getStringField(ENT_ATTRS_MD_VALUE)) {
+                if (STR_FIELD(md1, ENT_ATTRS_MD_VALUE) != STR_FIELD(md2, ENT_ATTRS_MD_VALUE)) {
+                    LM_M(("No match"));
                     return false;
                 }
                 else {
+                    LM_M(("Match"));
                     found = true;
                     continue;  // loop in i2
                 }
@@ -247,6 +251,7 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2) {
             continue; // loop in i1
         }
     }
+    LM_M(("Return true"));
     return true;
 
 }
@@ -290,12 +295,14 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         BSONArrayBuilder mdNewVBuilder;
 
         /* First add the metadata comming in the request */
+        unsigned int mdNewVSize = 0;
         for (unsigned int ix = 0; ix < ca.metadataVector.size() ; ++ix) {
             Metadata* md = ca.metadataVector.get(ix);
             /* Skip not custom metadata */
             if (isCustomMetadata(md->name)) {
                 continue;
             }
+            mdNewVSize++;
             if (md->type == "") {
                 mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md->name << ENT_ATTRS_MD_VALUE << md->value));
             }
@@ -314,6 +321,7 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
                 BSONObj md = i.next().embeddedObject();
                 mdVSize++;
                 if (!hasMetadata(md.getStringField(ENT_ATTRS_MD_NAME), md.getStringField(ENT_ATTRS_MD_TYPE), ca)) {
+                    mdNewVSize++;
                     if (md.hasField(ENT_ATTRS_MD_TYPE)) {
                         mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
                                            ENT_ATTRS_MD_TYPE << md.getStringField(ENT_ATTRS_MD_TYPE) <<
@@ -327,7 +335,6 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
             }
         }
 
-        unsigned int mdNewVSize = mdNewVBuilder.len();
         BSONObj mdNewV = mdNewVBuilder.arr();
         if (mdNewVSize > 0) {
             newAttr.appendArray(ENT_ATTRS_MD, mdNewV);
@@ -335,7 +342,8 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
 
         /* It was an actual update? */
         if (ca.compoundValueP == NULL) {
-            /* It was an actual update? */
+            /* In the case of simple value, we check if the value of the attribute changed or the metadata changed (the later one checking if the
+             * size of the original and final metadata vector is different and, in that case, if the vectors are not equal) */
             if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value || mdNewVSize != mdVSize || !equalMetadataVectors(mdV, mdNewV)) {
                 *actualUpdate = true;
             }
