@@ -181,8 +181,10 @@ std::string sendHttpSocket
 
       sprintf(portAsString, "%d", rushHeaderPort);
       rushHttpHeaders = "X-relayer-host: " + rushHeaderIP + ":" + portAsString + "\n";
+      if (useHttps)
+        rushHttpHeaders += "X-relayer-protocol: https\n";
 
-      // if (https) rushHttpHeaders += "X-relayer-protocol: https\n";
+      LM_T(LmtRush, ("HTTP headers:\n--------------\n%s\n-------------", rushHttpHeaders.c_str()));
     }
   }
 
