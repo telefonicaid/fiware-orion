@@ -25,7 +25,7 @@
 #############################################
 
 # Define the color log
-source /home/vagrant/workspace/fiware-orion/test/check_rpm/colors_shell.sh
+# The ${WORKSPACE} is set by the user of this script (e.g. Jenkins)
 source ${WORKSPACE}/scripts/colors_shell.sh
 
 _logStage "######## Executing the Check RPM Stage ... ########"
@@ -70,7 +70,7 @@ echo ""
 
 ## Check if exist the contextBroker directory in the home directory of the contextBroker
 _logStage "######## Check contextBroker directories... ########"
-if [[ ! -d /opt/contextBroker/ ]]; then
+if [[ ! -d /usr/share/contextBroker/ ]]; then
 	_logError ".............. directories are NOT created well .............."
 	exit 1
 else
