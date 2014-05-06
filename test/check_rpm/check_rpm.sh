@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
@@ -24,9 +22,14 @@
 ###   Script for check the contextBroker RPM   ###
 #############################################
 
-# Define the color log
 # The ${WORKSPACE} is set by the user of this script (e.g. Jenkins)
-source ${WORKSPACE}/scripts/colors_shell.sh
+if [[ -z ${WORKSPACE} ]]; then
+   echo "WORKSPACE variable should be defined with the root path to the fiware-orion git reposotory"
+   exit(1)
+fi
+
+# Define the color log
+source ${WORKSPACE}/test/check_rpm/scripts/colors_shell.sh
 
 _logStage "######## Executing the Check RPM Stage ... ########"
 echo ""
@@ -146,7 +149,7 @@ fi
 echo ""
 
 _logStage "######## Check if the directories are cleaned... ########"
-if [[ ! -d /opt/contextBroker/ ]]; then
+if [[ ! -d /usr/share/contextBroker/ ]]; then
 	_logOk ".............. All clean .............."
 else
 	_logError ".............. FAIL the directories are NOT cleaned .............."
