@@ -24,8 +24,8 @@
 
 # The ${WORKSPACE} is set by the user of this script (e.g. Jenkins)
 if [[ -z ${WORKSPACE} ]]; then
-   echo "WORKSPACE variable should be defined with the root path to the fiware-orion git reposotory"
-   exit(1)
+   echo "WORKSPACE variable should be defined with the root path to the fiware-orion git repository"
+   exit 1
 fi
 
 # Define the color log
