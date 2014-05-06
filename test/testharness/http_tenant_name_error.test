@@ -85,35 +85,35 @@ URL="/NGSI9/registerContext"
 
 # 1. OK
 echo "1: ++++++++++"
-curlXml2 $URL "$payload" "fiware-tenant: _kz-0123456789012345"
+curlXmlTenants $URL "$payload" "fiware-tenant: _kz-0123456789012345"
 echo
 echo
 
 
 # 2. Long tenant name
 echo "2: ++++++++++"
-curlXml2 $URL "$payload" "fiware-tenant: kz12345678901234567890"
+curlXmlTenants $URL "$payload" "fiware-tenant: kz12345678901234567890"
 echo
 echo
 
 
 # 3. Bad character in tenant name
 echo "3: ++++++++++"
-curlXml2 $URL "$payload" "fiware-tenant: kz+fg"
+curlXmlTenants $URL "$payload" "fiware-tenant: kz+fg"
 echo
 echo
 
 
 # 4. Reserved name in tenant name
 echo "4: ++++++++++"
-curlXml2 $URL "$payload" "fiware-tenant: log"
+curlXmlTenants $URL "$payload" "fiware-tenant: log"
 echo
 echo
 
 
 # 5. Reserved name (strange case) in tenant name
 echo "5: ++++++++++"
-curlXml2 $URL "$payload" "fiware-tenant: LoG"
+curlXmlTenants $URL "$payload" "fiware-tenant: LoG"
 
 --REGEXPECT--
 1: ++++++++++

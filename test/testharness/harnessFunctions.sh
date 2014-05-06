@@ -400,7 +400,7 @@ function curlXml()
   curlIt "XML" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/xml" "Accept: application/xml" "${extraoptions}"
 }
 
-function curlXml2()
+function curlXmlTenants()
 {
   url=$1
   payload=$2
