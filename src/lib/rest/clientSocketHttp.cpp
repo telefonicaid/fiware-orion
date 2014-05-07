@@ -161,7 +161,7 @@ std::string sendHttpSocket
   // But, this depends also on how the broker was started, so here the 'useRush'
   // parameter is cancelled in case the broker was started without rush.
   //
-  // IF rush is to be used, the IP/port is stored id rushHeaderIP/rushHeaderPort and
+  // IF rush is to be used, the IP/port is stored in rushHeaderIP/rushHeaderPort and
   // after that, the host and port of rush is set as ip/port for the message, that is
   // now sent to rush instead of to its final destination.
   // Also, a few HTTP headers for rush nust be setup.
@@ -183,8 +183,6 @@ std::string sendHttpSocket
       rushHttpHeaders = "X-relayer-host: " + rushHeaderIP + ":" + portAsString + "\n";
       if (useHttps)
         rushHttpHeaders += "X-relayer-protocol: https\n";
-
-      LM_T(LmtRush, ("HTTP headers:\n--------------\n%s\n-------------", rushHttpHeaders.c_str()));
     }
   }
 
@@ -198,15 +196,13 @@ std::string sendHttpSocket
            "%s %s HTTP/1.1\n"
            "User-Agent: orion/%s\n"
            "Host: %s:%d\n"
-           "Accept: application/xml, application/json\n",
-           verb.c_str(), resource.c_str(), versionGet(), ip.c_str(), (int) port);
+           "Accept: application/xml, application/json\n%s",
+           verb.c_str(), resource.c_str(), versionGet(), ip.c_str(), (int) port, rushHttpHeaders.c_str());
 
-  if (useRush)
-    strcat(preContent, rushHttpHeaders.c_str());
+  LM_T(LmtRush, ("'PRE' HTTP headers:\n--------------\n%s\n-------------", preContent));
 
   if (!content.empty())
   {
-
     char   headers[512];
     sprintf(headers,
             "Content-Type: %s\n"

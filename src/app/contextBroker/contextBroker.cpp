@@ -752,7 +752,10 @@ int main(int argC, char* argV[])
   contextBrokerInit(ngsi9Only);
 
   if (rush[0] != 0)
+  {
     rushParse(rush, &rushHost, &rushPort);
+    LM_T(LmtRush, ("rush host: '%s', rush port: %d", rushHost.c_str(), rushPort));
+  }
 
   if (https)
   {
