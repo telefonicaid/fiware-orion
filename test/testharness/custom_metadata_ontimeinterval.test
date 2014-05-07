@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Custom metadata ONCHANGE subscription
+Custom metadata ONTIMEINTERVAL subscription
 
 --SHELL-INIT--
 source harnessFunctions.sh
@@ -33,7 +33,7 @@ accumulatorStart
 --SHELL--
 source harnessFunctions.sh
 
-echo "=== 1. Create ONCHANGE subscription"
+echo "=== 1. Create ONTIMEINTERVAL subscription"
 url="/NGSI10/subscribeContext"
 payload='{
     "entities": [
@@ -50,16 +50,18 @@ payload='{
     "duration": "P1M",
     "notifyConditions": [
         {
-            "type": "ONCHANGE",
+            "type": "ONTIMEINTERVAL",
             "condValues": [
-                "temperature"
+                "PT1S"
             ]
         }
     ]
 }'
 curlJson ${url} "${payload}"
 
-echo "=== 2. Create an entity with metadata (a notification with metadata is sent)"
+sleep 0.5
+
+echo "=== 2. Create an entity with metadata"
 url="/NGSI10/updateContext"
 payload='{
     "contextElements": [
@@ -92,7 +94,10 @@ payload='{
 }'
 curlJson ${url} "${payload}"
 
-echo "=== 3. Change the value (a notification with metadata is sent)"
+# Wait the notification period so a notification is sent
+sleep 1
+
+echo "=== 3. Change the value"
 url="/NGSI10/updateContext"
 payload='{
     "contextElements": [
@@ -125,7 +130,10 @@ payload='{
 }'
 curlJson ${url} "${payload}"
 
-echo "=== 4. Change the metadata (a notification with metadata is sent)"
+# Wait the notification period so a notification is sent
+sleep 1
+
+echo "=== 4. Change the metadata"
 url="/NGSI10/updateContext"
 payload='{
     "contextElements": [
@@ -158,7 +166,10 @@ payload='{
 }'
 curlJson ${url} "${payload}"
 
-echo "=== 5. Change both value and metadata (a notification with metadata is sent)"
+# Wait the notification period so a notification is sent
+sleep 1
+
+echo "=== 5. Change both value and metadata"
 url="/NGSI10/updateContext"
 payload='{
     "contextElements": [
@@ -191,44 +202,14 @@ payload='{
 }'
 curlJson ${url} "${payload}"
 
-echo "=== 6. Update without changes (no notification is sent)"
-url="/NGSI10/updateContext"
-payload='{
-    "contextElements": [
-        {
-            "type": "Room",
-            "isPattern": "false",
-            "id": "Room1",
-            "attributes": [
-            {
-                "name": "temperature",
-                "type": "centigrade",
-                "value": "12",
-                "metadatas": [
-                    {
-                        "name": "colour",
-                        "type": "string",
-                        "value": "white"
-                    },
-                    {
-                        "name": "feeling",
-                        "type": "string",
-                        "value": "happy"
-                    }
-                ]
-            }
-            ]
-        }
-    ],
-    "updateAction": "UPDATE"
-}'
-curlJson ${url} "${payload}"
+# Wait the notification period so a notification is sent
+sleep 1
 
 echo "=== Get accumulated data (4 messages)"
 curl localhost:${LISTENER_PORT}/dump -s -S
 
 --REGEXPECT--
-=== 1. Create ONCHANGE subscription
+=== 1. Create ONTIMEINTERVAL subscription
 HTTP/1.1 200 OK
 Content-Length: 108
 Content-Type: application/json
@@ -240,7 +221,7 @@ Date: REGEX(.*)
         "subscriptionId": "REGEX([0-9a-f]{24})"
     }
 }
-=== 2. Create an entity with metadata (a notification with metadata is sent)
+=== 2. Create an entity with metadata
 HTTP/1.1 200 OK
 Content-Length: 716
 Content-Type: application/json
@@ -280,7 +261,7 @@ Date: REGEX(.*)
         }
     ]
 }
-=== 3. Change the value (a notification with metadata is sent)
+=== 3. Change the value
 HTTP/1.1 200 OK
 Content-Length: 716
 Content-Type: application/json
@@ -320,7 +301,7 @@ Date: REGEX(.*)
         }
     ]
 }
-=== 4. Change the metadata (a notification with metadata is sent)
+=== 4. Change the metadata
 HTTP/1.1 200 OK
 Content-Length: 716
 Content-Type: application/json
@@ -360,47 +341,7 @@ Date: REGEX(.*)
         }
     ]
 }
-=== 5. Change both value and metadata (a notification with metadata is sent)
-HTTP/1.1 200 OK
-Content-Length: 718
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "metadatas": [
-                            {
-                                "name": "colour",
-                                "type": "string",
-                                "value": "white"
-                            },
-                            {
-                                "name": "feeling",
-                                "type": "string",
-                                "value": "happy"
-                            }
-                        ],
-                        "name": "temperature",
-                        "type": "centigrade",
-                        "value": ""
-                    }
-                ],
-                "id": "Room1",
-                "isPattern": "false",
-                "type": "Room"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-=== 6. Update without changes (no notification is sent)
+=== 5. Change both value and metadata
 HTTP/1.1 200 OK
 Content-Length: 718
 Content-Type: application/json
