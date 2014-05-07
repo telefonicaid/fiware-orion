@@ -157,7 +157,7 @@ static void valueBson(ContextAttribute* ca, BSONObjBuilder& bsonAttr) {
 * Check that the parameter is a right custom metadata, i.e. one metadata without
 * an special semantic to be interpreted by the context broker itself
 *
-* FIXME P2: this function probably could be moved to another place "closer" to metadtta
+* FIXME P2: this function probably could be moved to another place "closer" to metadata
 */
 static bool isCustomMetadata(std::string md) {
     if (md != NGSI_MD_ID &&
@@ -175,14 +175,14 @@ static bool isCustomMetadata(std::string md) {
 *
 * hasMetadata -
 *
-* Check if a metadata is include in a (request) ContextAttribute
+* Check if a metadata is included in a (request) ContextAttribute
 */
 static bool hasMetadata(std::string name, std::string type, ContextAttribute ca) {
 
     for (unsigned int ix = 0; ix < ca.metadataVector.size() ; ++ix) {
         Metadata* md = ca.metadataVector.get(ix);
         /* Note that, different from entity types or attribute types, for attribute metadata we don't consider empty type
-         * as a wildcard in order to keep things simpler */
+         * as a wildcard in order to keep it simpler */
         if ((md->name == name) && (md->type == type)) {
             return true;
         }
@@ -196,8 +196,8 @@ static bool hasMetadata(std::string name, std::string type, ContextAttribute ca)
 *
 * matchMetadata -
 *
-* Returns if two metadata has the same name and type, taking into account that
-* could not be present
+* Returns if two metadata elements have the same name and type, taking into account that
+* the type field could not be present (it is optional in NGSI)
 */
 static bool matchMetadata(BSONObj& md1, BSONObj& md2) {
 
@@ -255,7 +255,7 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2) {
 *
 * bsonCustomMetadataToBson -
 *
-* Generates the BSON for metadata to be inserted in database for a given atribute.
+* Generates the BSON for metadata vector to be inserted in database for a given attribute.
 * If there is no custom metadata, then it returns false (true otherwise).
 *
 */
@@ -328,7 +328,7 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         /* Update metadata */
         BSONArrayBuilder mdNewVBuilder;
 
-        /* First add the metadata comming in the request */
+        /* First add the metadata elements comming in the request */
         unsigned int mdNewVSize = 0;
         for (unsigned int ix = 0; ix < ca.metadataVector.size() ; ++ix) {
             Metadata* md = ca.metadataVector.get(ix);
@@ -343,10 +343,9 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
             else {
                 mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md->name << ENT_ATTRS_MD_TYPE << md->type << ENT_ATTRS_MD_VALUE << md->value));
             }
-
         }
 
-        /* Second, for each metadata previously in the metadata vector but _not included in the request_, add it as is */
+        /* Second, for each metadata previously in the metadata vector but *not included in the request*, add it as is */
         unsigned int mdVSize = 0;
         BSONObj mdV;
         if (attr.hasField(ENT_ATTRS_MD)) {
@@ -376,8 +375,9 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
 
         /* It was an actual update? */
         if (ca.compoundValueP == NULL) {
-            /* In the case of simple value, we check if the value of the attribute changed or the metadata changed (the later one checking if the
-             * size of the original and final metadata vector is different and, in that case, if the vectors are not equal) */
+            /* In the case of simple value, we check if the value of the attribute changed or the metadata changed (the later
+             * one is done checking if the size of the original and final metadata vectors is different and, if they are of the
+             * same size, checking if the vectors are not equal) */
             if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value || mdNewVSize != mdVSize || !equalMetadataVectors(mdV, mdNewV)) {
                 *actualUpdate = true;
             }
@@ -411,7 +411,7 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
 
         }
 
-        /* Metadata is included as is */
+        /* Metadata is included "as is" */
         BSONObj mdV;
         if (bsonCustomMetadataToBson(mdV, attr)) {
             newAttr.appendArray(ENT_ATTRS_MD, mdV);
@@ -516,7 +516,7 @@ static bool updateAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
 *
 * contextAttributeCustomMetadataToBson -
 *
-* Generates the BSON for metadata to be inserted in database for a given atribute.
+* Generates the BSON for metadata vector to be inserted in database for a given atribute.
 * If there is no custom metadata, then it returns false (true otherwise).
 *
 */
@@ -584,7 +584,7 @@ static bool appendAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
 
         int now = getCurrentTime();
         newAttr.append(ENT_ATTRS_CREATION_DATE, now);
-        newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);        
+        newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
         newAttrsBuilder.append(newAttr.obj());
 
         newAttrs = newAttrsBuilder.arr();
@@ -964,6 +964,8 @@ static void buildGeneralErrorReponse(ContextElement* ceP, ContextAttribute* ca, 
 /* ****************************************************************************
 *
 * setResponseMetadata -
+*
+* Common method to create the metadata elements in updateContext responses
 *
 */
 static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes) {
