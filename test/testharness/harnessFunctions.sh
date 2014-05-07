@@ -287,7 +287,7 @@ function accumulatorStart()
 
   accumulatorStop $port
 
-  accumulator-server.py $port /notify $bindIp on &
+  accumulator-server.py $port /notify $bindIp &
   echo accumulator running as PID $$
 
   # Wait until accumulator has started or we have waited a given maximum time
