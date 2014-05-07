@@ -231,15 +231,11 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2) {
         for( BSONObj::iterator i2 = mdV2.begin(); i2.more(); ) {
             BSONObj md2 = i2.next().embeddedObject();
             /* Check metadata match */
-            LM_M(("comparing md1: <%s> <%s> <%s>", md1.getStringField(ENT_ATTRS_MD_NAME), md1.getStringField(ENT_ATTRS_MD_TYPE), md1.getStringField(ENT_ATTRS_MD_VALUE)));
-            LM_M(("comparing md2: <%s> <%s> <%s>", md2.getStringField(ENT_ATTRS_MD_NAME), md2.getStringField(ENT_ATTRS_MD_TYPE), md2.getStringField(ENT_ATTRS_MD_VALUE)));
             if (matchMetadata(md1, md2)) {
                 if (STR_FIELD(md1, ENT_ATTRS_MD_VALUE) != STR_FIELD(md2, ENT_ATTRS_MD_VALUE)) {
-                    LM_M(("No match"));
                     return false;
                 }
                 else {
-                    LM_M(("Match"));
                     found = true;
                     continue;  // loop in i2
                 }
@@ -251,7 +247,6 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2) {
             continue; // loop in i1
         }
     }
-    LM_M(("Return true"));
     return true;
 
 }
@@ -283,10 +278,8 @@ static bool bsonCustomMetadataToBson(BSONObj& newMdV, BSONObj& attr) {
                                    ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
             }
         }
-        LM_M(("mdVSize: %d", mdVSize));
         if (mdVSize > 0) {
             newMdV = mdNewVBuilder.arr();
-            LM_M(("metadata inside: %s", mdV.toString().c_str()));
             return true;
         }
         else {
@@ -297,7 +290,6 @@ static bool bsonCustomMetadataToBson(BSONObj& newMdV, BSONObj& attr) {
         return false;
     }
 }
-
 
 /* ****************************************************************************
 *
@@ -334,7 +326,6 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         updated = true;
 
         /* Update metadata */
-        // FIXME: move to a separate function?
         BSONArrayBuilder mdNewVBuilder;
 
         /* First add the metadata comming in the request */
@@ -423,7 +414,6 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         /* Metadata is included as is */
         BSONObj mdV;
         if (bsonCustomMetadataToBson(mdV, attr)) {
-            LM_M(("metadata found %s", mdV.toString().c_str()));
             newAttr.appendArray(ENT_ATTRS_MD, mdV);
         }
     }
@@ -463,10 +453,8 @@ static bool checkAndDelete (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
         newAttr->append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
 
         /* Custom metadata */
-        LM_M(("process delete: %s", STR_FIELD(attr, ENT_ATTRS_NAME).c_str()));
         BSONObj mdV;
         if (bsonCustomMetadataToBson(mdV, attr)) {
-            LM_M(("metadata found %s", mdV.toString().c_str()));
             newAttr->appendArray(ENT_ATTRS_MD, mdV);
         }
 
@@ -1531,7 +1519,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             mongoSemGive(__FUNCTION__, "update in EntitiesCollection");
         }
         catch( const DBException &e ) {
-            LM_M(("inside exception handling"));
             mongoSemGive(__FUNCTION__, "update in EntitiesCollection (mongo db exception)");
             cerP->statusCode.fill(SccReceiverInternalError,
                std::string("collection: ") + getEntitiesCollectionName() +
