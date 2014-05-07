@@ -152,12 +152,13 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
 *
 * Notifier::createIntervalThread -
 */
-void Notifier::createIntervalThread(std::string subId, int interval) {
+void Notifier::createIntervalThread(std::string subId, int interval, std::string tenant) {
 
     /* Create params dynamically. Note that the first action that thread does
      * if */
     ThreadData td;
     td.params = new OnIntervalThreadParams();
+    td.params->tenant = tenant;
     td.params->subId = subId;
     td.params->interval = interval;
     td.params->notifier = this;

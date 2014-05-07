@@ -96,17 +96,17 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
     /* Insert document in database */
     BSONObj subDoc = sub.obj();
     try {
-        LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextAvailabilityCollectionName(), subDoc.toString().c_str()));
+        LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextAvailabilityCollectionName(tenant).c_str(), subDoc.toString().c_str()));
 
         mongoSemTake(__FUNCTION__, "insert into SubscribeContextAvailabilityCollection");
-        connection->insert(getSubscribeContextAvailabilityCollectionName(), subDoc);
+        connection->insert(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), subDoc);
         mongoSemGive(__FUNCTION__, "insert into SubscribeContextAvailabilityCollection");
     }
     catch( const DBException &e ) {
         mongoSemGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (mongo db exception)");
         reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo db exception)");
         responseP->errorCode.fill(SccReceiverInternalError,
-                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
+                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                   " - insert(): " + subDoc.toString() +
                                   " - exception: " + e.what());
         LM_RE(SccOk, ("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
@@ -115,14 +115,14 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
         mongoSemGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (mongo generic exception)");
         reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo generic exception)");
         responseP->errorCode.fill(SccReceiverInternalError,
-                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
+                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                   " - insert(): " + subDoc.toString() +
                                   " - exception: " + "generic");
         LM_RE(SccOk, ("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
     }
 
     /* Send notifications for matching context registrations */
-    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.str(), requestP->reference.get(), inFormat);
+    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.str(), requestP->reference.get(), inFormat, tenant);
 
     /* Fill the response element */
     responseP->duration = requestP->duration;

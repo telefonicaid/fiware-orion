@@ -54,7 +54,7 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
 
     /* Check if new registration */
     if (requestP->registrationId.isEmpty()) {
-        HttpStatusCode result = processRegisterContext(requestP, responseP, NULL);
+        HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant);
         reqSemGive(__FUNCTION__, "ngsi9 register request");
         return result;
     }
@@ -67,7 +67,7 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
         id = OID(requestP->registrationId.get());
 
         mongoSemTake(__FUNCTION__, "findOne from RegistrationsCollection");
-        reg = connection->findOne(getRegistrationsCollectionName(), BSON("_id" << id));
+        reg = connection->findOne(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << id));
         mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection");
     }
     catch( const AssertionException &e ) {
@@ -87,7 +87,7 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
         reqSemGive(__FUNCTION__, "ngsi9 register request");
 
         responseP->errorCode.fill(SccReceiverInternalError,
-                                  std::string("collection: ") + getRegistrationsCollectionName() +
+                                  std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
                                   " - findOne() _id: " + requestP->registrationId.get() +
                                   " - exception: " + e.what());
         ++noOfRegistrationUpdateErrors;
@@ -98,7 +98,7 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
         reqSemGive(__FUNCTION__, "ngsi9 register request");
 
         responseP->errorCode.fill(SccReceiverInternalError,
-                                  std::string("collection: ") + getRegistrationsCollectionName() +
+                                  std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
                                   " - findOne() _id: " + requestP->registrationId.get() +
                                   " - exception: " + "generic");
         ++noOfRegistrationUpdateErrors;
@@ -113,7 +113,7 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
        return SccOk;
     }
 
-    HttpStatusCode result = processRegisterContext(requestP, responseP, &id);
+    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant);
     reqSemGive(__FUNCTION__, "ngsi9 register request");
     return result;
 }
