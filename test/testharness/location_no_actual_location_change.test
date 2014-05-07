@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Location no actual location change
+Location - no actual location change
 
 --SHELL-INIT--
 source harnessFunctions.sh
