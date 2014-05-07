@@ -28,7 +28,6 @@ source harnessFunctions.sh
 dbInit CB
 accumulatorStart localhost ${LISTENER_PORT}
 brokerStart CB 0-255 IPV4 -rush localhost:${LISTENER_PORT}
-sleep 1
 
 --SHELL--
 source harnessFunctions.sh
@@ -86,7 +85,6 @@ echo
 echo
 
 
-sleep 5
 echo "3. Update E/att"
 echo "+++++++++++++++"
 url="/NGSI10/updateContext"
