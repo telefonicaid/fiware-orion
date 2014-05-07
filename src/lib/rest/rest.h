@@ -52,7 +52,6 @@ typedef enum IpVersion
 extern IpVersion       ipVersionUsed;  
 extern std::string     rushHost;
 extern unsigned short  rushPort;
-extern bool            useHttps;
 
 
 

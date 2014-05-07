@@ -75,7 +75,6 @@ static char                      bindIPv6[MAX_LEN_IP]  = "::";
 IpVersion                        ipVersionUsed         = IPDUAL;
 std::string                      rushHost              = "";
 unsigned short                   rushPort              = 0;
-bool                             useHttps              = false;
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
@@ -607,11 +606,6 @@ void restInit
 
   if ((_ipVersion == IPV6) || (_ipVersion == IPDUAL))
      strncpy(bindIPv6, bindIPv6, MAX_LEN_IP - 1);
-
-
-  // https in use?
-  if (_httpsKey != NULL)
-    useHttps = true;
 
   // Starting REST interface
   int r;

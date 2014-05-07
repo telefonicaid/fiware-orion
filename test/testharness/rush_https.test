@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Rush
+Rush with HTTPS
 --SHELL-INIT--
 source harnessFunctions.sh
 
@@ -32,8 +32,8 @@ brokerStart CB 0-255 IPV4 -rush localhost:${LISTENER_PORT}
 --SHELL--
 source harnessFunctions.sh
 
-echo "1. Subscribe to changes in  E/att" # reference will never be reached as it stops in the accumulator
-echo "+++++++++++++++++++++++++++++++++"
+echo "1. Subscribe to changes in E/att" # reference will never be reached as it stops in the accumulator
+echo "++++++++++++++++++++++++++++++++"
 url="/NGSI10/subscribeContext"
 payload='<subscribeContextRequest>
   <entityIdList>
@@ -44,7 +44,7 @@ payload='<subscribeContextRequest>
   <attributeList>
     <attribute>att</attribute>
   </attributeList>
-  <reference>http://128.1.2.3:1234/notify</reference>
+  <reference>https://128.1.2.3:1234/notify</reference>
   <duration>P99Y</duration>
   <notifyConditions>
     <notifyCondition>
@@ -90,8 +90,8 @@ echo "+++++++++++++++++++"
 curl localhost:${LISTENER_PORT}/dump -s -S
 
 --REGEXPECT--
-1. Subscribe to changes in  E/att
-+++++++++++++++++++++++++++++++++
+1. Subscribe to changes in E/att
+++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 192
 Content-Type: application/xml
@@ -143,6 +143,7 @@ Date: REGEX(.*)
 POST http://localhost:REGEX(\d+)/notify
 Content-Length: 718
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+X-Relayer-Protocol: https
 Host: localhost:REGEX(\d+)
 X-Relayer-Host: 128.1.2.3:1234
 Accept: application/xml, application/json

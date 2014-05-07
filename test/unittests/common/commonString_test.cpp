@@ -72,43 +72,44 @@ TEST(commonString, parseUrl)
 
    std::string  host;
    int          port;
+   std::string  protocol;
    std::string  path;
 
-   r = parseUrl(url1, host, port, path);
+   r = parseUrl(url1, host, port, path, protocol);
    EXPECT_FALSE(r);
-   r = parseUrl(url2, host, port, path);
+   r = parseUrl(url2, host, port, path, protocol);
    EXPECT_FALSE(r);
-   r = parseUrl(url3, host, port, path);
+   r = parseUrl(url3, host, port, path, protocol);
    EXPECT_FALSE(r);
-   r = parseUrl(url4, host, port, path);
+   r = parseUrl(url4, host, port, path, protocol);
    EXPECT_FALSE(r);
-   r = parseUrl(url5, host, port, path);
+   r = parseUrl(url5, host, port, path, protocol);
    EXPECT_FALSE(r);
 
-   r = parseUrl(url6, host, port, path);
+   r = parseUrl(url6, host, port, path, protocol);
    EXPECT_TRUE(r);
    EXPECT_STREQ("XXX", host.c_str());
    EXPECT_EQ(1234, port);
    EXPECT_STREQ("/path", path.c_str());
 
-   r = parseUrl(url7, host, port, path);
+   r = parseUrl(url7, host, port, path, protocol);
    EXPECT_TRUE(r);
    EXPECT_STREQ("XXX", host.c_str());
    EXPECT_EQ(80, port); // DEFAULT_HTTP_PORT == 80
    EXPECT_STREQ("/path", path.c_str());
 
-   r = parseUrl(urlv61, host, port, path);
+   r = parseUrl(urlv61, host, port, path, protocol);
    EXPECT_FALSE(r);
-   r = parseUrl(urlv62, host, port, path);
+   r = parseUrl(urlv62, host, port, path, protocol);
    EXPECT_FALSE(r);
 
-   r = parseUrl(urlv63, host, port, path);
+   r = parseUrl(urlv63, host, port, path, protocol);
    EXPECT_TRUE(r);
    EXPECT_STREQ("2001:DB8:2de::e13", host.c_str());
    EXPECT_EQ(80, port); 
    EXPECT_STREQ("/path", path.c_str());
 
-   r = parseUrl(urlv64, host, port, path);
+   r = parseUrl(urlv64, host, port, path, protocol);
    EXPECT_TRUE(r);
    EXPECT_STREQ("::", host.c_str());
    EXPECT_EQ(80, port); 
@@ -126,10 +127,11 @@ TEST(string, parseFullUrl)
     std::string url = "http://host:8080/my/path";
 
     std::string host;
-    int port;
+    int         port;
     std::string path;
+    std::string protocol;
 
-    bool result = parseUrl(url, host, port, path);
+    bool result = parseUrl(url, host, port, path, protocol);
 
     EXPECT_TRUE(result) << "wrong result (shall be true)";
     EXPECT_EQ("host", host) << "wrong host";
@@ -147,10 +149,11 @@ TEST(string, parseUrlShortPath)
     std::string url = "http://host:8080/my";
 
     std::string host;
-    int port;
+    int         port;
     std::string path;
+    std::string protocol;
 
-    bool result = parseUrl(url, host, port, path);
+    bool result = parseUrl(url, host, port, path, protocol);
 
     EXPECT_TRUE(result) << "wrong result (shall be true)";
     EXPECT_EQ("host", host) << "wrong host";
@@ -167,10 +170,11 @@ TEST(string, parseUrlWithSlashPath)
     std::string url = "http://host:8080/";
 
     std::string host;
-    int port;
+    int         port;
     std::string path;
+    std::string protocol;
 
-    bool result = parseUrl(url, host, port, path);
+    bool result = parseUrl(url, host, port, path, protocol);
 
     EXPECT_TRUE(result) << "wrong result (shall be true)";
     EXPECT_EQ("host", host) << "wrong host";
@@ -188,10 +192,11 @@ TEST(string, parseUrlWithoutPath)
     std::string url = "http://host:8080";
 
     std::string host;
-    int port;
+    int         port;
     std::string path;
+    std::string protocol;
 
-    bool result = parseUrl(url, host, port, path);
+    bool result = parseUrl(url, host, port, path, protocol);
 
     EXPECT_TRUE(result) << "wrong result (shall be true)";
     EXPECT_EQ("host", host) << "wrong host";
@@ -208,10 +213,11 @@ TEST(string, parseUrlWithoutPort)
     std::string url = "http://host/my/path";
 
     std::string host;
-    int port;
+    int         port;
     std::string path;
+    std::string protocol;
 
-    bool result = parseUrl(url, host, port, path);
+    bool result = parseUrl(url, host, port, path, protocol);
 
     EXPECT_TRUE(result) << "wrong result (shall be true)";
     EXPECT_EQ("host", host) << "wrong host";
@@ -228,10 +234,11 @@ TEST(string, parseUrlWithoutPortAndPath)
     std::string url = "http://host";
 
     std::string host;
-    int port;
+    int         port;
     std::string path;
+    std::string protocol;
 
-    bool result = parseUrl(url, host, port, path);
+    bool result = parseUrl(url, host, port, path, protocol);
 
     EXPECT_TRUE(result) << "wrong result (shall be true)";
     EXPECT_EQ("host", host) << "wrong host";
@@ -248,10 +255,11 @@ TEST(string, parseMalformedUrl1)
     std::string url = "http://";
 
     std::string host;
-    int port;
+    int         port;
     std::string path;
+    std::string protocol;
 
-    bool result = parseUrl(url, host, port, path);
+    bool result = parseUrl(url, host, port, path, protocol);
 
     EXPECT_FALSE(result) << "wrong result (shall be false)";
 
@@ -266,10 +274,11 @@ TEST(string, parseMalformedUrl2)
     std::string url = "http://20:host:8080/my/path";
 
     std::string host;
-    int port;
+    int         port;
     std::string path;
+    std::string protocol;
 
-    bool result = parseUrl(url, host, port, path);
+    bool result = parseUrl(url, host, port, path, protocol);
 
     EXPECT_FALSE(result) << "wrong result (shall be false)";
 }
@@ -283,10 +292,11 @@ TEST(string, parseEmptyUrl)
     std::string url = "";
 
     std::string host;
-    int port;
+    int         port;
     std::string path;
+    std::string protocol;
 
-    bool result = parseUrl(url, host, port, path);
+    bool result = parseUrl(url, host, port, path, protocol);
 
     EXPECT_FALSE(result) << "wrong result (shall be false)";
 }

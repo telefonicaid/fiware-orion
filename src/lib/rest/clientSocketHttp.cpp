@@ -124,6 +124,7 @@ std::string sendHttpSocket
 (
    std::string     ip,
    unsigned short  port,
+   std::string     protocol,
    std::string     verb,
    std::string     resource,
    std::string     content_type,
@@ -181,7 +182,7 @@ std::string sendHttpSocket
 
       sprintf(portAsString, "%d", rushHeaderPort);
       rushHttpHeaders = "X-relayer-host: " + rushHeaderIP + ":" + portAsString + "\n";
-      if (useHttps)
+      if (protocol == "https:")
         rushHttpHeaders += "X-relayer-protocol: https\n";
     }
   }
@@ -286,5 +287,3 @@ std::string sendHttpSocket
   close(fd);
   return result;
 }
-
-
