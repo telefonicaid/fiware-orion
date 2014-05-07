@@ -161,7 +161,7 @@ std::string sendHttpSocket
   // But, this depends also on how the broker was started, so here the 'useRush'
   // parameter is cancelled in case the broker was started without rush.
   //
-  // IF rush is to be used, the IP/port is stored in rushHeaderIP/rushHeaderPort and
+  // If rush is to be used, the IP/port is stored in rushHeaderIP/rushHeaderPort and
   // after that, the host and port of rush is set as ip/port for the message, that is
   // now sent to rush instead of to its final destination.
   // Also, a few HTTP headers for rush nust be setup.

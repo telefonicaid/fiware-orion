@@ -645,7 +645,7 @@ static int loadFile(char* path, char* out, int outSize)
   if (nb == -1)
     LM_RE(-1, ("error reading from '%s': %s", path, strerror(errno)));
   if (nb != statBuf.st_size)
-    LM_RE(-1, ("bad size read from from '%s': %d, wanted %d", path, nb, statBuf.st_size));
+    LM_RE(-1, ("bad size read from '%s': %d, wanted %d", path, nb, statBuf.st_size));
 
   return 0;
 }
@@ -654,7 +654,7 @@ static int loadFile(char* path, char* out, int outSize)
 
 /* ****************************************************************************
 *
-* rushParse - parse rush host and port feom CLI argument
+* rushParse - parse rush host and port from CLI argument
 *
 * The '-rush' CLI argument has the format "host:port" and this function
 * splits that argument into rushHost and rushPort.
