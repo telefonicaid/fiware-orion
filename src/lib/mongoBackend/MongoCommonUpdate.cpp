@@ -152,23 +152,21 @@ static void valueBson(ContextAttribute* ca, BSONObjBuilder& bsonAttr) {
 
 /* ****************************************************************************
 *
-* isCustomMetadata -
+* isNotCustomMetadata -
 *
-* Check that the parameter is a right custom metadata, i.e. one metadata without
+* Check that the parameter is a not custom metadata, i.e. one metadata without
 * an special semantic to be interpreted by the context broker itself
 *
 * FIXME P2: this function probably could be moved to another place "closer" to metadata
 */
-static bool isCustomMetadata(std::string md) {
+static bool isNotCustomMetadata(std::string md) {
     if (md != NGSI_MD_ID &&
         md != NGSI_MD_LOCATION &&
         md != NGSI_MD_CREDATE &&
         md != NGSI_MD_MODDATE) {
         return false;
-    }
-    else {
-        return true;
-    }
+    }    
+    return true;
 }
 
 /* ****************************************************************************
@@ -237,7 +235,7 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2) {
                 }
                 else {
                     found = true;
-                    continue;  // loop in i2
+                    break;  // loop in i2
                 }
             }
         }
@@ -261,34 +259,33 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2) {
 */
 static bool bsonCustomMetadataToBson(BSONObj& newMdV, BSONObj& attr) {
 
-    if (attr.hasField(ENT_ATTRS_MD)) {
-        BSONArrayBuilder mdNewVBuilder;
-        BSONObj mdV = attr.getField(ENT_ATTRS_MD).embeddedObject();
-        unsigned int mdVSize = 0;
-        for( BSONObj::iterator i = mdV.begin(); i.more(); ) {
-            BSONObj md = i.next().embeddedObject();
-            mdVSize++;
-            if (md.hasField(ENT_ATTRS_MD_TYPE)) {
-                mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
-                                   ENT_ATTRS_MD_TYPE << md.getStringField(ENT_ATTRS_MD_TYPE) <<
-                                   ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
-            }
-            else {
-                mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
-                                   ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
-            }
-        }
-        if (mdVSize > 0) {
-            newMdV = mdNewVBuilder.arr();
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    else {
+    if (!attr.hasField(ENT_ATTRS_MD)) {
         return false;
     }
+
+    BSONArrayBuilder mdNewVBuilder;
+    BSONObj mdV = attr.getField(ENT_ATTRS_MD).embeddedObject();
+    unsigned int mdVSize = 0;
+    for( BSONObj::iterator i = mdV.begin(); i.more(); ) {
+        BSONObj md = i.next().embeddedObject();
+        mdVSize++;
+        if (md.hasField(ENT_ATTRS_MD_TYPE)) {
+            mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
+                                      ENT_ATTRS_MD_TYPE << md.getStringField(ENT_ATTRS_MD_TYPE) <<
+                                      ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
+         }
+         else {
+            mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
+                                      ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
+         }
+     }
+
+     if (mdVSize > 0) {
+         newMdV = mdNewVBuilder.arr();
+         return true;
+     }
+     return false;
+
 }
 
 /* ****************************************************************************
@@ -333,7 +330,7 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         for (unsigned int ix = 0; ix < ca.metadataVector.size() ; ++ix) {
             Metadata* md = ca.metadataVector.get(ix);
             /* Skip not custom metadata */
-            if (isCustomMetadata(md->name)) {
+            if (isNotCustomMetadata(md->name)) {
                 continue;
             }
             mdNewVSize++;
@@ -384,7 +381,7 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         }
         else {
             // FIXME P6: in the case of composed value, it's more difficult to know if an attribute
-            // has really changed its value (many levels have to be travesed). Until we can develop the
+            // has really changed its value (many levels have to be traversed). Until we can develop the
             // matching logic, we consider actualUpdate always true.
             *actualUpdate = true;
         }
@@ -526,7 +523,7 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute*
     unsigned int mdToAddSize;
     for (unsigned int ix = 0; ix < ca->metadataVector.size(); ++ix) {
         Metadata* md = ca->metadataVector.get(ix);
-        if (!isCustomMetadata(md->name)) {
+        if (!isNotCustomMetadata(md->name)) {
             mdToAddSize++;
             mdToAdd.append(BSON("name" << md->name << "type" << md->type << "value" << md->value));
             LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
@@ -536,11 +533,8 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute*
     if (mdToAddSize > 0) {
         mdV = mdToAdd.arr();
         return true;
-    }
-    else {
-        return false;
-    }
-
+    }   
+    return false;
 }
 
 /* ****************************************************************************
@@ -985,7 +979,7 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
     /* Custom (just "mirroring" in the response) */
     for (unsigned int ix = 0; ix < caReq->metadataVector.size(); ++ix) {
         Metadata* mdReq = caReq->metadataVector.get(ix);
-        if (!isCustomMetadata(mdReq->name)) {
+        if (!isNotCustomMetadata(mdReq->name)) {
             md = new Metadata(mdReq->name, mdReq->type, mdReq->value);
             caRes->metadataVector.push_back(md);
         }
