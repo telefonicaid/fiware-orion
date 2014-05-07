@@ -1,1 +1,2 @@
 - Add: custom metadata support (issue #252)
+- Fix: raising error on updateContext with location metadata don't involving actual change of location attribute (issue #351)

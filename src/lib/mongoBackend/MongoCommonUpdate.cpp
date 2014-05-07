@@ -1071,7 +1071,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
 
                 /* Check aspects related with location */
                 if (targetAttr->getLocation().length() > 0 ) {
-                    if (locAttr.length() > 0) {
+                    if (locAttr.length() > 0 && targetAttr->name != locAttr) {
                         cerP->statusCode.fill(SccInvalidParameter,
                                               std::string("action: APPEND") +
                                               std::string(" - entity: (") + eP->toString() + ")" +
