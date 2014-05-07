@@ -43,13 +43,6 @@ void setupDatabase(void) {
     mongoConnect("localhost");
     DBClientConnection* connection = getMongoConnection();
 
-#if 0
-    connection->dropCollection(std::string(DBPREFIX) + "." + REGISTRATIONS_COLL);
-    connection->dropCollection(std::string(DBPREFIX) + "." + ENTITIES_COLL);
-    connection->dropCollection(std::string(DBPREFIX) + "." + SUBSCRIBECONTEXT_COLL);
-    connection->dropCollection(std::string(DBPREFIX) + "." + SUBSCRIBECONTEXTAVAIL_COLL);
-    connection->dropCollection(std::string(DBPREFIX) + "." + ASSOCIATIONS_COLL);
-#endif
     connection->dropCollection(REGISTRATIONS_COLL);
     connection->dropCollection(ENTITIES_COLL);
     connection->dropCollection(SUBSCRIBECONTEXT_COLL);
