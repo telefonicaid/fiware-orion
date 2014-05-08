@@ -69,16 +69,16 @@ DATE=$(LANG=C date +"%a %b %d %Y")
 export dateLine="$DATE Fermin Galan <fermin@tid.es> ${NEW_VERSION}-${BROKER_RELEASE} (FIWARE-${FIWARE_VERSION}-${FIWARE_RELEASE})"
 
 
-# Modify rpm/contextBroker.spec only when step to a non-deve release
+# Modify rpm/SPECS/contextBroker.spec only when step to a non-deve release
 if [ "$BROKER_RELEASE" != "dev" ]
 then
     #
-    # Edit rpm/contextBroker.spec, adding the new changes from CHANGELOG_FILE
+    # Edit rpm/SPECS/contextBroker.spec, adding the new changes from CHANGELOG_FILE
     #
-    # 1. Find the line in rpm/contextBroker.spec, where to add the content of CHANGELOG_FILE plus the info-line for the changes.
+    # 1. Find the line in rpm/SPECS/contextBroker.spec, where to add the content of CHANGELOG_FILE plus the info-line for the changes.
     #    o LINES:       number of lines before the insertion
-    # 2. Get the total number of lines in rpm/contextBroker.spec
-    # 3. Get the number of lines in rpm/contextBroker.spec after the insertion
+    # 2. Get the total number of lines in rpm/SPECS/contextBroker.spec
+    # 3. Get the number of lines in rpm/SPECS/contextBroker.spec after the insertion
     #    o LAST_LINES:  number of lines after the insertion
     # 4. To a temporal file, add the four 'chunks':
     #    1. LINES
@@ -88,24 +88,24 @@ then
     # 5. Replace using the temporal file
 
     #
-    # 1. Find the line in rpm/contextBroker.spec, where to add the content of CHANGELOG_FILE
+    # 1. Find the line in rpm/SPECS/contextBroker.spec, where to add the content of CHANGELOG_FILE
     #    The for is because these is more than one oceuurence of '%changelog'. We are only
     #    interested in the last one.
     #
-    for line in $(grep -n '%changelog' rpm/contextBroker.spec | awk -F: '{ print $1 }')
+    for line in $(grep -n '%changelog' rpm/SPECS/contextBroker.spec | awk -F: '{ print $1 }')
     do
       LINE=$line
     done
 
 
     #
-    # 2. Get the total number of lines in rpm/contextBroker.spec
+    # 2. Get the total number of lines in rpm/SPECS/contextBroker.spec
     #
-    LINES=$(wc -l rpm/contextBroker.spec | awk '{ print $1 }')
+    LINES=$(wc -l rpm/SPECS/contextBroker.spec | awk '{ print $1 }')
 
 
     #
-    # 3. Get the number of lines in rpm/contextBroker.spec after the insertion
+    # 3. Get the number of lines in rpm/SPECS/contextBroker.spec after the insertion
     #
     typeset -i LAST_LINES
     LAST_LINES=$LINES-$LINE
@@ -114,18 +114,18 @@ then
     #
     # 4. To a temporal file, add the four 'chunks'
     #
-    head -$LINE rpm/contextBroker.spec         > /tmp/contextBroker.spec
+    head -$LINE rpm/SPECS/contextBroker.spec        >  /tmp/contextBroker.spec
 
-    echo -n '* '                              >> /tmp/contextBroker.spec
-    echo $dateLine                            >> /tmp/contextBroker.spec
+    echo -n '* '                                    >> /tmp/contextBroker.spec
+    echo $dateLine                                  >> /tmp/contextBroker.spec
 
-    cat $CHANGELOG_FILE                       >> /tmp/contextBroker.spec
-    echo                                      >> /tmp/contextBroker.spec
+    cat $CHANGELOG_FILE                             >> /tmp/contextBroker.spec
+    echo                                            >> /tmp/contextBroker.spec
 
-    tail -$LAST_LINES rpm/contextBroker.spec  >> /tmp/contextBroker.spec
+    tail -$LAST_LINES rpm/SPECS/contextBroker.spec  >> /tmp/contextBroker.spec
     
     # 5. Replace using the temporal file
-    mv /tmp/contextBroker.spec rpm/contextBroker.spec 
+    mv /tmp/contextBroker.spec rpm/SPECS/contextBroker.spec 
 
 fi
 
@@ -161,7 +161,7 @@ touch CHANGES_NEXT_RELEASE
 CURRENT_BRANCH=$(git branch | grep '^*' | cut -c 3-10)
 if [ "$CURRENT_BRANCH" == "develop" ]
 then
-    git add rpm/contextBroker.spec
+    git add rpm/SPECS/contextBroker.spec
     git add src/app/contextBroker/version.h
     git add test/testharness/version.test
     git add test/testharness/version_via_rest.test
