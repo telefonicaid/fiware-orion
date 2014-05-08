@@ -78,7 +78,7 @@ static void doNotification(OnIntervalThreadParams* params, std::string tenant) {
                 ncr.originator.set("localhost");
                 ncr.subscriptionId.set(params->subId);
 
-                params->notifier->sendNotifyContextRequest(&ncr, csi.url, csi.format);
+                params->notifier->sendNotifyContextRequest(&ncr, csi.url, tenant, csi.format);
 
                 ncr.contextElementResponseVector.release();
 

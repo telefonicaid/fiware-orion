@@ -659,7 +659,8 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
             }
             else if (sco->areaType== orion::PolygonType) {
                 BSONArrayBuilder vertex;
-                double x0, y0;
+                double x0 = 0;
+                double y0 = 0;
                 for (unsigned int jx = 0; jx < sco->polygon.vertexList.size() ; ++jx) {
                     double x = sco->polygon.vertexList[jx]->latitude();
                     double y = sco->polygon.vertexList[jx]->longitude();
@@ -1231,7 +1232,7 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
 
             if (isCondValueInContextElementResponse(condValues, &allCerV)) {
                 /* Send notification */
-                getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, format);
+                getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, format);
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
                 return true;
@@ -1240,7 +1241,7 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
             allCerV.release();
         }
         else {
-            getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, format);
+            getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, format);
             ncr.contextElementResponseVector.release();
             return true;
         }
@@ -1385,7 +1386,7 @@ bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, st
         /* Complete the fields in NotifyContextRequest */
         ncar.subscriptionId.set(subId);
 
-        getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, format);
+        getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, format);
         ncar.contextRegistrationResponseVector.release();
 
         /* Update database fields due to new notification */

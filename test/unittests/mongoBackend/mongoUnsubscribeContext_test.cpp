@@ -121,7 +121,7 @@ TEST(mongoUnsubscribeContext, subscriptionNotFound)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -168,7 +168,7 @@ TEST(mongoUnsubscribeContext, unsubscribe)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -224,7 +224,7 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -295,7 +295,7 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);

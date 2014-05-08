@@ -48,6 +48,7 @@ extern int socketHttpConnect(std::string host, unsigned short port);
 extern std::string sendHttpSocket( std::string ip,
                                    unsigned short port, 
                                    std::string verb,
+                                   std::string tenant,
                                    std::string resource, 
                                    std::string content_type, 
                                    std::string content,

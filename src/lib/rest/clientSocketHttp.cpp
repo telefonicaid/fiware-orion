@@ -125,6 +125,7 @@ std::string sendHttpSocket
    std::string     ip,
    unsigned short  port,
    std::string     verb,
+   std::string     tenant,
    std::string     resource,
    std::string     content_type,
    std::string     content,
@@ -163,6 +164,15 @@ std::string sendHttpSocket
            "Host: %s:%d\n"
            "Accept: application/xml, application/json\n",
            verb.c_str(), resource.c_str(), versionGet(), ip.c_str(), (int) port);
+
+  if (tenant != "")
+  {
+    char tenantHeader[128];
+
+    snprintf(tenantHeader, sizeof(tenantHeader), "fiware-service: %s\n", tenant.c_str());
+
+    strncat(preContent, tenantHeader, sizeof(preContent) - strlen(preContent));
+  }
 
   if (!content.empty())
   {
