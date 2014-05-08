@@ -43,10 +43,12 @@ void* startSenderThread(void* p)
 
     sendHttpSocket(params->ip,
                    params->port,
+                   params->protocol,                   
                    params->verb,
                    params->resource,
                    params->content_type,
                    params->content,
+                   true,
                    NOTIFICATION_WAIT_MODE);
 
     /* Delete the parameters after using them */
