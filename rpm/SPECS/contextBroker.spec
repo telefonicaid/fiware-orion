@@ -88,10 +88,6 @@ After configuring /etc/sysconfig/%{name} execute 'chkconfig %{name} on' to
 enable %{name} after a reboot.
 EOMSG
 
-%preun
-/etc/init.d/%{name} stop
-/sbin/chkconfig --del %{name}
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 rm -rf %{_builddir}
@@ -143,7 +139,6 @@ Summary: Test suite for %{name}
 %description tests
 Test suite for %{name}
 
-#%files tests
 %files tests -f MANIFEST.broker-tests
 
 %package -n %{name}-fiware
@@ -163,6 +158,28 @@ Using these interfaces, clients can do several operations:
   updated from applications, so queries are resolved based on that information.
 
 %files -n %{name}-fiware
+
+%preun
+/etc/init.d/%{name} stop
+/sbin/chkconfig --del %{name}
+
+%preun tests
+
+%preun -n %{name}-fiware
+/etc/init.d/%{name} stop
+/sbin/chkconfig --del %{name}
+
+%postun 
+rm -rf  /usr/share/contextBroker
+/usr/sbin/userdel -f %{owner}
+
+%postun tests
+rm -rf  /usr/share/contextBroker/tests
+
+%postun -n %{name}-fiware
+rm -rf  /usr/share/contextBroker
+/usr/sbin/userdel -f %{owner}
+
 
 %changelog
 * Wed Apr 09 2014 Fermin Galan <fermin@tid.es> 0.11.0-1 (FIWARE-3.3.3-1)
