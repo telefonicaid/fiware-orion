@@ -187,28 +187,28 @@ char            mtenant[32];
 */
 PaArgument paArgs[] =
 {
-  { "-fg",          &fg,           "FOREGROUND",      PaBool,   PaOpt, false,          false,  true,  "don't start as daemon"                },
-  { "-localIp",     bindAddress,   "LOCALIP",         PaString, PaOpt, _i "0.0.0.0",   PaNL,   PaNL,  "IP to receive new connections"        },
-  { "-port",        &port,         "PORT",            PaInt,    PaOpt, 1026,           PaNL,   PaNL,  "port to receive new connections"      },
-  { "-pidpath",      pidPath,      "PID_PATH",        PaString, PaOpt, PIDPATH,        PaNL,   PaNL,  "pid file path"                        },
+  { "-fg",           &fg,           "FOREGROUND",      PaBool,   PaOpt, false,          false,  true,  "don't start as daemon"                     },
+  { "-localIp",      bindAddress,   "LOCALIP",         PaString, PaOpt, _i "0.0.0.0",   PaNL,   PaNL,  "IP to receive new connections"             },
+  { "-port",         &port,         "PORT",            PaInt,    PaOpt, 1026,           PaNL,   PaNL,  "port to receive new connections"           },
+  { "-pidpath",      pidPath,      "PID_PATH",        PaString, PaOpt, PIDPATH,        PaNL,   PaNL,  "pid file path"                              },
 
-  { "-dbhost",      dbHost,        "DB_HOST",         PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "database host"                        },
-  { "-dbuser",      user,          "DB_USER",         PaString, PaOpt, _i "",          PaNL,   PaNL,  "database user"                        },
-  { "-dbpwd",       pwd,           "DB_PASSWORD",     PaString, PaOpt, _i "",          PaNL,   PaNL,  "database password"                    },
-  { "-db",          dbName,        "DB",              PaString, PaOpt, _i "orion",     PaNL,   PaNL,  "database name"                        },
+  { "-dbhost",       dbHost,        "DB_HOST",         PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "database host"                             },
+  { "-dbuser",       user,          "DB_USER",         PaString, PaOpt, _i "",          PaNL,   PaNL,  "database user"                             },
+  { "-dbpwd",        pwd,           "DB_PASSWORD",     PaString, PaOpt, _i "",          PaNL,   PaNL,  "database password"                         },
+  { "-db",           dbName,        "DB",              PaString, PaOpt, _i "orion",     PaNL,   PaNL,  "database name"                             },
 
-  { "-fwdHost",     fwdHost,       "FWD_HOST",        PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "host for forwarding NGSI9 regs"       },
-  { "-fwdPort",     &fwdPort,      "FWD_PORT",        PaInt,    PaOpt, 0,              0,      65000, "port for forwarding NGSI9 regs"       },
-  { "-ngsi9",       &ngsi9Only,    "CONFMAN",         PaBool,   PaOpt, false,          false,  true,  "run as Configuration Manager"         },
-  { "-ipv4",        &useOnlyIPv4,  "USEIPV4",         PaBool,   PaOpt, false,          false,  true,  "use ip v4 only"                       },
-  { "-ipv6",        &useOnlyIPv6,  "USEIPV6",         PaBool,   PaOpt, false,          false,  true,  "use ip v6 only"                       },
-  { "-harakiri",    &harakiri,     "HARAKIRI",        PaBool,   PaHid, false,          false,  true,  "commits harakiri on request"          },
+  { "-fwdHost",      fwdHost,       "FWD_HOST",        PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "host for forwarding NGSI9 regs"            },
+  { "-fwdPort",      &fwdPort,      "FWD_PORT",        PaInt,    PaOpt, 0,              0,      65000, "port for forwarding NGSI9 regs"            },
+  { "-ngsi9",        &ngsi9Only,    "CONFMAN",         PaBool,   PaOpt, false,          false,  true,  "run as Configuration Manager"              },
+  { "-ipv4",         &useOnlyIPv4,  "USEIPV4",         PaBool,   PaOpt, false,          false,  true,  "use ip v4 only"                            },
+  { "-ipv6",         &useOnlyIPv6,  "USEIPV6",         PaBool,   PaOpt, false,          false,  true,  "use ip v6 only"                            },
+  { "-harakiri",     &harakiri,     "HARAKIRI",        PaBool,   PaHid, false,          false,  true,  "commits harakiri on request"               },
 
-  { "-https",       &https,        "HTTPS",           PaBool,   PaOpt, false,          false,  true,  "use the https 'protocol'"             },
-  { "-key",         httpsKeyFile,  "HTTPS_KEY_FILE",  PaString, PaOpt, _i "",          PaNL,   PaNL,  "private server key file (for https)"  },
-  { "-cert",        httpsCertFile, "HTTPS_CERT_FILE", PaString, PaOpt, _i "",          PaNL,   PaNL,  "certificate key file (for https)"     },
+  { "-https",        &https,        "HTTPS",           PaBool,   PaOpt, false,          false,  true,  "use the https 'protocol'"                  },
+  { "-key",          httpsKeyFile,  "HTTPS_KEY_FILE",  PaString, PaOpt, _i "",          PaNL,   PaNL,  "private server key file (for https)"       },
+  { "-cert",         httpsCertFile, "HTTPS_CERT_FILE", PaString, PaOpt, _i "",          PaNL,   PaNL,  "certificate key file (for https)"          },
 
-  { "-multitenant", mtenant,       "MULTI_TENANT",    PaString, PaOpt, _i "off",       PaNL,   PaNL,  "tenancy mode (off|url|header)"        },
+  { "-multiservice", mtenant,       "MULTI_SERVICE",  PaString, PaOpt, _i "off",       PaNL,   PaNL,  "service multi tenancy mode (off|url|header)"},
   
   PA_END_OF_ARGS
 };
@@ -988,16 +988,25 @@ const char* description =
 *
 * contextBrokerInit -
 */
-static void contextBrokerInit(bool ngsi9Only)
+static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multitenant)
 {
   /* Set notifier object (singleton) */
   setNotifier(new Notifier());
 
   /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
-  if (!ngsi9Only)
-    // FIXME P10: we should ask for all the "orion.csubs" and "orion.X.csubs" databases at mongo a do a loop for
-    // recovering in each one
+  if (!ngsi9Only) {
     recoverOntimeIntervalThreads("");
+    if (multitenant) {
+        /* We get tenant database names and recover ontime interval threads on each one */
+        std::vector<std::string> orionDbs;
+        getOrionDatabases(orionDbs);
+        for (unsigned int ix = 0; ix < orionDbs.size(); ++ix) {
+            std::string orionDb = orionDbs[ix];
+            std::string tenant = orionDb.substr(dbPrefix.length() + 1);   // + 1 for the "_" in "orion_tenantA"
+            recoverOntimeIntervalThreads(tenant);
+        }
+    }
+  }
   else
     LM_F(("Running in NGSI9 only mode"));
 }
@@ -1008,7 +1017,9 @@ static void contextBrokerInit(bool ngsi9Only)
 */
 static void mongoInit(const char* dbHost, std::string dbName, const char* user, const char* pwd)
 {
-   if (!mongoConnect(dbHost, dbName.c_str(), user, pwd))
+   std::string multitenant = mtenant;
+
+   if (!mongoConnect(dbHost, dbName.c_str(), user, pwd, multitenant != "off"))
     LM_X(1, ("MongoDB error"));
 
   if (user[0] != 0) 
@@ -1023,10 +1034,20 @@ static void mongoInit(const char* dbHost, std::string dbName, const char* user, 
   setSubscribeContextAvailabilityCollectionName("casubs");
   setAssociationsCollectionName("associations");
 
-  // FIXME P10: we should move this to the updateContext logic, so each time an insert() is done in that
-  // collection we ensure that the index is there (optimally, before the first insert ever, but I'm not
-  // sure if that is easy to detect at mongoBackend)
+  /* Note that index creation operation is idempotent. From http://docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/,
+   * "If you call multiple ensureIndex() methods with the same index specification at the same time, only the first operation will
+   * succeed, all other operations will have no effect." */
   ensureLocationIndex("");
+  if (multitenant != "off") {
+      /* We get tenant database names and apply ensure the location index in each one */
+      std::vector<std::string> orionDbs;
+      getOrionDatabases(orionDbs);
+      for (unsigned int ix = 0; ix < orionDbs.size(); ++ix) {
+          std::string orionDb = orionDbs[ix];
+          std::string tenant = orionDb.substr(dbName.length() + 1);   // + 1 for the "_" in "orion_tenantA"
+          ensureLocationIndex(tenant);
+      }
+  }
 }
 
 
@@ -1142,7 +1163,7 @@ int main(int argC, char* argV[])
   pidFile();
   orionInit(orionExit, ORION_VERSION);
   mongoInit(dbHost, dbName, user, pwd);
-  contextBrokerInit(ngsi9Only);
+  contextBrokerInit(ngsi9Only, dbName, multitenant != "off");
 
   if (https)
   {

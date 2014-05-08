@@ -128,7 +128,7 @@ using namespace mongo;
 *
 * mongoConnect -
 */
-extern bool mongoConnect(const char* host, const char* db, const char* username, const char* passwd);
+extern bool mongoConnect(const char* host, const char* db, const char* username, const char* passwd, bool multitenant);
 extern bool mongoConnect(const char* host);
 #ifdef UNIT_TEST
 extern bool mongoConnect(DBClientConnection* c);
@@ -166,6 +166,17 @@ extern DBClientConnection* getMongoConnection(void);
 * setDbPrefix -
 */
 extern void setDbPrefix(std::string dbPrefix);
+
+/*****************************************************************************
+*
+* getOrionDatabases -
+*
+* Return the list of Orion databases (the ones that start with the dbPrefix + "_").
+* Note that the DB belonging to the default service is not included in the
+* returned list
+*
+*/
+extern void getOrionDatabases(std::vector<std::string>& dbs);
 
 /*****************************************************************************
 *
@@ -237,7 +248,7 @@ extern bool mongoLocationCapable(void);
 *
 * ensureLocationIndex -
 */
-extern void ensureLocationIndex(std::string tentant);
+extern void ensureLocationIndex(std::string tenant);
 
 /* ****************************************************************************
 *

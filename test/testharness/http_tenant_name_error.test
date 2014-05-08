@@ -26,7 +26,7 @@ Erroneous tenant URL names
 source harnessFunctions.sh
 
 dbInit CB
-brokerStart CB 0 IPV4 -multitenant header
+brokerStart CB 0 IPV4 -multiservice header
 
 --SHELL--
 source harnessFunctions.sh
@@ -85,35 +85,35 @@ URL="/NGSI9/registerContext"
 
 # 1. OK
 echo "1: ++++++++++"
-curlXml2 $URL "$payload" "fiware-tenant: _kz-0123456789012345"
+curlXml2 $URL "$payload" "fiware-service: _kz0123456789012345"
 echo
 echo
 
 
 # 2. Long tenant name
 echo "2: ++++++++++"
-curlXml2 $URL "$payload" "fiware-tenant: kz12345678901234567890"
+curlXml2 $URL "$payload" "fiware-service: kz12345678901234567890"
 echo
 echo
 
 
 # 3. Bad character in tenant name
 echo "3: ++++++++++"
-curlXml2 $URL "$payload" "fiware-tenant: kz+fg"
+curlXml2 $URL "$payload" "fiware-service: kz+fg"
 echo
 echo
 
 
 # 4. Reserved name in tenant name
 echo "4: ++++++++++"
-curlXml2 $URL "$payload" "fiware-tenant: log"
+curlXml2 $URL "$payload" "fiware-service: log"
 echo
 echo
 
 
 # 5. Reserved name (strange case) in tenant name
 echo "5: ++++++++++"
-curlXml2 $URL "$payload" "fiware-tenant: LoG"
+curlXml2 $URL "$payload" "fiware-service: LoG"
 
 --REGEXPECT--
 1: ++++++++++
