@@ -157,7 +157,7 @@ echo "4: ***********************************"
 --REGEXPECT--
 1: ***********************************
 HTTP/1.1 200 OK
-Content-Length: 406
+Content-Length: 895
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -167,6 +167,23 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
+                        "metadatas": [
+                            {
+                                "name": "attributeValueIdentifier",
+                                "type": "long",
+                                "value": "1"
+                            },
+                            {
+                                "name": "attributeValueIdentifier",
+                                "type": "long",
+                                "value": "2"
+                            },
+                            {
+                                "name": "attributeValueIdentifier",
+                                "type": "long",
+                                "value": "3"
+                            }
+                        ],
                         "name": "temperature", 
                         "type": "degree",
                         "value": ""
@@ -195,7 +212,7 @@ Date: REGEX(.*)
 }
 3: ***********************************
 HTTP/1.1 200 OK
-Content-Length: 406
+Content-Length: 895
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -205,6 +222,23 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
+                        "metadatas": [
+                            {
+                                "name": "attributeValueIdentifier",
+                                "type": "long",
+                                "value": "1"
+                            },
+                            {
+                                "name": "attributeValueIdentifier",
+                                "type": "long",
+                                "value": "2"
+                            },
+                            {
+                                "name": "attributeValueIdentifier",
+                                "type": "long",
+                                "value": "3"
+                            }
+                        ],
                         "name": "temperature", 
                         "type": "degree",
                         "value": ""

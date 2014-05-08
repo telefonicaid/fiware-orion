@@ -1,1 +1,3 @@
 - Add: Rush can now be used as relayer for the broker, using the option '-rush' (Issue #251)
+- Add: Custom metadata support (issue #252)
+- Fix: Raising error on updateContext with location metadata doesn't involve actual change of location attribute (issue #351)
