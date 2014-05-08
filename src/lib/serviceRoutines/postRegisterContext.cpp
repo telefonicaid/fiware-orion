@@ -52,6 +52,7 @@ static std::string fordwardRegisterContext(char* host, int port, std::string pay
     LM_T(LmtCm, ("payload (content-type: application/xml): '%s'", payload.c_str()));
     std::string response = sendHttpSocket(fwdHost,
                    fwdPort,
+                   "http:",
                    "POST",
                    "ngsi9/registerContext",
                    //FIXME P3: unhardwire content type

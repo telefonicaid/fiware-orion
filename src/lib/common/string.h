@@ -46,7 +46,7 @@ extern int stringSplit(std::string in, char delimiter, std::vector<std::string>&
 * parseUrl -
 *
 */
-extern bool parseUrl(std::string url, std::string& host, int& port, std::string& path);
+extern bool parseUrl(std::string url, std::string& host, int& port, std::string& path, std::string& protocol);
 
 /* ****************************************************************************
 *

@@ -68,8 +68,9 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, std::string u
     std::string  host;
     int          port;
     std::string  path;
-
-    if (!parseUrl(url, host, port, path)) {
+    std::string  protocol;
+    
+    if (!parseUrl(url, host, port, path, protocol)) {
         LM_RVE(("Sending NotifyContextRequest: malformed URL: '%s'", url.c_str()));
     }
 
@@ -77,19 +78,20 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, std::string u
     std::string content_type = (format == XML ? "application/xml" : "application/json");
 
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, "POST", path, content_type, payload, NOTIFICATION_WAIT_MODE);
+    sendHttpSocket(host, port, protocol, "POST", path, content_type, payload, true, NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
     /* Send the message (no wait for response), in a separate thread to avoid blocking */
     pthread_t tid;
     SenderThreadParams* params = new SenderThreadParams();
-    params->ip = host;
-    params->port = port;
-    params->verb = "POST";
-    params->resource = path;
-    params->content_type = content_type;
-    params->content = payload;
+    params->ip            = host;
+    params->port          = port;
+    params->protocol      = protocol;
+    params->verb          = "POST";
+    params->resource      = path;
+    params->content_type  = content_type;
+    params->content       = payload;
 
     int ret = pthread_create(&tid, NULL, startSenderThread, params);
     if (ret != 0) {
@@ -114,10 +116,11 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     std::string payload = ncar->render(NotifyContextAvailability, format, "");
 
     /* Parse URL */
-    std::string host;
-    int port;
-    std::string path;
-    if (!parseUrl(url, host, port, path)) {
+    std::string  host;
+    int          port;
+    std::string  path;
+    std::string  protocol;
+    if (!parseUrl(url, host, port, path, protocol)) {
         LM_RVE(("Sending NotifyContextAvailabilityRequest: malformed URL: '%s'", url.c_str()));
     }
 
@@ -126,7 +129,7 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
 
     /* Send the message (no wait for response, in a separated thread to avoid blocking response)*/
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, "POST", path, content_type, payload, NOTIFICATION_WAIT_MODE);
+    sendHttpSocket(host, port, protocol, "POST", path, content_type, payload, true, NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD

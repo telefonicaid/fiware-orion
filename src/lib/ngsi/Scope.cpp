@@ -125,10 +125,10 @@ std::string Scope::check(RequestType requestType, Format format, std::string ind
   }
   else
   {
-    if ((type == "") || (type == "not in use"))
+    if (type == "")
       return "Empty type in restriction scope";
 
-    if ((value == "") || (value == "not in use"))
+    if (value == "")
       return "Empty value in restriction scope";
   }
 

@@ -843,6 +843,25 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
                     caP->metadataVector.push_back(md);
                 }
 
+                /* Setting custom metadata (if any) */
+                if (queryAttr.hasField(ENT_ATTRS_MD)) {
+                    std::vector<BSONElement> metadataV = queryAttr.getField(ENT_ATTRS_MD).Array();
+                    for (unsigned int ix = 0; ix < metadataV.size(); ++ix) {
+
+                        BSONObj metadata = metadataV[ix].embeddedObject();
+                        Metadata* md;
+
+                        if (metadata.hasField(ENT_ATTRS_TYPE)) {
+                            md = new Metadata(STR_FIELD(metadata, ENT_ATTRS_MD_NAME), STR_FIELD(metadata, ENT_ATTRS_MD_TYPE), STR_FIELD(metadata, ENT_ATTRS_MD_VALUE));
+                        }
+                        else {
+                            md = new Metadata(STR_FIELD(metadata, ENT_ATTRS_MD_NAME), "", STR_FIELD(metadata, ENT_ATTRS_MD_VALUE));
+                        }
+
+                        caP->metadataVector.push_back(md);
+                    }
+                }
+
                 cer->contextElement.contextAttributeVector.push_back(caP);
             }
 

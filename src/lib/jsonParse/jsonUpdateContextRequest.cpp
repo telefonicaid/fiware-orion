@@ -50,10 +50,10 @@ static std::string contextElement(std::string path, std::string value, ParseData
   
   reqDataP->upcr.res.contextElementVector.push_back(reqDataP->upcr.ceP);
 
-  reqDataP->upcr.ceP->entityId.id          = "not in use";
-  reqDataP->upcr.ceP->entityId.type        = "not in use";
+  reqDataP->upcr.ceP->entityId.id          = "";
+  reqDataP->upcr.ceP->entityId.type        = "";
   reqDataP->upcr.ceP->entityId.isPattern   = "false";
-  reqDataP->upcr.ceP->attributeDomainName.set("not in use");
+  reqDataP->upcr.ceP->attributeDomainName.set("");
 
   return "OK";
 }
@@ -125,7 +125,7 @@ static std::string attribute(std::string path, std::string value, ParseData* req
 {
   LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
 
-  reqDataP->upcr.attributeP = new ContextAttribute("not in use", "not in use");
+  reqDataP->upcr.attributeP = new ContextAttribute("", "");
 
   reqDataP->upcr.ceP->contextAttributeVector.push_back(reqDataP->upcr.attributeP);
 
@@ -189,9 +189,9 @@ static std::string metadata(std::string path, std::string value, ParseData* reqD
 
   reqDataP->upcr.contextMetadataP = new Metadata();
 
-  reqDataP->upcr.contextMetadataP->type  = "not in use";
-  reqDataP->upcr.contextMetadataP->name  = "not in use";
-  reqDataP->upcr.contextMetadataP->value = "not in use";
+  reqDataP->upcr.contextMetadataP->type  = "";
+  reqDataP->upcr.contextMetadataP->name  = "";
+  reqDataP->upcr.contextMetadataP->value = "";
 
   reqDataP->upcr.attributeP->metadataVector.push_back(reqDataP->upcr.contextMetadataP);
 
@@ -251,9 +251,9 @@ static std::string domainMetadata(std::string path, std::string value, ParseData
   LM_T(LmtParse, ("Creating a reg metadata"));
 
   reqDataP->upcr.domainMetadataP = new Metadata();
-  reqDataP->upcr.domainMetadataP->type  = "not in use";
-  reqDataP->upcr.domainMetadataP->name  = "not in use";
-  reqDataP->upcr.domainMetadataP->value = "not in use";
+  reqDataP->upcr.domainMetadataP->type  = "";
+  reqDataP->upcr.domainMetadataP->name  = "";
+  reqDataP->upcr.domainMetadataP->value = "";
   reqDataP->upcr.ceP->domainMetadataVector.push_back(reqDataP->upcr.domainMetadataP);
 
   return "OK";
