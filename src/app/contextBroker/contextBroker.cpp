@@ -187,28 +187,28 @@ char            mtenant[32];
 */
 PaArgument paArgs[] =
 {
-  { "-fg",          &fg,           "FOREGROUND",      PaBool,   PaOpt, false,          false,  true,  "don't start as daemon"                },
-  { "-localIp",     bindAddress,   "LOCALIP",         PaString, PaOpt, _i "0.0.0.0",   PaNL,   PaNL,  "IP to receive new connections"        },
-  { "-port",        &port,         "PORT",            PaInt,    PaOpt, 1026,           PaNL,   PaNL,  "port to receive new connections"      },
-  { "-pidpath",      pidPath,      "PID_PATH",        PaString, PaOpt, PIDPATH,        PaNL,   PaNL,  "pid file path"                        },
+  { "-fg",           &fg,           "FOREGROUND",      PaBool,   PaOpt, false,          false,  true,  "don't start as daemon"                     },
+  { "-localIp",      bindAddress,   "LOCALIP",         PaString, PaOpt, _i "0.0.0.0",   PaNL,   PaNL,  "IP to receive new connections"             },
+  { "-port",         &port,         "PORT",            PaInt,    PaOpt, 1026,           PaNL,   PaNL,  "port to receive new connections"           },
+  { "-pidpath",      pidPath,      "PID_PATH",        PaString, PaOpt, PIDPATH,        PaNL,   PaNL,  "pid file path"                              },
 
-  { "-dbhost",      dbHost,        "DB_HOST",         PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "database host"                        },
-  { "-dbuser",      user,          "DB_USER",         PaString, PaOpt, _i "",          PaNL,   PaNL,  "database user"                        },
-  { "-dbpwd",       pwd,           "DB_PASSWORD",     PaString, PaOpt, _i "",          PaNL,   PaNL,  "database password"                    },
-  { "-db",          dbName,        "DB",              PaString, PaOpt, _i "orion",     PaNL,   PaNL,  "database name"                        },
+  { "-dbhost",       dbHost,        "DB_HOST",         PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "database host"                             },
+  { "-dbuser",       user,          "DB_USER",         PaString, PaOpt, _i "",          PaNL,   PaNL,  "database user"                             },
+  { "-dbpwd",        pwd,           "DB_PASSWORD",     PaString, PaOpt, _i "",          PaNL,   PaNL,  "database password"                         },
+  { "-db",           dbName,        "DB",              PaString, PaOpt, _i "orion",     PaNL,   PaNL,  "database name"                             },
 
-  { "-fwdHost",     fwdHost,       "FWD_HOST",        PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "host for forwarding NGSI9 regs"       },
-  { "-fwdPort",     &fwdPort,      "FWD_PORT",        PaInt,    PaOpt, 0,              0,      65000, "port for forwarding NGSI9 regs"       },
-  { "-ngsi9",       &ngsi9Only,    "CONFMAN",         PaBool,   PaOpt, false,          false,  true,  "run as Configuration Manager"         },
-  { "-ipv4",        &useOnlyIPv4,  "USEIPV4",         PaBool,   PaOpt, false,          false,  true,  "use ip v4 only"                       },
-  { "-ipv6",        &useOnlyIPv6,  "USEIPV6",         PaBool,   PaOpt, false,          false,  true,  "use ip v6 only"                       },
-  { "-harakiri",    &harakiri,     "HARAKIRI",        PaBool,   PaHid, false,          false,  true,  "commits harakiri on request"          },
+  { "-fwdHost",      fwdHost,       "FWD_HOST",        PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "host for forwarding NGSI9 regs"            },
+  { "-fwdPort",      &fwdPort,      "FWD_PORT",        PaInt,    PaOpt, 0,              0,      65000, "port for forwarding NGSI9 regs"            },
+  { "-ngsi9",        &ngsi9Only,    "CONFMAN",         PaBool,   PaOpt, false,          false,  true,  "run as Configuration Manager"              },
+  { "-ipv4",         &useOnlyIPv4,  "USEIPV4",         PaBool,   PaOpt, false,          false,  true,  "use ip v4 only"                            },
+  { "-ipv6",         &useOnlyIPv6,  "USEIPV6",         PaBool,   PaOpt, false,          false,  true,  "use ip v6 only"                            },
+  { "-harakiri",     &harakiri,     "HARAKIRI",        PaBool,   PaHid, false,          false,  true,  "commits harakiri on request"               },
 
-  { "-https",       &https,        "HTTPS",           PaBool,   PaOpt, false,          false,  true,  "use the https 'protocol'"             },
-  { "-key",         httpsKeyFile,  "HTTPS_KEY_FILE",  PaString, PaOpt, _i "",          PaNL,   PaNL,  "private server key file (for https)"  },
-  { "-cert",        httpsCertFile, "HTTPS_CERT_FILE", PaString, PaOpt, _i "",          PaNL,   PaNL,  "certificate key file (for https)"     },
+  { "-https",        &https,        "HTTPS",           PaBool,   PaOpt, false,          false,  true,  "use the https 'protocol'"                  },
+  { "-key",          httpsKeyFile,  "HTTPS_KEY_FILE",  PaString, PaOpt, _i "",          PaNL,   PaNL,  "private server key file (for https)"       },
+  { "-cert",         httpsCertFile, "HTTPS_CERT_FILE", PaString, PaOpt, _i "",          PaNL,   PaNL,  "certificate key file (for https)"          },
 
-  { "-multiservice", mtenant,       "MULTI_SERVICE",  PaString, PaOpt, _i "off",       PaNL,   PaNL,  "service multi tenancy mode (off|url|header)"        },
+  { "-multiservice", mtenant,       "MULTI_SERVICE",  PaString, PaOpt, _i "off",       PaNL,   PaNL,  "service multi tenancy mode (off|url|header)"},
   
   PA_END_OF_ARGS
 };
