@@ -988,16 +988,25 @@ const char* description =
 *
 * contextBrokerInit -
 */
-static void contextBrokerInit(bool ngsi9Only)
+static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multitenant)
 {
   /* Set notifier object (singleton) */
   setNotifier(new Notifier());
 
   /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
-  if (!ngsi9Only)
-    // FIXME P10: we should ask for all the "orion.csubs" and "orion.X.csubs" databases at mongo a do a loop for
-    // recovering in each one
+  if (!ngsi9Only) {
     recoverOntimeIntervalThreads("");
+    if (multitenant) {
+        /* We get tenant database names and recover ontime interval threads on each one */
+        std::vector<std::string> orionDbs;
+        getOrionDatabases(orionDbs);
+        for (unsigned int ix = 0; ix < orionDbs.size(); ++ix) {
+            std::string orionDb = orionDbs[ix];
+            std::string tenant = orionDb.substr(dbPrefix.length() + 1);   // + 1 for the "_" in "orion_tentantA"
+            recoverOntimeIntervalThreads(tenant);
+        }
+    }
+  }
   else
     LM_F(("Running in NGSI9 only mode"));
 }
@@ -1008,7 +1017,9 @@ static void contextBrokerInit(bool ngsi9Only)
 */
 static void mongoInit(const char* dbHost, std::string dbName, const char* user, const char* pwd)
 {
-   if (!mongoConnect(dbHost, dbName.c_str(), user, pwd))
+   std::string multitenant = mtenant;
+
+   if (!mongoConnect(dbHost, dbName.c_str(), user, pwd, multitenant != "off"))
     LM_X(1, ("MongoDB error"));
 
   if (user[0] != 0) 
@@ -1023,10 +1034,20 @@ static void mongoInit(const char* dbHost, std::string dbName, const char* user, 
   setSubscribeContextAvailabilityCollectionName("casubs");
   setAssociationsCollectionName("associations");
 
-  // FIXME P10: we should move this to the updateContext logic, so each time an insert() is done in that
-  // collection we ensure that the index is there (optimally, before the first insert ever, but I'm not
-  // sure if that is easy to detect at mongoBackend)
+  /* Note that index creation operation is idempotent. From http://docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/,
+   * "If you call multiple ensureIndex() methods with the same index specification at the same time, only the first operation will
+   * succeed, all other operations will have no effect." */
   ensureLocationIndex("");
+  if (multitenant != "off") {
+      /* We get tenant database names and apply ensure the location index in each one */
+      std::vector<std::string> orionDbs;
+      getOrionDatabases(orionDbs);
+      for (unsigned int ix = 0; ix < orionDbs.size(); ++ix) {
+          std::string orionDb = orionDbs[ix];
+          std::string tenant = orionDb.substr(dbName.length() + 1);   // + 1 for the "_" in "orion_tentantA"
+          ensureLocationIndex(tenant);
+      }
+  }
 }
 
 
@@ -1142,7 +1163,7 @@ int main(int argC, char* argV[])
   pidFile();
   orionInit(orionExit, ORION_VERSION);
   mongoInit(dbHost, dbName, user, pwd);
-  contextBrokerInit(ngsi9Only);
+  contextBrokerInit(ngsi9Only, dbName, multitenant != "off");
 
   if (https)
   {

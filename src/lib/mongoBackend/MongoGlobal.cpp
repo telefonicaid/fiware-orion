@@ -84,7 +84,7 @@ static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElem
 *
 * mongoConnect -
 */
-bool mongoConnect(const char* host, const char* db, const char* username, const char* passwd) {
+bool mongoConnect(const char* host, const char* db, const char* username, const char* passwd, bool multitenant) {
 
     std::string err;
 
@@ -118,10 +118,25 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
       LM_RE(false, ("MongoDB connection failed, after %d retries: '%s'", retries, err.c_str()));
     }
 
-    if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0) {
-        if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err)) {
-            mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
-            LM_RE(false, ("Auth error (db=%s, username=%s, pswd=%s): %s", db, username, passwd, err.c_str()));
+    /* Authentication is different depending if multiserive is used or not. In the case of not
+     * using multiservice, we authenticate in the single-service database. In the case of using
+     * multiservice, it isn't a default database that we now at contextBroker start time (when
+     * this connection function is invoked) so we authenticate on the admin database, which provides
+     * access to any database */
+    if (multitenant) {
+        if (strlen(username) != 0 && strlen(passwd) != 0) {
+            if (!connection->auth("admin", std::string(username), std::string(passwd), err)) {
+                mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
+                LM_RE(false, ("Auth error (db=admin, username=%s, pswd=%s): %s", username, passwd, err.c_str()));
+            }
+        }
+    }
+    else {
+        if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0) {
+            if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err)) {
+                mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
+                LM_RE(false, ("Auth error (db=%s, username=%s, pswd=%s): %s", db, username, passwd, err.c_str()));
+            }
         }
     }
 
@@ -149,7 +164,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
 */
 bool mongoConnect(const char* host) {
 
-    return mongoConnect(host, "", "", "");
+    return mongoConnect(host, "", "", "", false);
 }
 
 /* ****************************************************************************
@@ -222,6 +237,32 @@ extern void setDbPrefix(std::string _dbPrefix) {
 
 /*****************************************************************************
 *
+* getOrionDatabases -
+*
+*/
+extern void getOrionDatabases(std::vector<std::string>& dbs) {
+
+    BSONObj result;
+    mongoSemTake(__FUNCTION__, "get Orion databases");
+    connection->runCommand("admin", BSON("listDatabases" << 1), result);
+    mongoSemGive(__FUNCTION__, "get Orion databases");
+
+    std::vector<BSONElement> databases = result.getField("databases").Array();
+
+    for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i) {
+        BSONObj db = (*i).Obj();
+        std::string dbName = STR_FIELD(db, "name");
+        std::string prefix = dbPrefix + "_";
+        if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0) {
+            LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
+            dbs.push_back(dbName);
+        }
+    }
+
+}
+
+/*****************************************************************************
+*
 * setEntitiesCollectionName -
 */
 void setEntitiesCollectionName(std::string name) {
@@ -272,7 +313,9 @@ static std::string composeCollectionName(std::string tenant, std::string colName
         result = dbPrefix + "." + colName;
     }
     else {
-        result = dbPrefix + "." + tenant + "." + colName;
+        /* Note that we can not use "." for database delimiter. A database can  not containt this
+         * character, http://docs.mongodb.org/manual/reference/limits/#Restrictions-on-Database-Names-for-Unix-and-Linux-Systems */
+        result = dbPrefix + "_" + tenant + "." + colName;
     }
     return result;
 }
@@ -335,7 +378,7 @@ void ensureLocationIndex(std::string tenant) {
     if (mongoLocationCapable()) {
         std::string index = std::string(ENT_LOCATION) + "." + ENT_LOCATION_COORDS;
         connection->ensureIndex(getEntitiesCollectionName(tenant).c_str(), BSON(index << "2dsphere" ));
-        LM_T(LmtMongo, ("ensuring 2dsphere index on %s", index.c_str()));
+        LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenant.c_str()));
     }
 }
 
@@ -386,7 +429,7 @@ void recoverOntimeIntervalThreads(std::string tenant) {
             BSONObj condition = condV[ix].embeddedObject();
             if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0) {
                int interval = condition.getIntField(CSUB_CONDITIONS_VALUE);
-               LM_T(LmtNotifier, ("creating ONTIMEINTERVAL for subscription %s with interval %d", subId.c_str(), interval));
+               LM_T(LmtNotifier, ("creating ONTIMEINTERVAL for subscription %s with interval %d (tenant %s)", subId.c_str(), interval, tenant.c_str()));
                processOntimeIntervalCondition(subId, interval, tenant);
             }
         }
