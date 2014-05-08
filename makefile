@@ -33,9 +33,18 @@ ifndef CPU_COUNT
 	CPU_COUNT:=$(shell cat /proc/cpuinfo | grep processor | wc -l)
 endif
 
+ifndef ORION_WS
+	ORION_WS:=$(shell pwd)
+endif
+
+# Directory for the rpm stage
+ifndef TOPDIR
+	RPM_TOPDIR=$(ORION_WS)/rpm
+endif
+
 # Version for the contextBroker-* packages (except contextBroker-fiware)
 ifndef BROKER_VERSION
-	BROKER_VERSION:=$(shell grep "\#define ORION_VERSION" src/app/contextBroker/version.h | sed -e 's/^.* "//' -e 's/"//')
+	BROKER_VERSION:=$(shell grep "\#define ORION_VERSION" src/app/contextBroker/version.h | sed -e 's/^.* "//' -e 's/"//' | sed -e 's/-/_/g')
 endif
 
 # Release ID for the contextBroker-* packages (execept contextBroker-fiware)
@@ -190,14 +199,10 @@ install_debug_libs: debug
 
 
 rpm: 
-	mkdir -p ~/rpmbuild/BUILD
-	mkdir -p ~/rpmbuild/RPMS
-	mkdir -p ~/rpmbuild/SOURCES
-	mkdir -p ~/rpmbuild/SPECS
-	mkdir -p ~/rpmbuild/SRPMS
-	rm -f ~/rpmbuild/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	git archive --format tar --prefix=contextBroker-$(BROKER_VERSION)/ HEAD |  gzip >  $(HOME)/rpmbuild/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	rpmbuild -ba rpm/contextBroker.spec \
+	rm -f rpm/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
+	git archive --format tar --prefix=contextBroker-$(BROKER_VERSION)/ HEAD |  gzip >  $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
+	rpmbuild -ba $(RPM_TOPDIR)/SPECS/contextBroker.spec \
+		--define '_topdir $(RPM_TOPDIR)' \
 		--define 'broker_version $(BROKER_VERSION)' \
 		--define 'broker_release $(BROKER_RELEASE)' \
 		--define 'fiware_version $(FIWARE_VERSION)' \
