@@ -208,7 +208,7 @@ PaArgument paArgs[] =
   { "-key",         httpsKeyFile,  "HTTPS_KEY_FILE",  PaString, PaOpt, _i "",          PaNL,   PaNL,  "private server key file (for https)"  },
   { "-cert",        httpsCertFile, "HTTPS_CERT_FILE", PaString, PaOpt, _i "",          PaNL,   PaNL,  "certificate key file (for https)"     },
 
-  { "-multitenant", mtenant,       "MULTI_TENANT",    PaString, PaOpt, _i "off",       PaNL,   PaNL,  "tenancy mode (off|url|header)"        },
+  { "-multiservice", mtenant,       "MULTI_TENANT",    PaString, PaOpt, _i "off",       PaNL,   PaNL,  "service multi tenancy mode (off|url|header)"        },
   
   PA_END_OF_ARGS
 };
