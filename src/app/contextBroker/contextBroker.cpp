@@ -208,7 +208,7 @@ PaArgument paArgs[] =
   { "-key",         httpsKeyFile,  "HTTPS_KEY_FILE",  PaString, PaOpt, _i "",          PaNL,   PaNL,  "private server key file (for https)"  },
   { "-cert",        httpsCertFile, "HTTPS_CERT_FILE", PaString, PaOpt, _i "",          PaNL,   PaNL,  "certificate key file (for https)"     },
 
-  { "-multiservice", mtenant,       "MULTI_TENANT",    PaString, PaOpt, _i "off",       PaNL,   PaNL,  "service multi tenancy mode (off|url|header)"        },
+  { "-multiservice", mtenant,       "MULTI_SERVICE",  PaString, PaOpt, _i "off",       PaNL,   PaNL,  "service multi tenancy mode (off|url|header)"        },
   
   PA_END_OF_ARGS
 };
@@ -1002,7 +1002,7 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
         getOrionDatabases(orionDbs);
         for (unsigned int ix = 0; ix < orionDbs.size(); ++ix) {
             std::string orionDb = orionDbs[ix];
-            std::string tenant = orionDb.substr(dbPrefix.length() + 1);   // + 1 for the "_" in "orion_tentantA"
+            std::string tenant = orionDb.substr(dbPrefix.length() + 1);   // + 1 for the "_" in "orion_tenantA"
             recoverOntimeIntervalThreads(tenant);
         }
     }
@@ -1044,7 +1044,7 @@ static void mongoInit(const char* dbHost, std::string dbName, const char* user, 
       getOrionDatabases(orionDbs);
       for (unsigned int ix = 0; ix < orionDbs.size(); ++ix) {
           std::string orionDb = orionDbs[ix];
-          std::string tenant = orionDb.substr(dbName.length() + 1);   // + 1 for the "_" in "orion_tentantA"
+          std::string tenant = orionDb.substr(dbName.length() + 1);   // + 1 for the "_" in "orion_tenantA"
           ensureLocationIndex(tenant);
       }
   }

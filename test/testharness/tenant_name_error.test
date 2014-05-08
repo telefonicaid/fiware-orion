@@ -83,7 +83,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 
 # 1. OK
 echo "1: ++++++++++"
-url="/_kz0123456789012345/NGSI9/registerContext"
+url="/_kzg0123456789012345/NGSI9/registerContext"
 curlXml ${url} "${payload}"
 echo
 echo

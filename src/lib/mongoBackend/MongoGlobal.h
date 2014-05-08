@@ -171,7 +171,7 @@ extern void setDbPrefix(std::string dbPrefix);
 *
 * getOrionDatabases -
 *
-* Rerturn the list of Orion databases (the ones that start with the dbPrefix + "_").
+* Return the list of Orion databases (the ones that start with the dbPrefix + "_").
 * Note that the DB belonging to the default service is not included in the
 * returned list
 *
@@ -248,7 +248,7 @@ extern bool mongoLocationCapable(void);
 *
 * ensureLocationIndex -
 */
-extern void ensureLocationIndex(std::string tentant);
+extern void ensureLocationIndex(std::string tenant);
 
 /* ****************************************************************************
 *
