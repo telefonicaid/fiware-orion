@@ -947,6 +947,11 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
 
     LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName(tenant).c_str()));
 
+    /* Actually we don't know if this is the first entity (thus, the collection is being created) or not. However, we can
+     * invoke ensureLocationIndex() in anycase, given that it is harmless in the case the collection and index already
+     * exits (see docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/)*/
+    ensureLocationIndex(tenant);
+
     if (!legalIdUsage(attrsV)) {
         *errDetail = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: (" + e.toString() + ")";
         return false;

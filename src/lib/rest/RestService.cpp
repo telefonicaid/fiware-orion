@@ -109,10 +109,10 @@ static std::string tenantCheck(std::string tenant)
 
   while (*name != 0)
   {
-    if ((!isalnum(*name)) && (*name != '-') && (*name != '_'))
+    if ((!isalnum(*name)) && (*name != '_'))
     {
       LM_E(("offending character: %c", *name));
-      return "bad character in tenant name - only hyphen, underscore and alphanumeric characters are allowed";
+      return "bad character in tenant name - only underscore and alphanumeric characters are allowed";
     }
 
     ++name;
