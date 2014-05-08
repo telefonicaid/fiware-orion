@@ -35,3 +35,8 @@ fiware-orion.creator
 fiware-orion.creator.user
 fiware-orion.files
 fiware-orion.includes
+
+rpm/RPMS/
+rpm/SRPMS/
+rpm/SOURCES/
+

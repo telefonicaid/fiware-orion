@@ -35,7 +35,7 @@ Packager:   Fermín Galán <fermin@tid.es>
 URL:        http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-context-broker
 Source:     %{name}-%{broker_version}.tar.gz
 BuildRoot: /var/tmp/%{name}-buildroot
-Requires:  libstdc++, boost-thread, boost-filesystem, libmicrohttpd
+Requires:  libstdc++, boost-thread, boost-filesystem, libmicrohttpd, logrotate
 Buildrequires: gcc, cmake, gcc-c++, libmicrohttpd-devel, boost-devel
 Requires(pre): shadow-utils
 
@@ -54,6 +54,7 @@ Using these interfaces, clients can do several operations:
 if [ -d $RPM_BUILD_ROOT/usr ]; then
    rm -rf $RPM_BUILD_ROOT
 fi
+
 %setup
 
 %pre
@@ -87,12 +88,9 @@ After configuring /etc/sysconfig/%{name} execute 'chkconfig %{name} on' to
 enable %{name} after a reboot.
 EOMSG
 
-%preun
-/etc/init.d/%{name} stop
-/sbin/chkconfig --del %{name}
-
 %clean
 rm -rf $RPM_BUILD_ROOT
+rm -rf %{_builddir}
 
 %build
 #FIXME There is an open issue with "make release" malfunction. Until get fixed, we will build in debug mode
@@ -103,6 +101,8 @@ make debug DESTDIR=$RPM_BUILD_ROOT BUILD_ARCH=%{build_arch}
 #FIXME There is an open issue with "make release" malfunction. Until get fixed, we will build in debug mode
 #make install DESTDIR=$RPM_BUILD_ROOT
 make install_debug DESTDIR=$RPM_BUILD_ROOT
+cp -R %{_sourcedir}/etc $RPM_BUILD_ROOT
+
 # rpmbuild seems to do the strip step automatically. However, this would fail after chmod, so we "manually" do
 # it as part of our install script
 strip $RPM_BUILD_ROOT/usr/bin/contextBroker
@@ -134,12 +134,11 @@ grep "tests" MANIFEST > MANIFEST.broker-tests
 %changelog
 
 %package tests
-Requires: %{name}, python, python-flask, nc, curl, libxml2, mongodb
+Requires: %{name}, python, python-flask, nc, curl, libxml2, mongo-10gen 
 Summary: Test suite for %{name}
 %description tests
 Test suite for %{name}
 
-#%files tests
 %files tests -f MANIFEST.broker-tests
 
 %package -n %{name}-fiware
@@ -159,6 +158,28 @@ Using these interfaces, clients can do several operations:
   updated from applications, so queries are resolved based on that information.
 
 %files -n %{name}-fiware
+
+%preun
+/etc/init.d/%{name} stop
+/sbin/chkconfig --del %{name}
+
+%preun tests
+
+%preun -n %{name}-fiware
+/etc/init.d/%{name} stop
+/sbin/chkconfig --del %{name}
+
+%postun 
+rm -rf  /usr/share/contextBroker
+/usr/sbin/userdel -f %{owner}
+
+%postun tests
+rm -rf  /usr/share/contextBroker/tests
+
+%postun -n %{name}-fiware
+rm -rf  /usr/share/contextBroker
+/usr/sbin/userdel -f %{owner}
+
 
 %changelog
 * Wed Apr 30 2014 Fermin Galan <fermin@tid.es> 0.12.0-1 (FIWARE-3.4.1-1)

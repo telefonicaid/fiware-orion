@@ -234,10 +234,9 @@ function brokerStop
 #
 function accumulatorStop()
 {
-
   port=$1
 
-  # If port is missing, we use the default LISTERNER_PORT
+  # If port is missing, we use the default LISTENER_PORT
   if [ -z "$port" ]
   then
     port=${LISTENER_PORT}
@@ -282,7 +281,7 @@ function accumulatorStart()
   bindIp=$1
   port=$2
 
-  # If port is missing, we use the default LISTERNER_PORT
+  # If port is missing, we use the default LISTENER_PORT
   if [ -z "$port" ]
   then
     port=${LISTENER_PORT}

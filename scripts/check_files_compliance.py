@@ -82,6 +82,10 @@ def ignore(root, file):
     if 'BUILD_' in root or '.git' in root:
         return True
 
+    # Files in the rpm/SRPMS, rpm/SOURCES or rpm/RPMS directories are not processed
+    if 'SRPMS' in root or 'SOURCES' or 'RPMS'in root:
+        return True
+
     # Files in the test/valdring directory ending with .out are not processed
     if 'valgrind' in root and file.endswith('.out'):
         return True
