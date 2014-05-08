@@ -32,6 +32,7 @@ typedef struct SenderThreadParams {
     std::string    ip;
     unsigned short port;
     std::string    verb;
+    std::string    tenant;
     std::string    resource;
     std::string    content_type;
     std::string    content;
