@@ -1,4 +1,5 @@
 # Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+
 #
 # This file is part of Orion Context Broker.
 #
@@ -35,7 +36,8 @@ source harnessFunctions.sh
 echo "1. Subscribe to changes in  E/att" # reference will never be reached as it stops in the accumulator
 echo "+++++++++++++++++++++++++++++++++"
 url="/NGSI10/subscribeContext"
-payload='<subscribeContextRequest>
+payload='<?xml version="1.0"?>
+<subscribeContextRequest>
   <entityIdList>
     <entityId type="Test" isPattern="false">
       <id>E</id>
@@ -63,7 +65,8 @@ echo
 echo "2. Update/Append E/att"
 echo "++++++++++++++++++++++"
 url="/NGSI10/updateContext"
-payload='<updateContextRequest>
+payload='<?xml version="1.0"?>
+<updateContextRequest>
   <contextElementList>
     <contextElement>
       <entityId type="Test" isPattern="false">
