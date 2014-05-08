@@ -27,7 +27,7 @@ source harnessFunctions.sh
 
 dbInit CB
 accumulatorStart localhost ${LISTENER_PORT}
-brokerStart CB 30,60,185 IPV4 -multitenant url
+brokerStart CB 30,60,185 IPV4 -multiservice url
 
 --SHELL--
 source harnessFunctions.sh
@@ -145,8 +145,8 @@ Content-Length: 718
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
+Fiware-Service: kz
 Content-Type: application/xml
-Fiware-Tenant: kz
 
 <notifyContextRequest>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>

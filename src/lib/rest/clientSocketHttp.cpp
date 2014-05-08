@@ -169,7 +169,7 @@ std::string sendHttpSocket
   {
     char tenantHeader[128];
 
-    snprintf(tenantHeader, sizeof(tenantHeader), "fiware-tenant: %s\n", tenant.c_str());
+    snprintf(tenantHeader, sizeof(tenantHeader), "fiware-service: %s\n", tenant.c_str());
 
     strncat(preContent, tenantHeader, sizeof(preContent) - strlen(preContent));
   }
