@@ -274,8 +274,6 @@ static std::string composeCollectionName(std::string tenant, std::string colName
     else {
         result = dbPrefix + "." + tenant + "." + colName;
     }
-    LM_M(("compose col name: <%s> + <%s> + <%s>: <%s>",
-          dbPrefix.c_str(), tenant.c_str(), colName.c_str(), result.c_str()));
     return result;
 }
 
