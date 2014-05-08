@@ -995,7 +995,9 @@ static void contextBrokerInit(bool ngsi9Only)
 
   /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
   if (!ngsi9Only)
-    recoverOntimeIntervalThreads();
+    // FIXME P10: we should ask for all the "orion.csubs" and "orion.X.csubs" databases at mongo a do a loop for
+    // recovering in each one
+    recoverOntimeIntervalThreads("");
   else
     LM_F(("Running in NGSI9 only mode"));
 }
@@ -1014,13 +1016,17 @@ static void mongoInit(const char* dbHost, std::string dbName, const char* user, 
   else
     LM_F(("Connected to mongo at %s:%s", dbHost, dbName.c_str()));
 
-  setEntitiesCollectionName(dbName + ".entities");
-  setRegistrationsCollectionName(dbName + ".registrations");
-  setSubscribeContextCollectionName(dbName + ".csubs");
-  setSubscribeContextAvailabilityCollectionName(dbName + ".casubs");
-  setAssociationsCollectionName(dbName + ".associations");
+  setDbPrefix(dbName);
+  setEntitiesCollectionName("entities");
+  setRegistrationsCollectionName("registrations");
+  setSubscribeContextCollectionName("csubs");
+  setSubscribeContextAvailabilityCollectionName("casubs");
+  setAssociationsCollectionName("associations");
 
-  ensureLocationIndex();
+  // FIXME P10: we should move this to the updateContext logic, so each time an insert() is done in that
+  // collection we ensure that the index is there (optimally, before the first insert ever, but I'm not
+  // sure if that is easy to detect at mongoBackend)
+  ensureLocationIndex("");
 }
 
 

@@ -43,7 +43,7 @@
 *
 * doNotification -
 */
-static void doNotification(OnIntervalThreadParams* params) {
+static void doNotification(OnIntervalThreadParams* params, std::string tenant) {
 
     std::string err;
 
@@ -51,7 +51,7 @@ static void doNotification(OnIntervalThreadParams* params) {
      * OnIntervalThreadParams coming for the csubs document at thread creation time
      * from mongoBackend, we always needs that to get fresh lastNotification */
     ContextSubscriptionInfo csi;
-    if (mongoGetContextSubscriptionInfo(params->subId, &csi, &err) != SccOk) {
+    if (mongoGetContextSubscriptionInfo(params->subId, &csi, &err, tenant) != SccOk) {
         LM_RVE(("error invoking mongoGetContextSubscriptionInfo: '%s'", err.c_str()));
     }
 
@@ -65,7 +65,7 @@ static void doNotification(OnIntervalThreadParams* params) {
 
             /* Query database for data */
             NotifyContextRequest ncr;
-            if (mongoGetContextElementResponses(csi.entityIdVector, csi.attributeList, &(ncr.contextElementResponseVector), &err) != SccOk) {
+            if (mongoGetContextElementResponses(csi.entityIdVector, csi.attributeList, &(ncr.contextElementResponseVector), &err, tenant) != SccOk) {
                 csi.release();
                 ncr.contextElementResponseVector.release();
                 LM_RVE(("error invoking mongoGetContextElementResponses: '%s'", err.c_str()));
@@ -83,7 +83,7 @@ static void doNotification(OnIntervalThreadParams* params) {
                 ncr.contextElementResponseVector.release();
 
                 /* Update database fields due to new notification */
-                if (mongoUpdateCsubNewNotification(params->subId, &err) != SccOk) {
+                if (mongoUpdateCsubNewNotification(params->subId, &err, tenant) != SccOk) {
                     csi.release();
                     LM_RVE(("error invoking mongoUpdateCsubNewNotification: '%s'", err.c_str()));
                 }
@@ -115,7 +115,7 @@ void* startOnIntervalThread(void* p) {
 
         /* Do the work (we put this in a function due to error conditions would produce an
          * early interruption of the process) */
-        doNotification(params);
+        doNotification(params, params->tenant);
 
         /* Sleeps for interval */
         sleep(params->interval);

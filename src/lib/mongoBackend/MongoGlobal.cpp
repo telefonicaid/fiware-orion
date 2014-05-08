@@ -65,12 +65,13 @@ using namespace mongo;
 static DBClientConnection*  connection;
 static int                  mongoVersionMayor = -1;
 static int                  mongoVersionMinor = -1;
-static char*                entitiesCollectionName                      = NULL;
-static char*                registrationsCollectionName                 = NULL;
-static char*                subscribeContextCollectionName              = NULL;
-static char*                subscribeContextAvailabilityCollectionName  = NULL;
-static char*                assocationsCollectionName                   = NULL;
-static Notifier*            notifier                                    = NULL;
+static std::string          dbPrefix;
+static std::string          entitiesCollectionName;
+static std::string          registrationsCollectionName;
+static std::string          subscribeContextCollectionName;
+static std::string          subscribeContextAvailabilityCollectionName;
+static std::string          assocationsCollectionName;
+static Notifier*            notifier;
 
 /* ****************************************************************************
 *
@@ -213,15 +214,18 @@ DBClientConnection* getMongoConnection(void) {
 
 /*****************************************************************************
 *
+* setDbPrefix -
+*/
+extern void setDbPrefix(std::string _dbPrefix) {
+    dbPrefix = _dbPrefix;
+}
+
+/*****************************************************************************
+*
 * setEntitiesCollectionName -
 */
 void setEntitiesCollectionName(std::string name) {
-
-    if (entitiesCollectionName != NULL) {
-        free(entitiesCollectionName);
-    }
-
-    entitiesCollectionName = strdup(name.c_str());
+    entitiesCollectionName = name;
 }
 
 /*****************************************************************************
@@ -229,12 +233,7 @@ void setEntitiesCollectionName(std::string name) {
 * setRegistrationsCollectionName -
 */
 void setRegistrationsCollectionName(std::string name) {
-
-    if (registrationsCollectionName != NULL) {
-        free(registrationsCollectionName);
-    }
-
-    registrationsCollectionName = strdup(name.c_str());
+    registrationsCollectionName = name;
 }
 
 /*****************************************************************************
@@ -242,12 +241,7 @@ void setRegistrationsCollectionName(std::string name) {
 * setSubscribeContextCollectionName -
 */
 void setSubscribeContextCollectionName(std::string name) {
-
-    if (subscribeContextCollectionName != NULL) {
-        free(subscribeContextCollectionName);
-    }
-
-    subscribeContextCollectionName = strdup(name.c_str());
+    subscribeContextCollectionName = name;
 }
 
 /*****************************************************************************
@@ -255,12 +249,7 @@ void setSubscribeContextCollectionName(std::string name) {
 * setSubscribeContextAvailabilityCollectionName -
 */
 void setSubscribeContextAvailabilityCollectionName(std::string name) {
-
-    if (subscribeContextAvailabilityCollectionName != NULL) {
-        free(subscribeContextAvailabilityCollectionName);
-    }
-
-    subscribeContextAvailabilityCollectionName = strdup(name.c_str());
+    subscribeContextAvailabilityCollectionName = name;
 }
 
 /*****************************************************************************
@@ -268,51 +257,64 @@ void setSubscribeContextAvailabilityCollectionName(std::string name) {
 * setAssociationsCollectionName -
 */
 extern void setAssociationsCollectionName(std::string name) {
-    if (assocationsCollectionName != NULL) {
-        free(assocationsCollectionName);
-    }
+    assocationsCollectionName = name;
+}
 
-    assocationsCollectionName = strdup(name.c_str());
+/*****************************************************************************
+*
+* composeCollectionName -
+*
+* Common helper function for composing collection names
+*/
+static std::string composeCollectionName(std::string tenant, std::string colName) {
+    std::string result;
+    if (tenant == "") {
+        result = dbPrefix + "." + colName;
+    }
+    else {
+        result = dbPrefix + "." + tenant + "." + colName;
+    }
+    return result;
 }
 
 /*****************************************************************************
 *
 * getEntitiesCollectionName -
 */
-const char* getEntitiesCollectionName(void) {
-    return entitiesCollectionName;
+std::string getEntitiesCollectionName(std::string tenant) {
+    return composeCollectionName(tenant, entitiesCollectionName);
 }
 
 /*****************************************************************************
 *
 * getRegistrationsCollectionName -
 */
-const char* getRegistrationsCollectionName(void) {
-    return registrationsCollectionName;
+std::string getRegistrationsCollectionName(std::string tenant) {
+    return composeCollectionName(tenant, registrationsCollectionName);
 }
 
 /*****************************************************************************
 *
 * getSubscribeContextCollectionName -
 */
-const char* getSubscribeContextCollectionName(void) {
-    return subscribeContextCollectionName;
+std::string getSubscribeContextCollectionName(std::string tenant) {
+    return composeCollectionName(tenant, subscribeContextCollectionName);
 }
 
 /*****************************************************************************
 *
 * getSubscribeContextAvailabilityCollectionName -
 */
-const char* getSubscribeContextAvailabilityCollectionName(void) {
-    return subscribeContextAvailabilityCollectionName;
+std::string getSubscribeContextAvailabilityCollectionName(std::string tenant) {
+    return composeCollectionName(tenant, subscribeContextAvailabilityCollectionName);
 }
 
 /*****************************************************************************
 *
 * getAssociationsCollectionName -
 */
-const char* getAssociationsCollectionName(void) {
-    return assocationsCollectionName;
+std::string getAssociationsCollectionName(std::string tenant) {
+    return composeCollectionName(tenant, assocationsCollectionName);
 }
 
 /*****************************************************************************
@@ -328,11 +330,11 @@ bool mongoLocationCapable(void) {
 *
 * ensureLocationIndex -
 */
-void ensureLocationIndex(void) {
+void ensureLocationIndex(std::string tenant) {
     /* Ensure index for entity locations, in the case of using 2.4 */
     if (mongoLocationCapable()) {
         std::string index = std::string(ENT_LOCATION) + "." + ENT_LOCATION_COORDS;
-        connection->ensureIndex(getEntitiesCollectionName(), BSON(index << "2dsphere" ));
+        connection->ensureIndex(getEntitiesCollectionName(tenant).c_str(), BSON(index << "2dsphere" ));
         LM_T(LmtMongo, ("ensuring 2dsphere index on %s", index.c_str()));
     }
 }
@@ -341,7 +343,7 @@ void ensureLocationIndex(void) {
 *
 * recoverOntimeIntervalThreads -
 */
-void recoverOntimeIntervalThreads() {
+void recoverOntimeIntervalThreads(std::string tenant) {
 
     /* Look for ONTIMEINTERVAL subscriptions in database */
     std::string condType= std::string(CSUB_CONDITIONS) + "."  + CSUB_CONDITIONS_TYPE;
@@ -350,9 +352,9 @@ void recoverOntimeIntervalThreads() {
     DBClientConnection* connection = getMongoConnection();
     auto_ptr<DBClientCursor> cursor;
     try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(), query.toString().c_str()));
+        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), query.toString().c_str()));
         mongoSemTake(__FUNCTION__, "query in SubscribeContextCollection");
-        cursor = connection->query(getSubscribeContextCollectionName(), query);
+        cursor = connection->query(getSubscribeContextCollectionName(tenant).c_str(), query);
 
         /*
          * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
@@ -385,7 +387,7 @@ void recoverOntimeIntervalThreads() {
             if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0) {
                int interval = condition.getIntField(CSUB_CONDITIONS_VALUE);
                LM_T(LmtNotifier, ("creating ONTIMEINTERVAL for subscription %s with interval %d", subId.c_str(), interval));
-               processOntimeIntervalCondition(subId, interval);
+               processOntimeIntervalCondition(subId, interval, tenant);
             }
         }
     }
@@ -667,7 +669,7 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
 * empty value causes an error)
 *
 */
-bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty) {
+bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty, std::string tenant) {
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -739,9 +741,9 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
     /* Do the query on MongoDB */
     auto_ptr<DBClientCursor> cursor;
     try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(), query.toString().c_str()));
+        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
         mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
-        cursor = connection->query(getEntitiesCollectionName(), query);
+        cursor = connection->query(getEntitiesCollectionName(tenant).c_str(), query);
 
         /*
          * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
@@ -756,7 +758,7 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
     catch( const DBException &e ) {
 
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo db exception)");
-        *err = std::string("collection: ") + getEntitiesCollectionName() +
+        *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
 
@@ -765,7 +767,7 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
     catch(...) {
 
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo generic exception)");
-        *err = std::string("collection: ") + getEntitiesCollectionName() +
+        *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
 
@@ -957,7 +959,7 @@ static void processContextRegistrationElement (BSONObj cr, EntityIdVector enV, A
 * ContextRegistrationResponseVector or error.
 *
 */
-bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistrationResponseVector* crrV, std::string* err) {
+bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistrationResponseVector* crrV, std::string* err, std::string tenant) {
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -1025,15 +1027,15 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
     auto_ptr<DBClientCursor> cursor;
 
     try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(), query.toString().c_str()));
+        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(tenant).c_str(), query.toString().c_str()));
         mongoSemTake(__FUNCTION__, "query in RegistrationsCollection");
-        cursor = connection->query(getRegistrationsCollectionName(), query);
+        cursor = connection->query(getRegistrationsCollectionName(tenant).c_str(), query);
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection");
     }
     catch( const DBException &e ) {
 
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo db exception)");
-        *err = std::string("collection: ") + getRegistrationsCollectionName() +
+        *err = std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
 
@@ -1042,7 +1044,7 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
     catch(...) {
 
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo generic exception)");
-        *err = std::string("collection: ") + getRegistrationsCollectionName() +
+        *err = std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
 
@@ -1153,14 +1155,14 @@ AttributeList subToAttributeList(BSONObj sub) {
 * is returned. This is used in the caller to know if lastNotification field in the
 * subscription document in csubs collection has to be modified or not.
 */
-bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, ConditionValueList* condValues, std::string subId, std::string notifyUrl, Format format) {
+bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, ConditionValueList* condValues, std::string subId, std::string notifyUrl, Format format, std::string tenant) {
 
     std::string err;
     NotifyContextRequest ncr;
 
     // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
     Restriction res;
-    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false)) {
+    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant)) {
         ncr.contextElementResponseVector.release();
         LM_RE(false, (err.c_str()));
     }
@@ -1178,7 +1180,7 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
             ContextElementResponseVector allCerV;
             AttributeList emptyList;
             // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
-            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false)) {
+            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false, tenant)) {
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
                 LM_RE(false, (err.c_str()));
@@ -1209,9 +1211,9 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
 *
 * processOntimeIntervalCondition -
 */
-void processOntimeIntervalCondition(std::string subId, int interval) {
+void processOntimeIntervalCondition(std::string subId, int interval, std::string tenant) {
 
-    getNotifier()->createIntervalThread(subId, interval);
+    getNotifier()->createIntervalThread(subId, interval, tenant);
 
 }
 
@@ -1220,7 +1222,7 @@ void processOntimeIntervalCondition(std::string subId, int interval) {
 * processConditionVector -
 *
 */
-BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format) {
+BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format, std::string tenant) {
 
     BSONArrayBuilder conds;
     *notificationDone = false;
@@ -1236,7 +1238,7 @@ BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV
             conds.append(BSON(CSUB_CONDITIONS_TYPE << ON_TIMEINTERVAL_CONDITION <<
                               CSUB_CONDITIONS_VALUE << interval.seconds));
 
-            processOntimeIntervalCondition(subId, interval.seconds);
+            processOntimeIntervalCondition(subId, interval.seconds, tenant);
         }
         else if (nc->type == ON_CHANGE_CONDITION) {
 
@@ -1254,7 +1256,8 @@ BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV
                                      &(nc->condValueList),
                                      subId,
                                      url,
-                                     format)) {
+                                     format,
+                                     tenant)) {
 
                 *notificationDone = true;
             }
@@ -1271,11 +1274,11 @@ BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV
 *
 * mongoUpdateCasubNewNotification -
 *
-* This methos is pretty similar to the mongoUpdateCsubNewNotification in mongoOntimeintervalOperations module.
+* This method is pretty similar to the mongoUpdateCsubNewNotification in mongoOntimeintervalOperations module.
 * However, it doesn't take semaphore
 *
 */
-static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::string* err) {
+static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::string* err, std::string tenant) {
 
     LM_T(LmtMongo, ("Update NGSI9 Subscription New Notification"));
 
@@ -1285,12 +1288,12 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
     try {
         BSONObj query = BSON("_id" << OID(subId));
         BSONObj update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CASUB_COUNT << 1));
-        LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextAvailabilityCollectionName(),
+        LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextAvailabilityCollectionName(tenant).c_str(),
                         query.toString().c_str(),
                         update.toString().c_str()));
 
         mongoSemTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
-        connection->update(getSubscribeContextAvailabilityCollectionName(), query, update);
+        connection->update(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), query, update);
         mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
     }
     catch( const DBException &e ) {
@@ -1324,12 +1327,12 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
 * This method returns true if the notification was actually send. Otherwise, false
 * is returned.
 */
-bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl, Format format) {
+bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl, Format format, std::string tenant) {
 
     std::string err;
     NotifyContextAvailabilityRequest ncar;
 
-    if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err)) {
+    if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant)) {
        ncar.contextRegistrationResponseVector.release();
        LM_RE(false, (err.c_str()));
     }
@@ -1343,7 +1346,7 @@ bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, st
         ncar.contextRegistrationResponseVector.release();
 
         /* Update database fields due to new notification */
-        if (mongoUpdateCasubNewNotification(subId, &err) != SccOk) {
+        if (mongoUpdateCasubNewNotification(subId, &err, tenant) != SccOk) {
             LM_RE(false, ("error invoking mongoUpdateCasubNewNotification: '%s'", err.c_str()));
         }
 
