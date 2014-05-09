@@ -58,7 +58,7 @@ function harnessExit()
 #
 function dbInit()
 {
-  role=$1
+  role=$1  
 
   if [ "$role" == "CB" ]
   then
@@ -67,6 +67,20 @@ function dbInit()
   then
     echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_AUX_NAME} --quiet
   fi
+}
+
+# ------------------------------------------------------------------------------
+#
+# dbTenantInit -
+#
+function dbTenantInit()
+{
+  db=$1
+
+  echo "DEBUG: deleting $db"
+
+  echo 'db.dropDatabase()' | mongo $db --quiet
+
 }
 
 

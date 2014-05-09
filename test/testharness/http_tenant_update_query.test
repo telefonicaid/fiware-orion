@@ -26,7 +26,9 @@ HTTP-Tenant update and query
 source harnessFunctions.sh
 
 dbInit CB
-brokerStart CB 0 IPV4 -multitenant header
+dbTenantInit ${BROKER_DATABASE_NAME}-t_03
+dbTenantInit ${BROKER_DATABASE_NAME}-t_04
+brokerStart CB 0-255 IPV4 -multiservice header
 
 --SHELL--
 source harnessFunctions.sh
@@ -51,7 +53,7 @@ payload='<updateContextRequest>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-tenant t_03"
+curlXmlTenants ${url} "${payload}" "" "fiware-service: t_03"
 echo
 echo
 
@@ -76,7 +78,7 @@ payload='<updateContextRequest>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-tenant t_04"
+curlXmlTenants ${url} "${payload}" "" "fiware-service: t_04"
 echo
 echo
 
@@ -90,7 +92,7 @@ payload='<queryContextRequest>
     </entityId>
   </entityIdList>
 </queryContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-tenant t_03"
+curlXmlTenants ${url} "${payload}" "" "fiware-service: t_03"
 echo
 echo
 
@@ -105,7 +107,7 @@ payload='<queryContextRequest>
     </entityId>
   </entityIdList>
 </queryContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-tenant t_04"
+curlXmlTenants ${url} "${payload}" "" "fiware-service: t_04"
 
 
 --REGEXPECT--

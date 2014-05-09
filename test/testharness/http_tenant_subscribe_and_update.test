@@ -26,7 +26,9 @@ HTTP-Tenant subscribe and update
 source harnessFunctions.sh
 
 dbInit CB
-brokerStart CB 0 IPV4 -multiservice header
+dbTenantInit ${BROKER_DATABASE_NAME}-t_01
+dbTenantInit ${BROKER_DATABASE_NAME}-t_02
+brokerStart CB 0-255 IPV4 -multiservice header
 accumulatorStart localhost 11001
 accumulatorStart localhost 11002
 
@@ -55,7 +57,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-tenant: t_01"
+curlXmlTenants ${url} "${payload}" "" "fiware-service: t_01"
 echo
 echo
 
@@ -82,7 +84,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-tenant: t_02"
+curlXmlTenants ${url} "${payload}" "" "fiware-service: t_02"
 echo
 echo
 
@@ -108,7 +110,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-tenant: t_01"
+curlXmlTenants ${url} "${payload}" "" "fiware-service: t_01"
 echo
 echo
 
@@ -134,7 +136,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-tenant: t_02"
+curlXmlTenants ${url} "${payload}" "" "fiware-service: t_02"
 echo
 echo
 

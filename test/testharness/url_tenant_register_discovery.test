@@ -26,7 +26,9 @@ URL-Tenant registration and discovery
 source harnessFunctions.sh
 
 dbInit CB
-brokerStart CB 0 IPV4 -multiservice url
+dbTenantInit ${BROKER_DATABASE_NAME}-t_01
+dbTenantInit ${BROKER_DATABASE_NAME}-t_02
+brokerStart CB 0-255 IPV4 -multiservice url
 
 --SHELL--
 source harnessFunctions.sh
@@ -150,7 +152,7 @@ Date: REGEX(.*)
 3. Discover entity E with URL-Tenant t_01
 ++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1000
+Content-Length: 786
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -181,7 +183,7 @@ Date: REGEX(.*)
 4. Discover entity E with URL-Tenant t_02
 ++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1000
+Content-Length: 786
 Content-Type: application/xml
 Date: REGEX(.*)
 
