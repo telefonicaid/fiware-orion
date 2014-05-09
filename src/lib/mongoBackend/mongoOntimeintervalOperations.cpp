@@ -39,7 +39,7 @@ using namespace mongo;
 *
 * mongoGetContextSubscriptionInfo -
 */
-HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscriptionInfo* csiP, std::string* err) {
+HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscriptionInfo* csiP, std::string* err, std::string tenant) {
 
     reqSemTake(__FUNCTION__, "get info on subscriptions");
 
@@ -48,11 +48,11 @@ HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscri
     DBClientConnection* connection = getMongoConnection();
 
     /* Search for the document */
-    LM_T(LmtMongo, ("findOne() in '%s' collection by _id '%s'", getSubscribeContextCollectionName(), subId.c_str()));
+    LM_T(LmtMongo, ("findOne() in '%s' collection by _id '%s'", getSubscribeContextCollectionName(tenant).c_str(), subId.c_str()));
     BSONObj sub;
     try {
         mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
-        sub = connection->findOne(getSubscribeContextCollectionName(), BSON("_id" << OID(subId)));
+        sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(subId)));
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
     }
     catch( const DBException &e ) {
@@ -116,7 +116,7 @@ HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscri
 *
 * mongoGetContextElementResponses -
 */
-HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList attrL, ContextElementResponseVector* cerV, std::string* err) {
+HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList attrL, ContextElementResponseVector* cerV, std::string* err, std::string tenant) {
 
     /* This function is basically a wrapper of mongoBackend internal entitiesQuery() function */
 
@@ -125,7 +125,7 @@ HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList
 
     // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
     Restriction res;
-    if (!entitiesQuery(enV, attrL, res, cerV, err, true)) {
+    if (!entitiesQuery(enV, attrL, res, cerV, err, true, tenant)) {
         reqSemGive(__FUNCTION__, "get context-element responses (no entities found)");
         cerV->release();
         LM_RE(SccOk, ((*err).c_str()));
@@ -140,7 +140,7 @@ HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList
 * mongoUpdateCsubNewNotification -
 *
 */
-HttpStatusCode mongoUpdateCsubNewNotification(std::string subId, std::string* err) {
+HttpStatusCode mongoUpdateCsubNewNotification(std::string subId, std::string* err, std::string tenant) {
 
     reqSemTake(__FUNCTION__, "update subscription notifications");
 
@@ -152,12 +152,12 @@ HttpStatusCode mongoUpdateCsubNewNotification(std::string subId, std::string* er
     try {
         BSONObj query = BSON("_id" << OID(subId));
         BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CSUB_COUNT << 1));
-        LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextCollectionName(),
+        LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextCollectionName(tenant).c_str(),
                         query.toString().c_str(),
                         update.toString().c_str()));
 
         mongoSemTake(__FUNCTION__, "update in SubscribeContextCollection");
-        connection->update(getSubscribeContextCollectionName(), query, update);
+        connection->update(getSubscribeContextCollectionName(tenant).c_str(), query, update);
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection");
     }
     catch( const DBException &e ) {

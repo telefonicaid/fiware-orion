@@ -35,7 +35,7 @@
 *
 * mongoNofityContextAvailability -
 */
-HttpStatusCode mongoNotifyContextAvailability(NotifyContextAvailabilityRequest* requestP, NotifyContextAvailabilityResponse* responseP) {
+HttpStatusCode mongoNotifyContextAvailability(NotifyContextAvailabilityRequest* requestP, NotifyContextAvailabilityResponse* responseP, std::string tenant) {
 
     reqSemTake(__FUNCTION__, "mongo ngsi9 notification");
 
@@ -57,11 +57,10 @@ HttpStatusCode mongoNotifyContextAvailability(NotifyContextAvailabilityRequest* 
      * point of view, notifyContextAvailability is considered as a new registration (as no registratinId is
      * received in the notification message) */
     RegisterContextResponse rcres;
-    processRegisterContext(&rcr, &rcres, NULL);
+    processRegisterContext(&rcr, &rcres, NULL, tenant);
 
     responseP->responseCode.fill(SccOk);
 
     reqSemGive(__FUNCTION__, "mongo ngsi9 notification");
     return SccOk;
 }
-

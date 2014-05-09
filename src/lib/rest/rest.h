@@ -52,6 +52,7 @@ typedef enum IpVersion
 extern IpVersion       ipVersionUsed;  
 extern std::string     rushHost;
 extern unsigned short  rushPort;
+extern std::string     multitenant;
 
 
 
@@ -73,6 +74,7 @@ extern void restInit
    IpVersion         _ipVersion,
    const char*       _bindAddress,
    unsigned short    _port,
+   std::string       _multitenant   = "off",
    std::string       _rushHost      = "",
    unsigned short    _rushPort      = 0,
    const char*       _httpsKey      = NULL,

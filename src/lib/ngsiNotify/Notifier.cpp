@@ -59,7 +59,7 @@ Notifier::~Notifier (void) {
 *
 * Notifier::sendNotifyContextRequest -
 */
-void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, std::string url, Format format)
+void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, std::string url, std::string tenant, Format format)
 {
     /* Render NotifyContextRequest */
     std::string payload = ncr->render(NotifyContext, format, "");
@@ -78,7 +78,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, std::string u
     std::string content_type = (format == XML ? "application/xml" : "application/json");
 
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, protocol, "POST", path, content_type, payload, true, NOTIFICATION_WAIT_MODE);
+    sendHttpSocket(host, port, protocol, "POST", tenant, path, content_type, payload, true, NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
@@ -89,6 +89,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, std::string u
     params->port          = port;
     params->protocol      = protocol;
     params->verb          = "POST";
+    params->tenant        = tenant;
     params->resource      = path;
     params->content_type  = content_type;
     params->content       = payload;
@@ -110,7 +111,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, std::string u
 * they could be refactored in the future to have a common part using a parent
 * class for both types of notifications and using it as first argument
 */
-void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, std::string url, Format format) {
+void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, std::string url, std::string tenant, Format format) {
 
     /* Render NotifyContextAvailabilityRequest */
     std::string payload = ncar->render(NotifyContextAvailability, format, "");
@@ -129,17 +130,18 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
 
     /* Send the message (no wait for response, in a separated thread to avoid blocking response)*/
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, protocol, "POST", path, content_type, payload, true, NOTIFICATION_WAIT_MODE);
+    sendHttpSocket(host, port, protocol, "POST", tenant, path, content_type, payload, true, NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
     pthread_t tid;
     SenderThreadParams* params = new SenderThreadParams();
 
-    params->ip       = host;
-    params->port     = port;
-    params->verb     = "POST";
-    params->resource = path;   
+    params->ip           = host;
+    params->port         = port;
+    params->verb         = "POST";
+    params->tenant       = tenant;
+    params->resource     = path;   
     params->content_type = content_type;
     params->content      = payload;
 
@@ -155,12 +157,13 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
 *
 * Notifier::createIntervalThread -
 */
-void Notifier::createIntervalThread(std::string subId, int interval) {
+void Notifier::createIntervalThread(std::string subId, int interval, std::string tenant) {
 
     /* Create params dynamically. Note that the first action that thread does
      * if */
     ThreadData td;
     td.params = new OnIntervalThreadParams();
+    td.params->tenant = tenant;
     td.params->subId = subId;
     td.params->interval = interval;
     td.params->notifier = this;

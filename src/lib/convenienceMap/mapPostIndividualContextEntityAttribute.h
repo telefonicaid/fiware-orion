@@ -29,12 +29,14 @@
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/AppendContextElementResponse.h"
 #include "convenience/UpdateContextAttributeRequest.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/HttpStatusCode.h"
 
 
 /* ****************************************************************************
 *
 * mapPostIndividualContextEntityAttribute - 
 */
-extern HttpStatusCode mapPostIndividualContextEntityAttribute(std::string entityId, std::string attributeName, UpdateContextAttributeRequest* request, StatusCode* response);
+extern HttpStatusCode mapPostIndividualContextEntityAttribute(std::string entityId, std::string attributeName, UpdateContextAttributeRequest* request, StatusCode* response, ConnectionInfo* ciP);
 
 #endif

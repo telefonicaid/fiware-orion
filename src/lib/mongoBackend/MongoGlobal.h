@@ -132,7 +132,7 @@ using namespace mongo;
 *
 * mongoConnect -
 */
-extern bool mongoConnect(const char* host, const char* db, const char* username, const char* passwd);
+extern bool mongoConnect(const char* host, const char* db, const char* username, const char* passwd, bool multitenant);
 extern bool mongoConnect(const char* host);
 #ifdef UNIT_TEST
 extern bool mongoConnect(DBClientConnection* c);
@@ -164,6 +164,23 @@ extern void mongoDisconnect();
 * the Mongo C++ API seems not working that way
 */
 extern DBClientConnection* getMongoConnection(void);
+
+/*****************************************************************************
+*
+* setDbPrefix -
+*/
+extern void setDbPrefix(std::string dbPrefix);
+
+/*****************************************************************************
+*
+* getOrionDatabases -
+*
+* Return the list of Orion databases (the ones that start with the dbPrefix + "_").
+* Note that the DB belonging to the default service is not included in the
+* returned list
+*
+*/
+extern void getOrionDatabases(std::vector<std::string>& dbs);
 
 /*****************************************************************************
 *
@@ -199,31 +216,31 @@ extern void setAssociationsCollectionName(std::string name);
 *
 * getEntitiesCollectionName -
 */
-extern const char* getEntitiesCollectionName(void);
+extern std::string getEntitiesCollectionName(std::string tenant);
 
 /*****************************************************************************
 *
 * getRegistrationsCollectionName -
 */
-extern const char* getRegistrationsCollectionName(void);
+extern std::string getRegistrationsCollectionName(std::string tenant);
 
 /*****************************************************************************
 *
 * getSubscribeContextCollectionName -
 */
-extern const char* getSubscribeContextCollectionName(void);
+extern std::string getSubscribeContextCollectionName(std::string tenant);
 
 /*****************************************************************************
 *
 * getSubscribeContextAvailabilityCollectionName -
 */
-extern const char* getSubscribeContextAvailabilityCollectionName(void);
+extern std::string getSubscribeContextAvailabilityCollectionName(std::string tenant);
 
 /*****************************************************************************
 *
 * getAssociationsCollectionName -
 */
-extern const char* getAssociationsCollectionName(void);
+extern std::string getAssociationsCollectionName(std::string tenant);
 
 /*****************************************************************************
 *
@@ -235,13 +252,13 @@ extern bool mongoLocationCapable(void);
 *
 * ensureLocationIndex -
 */
-extern void ensureLocationIndex(void);
+extern void ensureLocationIndex(std::string tenant);
 
 /* ****************************************************************************
 *
 * recoverOntimeIntervalThreads -
 */
-extern void recoverOntimeIntervalThreads();
+extern void recoverOntimeIntervalThreads(std::string tenant);
 
 /* ****************************************************************************
 *
@@ -266,14 +283,14 @@ extern bool includedAttribute(ContextAttribute attr, AttributeList* attrsV);
 * entitiesQuery -
 *
 */
-extern bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty);
+extern bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty, std::string tenant);
 
 /* ****************************************************************************
 *
 * registrationsQuery -
 *
 */
-extern bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistrationResponseVector* cerV, std::string* err);
+extern bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistrationResponseVector* cerV, std::string* err, std::string tenant);
 
 /* ****************************************************************************
 *
@@ -300,27 +317,27 @@ extern AttributeList subToAttributeList(BSONObj attrL);
 * processOnChangeCondition -
 *
 */
-extern void processOntimeIntervalCondition(std::string subId, int interval);
+extern void processOntimeIntervalCondition(std::string subId, int interval, std::string tenant);
 
 /* ****************************************************************************
 *
 * processOnChangeCondition -
 *
 */
-extern bool processOnChangeCondition(EntityIdVector enV, AttributeList attrV, ConditionValueList* condValues, std::string subId, std::string notifyUrl, Format format);
+extern bool processOnChangeCondition(EntityIdVector enV, AttributeList attrV, ConditionValueList* condValues, std::string subId, std::string notifyUrl, Format format, std::string tenant);
 
 /* ****************************************************************************
 *
 * processConditionVector -
 *
 */
-extern BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format);
+extern BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format, std::string tenant);
 
 /* ****************************************************************************
 *
 * processAvailabilitySubscriptions -
 *
 */
-extern bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl, Format format);
+extern bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl, Format format, std::string tenant);
 
 #endif

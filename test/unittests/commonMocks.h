@@ -153,20 +153,20 @@ public:
          * actually created/sent */
     }
 
-    MOCK_METHOD3(sendNotifyContextRequest, void(NotifyContextRequest* ncr, std::string url, Format f));
-    MOCK_METHOD3(sendNotifyContextAvailabilityRequest, void(NotifyContextAvailabilityRequest* ncar, std::string url, Format f));
-    MOCK_METHOD2(createIntervalThread, void(std::string subId, int interval));
+    MOCK_METHOD4(sendNotifyContextRequest, void(NotifyContextRequest* ncr, std::string url, std::string tenant, Format f));
+    MOCK_METHOD4(sendNotifyContextAvailabilityRequest, void(NotifyContextAvailabilityRequest* ncar, std::string url, std::string tenant, Format f));
+    MOCK_METHOD3(createIntervalThread, void(std::string subId, int interval, std::string tenant));
     MOCK_METHOD1(destroyOntimeIntervalThreads, void(std::string subId));
 
     /* Wrappers for parent methods (used in ON_CALL() defaults set in the constructor) */
-    void parent_sendNotifyContextRequest(NotifyContextRequest* ncr, std::string url, Format format) {
-        return Notifier::sendNotifyContextRequest(ncr, url, format);
+    void parent_sendNotifyContextRequest(NotifyContextRequest* ncr, std::string url, std::string tenant, Format format) {
+       return Notifier::sendNotifyContextRequest(ncr, url, tenant, format);
     }
-    void parent_sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, std::string url, Format format) {
-        return Notifier::sendNotifyContextAvailabilityRequest(ncar, url, format);
+    void parent_sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, std::string url, std::string tenant, Format format) {
+       return Notifier::sendNotifyContextAvailabilityRequest(ncar, url, tenant, format);
     }
-    void parent_createIntervalThread(std::string subId, int interval) {
-        return Notifier::createIntervalThread(subId, interval);
+    void parent_createIntervalThread(std::string subId, int interval, std::string tenant) {
+        return Notifier::createIntervalThread(subId, interval, tenant);
     }
     void parent_destroyOntimeIntervalThreads(std::string subId) {
         return Notifier::destroyOntimeIntervalThreads(subId);

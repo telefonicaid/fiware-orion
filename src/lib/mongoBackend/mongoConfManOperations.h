@@ -31,12 +31,12 @@
 *
 * mongoSetFwdRegId -
 */
-extern void mongoSetFwdRegId(std::string regId, std::string fwdRegId);
+extern void mongoSetFwdRegId(std::string regId, std::string fwdRegId, std::string tenant = "");
 
 /* ****************************************************************************
 *
 * mongoGetFwdRegId -
 */
-extern std::string mongoGetFwdRegId(std::string regId);
+extern std::string mongoGetFwdRegId(std::string regId, std::string tenant = "");
 
 #endif

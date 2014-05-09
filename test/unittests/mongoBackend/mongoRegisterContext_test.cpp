@@ -133,7 +133,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok)
 
   /* Prepare mock */
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
           .Times(0);
   setNotifier(notifierMock);
 
@@ -211,7 +211,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_At0_Ok)
 
   /* Prepare mock */
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
           .Times(0);
   setNotifier(notifierMock);
 
@@ -289,7 +289,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtN_Ok)
 
   /* Prepare mock */
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
           .Times(0);
   setNotifier(notifierMock);
 
@@ -379,7 +379,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtNnt_Ok)
 
   /* Prepare mock */
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
           .Times(0);
   setNotifier(notifierMock);
 
@@ -468,7 +468,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtN_Ok)
 
   /* Prepare mock */
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
           .Times(0);
   setNotifier(notifierMock);
 
@@ -550,7 +550,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtNnt_Ok)
 
   /* Prepare mock */
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
           .Times(0);
   setNotifier(notifierMock);
 
@@ -640,7 +640,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_At0_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -723,7 +723,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_At0_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -806,7 +806,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtN_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -902,7 +902,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtNnt_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -998,7 +998,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtN_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1094,7 +1094,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtNnt_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1190,7 +1190,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_At0_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1282,7 +1282,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_At0_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1374,7 +1374,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtN_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1491,7 +1491,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtNnt_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1608,7 +1608,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtN_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1725,7 +1725,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtNnt_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1842,7 +1842,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_At0_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1945,7 +1945,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_At0_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2048,7 +2048,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtN_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2175,7 +2175,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtNnt_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2302,7 +2302,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtN_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2429,7 +2429,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtNnt_Ok)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2565,9 +2565,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability1)
   expectedNcar.subscriptionId.set("51307b66f481db11bf860001");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", XML))
           .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", XML))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", XML))
           .Times(0);
   setNotifier(notifierMock);
 
@@ -2635,9 +2635,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability2)
   expectedNcar2.subscriptionId.set("51307b66f481db11bf860002");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar1),"http://notify1.me", XML))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar1),"http://notify1.me", "", XML))
           .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar2),"http://notify2.me", XML))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar2),"http://notify2.me", "", XML))
           .Times(1);
   setNotifier(notifierMock);
 
@@ -2704,9 +2704,9 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability3)
   expectedNcar.subscriptionId.set("51307b66f481db11bf860001");
 
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", XML))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(MatchNcar(&expectedNcar),"http://notify1.me", "", XML))
           .Times(1);
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", XML))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,"http://notify2.me", "", XML))
           .Times(0);
   setNotifier(notifierMock);
 
@@ -2763,7 +2763,7 @@ TEST(mongoRegisterContextRequest, defaultDuration)
 
   /* Prepare mock */
   NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
           .Times(0);
   setNotifier(notifierMock);
 
@@ -2844,7 +2844,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
