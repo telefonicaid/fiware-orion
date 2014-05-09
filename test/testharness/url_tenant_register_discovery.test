@@ -26,7 +26,7 @@ URL-Tenant registration and discovery
 source harnessFunctions.sh
 
 dbInit CB
-brokerStart CB 0 IPV4 -multitenant url
+brokerStart CB 0 IPV4 -multiservice url
 
 --SHELL--
 source harnessFunctions.sh

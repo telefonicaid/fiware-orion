@@ -26,7 +26,7 @@ HTTP-Tenant subscribe and update
 source harnessFunctions.sh
 
 dbInit CB
-brokerStart CB 0 IPV4 -multitenant header
+brokerStart CB 0 IPV4 -multiservice header
 accumulatorStart localhost 11001
 accumulatorStart localhost 11002
 

@@ -345,7 +345,7 @@ fi
 
 
 
-echo CURL: curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" --header "fiware-tenant: $httpTenant" $CURL_VERBOSE -X $method $cert
+echo CURL: curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" --header "fiware-service: $httpTenant" $CURL_VERBOSE -X $method $cert
 # -----------------------------------------------------------------------------
 #
 # curl
@@ -354,11 +354,11 @@ echo CURL: curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" --header "f
 #
 if [ "$useXmlLint" == 1 ] 
 then
-  (curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" --header "fiware-tenant: $httpTenant" $CURL_VERBOSE -X $method $cert -d @- | xmllint --format -) << EOF
+  (curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" --header "fiware-service: $httpTenant" $CURL_VERBOSE -X $method $cert -d @- | xmllint --format -) << EOF
 $(echo $data)
 EOF
 else
-  (curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" --header "fiware-tenant: $httpTenant" $CURL_VERBOSE -X $method $cert -d @-) << EOF
+  (curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" --header "fiware-service: $httpTenant" $CURL_VERBOSE -X $method $cert -d @-) << EOF
 $(echo $data)
 EOF
 fi

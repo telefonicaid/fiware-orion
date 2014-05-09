@@ -54,11 +54,11 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
   BSONObj sub;
   try {
       OID id = OID(requestP->subscriptionId.get());
-      LM_T(LmtMongo, ("findOne() in '%s' collection _id '%s'}", getSubscribeContextAvailabilityCollectionName(),
+      LM_T(LmtMongo, ("findOne() in '%s' collection _id '%s'}", getSubscribeContextAvailabilityCollectionName(tenant).c_str(),
                          requestP->subscriptionId.get().c_str()));
 
       mongoSemTake(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
-      sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << id));
+      sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), BSON("_id" << id));
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
 
       if (sub.isEmpty()) {
@@ -81,7 +81,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection (mongo db exception)");
       reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)");
       responseP->statusCode.fill(SccReceiverInternalError,
-                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
+                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                  " - findOne() _id: " + requestP->subscriptionId.get() +
                                  " - exception: " + e.what());
       return SccOk;
@@ -90,7 +90,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection (mongo generic exception)");
       reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo generic exception)");
       responseP->statusCode.fill(SccReceiverInternalError,
-                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
+                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                  " - findOne() _id: " + requestP->subscriptionId.get() +
                                  " - exception: " + "generic");
       return SccOk;
@@ -100,17 +100,17 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
   // FIXME: I would prefer to do the find and remove in a single operation. Is the some similar
   // to findAndModify for this?
   try {
-      LM_T(LmtMongo, ("remove() in '%s' collection _id '%s'}", getSubscribeContextAvailabilityCollectionName(),
+      LM_T(LmtMongo, ("remove() in '%s' collection _id '%s'}", getSubscribeContextAvailabilityCollectionName(tenant).c_str(),
                          requestP->subscriptionId.get().c_str()));
       mongoSemTake(__FUNCTION__, "remove in SubscribeContextAvailabilityCollection");
-      connection->remove(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << OID(requestP->subscriptionId.get())));
+      connection->remove(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), BSON("_id" << OID(requestP->subscriptionId.get())));
       mongoSemGive(__FUNCTION__, "remove in SubscribeContextAvailabilityCollection");
   }
   catch( const DBException &e ) {
       mongoSemGive(__FUNCTION__, "remove in SubscribeContextAvailabilityCollection (mongo db exception)");
       reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)");
       responseP->statusCode.fill(SccReceiverInternalError,
-                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
+                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                  " - remove() _id: " + requestP->subscriptionId.get().c_str() +
                                  " - exception: " + e.what());
       return SccOk;
@@ -119,7 +119,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
       mongoSemGive(__FUNCTION__, "remove in SubscribeContextAvailabilityCollection (mongo generic exception)");
       reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo generic exception)");
       responseP->statusCode.fill(SccReceiverInternalError,
-                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
+                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                  " - remove() _id: " + requestP->subscriptionId.get().c_str() +
                                  " - exception: " + "generic");
       return SccOk;

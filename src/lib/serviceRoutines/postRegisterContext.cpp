@@ -46,18 +46,20 @@
 * NOTE
 *   Used by registerContextForward
 */
-static std::string fordwardRegisterContext(char* host, int port, std::string payload) {
+static std::string fordwardRegisterContext(char* host, int port, std::string tenant, std::string payload) {
 
     LM_T(LmtCm, ("forwarding registerContext to: host='%s', port=%d", fwdHost, fwdPort));
     LM_T(LmtCm, ("payload (content-type: application/xml): '%s'", payload.c_str()));
     std::string response = sendHttpSocket(fwdHost,
-                   fwdPort,
-                   "POST",
-                   "ngsi9/registerContext",
-                   //FIXME P3: unhardwire content type
-                   std::string ("application/xml"),
-                   payload,
-                   true);
+                                          fwdPort,
+                                          "http:",
+                                          "POST",
+                                          tenant,
+                                          "ngsi9/registerContext",
+                                          //FIXME P3: unhardwire content type
+                                          std::string("application/xml"),
+                                          payload,
+                                          true);
     LM_T(LmtCm, ("response to forward registerContext: '%s'", response.c_str()));
 
     return response;
@@ -81,7 +83,7 @@ static void registerContextForward(ConnectionInfo* ciP, ParseData* parseDataP, R
     ciP->httpStatusCode  = mongoRegisterContext(&parseDataP->rcr.res, rcrP, ciP->tenant);
 
     std::string payload  = parseDataP->rcr.res.render(RegisterContext, ciP->inFormat, "");
-    std::string response = fordwardRegisterContext(fwdHost, fwdPort, payload);
+    std::string response = fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, payload);
 
     if (response == "error")
        LM_RVE(("fordwardRegisterContext failed"));
@@ -115,7 +117,7 @@ static void registerContextForward(ConnectionInfo* ciP, ParseData* parseDataP, R
     parseDataP->rcr.res.registrationId.set(fwdRegId);
     mongoSetFwdRegId(rcrP->registrationId.get(), fwdRegId, ciP->tenant);
     std::string payload = parseDataP->rcr.res.render(RegisterContext, ciP->inFormat, "");
-    fordwardRegisterContext(fwdHost, fwdPort, payload);
+    fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, payload);
   }
 }
 

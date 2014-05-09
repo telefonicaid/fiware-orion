@@ -26,7 +26,7 @@ Erroneous tenant URL names
 source harnessFunctions.sh
 
 dbInit CB
-brokerStart CB 0 IPV4 -multitenant header
+brokerStart CB 0 IPV4 -multiservice header
 
 --SHELL--
 source harnessFunctions.sh
@@ -112,7 +112,6 @@ echo
 
 
 # 5. Reserved name (strange case) in tenant name
-echo "5: ++++++++++"
 curlXmlTenants $URL "$payload" "fiware-tenant: LoG"
 
 --REGEXPECT--

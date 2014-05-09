@@ -37,5 +37,5 @@
 	  <restriction>restriction</restriction>
 	</notifyCondition>
   </notifyConditions>
-  <throttling>P5Y</throttling>
+  <throttling>PT1S</throttling>
 </subscribeContextRequest>

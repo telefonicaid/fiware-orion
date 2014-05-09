@@ -26,7 +26,7 @@ URL-Tenant subscribe and update
 source harnessFunctions.sh
 
 dbInit CB
-brokerStart CB 0 IPV4 -multitenant url
+brokerStart CB 0 IPV4 -multiservice url
 accumulatorStart localhost 11001
 accumulatorStart localhost 11002
 

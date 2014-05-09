@@ -74,6 +74,8 @@ static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
 static char                      bindIPv6[MAX_LEN_IP]  = "::";
 IpVersion                        ipVersionUsed         = IPDUAL;
 std::string                      multitenant           = "off";
+std::string                      rushHost              = "";
+unsigned short                   rushPort              = 0;
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
@@ -100,7 +102,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "connection") == 0)      headerP->connection     = value;
   else if (strcasecmp(key.c_str(), "content-type") == 0)    headerP->contentType    = value;
   else if (strcasecmp(key.c_str(), "content-length") == 0)  headerP->contentLength  = atoi(value);
-  else if (strcasecmp(key.c_str(), "fiware-tenant") == 0)   headerP->tenant         = value;
+  else if (strcasecmp(key.c_str(), "fiware-service") == 0)  headerP->tenant         = value;
   else
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
 
@@ -576,6 +578,8 @@ void restInit
   const char*        _bindAddress,
   unsigned short     _port,
   std::string        _multitenant,
+  std::string        _rushHost,
+  unsigned short     _rushPort,
   const char*        _httpsKey,
   const char*        _httpsCertificate,
   RestServeFunction  _serveFunction,
@@ -591,6 +595,8 @@ void restInit
   serveFunction = (_serveFunction != NULL)? _serveFunction : serve;
   acceptTextXml = _acceptTextXml;
   multitenant   = _multitenant;
+  rushHost      = _rushHost;
+  rushPort      = _rushPort;
 
   strncpy(bindIp, LOCAL_IP_V4, MAX_LEN_IP - 1);
   strncpy(bindIPv6, LOCAL_IP_V6, MAX_LEN_IP - 1);
@@ -605,7 +611,6 @@ void restInit
 
   if ((_ipVersion == IPV6) || (_ipVersion == IPDUAL))
      strncpy(bindIPv6, bindIPv6, MAX_LEN_IP - 1);
-
 
   // Starting REST interface
   int r;

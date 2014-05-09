@@ -177,6 +177,7 @@ char            httpsKeyFile[1024];
 char            httpsCertFile[1024];
 bool            https;
 char            mtenant[32];
+char            rush[256];
 
 
 
@@ -187,29 +188,30 @@ char            mtenant[32];
 */
 PaArgument paArgs[] =
 {
-  { "-fg",          &fg,           "FOREGROUND",      PaBool,   PaOpt, false,          false,  true,  "don't start as daemon"                },
-  { "-localIp",     bindAddress,   "LOCALIP",         PaString, PaOpt, _i "0.0.0.0",   PaNL,   PaNL,  "IP to receive new connections"        },
-  { "-port",        &port,         "PORT",            PaInt,    PaOpt, 1026,           PaNL,   PaNL,  "port to receive new connections"      },
-  { "-pidpath",      pidPath,      "PID_PATH",        PaString, PaOpt, PIDPATH,        PaNL,   PaNL,  "pid file path"                        },
+  { "-fg",           &fg,           "FOREGROUND",      PaBool,   PaOpt, false,          false,  true,  "don't start as daemon"                     },
+  { "-localIp",      bindAddress,   "LOCALIP",         PaString, PaOpt, _i "0.0.0.0",   PaNL,   PaNL,  "IP to receive new connections"             },
+  { "-port",         &port,         "PORT",            PaInt,    PaOpt, 1026,           PaNL,   PaNL,  "port to receive new connections"           },
+  { "-pidpath",      pidPath,       "PID_PATH",        PaString, PaOpt, PIDPATH,        PaNL,   PaNL,  "pid file path"                             },
 
-  { "-dbhost",      dbHost,        "DB_HOST",         PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "database host"                        },
-  { "-dbuser",      user,          "DB_USER",         PaString, PaOpt, _i "",          PaNL,   PaNL,  "database user"                        },
-  { "-dbpwd",       pwd,           "DB_PASSWORD",     PaString, PaOpt, _i "",          PaNL,   PaNL,  "database password"                    },
-  { "-db",          dbName,        "DB",              PaString, PaOpt, _i "orion",     PaNL,   PaNL,  "database name"                        },
+  { "-dbhost",       dbHost,        "DB_HOST",         PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "database host"                             },
+  { "-dbuser",       user,          "DB_USER",         PaString, PaOpt, _i "",          PaNL,   PaNL,  "database user"                             },
+  { "-dbpwd",        pwd,           "DB_PASSWORD",     PaString, PaOpt, _i "",          PaNL,   PaNL,  "database password"                         },
+  { "-db",           dbName,        "DB",              PaString, PaOpt, _i "orion",     PaNL,   PaNL,  "database name"                             },
 
-  { "-fwdHost",     fwdHost,       "FWD_HOST",        PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "host for forwarding NGSI9 regs"       },
-  { "-fwdPort",     &fwdPort,      "FWD_PORT",        PaInt,    PaOpt, 0,              0,      65000, "port for forwarding NGSI9 regs"       },
-  { "-ngsi9",       &ngsi9Only,    "CONFMAN",         PaBool,   PaOpt, false,          false,  true,  "run as Configuration Manager"         },
-  { "-ipv4",        &useOnlyIPv4,  "USEIPV4",         PaBool,   PaOpt, false,          false,  true,  "use ip v4 only"                       },
-  { "-ipv6",        &useOnlyIPv6,  "USEIPV6",         PaBool,   PaOpt, false,          false,  true,  "use ip v6 only"                       },
-  { "-harakiri",    &harakiri,     "HARAKIRI",        PaBool,   PaHid, false,          false,  true,  "commits harakiri on request"          },
+  { "-fwdHost",      fwdHost,       "FWD_HOST",        PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "host for forwarding NGSI9 regs"            },
+  { "-fwdPort",      &fwdPort,      "FWD_PORT",        PaInt,    PaOpt, 0,              0,      65000, "port for forwarding NGSI9 regs"            },
+  { "-ngsi9",        &ngsi9Only,    "CONFMAN",         PaBool,   PaOpt, false,          false,  true,  "run as Configuration Manager"              },
+  { "-ipv4",         &useOnlyIPv4,  "USEIPV4",         PaBool,   PaOpt, false,          false,  true,  "use ip v4 only"                            },
+  { "-ipv6",         &useOnlyIPv6,  "USEIPV6",         PaBool,   PaOpt, false,          false,  true,  "use ip v6 only"                            },
+  { "-harakiri",     &harakiri,     "HARAKIRI",        PaBool,   PaHid, false,          false,  true,  "commits harakiri on request"               },
 
-  { "-https",       &https,        "HTTPS",           PaBool,   PaOpt, false,          false,  true,  "use the https 'protocol'"             },
-  { "-key",         httpsKeyFile,  "HTTPS_KEY_FILE",  PaString, PaOpt, _i "",          PaNL,   PaNL,  "private server key file (for https)"  },
-  { "-cert",        httpsCertFile, "HTTPS_CERT_FILE", PaString, PaOpt, _i "",          PaNL,   PaNL,  "certificate key file (for https)"     },
+  { "-https",        &https,        "HTTPS",           PaBool,   PaOpt, false,          false,  true,  "use the https 'protocol'"                  },
+  { "-key",          httpsKeyFile,  "HTTPS_KEY_FILE",  PaString, PaOpt, _i "",          PaNL,   PaNL,  "private server key file (for https)"       },
+  { "-cert",         httpsCertFile, "HTTPS_CERT_FILE", PaString, PaOpt, _i "",          PaNL,   PaNL,  "certificate key file (for https)"          },
 
-  { "-multitenant", mtenant,       "MULTI_TENANT",    PaString, PaOpt, _i "off",       PaNL,   PaNL,  "tenancy mode (off|url|header)"        },
-  
+  { "-rush",         rush,          "RUSH",            PaString, PaOpt, _i "",          PaNL,   PaNL,  "rush host (IP:port)"                         },
+  { "-multiservice", mtenant,       "MULTI_SERVICE",   PaString, PaOpt, _i "off",       PaNL,   PaNL,  "service multi tenancy mode (off|url|header)" },
+
   PA_END_OF_ARGS
 };
 
@@ -240,7 +242,7 @@ PaArgument paArgs[] =
 * restServiceMTenant - services for BROKER (ngsi9/10) and tenants 
 *
 * This service vector (configuration) is used if the broker is started with
-* the the -multitenant option (but not the -ngsi9 option)
+* the the -multiservice option (but not the -ngsi9 option)
 */
 RestService restServiceMTenant[] =
 {
@@ -491,7 +493,7 @@ RestService restServiceMTenant[] =
 * restServiceV - services for BROKER (ngsi9/10) without tenants
 *
 * This is the default service vector, that is used if the broker is started without
-* the -ngsi9 and -multitenant options 
+* the -ngsi9 and -multiservice options
 */
 RestService restServiceV[] =
 {
@@ -641,7 +643,7 @@ RestService restServiceV[] =
 *
 * This service vector (configuration) is used if the broker is started as
 * CONFIGURATION MANAGER (using the -ngsi9 option) and without using the
-* -multitenant option. 
+* -multiservice option.
 */
 RestService restServiceNgsi9[] =
 {
@@ -735,7 +737,7 @@ RestService restServiceNgsi9[] =
 *
 * This service vector (configuration) is used if the broker is started as
 * CONFIGURATION MANAGER (using the -ngsi9 option) and also with the
-* -multitenant option.
+* -multiservice option.
 */
 RestService restServiceNgsi9MTenant[] =
 {
@@ -988,14 +990,25 @@ const char* description =
 *
 * contextBrokerInit -
 */
-static void contextBrokerInit(bool ngsi9Only)
+static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multitenant)
 {
   /* Set notifier object (singleton) */
   setNotifier(new Notifier());
 
   /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
-  if (!ngsi9Only)
-    recoverOntimeIntervalThreads();
+  if (!ngsi9Only) {
+    recoverOntimeIntervalThreads("");
+    if (multitenant) {
+        /* We get tenant database names and recover ontime interval threads on each one */
+        std::vector<std::string> orionDbs;
+        getOrionDatabases(orionDbs);
+        for (unsigned int ix = 0; ix < orionDbs.size(); ++ix) {
+            std::string orionDb = orionDbs[ix];
+            std::string tenant = orionDb.substr(dbPrefix.length() + 1);   // + 1 for the "_" in "orion_tenantA"
+            recoverOntimeIntervalThreads(tenant);
+        }
+    }
+  }
   else
     LM_F(("Running in NGSI9 only mode"));
 }
@@ -1006,7 +1019,9 @@ static void contextBrokerInit(bool ngsi9Only)
 */
 static void mongoInit(const char* dbHost, std::string dbName, const char* user, const char* pwd)
 {
-   if (!mongoConnect(dbHost, dbName.c_str(), user, pwd))
+   std::string multitenant = mtenant;
+
+   if (!mongoConnect(dbHost, dbName.c_str(), user, pwd, multitenant != "off"))
     LM_X(1, ("MongoDB error"));
 
   if (user[0] != 0) 
@@ -1014,13 +1029,27 @@ static void mongoInit(const char* dbHost, std::string dbName, const char* user, 
   else
     LM_F(("Connected to mongo at %s:%s", dbHost, dbName.c_str()));
 
-  setEntitiesCollectionName(dbName + ".entities");
-  setRegistrationsCollectionName(dbName + ".registrations");
-  setSubscribeContextCollectionName(dbName + ".csubs");
-  setSubscribeContextAvailabilityCollectionName(dbName + ".casubs");
-  setAssociationsCollectionName(dbName + ".associations");
+  setDbPrefix(dbName);
+  setEntitiesCollectionName("entities");
+  setRegistrationsCollectionName("registrations");
+  setSubscribeContextCollectionName("csubs");
+  setSubscribeContextAvailabilityCollectionName("casubs");
+  setAssociationsCollectionName("associations");
 
-  ensureLocationIndex();
+  /* Note that index creation operation is idempotent. From http://docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/,
+   * "If you call multiple ensureIndex() methods with the same index specification at the same time, only the first operation will
+   * succeed, all other operations will have no effect." */
+  ensureLocationIndex("");
+  if (multitenant != "off") {
+      /* We get tenant database names and apply ensure the location index in each one */
+      std::vector<std::string> orionDbs;
+      getOrionDatabases(orionDbs);
+      for (unsigned int ix = 0; ix < orionDbs.size(); ++ix) {
+          std::string orionDb = orionDbs[ix];
+          std::string tenant = orionDb.substr(dbName.length() + 1);   // + 1 for the "_" in "orion_tenantA"
+          ensureLocationIndex(tenant);
+      }
+  }
 }
 
 
@@ -1056,9 +1085,37 @@ static int loadFile(char* path, char* out, int outSize)
   if (nb == -1)
     LM_RE(-1, ("error reading from '%s': %s", path, strerror(errno)));
   if (nb != statBuf.st_size)
-    LM_RE(-1, ("bad size read from from '%s': %d, wanted %d", path, nb, statBuf.st_size));
+    LM_RE(-1, ("bad size read from '%s': %d, wanted %d", path, nb, statBuf.st_size));
 
   return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* rushParse - parse rush host and port from CLI argument
+*
+* The '-rush' CLI argument has the format "host:port" and this function
+* splits that argument into rushHost and rushPort.
+* If there is a syntax error in the argument, the function exists the program
+* with an error message
+*/
+static void rushParse(char* rush, std::string* rushHostP, unsigned short* rushPortP)
+{
+  char* colon = strchr(rush, ':');
+
+  if (colon == NULL)
+    LM_X(1, ("Bad syntax of '-rush' value: '%s' (wanted: 'host:port')"));
+
+  *colon = 0;
+  ++colon;
+
+  *rushHostP = rush;
+  *rushPortP = atoi(colon);
+
+  if ((*rushHostP == "") || (*rushPortP == 0))
+    LM_X(1, ("Bad syntax of '-rush' value: '%s' (wanted: 'host:port')"));
 }
 
 
@@ -1069,6 +1126,9 @@ static int loadFile(char* path, char* out, int outSize)
 */
 int main(int argC, char* argV[])
 {
+  unsigned short rushPort;
+  std::string    rushHost;
+
   signal(SIGINT,  sigHandler);
   signal(SIGTERM, sigHandler);
 
@@ -1108,7 +1168,7 @@ int main(int argC, char* argV[])
 
   std::string multitenant = mtenant;
   if ((multitenant != "off") && (multitenant != "header") && (multitenant != "url"))
-    LM_X(1, ("Bad value for -multitenant. Allowed values: 'off', 'header' and 'url'"));
+    LM_X(1, ("Bad value for -multiservice. Allowed values: 'off', 'header' and 'url'"));
 
   if (useOnlyIPv6 && useOnlyIPv4)
     LM_X(1, ("-ipv4 and -ipv6 can not be activated at the same time. They are incompatible"));
@@ -1136,7 +1196,13 @@ int main(int argC, char* argV[])
   pidFile();
   orionInit(orionExit, ORION_VERSION);
   mongoInit(dbHost, dbName, user, pwd);
-  contextBrokerInit(ngsi9Only);
+  contextBrokerInit(ngsi9Only, dbName, multitenant != "off");
+
+  if (rush[0] != 0)
+  {
+    rushParse(rush, &rushHost, &rushPort);
+    LM_T(LmtRush, ("rush host: '%s', rush port: %d", rushHost.c_str(), rushPort));
+  }
 
   if (https)
   {
@@ -1151,12 +1217,13 @@ int main(int argC, char* argV[])
     LM_V(("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_V(("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, httpsPrivateServerKey, httpsCertificate);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, httpsPrivateServerKey, httpsCertificate);
+
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
-    restInit(rsP, ipVersion, bindAddress, port, mtenant);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort);
 
   while (1)
     sleep(10);
