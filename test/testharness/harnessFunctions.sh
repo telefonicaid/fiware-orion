@@ -65,7 +65,7 @@ function dbInit()
     echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
   elif [ "$role" == "CM" ]
   then
-    echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_AUX_NAME} --quiet
+    echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE2_NAME} --quiet
   fi
 }
 
@@ -119,7 +119,7 @@ function localBrokerStart()
   then
     mkdir -p /tmp/configManager
     port=$CM_PORT
-    CB_START_CMD="contextBroker -harakiri -port ${CM_PORT}     -pidpath ${BROKER_PID_FILE_AUX} -db ${BROKER_DATABASE_AUX_NAME} -t $traceLevels -fwdPort ${BROKER_PORT} -logDir /tmp/configManager -ngsi9 $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port ${CM_PORT}     -pidpath ${BROKER_PID2_FILE} -db ${BROKER_DATABASE2_NAME} -t $traceLevels -fwdPort ${BROKER_PORT} -logDir /tmp/configManager -ngsi9 $extraParams"
   fi
 
   if [ "$VALGRIND" == "" ]; then
@@ -226,7 +226,7 @@ function brokerStop
     port=$BROKER_PORT
   elif [ "$role" == "CM" ]
   then
-    pidFile=$BROKER_PID_FILE_AUX
+    pidFile=$BROKER_PID2_FILE
     port=$CM_PORT
   fi
 

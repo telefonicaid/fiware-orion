@@ -30,7 +30,7 @@ dbTenantInit ${BROKER_DATABASE_NAME}-t_01
 dbTenantInit ${BROKER_DATABASE_NAME}-t_02
 brokerStart CB 0-255 IPV4 -multiservice url
 accumulatorStart localhost ${LISTENER_PORT}
-accumulatorStart localhost ${LISTENER_PORT_AUX}
+accumulatorStart localhost ${LISTENER2_PORT}
 
 --SHELL--
 source harnessFunctions.sh
@@ -330,4 +330,4 @@ Content-Type: application/xml
 source harnessFunctions.sh
 brokerStop CB
 accumulatorStop ${LISTENER_PORT}
-accumulatorStop ${LISTENER_PORT_AUX}
+accumulatorStop ${LISTENER2_PORT}
