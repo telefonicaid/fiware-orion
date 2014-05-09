@@ -29,8 +29,8 @@ dbInit CB
 dbTenantInit ${BROKER_DATABASE_NAME}-t_01
 dbTenantInit ${BROKER_DATABASE_NAME}-t_02
 brokerStart CB 0-255 IPV4 -multiservice url
-accumulatorStart localhost 11001
-accumulatorStart localhost 11002
+accumulatorStart localhost ${LISTENER_PORT}
+accumulatorStart localhost ${LISTENER_PORT_AUX}
 
 --SHELL--
 source harnessFunctions.sh
@@ -329,5 +329,5 @@ Content-Type: application/xml
 --TEARDOWN--
 source harnessFunctions.sh
 brokerStop CB
-accumulatorStop 11001
-accumulatorStop 11002
+accumulatorStop ${LISTENER_PORT}
+accumulatorStop ${LISTENER_PORT_AUX}
