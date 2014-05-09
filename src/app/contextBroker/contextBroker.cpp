@@ -340,15 +340,24 @@ RestService restServiceV[] =
   // log request
   { "GET",    LogRequest,                                  2, { "log", "verbose"                                         }, "",                                             logVerboseTreat                           },
   { "PUT",    LogRequest,                                  3, { "log", "verbose", "*"                                    }, "",                                             logVerboseTreat                           },
-  { "POST",   LogRequest,                                  3, { "log", "verbose", "*"                                    }, "",                                             logVerboseTreat                           },
   { "DELETE", LogRequest,                                  2, { "log", "verbose"                                         }, "",                                             logVerboseTreat                           },
+  { "*",      LogRequest,                                  3, { "log", "verbose", "*"                                    }, "",                                             badVerbGetPutDeleteOnly                   },
 
+  // The documentation (Installation and Admin Guide) says /log/trace ...
+  { "GET",    LogRequest,                                  2, { "log", "trace"                                           }, "",                                             logTraceTreat                             },
+  { "PUT",    LogRequest,                                  3, { "log", "trace", "*"                                      }, "",                                             logTraceTreat                             },
+  { "DELETE", LogRequest,                                  2, { "log", "trace"                                           }, "",                                             logTraceTreat                             },
+  { "DELETE", LogRequest,                                  3, { "log", "trace", "*"                                      }, "",                                             logTraceTreat                             },
+  { "*",      LogRequest,                                  2, { "log", "trace"                                           }, "",                                             badVerbAllFour                            },
+  { "*",      LogRequest,                                  3, { "log", "trace", "*"                                      }, "",                                             badVerbAllFour                            },
+
+  // ... and to maintain backward compatibility we keep supporting /log/traceLevel too
   { "GET",    LogRequest,                                  2, { "log", "traceLevel"                                      }, "",                                             logTraceTreat                             },
   { "PUT",    LogRequest,                                  3, { "log", "traceLevel", "*"                                 }, "",                                             logTraceTreat                             },
-  { "POST",   LogRequest,                                  3, { "log", "traceLevel", "*"                                 }, "",                                             logTraceTreat                             },
   { "DELETE", LogRequest,                                  2, { "log", "traceLevel"                                      }, "",                                             logTraceTreat                             },
   { "DELETE", LogRequest,                                  3, { "log", "traceLevel", "*"                                 }, "",                                             logTraceTreat                             },
-
+  { "*",      LogRequest,                                  2, { "log", "traceLevel"                                      }, "",                                             badVerbAllFour                            },
+  { "*",      LogRequest,                                  3, { "log", "traceLevel", "*"                                 }, "",                                             badVerbAllFour                            },
 
   // version request
   { "GET",    VersionRequest,                              1, { "version"                                                }, "",                                             versionTreat                              },
@@ -426,15 +435,22 @@ RestService restServiceNgsi9V[] =
   // log request
   { "GET",    LogRequest,                                  2, { "log", "verbose"                                         }, "",                                             logVerboseTreat                           },
   { "PUT",    LogRequest,                                  3, { "log", "verbose", "*"                                    }, "",                                             logVerboseTreat                           },
-  { "POST",   LogRequest,                                  3, { "log", "verbose", "*"                                    }, "",                                             logVerboseTreat                           },
   { "DELETE", LogRequest,                                  2, { "log", "verbose"                                         }, "",                                             logVerboseTreat                           },
+  { "*",      LogRequest,                                  3, { "log", "verbose", "*"                                    }, "",                                             badVerbGetPutDeleteOnly                   },
+
+  { "GET",    LogRequest,                                  2, { "log", "trace"                                           }, "",                                             logTraceTreat                             },
+  { "PUT",    LogRequest,                                  3, { "log", "trace", "*"                                      }, "",                                             logTraceTreat                             },
+  { "DELETE", LogRequest,                                  2, { "log", "trace"                                           }, "",                                             logTraceTreat                             },
+  { "DELETE", LogRequest,                                  3, { "log", "trace", "*"                                      }, "",                                             logTraceTreat                             },
+  { "*",      LogRequest,                                  2, { "log", "trace"                                           }, "",                                             badVerbAllFour                            },
+  { "*",      LogRequest,                                  3, { "log", "trace", "*"                                      }, "",                                             badVerbAllFour                            },
 
   { "GET",    LogRequest,                                  2, { "log", "traceLevel"                                      }, "",                                             logTraceTreat                             },
   { "PUT",    LogRequest,                                  3, { "log", "traceLevel", "*"                                 }, "",                                             logTraceTreat                             },
-  { "POST",   LogRequest,                                  3, { "log", "traceLevel", "*"                                 }, "",                                             logTraceTreat                             },
   { "DELETE", LogRequest,                                  2, { "log", "traceLevel"                                      }, "",                                             logTraceTreat                             },
   { "DELETE", LogRequest,                                  3, { "log", "traceLevel", "*"                                 }, "",                                             logTraceTreat                             },
-
+  { "*",      LogRequest,                                  2, { "log", "traceLevel"                                      }, "",                                             badVerbAllFour                            },
+  { "*",      LogRequest,                                  3, { "log", "traceLevel", "*"                                 }, "",                                             badVerbAllFour                            },
 
   // version request
   { "GET",    VersionRequest,                              1, { "version"                                                }, "",                                             versionTreat                              },
