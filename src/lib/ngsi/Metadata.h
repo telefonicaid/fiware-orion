@@ -32,6 +32,11 @@
 #include "ngsi/Request.h"
 #include "ngsi/Association.h"
 
+/* Metadata interpreted by Orion Context Broker, i.e. not custom metadata */
+#define NGSI_MD_ID       "ID"
+#define NGSI_MD_LOCATION "location"
+#define NGSI_MD_CREDATE  "creDate"    // FIXME P5: to be used for creDate (currenly only in DB)
+#define NGSI_MD_MODDATE  "modDate"    // FIXME P5: to be used for modDate (currenly only in DB)
 
 
 /* ****************************************************************************

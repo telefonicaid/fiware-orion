@@ -106,6 +106,7 @@ typedef enum TraceLevels
   LmtCm = 210,
   LmtIotaXmlReg,
   LmtIotaXmlObs,
+  LmtRush
 } TraceLevels;
 
 

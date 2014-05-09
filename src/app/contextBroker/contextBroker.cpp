@@ -177,6 +177,7 @@ char            httpsKeyFile[1024];
 char            httpsCertFile[1024];
 bool            https;
 char            mtenant[32];
+char            rush[256];
 
 
 
@@ -190,7 +191,7 @@ PaArgument paArgs[] =
   { "-fg",           &fg,           "FOREGROUND",      PaBool,   PaOpt, false,          false,  true,  "don't start as daemon"                     },
   { "-localIp",      bindAddress,   "LOCALIP",         PaString, PaOpt, _i "0.0.0.0",   PaNL,   PaNL,  "IP to receive new connections"             },
   { "-port",         &port,         "PORT",            PaInt,    PaOpt, 1026,           PaNL,   PaNL,  "port to receive new connections"           },
-  { "-pidpath",      pidPath,      "PID_PATH",        PaString, PaOpt, PIDPATH,        PaNL,   PaNL,  "pid file path"                              },
+  { "-pidpath",      pidPath,       "PID_PATH",        PaString, PaOpt, PIDPATH,        PaNL,   PaNL,  "pid file path"                             },
 
   { "-dbhost",       dbHost,        "DB_HOST",         PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "database host"                             },
   { "-dbuser",       user,          "DB_USER",         PaString, PaOpt, _i "",          PaNL,   PaNL,  "database user"                             },
@@ -208,8 +209,9 @@ PaArgument paArgs[] =
   { "-key",          httpsKeyFile,  "HTTPS_KEY_FILE",  PaString, PaOpt, _i "",          PaNL,   PaNL,  "private server key file (for https)"       },
   { "-cert",         httpsCertFile, "HTTPS_CERT_FILE", PaString, PaOpt, _i "",          PaNL,   PaNL,  "certificate key file (for https)"          },
 
-  { "-multiservice", mtenant,       "MULTI_SERVICE",  PaString, PaOpt, _i "off",       PaNL,   PaNL,  "service multi tenancy mode (off|url|header)"},
-  
+  { "-rush",         rush,          "RUSH",            PaString, PaOpt, _i "",          PaNL,   PaNL,  "rush host (IP:port)"                         },
+  { "-multiservice", mtenant,       "MULTI_SERVICE",   PaString, PaOpt, _i "off",       PaNL,   PaNL,  "service multi tenancy mode (off|url|header)" },
+
   PA_END_OF_ARGS
 };
 
@@ -1083,9 +1085,37 @@ static int loadFile(char* path, char* out, int outSize)
   if (nb == -1)
     LM_RE(-1, ("error reading from '%s': %s", path, strerror(errno)));
   if (nb != statBuf.st_size)
-    LM_RE(-1, ("bad size read from from '%s': %d, wanted %d", path, nb, statBuf.st_size));
+    LM_RE(-1, ("bad size read from '%s': %d, wanted %d", path, nb, statBuf.st_size));
 
   return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* rushParse - parse rush host and port from CLI argument
+*
+* The '-rush' CLI argument has the format "host:port" and this function
+* splits that argument into rushHost and rushPort.
+* If there is a syntax error in the argument, the function exists the program
+* with an error message
+*/
+static void rushParse(char* rush, std::string* rushHostP, unsigned short* rushPortP)
+{
+  char* colon = strchr(rush, ':');
+
+  if (colon == NULL)
+    LM_X(1, ("Bad syntax of '-rush' value: '%s' (wanted: 'host:port')"));
+
+  *colon = 0;
+  ++colon;
+
+  *rushHostP = rush;
+  *rushPortP = atoi(colon);
+
+  if ((*rushHostP == "") || (*rushPortP == 0))
+    LM_X(1, ("Bad syntax of '-rush' value: '%s' (wanted: 'host:port')"));
 }
 
 
@@ -1096,6 +1126,9 @@ static int loadFile(char* path, char* out, int outSize)
 */
 int main(int argC, char* argV[])
 {
+  unsigned short rushPort;
+  std::string    rushHost;
+
   signal(SIGINT,  sigHandler);
   signal(SIGTERM, sigHandler);
 
@@ -1165,6 +1198,12 @@ int main(int argC, char* argV[])
   mongoInit(dbHost, dbName, user, pwd);
   contextBrokerInit(ngsi9Only, dbName, multitenant != "off");
 
+  if (rush[0] != 0)
+  {
+    rushParse(rush, &rushHost, &rushPort);
+    LM_T(LmtRush, ("rush host: '%s', rush port: %d", rushHost.c_str(), rushPort));
+  }
+
   if (https)
   {
     char* httpsPrivateServerKey = (char*) malloc(2048);
@@ -1178,12 +1217,13 @@ int main(int argC, char* argV[])
     LM_V(("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_V(("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, httpsPrivateServerKey, httpsCertificate);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, httpsPrivateServerKey, httpsCertificate);
+
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
-    restInit(rsP, ipVersion, bindAddress, port, mtenant);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort);
 
   while (1)
     sleep(10);

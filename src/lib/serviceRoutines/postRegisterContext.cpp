@@ -51,14 +51,15 @@ static std::string fordwardRegisterContext(char* host, int port, std::string ten
     LM_T(LmtCm, ("forwarding registerContext to: host='%s', port=%d", fwdHost, fwdPort));
     LM_T(LmtCm, ("payload (content-type: application/xml): '%s'", payload.c_str()));
     std::string response = sendHttpSocket(fwdHost,
-                   fwdPort,
-                   "POST",
-                   tenant,
-                   "ngsi9/registerContext",
-                   //FIXME P3: unhardwire content type
-                   std::string ("application/xml"),
-                   payload,
-                   true);
+                                          fwdPort,
+                                          "http:",
+                                          "POST",
+                                          tenant,
+                                          "ngsi9/registerContext",
+                                          //FIXME P3: unhardwire content type
+                                          std::string("application/xml"),
+                                          payload,
+                                          true);
     LM_T(LmtCm, ("response to forward registerContext: '%s'", response.c_str()));
 
     return response;
