@@ -133,7 +133,7 @@ Date: REGEX(.*)
 
 2: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 263
+Content-Length: 254
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -141,13 +141,13 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain hyphens, underscores and alphanumeric characters)</details>
+  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
 </orionError>
 
 
 3: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 263
+Content-Length: 254
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -155,13 +155,13 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain hyphens, underscores and alphanumeric characters)</details>
+  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
 </orionError>
 
 
 4: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 263
+Content-Length: 254
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -169,13 +169,13 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain hyphens, underscores and alphanumeric characters)</details>
+  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
 </orionError>
 
 
 5: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 263
+Content-Length: 254
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -183,7 +183,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain hyphens, underscores and alphanumeric characters)</details>
+  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
 </orionError>
 --TEARDOWN--
 source harnessFunctions.sh

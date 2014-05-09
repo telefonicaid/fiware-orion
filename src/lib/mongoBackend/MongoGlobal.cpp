@@ -252,7 +252,7 @@ extern void getOrionDatabases(std::vector<std::string>& dbs) {
     for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i) {
         BSONObj db = (*i).Obj();
         std::string dbName = STR_FIELD(db, "name");
-        std::string prefix = dbPrefix + "_";
+        std::string prefix = dbPrefix + "-";
         if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0) {
             LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
             dbs.push_back(dbName);
@@ -315,7 +315,7 @@ static std::string composeCollectionName(std::string tenant, std::string colName
     else {
         /* Note that we can not use "." for database delimiter. A database can  not containt this
          * character, http://docs.mongodb.org/manual/reference/limits/#Restrictions-on-Database-Names-for-Unix-and-Linux-Systems */
-        result = dbPrefix + "_" + tenant + "." + colName;
+        result = dbPrefix + "-" + tenant + "." + colName;
     }
     return result;
 }

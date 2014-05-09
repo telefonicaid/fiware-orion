@@ -242,7 +242,7 @@ PaArgument paArgs[] =
 * restServiceMTenant - services for BROKER (ngsi9/10) and tenants 
 *
 * This service vector (configuration) is used if the broker is started with
-* the the -multitenant option (but not the -ngsi9 option)
+* the the -multiservice option (but not the -ngsi9 option)
 */
 RestService restServiceMTenant[] =
 {
@@ -493,7 +493,7 @@ RestService restServiceMTenant[] =
 * restServiceV - services for BROKER (ngsi9/10) without tenants
 *
 * This is the default service vector, that is used if the broker is started without
-* the -ngsi9 and -multitenant options 
+* the -ngsi9 and -multiservice options
 */
 RestService restServiceV[] =
 {
@@ -643,7 +643,7 @@ RestService restServiceV[] =
 *
 * This service vector (configuration) is used if the broker is started as
 * CONFIGURATION MANAGER (using the -ngsi9 option) and without using the
-* -multitenant option. 
+* -multiservice option.
 */
 RestService restServiceNgsi9[] =
 {
@@ -737,7 +737,7 @@ RestService restServiceNgsi9[] =
 *
 * This service vector (configuration) is used if the broker is started as
 * CONFIGURATION MANAGER (using the -ngsi9 option) and also with the
-* -multitenant option.
+* -multiservice option.
 */
 RestService restServiceNgsi9MTenant[] =
 {
@@ -1168,7 +1168,7 @@ int main(int argC, char* argV[])
 
   std::string multitenant = mtenant;
   if ((multitenant != "off") && (multitenant != "header") && (multitenant != "url"))
-    LM_X(1, ("Bad value for -multitenant. Allowed values: 'off', 'header' and 'url'"));
+    LM_X(1, ("Bad value for -multiservice. Allowed values: 'off', 'header' and 'url'"));
 
   if (useOnlyIPv6 && useOnlyIPv4)
     LM_X(1, ("-ipv4 and -ipv6 can not be activated at the same time. They are incompatible"));

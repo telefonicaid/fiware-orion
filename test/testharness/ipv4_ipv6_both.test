@@ -29,7 +29,7 @@ source harnessFunctions.sh
 dbInit CB
 brokerStart CB
 accumulatorStart 0.0.0.0 ${LISTENER_PORT}
-accumulatorStart :: ${LISTENER_PORT_AUX}
+accumulatorStart :: ${LISTENER2_PORT}
 
 --SHELL--
 source harnessFunctions.sh
@@ -53,7 +53,7 @@ SUB_OUT=$((curl -g [::1]:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header '
         <attribute>temperature</attribute>
         <attribute>lightstatus</attribute>
   </attributeList>
-  <reference>http://::1:${LISTENER_PORT_AUX}/notify</reference>
+  <reference>http://::1:${LISTENER2_PORT}/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
         <notifyCondition>
@@ -127,7 +127,7 @@ EOF
 
 echo "6: ++++++++++++++++++++"
 #Get accumulated data
-curl -g [::1]:${LISTENER_PORT_AUX}/dump -s -S
+curl -g [::1]:${LISTENER2_PORT}/dump -s -S
 
 echo "7: ++++++++++++++++++++"
 #Get accumulated data
@@ -272,4 +272,4 @@ source harnessFunctions.sh
 
 brokerStop CB
 accumulatorStop ${LISTENER_PORT}
-accumulatorStop ${LISTENER_PORT_AUX}
+accumulatorStop ${LISTENER2_PORT}
