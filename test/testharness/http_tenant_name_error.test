@@ -85,34 +85,35 @@ URL="/NGSI9/registerContext"
 
 # 1. OK
 echo "1: ++++++++++"
-curlXmlTenants $URL "$payload" "fiware-tenant: _kz-0123456789012345"
+curlXmlTenants $URL "$payload" "fiware-service: _kgz0123456789012345"
 echo
 echo
 
 
 # 2. Long tenant name
 echo "2: ++++++++++"
-curlXmlTenants $URL "$payload" "fiware-tenant: kz12345678901234567890"
+curlXmlTenants $URL "$payload" "fiware-service: kz12345678901234567890"
 echo
 echo
 
 
 # 3. Bad character in tenant name
 echo "3: ++++++++++"
-curlXmlTenants $URL "$payload" "fiware-tenant: kz+fg"
+curlXmlTenants $URL "$payload" "fiware-service: kz+fg"
 echo
 echo
 
 
 # 4. Reserved name in tenant name
 echo "4: ++++++++++"
-curlXmlTenants $URL "$payload" "fiware-tenant: log"
+curlXmlTenants $URL "$payload" "fiware-service: log"
 echo
 echo
 
 
+echo "5: ++++++++++"
 # 5. Reserved name (strange case) in tenant name
-curlXmlTenants $URL "$payload" "fiware-tenant: LoG"
+curlXmlTenants $URL "$payload" "fiware-service: LoG"
 
 --REGEXPECT--
 1: ++++++++++
@@ -130,7 +131,7 @@ Date: REGEX(.*)
 
 2: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 263
+Content-Length: 254
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -138,13 +139,13 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain hyphens, underscores and alphanumeric characters)</details>
+  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
 </orionError>
 
 
 3: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 263
+Content-Length: 254
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -152,13 +153,13 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain hyphens, underscores and alphanumeric characters)</details>
+  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
 </orionError>
 
 
 4: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 263
+Content-Length: 254
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -166,13 +167,13 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain hyphens, underscores and alphanumeric characters)</details>
+  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
 </orionError>
 
 
 5: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 263
+Content-Length: 254
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -180,7 +181,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain hyphens, underscores and alphanumeric characters)</details>
+  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
 </orionError>
 --TEARDOWN--
 source harnessFunctions.sh

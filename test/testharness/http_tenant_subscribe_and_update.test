@@ -258,6 +258,7 @@ Content-Length: 727
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:11001
 Accept: application/xml, application/json
+Fiware-Service: t_01
 Content-Type: application/xml
 
 <notifyContextRequest>
@@ -295,6 +296,7 @@ Content-Length: 727
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:11002
 Accept: application/xml, application/json
+Fiware-Service: t_02
 Content-Type: application/xml
 
 <notifyContextRequest>
@@ -327,3 +329,5 @@ Content-Type: application/xml
 --TEARDOWN--
 source harnessFunctions.sh
 brokerStop CB
+accumulatorStop 11001
+accumulatorStop 11002

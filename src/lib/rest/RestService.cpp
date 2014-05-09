@@ -213,12 +213,12 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     //
     // A tenant string must not be longer that 20 characters and may only contain
-    // hyphens, underscores and alphanumeric characters.
+    // underscores and alphanumeric characters.
     //
     std::string result;
     if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
     {
-      OrionError   error(SccBadRequest, "tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain hyphens, underscores and alphanumeric characters)");
+      OrionError   error(SccBadRequest, "tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)");
       std::string  response = error.render(ciP->outFormat, "");
 
       LM_E(("tenant name error: %s", result.c_str()));

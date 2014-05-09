@@ -152,7 +152,7 @@ Date: REGEX(.*)
 3. Discover entity E with HTTP-Tenant t_01
 ++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1000
+Content-Length: 786
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -183,7 +183,7 @@ Date: REGEX(.*)
 4. Discover entity E with HTTP-Tenant t_02
 ++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1000
+Content-Length: 786
 Content-Type: application/xml
 Date: REGEX(.*)
 
