@@ -126,6 +126,7 @@ std::string sendHttpSocket
    unsigned short  port,
    std::string     protocol,
    std::string     verb,
+   std::string     tenant,
    std::string     resource,
    std::string     content_type,
    std::string     content,
@@ -201,6 +202,15 @@ std::string sendHttpSocket
            verb.c_str(), resource.c_str(), versionGet(), ip.c_str(), (int) port, rushHttpHeaders.c_str());
 
   LM_T(LmtRush, ("'PRE' HTTP headers:\n--------------\n%s\n-------------", preContent));
+
+  if (tenant != "")
+  {
+    char tenantHeader[128];
+
+    snprintf(tenantHeader, sizeof(tenantHeader), "fiware-service: %s\n", tenant.c_str());
+
+    strncat(preContent, tenantHeader, sizeof(preContent) - strlen(preContent));
+  }
 
   if (!content.empty())
   {

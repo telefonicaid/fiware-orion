@@ -27,8 +27,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
-
 #include "convenienceMap/mapGetIndividualContextEntityAttributes.h"
+#include "rest/ConnectionInfo.h"
+
 #include "testInit.h"
 
 
@@ -74,13 +75,14 @@ TEST(mapGetIndividualContextEntityAttributes, notFoundThenFound)
 {
   HttpStatusCode          ms;
   ContextElementResponse  response;
+  ConnectionInfo          ci;
 
   prepareDatabase("E1", "Room");
 
-  ms = mapGetIndividualContextEntityAttributes("NotFound", &response);
+  ms = mapGetIndividualContextEntityAttributes("NotFound", &response, &ci);
   EXPECT_EQ(ms, SccOk);
 
-  ms = mapGetIndividualContextEntityAttributes("E1", &response);
+  ms = mapGetIndividualContextEntityAttributes("E1", &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_STREQ("E1", response.contextElement.entityId.id.c_str());
 

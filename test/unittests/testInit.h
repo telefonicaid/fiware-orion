@@ -30,6 +30,7 @@
 #include "ngsi10/NotifyContextRequest.h"
 
 /* Collection names used for testing */
+#define DBPREFIX "unittest"
 #define REGISTRATIONS_COLL "unittest.registrations"
 #define ENTITIES_COLL "unittest.entities"
 #define SUBSCRIBECONTEXT_COLL "unittest.csubs"

@@ -1,3 +1,5 @@
-- Add: Rush can now be used as relayer for the broker, using the option '-rush' (Issue #251)
+- Add: Rush can now be used as relayer for the broker, using the option '-rush' (issue #251)
 - Add: Custom metadata support (issue #252)
+- Add: service multitenancy mode (issue #322)
 - Fix: Raising error on updateContext with location metadata doesn't involve actual change of location attribute (issue #351)
+- Add: Multi-service support (tenants), using the option -multiservice (issue #322)

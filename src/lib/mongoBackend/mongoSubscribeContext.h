@@ -37,6 +37,6 @@
 *
 * mongoSubscribeContext - 
 */
-extern HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, SubscribeContextResponse* responseP, Format inFormat = XML);
+extern HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, SubscribeContextResponse* responseP, Format inFormat = XML, std::string tenant = "");
 
 #endif

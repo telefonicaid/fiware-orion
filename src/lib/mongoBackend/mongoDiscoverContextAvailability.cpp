@@ -42,7 +42,7 @@ using namespace mongo;
 *
 * associationsQuery -
 */
-bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scope, MetadataVector* mdV, std::string* err) {
+bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scope, MetadataVector* mdV, std::string* err, std::string tenant) {
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -83,10 +83,10 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
     BSONObj query = queryB.obj();
     auto_ptr<DBClientCursor> cursor;
     try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getAssociationsCollectionName(), query.toString().c_str()));
+        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getAssociationsCollectionName(tenant).c_str(), query.toString().c_str()));
 
         mongoSemTake(__FUNCTION__, "query in AssociationsCollection");
-        cursor = connection->query(getAssociationsCollectionName(), query);
+        cursor = connection->query(getAssociationsCollectionName(tenant).c_str(), query);
 
         /*
          * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
@@ -101,7 +101,7 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
     catch( const DBException &e ) {
 
         mongoSemGive(__FUNCTION__, "query in AssociationsCollection (DBException)");
-        *err = std::string("collection: ") + getAssociationsCollectionName() +
+        *err = std::string("collection: ") + getAssociationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
         return false;
@@ -109,7 +109,7 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
     catch(...) {
 
         mongoSemGive(__FUNCTION__, "query in AssociationsCollection (Generic Exception)");
-        *err = std::string("collection: ") + getAssociationsCollectionName() +
+        *err = std::string("collection: ") + getAssociationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
         return false;
@@ -154,7 +154,7 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
 *
 * associationsDiscoverConvextAvailability -
 */
-static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, std::string scope) {
+static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, std::string scope, std::string tenant) {
 
     if (scope == SCOPE_VALUE_ASSOC_ALL) {
         LM_W(("%s scope not supported", SCOPE_VALUE_ASSOC_ALL));
@@ -164,7 +164,7 @@ static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAva
 
     MetadataVector mdV;
     std::string err;
-    if (!associationsQuery(requestP->entityIdVector, requestP->attributeList, scope, &mdV, &err)) {
+    if (!associationsQuery(requestP->entityIdVector, requestP->attributeList, scope, &mdV, &err, tenant)) {
         responseP->errorCode.fill(SccReceiverInternalError, std::string("Database error: ") + err);
         LM_RE(SccOk,(responseP->errorCode.details.c_str()));
     }
@@ -196,7 +196,7 @@ static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAva
         }
 
         ContextRegistrationResponseVector crrV;
-        if (!registrationsQuery(enV, attrL, &crrV, &err)) {
+        if (!registrationsQuery(enV, attrL, &crrV, &err, tenant)) {
             responseP->errorCode.fill(SccReceiverInternalError, err);
             LM_RE(SccOk,(responseP->errorCode.details.c_str()));
         }
@@ -220,9 +220,9 @@ static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAva
 *
 * conventionalDiscoverContextAvailability -
 */
-static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP) {
+static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, std::string tenant) {
     std::string err;
-    if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err)) {
+    if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err, tenant)) {
         responseP->errorCode.fill(SccReceiverInternalError, err);
         LM_RE(SccOk,(responseP->errorCode.details.c_str()));
     }
@@ -241,7 +241,7 @@ static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAva
 *
 * mongoDiscoverContextAvailability - 
 */
-HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP)
+HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, std::string tenant)
 {
   reqSemTake(__FUNCTION__, "mongo ngsi9 discovery request");
 
@@ -259,7 +259,7 @@ HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityReque
     std::string scopeValue = requestP->restriction.scopeVector.get(0)->value;
 
     if (scopeType == SCOPE_TYPE_ASSOC) {
-      HttpStatusCode ms = associationsDiscoverConvextAvailability(requestP, responseP, scopeValue);
+      HttpStatusCode ms = associationsDiscoverConvextAvailability(requestP, responseP, scopeValue, tenant);
       reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request (association)");
       return ms;
     }
@@ -268,7 +268,7 @@ HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityReque
     }
   }
 
-  HttpStatusCode hsCode = conventionalDiscoverContextAvailability(requestP, responseP);
+  HttpStatusCode hsCode = conventionalDiscoverContextAvailability(requestP, responseP, tenant);
   if (hsCode != SccOk)
     ++noOfDiscoveryErrors;
 

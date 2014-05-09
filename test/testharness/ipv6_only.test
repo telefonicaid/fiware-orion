@@ -29,7 +29,7 @@ source harnessFunctions.sh
 dbInit CB
 brokerStart CB 0-255 IPV6
 accumulatorStart 0.0.0.0 ${LISTENER_PORT}
-accumulatorStart :: ${LISTENER_PORT_AUX}
+accumulatorStart :: ${LISTENER2_PORT}
 
 --SHELL--
 source harnessFunctions.sh
@@ -97,7 +97,7 @@ EOF
 
 echo "4: ++++++++++++++++++++"
 #Get accumulated data
-curl -g [::1]:${LISTENER_PORT_AUX}/number -s -S
+curl -g [::1]:${LISTENER2_PORT}/number -s -S
 
 echo "5: ++++++++++++++++++++"
 #Get accumulated data
@@ -152,4 +152,4 @@ source harnessFunctions.sh
 
 brokerStop CB
 accumulatorStop ${LISTENER_PORT}
-accumulatorStop ${LISTENER_PORT_AUX}
+accumulatorStop ${LISTENER2_PORT}

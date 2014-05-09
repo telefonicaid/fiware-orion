@@ -34,10 +34,11 @@ void* startSenderThread(void* p)
 {
     SenderThreadParams* params = (SenderThreadParams*) p;
 
-    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, path='%s', content-type: %s", 
+    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', path='%s', content-type: %s", 
                        params->ip.c_str(),
                        params->port,
                        params->verb.c_str(),
+                       params->tenant.c_str(),
                        params->resource.c_str(),
                        params->content_type.c_str()));
 
@@ -45,6 +46,7 @@ void* startSenderThread(void* p)
                    params->port,
                    params->protocol,                   
                    params->verb,
+                   params->tenant,
                    params->resource,
                    params->content_type,
                    params->content,
