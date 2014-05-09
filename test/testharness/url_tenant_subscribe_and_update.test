@@ -35,7 +35,7 @@ accumulatorStart localhost ${LISTENER2_PORT}
 --SHELL--
 source harnessFunctions.sh
 
-echo "1. Make 11001 a subscription for E/att on tenant t_01"
+echo "1. Make a subscription for E/att on tenant t_01"
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
 url="/t_01/NGSI10/subscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
@@ -46,7 +46,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </entityId>
   </entityIdList>
   <attributeList/>
-  <reference>http://127.0.0.1:11001/notify</reference>
+  <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
     <notifyCondition>
@@ -62,7 +62,7 @@ echo
 echo
 
 
-echo "2. Make 11002 a subscription for E/att on tenant t_02"
+echo "2. Make a subscription for E/att on tenant t_02"
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
 url="/t_02/NGSI10/subscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
@@ -73,7 +73,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </entityId>
   </entityIdList>
   <attributeList/>
-  <reference>http://127.0.0.1:11002/notify</reference>
+  <reference>http://127.0.0.1:'${LISTENER2_PORT}'/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
     <notifyCondition>
@@ -103,7 +103,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
         <contextAttribute>
           <name>att</name>
           <type>test</type>
-          <contextValue>accu_11001</contextValue>
+          <contextValue>accu_t01</contextValue>
         </contextAttribute>
       </contextAttributeList>
     </contextElement>
@@ -129,7 +129,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
         <contextAttribute>
           <name>att</name>
           <type>test</type>
-          <contextValue>accu_11002</contextValue>
+          <contextValue>accu_t02</contextValue>
         </contextAttribute>
       </contextAttributeList>
     </contextElement>
@@ -155,7 +155,7 @@ echo
 
 
 --REGEXPECT--
-1. Make 11001 a subscription for E/att on tenant t_01
+1. Make a subscription for E/att on tenant t_01
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 192
@@ -171,7 +171,7 @@ Date: REGEX(.*)
 </subscribeContextResponse>
 
 
-2. Make 11002 a subscription for E/att on tenant t_02
+2. Make a subscription for E/att on tenant t_02
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 192
@@ -254,9 +254,9 @@ Date: REGEX(.*)
 5. Dump accumulator t_01
 +++++++++++++++++++++++++
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 727
+Content-Length: 725
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: 127.0.0.1:11001
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
 Fiware-Service: t_01
 Content-Type: application/xml
@@ -274,7 +274,7 @@ Content-Type: application/xml
           <contextAttribute>
             <name>att</name>
             <type>test</type>
-            <contextValue>accu_11001</contextValue>
+            <contextValue>accu_t01</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -292,9 +292,9 @@ Content-Type: application/xml
 6. Dump accumulator t_02
 +++++++++++++++++++++++++
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 727
+Content-Length: 725
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
-Host: 127.0.0.1:11002
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
 Fiware-Service: t_02
 Content-Type: application/xml
@@ -312,7 +312,7 @@ Content-Type: application/xml
           <contextAttribute>
             <name>att</name>
             <type>test</type>
-            <contextValue>accu_11002</contextValue>
+            <contextValue>accu_t02</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
