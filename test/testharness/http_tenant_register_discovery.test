@@ -58,7 +58,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-service: t_01"
+curlXmlTenants ${url} "${payload}" "fiware-service: t_01"
 echo
 echo
 
@@ -88,7 +88,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-service: t_02"
+curlXmlTenants ${url} "${payload}" "fiware-service: t_02"
 echo
 echo
 
@@ -103,7 +103,7 @@ payload='<discoverContextAvailabilityRequest>
     </entityId>
   </entityIdList>
 </discoverContextAvailabilityRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-service: t_01"
+curlXmlTenants ${url} "${payload}" "fiware-service: t_01"
 echo
 echo
 
@@ -118,7 +118,7 @@ payload='<discoverContextAvailabilityRequest>
     </entityId>
   </entityIdList>
 </discoverContextAvailabilityRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-service: t_02"
+curlXmlTenants ${url} "${payload}" "fiware-service: t_02"
 
 --REGEXPECT--
 1. Register entity E with HTTP-Tenant t_01

@@ -53,7 +53,7 @@ payload='<updateContextRequest>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-service: t_03"
+curlXmlTenants ${url} "${payload}" "fiware-service: t_03"
 echo
 echo
 
@@ -78,7 +78,7 @@ payload='<updateContextRequest>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-service: t_04"
+curlXmlTenants ${url} "${payload}" "fiware-service: t_04"
 echo
 echo
 
@@ -92,7 +92,7 @@ payload='<queryContextRequest>
     </entityId>
   </entityIdList>
 </queryContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-service: t_03"
+curlXmlTenants ${url} "${payload}" "fiware-service: t_03"
 echo
 echo
 
@@ -107,7 +107,7 @@ payload='<queryContextRequest>
     </entityId>
   </entityIdList>
 </queryContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-service: t_04"
+curlXmlTenants ${url} "${payload}" "fiware-service: t_04"
 
 
 --REGEXPECT--

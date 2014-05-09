@@ -57,7 +57,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-service: t_01"
+curlXmlTenants ${url} "${payload}" "fiware-service: t_01"
 echo
 echo
 
@@ -84,7 +84,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-service: t_02"
+curlXmlTenants ${url} "${payload}" "fiware-service: t_02"
 echo
 echo
 
@@ -110,7 +110,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-service: t_01"
+curlXmlTenants ${url} "${payload}" "fiware-service: t_01"
 echo
 echo
 
@@ -136,7 +136,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXmlTenants ${url} "${payload}" "" "fiware-service: t_02"
+curlXmlTenants ${url} "${payload}" "fiware-service: t_02"
 echo
 echo
 
