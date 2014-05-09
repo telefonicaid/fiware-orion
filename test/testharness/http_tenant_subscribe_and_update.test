@@ -141,16 +141,16 @@ echo
 echo
 
 
-echo "5. Dump accumulator 11001"
+echo "5. Dump accumulator t_01"
 echo "+++++++++++++++++++++++++"
-curl localhost:11001/dump
+curl localhost:${LISTENER_PORT}/dump
 echo
 echo
 
 
-echo "6. Dump accumulator 11002"
+echo "6. Dump accumulator t_02"
 echo "+++++++++++++++++++++++++"
-curl localhost:11002/dump
+curl localhost:${LISTENER2_PORT}/dump
 echo
 
 
@@ -251,9 +251,9 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-5. Dump accumulator 11001
+5. Dump accumulator t_01
 +++++++++++++++++++++++++
-POST http://127.0.0.1:11001/notify
+POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 727
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:11001
@@ -289,9 +289,9 @@ Content-Type: application/xml
 =======================================
 
 
-6. Dump accumulator 11002
+6. Dump accumulator t_02
 +++++++++++++++++++++++++
-POST http://127.0.0.1:11002/notify
+POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 727
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:11002

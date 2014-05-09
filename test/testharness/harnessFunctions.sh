@@ -77,8 +77,6 @@ function dbTenantInit()
 {
   db=$1
 
-  echo "DEBUG: deleting $db"
-
   echo 'db.dropDatabase()' | mongo $db --quiet
 
 }
