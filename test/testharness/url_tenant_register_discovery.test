@@ -96,7 +96,8 @@ echo
 echo "3. Discover entity E with URL-Tenant t_01"
 echo "++++++++++++++++++++++++++++++++++++++++++++"
 url="/t_01/ngsi9/discoverContextAvailability"
-payload='<discoverContextAvailabilityRequest>
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<discoverContextAvailabilityRequest>
   <entityIdList>
     <entityId type="Test" isPattern="false">
       <id>E</id>
@@ -111,7 +112,8 @@ echo
 echo "4. Discover entity E with URL-Tenant t_02"
 echo "++++++++++++++++++++++++++++++++++++++++++++"
 url="/t_02/ngsi9/discoverContextAvailability"
-payload='<discoverContextAvailabilityRequest>
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<discoverContextAvailabilityRequest>
   <entityIdList>
     <entityId type="Test" isPattern="false">
       <id>E</id>

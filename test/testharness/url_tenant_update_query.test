@@ -36,7 +36,8 @@ source harnessFunctions.sh
 echo "1. Update/append entity E with URL-Tenant t_03"
 echo "++++++++++++++++++++++++++++++++++++++++++++++++++++"
 url="/t_03/NGSI10/updateContext"
-payload='<updateContextRequest>
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
   <contextElementList>
     <contextElement>
       <entityId type="Test" isPattern="false">
@@ -61,7 +62,8 @@ echo
 echo "2. Update/append entity E with URL-Tenant t_04"
 echo "++++++++++++++++++++++++++++++++++++++++++++++++++++"
 url="/t_04/NGSI10/updateContext"
-payload='<updateContextRequest>
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
   <contextElementList>
     <contextElement>
       <entityId type="Test" isPattern="false">
@@ -85,7 +87,8 @@ echo
 echo "3. Query entity E with URL-Tenant t_03"
 echo "++++++++++++++++++++++++++++++++++++++"
 url='/t_03/NGSI10/queryContext'
-payload='<queryContextRequest>
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
   <entityIdList>
     <entityId type="Test" isPattern="false">
       <id>E</id>
@@ -100,7 +103,8 @@ echo
 echo "4. Query entity E with URL-Tenant t_04"
 echo "++++++++++++++++++++++++++++++++++++++"
 url='/t_04/NGSI10/queryContext'
-payload='<queryContextRequest>
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
   <entityIdList>
     <entityId type="Test" isPattern="false">
       <id>E</id>
