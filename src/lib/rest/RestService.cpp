@@ -223,6 +223,14 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       LM_E(("tenant name error: %s", result.c_str()));
       restReply(ciP, response);
+
+      if (reqP != NULL)
+        reqP->release(&parseData);
+      if (jsonReqP != NULL)
+        jsonReqP->release(&parseData);
+
+      compV.clear();
+        
       return response;
     }
 
