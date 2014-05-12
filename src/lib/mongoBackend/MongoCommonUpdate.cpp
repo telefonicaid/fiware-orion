@@ -520,7 +520,7 @@ static bool updateAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
 static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute* ca) {
 
     BSONArrayBuilder mdToAdd;
-    unsigned int mdToAddSize;
+    unsigned int mdToAddSize = 0;
     for (unsigned int ix = 0; ix < ca->metadataVector.size(); ++ix) {
         Metadata* md = ca->metadataVector.get(ix);
         if (!isNotCustomMetadata(md->name)) {
