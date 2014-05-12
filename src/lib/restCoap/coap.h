@@ -14,8 +14,6 @@ class Coap
 
     int   callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom);
     void  serve();
-    void  printAddressStructures(struct addrinfo *addr);
-    void  printAddress(struct addrinfo *addr);
 
   public:
     int   run(const char *_host, unsigned short _port);
