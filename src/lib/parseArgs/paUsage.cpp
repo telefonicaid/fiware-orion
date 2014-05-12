@@ -250,6 +250,8 @@ void paUsage(void)
 	// paLogOn = true;
 	paIterateInit();
 	PA_M(("------------- presenting usage -------------"));
+
+  bool firstTime = true;
 	while ((aP = paIterateNext(paiList)) != NULL)
 	{
 		char  xName[512];
@@ -262,6 +264,13 @@ void paUsage(void)
 			continue;
 		if ((aP->isBuiltin == true) && (aP->includeInUsage == false))
 			continue;
+
+    if (!firstTime)
+    {
+		  sprintf(s, "%s        ", spacePad); /* 8 spaces for "Usage:  " */
+		  strncat(paResultString, s, sizeof(paResultString) - 1);
+    }
+    firstTime = false;
 
 		if ((aP->isBuiltin == false) && (firstUserOptionFound == false))
 		{
@@ -284,15 +293,12 @@ void paUsage(void)
 
 		sprintf(s, " %s\n", xName);
 		strncat(paResultString, s, sizeof(paResultString) - 1);
-		sprintf(s, "%s        ", spacePad); /* 8 spaces for "Usage:  " */
-		strncat(paResultString, s, sizeof(paResultString) - 1);
 
 		PA_M(("parsed arg %d", ix));
     }
-	// paLogOn = false;
+    // paLogOn = false;
     free(spacePad);
     PA_M(("presenting usage"));
-    strncat(paResultString, "\r", sizeof(paResultString) - 1);
 
 	printf("%s\n", paResultString);
     exit(0);

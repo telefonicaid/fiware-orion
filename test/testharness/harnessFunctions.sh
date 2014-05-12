@@ -58,15 +58,27 @@ function harnessExit()
 #
 function dbInit()
 {
-  role=$1
+  role=$1  
 
   if [ "$role" == "CB" ]
   then
     echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
   elif [ "$role" == "CM" ]
   then
-    echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_AUX_NAME} --quiet
+    echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE2_NAME} --quiet
   fi
+}
+
+# ------------------------------------------------------------------------------
+#
+# dbTenantInit -
+#
+function dbTenantInit()
+{
+  db=$1
+
+  echo 'db.dropDatabase()' | mongo $db --quiet
+
 }
 
 
@@ -80,7 +92,13 @@ function localBrokerStart()
   role=$1
   traceLevels=$2
   ipVersion=$3
-  extraParams="$4"
+
+  shift
+  shift
+  shift
+
+  extraParams=$*
+
   IPvOption=""
 
   if [ "$ipVersion" == "IPV4" ]
@@ -99,7 +117,7 @@ function localBrokerStart()
   then
     mkdir -p /tmp/configManager
     port=$CM_PORT
-    CB_START_CMD="contextBroker -harakiri -port ${CM_PORT}     -pidpath ${BROKER_PID_FILE_AUX} -db ${BROKER_DATABASE_AUX_NAME} -t $traceLevels -fwdPort ${BROKER_PORT} -logDir /tmp/configManager -ngsi9 $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port ${CM_PORT}     -pidpath ${BROKER_PID2_FILE} -db ${BROKER_DATABASE2_NAME} -t $traceLevels -fwdPort ${BROKER_PORT} -logDir /tmp/configManager -ngsi9 $extraParams"
   fi
 
   if [ "$VALGRIND" == "" ]; then
@@ -168,7 +186,12 @@ function brokerStart()
   role=$1
   traceLevels=$2
   ipVersion=$3
-  extraParams="$4"
+
+  shift
+  shift
+  shift
+
+  extraParams=$*
 
   if [ "$role" == "" ]
   then
@@ -182,7 +205,7 @@ function brokerStart()
   fi
 
   localBrokerStop $role
-  localBrokerStart $role $traceLevels $ipVersion "$extraParams"
+  localBrokerStart $role $traceLevels $ipVersion $extraParams
 }
 
 
@@ -201,7 +224,7 @@ function brokerStop
     port=$BROKER_PORT
   elif [ "$role" == "CM" ]
   then
-    pidFile=$BROKER_PID_FILE_AUX
+    pidFile=$BROKER_PID2_FILE
     port=$CM_PORT
   fi
 
@@ -223,10 +246,9 @@ function brokerStop
 #
 function accumulatorStop()
 {
-
   port=$1
 
-  # If port is missing, we use the default LISTERNER_PORT
+  # If port is missing, we use the default LISTENER_PORT
   if [ -z "$port" ]
   then
     port=${LISTENER_PORT}
@@ -271,7 +293,7 @@ function accumulatorStart()
   bindIp=$1
   port=$2
 
-  # If port is missing, we use the default LISTERNER_PORT
+  # If port is missing, we use the default LISTENER_PORT
   if [ -z "$port" ]
   then
     port=${LISTENER_PORT}
@@ -352,11 +374,17 @@ function curlIt()
   contenttype=$4
   accept=$5
   extraoptions=$6
+  httpTenant=$7
 
   params="-s -S --dump-header headers.out"
   
-  response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" --header "Expect:" ${extraoptions} -d @- ))
-  
+  if [ "$extraoptions" == "" ] && [ "$httpTenant" != "" ]
+  then
+    response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" --header "Expect:" --header "$httpTenant" -d @- ))
+  else
+    response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" --header "Expect:" ${extraoptions} -d @- ))
+  fi
+
   if [ "$outFormat" == "XML" ] || [ "$outFormat" == "xml" ]
   then
     printXmlWithHeaders "${response}"
@@ -383,6 +411,14 @@ function curlXml()
   curlIt "XML" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/xml" "Accept: application/xml" "${extraoptions}"
 }
 
+function curlXmlTenants()
+{
+  url=$1
+  payload=$2
+  tenant=$3
+  
+  curlIt "XML" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/xml" "Accept: application/xml" "" "$tenant"
+}
 
 
 # ------------------------------------------------------------------------------

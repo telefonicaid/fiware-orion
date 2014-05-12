@@ -54,7 +54,7 @@ typedef struct RestService
   std::string   verb;
   RequestType   request;
   int           components;
-  std::string   compV[6];
+  std::string   compV[7];
   std::string   payloadWord;
   RestTreat     treat;
 } RestService;

@@ -32,6 +32,7 @@
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 #include "rest/HttpStatusCode.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -39,11 +40,11 @@
 *
 * mapGetContextEntityTypes - 
 */
-HttpStatusCode mapGetContextEntityTypes(std::string typeName, DiscoverContextAvailabilityResponse* response)
+HttpStatusCode mapGetContextEntityTypes(std::string typeName, DiscoverContextAvailabilityResponse* response, ConnectionInfo* ciP)
 {
   DiscoverContextAvailabilityRequest  request;
   EntityId                            entityId(".*", typeName, "true");
 
   request.entityIdVector.push_back(&entityId);
-  return mongoDiscoverContextAvailability(&request, response);
+  return mongoDiscoverContextAvailability(&request, response, ciP->tenant);
 }

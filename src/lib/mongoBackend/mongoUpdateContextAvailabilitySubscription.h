@@ -37,6 +37,6 @@
 *
 * mongoUpdateContextAvailabilitySubscription - 
 */
-extern HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabilitySubscriptionRequest* requestP, UpdateContextAvailabilitySubscriptionResponse* responseP, Format inFormat = XML);
+extern HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabilitySubscriptionRequest* requestP, UpdateContextAvailabilitySubscriptionResponse* responseP, Format inFormat = XML, std::string tenant = "");
 
 #endif

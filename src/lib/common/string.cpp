@@ -194,9 +194,8 @@ int stringSplit(std::string in, char delimiter, std::vector<std::string>& outV)
 * argument is not a valid URL. Otherwise, it returns true.
 *
 */
-bool parseUrl(std::string url, std::string& host, int& port, std::string& path)
+bool parseUrl(std::string url, std::string& host, int& port, std::string& path, std::string& protocol)
 {
-
     /* Sanity check */
     if (url == "") {
         return false;
@@ -205,6 +204,8 @@ bool parseUrl(std::string url, std::string& host, int& port, std::string& path)
     /* First: split by the first '/' to get host:ip and path */
     std::vector<std::string>  urlTokens;
     int                       components = stringSplit(url, '/', urlTokens);
+
+    protocol = urlTokens[0];
 
     /* http://some.host.com/my/path
      *      ^^             ^  ^

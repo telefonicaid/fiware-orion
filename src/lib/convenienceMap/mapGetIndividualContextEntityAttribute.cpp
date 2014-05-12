@@ -29,6 +29,8 @@
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/HttpStatusCode.h"
 
 
 
@@ -36,7 +38,7 @@
 *
 * mapGetIndividualContextEntityAttribute - 
 */
-HttpStatusCode mapGetIndividualContextEntityAttribute(std::string entityId, std::string attributeName, ContextAttributeResponse* response)
+HttpStatusCode mapGetIndividualContextEntityAttribute(std::string entityId, std::string attributeName, ContextAttributeResponse* response, ConnectionInfo* ciP)
 {
    HttpStatusCode        ms;
    QueryContextRequest   qcRequest;
@@ -46,7 +48,7 @@ HttpStatusCode mapGetIndividualContextEntityAttribute(std::string entityId, std:
    qcRequest.entityIdVector.push_back(&entity);
    qcRequest.attributeList.push_back(attributeName);
 
-   ms = mongoQueryContext(&qcRequest, &qcResponse);
+   ms = mongoQueryContext(&qcRequest, &qcResponse, ciP->tenant);
 
    if ((ms != SccOk) || (qcResponse.contextElementResponseVector.size() == 0))
    {

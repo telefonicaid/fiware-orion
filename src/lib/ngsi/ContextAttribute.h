@@ -33,10 +33,6 @@
 #include "ngsi/Request.h"
 #include "parse/CompoundValueNode.h"
 
-#define NGSI_MD_ID       "ID"
-#define NGSI_MD_LOCATION "location"
-
-
 /* ****************************************************************************
 *
 * ContextAttribute - 

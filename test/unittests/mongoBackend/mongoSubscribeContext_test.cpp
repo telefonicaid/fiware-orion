@@ -324,9 +324,9 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T1_C0)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -415,9 +415,9 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T1_C0_JSON)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -506,9 +506,9 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T1_C0)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -601,11 +601,11 @@ TEST(mongoSubscribeContext, Ent1_Attr0_TN_C0)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -700,11 +700,11 @@ TEST(mongoSubscribeContext, Ent1_AttrN_TN_C0)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -803,9 +803,9 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -896,9 +896,9 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -992,9 +992,9 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1093,9 +1093,9 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1187,9 +1187,9 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1293,9 +1293,9 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1391,11 +1391,11 @@ TEST(mongoSubscribeContext, Ent1_Attr0_TN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1506,11 +1506,11 @@ TEST(mongoSubscribeContext, Ent1_Attr0_TN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1614,11 +1614,11 @@ TEST(mongoSubscribeContext, Ent1_AttrN_TN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1733,11 +1733,11 @@ TEST(mongoSubscribeContext, Ent1_AttrN_TN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1846,9 +1846,9 @@ TEST(mongoSubscribeContext, EntN_Attr0_T1_C0)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1946,9 +1946,9 @@ TEST(mongoSubscribeContext, EntN_AttrN_T1_C0)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2048,11 +2048,11 @@ TEST(mongoSubscribeContext, EntN_Attr0_TN_C0)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2153,11 +2153,11 @@ TEST(mongoSubscribeContext, EntN_AttrN_TN_C0)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2262,9 +2262,9 @@ TEST(mongoSubscribeContext, EntN_Attr0_T0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2361,9 +2361,9 @@ TEST(mongoSubscribeContext, EntN_AttrN_T0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2463,9 +2463,9 @@ TEST(mongoSubscribeContext, EntN_Attr0_T0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2570,9 +2570,9 @@ TEST(mongoSubscribeContext, EntN_Attr0_T0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2670,9 +2670,9 @@ TEST(mongoSubscribeContext, EntN_AttrN_T0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2781,9 +2781,9 @@ TEST(mongoSubscribeContext, EntN_AttrN_T0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2885,11 +2885,11 @@ TEST(mongoSubscribeContext, EntN_Attr0_TN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3006,11 +3006,11 @@ TEST(mongoSubscribeContext, EntN_Attr0_TN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3120,11 +3120,11 @@ TEST(mongoSubscribeContext, EntN_AttrN_TN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3245,11 +3245,11 @@ TEST(mongoSubscribeContext, EntN_AttrN_TN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3364,9 +3364,9 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T1_C0_throttling)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3456,9 +3456,9 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T1_C0_throttling)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3552,9 +3552,9 @@ TEST(mongoSubscribeContext, EntN_Attr0_T1_C0_throttling)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3653,9 +3653,9 @@ TEST(mongoSubscribeContext, EntN_AttrN_T1_C0_throttling)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3769,9 +3769,9 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -3876,9 +3876,9 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_C1_JSON)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -3981,9 +3981,9 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4090,9 +4090,9 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4215,9 +4215,9 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4340,9 +4340,9 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_T0_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4456,9 +4456,9 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4572,9 +4572,9 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_T0_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4702,9 +4702,9 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4832,9 +4832,9 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_T0_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4943,9 +4943,9 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5059,9 +5059,9 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5176,9 +5176,9 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5282,9 +5282,9 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CN_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5400,9 +5400,9 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5518,9 +5518,9 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CN_partial_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5636,9 +5636,9 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5748,11 +5748,11 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_TN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -5877,11 +5877,11 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_TN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -5997,11 +5997,11 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_TN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -6128,11 +6128,11 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_TN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -6263,9 +6263,9 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6380,9 +6380,9 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6504,9 +6504,9 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_T0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6633,9 +6633,9 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_T0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6751,9 +6751,9 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_T0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6878,9 +6878,9 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_T0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -7002,11 +7002,11 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_TN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -7143,11 +7143,11 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_TN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -7273,11 +7273,11 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_TN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -7414,11 +7414,11 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_TN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -7533,9 +7533,9 @@ TEST(mongoSubscribeContext, defaultDuration)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -7627,14 +7627,14 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
     // FIXME: note that processOntimeIntervalCondition() is called before the document is
     // inserted in database. Same will happend with processOnChangeCondition(). Maybe
     // a better approach is to create thread and sendNotifyContextRequest only in case of successful document
     // inserting. Once fixed, change Times(1) to Time(0). Add also a new test to check on
     // processOnChangeCondition()
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(1);
     setNotifier(notifierMock);
 

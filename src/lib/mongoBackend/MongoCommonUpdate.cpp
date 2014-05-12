@@ -150,6 +150,143 @@ static void valueBson(ContextAttribute* ca, BSONObjBuilder& bsonAttr) {
 
 }
 
+/* ****************************************************************************
+*
+* isNotCustomMetadata -
+*
+* Check that the parameter is a not custom metadata, i.e. one metadata without
+* an special semantic to be interpreted by the context broker itself
+*
+* FIXME P2: this function probably could be moved to another place "closer" to metadata
+*/
+static bool isNotCustomMetadata(std::string md) {
+    if (md != NGSI_MD_ID &&
+        md != NGSI_MD_LOCATION &&
+        md != NGSI_MD_CREDATE &&
+        md != NGSI_MD_MODDATE) {
+        return false;
+    }    
+    return true;
+}
+
+/* ****************************************************************************
+*
+* hasMetadata -
+*
+* Check if a metadata is included in a (request) ContextAttribute
+*/
+static bool hasMetadata(std::string name, std::string type, ContextAttribute ca) {
+
+    for (unsigned int ix = 0; ix < ca.metadataVector.size() ; ++ix) {
+        Metadata* md = ca.metadataVector.get(ix);
+        /* Note that, different from entity types or attribute types, for attribute metadata we don't consider empty type
+         * as a wildcard in order to keep it simpler */
+        if ((md->name == name) && (md->type == type)) {
+            return true;
+        }
+    }
+    return false;
+
+}
+
+
+/* ****************************************************************************
+*
+* matchMetadata -
+*
+* Returns if two metadata elements have the same name and type, taking into account that
+* the type field could not be present (it is optional in NGSI)
+*/
+static bool matchMetadata(BSONObj& md1, BSONObj& md2) {
+
+    if (md1.hasField(ENT_ATTRS_MD_TYPE)) {
+        return md2.hasField(ENT_ATTRS_MD_TYPE) &&
+               STR_FIELD(md1, ENT_ATTRS_MD_TYPE) == STR_FIELD(md2, ENT_ATTRS_MD_TYPE) &&
+               STR_FIELD(md1, ENT_ATTRS_MD_NAME) == STR_FIELD(md2, ENT_ATTRS_MD_NAME);
+    }
+    else {
+        return !md2.hasField(ENT_ATTRS_MD_TYPE) &&
+               STR_FIELD(md1, ENT_ATTRS_MD_NAME) == STR_FIELD(md2, ENT_ATTRS_MD_NAME);
+    }
+
+}
+
+/* ****************************************************************************
+*
+* equalMetadataVectors -
+*
+* Given two vectors with the same metadata names-types, check that all the values
+* are equal, returning false otherwise.
+*
+* Arguments are passed by reference to avoid "heavy" copies
+*/
+static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2) {
+
+
+    bool found = false;
+    for( BSONObj::iterator i1 = mdV1.begin(); i1.more(); ) {
+        BSONObj md1 = i1.next().embeddedObject();
+        for( BSONObj::iterator i2 = mdV2.begin(); i2.more(); ) {
+            BSONObj md2 = i2.next().embeddedObject();
+            /* Check metadata match */
+            if (matchMetadata(md1, md2)) {
+                if (STR_FIELD(md1, ENT_ATTRS_MD_VALUE) != STR_FIELD(md2, ENT_ATTRS_MD_VALUE)) {
+                    return false;
+                }
+                else {
+                    found = true;
+                    break;  // loop in i2
+                }
+            }
+        }
+        if (found) {
+            /* Shortcut for early passing to the next attribute in i1 */
+            found = false;
+            continue; // loop in i1
+        }
+    }
+    return true;
+
+}
+
+/* ****************************************************************************
+*
+* bsonCustomMetadataToBson -
+*
+* Generates the BSON for metadata vector to be inserted in database for a given attribute.
+* If there is no custom metadata, then it returns false (true otherwise).
+*
+*/
+static bool bsonCustomMetadataToBson(BSONObj& newMdV, BSONObj& attr) {
+
+    if (!attr.hasField(ENT_ATTRS_MD)) {
+        return false;
+    }
+
+    BSONArrayBuilder mdNewVBuilder;
+    BSONObj mdV = attr.getField(ENT_ATTRS_MD).embeddedObject();
+    unsigned int mdVSize = 0;
+    for( BSONObj::iterator i = mdV.begin(); i.more(); ) {
+        BSONObj md = i.next().embeddedObject();
+        mdVSize++;
+        if (md.hasField(ENT_ATTRS_MD_TYPE)) {
+            mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
+                                      ENT_ATTRS_MD_TYPE << md.getStringField(ENT_ATTRS_MD_TYPE) <<
+                                      ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
+         }
+         else {
+            mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
+                                      ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
+         }
+     }
+
+     if (mdVSize > 0) {
+         newMdV = mdNewVBuilder.arr();
+         return true;
+     }
+     return false;
+
+}
 
 /* ****************************************************************************
 *
@@ -180,27 +317,80 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
     }
     if (smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_TYPE), STR_FIELD(attr, ENT_ATTRS_ID),
                        ca.name, ca.type, ca.getId())) {
+
         /* Attribute match: update value */
         valueBson(&ca, newAttr);
         updated = true;
 
+        /* Update metadata */
+        BSONArrayBuilder mdNewVBuilder;
+
+        /* First add the metadata elements comming in the request */
+        unsigned int mdNewVSize = 0;
+        for (unsigned int ix = 0; ix < ca.metadataVector.size() ; ++ix) {
+            Metadata* md = ca.metadataVector.get(ix);
+            /* Skip not custom metadata */
+            if (isNotCustomMetadata(md->name)) {
+                continue;
+            }
+            mdNewVSize++;
+            if (md->type == "") {
+                mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md->name << ENT_ATTRS_MD_VALUE << md->value));
+            }
+            else {
+                mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md->name << ENT_ATTRS_MD_TYPE << md->type << ENT_ATTRS_MD_VALUE << md->value));
+            }
+        }
+
+        /* Second, for each metadata previously in the metadata vector but *not included in the request*, add it as is */
+        unsigned int mdVSize = 0;
+        BSONObj mdV;
+        if (attr.hasField(ENT_ATTRS_MD)) {
+            mdV = attr.getField(ENT_ATTRS_MD).embeddedObject();
+            for( BSONObj::iterator i = mdV.begin(); i.more(); ) {
+                BSONObj md = i.next().embeddedObject();
+                mdVSize++;
+                if (!hasMetadata(md.getStringField(ENT_ATTRS_MD_NAME), md.getStringField(ENT_ATTRS_MD_TYPE), ca)) {
+                    mdNewVSize++;
+                    if (md.hasField(ENT_ATTRS_MD_TYPE)) {
+                        mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
+                                           ENT_ATTRS_MD_TYPE << md.getStringField(ENT_ATTRS_MD_TYPE) <<
+                                           ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
+                    }
+                    else {
+                        mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
+                                           ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
+                    }
+                }
+            }
+        }
+
+        BSONObj mdNewV = mdNewVBuilder.arr();
+        if (mdNewVSize > 0) {
+            newAttr.appendArray(ENT_ATTRS_MD, mdNewV);
+        }
+
         /* It was an actual update? */
         if (ca.compoundValueP == NULL) {
-            /* It was an actual update? */
-            if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value) {
+            /* In the case of simple value, we check if the value of the attribute changed or the metadata changed (the later
+             * one is done checking if the size of the original and final metadata vectors is different and, if they are of the
+             * same size, checking if the vectors are not equal) */
+            if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value || mdNewVSize != mdVSize || !equalMetadataVectors(mdV, mdNewV)) {
                 *actualUpdate = true;
             }
         }
         else {
             // FIXME P6: in the case of composed value, it's more difficult to know if an attribute
-            // has really changed its value (many levels have to be travesed. Until we can develop the
+            // has really changed its value (many levels have to be traversed). Until we can develop the
             // matching logic, we consider actualUpdate always true.
             *actualUpdate = true;
         }
 
     }
     else {
-        /* Attribute doesn't match: value is included "as is", taking into account it can be a compound value */
+        /* Attribute doesn't match */
+
+        /* Value is included "as is", taking into account it can be a compound value */
         if (attr.hasField(ENT_ATTRS_VALUE)) {
             BSONElement value = attr.getField(ENT_ATTRS_VALUE);
             if (value.type() == String) {
@@ -216,6 +406,12 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
                 LM_E(("unknown BSON type"));
             }
 
+        }
+
+        /* Metadata is included "as is" */
+        BSONObj mdV;
+        if (bsonCustomMetadataToBson(mdV, attr)) {
+            newAttr.appendArray(ENT_ATTRS_MD, mdV);
         }
     }
 
@@ -252,6 +448,13 @@ static bool checkAndDelete (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
         newAttr->append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
         newAttr->append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
         newAttr->append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
+
+        /* Custom metadata */
+        BSONObj mdV;
+        if (bsonCustomMetadataToBson(mdV, attr)) {
+            newAttr->appendArray(ENT_ATTRS_MD, mdV);
+        }
+
         /* The hasField() check is needed to preserve compatibility with entities that were created
          * in database by a CB instance previous to the support of creation and modification dates */
         if (attr.hasField(ENT_ATTRS_CREATION_DATE)) {
@@ -308,6 +511,34 @@ static bool updateAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
 
 /* ****************************************************************************
 *
+* contextAttributeCustomMetadataToBson -
+*
+* Generates the BSON for metadata vector to be inserted in database for a given atribute.
+* If there is no custom metadata, then it returns false (true otherwise).
+*
+*/
+static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute* ca) {
+
+    BSONArrayBuilder mdToAdd;
+    unsigned int mdToAddSize;
+    for (unsigned int ix = 0; ix < ca->metadataVector.size(); ++ix) {
+        Metadata* md = ca->metadataVector.get(ix);
+        if (!isNotCustomMetadata(md->name)) {
+            mdToAddSize++;
+            mdToAdd.append(BSON("name" << md->name << "type" << md->type << "value" << md->value));
+            LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
+                            md->name.c_str(), md->type.c_str(), md->value.c_str()));
+        }
+    }
+    if (mdToAddSize > 0) {
+        mdV = mdToAdd.arr();
+        return true;
+    }   
+    return false;
+}
+
+/* ****************************************************************************
+*
 * appendAttribute -
 *
 * In the case of "actual append", it always return true
@@ -340,6 +571,11 @@ static bool appendAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
         if (caP->getId() != "") {
             newAttr.append(ENT_ATTRS_ID, caP->getId());
         }
+        BSONObj mdV;
+        if (contextAttributeCustomMetadataToBson(mdV, caP)) {
+            newAttr.appendArray(ENT_ATTRS_MD, mdV);
+        }
+
         int now = getCurrentTime();
         newAttr.append(ENT_ATTRS_CREATION_DATE, now);
         newAttr.append(ENT_ATTRS_MODIFICATION_DATE, now);
@@ -495,7 +731,7 @@ static bool deleteAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
 * addTriggeredSubscriptions
 *
 */
-static bool addTriggeredSubscriptions(std::string entityId, std::string entityType, std::string attr, map<string, BSONObj*>* subs, std::string* err) {
+static bool addTriggeredSubscriptions(std::string entityId, std::string entityType, std::string attr, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -552,10 +788,10 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
     /* Do the query */
     auto_ptr<DBClientCursor> cursor;
     try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(), query.toString().c_str()));
+        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), query.toString().c_str()));
 
         mongoSemTake(__FUNCTION__, "query in SubscribeContextCollection");
-        cursor = connection->query(getSubscribeContextCollectionName(), query);
+        cursor = connection->query(getSubscribeContextCollectionName(tenant).c_str(), query);
 
         /*
          * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
@@ -569,14 +805,14 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
     }
     catch( const DBException &e ) {
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (DBException)");
-        *err = std::string("collection: ") + getSubscribeContextCollectionName() +
+        *err = std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                " - query(): " + query.toString() +
                " - exception: " + e.what();
         return false;
     }
     catch(...) {
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (Generic Exception)");
-        *err = std::string("collection: ") + getSubscribeContextCollectionName() +
+        *err = std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                " - query(): " + query.toString() +
                " - exception: " + "generic";
         return false;
@@ -606,7 +842,7 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
 * processSubscriptions
 *
 */
-static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::string* err) {
+static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -622,15 +858,15 @@ static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::
         try
         {
            mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
-           sub = connection->findOne(getSubscribeContextCollectionName(), BSON("_id" << OID(mapSubId)));
+           sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(mapSubId)));
            mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
         }
         catch (...)
         {
            mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo generic exception)");
-           LM_E(("Got an exception during findOne of collection '%s'", getSubscribeContextCollectionName()));
+           LM_E(("Got an exception during findOne of collection '%s'", getSubscribeContextCollectionName(tenant).c_str()));
 
-           *err = std::string("collection: ") + getEntitiesCollectionName();
+           *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str();
            return false;
         }
 
@@ -661,22 +897,23 @@ static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::
         if (processOnChangeCondition(enV, attrL, NULL,
                                      subId.str(),
                                      STR_FIELD(sub, CSUB_REFERENCE),
-                                     format)) {
+                                     format,
+                                     tenant)) {
 
             BSONObj query = BSON("_id" << subId);
             BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CSUB_COUNT << 1));
             try {
-                LM_T(LmtMongo, ("update() in '%s' collection: {%s, %s}", getSubscribeContextCollectionName(),
+                LM_T(LmtMongo, ("update() in '%s' collection: {%s, %s}", getSubscribeContextCollectionName(tenant).c_str(),
                                 query.toString().c_str(),
                                 update.toString().c_str()));
 
                 mongoSemTake(__FUNCTION__, "update in SubscribeContextCollection");
-                connection->update(getSubscribeContextCollectionName(), query, update);
+                connection->update(getSubscribeContextCollectionName(tenant).c_str(), query, update);
                 mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection");
             }
             catch( const DBException &e ) {
                 mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
-                *err = std::string("collection: ") + getEntitiesCollectionName() +
+                *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                        " - query(): " + query.toString() + " - update(): " + update.toString() + " - exception: " + e.what();
                 enV.release();
                 attrL.release();
@@ -684,7 +921,7 @@ static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::
             }
             catch(...) {
                 mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
-                *err = std::string("collection: ") + getEntitiesCollectionName() +
+                *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                        " - query(): " + query.toString() + " - update(): " + update.toString() + " - exception: " + "generic";
                 enV.release();
                 attrL.release();
@@ -721,6 +958,38 @@ static void buildGeneralErrorReponse(ContextElement* ceP, ContextAttribute* ca, 
 
 /* ****************************************************************************
 *
+* setResponseMetadata -
+*
+* Common method to create the metadata elements in updateContext responses
+*
+*/
+static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes) {
+
+    Metadata* md;
+
+    /* Not custom */
+    if (caReq->getId().length() > 0) {
+        md = new Metadata(NGSI_MD_ID, "string", caReq->getId());
+        caRes->metadataVector.push_back(md);
+    }
+    if (caReq->getLocation().length() > 0) {
+        md = new Metadata(NGSI_MD_LOCATION, "string", caReq->getLocation());
+        caRes->metadataVector.push_back(md);
+    }
+
+    /* Custom (just "mirroring" in the response) */
+    for (unsigned int ix = 0; ix < caReq->metadataVector.size(); ++ix) {
+        Metadata* mdReq = caReq->metadataVector.get(ix);
+        if (!isNotCustomMetadata(mdReq->name)) {
+            md = new Metadata(mdReq->name, mdReq->type, mdReq->value);
+            caRes->metadataVector.push_back(md);
+        }
+    }
+
+}
+
+/* ****************************************************************************
+*
 * processContextAttributeVector -
 *
 * Returns true if entity was actually modified, false otherwise (including fail cases)
@@ -733,7 +1002,8 @@ static bool processContextAttributeVector (ContextElement*               ceP,
                                            ContextElementResponse*       cerP,
                                            std::string&                  locAttr,
                                            double&                       coordLat,
-                                           double&                       coordLong)
+                                           double&                       coordLong,
+                                           std::string                   tenant)
 {
 
     EntityId*   eP         = &cerP->contextElement.entityId;
@@ -749,18 +1019,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
 
         /* No matter if success or fail, we have to include the attribute in the response */
         ContextAttribute* ca = new ContextAttribute(targetAttr->name, targetAttr->type);
-
-        // FIXME P4: not sure, but probably we can generalize this when we address
-        // issue https://github.com/telefonicaid/fiware-orion/issues/252
-        Metadata* md;
-        if (targetAttr->getId().length() > 0) {
-            md = new Metadata(NGSI_MD_ID, "string", targetAttr->getId());
-            ca->metadataVector.push_back(md);
-        }
-        if (targetAttr->getLocation().length() > 0) {
-            md = new Metadata(NGSI_MD_LOCATION, "string", targetAttr->getLocation());
-            ca->metadataVector.push_back(md);
-        }
+        setResponseMetadata(targetAttr, ca);
         cerP->contextElement.contextAttributeVector.push_back(ca);
 
         /* actualUpdate could be changed to false in the "update" case. For "delete" and
@@ -814,7 +1073,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
 
                 /* Check aspects related with location */
                 if (targetAttr->getLocation().length() > 0 ) {
-                    if (locAttr.length() > 0) {
+                    if (locAttr.length() > 0 && targetAttr->name != locAttr) {
                         cerP->statusCode.fill(SccInvalidParameter,
                                               std::string("action: APPEND") +
                                               std::string(" - entity: (") + eP->toString() + ")" +
@@ -901,7 +1160,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
          * is "bypassed" */
         if (actualUpdate) {
             std::string err;
-            if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, &err)) {
+            if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, &err, tenant)) {
                 cerP->statusCode.fill(SccReceiverInternalError, err);
                 LM_RE(false, (err.c_str()));
             }
@@ -939,11 +1198,16 @@ static bool processContextAttributeVector (ContextElement*               ceP,
 * createEntity -
 *
 */
-static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string* errDetail) {
+static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string* errDetail, std::string tenant) {
 
     DBClientConnection* connection = getMongoConnection();
 
-    LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName()));
+    LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName(tenant).c_str()));
+
+    /* Actually we don't know if this is the first entity (thus, the collection is being created) or not. However, we can
+     * invoke ensureLocationIndex() in anycase, given that it is harmless in the case the collection and index already
+     * exits (see docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/)*/
+    ensureLocationIndex(tenant);
 
     if (!legalIdUsage(attrsV)) {
         *errDetail = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: (" + e.toString() + ")";
@@ -984,6 +1248,12 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
                             attrsV.get(ix)->type.c_str(),
                             attrsV.get(ix)->value.c_str(),
                             attrId.c_str()));
+        }        
+
+        /* Custom metadata */
+        BSONObj mdV;
+        if (contextAttributeCustomMetadataToBson(mdV, attrsV.get(ix))) {
+            bsonAttr.appendArray(ENT_ATTRS_MD, mdV);
         }
         attrsToAdd.append(bsonAttr.obj());
 
@@ -1004,14 +1274,14 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
 
     BSONObj insertedDoc = insertedDocB.obj();
     try {
-        LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getEntitiesCollectionName(), insertedDoc.toString().c_str()));
+        LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), insertedDoc.toString().c_str()));
         mongoSemTake(__FUNCTION__, "insert into EntitiesCollection");
-        connection->insert(getEntitiesCollectionName(), insertedDoc);
+        connection->insert(getEntitiesCollectionName(tenant).c_str(), insertedDoc);
         mongoSemGive(__FUNCTION__, "insert into EntitiesCollection");
     }
     catch( const DBException &e ) {
         mongoSemGive(__FUNCTION__, "insert into EntitiesCollection (mongo db exception)");
-        *errDetail = std::string("Database Error: collection: ") + getEntitiesCollectionName() +
+        *errDetail = std::string("Database Error: collection: ") + getEntitiesCollectionName(tenant).c_str() +
                 " - insert(): " + insertedDoc.toString() +
                 " - exception: " + e.what();
 
@@ -1019,7 +1289,7 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
     }
     catch(...) {
         mongoSemGive(__FUNCTION__, "insert into EntitiesCollection (mongo generic exception)");
-        *errDetail = std::string("Database Error: collection: ") + getEntitiesCollectionName() +
+        *errDetail = std::string("Database Error: collection: ") + getEntitiesCollectionName(tenant).c_str() +
                 " - insert(): " + insertedDoc.toString() +
                 " - exception: " + "generic";
 
@@ -1034,7 +1304,7 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
 * removeEntity -
 *
 */
-static bool removeEntity(std::string entityId, std::string entityType, ContextElementResponse* cerP) {
+static bool removeEntity(std::string entityId, std::string entityType, ContextElementResponse* cerP, std::string tenant) {
 
     const std::string idString = std::string("_id.") + ENT_ENTITY_ID;
     const std::string typeString = std::string("_id.") + ENT_ENTITY_TYPE;
@@ -1049,16 +1319,16 @@ static bool removeEntity(std::string entityId, std::string entityType, ContextEl
         query = BSON(idString << entityId << typeString << entityType);
     }
     try {
-        LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", getEntitiesCollectionName(),
+        LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", getEntitiesCollectionName(tenant).c_str(),
                            query.toString().c_str()));
         mongoSemTake(__FUNCTION__, "remove in EntitiesCollection");
-        connection->remove(getEntitiesCollectionName(), query);
+        connection->remove(getEntitiesCollectionName(tenant).c_str(), query);
         mongoSemGive(__FUNCTION__, "remove in EntitiesCollection");
     }
     catch( const DBException &e ) {
         mongoSemGive(__FUNCTION__, "remove in EntitiesCollection (mongo db exception)");
         cerP->statusCode.fill(SccReceiverInternalError,
-           std::string("collection: ") + getEntitiesCollectionName() +
+           std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
            " - remove() query: " + query.toString() +
            " - exception: " + e.what());
 
@@ -1067,7 +1337,7 @@ static bool removeEntity(std::string entityId, std::string entityType, ContextEl
     catch(...) {
         mongoSemGive(__FUNCTION__, "update in EntitiesCollection (mongo generic exception)");
         cerP->statusCode.fill(SccReceiverInternalError,
-           std::string("collection: ") + getEntitiesCollectionName() +
+           std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
            " - remove() query: " + query.toString() +
            " - exception: " + "generic");
 
@@ -1076,14 +1346,14 @@ static bool removeEntity(std::string entityId, std::string entityType, ContextEl
 
     cerP->statusCode.fill(SccOk);
     return true;
-}
+} 
 
 /* ****************************************************************************
 *
 * processContextElement -
 *
 */
-void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, std::string action) {
+void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, std::string action, std::string tenant) {
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -1127,9 +1397,9 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     auto_ptr<DBClientCursor> cursor;
 
     try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(), query.toString().c_str()));
+        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
         mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
-        cursor = connection->query(getEntitiesCollectionName(), query);
+        cursor = connection->query(getEntitiesCollectionName(tenant).c_str(), query);
 
         /*
          * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
@@ -1144,7 +1414,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     catch( const DBException &e ) {
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo db exception)");
         buildGeneralErrorReponse(ceP, NULL, responseP, SccReceiverInternalError,                           
-                           std::string("collection: ") + getEntitiesCollectionName() +
+                           std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                               " - query(): " + query.toString() +
                               " - exception: " + e.what());
         return;
@@ -1152,7 +1422,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     catch(...) {
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo generic exception)");
         buildGeneralErrorReponse(ceP, NULL, responseP, SccReceiverInternalError,                           
-                           std::string("collection: ") + getEntitiesCollectionName() +
+                           std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                               " - query(): " + query.toString() +
                               " - exception: " + "generic");
         return;
@@ -1173,7 +1443,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
         /* If the vector of Context Attributes is empty and the operation was DELETE, then delete the entity */
         if (strcasecmp(action.c_str(), "delete") == 0 && ceP->contextAttributeVector.size() == 0) {
-            removeEntity(entityId, entityType, cerP);
+            removeEntity(entityId, entityType, cerP, tenant);
             responseP->contextElementResponseVector.push_back(cerP);
             continue;
         }
@@ -1206,7 +1476,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             coordLong = loc.getField(ENT_LOCATION_COORDS).Array()[1].Double();
         }
 
-        if (!processContextAttributeVector(ceP, action, &subsToNotify, attrs, cerP, locAttr, coordLat, coordLong)) {
+        if (!processContextAttributeVector(ceP, action, &subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant)) {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
             responseP->contextElementResponseVector.push_back(cerP);
             continue;
@@ -1244,18 +1514,17 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             query = BSON(idString << entityId << typeString << entityType);
         }
         try {
-            LM_T(LmtMongo, ("update() in '%s' collection: {%s, %s}", getEntitiesCollectionName(),
+            LM_T(LmtMongo, ("update() in '%s' collection: {%s, %s}", getEntitiesCollectionName(tenant).c_str(),
                                query.toString().c_str(),
                                updatedEntity.toString().c_str()));
             mongoSemTake(__FUNCTION__, "update in EntitiesCollection");
-            connection->update(getEntitiesCollectionName(), query, updatedEntity);
+            connection->update(getEntitiesCollectionName(tenant).c_str(), query, updatedEntity);
             mongoSemGive(__FUNCTION__, "update in EntitiesCollection");
         }
         catch( const DBException &e ) {
-            LM_M(("inside exception handling"));
             mongoSemGive(__FUNCTION__, "update in EntitiesCollection (mongo db exception)");
             cerP->statusCode.fill(SccReceiverInternalError,
-               std::string("collection: ") + getEntitiesCollectionName() +
+               std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                " - update() query: " + query.toString() +
                " - update() doc: " + updatedEntity.toString() +
                " - exception: " + e.what());
@@ -1266,7 +1535,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         catch(...) {
             mongoSemGive(__FUNCTION__, "update in EntitiesCollection (mongo generic exception)");
             cerP->statusCode.fill(SccReceiverInternalError,
-               std::string("collection: ") + getEntitiesCollectionName() +
+               std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                " - update() query: " + query.toString() +
                " - update() doc: " + updatedEntity.toString() +
                " - exception: " + "generic");
@@ -1293,7 +1562,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
          * previous addTriggeredSubscriptions() invocations */
         std::string err;
-        processSubscriptions(en, &subsToNotify, &err);
+        processSubscriptions(en, &subsToNotify, &err, tenant);
 
         /* To finish with this entity processing, add the corresponding ContextElementResponse to
          * the global response */
@@ -1317,25 +1586,13 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             cerP->contextElement.entityId.fill(en.id, en.type, "false");
             for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                 ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
-                ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);
-
-                // FIXME P4: not sure, but probably we can generalize this when we address
-                // issue https://github.com/telefonicaid/fiware-orion/issues/252
-                Metadata* md;
-                if (caP->getId().length() > 0) {
-                    md = new Metadata(NGSI_MD_ID, "string", caP->getId());
-                    ca->metadataVector.push_back(md);
-                }
-                if (caP->getLocation().length() > 0) {
-                    md = new Metadata(NGSI_MD_LOCATION, "string", caP->getLocation());
-                    ca->metadataVector.push_back(md);
-                }
-
+                ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);                
+                setResponseMetadata(caP, ca);
                 cerP->contextElement.contextAttributeVector.push_back(ca);
             }
 
             std::string errReason, errDetail;
-            if (!createEntity(en, ceP->contextAttributeVector, &errDetail)) {
+            if (!createEntity(en, ceP->contextAttributeVector, &errDetail, tenant)) {
                cerP->statusCode.fill(SccInvalidParameter, errDetail);
             }
             else {
@@ -1345,13 +1602,13 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 std::map<string, BSONObj*> subsToNotify;
                 for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                     std::string err;
-                    if (!addTriggeredSubscriptions(en.id, en.type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err)) {
+                    if (!addTriggeredSubscriptions(en.id, en.type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err, tenant)) {
                         cerP->statusCode.fill(SccReceiverInternalError, err);
                         responseP->contextElementResponseVector.push_back(cerP);
                         LM_RVE((err.c_str()));
                     }
                 }
-                processSubscriptions(en, &subsToNotify, &errReason);
+                processSubscriptions(en, &subsToNotify, &errReason, tenant);
             }
             responseP->contextElementResponseVector.push_back(cerP);
         }

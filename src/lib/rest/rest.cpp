@@ -74,7 +74,9 @@ static bool                      acceptTextXml         = false;
 static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
 static char                      bindIPv6[MAX_LEN_IP]  = "::";
 IpVersion                        ipVersionUsed         = IPDUAL;
-
+std::string                      multitenant           = "off";
+std::string                      rushHost              = "";
+unsigned short                   rushPort              = 0;
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static Coap*                     coapDaemon            = NULL;
@@ -102,6 +104,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "connection") == 0)      headerP->connection     = value;
   else if (strcasecmp(key.c_str(), "content-type") == 0)    headerP->contentType    = value;
   else if (strcasecmp(key.c_str(), "content-length") == 0)  headerP->contentLength  = atoi(value);
+  else if (strcasecmp(key.c_str(), "fiware-service") == 0)  headerP->tenant         = value;
   else
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
 
@@ -384,8 +387,9 @@ static int connectionTreat
     *con_cls = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
-
-    ciP->outFormat  = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
+    ciP->tenantFromHttpHeader = ciP->httpHeaders.tenant;
+    LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));
+    ciP->outFormat            = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
       ciP->outFormat = XML; // XML is default output format
 
@@ -447,7 +451,7 @@ static int connectionTreat
 
 
   // 3. Finally, serve the request (unless an error has occurred)
-  if (((ciP->verb == POST) || (ciP->verb == PUT)) && (ciP->httpHeaders.contentLength == 0))
+  if (((ciP->verb == POST) || (ciP->verb == PUT)) && (ciP->httpHeaders.contentLength == 0) && (strncasecmp(ciP->url.c_str(), "/log/", 5) != 0))
   {
     std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST request");
     ciP->httpStatusCode = SccLengthRequired;
@@ -577,6 +581,9 @@ void restInit
   IpVersion          _ipVersion,
   const char*        _bindAddress,
   unsigned short     _port,
+  std::string        _multitenant,
+  std::string        _rushHost,
+  unsigned short     _rushPort,
   const char*        _httpsKey,
   const char*        _httpsCertificate,
   RestServeFunction  _serveFunction,
@@ -591,6 +598,9 @@ void restInit
   ipVersionUsed = _ipVersion;
   serveFunction = (_serveFunction != NULL)? _serveFunction : serve;
   acceptTextXml = _acceptTextXml;
+  multitenant   = _multitenant;
+  rushHost      = _rushHost;
+  rushPort      = _rushPort;
 
   strncpy(bindIp, LOCAL_IP_V4, MAX_LEN_IP - 1);
   strncpy(bindIPv6, LOCAL_IP_V6, MAX_LEN_IP - 1);
