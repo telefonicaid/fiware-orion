@@ -1801,7 +1801,14 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
         if (fds[i].write != NULL)
           fds[i].write(line);
         else
-          write(fds[i].fd, line, sz);
+        {
+          int nb = write(fds[i].fd, line, sz);
+
+          if (nb == -1)
+            printf("LOG error: write(%d): %s\n", fds[i].fd, strerror(errno));
+          else if (nb != sz)
+            printf("LOG error: written %d bytes only (wanted %d)\n", nb, sz);
+        }
     }
     
     ++logLines;
