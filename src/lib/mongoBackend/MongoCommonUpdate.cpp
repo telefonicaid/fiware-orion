@@ -548,8 +548,7 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute*
 */
 static bool appendAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute* caP) {
 
-    /* In the current version (and until we close old issue 33)
-     * APPEND with existing attribute equals to UPDATE */
+    /* APPEND with existing attribute equals to UPDATE */
     BSONArrayBuilder newAttrsBuilder;
     bool updated = false;
     bool actualUpdate = false;
