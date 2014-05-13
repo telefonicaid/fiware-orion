@@ -71,7 +71,7 @@ if [[ -z "${BROKER_DATABASE_USER}" ]]; then
             -pidpath ${BROKER_PID_FILE}  \
             -dbhost ${BROKER_DATABASE_HOST} \
             -db ${BROKER_DATABASE_NAME} \
-            ${BROKER_EXTRA_OPS} "
+            ${BROKER_EXTRA_OPS}"
 else
     BROKER_OPTS="-port ${BROKER_PORT} \
             -logDir ${BROKER_LOG_DIR} \
