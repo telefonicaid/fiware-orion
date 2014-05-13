@@ -137,7 +137,7 @@ echo ""
 
 ## Uninstall the contextBroker RPM
 _logStage "######## Uninstall the contextBroker RPM ########"
-sudo rpm -e contextBroker contextBroker-tests &> /dev/null
+sudo rpm -e contextBroker &> /dev/null
 result=$?
 if [[ $result -ne 0 ]]; then 
 	_logError ".............. Uninstall failed .............."
