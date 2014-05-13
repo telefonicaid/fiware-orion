@@ -548,8 +548,7 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute*
 */
 static bool appendAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute* caP) {
 
-    /* In the current version (and until we close old issue 33)
-     * APPEND with existing attribute equals to UPDATE */
+    /* APPEND with existing attribute equals to UPDATE */
     BSONArrayBuilder newAttrsBuilder;
     bool updated = false;
     bool actualUpdate = false;
@@ -826,7 +825,7 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
 
         if (subs->count(subIdStr) == 0) {
             LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
-            // FIXME P8: see old issues #90
+            // FIXME P8: see issue #371
             // subs->insert(std::pair<string, BSONObj*>(subIdStr, new BSONObj(sub)));
 
             subs->insert(std::pair<string, BSONObj*>(subIdStr, NULL));
@@ -849,7 +848,7 @@ static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::
     /* For each one of the subscriptions in the map, send notification */
     for (std::map<string, BSONObj*>::iterator it = subs->begin(); it != subs->end(); ++it) {
 
-        //FIXME P8: see old issue #90
+        //FIXME P8: see issue #371
         //BSONObj sub = *(it->second);
 
         std::string  mapSubId = it->first;
@@ -933,7 +932,7 @@ static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::
          * addTriggeredSubscriptions */
         attrL.release();
         enV.release();
-        // delete it->second; FIXME P8: see old issue #90
+        // delete it->second; FIXME P8: see issue #371
     }
 
     return true;
@@ -1167,7 +1166,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
         }
 
 #if 0
-        /* DEBUG (see old issue #90) */
+        /* DEBUG (see issue #371) */
         int ix = 0;
         for (std::map<string, BSONObj*>::iterator it = subsToNotify.begin(); it != subsToNotify.end(); ++it) {
             BSONObj b = *(it->second);
@@ -1545,7 +1544,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         }
 
 #if 0
-        /* DEBUG (see issue #90) */
+        /* DEBUG (see issue #371) */
         int ix = 0;
         for (std::map<string, BSONObj*>::iterator it = subsToNotify.begin(); it != subsToNotify.end(); ++it) {
             BSONObj b = *(it->second);

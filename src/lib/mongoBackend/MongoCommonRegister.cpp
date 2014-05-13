@@ -122,7 +122,7 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
     bool ret = true;
     for (std::map<string, BSONObj*>::iterator it = subs->begin(); it != subs->end(); ++it) {
 
-        //FIXME P8: see old issue #90
+        //FIXME P8: see issue #371
         //BSONObj sub = *(it->second);
         std::string mapSubId = it->first;
         BSONObj     sub;

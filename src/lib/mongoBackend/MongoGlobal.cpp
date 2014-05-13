@@ -522,16 +522,16 @@ bool includedAttribute(ContextAttribute attr, AttributeList* attrsV) {
 
 /* ****************************************************************************
 *
-* processEntitityPatternFalse -
+* fillQueryEntFalse -
 */
-static void processEntitityPatternFalse(BSONArrayBuilder* arrayP, EntityId* enP, bool withType = true) {
+static void fillQueryEntFalse(BSONArrayBuilder& ba, EntityId* enP, bool withType = true) {
 
     if (withType) {
-        arrayP->append(BSON(ENT_ENTITY_ID << enP->id << ENT_ENTITY_TYPE << enP->type));
+        ba.append(BSON(ENT_ENTITY_ID << enP->id << ENT_ENTITY_TYPE << enP->type));
         LM_T(LmtMongo, ("Entity query token (isPattern=false): {id: %s, type: %s}", enP->id.c_str(), enP->type.c_str()));
     }
     else {
-        arrayP->append(enP->id);
+        ba.append(enP->id);
         LM_T(LmtMongo, ("Entity query token (isPattern=false): {id: %s}", enP->id.c_str()));
     }
 
@@ -539,24 +539,24 @@ static void processEntitityPatternFalse(BSONArrayBuilder* arrayP, EntityId* enP,
 
 /* ****************************************************************************
 *
-* processEntitityPatternFalse -
+* fillQueryEntTrue -
 */
-static void processEntitityPatternTrue(BSONArrayBuilder* arrayP, EntityId* enP) {
+static void fillQueryEntTrue(BSONArrayBuilder& ba, EntityId* enP) {
 
-    BSONObjBuilder enObjB;
+    BSONObjBuilder ent;
 
     const std::string idString = std::string("_id.") + ENT_ENTITY_ID;
     const std::string typeString = std::string("_id.") + ENT_ENTITY_TYPE;
 
-    enObjB.appendRegex(idString, enP->id);
+    ent.appendRegex(idString, enP->id);
     if (enP->type != "") {
-        enObjB.append(typeString, enP->type);
+        ent.append(typeString, enP->type);
     }
 
-    BSONObj enObj = enObjB.obj();
-    arrayP->append(enObj);
+    BSONObj entObj = ent.obj();
+    ba.append(entObj);
 
-    LM_T(LmtMongo, ("Entity query token (isPattern=true): '%s'", enObj.toString().c_str()));
+    LM_T(LmtMongo, ("Entity query token (isPattern=true): '%s'", entObj.toString().c_str()));
 
 }
 
@@ -717,30 +717,60 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
 
     DBClientConnection* connection = getMongoConnection();
 
-    /* Build query (entities part) */
-    // FIXME P2: this implementation need to be refactored for cleanup
+    /* Query structure is as follows
+     *
+     * {
+     *    "$or": [ ... ],            (always)
+     *    "attrs.name": { ... },     (only if attributes are used in the query)
+     *    "location.coords": { ... } (only in the case of geo queries)
+     *  }
+     *
+     */
 
-    /* We store isPattern=true and isPattern=false entities in different arrays, that will
-     * be used in the final composition of the query */
-    BSONArrayBuilder entitiesPatternFalseWithoutType;
-    BSONArrayBuilder entitiesPatternFalseWithType;
-    BSONArrayBuilder entitiesPatternTrue;
+    BSONObjBuilder finalQuery;
+
+    /* Part 1: entities */
+    BSONArrayBuilder orEnt;
+
+    BSONArrayBuilder entFalseWType;
+    BSONArrayBuilder entFalseWOType;
     for (unsigned int ix = 0; ix < enV.size(); ++ix) {
         if (isTrue(enV.get(ix)->isPattern)) {
-            processEntitityPatternTrue(&entitiesPatternTrue, enV.get(ix));
+            /* Part 1.1: add from 0 to N objects (in entTrue) to the $or array for entities
+             * with isPatter=true. Note we are using the builder for the $or vector itself,
+             * as in this case entities can be "directly" inserted. For the other two parts, we
+             * just accumulate in this loop, as they need additional BSON composition before be
+             * inserted in the $or array */
+            fillQueryEntTrue(orEnt, enV.get(ix));
         }
         else {
+            /* Accumulating for later BSON composition (Part 1.2 and Part 1.3 below)*/
             if (enV.get(ix)->type == "") {
-                processEntitityPatternFalse(&entitiesPatternFalseWithoutType, enV.get(ix), false);
+                fillQueryEntFalse(entFalseWOType, enV.get(ix), false);
             }
             else {
-                processEntitityPatternFalse(&entitiesPatternFalseWithType, enV.get(ix), true);
+                fillQueryEntFalse(entFalseWType, enV.get(ix), true);
             }
         }
     }
 
-    /* Build query (attributes part) */
+    /* Part 1.2: add up to one object in the $or array for entities isPattern=false with type
+     * (check size to avoid "{ _id: { $in: {} } }" that would make the query fail) */
+    if (entFalseWType.arrSize() > 0) {
+        orEnt.append(BSON("_id" << BSON("$in" << entFalseWType.arr())));
+    }
 
+    /* Part 1.3: add up to one object to the $or array for entities isPattern=false without type
+     * (check size to avoid "{ _id: { $in: {} } }" that would make the query fail) */
+    if (entFalseWOType.arrSize() > 0) {
+        std::string idId = std::string("_id.") + ENT_ENTITY_ID;
+        orEnt.append(BSON(idId << BSON("$in" << entFalseWOType.arr())));
+    }
+
+    /* Finally the result of the 3 parts is appended to the final query */
+    finalQuery.append("$or", orEnt.arr());
+
+    /* Part 2: attributes */
     BSONArrayBuilder attrs;
     for (unsigned int ix = 0; ix < attrL.size(); ++ix) {
         std::string attrName = attrL.get(ix);
@@ -748,41 +778,21 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
         LM_T(LmtMongo, ("Attribute query token: '%s'", attrName.c_str()));
     }
     std::string attrNames = std::string(ENT_ATTRS) + "." + ENT_ATTRS_NAME;
-
-    /* Compose final query */
-    BSONObjBuilder queryBuilder;
-
-    if (entitiesPatternFalseWithType.arrSize() > 0) {
-        /* We need this checking to avoid a ugly "{ _id: { $in: {} } }" in the $or array
-         * that would make the query fail */
-        entitiesPatternTrue.append(BSON("_id" << BSON("$in" << entitiesPatternFalseWithType.arr())));
-    }
-    if (entitiesPatternFalseWithoutType.arrSize() > 0) {
-        /* We need this checking to avoid a ugly "{ _id.id: { $in: {} } }" in the $or array
-         * that would make the query fail */
-        std::string idId = std::string("_id.") + ENT_ENTITY_ID;
-        entitiesPatternTrue.append(BSON(idId << BSON("$in" << entitiesPatternFalseWithoutType.arr())));
-    }
-
-    /* The $or clause could be omitted if entitiesPatternTrue is empty, but we can assume that
-     * it has no impact on MongoDB query optimizer */
-    queryBuilder.append("$or", entitiesPatternTrue.arr());
     if (attrs.arrSize() > 0) {
         /* If we don't do this checking, the {$in: [] } in the attribute name part will
          * make the query fail*/
-        queryBuilder.append(attrNames, BSON("$in" << attrs.arr()));
+        finalQuery.append(attrNames, BSON("$in" << attrs.arr()));
     }
 
-    /* Potentially include area scope in the query */
+    /* Part 3: geo-location */
     BSONObj areaQuery;
     if (processAreaScope(res.scopeVector, areaQuery)) {
        std::string locCoords = std::string(ENT_LOCATION) + "." + ENT_LOCATION_COORDS;
-       queryBuilder.append(locCoords, areaQuery);
+       finalQuery.append(locCoords, areaQuery);
     }
 
-    BSONObj query = queryBuilder.obj();
-
     /* Do the query on MongoDB */
+    BSONObj query = finalQuery.obj();
     auto_ptr<DBClientCursor> cursor;
     try {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
