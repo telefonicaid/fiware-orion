@@ -3119,7 +3119,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbUpdateFail)
 *
 * MongoDbFindOneFail -
 *
-* FIXME: this need of this test depend of issue #371.
+* FIXME: The necessity of this test depends on issue #371.
+*
 * If we are able to solve the problem, it is unneded. However, if the conclusion of that issue
 * is that we need the dobule-query on csubs, then we need this tests. By the moment, we leave the
 * stub, marked with DISABLED.
