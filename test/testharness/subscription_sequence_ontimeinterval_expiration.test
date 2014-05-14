@@ -84,7 +84,7 @@ SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -
 echo "$SUB_OUT"
 echo "2: ++++++++++++++++++++"
 
-#Sleep 10 seconds. Only 3 subscriptions arrive (at time 0, 2 and 4)
+#Sleep 10 seconds. Only 3 subscriptions arrive (at time 0, 2 and 4) as subscription expires at time=5s
 sleep 10s
 
 curl localhost:${LISTENER_PORT}/dump -s -S 

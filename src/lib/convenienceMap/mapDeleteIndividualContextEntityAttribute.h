@@ -27,6 +27,8 @@
 */
 #include "mongoBackend/MongoGlobal.h"
 #include "ngsi/StatusCode.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/HttpStatusCode.h"
 
 
 
@@ -34,6 +36,6 @@
 *
 * mapDeleteIndividualContextEntityAttribute - 
 */
-extern HttpStatusCode mapDeleteIndividualContextEntityAttribute(std::string entityId, std::string attributeName, StatusCode* response);
+extern HttpStatusCode mapDeleteIndividualContextEntityAttribute(std::string entityId, std::string attributeName, StatusCode* response, ConnectionInfo* ciP);
 
 #endif

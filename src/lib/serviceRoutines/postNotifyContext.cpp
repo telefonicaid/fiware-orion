@@ -45,7 +45,7 @@ std::string postNotifyContext(ConnectionInfo* ciP, int components, std::vector<s
 {
   NotifyContextResponse  ncr;
 
-  ciP->httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res, &ncr);
+  ciP->httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res, &ncr, ciP->tenant);
 
   std::string answer = ncr.render(NotifyContext, ciP->outFormat, "");
 

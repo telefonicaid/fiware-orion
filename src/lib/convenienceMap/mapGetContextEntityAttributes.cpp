@@ -27,11 +27,12 @@
 #include "logMsg/logMsg.h"
 
 #include "convenienceMap/mapGetContextEntityAttributes.h"
-#include "rest/HttpStatusCode.h"
 #include "mongoBackend/mongoDiscoverContextAvailability.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/HttpStatusCode.h"
 
 
 
@@ -39,11 +40,11 @@
 *
 * mapGetContextEntityAttributes - 
 */
-HttpStatusCode mapGetContextEntityAttributes(std::string id, DiscoverContextAvailabilityResponse* response)
+HttpStatusCode mapGetContextEntityAttributes(std::string id, DiscoverContextAvailabilityResponse* response, ConnectionInfo* ciP)
 {
   DiscoverContextAvailabilityRequest request;
   EntityId                           entityId(id, "", "false");
 
   request.entityIdVector.push_back(&entityId);
-  return mongoDiscoverContextAvailability(&request, response);
+  return mongoDiscoverContextAvailability(&request, response, ciP->tenant);
 }

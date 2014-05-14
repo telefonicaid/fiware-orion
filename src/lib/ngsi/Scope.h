@@ -38,9 +38,7 @@ using namespace orion;
 *
 * Defined scopes so far
 */
-//FIXME: SCOPE_TYPE_ASSOC is not very good as string token, we should talk with NEC
-//to use a better one
-#define SCOPE_TYPE_ASSOC           "Include Associations"
+#define SCOPE_TYPE_ASSOC           "IncludeAssociations"
 #define SCOPE_VALUE_ASSOC_SOURCE   "SOURCES"
 #define SCOPE_VALUE_ASSOC_TARGET   "TARGETS"
 #define SCOPE_VALUE_ASSOC_ALL      "ALL"

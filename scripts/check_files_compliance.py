@@ -82,6 +82,10 @@ def ignore(root, file):
     if 'BUILD_' in root or '.git' in root:
         return True
 
+    # Files in the rpm/SRPMS, rpm/SOURCES or rpm/RPMS directories are not processed
+    if 'SRPMS' in root or 'SOURCES' or 'RPMS'in root:
+        return True
+
     # Files in the test/valdring directory ending with .out are not processed
     if 'valgrind' in root and file.endswith('.out'):
         return True
@@ -123,7 +127,7 @@ def supported_extension(root, file):
     if file.endswith('.py') or file.endswith('.cpp') or file.endswith('.h') or file.endswith('.xml')\
         or file.endswith('.json') or file.endswith('.test') or file.endswith('.vtest') or file.endswith('.txt')\
         or file.endswith('.sh') or file == 'makefile' or file == 'Makefile' or file.endswith('.spec') \
-        or file.endswith('.cfg') or file.endswith('.DISABLED') or file.endswith('.xtest') or file.endswith('.centos'):
+        or file.endswith('.cfg') or file.endswith('.DISABLED') or file.endswith('.xtest') or file.endswith('.centos') or file.endswith('.js'):
         return True
 
     if 'config' in root and file == 'contextBroker':

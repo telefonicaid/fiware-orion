@@ -31,6 +31,7 @@ class Notifier;     // actually defined in Notifier.h
 typedef struct OnIntervalThreadParams {
     std::string     subId;
     int             interval;
+    std::string     tenant;
     Notifier*       notifier;
 } OnIntervalThreadParams;
 

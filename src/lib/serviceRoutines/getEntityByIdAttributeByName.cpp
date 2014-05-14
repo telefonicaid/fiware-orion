@@ -47,7 +47,7 @@ std::string getEntityByIdAttributeByName(ConnectionInfo* ciP, int components, st
   DiscoverContextAvailabilityResponse  response;
 
   LM_T(LmtConvenience, ("CONVENIENCE: got a  'GET' request for entityId '%s', attribute '%s'", entityId.c_str(), attributeName.c_str()));
-  ciP->httpStatusCode = mapGetEntityByIdAttributeByName(entityId, attributeName, &response);
+  ciP->httpStatusCode = mapGetEntityByIdAttributeByName(entityId, attributeName, &response, ciP);
   answer = response.render(DiscoverContextAvailability, ciP->outFormat, "");
   response.release();
   

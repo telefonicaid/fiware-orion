@@ -29,6 +29,16 @@
 #   source ../../scripts/testEnv.sh
 # fi
 
+if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
+then
+  echo
+  echo '-----------------------------------------------------------'
+  echo "Test Environment missing - please source scripts/testEnv.sh"
+  echo '-----------------------------------------------------------'
+  echo
+  exit 1
+fi
+
 
 
 # ------------------------------------------------------------------------------
@@ -48,15 +58,27 @@ function harnessExit()
 #
 function dbInit()
 {
-  role=$1
+  role=$1  
 
   if [ "$role" == "CB" ]
   then
     echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
   elif [ "$role" == "CM" ]
   then
-    echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_AUX_NAME} --quiet
+    echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE2_NAME} --quiet
   fi
+}
+
+# ------------------------------------------------------------------------------
+#
+# dbTenantInit -
+#
+function dbTenantInit()
+{
+  db=$1
+
+  echo 'db.dropDatabase()' | mongo $db --quiet
+
 }
 
 
@@ -70,6 +92,13 @@ function localBrokerStart()
   role=$1
   traceLevels=$2
   ipVersion=$3
+
+  shift
+  shift
+  shift
+
+  extraParams=$*
+
   IPvOption=""
 
   if [ "$ipVersion" == "IPV4" ]
@@ -83,12 +112,12 @@ function localBrokerStart()
   if [ "$role" == "CB" ]
   then
     port=$BROKER_PORT
-    CB_START_CMD="contextBroker -vvvvv -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME}     -t $traceLevels $IPvOption"
+    CB_START_CMD="contextBroker -vvvvv -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME} -t $traceLevels $IPvOption $extraParams"
   elif [ "$role" == "CM" ]
   then
     mkdir -p /tmp/configManager
     port=$CM_PORT
-    CB_START_CMD="contextBroker -harakiri -port ${CM_PORT}     -pidpath ${BROKER_PID_FILE_AUX} -db ${BROKER_DATABASE_AUX_NAME} -t $traceLevels -fwdPort ${BROKER_PORT} -logDir /tmp/configManager -ngsi9 "
+    CB_START_CMD="contextBroker -harakiri -port ${CM_PORT}     -pidpath ${BROKER_PID2_FILE} -db ${BROKER_DATABASE2_NAME} -t $traceLevels -fwdPort ${BROKER_PORT} -logDir /tmp/configManager -ngsi9 $extraParams"
   fi
 
   if [ "$VALGRIND" == "" ]; then
@@ -139,7 +168,7 @@ function localBrokerStop
       sleep 1
       running_broker=$(ps -fe | grep contextBroker | grep $port | wc -l)
       if [ $running_broker -ne 0 ]; then
-        echo "Existing contextBroker is inmortal, can not be killed!"
+        echo "Existing contextBroker is immortal, can not be killed!"
         exit 1
       fi
     fi
@@ -158,6 +187,12 @@ function brokerStart()
   traceLevels=$2
   ipVersion=$3
 
+  shift
+  shift
+  shift
+
+  extraParams=$*
+
   if [ "$role" == "" ]
   then
     echo "No role given as first parameter for brokerStart"
@@ -170,7 +205,7 @@ function brokerStart()
   fi
 
   localBrokerStop $role
-  localBrokerStart $role $traceLevels $ipVersion
+  localBrokerStart $role $traceLevels $ipVersion $extraParams
 }
 
 
@@ -189,7 +224,7 @@ function brokerStop
     port=$BROKER_PORT
   elif [ "$role" == "CM" ]
   then
-    pidFile=$BROKER_PID_FILE_AUX
+    pidFile=$BROKER_PID2_FILE
     port=$CM_PORT
   fi
 
@@ -211,10 +246,9 @@ function brokerStop
 #
 function accumulatorStop()
 {
-
   port=$1
 
-  # If port is missing, we use the default LISTERNER_PORT
+  # If port is missing, we use the default LISTENER_PORT
   if [ -z "$port" ]
   then
     port=${LISTENER_PORT}
@@ -241,7 +275,7 @@ function accumulatorStop()
 
       if [ $running_app -ne 0 ]
       then
-        echo "Existing accumulator-server.py is inmortal, can not be killed!"
+        echo "Existing accumulator-server.py is immortal, can not be killed!"
         exit 1
       fi
     fi
@@ -259,7 +293,7 @@ function accumulatorStart()
   bindIp=$1
   port=$2
 
-  # If port is missing, we use the default LISTERNER_PORT
+  # If port is missing, we use the default LISTENER_PORT
   if [ -z "$port" ]
   then
     port=${LISTENER_PORT}
@@ -299,8 +333,11 @@ function accumulatorStart()
 function printXmlWithHeaders()
 {
   text=$1
+
   cat headers.out
-  echo "${text}" | xmllint --format -
+
+  echo "$text" | xmllint --format -
+
   rm headers.out
 }
 
@@ -313,8 +350,11 @@ function printXmlWithHeaders()
 function printJsonWithHeaders()
 {
   text=$1
+
   cat headers.out
+
   echo "${text}" | python -mjson.tool
+
   rm headers.out
 }
 
@@ -322,31 +362,36 @@ function printJsonWithHeaders()
 
 # ------------------------------------------------------------------------------
 #
-# curlIt - 
+# curlIt- 
 #
 # URL: You also have to specify host, port
 # 
 function curlIt()
 {
-  encoding=$1
+  outFormat=$1
   url=$2
   payload=$3
   contenttype=$4
   accept=$5
   extraoptions=$6
-  
+  httpTenant=$7
+
   params="-s -S --dump-header headers.out"
   
-  response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" --header "Expect:" ${extraoptions} -d @- ))
-  
-  if [ "$encoding" == "XML" ]
+  if [ "$extraoptions" == "" ] && [ "$httpTenant" != "" ]
+  then
+    response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" --header "Expect:" --header "$httpTenant" -d @- ))
+  else
+    response=$(echo ${payload} | (curl ${url} ${params} --header "${contenttype}" --header "${accept}" --header "Expect:" ${extraoptions} -d @- ))
+  fi
+
+  if [ "$outFormat" == "XML" ] || [ "$outFormat" == "xml" ]
   then
     printXmlWithHeaders "${response}"
-  elif [ "$encoding" == "JSON" ]
+  elif [ "$outFormat" == "JSON" ] || [ "$outFormat" == "json" ]
   then
     printJsonWithHeaders "${response}"
   fi
-    
 }
 
 
@@ -366,6 +411,14 @@ function curlXml()
   curlIt "XML" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/xml" "Accept: application/xml" "${extraoptions}"
 }
 
+function curlXmlTenants()
+{
+  url=$1
+  payload=$2
+  tenant=$3
+  
+  curlIt "XML" "localhost:${BROKER_PORT}${url}" "${payload}" "Content-Type: application/xml" "Accept: application/xml" "" "$tenant"
+}
 
 
 # ------------------------------------------------------------------------------
@@ -391,7 +444,7 @@ function curlJson()
 #
 function curlNoPayload()
 {
-  encoding=$1
+  outFormat=$1
   url=$2
   extraoptions=$3
   contenttype=$4
@@ -401,10 +454,10 @@ function curlNoPayload()
   
   response=$(curl localhost:${BROKER_PORT}${url} ${params} ${extraoptions} --header "${contenttype}" --header "${accept}")
     
-  if [ "$encoding" == "XML" ]
+  if [ "$outFormat" == "XML" ] || [ "$outFormat" == "xml" ]
   then
     printXmlWithHeaders "${response}"
-  elif [ "$encoding" == "JSON" ]
+  elif [ "$outFormat" == "JSON" ] || [ "$outFormat" == "json" ]
   then
     printJsonWithHeaders "${response}"
   fi

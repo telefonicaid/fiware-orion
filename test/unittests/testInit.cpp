@@ -49,11 +49,13 @@ void setupDatabase(void) {
     connection->dropCollection(SUBSCRIBECONTEXTAVAIL_COLL);
     connection->dropCollection(ASSOCIATIONS_COLL);
 
-    setRegistrationsCollectionName(REGISTRATIONS_COLL);
-    setEntitiesCollectionName(ENTITIES_COLL);
-    setSubscribeContextCollectionName(SUBSCRIBECONTEXT_COLL);
-    setSubscribeContextAvailabilityCollectionName(SUBSCRIBECONTEXTAVAIL_COLL);
-    setAssociationsCollectionName(ASSOCIATIONS_COLL);
+
+    setDbPrefix(DBPREFIX);
+    setRegistrationsCollectionName("registrations");
+    setEntitiesCollectionName("entities");
+    setSubscribeContextCollectionName("csubs");
+    setSubscribeContextAvailabilityCollectionName("casubs");
+    setAssociationsCollectionName("associations");
 
 }
 

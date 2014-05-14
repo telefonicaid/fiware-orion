@@ -35,7 +35,7 @@ Packager:   Fermín Galán <fermin@tid.es>
 URL:        http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-context-broker
 Source:     %{name}-%{broker_version}.tar.gz
 BuildRoot: /var/tmp/%{name}-buildroot
-Requires:  libstdc++, boost-thread, boost-filesystem, libmicrohttpd
+Requires:  libstdc++, boost-thread, boost-filesystem, libmicrohttpd, logrotate
 Buildrequires: gcc, cmake, gcc-c++, libmicrohttpd-devel, boost-devel
 Requires(pre): shadow-utils
 
@@ -54,6 +54,7 @@ Using these interfaces, clients can do several operations:
 if [ -d $RPM_BUILD_ROOT/usr ]; then
    rm -rf $RPM_BUILD_ROOT
 fi
+
 %setup
 
 %pre
@@ -87,12 +88,9 @@ After configuring /etc/sysconfig/%{name} execute 'chkconfig %{name} on' to
 enable %{name} after a reboot.
 EOMSG
 
-%preun
-/etc/init.d/%{name} stop
-/sbin/chkconfig --del %{name}
-
 %clean
 rm -rf $RPM_BUILD_ROOT
+rm -rf %{_builddir}
 
 %build
 #FIXME There is an open issue with "make release" malfunction. Until get fixed, we will build in debug mode
@@ -103,6 +101,8 @@ make debug DESTDIR=$RPM_BUILD_ROOT BUILD_ARCH=%{build_arch}
 #FIXME There is an open issue with "make release" malfunction. Until get fixed, we will build in debug mode
 #make install DESTDIR=$RPM_BUILD_ROOT
 make install_debug DESTDIR=$RPM_BUILD_ROOT
+cp -R %{_sourcedir}/etc $RPM_BUILD_ROOT
+
 # rpmbuild seems to do the strip step automatically. However, this would fail after chmod, so we "manually" do
 # it as part of our install script
 strip $RPM_BUILD_ROOT/usr/bin/contextBroker
@@ -134,12 +134,11 @@ grep "tests" MANIFEST > MANIFEST.broker-tests
 %changelog
 
 %package tests
-Requires: %{name}, python, python-flask, nc, curl, libxml2, mongodb
+Requires: %{name}, python, python-flask, python-jinja2, nc, curl, libxml2, mongo-10gen 
 Summary: Test suite for %{name}
 %description tests
 Test suite for %{name}
 
-#%files tests
 %files tests -f MANIFEST.broker-tests
 
 %package -n %{name}-fiware
@@ -160,7 +159,47 @@ Using these interfaces, clients can do several operations:
 
 %files -n %{name}-fiware
 
+%preun
+/etc/init.d/%{name} stop
+/sbin/chkconfig --del %{name}
+
+%preun tests
+
+%preun -n %{name}-fiware
+/etc/init.d/%{name} stop
+/sbin/chkconfig --del %{name}
+
+%postun 
+rm -rf  /usr/share/contextBroker
+/usr/sbin/userdel -f %{owner}
+
+%postun tests
+rm -rf  /usr/share/contextBroker/tests
+
+%postun -n %{name}-fiware
+rm -rf  /usr/share/contextBroker
+/usr/sbin/userdel -f %{owner}
+
+
 %changelog
+* Wed Apr 30 2014 Fermin Galan <fermin@tid.es> 0.12.0-1 (FIWARE-3.4.1-1)
+- Add:  The broker now supports https, see CLI options '-https', '-cert' and '-key'
+- Add:  New command line option '--silent', to suppress all log messages except errors. (Issue #291)
+- Fix:  All responses with StatusCode now have the 'reasonPhrase' in accordance with the 'code' (Issue 242).
+- Fix:  Every Context Element gets its corresponding Context Element Response when processing updateContext operations
+        (previous version was interrupted in the middle if the processing if one Context Element resulted in error).
+- Fix:  Requests with unacceptable Content-Type (HTTP header) get a "415 Unsupported Media Type" and a descriptive payload 'orionError'.
+        Requests with unsupported 'Accept' format (HTTP header) get a "406 Not Acceptable" and a descriptive payload 'orionError'.
+        Requests with "both 415 and 406" get a "415 Unsupported Media Type" and a descriptive payload 'orionError' in XML. (Issue #48)
+- Fix:  The broker now performs retries when connecting to mongodb at startup. (Issue #308)
+- Fix:  Responses containing context attributes with *compound values* AND metadata is now correctly rendered (Issue #323).
+- Fix:  Now it is possible to have 'not in use' as a valid context value.
+- Fix:  The ISO8601 parser has been improved. (Issue #231)
+- Fix:  An important bug in the log trace library has been fixed. This fix *may* solve 'strange errors' (Issue #313)
+- Fix:  Fixed a bug about empty context attribute values, probably introduced when compound values were invented (release 0.11.0).
+- Fix:  Fixed the bug for failing long requests (Issue #333)
+- Fix:  Changed the string for associations from 'Include Assciations' to 'IncludeAssociations' (small part of issue #334)
+
 * Wed Apr 09 2014 Fermin Galan <fermin@tid.es> 0.11.0-1 (FIWARE-3.3.3-1)
 - Add: "geo" queries functionality.
 - Add: attribute values can now be not only simple strings but compound expressions with vectors and key-maps

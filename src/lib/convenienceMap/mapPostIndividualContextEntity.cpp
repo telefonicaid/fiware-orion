@@ -25,15 +25,17 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "mongoBackend/MongoGlobal.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/AppendContextElementResponse.h"
 #include "convenienceMap/mapPostIndividualContextEntity.h"
+#include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/HttpStatusCode.h"
 
 
 
@@ -41,7 +43,7 @@
 *
 * mapPostIndividualContextEntity - 
 */
-HttpStatusCode mapPostIndividualContextEntity(std::string entityId, AppendContextElementRequest* request, AppendContextElementResponse* response)
+HttpStatusCode mapPostIndividualContextEntity(std::string entityId, AppendContextElementRequest* request, AppendContextElementResponse* response, ConnectionInfo* ciP)
 {
   HttpStatusCode         ms;
   UpdateContextRequest   ucRequest;
@@ -55,7 +57,7 @@ HttpStatusCode mapPostIndividualContextEntity(std::string entityId, AppendContex
   ucRequest.contextElementVector.push_back(ceP);
   ucRequest.updateActionType.set("Append");
 
-  ms = mongoUpdateContext(&ucRequest, &ucResponse);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant);
 
   ContextAttributeResponse* car                      = new ContextAttributeResponse();
   ContextElementResponse*   ucContextElementResponse = ucResponse.contextElementResponseVector.get(0);

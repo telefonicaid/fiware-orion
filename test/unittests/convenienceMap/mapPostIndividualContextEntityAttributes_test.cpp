@@ -34,6 +34,8 @@
 #include "mongoBackend/mongoRegisterContext.h"
 #include "ngsi9/RegisterContextResponse.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
+#include "rest/ConnectionInfo.h"
+
 #include "testInit.h"
 
 
@@ -81,6 +83,7 @@ TEST(mapPostIndividualContextEntityAttributes, newEntityThenNewEntity)
   HttpStatusCode                ms;
   AppendContextElementRequest   request;
   AppendContextElementResponse  response;
+  ConnectionInfo                ci;
 
   /* Set timer */
   Timer* t = new Timer();
@@ -89,11 +92,11 @@ TEST(mapPostIndividualContextEntityAttributes, newEntityThenNewEntity)
   prepareDatabase("MPICE", "ttt");
   request.attributeDomainName.set("ad");
 
-  ms = mapPostIndividualContextEntityAttributes("MPICE", &request, &response);
+  ms = mapPostIndividualContextEntityAttributes("MPICE", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk, response.errorCode.code);
 
-  ms = mapPostIndividualContextEntityAttributes("MPICE2", &request, &response);
+  ms = mapPostIndividualContextEntityAttributes("MPICE2", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk, response.errorCode.code);
 }

@@ -48,6 +48,7 @@ typedef enum TraceLevels
   LmtMhd,
   LmtSavedResponse,
   LmtIncompletePayload,
+  LmtTenant = 30,
 
   /* Parser (40-59) */
   LmtParse    = 40,
@@ -93,8 +94,9 @@ typedef enum TraceLevels
   LmtServiceInputPayload = 180,
   LmtServiceOutPayload,
   LmtClientInputPayload,
-  LmtClientOutputPayload,
+  LmtClientOutputPayload = 183, // Very important for harness test notification_different_sizes
   LmtPartialPayload,
+  LmtClientOutputPayloadDump,
 
   /* Semaphores (200-201) */
   LmtReqSem = 200,
@@ -104,6 +106,7 @@ typedef enum TraceLevels
   LmtCm = 210,
   LmtIotaXmlReg,
   LmtIotaXmlObs,
+  LmtRush
 } TraceLevels;
 
 

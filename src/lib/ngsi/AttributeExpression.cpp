@@ -50,7 +50,7 @@ std::string AttributeExpression::check(RequestType requestType, Format format, s
 */
 bool AttributeExpression::isEmpty(void)
 {
-  if ((string == "") || (string == "not in use"))
+  if (string == "")
     return true;
 
   return false;

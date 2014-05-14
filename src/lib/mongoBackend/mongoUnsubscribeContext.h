@@ -36,6 +36,6 @@
 *
 * mongoUnsubscribeContext - 
 */
-extern HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, UnsubscribeContextResponse* responseP);
+extern HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, UnsubscribeContextResponse* responseP, std::string tenant = "");
 
 #endif

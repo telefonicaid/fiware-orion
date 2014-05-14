@@ -165,37 +165,32 @@ static XmlRequest* xmlRequestGet(RequestType request, std::string method)
 
 /* ****************************************************************************
 *
-* xmlDocPrepare - 
-*/
-static xml_node<>* xmlDocPrepare(char* xml)
-{
-  xml_document<> doc;
-
-  try
-  {
-    doc.parse<0>(xml);     // 0 means default parse flags
-  }
-  catch (parse_error& e)
-  {
-    LM_F(("doc:\n----------------------------------------------\n%s\n------------------------------------", xml));
-    LM_RE(NULL, ("PARSE ERROR: %s", e.what()));
-  }
-
-  xml_node<>* father = doc.first_node();
-
-  return father;
-}
-
-
-
-/* ****************************************************************************
-*
 * xmlTreat -
 */
 std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseDataP, RequestType request, std::string payloadWord, XmlRequest** reqPP)
 {
-  xml_node<>*   father    = xmlDocPrepare((char*) content);
-  XmlRequest*   reqP      = xmlRequestGet(request, ciP->method);
+  xml_document<> doc;
+  char*          xmlPayload = (char*) content;
+
+  try
+  {
+    doc.parse<0>(xmlPayload);
+  }
+  catch (parse_error& e)
+  {
+    LM_F(("doc:\n----------------------------------------------\n%s\n------------------------------------", content));
+    std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", "unknown", SccBadRequest, "XML Parse Error");
+    LM_RE(errorReply, ("PARSE ERROR: %s", e.what()));
+  }
+  catch (...)
+  {
+    LM_F(("doc:\n----------------------------------------------\n%s\n------------------------------------", content));
+    std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", "unknown", SccBadRequest, "XML Parse Error");
+    LM_RE(errorReply, ("GENERIC ERROR during doc.parse"));
+  }
+
+  xml_node<>*   father = doc.first_node();
+  XmlRequest*   reqP   = xmlRequestGet(request, ciP->method);
 
   ciP->parseDataP = parseDataP;
 

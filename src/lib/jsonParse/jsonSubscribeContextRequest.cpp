@@ -51,8 +51,8 @@ static std::string entityId(std::string path, std::string value, ParseData* pars
   parseDataP->scr.entityIdP = new EntityId();
 
   LM_T(LmtNew, ("New entityId at %p", parseDataP->scr.entityIdP));
-  parseDataP->scr.entityIdP->id        = "not in use";
-  parseDataP->scr.entityIdP->type      = "not in use";
+  parseDataP->scr.entityIdP->id        = "";
+  parseDataP->scr.entityIdP->type      = "";
   parseDataP->scr.entityIdP->isPattern = "false";
 
   parseDataP->scr.res.entityIdVector.push_back(parseDataP->scr.entityIdP);
