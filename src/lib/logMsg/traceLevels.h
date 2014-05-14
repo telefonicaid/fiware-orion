@@ -49,6 +49,7 @@ typedef enum TraceLevels
   LmtSavedResponse,
   LmtIncompletePayload,
   LmtTenant = 30,
+  LmtUriParams,
 
   /* Parser (40-59) */
   LmtParse    = 40,

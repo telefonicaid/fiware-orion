@@ -46,7 +46,7 @@ std::string postSubscribeContext(ConnectionInfo* ciP, int components, std::vecto
   // used to do the subscription, so we are passing ciP->inFomat. This is just an heuristic, the client could want
   // for example to use XML in the subscription message but wants notifications in JSON. We need a more
   // flexible approach, to be implemented
-  ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->inFormat, ciP->tenant);
+  ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam);
   answer = scr.render(SubscribeContext, ciP->outFormat, "");
 
   return answer;

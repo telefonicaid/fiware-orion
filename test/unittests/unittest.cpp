@@ -58,6 +58,14 @@ static TimerMock*    timerMock    = NULL;
 
 /* ****************************************************************************
 *
+* uriParams - 
+*/
+std::map<std::string, std::string> uriParams;
+
+
+
+/* ****************************************************************************
+*
 * utInit - unit test init
 *
 */
@@ -90,6 +98,11 @@ void utInit(void)
 #ifdef UT_DEBUG
   printf("**************** FROM utInit (%d inits, %d exits)\n", noOfInits, noOfExits);
 #endif
+
+  //
+  // Default mime type for notifications: application/xml
+  //
+  uriParams["notifyFormat"] = "XML";
 }
 
 

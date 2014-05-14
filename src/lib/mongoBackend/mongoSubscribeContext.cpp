@@ -39,11 +39,19 @@
 *
 * mongoSubscribeContext - 
 */
-HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, SubscribeContextResponse* responseP, Format inFormat, std::string tenant)
+HttpStatusCode mongoSubscribeContext
+(
+  SubscribeContextRequest*             requestP,
+  SubscribeContextResponse*            responseP,
+  std::string                          tenant,
+  std::map<std::string, std::string>&  uriParam
+)
 {
-    reqSemTake(__FUNCTION__, "ngsi10 subscribe request");
+    std::string notifyFormat = uriParam["notifyFormat"];
 
-    LM_T(LmtMongo, ("Subscribe Context Request"));
+    LM_T(LmtMongo, ("Subscribe Context Request: notifications sent in '%s' format", notifyFormat.c_str()));
+
+    reqSemTake(__FUNCTION__, "ngsi10 subscribe request");
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -93,7 +101,7 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
                                              requestP->attributeList, oid.str(),
                                              requestP->reference.get(),
                                              &notificationDone,
-                                             inFormat,
+                                             (notifyFormat == "XML")? XML : JSON,
                                              tenant);
     sub.append(CSUB_CONDITIONS, conds);
     if (notificationDone) {
@@ -102,7 +110,7 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
     }
 
     /* Adding format to use in notifications */
-    sub.append(CSUB_FORMAT, std::string(formatToString(inFormat)));
+    sub.append(CSUB_FORMAT, notifyFormat);
 
     /* Insert document in database */
     BSONObj subDoc = sub.obj();

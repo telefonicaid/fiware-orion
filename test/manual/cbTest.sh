@@ -50,7 +50,7 @@ function verboseMsg()
 #
 function usage()
 {
-  echo usage: $0 '[-host <host>] [-port <p>] [-v (verbose)] [-lint (use xmllint)] [-cop <convenience operation>] [-X <method>] [--tenant <tenant>] [--httpTenant <tenant>] [-en <entityId>] [-attr (attributeName)] [-id <reg/sub id>] [-json (in and out-format in JSON)] [-informat (in-format)] [-outformat (out-format)] [-table <table to debug>] [--https] <operation> <data file>'
+  echo usage: $0 '[-host <host>] [-port <p>] [-v (verbose)] [-lint (use xmllint)] [-cop <convenience operation>] [-X <method>] [--tenant <tenant>] [--httpTenant <tenant>] [--params <URI parameters>] [-en <entityId>] [-attr (attributeName)] [-id <reg/sub id>] [-json (in and out-format in JSON)] [-informat (in-format)] [-outformat (out-format)] [-table <table to debug>] [--https] <operation> <data file>'
 
   verbose=1
   verboseMsg "Operations:"
@@ -101,7 +101,7 @@ protocol='http'
 cert=""
 tenant=""
 httpTenant=""
-
+uriParams=""
 
 
 # -----------------------------------------------------------------------------
@@ -115,6 +115,7 @@ do
   elif [ "$1" == "-lint" ];        then useXmlLint=1;
   elif [ "$1" == "--https" ];      then protocol='https'; cert='--cacert ../../security/localhost.pem';
   elif [ "$1" == "--tenant" ];     then tenant=$2;                      shift;
+  elif [ "$1" == "--params" ];     then uriParams=$2;                   shift;
   elif [ "$1" == "--httpTenant" ]; then httpTenant=$2;                  shift;
   elif [ "$1" == "-host" ];        then host=$2;                        shift;
   elif [ "$1" == "-port" ];        then port=$2;                        shift;
@@ -343,7 +344,10 @@ then
   url=$(echo $url | sed "s/ATTRIBUTE_NAME/$attributeName/g")
 fi
 
-
+if [ "$uriParams" != "" ]
+then
+  url=${url}"?$uriParams"
+fi
 
 echo CURL: curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" --header "fiware-service: $httpTenant" $CURL_VERBOSE -X $method $cert
 # -----------------------------------------------------------------------------
@@ -354,11 +358,11 @@ echo CURL: curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" --header "f
 #
 if [ "$useXmlLint" == 1 ] 
 then
-  (curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" --header "fiware-service: $httpTenant" $CURL_VERBOSE -X $method $cert -d @- | xmllint --format -) << EOF
+  (curl -3 $url --include --header "$IN_FORMAT" --header "$OUT_FORMAT" --header "fiware-service: $httpTenant" $CURL_VERBOSE -X $method $cert -d @- | xmllint --format -) << EOF
 $(echo $data)
 EOF
 else
-  (curl -3 $url --header "$IN_FORMAT" --header "$OUT_FORMAT" --header "fiware-service: $httpTenant" $CURL_VERBOSE -X $method $cert -d @-) << EOF
+  (curl -3 $url --include --header "$IN_FORMAT" --header "$OUT_FORMAT" --header "fiware-service: $httpTenant" $CURL_VERBOSE -X $method $cert -d @-) << EOF
 $(echo $data)
 EOF
 fi
