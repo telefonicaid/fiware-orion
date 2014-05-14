@@ -313,7 +313,7 @@ static std::string composeCollectionName(std::string tenant, std::string colName
         result = dbPrefix + "." + colName;
     }
     else {
-        /* Note that we can not use "." for database delimiter. A database can  not containt this
+        /* Note that we can not use "." as database delimiter. A database cannot contain this
          * character, http://docs.mongodb.org/manual/reference/limits/#Restrictions-on-Database-Names-for-Unix-and-Linux-Systems */
         result = dbPrefix + "-" + tenant + "." + colName;
     }
@@ -376,7 +376,7 @@ bool mongoLocationCapable(void) {
 void ensureLocationIndex(std::string tenant) {
     /* Ensure index for entity locations, in the case of using 2.4 */
     if (mongoLocationCapable()) {
-        std::string index = std::string(ENT_LOCATION) + "." + ENT_LOCATION_COORDS;
+        std::string index = ENT_LOCATION "." ENT_LOCATION_COORDS;
         connection->ensureIndex(getEntitiesCollectionName(tenant).c_str(), BSON(index << "2dsphere" ));
         LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenant.c_str()));
     }
@@ -389,7 +389,7 @@ void ensureLocationIndex(std::string tenant) {
 void recoverOntimeIntervalThreads(std::string tenant) {
 
     /* Look for ONTIMEINTERVAL subscriptions in database */
-    std::string condType= std::string(CSUB_CONDITIONS) + "."  + CSUB_CONDITIONS_TYPE;
+    std::string condType= CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
     BSONObj query = BSON(condType << ON_TIMEINTERVAL_CONDITION);
 
     DBClientConnection* connection = getMongoConnection();
@@ -534,7 +534,6 @@ static void fillQueryEntFalse(BSONArrayBuilder& ba, EntityId* enP, bool withType
         ba.append(enP->id);
         LM_T(LmtMongo, ("Entity query token (isPattern=false): {id: %s}", enP->id.c_str()));
     }
-
 }
 
 /* ****************************************************************************
@@ -543,10 +542,9 @@ static void fillQueryEntFalse(BSONArrayBuilder& ba, EntityId* enP, bool withType
 */
 static void fillQueryEntTrue(BSONArrayBuilder& ba, EntityId* enP) {
 
-    BSONObjBuilder ent;
-
-    const std::string idString = std::string("_id.") + ENT_ENTITY_ID;
-    const std::string typeString = std::string("_id.") + ENT_ENTITY_TYPE;
+    BSONObjBuilder     ent;
+    const std::string  idString   = "_id." ENT_ENTITY_ID;
+    const std::string  typeString = "_id." ENT_ENTITY_TYPE;
 
     ent.appendRegex(idString, enP->id);
     if (enP->type != "") {
@@ -557,7 +555,6 @@ static void fillQueryEntTrue(BSONArrayBuilder& ba, EntityId* enP) {
     ba.append(entObj);
 
     LM_T(LmtMongo, ("Entity query token (isPattern=true): '%s'", entObj.toString().c_str()));
-
 }
 
 /* ****************************************************************************
@@ -763,7 +760,7 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
     /* Part 1.3: add up to one object to the $or array for entities isPattern=false without type
      * (check size to avoid "{ _id: { $in: {} } }" that would make the query fail) */
     if (entFalseWOType.arrSize() > 0) {
-        std::string idId = std::string("_id.") + ENT_ENTITY_ID;
+        std::string idId = "_id." ENT_ENTITY_ID;
         orEnt.append(BSON(idId << BSON("$in" << entFalseWOType.arr())));
     }
 
@@ -777,7 +774,7 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
         attrs.append(attrName);
         LM_T(LmtMongo, ("Attribute query token: '%s'", attrName.c_str()));
     }
-    std::string attrNames = std::string(ENT_ATTRS) + "." + ENT_ATTRS_NAME;
+    std::string attrNames = ENT_ATTRS "." ENT_ATTRS_NAME;
     if (attrs.arrSize() > 0) {
         /* If we don't do this checking, the {$in: [] } in the attribute name part will
          * make the query fail*/
@@ -787,7 +784,7 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
     /* Part 3: geo-location */
     BSONObj areaQuery;
     if (processAreaScope(res.scopeVector, areaQuery)) {
-       std::string locCoords = std::string(ENT_LOCATION) + "." + ENT_LOCATION_COORDS;
+       std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
        finalQuery.append(locCoords, areaQuery);
     }
 
@@ -1038,13 +1035,10 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
 
     /* Build query based on arguments */
     // FIXME P2: this implementation need to be refactored for cleanup
-    std::string contextRegistrationEntities = std::string(REG_CONTEXT_REGISTRATION) + "." + REG_ENTITIES;
-    std::string contextRegistrationEntitiesId = std::string(REG_CONTEXT_REGISTRATION) + "." + REG_ENTITIES +
-            "." + REG_ENTITY_ID;
-    std::string contextRegistrationEntitiesType = std::string(REG_CONTEXT_REGISTRATION) + "." + REG_ENTITIES +
-            "." + REG_ENTITY_TYPE;
-    std::string contextRegistrationAttrsNames = std::string(REG_CONTEXT_REGISTRATION) + "." + REG_ATTRS +
-            "." + REG_ATTRS_NAME;
+    std::string contextRegistrationEntities     = REG_CONTEXT_REGISTRATION "." REG_ENTITIES;
+    std::string contextRegistrationEntitiesId   = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ID;
+    std::string contextRegistrationEntitiesType = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_TYPE;
+    std::string contextRegistrationAttrsNames   = REG_CONTEXT_REGISTRATION "." REG_ATTRS    "." REG_ATTRS_NAME;
 
     BSONArrayBuilder entityOr;
     BSONArrayBuilder entitiesWithType;

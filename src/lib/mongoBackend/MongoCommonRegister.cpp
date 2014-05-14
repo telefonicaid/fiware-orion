@@ -254,7 +254,7 @@ static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONOb
          "}";
     LM_T(LmtMongo, ("JS function: %s", function.c_str()));
 
-    std::string entPatternQ = std::string(CSUB_ENTITIES) + "." + CSUB_ENTITY_ISPATTERN;
+    std::string entPatternQ = CSUB_ENTITIES "." CSUB_ENTITY_ISPATTERN;
 
     BSONObjBuilder queryPattern;
     queryPattern.append(entPatternQ, "true");
