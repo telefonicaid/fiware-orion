@@ -39,7 +39,7 @@
 std::string AttributeAssociation::render(Format format, std::string indent, bool comma)
 {
   std::string  out                     = "";
-  std::string  tag                     = "AttributeAssociation";
+  std::string  tag                     = "attributeAssociation";
   bool         targetAttributeRendered = target != "";
 
   out += startTag(indent, tag, format);

@@ -51,7 +51,7 @@ void AttributeAssociationList::push_back(AttributeAssociation* aaP)
 std::string AttributeAssociationList::render(Format format, std::string indent, bool comma)
 {
   std::string out     = "";
-  std::string xmlTag  = "AttributeAssociationList";
+  std::string xmlTag  = "attributeAssociationList";
   std::string jsonTag = "associations";
 
   if (vec.size() == 0)

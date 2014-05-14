@@ -39,7 +39,7 @@ TEST(Association, ok)
    Association           a;
    AttributeAssociation* aa = new AttributeAssociation();
    std::string           out;
-   std::string           expected = "  <entityAssociation>\n    <sourceEntityId type=\"source\" isPattern=\"false\">\n      <id>Source</id>\n    </sourceEntityId>\n    <targetEntityId type=\"target\" isPattern=\"false\">\n      <id>Target</id>\n    </targetEntityId>\n  </entityAssociation>\n  <AttributeAssociationList>\n    <AttributeAssociation>\n      <sourceAttribute>Source</sourceAttribute>\n      <targetAttribute>Target</targetAttribute>\n    </AttributeAssociation>\n  </AttributeAssociationList>\n";
+   std::string           expected = "  <entityAssociation>\n    <sourceEntityId type=\"source\" isPattern=\"false\">\n      <id>Source</id>\n    </sourceEntityId>\n    <targetEntityId type=\"target\" isPattern=\"false\">\n      <id>Target</id>\n    </targetEntityId>\n  </entityAssociation>\n  <attributeAssociationList>\n    <attributeAssociation>\n      <sourceAttribute>Source</sourceAttribute>\n      <targetAttribute>Target</targetAttribute>\n    </attributeAssociation>\n  </attributeAssociationList>\n";
 
    a.entityAssociation.source.fill("Source", "source", "false");
    a.entityAssociation.target.fill("Target", "target", "false");
