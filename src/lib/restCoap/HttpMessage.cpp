@@ -3,7 +3,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include <boost/regex.hpp>
 #include <stdlib.h>  // atoi
 
 HttpMessage::HttpMessage(MemoryStruct* data)

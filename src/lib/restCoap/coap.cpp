@@ -18,12 +18,11 @@
 #include <string>
 #include <string.h>
 
-
-
 #include <boost/thread.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "HttpProxy.h"
+#include "HttpMessage.h"
 
 
 
@@ -41,47 +40,57 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
 
   // Translate request from CoAP to HTTP and send it to MHD
   MemoryStruct* httpResponse = NULL; // Will contain HTTP Response
-  sendHttpRequest(host, port, request, httpResponse);
+  httpResponse = sendHttpRequest(host, port, request);
   if (httpResponse == NULL)
   {
     // Could not get an answer
   }
 
-  CoapPDU *coapResponse = new CoapPDU();
+  HttpMessage* hm = new HttpMessage(httpResponse);
+
+
   // Translate response from HTTP to CoAP
-  http2Coap(httpResponse, coapResponse);
+  CoapPDU *coapResponse = hm->toCoap();
+//  CoapPDU *coapResponse = new CoapPDU();
+
+  if (coapResponse == NULL)
+  {
+    // Could not translate HTTP into CoAP
+  }
 
   // Prepare appropriate response in CoAP
   coapResponse->setVersion(1);
   coapResponse->setMessageID(request->getMessageID());
   coapResponse->setToken(request->getTokenPointer(),request->getTokenLength());
-  //response->setToken((uint8_t*)"\1\16",2);
-  char *payload = (char*)"This is a mundanely worded test payload.";
 
-  // respond differently, depending on method code
-  switch (request->getCode())
-  {
-    case CoapPDU::COAP_EMPTY:
-      // makes no sense, send RST
-    break;
-    case CoapPDU::COAP_GET:
-      coapResponse->setCode(CoapPDU::COAP_CONTENT);
-      coapResponse->setContentFormat(CoapPDU::COAP_CONTENT_FORMAT_TEXT_PLAIN);
-      coapResponse->setPayload((uint8_t*)payload,strlen(payload));
-    break;
-    case CoapPDU::COAP_POST:
-      coapResponse->setCode(CoapPDU::COAP_CREATED);
-    break;
-    case CoapPDU::COAP_PUT:
-      coapResponse->setCode(CoapPDU::COAP_CHANGED);
-    break;
-    case CoapPDU::COAP_DELETE:
-      coapResponse->setCode(CoapPDU::COAP_DELETED);
-      coapResponse->setPayload((uint8_t*)"DELETE OK",9);
-    break;
-    default:
-    break;
-  }
+  //response->setToken((uint8_t*)"\1\16",2);
+
+//  char *payload = (char*)"This is a mundanely worded test payload.";
+
+//  // respond differently, depending on method code
+//  switch (request->getCode())
+//  {
+//    case CoapPDU::COAP_EMPTY:
+//      // makes no sense, send RST
+//    break;
+//    case CoapPDU::COAP_GET:
+//      coapResponse->setCode(CoapPDU::COAP_CONTENT);
+//      coapResponse->setContentFormat(CoapPDU::COAP_CONTENT_FORMAT_TEXT_PLAIN);
+//      coapResponse->setPayload((uint8_t*)payload,strlen(payload));
+//    break;
+//    case CoapPDU::COAP_POST:
+//      coapResponse->setCode(CoapPDU::COAP_CREATED);
+//    break;
+//    case CoapPDU::COAP_PUT:
+//      coapResponse->setCode(CoapPDU::COAP_CHANGED);
+//    break;
+//    case CoapPDU::COAP_DELETE:
+//      coapResponse->setCode(CoapPDU::COAP_DELETED);
+//      coapResponse->setPayload((uint8_t*)"DELETE OK",9);
+//    break;
+//    default:
+//    break;
+//  }
 
   // type
   switch (request->getType())
@@ -100,6 +109,10 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
       return 1;
     break;
   };
+
+  delete request;
+
+  coapResponse->printHuman();
 
   // send the packet
   ssize_t sent = sendto(sockfd, coapResponse->getPDUPointer(), coapResponse->getPDULength(), 0, (sockaddr*)recvFrom, addrLen);
@@ -126,8 +139,8 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
 void Coap::serve()
 {
   // Buffers for UDP and URIs
-  char buffer[BUFFER_SIZE];
-  char uriBuffer[URI_BUFFER_SIZE];
+  char buffer[COAP_BUFFER_SIZE];
+  char uriBuffer[COAP_URI_BUFFER_SIZE];
   int  recvURILen = 0;
   int  ret = 0;
 
@@ -168,34 +181,24 @@ void Coap::serve()
   }
 
   // reuse the same PDU
-  CoapPDU *recvPDU = new CoapPDU((uint8_t*)buffer, BUFFER_SIZE, BUFFER_SIZE);
+  //CoapPDU *recvPDU = new CoapPDU((uint8_t*)buffer, COAP_BUFFER_SIZE, COAP_BUFFER_SIZE);
+  CoapPDU *recvPDU = NULL;
 
   LM_V(("Listening for packets..."));
   while (1)
   {
     // receive packet
-    ret = recvfrom(sd, &buffer, BUFFER_SIZE, 0, (sockaddr*)&recvAddr, &recvAddrLen);
+    ret = recvfrom(sd, &buffer, COAP_BUFFER_SIZE, 0, (sockaddr*)&recvAddr, &recvAddrLen);
     if (ret == -1)
     {
       LM_V(("Error receiving data"));
       return;
     }
 
-    // print src address
-//    switch (recvAddr.ss_family) {
-//      case AF_INET:
-//        v4Addr = (struct sockaddr_in*)&recvAddr;
-//        LM_V(("Got packet from %s:%d", inet_ntoa(v4Addr->sin_addr), ntohs(v4Addr->sin_port)));
-//      break;
-
-//      case AF_INET6:
-//        v6Addr = (struct sockaddr_in6*)&recvAddr;
-//        LM_V(("Got packet from %s:%d",inet_ntop(AF_INET6, &v6Addr->sin6_addr, straddr, sizeof(straddr)), ntohs(v6Addr->sin6_port)));
-//      break;
-//    }
+    recvPDU = new CoapPDU((uint8_t*)buffer, COAP_BUFFER_SIZE, COAP_BUFFER_SIZE);
 
     // validate packet
-    if (ret > BUFFER_SIZE)
+    if (ret > COAP_BUFFER_SIZE)
     {
       LM_V(("PDU too large to fit in pre-allocated buffer"));
       continue;
@@ -210,7 +213,7 @@ void Coap::serve()
     //recvPDU->printHuman();
 
     // Treat URI
-    if (recvPDU->getURI(uriBuffer, URI_BUFFER_SIZE, &recvURILen) != 0)
+    if (recvPDU->getURI(uriBuffer, COAP_URI_BUFFER_SIZE, &recvURILen) != 0)
     {
       LM_V(("Error retrieving URI"));
       continue;

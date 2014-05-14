@@ -49,20 +49,21 @@ size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *user
 *
 * sendHttpRequest -
 */
-void sendHttpRequest(char *host, unsigned short port, CoapPDU *request, MemoryStruct* chunk)
+MemoryStruct* sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
 {
-  char*     url                          = NULL;
-  int       recvURILen                   = 0;
-  CURL*     curl                         = curl_easy_init();
-  CURLcode  res;
-  char      uriBuffer[URI_BUFFER_SIZE];
+  char*         url                      = NULL;
+  int           recvURILen               = 0;
+  CURL*         curl                     = curl_easy_init();
+  MemoryStruct* httpResponse             = NULL;
+  CURLcode      res;
+  char          uriBuffer[COAP_URI_BUFFER_SIZE];
 
   if (curl)
   {
     // Allocate to hold HTTP response
-    chunk = new MemoryStruct;
-    chunk->memory = (char*)malloc(1); // will grow as needed
-    chunk->size = 0; // no data at this point
+    httpResponse = new MemoryStruct;
+    httpResponse->memory = (char*)malloc(1); // will grow as needed
+    httpResponse->size = 0; // no data at this point
 
     // --- Set HTTP verb
     std::string httpVerb = "";
@@ -137,14 +138,24 @@ void sendHttpRequest(char *host, unsigned short port, CoapPDU *request, MemorySt
     }
 
 
+    // Set Content-length
+    std::string string = "Content-length: " + request->getPayloadLength();
+    headers = curl_slist_append(headers, string.c_str());
+    LM_V(("Got: '%s'", string.c_str()));
+
+    // Set Expect
+    headers = curl_slist_append(headers, "Expect: ");
+
     // --- Prepare URL
-    request->getURI(uriBuffer, URI_BUFFER_SIZE, &recvURILen);
+    request->getURI(uriBuffer, COAP_URI_BUFFER_SIZE, &recvURILen);
     url = new char[strlen(host) + recvURILen];
     strcpy(url, host);
     if (recvURILen > 0)
       strncat(url, uriBuffer, recvURILen);
 
     // --- Set contents
+    //u_int8_t* payload = new u_int8_t[request->getPayloadLength()];
+
     u_int8_t* payload = request->getPayloadCopy();
 
 
@@ -155,7 +166,7 @@ void sendHttpRequest(char *host, unsigned short port, CoapPDU *request, MemorySt
     curl_easy_setopt(curl, CURLOPT_HEADER, 1); // Activate include the header in the body output
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); // Put headers in place
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)chunk); // Custom data for response handling
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)httpResponse); // Custom data for response handling
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payload);
 
 
@@ -166,16 +177,12 @@ void sendHttpRequest(char *host, unsigned short port, CoapPDU *request, MemorySt
       fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
     }
 
-
-    // --- Barf out
-    //LM_V(("CHUNK:\n%s", chunk->memory));
-
-
-
     // --- Cleanup curl environment
     curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
   }
+
+  return httpResponse;
 }
 
 

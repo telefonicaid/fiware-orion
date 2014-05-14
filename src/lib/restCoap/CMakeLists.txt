@@ -23,11 +23,13 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET (SOURCES
     coap.cpp
     HttpProxy.cpp
+    HttpMessage.cpp
 )
 
 SET (HEADERS
     coap.h
     HttpProxy.h
+    HttpMessage.h
 )
 
 
