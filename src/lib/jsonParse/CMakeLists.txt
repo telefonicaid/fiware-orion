@@ -48,7 +48,6 @@ SET (HEADERS
     jsonRequest.h
     jsonParse.h
     JsonNode.h
-    jsonNullTreat.h
 
     jsonRegisterContextRequest.h
     jsonDiscoverContextAvailabilityRequest.h
