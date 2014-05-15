@@ -39,7 +39,7 @@ using namespace mongo;
 *
 * mongoGetContextSubscriptionInfo -
 */
-HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscriptionInfo* csiP, std::string* err, std::string tenant) {
+HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, ContextSubscriptionInfo* csiP, std::string* err, const std::string& tenant) {
 
     reqSemTake(__FUNCTION__, "get info on subscriptions");
 
@@ -117,7 +117,7 @@ HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscri
 *
 * mongoGetContextElementResponses -
 */
-HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList attrL, ContextElementResponseVector* cerV, std::string* err, std::string tenant) {
+HttpStatusCode mongoGetContextElementResponses(const EntityIdVector& enV, const AttributeList& attrL, ContextElementResponseVector* cerV, std::string* err, const std::string& tenant) {
 
     /* This function is basically a wrapper of mongoBackend internal entitiesQuery() function */
 
@@ -141,7 +141,7 @@ HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList
 * mongoUpdateCsubNewNotification -
 *
 */
-HttpStatusCode mongoUpdateCsubNewNotification(std::string subId, std::string* err, std::string tenant) {
+HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::string* err, const std::string& tenant) {
 
     reqSemTake(__FUNCTION__, "update subscription notifications");
 

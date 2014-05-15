@@ -43,7 +43,7 @@ HttpStatusCode mongoSubscribeContext
 (
   SubscribeContextRequest*             requestP,
   SubscribeContextResponse*            responseP,
-  std::string                          tenant,
+  const std::string&                   tenant,
   std::map<std::string, std::string>&  uriParam
 )
 {
