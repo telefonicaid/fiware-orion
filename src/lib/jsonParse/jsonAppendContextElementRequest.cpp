@@ -33,7 +33,7 @@
 #include "jsonParse/jsonParse.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonAppendContextElementRequest.h"
-#include "jsonParse/jsonNullTreat.h"
+#include "parse/nullTreat.h"
 #include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"
 
@@ -43,7 +43,7 @@
 *
 * attributeDomainName - 
 */
-static std::string attributeDomainName(std::string path, std::string value, ParseData* reqData)
+static std::string attributeDomainName(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got an attributeDomainName"));
   reqData->acer.res.attributeDomainName.set(value);
@@ -56,7 +56,7 @@ static std::string attributeDomainName(std::string path, std::string value, Pars
 *
 * contextAttribute -
 */
-static std::string contextAttribute(std::string path, std::string value, ParseData* reqData)
+static std::string contextAttribute(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got an attribute"));
   reqData->acer.attributeP = new ContextAttribute();
@@ -70,7 +70,7 @@ static std::string contextAttribute(std::string path, std::string value, ParseDa
 *
 * contextAttributeName -
 */
-static std::string contextAttributeName(std::string path, std::string value, ParseData* reqData)
+static std::string contextAttributeName(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got an attribute name: %s", value.c_str()));
   reqData->acer.attributeP->name = value;
@@ -83,7 +83,7 @@ static std::string contextAttributeName(std::string path, std::string value, Par
 *
 * contextAttributeType -
 */
-static std::string contextAttributeType(std::string path, std::string value, ParseData* reqData)
+static std::string contextAttributeType(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got an attribute type: %s", value.c_str()));
   reqData->acer.attributeP->type = value;
@@ -96,7 +96,7 @@ static std::string contextAttributeType(std::string path, std::string value, Par
 *
 * contextAttributeValue -
 */
-static std::string contextAttributeValue(std::string path, std::string value, ParseData* parseDataP)
+static std::string contextAttributeValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute value: %s", value.c_str()));
   parseDataP->lastContextAttribute = parseDataP->acer.attributeP;
@@ -110,7 +110,7 @@ static std::string contextAttributeValue(std::string path, std::string value, Pa
 *
 * contextMetadata - 
 */
-static std::string contextMetadata(std::string path, std::string value, ParseData* reqData)
+static std::string contextMetadata(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata"));
   reqData->acer.metadataP = new Metadata();
@@ -124,7 +124,7 @@ static std::string contextMetadata(std::string path, std::string value, ParseDat
 *
 * contextMetadataName - 
 */
-static std::string contextMetadataName(std::string path, std::string value, ParseData* reqData)
+static std::string contextMetadataName(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata name '%s'", value.c_str()));
   reqData->acer.metadataP->name = value;
@@ -137,7 +137,7 @@ static std::string contextMetadataName(std::string path, std::string value, Pars
 *
 * contextMetadataType - 
 */
-static std::string contextMetadataType(std::string path, std::string value, ParseData* reqData)
+static std::string contextMetadataType(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata type '%s'", value.c_str()));
   reqData->acer.metadataP->type = value;
@@ -150,7 +150,7 @@ static std::string contextMetadataType(std::string path, std::string value, Pars
 *
 * contextMetadataValue - 
 */
-static std::string contextMetadataValue(std::string path, std::string value, ParseData* reqData)
+static std::string contextMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
   reqData->acer.metadataP->value = value;
@@ -163,7 +163,7 @@ static std::string contextMetadataValue(std::string path, std::string value, Par
 *
 * domainMetadata - 
 */
-static std::string domainMetadata(std::string path, std::string value, ParseData* reqData)
+static std::string domainMetadata(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata"));
   reqData->acer.domainMetadataP = new Metadata();
@@ -177,7 +177,7 @@ static std::string domainMetadata(std::string path, std::string value, ParseData
 *
 * domainMetadataName - 
 */
-static std::string domainMetadataName(std::string path, std::string value, ParseData* reqData)
+static std::string domainMetadataName(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata name '%s'", value.c_str()));
   reqData->acer.domainMetadataP->name = value;
@@ -190,7 +190,7 @@ static std::string domainMetadataName(std::string path, std::string value, Parse
 *
 * domainMetadataType - 
 */
-static std::string domainMetadataType(std::string path, std::string value, ParseData* reqData)
+static std::string domainMetadataType(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata type '%s'", value.c_str()));
   reqData->acer.domainMetadataP->type = value;
@@ -203,7 +203,7 @@ static std::string domainMetadataType(std::string path, std::string value, Parse
 *
 * domainMetadataValue - 
 */
-static std::string domainMetadataValue(std::string path, std::string value, ParseData* reqData)
+static std::string domainMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
   reqData->acer.domainMetadataP->value = value;

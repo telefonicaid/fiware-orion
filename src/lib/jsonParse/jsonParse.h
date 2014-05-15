@@ -37,6 +37,6 @@
 *
 * jsonParse - 
 */
-extern std::string jsonParse(ConnectionInfo* ciP, const char* content, std::string requestType, JsonNode* parseVector, ParseData* reqDataP);
+extern std::string jsonParse(ConnectionInfo* ciP, const char* content, const std::string& requestType, JsonNode* parseVector, ParseData* reqDataP);
 
 #endif

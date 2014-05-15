@@ -29,11 +29,11 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "jsonParse/JsonNode.h"
-#include "jsonParse/jsonNullTreat.h"
 #include "jsonParse/jsonDiscoverContextAvailabilityRequest.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/EntityId.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
+#include "parse/nullTreat.h"
 #include "rest/ConnectionInfo.h"
 
 
@@ -42,7 +42,7 @@
 *
 * entityId - 
 */
-static std::string entityId(std::string path, std::string value, ParseData* reqDataP)
+static std::string entityId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
 
@@ -64,7 +64,7 @@ static std::string entityId(std::string path, std::string value, ParseData* reqD
 *
 * entityIdId - 
 */
-static std::string entityIdId(std::string path, std::string value, ParseData* reqDataP)
+static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
    reqDataP->dcar.entityIdP->id = value;
    LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->dcar.entityIdP->id.c_str()));
@@ -78,7 +78,7 @@ static std::string entityIdId(std::string path, std::string value, ParseData* re
 *
 * entityIdType - 
 */
-static std::string entityIdType(std::string path, std::string value, ParseData* reqDataP)
+static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
    reqDataP->dcar.entityIdP->type = value;
    LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->dcar.entityIdP->type.c_str()));
@@ -92,7 +92,7 @@ static std::string entityIdType(std::string path, std::string value, ParseData* 
 *
 * entityIdIsPattern - 
 */
-static std::string entityIdIsPattern(std::string path, std::string value, ParseData* reqDataP)
+static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
@@ -110,7 +110,7 @@ static std::string entityIdIsPattern(std::string path, std::string value, ParseD
 *
 * attribute - 
 */
-static std::string attribute(std::string path, std::string value, ParseData* reqDataP)
+static std::string attribute(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an attribute: '%s'", value.c_str()));
 
@@ -125,7 +125,7 @@ static std::string attribute(std::string path, std::string value, ParseData* req
 *
 * attributeList - 
 */
-static std::string attributeList(std::string path, std::string value, ParseData* reqDataP)
+static std::string attributeList(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an attributeList: '%s'", value.c_str()));
   return "OK";
@@ -137,7 +137,7 @@ static std::string attributeList(std::string path, std::string value, ParseData*
 *
 * restriction - 
 */
-static std::string restriction(std::string path, std::string value, ParseData* reqDataP)
+static std::string restriction(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   reqDataP->dcar.res.restrictions += 1;
   return "OK";
@@ -149,7 +149,7 @@ static std::string restriction(std::string path, std::string value, ParseData* r
 *
 * attributeExpression - 
 */
-static std::string attributeExpression(std::string path, std::string value, ParseData* reqDataP)
+static std::string attributeExpression(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an attributeExpression: '%s'", value.c_str()));
 
@@ -167,7 +167,7 @@ static std::string attributeExpression(std::string path, std::string value, Pars
 *
 * operationScope - 
 */
-static std::string operationScope(std::string path, std::string value, ParseData* reqDataP)
+static std::string operationScope(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an operationScope"));
   
@@ -185,7 +185,7 @@ static std::string operationScope(std::string path, std::string value, ParseData
 *
 * scopeType - 
 */
-static std::string scopeType(std::string path, std::string value, ParseData* reqDataP)
+static std::string scopeType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
    reqDataP->dcar.scopeP->type = value;
    LM_T(LmtParse, ("Set scope 'type' to '%s' for a scope", reqDataP->dcar.scopeP->type.c_str()));
@@ -198,7 +198,7 @@ static std::string scopeType(std::string path, std::string value, ParseData* req
 *
 * scopeValue - 
 */
-static std::string scopeValue(std::string path, std::string value, ParseData* reqDataP)
+static std::string scopeValue(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
    reqDataP->dcar.scopeP->value = value;
    LM_T(LmtParse, ("Set scope 'value' to '%s' for a scope", reqDataP->dcar.scopeP->value.c_str()));

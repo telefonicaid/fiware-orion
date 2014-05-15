@@ -34,7 +34,7 @@
 *
 * JsonNodeTreat - 
 */
-typedef std::string (*JsonNodeTreat)(std::string path, std::string value, ParseData* reqDataP);
+typedef std::string (*JsonNodeTreat)(const std::string& path, const std::string& value, ParseData* reqDataP);
 
 
 
