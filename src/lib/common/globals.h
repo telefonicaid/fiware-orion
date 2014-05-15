@@ -49,7 +49,7 @@
 *
 * OrionExitFunction - 
 */
-typedef void (*OrionExitFunction)(int exitCode, std::string reason);
+typedef void (*OrionExitFunction)(int exitCode, const std::string& reason);
 
 
 
@@ -113,6 +113,6 @@ extern long long toSeconds(int value, char what, bool dayPart);
 * This is common code for Duration and Throttling (at least)
 *
 */
-extern long long parse8601(std::string s);
+extern long long parse8601(const std::string& s);
 
 #endif

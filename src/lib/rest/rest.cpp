@@ -552,6 +552,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
+      // LM_V(("Starting HTTPS daemon on IPv4 %s port %d", bindIp, port));
       mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_SSL, // MHD_USE_SELECT_INTERNALLY
                                    htons(port),
                                    NULL,

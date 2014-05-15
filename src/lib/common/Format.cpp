@@ -55,7 +55,7 @@ const char* formatToString(Format format)
 *
 * stringToFormat
 */
-Format stringToFormat(std::string s)
+Format stringToFormat(const std::string& s)
 {
     if (s == "XML")
         return XML;
@@ -69,7 +69,7 @@ Format stringToFormat(std::string s)
 *
 * formatParse - 
 */
-Format formatParse(std::string formatString, std::string* charsetP)
+Format formatParse(const std::string& formatString, std::string* charsetP)
 {
   char* s;
   char* cP = (char*) formatString.c_str();

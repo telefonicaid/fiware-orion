@@ -54,13 +54,13 @@ extern const char* formatToString(Format format);
 *
 * stringToFormat
 */
-extern Format stringToFormat(std::string s);
+extern Format stringToFormat(const std::string& s);
 
 
 /* ****************************************************************************
 *
 * formatParse - 
 */
-extern Format formatParse(std::string format, std::string* charsetP);
+extern Format formatParse(const std::string& format, std::string* charsetP);
 
 #endif

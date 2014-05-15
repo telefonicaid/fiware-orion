@@ -33,20 +33,20 @@
 *
 * isIPv6 -
 */
-extern bool isIPv6(std::string in);
+extern bool isIPv6(const std::string& in);
 
 /* ****************************************************************************
 *
 * stringSplit - 
 */
-extern int stringSplit(std::string in, char delimiter, std::vector<std::string>& outV);
+extern int stringSplit(const std::string& in, char delimiter, std::vector<std::string>& outV);
 
 /* ****************************************************************************
 *
 * parseUrl -
 *
 */
-extern bool parseUrl(std::string url, std::string& host, int& port, std::string& path, std::string& protocol);
+extern bool parseUrl(const std::string& url, std::string& host, int& port, std::string& path, std::string& protocol);
 
 /* ****************************************************************************
 *
@@ -70,7 +70,7 @@ extern bool onlyWs(const char* s);
 *
 * string2coords - 
 */
-extern bool string2coords(std::string s, double& latitude, double& longitude);
+extern bool string2coords(const std::string& s, double& latitude, double& longitude);
 
 /* ****************************************************************************
 *
@@ -82,7 +82,7 @@ extern void coords2string(std::string& s, double latitude, double longitude, int
 *
 * versionParse -
 */
-bool versionParse(std::string version, int& mayor, int& minor, std::string& extra);
+bool versionParse(const std::string& version, int& mayor, int& minor, std::string& extra);
 
 /* ****************************************************************************
 *
