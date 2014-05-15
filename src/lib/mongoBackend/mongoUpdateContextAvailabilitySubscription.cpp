@@ -40,7 +40,7 @@
 *
 * mongoUpdateContextAvailabilitySubscription - 
 */
-HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabilitySubscriptionRequest* requestP, UpdateContextAvailabilitySubscriptionResponse* responseP, Format inFormat, std::string tenant)
+HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabilitySubscriptionRequest* requestP, UpdateContextAvailabilitySubscriptionResponse* responseP, Format inFormat, const std::string& tenant)
 {
   LM_T(LmtMongo, ("Update Context Subscription"));
   reqSemTake(__FUNCTION__, "ngsi9 update subscription request");
