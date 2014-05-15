@@ -42,8 +42,16 @@ using namespace mongo;
 *
 * associationsQuery -
 */
-bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scope, MetadataVector* mdV, std::string* err, std::string tenant) {
-
+static bool associationsQuery
+(
+  EntityIdVector*       enV,
+  AttributeList*        attrL,
+  const std::string&    scope,
+  MetadataVector*       mdV,
+  std::string*          err,
+  const std::string&    tenant
+)
+{
     DBClientConnection* connection = getMongoConnection();
 
     /* Note that SCOPE_VALUE_ASSOC_SOURCE means that the argument is a target (so we use ASSOC_TARGET_ENT and
@@ -53,8 +61,8 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
 
     /* Build query (entity part) */
     BSONArrayBuilder enArray;
-    for (unsigned int ix = 0; ix < enV.size() ; ++ix) {
-        enArray.append(BSON(ASSOC_ENT_ID << enV.get(ix)->id << ASSOC_ENT_TYPE << enV.get(ix)->type));
+    for (unsigned int ix = 0; ix < enV->size(); ++ix) {
+        enArray.append(BSON(ASSOC_ENT_ID << enV->get(ix)->id << ASSOC_ENT_TYPE << enV->get(ix)->type));
     }
     BSONObj queryEn;
     if (scope == SCOPE_VALUE_ASSOC_SOURCE) {
@@ -67,8 +75,8 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
 
     /* Build query (attribute part) */
     BSONArrayBuilder attrArray;
-    for (unsigned int ix = 0; ix < attrL.size() ; ++ix) {
-        attrArray.append(attrL.get(ix));
+    for (unsigned int ix = 0; ix < attrL->size() ; ++ix) {
+        attrArray.append(attrL->get(ix));
     }
     std::string attrField;
     if (scope == SCOPE_VALUE_ASSOC_SOURCE) {
@@ -154,7 +162,7 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
 *
 * associationsDiscoverConvextAvailability -
 */
-static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, std::string scope, std::string tenant) {
+static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, const std::string& scope, const std::string& tenant) {
 
     if (scope == SCOPE_VALUE_ASSOC_ALL) {
         LM_W(("%s scope not supported", SCOPE_VALUE_ASSOC_ALL));
@@ -164,7 +172,7 @@ static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAva
 
     MetadataVector mdV;
     std::string err;
-    if (!associationsQuery(requestP->entityIdVector, requestP->attributeList, scope, &mdV, &err, tenant)) {
+    if (!associationsQuery(&requestP->entityIdVector, &requestP->attributeList, scope, &mdV, &err, tenant)) {
         responseP->errorCode.fill(SccReceiverInternalError, std::string("Database error: ") + err);
         LM_RE(SccOk,(responseP->errorCode.details.c_str()));
     }
@@ -220,7 +228,7 @@ static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAva
 *
 * conventionalDiscoverContextAvailability -
 */
-static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, std::string tenant) {
+static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, const std::string& tenant) {
     std::string err;
     if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err, tenant)) {
         responseP->errorCode.fill(SccReceiverInternalError, err);
@@ -241,7 +249,7 @@ static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAva
 *
 * mongoDiscoverContextAvailability - 
 */
-HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, std::string tenant)
+HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, const std::string& tenant)
 {
   reqSemTake(__FUNCTION__, "mongo ngsi9 discovery request");
 
