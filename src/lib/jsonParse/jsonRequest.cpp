@@ -132,7 +132,7 @@ static JsonRequest* jsonRequestGet(RequestType request, std::string method)
 *
 * jsonTreat - 
 */
-std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parseDataP, RequestType request, std::string payloadWord, JsonRequest** reqPP)
+std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parseDataP, RequestType request, const std::string& payloadWord, JsonRequest** reqPP)
 {
   std::string   res   = "OK";
   JsonRequest*  reqP  = jsonRequestGet(request, ciP->method);

@@ -101,7 +101,7 @@ bool isFalse(const std::string& s)
 *
 * getTimer -
 */
-Timer* getTimer() {
+Timer* getTimer(void) {
     return timer;
 }
 

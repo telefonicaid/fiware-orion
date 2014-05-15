@@ -71,7 +71,7 @@ extern std::string valueTag(const std::string& indent, const std::string& xmlTag
 *
 * startArray -
 */
-std::string startArray(const std::string& indent, const std::string& tagName, Format format, bool showTag = true);
+extern std::string startArray(const std::string& indent, const std::string& tagName, Format format, bool showTag = true);
 
 
 
@@ -79,6 +79,6 @@ std::string startArray(const std::string& indent, const std::string& tagName, Fo
 *
 * endArray -
 */
-std::string endArray(const std::string& indent, const std::string& tagName, Format format);
+extern std::string endArray(const std::string& indent, const std::string& tagName, Format format);
 
 #endif

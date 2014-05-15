@@ -86,7 +86,7 @@ extern bool isFalse(const std::string& s);
 *
 * getTimer -
 */
-extern Timer* getTimer();
+extern Timer* getTimer(void);
 
 /*****************************************************************************
 *
