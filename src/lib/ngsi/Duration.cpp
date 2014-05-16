@@ -52,7 +52,7 @@ Duration::Duration()
 *
 * Duration::check - 
 */
-std::string Duration::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string Duration::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   if (string == "")
     return "OK";
@@ -74,7 +74,7 @@ std::string Duration::check(RequestType requestType, Format format, std::string 
 *
 * Duration::set - 
 */
-void Duration::set(std::string value)
+void Duration::set(const std::string& value)
 {
   string = value;
   parse(); // just to flag valid/invalid
@@ -121,7 +121,7 @@ long long Duration::parse(void)
 *
 * Duration::present - 
 */
-void Duration::present(std::string indent)
+void Duration::present(const std::string& indent)
 {
   if (string != "")
     PRINTF("%sDuration: %s\n", indent.c_str(), string.c_str());
@@ -135,7 +135,7 @@ void Duration::present(std::string indent)
 *
 * Duration::render - 
 */
-std::string Duration::render(Format format, std::string indent, bool comma)
+std::string Duration::render(Format format, const std::string& indent, bool comma)
 {
   if (string == "")
     return "";
