@@ -73,7 +73,7 @@ UpdateContextAvailabilitySubscriptionResponse::~UpdateContextAvailabilitySubscri
 *
 * UpdateContextAvailabilitySubscriptionResponse::render - 
 */
-std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType requestType, Format format, std::string indent, int counter)
+std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType requestType, Format format, const std::string& indent, int counter)
 {
   std::string  out                = "";
   std::string  tag                = "updateContextAvailabilitySubscriptionResponse";
@@ -97,7 +97,7 @@ std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType re
 *
 * UpdateContextAvailabilitySubscriptionResponse::check - 
 */
-std::string UpdateContextAvailabilitySubscriptionResponse::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string UpdateContextAvailabilitySubscriptionResponse::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string  res;
 

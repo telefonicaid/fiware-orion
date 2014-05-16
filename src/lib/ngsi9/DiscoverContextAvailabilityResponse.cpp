@@ -71,7 +71,7 @@ DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(StatusC
 *
 * DiscoverContextAvailabilityResponse::render - 
 */
-std::string DiscoverContextAvailabilityResponse::render(RequestType requestType, Format format, std::string indent)
+std::string DiscoverContextAvailabilityResponse::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string  out = "";
   std::string  tag = "discoverContextAvailabilityResponse";

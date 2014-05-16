@@ -42,7 +42,7 @@
 *
 * RegisterContextRequest::render - 
 */
-std::string RegisterContextRequest::render(RequestType requestType, Format format, std::string indent)
+std::string RegisterContextRequest::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string  out                                 = "";
   std::string  xmlTag                              = "registerContextRequest";
@@ -69,7 +69,7 @@ std::string RegisterContextRequest::render(RequestType requestType, Format forma
 *
 * RegisterContextRequest::check - 
 */
-std::string RegisterContextRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string RegisterContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   RegisterContextResponse  response(this);
   std::string              res;
@@ -117,7 +117,7 @@ void RegisterContextRequest::release(void)
 *
 * RegisterContextRequest::fill - 
 */
-void RegisterContextRequest::fill(RegisterProviderRequest& rpr, std::string entityId, std::string entityType, std::string attributeName)
+void RegisterContextRequest::fill(RegisterProviderRequest& rpr, const std::string& entityId, const std::string& entityType, const std::string& attributeName)
 {
   ContextRegistration*          crP        = new ContextRegistration();
   EntityId*                     entityIdP  = new EntityId(entityId, entityType, "false");

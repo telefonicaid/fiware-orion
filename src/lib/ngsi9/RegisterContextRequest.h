@@ -46,11 +46,11 @@ typedef struct RegisterContextRequest
   Duration                   duration;                   // Optional
   RegistrationId             registrationId;             // Optional
 
-  std::string   render(RequestType requestType, Format format, std::string indent);
-  std::string   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
+  std::string   render(RequestType requestType, Format format, const std::string& indent);
+  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(void);
   void          release(void);
-  void          fill(RegisterProviderRequest& rpr, std::string entityId, std::string entityType, std::string attributeName);
+  void          fill(RegisterProviderRequest& rpr, const std::string& entityId, const std::string& entityType, const std::string& attributeName);
 } RegisterContextRequest;
 
 #endif
