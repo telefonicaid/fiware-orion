@@ -36,7 +36,7 @@
 *
 * check - 
 */
-std::string Association::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string Association::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string res;
 
@@ -52,7 +52,7 @@ std::string Association::check(RequestType requestType, Format format, std::stri
 *
 * render - 
 */
-std::string Association::render(Format format, std::string indent, bool comma)
+std::string Association::render(Format format, const std::string& indent, bool comma)
 {
   std::string  out                              = ""; 
   bool         attributeAssociationListRendered = attributeAssociationList.size() != 0;

@@ -42,11 +42,11 @@ typedef struct ConditionValueList
 {
   std::vector<std::string>  vec;
 
-  std::string  render(Format format, std::string indent, bool comma);
-  std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void         present(std::string indent);
+  std::string  render(Format format, const std::string& indent, bool comma);
+  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  void         present(const std::string& indent);
   void         release(void);
-  void         push_back(std::string attributeName);
+  void         push_back(const std::string& attributeName);
   unsigned int size(void);
   std::string  get(int ix);
 } ConditionValueList;
