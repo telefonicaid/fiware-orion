@@ -36,7 +36,7 @@
 *
 * NotifyContextRequest::render -
 */
-std::string NotifyContextRequest::render(RequestType requestType, Format format, std::string indent)
+std::string NotifyContextRequest::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string  out                                  = "";
   std::string  tag                                  = "notifyContextRequest";
@@ -62,7 +62,7 @@ std::string NotifyContextRequest::render(RequestType requestType, Format format,
 *
 * NotifyContextRequest::check
 */
-std::string NotifyContextRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string NotifyContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string            res;
   NotifyContextResponse  response;
@@ -88,7 +88,7 @@ std::string NotifyContextRequest::check(RequestType requestType, Format format, 
 *
 * NotifyContextRequest::present -
 */
-void NotifyContextRequest::present(std::string indent)
+void NotifyContextRequest::present(const std::string& indent)
 {
   subscriptionId.present(indent);
   originator.present(indent);
