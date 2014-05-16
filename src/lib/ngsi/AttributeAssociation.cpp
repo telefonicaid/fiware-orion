@@ -36,7 +36,7 @@
 *
 * render - 
 */
-std::string AttributeAssociation::render(Format format, std::string indent, bool comma)
+std::string AttributeAssociation::render(Format format, const std::string& indent, bool comma)
 {
   std::string  out                     = "";
   std::string  tag                     = "attributeAssociation";
@@ -56,7 +56,7 @@ std::string AttributeAssociation::render(Format format, std::string indent, bool
 *
 * check - 
 */
-std::string AttributeAssociation::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string AttributeAssociation::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   if (source == "")
     return "empty source";
@@ -73,7 +73,7 @@ std::string AttributeAssociation::check(RequestType requestType, Format format, 
 *
 * present - 
 */
-void AttributeAssociation::present(std::string indent, int ix)
+void AttributeAssociation::present(const std::string& indent, int ix)
 {
   if (ix == -1)
     PRINTF("%sAttribute Association:\n",       indent.c_str());

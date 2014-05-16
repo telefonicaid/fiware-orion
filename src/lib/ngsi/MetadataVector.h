@@ -42,12 +42,12 @@ typedef struct MetadataVector
 
   std::string  tag;        // Help variable for the 'render' method
 
-  MetadataVector(std::string _tag = "registrationMetadata");
+  MetadataVector(const std::string& _tag = "registrationMetadata");
 
-  void         tagSet(std::string tagName);
-  std::string  render(Format format, std::string indent, bool comma = false);
-  std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void         present(std::string metadataType, std::string indent);
+  void         tagSet(const std::string& tagName);
+  std::string  render(Format format, const std::string& indent, bool comma = false);
+  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  void         present(const std::string& metadataType, const std::string& indent);
   void         push_back(Metadata* item);
   unsigned int size(void);
   Metadata*    get(int ix);
