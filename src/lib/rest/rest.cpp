@@ -82,7 +82,7 @@ static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
-__thread char                    static_buffer[STATIC_BUFFER_SIZE];
+__thread char                    static_buffer[STATIC_BUFFER_SIZE + 1];
 
 
 
@@ -486,7 +486,7 @@ static int connectionTreat
       if (ciP->httpHeaders.contentLength <= PAYLOAD_MAX_SIZE)
       {
         if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
-          ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength);
+          ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
         else
           ciP->payload = static_buffer;
 
