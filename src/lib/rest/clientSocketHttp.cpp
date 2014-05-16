@@ -53,7 +53,6 @@
 int socketHttpConnect(std::string host, unsigned short port)
 {
   int                 fd;
-  int                 status;
   struct addrinfo     hints;
   struct addrinfo*    peer;
   char                port_str[10];
@@ -81,9 +80,9 @@ int socketHttpConnect(std::string host, unsigned short port)
     LM_VVV(("Allow IPv4 or IPv6"));
   }
 
-  snprintf(port_str, sizeof(port_str), "%d" , port);
+  snprintf(port_str, sizeof(port_str), "%d" , (int) port);
 
-  if ((status = getaddrinfo(host.c_str(), port_str, &hints, &peer)) != 0) {
+  if (getaddrinfo(host.c_str(), port_str, &hints, &peer) != 0) {
     LM_RE(-1, ("getaddrinfo('%s'): %s", host.c_str(), strerror(errno)));
   }
 
@@ -181,7 +180,7 @@ std::string sendHttpSocket
       ip             = rushHost;
       port           = rushPort;
 
-      sprintf(portAsString, "%d", rushHeaderPort);
+      sprintf(portAsString, "%d", (int) rushHeaderPort);
       rushHttpHeaders = "X-relayer-host: " + rushHeaderIP + ":" + portAsString + "\n";
       if (protocol == "https:")
         rushHttpHeaders += "X-relayer-protocol: https\n";
@@ -191,7 +190,6 @@ std::string sendHttpSocket
   // Buffers clear
   memset(buffer, 0, TAM_BUF);
   memset(response, 0, TAM_BUF);
-  memset(preContent, 0, TAM_BUF);
   memset(msg, 0, MAX_STA_MSG_SIZE);
 
   snprintf(preContent, sizeof(preContent),

@@ -73,11 +73,8 @@ void restReply(ConnectionInfo* ciP, std::string answer)
   if (!response)
     LM_RVE(("MHD_create_response_from_buffer FAILED"));
 
-  if (ciP->httpHeader.size() != 0)
-  {
-     for (unsigned int hIx = 0; hIx < ciP->httpHeader.size(); ++hIx)
-        MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
-  }
+  for (unsigned int hIx = 0; hIx < ciP->httpHeader.size(); ++hIx)
+    MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
 
   if (answer != "")
   {

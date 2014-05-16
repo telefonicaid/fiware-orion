@@ -341,8 +341,6 @@ static int outFormatCheck(ConnectionInfo* ciP)
 */
 static int contentTypeCheck(ConnectionInfo* ciP)
 {
-  std::string details = "";
-
   //
   // Four cases:
   //   1. If there is no payload, the Content-Type is not interesting
