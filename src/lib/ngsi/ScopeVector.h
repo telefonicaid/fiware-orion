@@ -40,9 +40,9 @@ typedef struct ScopeVector
 {
   std::vector<Scope*>  vec;
 
-  std::string  render(Format format, std::string indent, bool comma);
-  std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void         present(std::string indent);
+  std::string  render(Format format, const std::string& indent, bool comma);
+  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  void         present(const std::string& indent);
   void         push_back(Scope* item);
   unsigned int size(void);
   Scope*       get(int ix);

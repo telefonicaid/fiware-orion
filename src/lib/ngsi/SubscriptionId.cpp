@@ -50,7 +50,7 @@ SubscriptionId::SubscriptionId()
 *
 * SubscriptionId::SubscriptionId - 
 */
-SubscriptionId::SubscriptionId(std::string subId)
+SubscriptionId::SubscriptionId(const std::string& subId)
 {
    string = subId;
 }
@@ -61,7 +61,7 @@ SubscriptionId::SubscriptionId(std::string subId)
 *
 * SubscriptionId::check - 
 */
-std::string SubscriptionId::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string SubscriptionId::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string out = "OK";
 
@@ -88,7 +88,7 @@ bool SubscriptionId::isEmpty(void)
 *
 * SubscriptionId::set - 
 */
-void SubscriptionId::set(std::string value)
+void SubscriptionId::set(const std::string& value)
 {
   string = value;
 }
@@ -110,7 +110,7 @@ std::string SubscriptionId::get(void)
 *
 * SubscriptionId::present - 
 */
-void SubscriptionId::present(std::string indent)
+void SubscriptionId::present(const std::string& indent)
 {
   if (string != "")
     PRINTF("%sSubscriptionId: %s\n", indent.c_str(), string.c_str());
@@ -124,7 +124,7 @@ void SubscriptionId::present(std::string indent)
 *
 * SubscriptionId::render - 
 */
-std::string SubscriptionId::render(RequestType container, Format format, std::string indent, bool comma)
+std::string SubscriptionId::render(RequestType container, Format format, const std::string& indent, bool comma)
 {
   std::string xString = string;
   

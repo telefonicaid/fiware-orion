@@ -47,7 +47,7 @@ SubscribeError::SubscribeError()
 *
 * SubscribeError::render - 
 */
-std::string SubscribeError::render(RequestType requestType, Format format, std::string indent, bool comma)
+std::string SubscribeError::render(RequestType requestType, Format format, const std::string& indent, bool comma)
 {
   std::string out = "";
   std::string tag = "subscribeError";
@@ -82,7 +82,7 @@ std::string SubscribeError::render(RequestType requestType, Format format, std::
 *
 * check - 
 */
-std::string SubscribeError::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string SubscribeError::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
    return "OK";
 }
