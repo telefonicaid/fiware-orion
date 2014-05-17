@@ -49,10 +49,10 @@ namespace orion
 void compoundValueStart
 (
     ConnectionInfo*                 ciP,
-    std::string                     path,
-    std::string                     name,
-    std::string                     value,
-    std::string                     rest,
+    const std::string&              path,
+    const std::string&              name,
+    const std::string&              value,
+    const std::string&              rest,
     orion::CompoundValueNode::Type  type,
     bool                            fatherIsVector
 )
@@ -92,7 +92,7 @@ void compoundValueStart
 *
 * containerType: vector/object/string
 */
-void compoundValueMiddle(ConnectionInfo* ciP, std::string relPath, std::string name, std::string value, orion::CompoundValueNode::Type type)
+void compoundValueMiddle(ConnectionInfo* ciP, const std::string& relPath, const std::string& name, const std::string& value, orion::CompoundValueNode::Type type)
 {
   LM_T(LmtCompoundValue, ("Compound MIDDLE %s: %s: NAME: '%s', VALUE: '%s'", relPath.c_str(), CompoundValueNode::typeName(type), name.c_str(), value.c_str()));
   if ((type == orion::CompoundValueNode::Vector) || (type == orion::CompoundValueNode::Object))

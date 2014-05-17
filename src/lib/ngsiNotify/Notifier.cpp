@@ -59,7 +59,7 @@ Notifier::~Notifier (void) {
 *
 * Notifier::sendNotifyContextRequest -
 */
-void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, std::string url, std::string tenant, Format format)
+void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, Format format)
 {
     /* Render NotifyContextRequest */
     std::string payload = ncr->render(NotifyContext, format, "");
@@ -111,7 +111,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, std::string u
 * they could be refactored in the future to have a common part using a parent
 * class for both types of notifications and using it as first argument
 */
-void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, std::string url, std::string tenant, Format format) {
+void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncar, const std::string& url, const std::string& tenant, Format format) {
 
     /* Render NotifyContextAvailabilityRequest */
     std::string payload = ncar->render(NotifyContextAvailability, format, "");
@@ -157,7 +157,7 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
 *
 * Notifier::createIntervalThread -
 */
-void Notifier::createIntervalThread(std::string subId, int interval, std::string tenant) {
+void Notifier::createIntervalThread(const std::string& subId, int interval, const std::string& tenant) {
 
     /* Create params dynamically. Note that the first action that thread does
      * if */
@@ -184,7 +184,7 @@ void Notifier::createIntervalThread(std::string subId, int interval, std::string
 *
 * Notifier::destroyOntimeIntervalThreads -
 */
-void Notifier::destroyOntimeIntervalThreads(std::string subId) {
+void Notifier::destroyOntimeIntervalThreads(const std::string& subId) {
 
     std::vector<pthread_t> canceled;
 
