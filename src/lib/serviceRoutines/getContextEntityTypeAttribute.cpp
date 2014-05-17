@@ -40,7 +40,7 @@
 *
 * getContextEntityTypeAttribute - 
 */
-std::string getContextEntityTypeAttribute(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string getContextEntityTypeAttribute(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string                          entityType     = compV[2];
   std::string                          attributeName  = compV[4];

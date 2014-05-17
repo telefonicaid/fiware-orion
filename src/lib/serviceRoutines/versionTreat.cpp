@@ -69,7 +69,7 @@ char* versionGet() {
 *
 * versionTreat - 
 */
-std::string versionTreat(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string versionTreat(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string out     = "";
   std::string tag     = "orion";

@@ -34,7 +34,7 @@
 *
 * orionReply - 
 */
-std::string orionReply(ConnectionInfo* ciP, std::string what, std::string value)
+std::string orionReply(ConnectionInfo* ciP, const std::string& what, const std::string& value)
 {
    std::string out = "";
 

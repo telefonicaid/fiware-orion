@@ -37,6 +37,6 @@
 *
 * badVerbGetPostOnly - 
 */
-extern std::string badVerbGetPostOnly(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+extern std::string badVerbGetPostOnly(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
 
 #endif

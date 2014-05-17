@@ -48,7 +48,7 @@ OrionError::OrionError()
 *
 * OrionError::OrionError - 
 */
-OrionError::OrionError(HttpStatusCode _code, std::string _details)
+OrionError::OrionError(HttpStatusCode _code, const std::string& _details)
 {
   code          = _code;
   reasonPhrase  = httpStatusCodeString(code);
@@ -74,11 +74,12 @@ OrionError::OrionError(StatusCode& sc)
 *
 * OrionError::render - 
 */
-std::string OrionError::render(Format format, std::string indent)
+std::string OrionError::render(Format format, const std::string& _indent)
 {
   std::string out           = "";
   std::string tag           = "orionError";
-  std::string initialIndent = indent;
+  std::string initialIndent = _indent;
+  std::string indent        = _indent;
 
   //
   // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here

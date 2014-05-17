@@ -43,7 +43,7 @@
 *
 * statisticsTreat - 
 */
-std::string statisticsTreat(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string statisticsTreat(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string out     = "";
   std::string tag     = "orion";

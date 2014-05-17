@@ -37,7 +37,7 @@
 *
 * postQueryContext - 
 */
-std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   QueryContextResponse  qcr;
   std::string           answer;

@@ -41,7 +41,7 @@
 *
 * GET /ngsi10/contextEntities/{entityID}/attributes/{attributeName}/{valueID}
 */
-std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   QueryContextRequest      request;
   QueryContextResponse     response;

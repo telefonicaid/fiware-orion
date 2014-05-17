@@ -83,7 +83,7 @@ std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService
 *
 * tenantCheck - 
 */
-static std::string tenantCheck(std::string tenant)
+static std::string tenantCheck(const std::string& tenant)
 {
   const char* ctenant = tenant.c_str();
 

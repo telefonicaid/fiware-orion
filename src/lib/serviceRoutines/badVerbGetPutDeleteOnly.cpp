@@ -39,7 +39,7 @@
 *
 * badVerbGetPutDeleteOnly - 
 */
-std::string badVerbGetPutDeleteOnly(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string badVerbGetPutDeleteOnly(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   ciP->httpHeader.push_back("Allow");
   ciP->httpHeaderValue.push_back("GET, PUT, DELETE");

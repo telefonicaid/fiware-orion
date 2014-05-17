@@ -50,7 +50,7 @@
 *
 * socketHttpConnect -
 */
-int socketHttpConnect(std::string host, unsigned short port)
+int socketHttpConnect(const std::string& host, unsigned short port)
 {
   int                 fd;
   struct addrinfo     hints;
@@ -121,16 +121,16 @@ int socketHttpConnect(std::string host, unsigned short port)
 */
 std::string sendHttpSocket
 (
-   std::string     ip,
-   unsigned short  port,
-   std::string     protocol,
-   std::string     verb,
-   std::string     tenant,
-   std::string     resource,
-   std::string     content_type,
-   std::string     content,
-   bool            useRush,
-   bool            waitForResponse
+   const std::string&     _ip,
+   unsigned short         port,
+   const std::string&     protocol,
+   const std::string&     verb,
+   const std::string&     tenant,
+   const std::string&     resource,
+   const std::string&     content_type,
+   const std::string&     content,
+   bool                   useRush,
+   bool                   waitForResponse
 )
 {  
   char                       buffer[TAM_BUF];
@@ -145,6 +145,7 @@ std::string sendHttpSocket
   std::string                rushHttpHeaders    = "";
   static unsigned long long  callNo             = 0;
   std::string                result;
+  std::string                ip                 = _ip;
 
   ++callNo;
 

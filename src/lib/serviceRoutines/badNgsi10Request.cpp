@@ -39,7 +39,7 @@
 *
 * badNgsi10Request - 
 */
-std::string badNgsi10Request(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string badNgsi10Request(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string answer;
 

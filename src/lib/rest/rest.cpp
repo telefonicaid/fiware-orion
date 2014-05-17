@@ -171,7 +171,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 *
 * wantedOutputSupported - 
 */
-static Format wantedOutputSupported(std::string acceptList, std::string* charsetP)
+static Format wantedOutputSupported(const std::string& acceptList, std::string* charsetP)
 {
   std::vector<std::string>  vec;
   char* copy;
@@ -638,17 +638,17 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 */
 void restInit
 (
-  RestService*       _restServiceV,
-  IpVersion          _ipVersion,
-  const char*        _bindAddress,
-  unsigned short     _port,
-  std::string        _multitenant,
-  std::string        _rushHost,
-  unsigned short     _rushPort,
-  const char*        _httpsKey,
-  const char*        _httpsCertificate,
-  RestServeFunction  _serveFunction,
-  bool               _acceptTextXml
+  RestService*        _restServiceV,
+  IpVersion           _ipVersion,
+  const char*         _bindAddress,
+  unsigned short      _port,
+  const std::string&  _multitenant,
+  const std::string&  _rushHost,
+  unsigned short      _rushPort,
+  const char*         _httpsKey,
+  const char*         _httpsCertificate,
+  RestServeFunction   _serveFunction,
+  bool                _acceptTextXml
 )
 {
   const char* key  = _httpsKey;

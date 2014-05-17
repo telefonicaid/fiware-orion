@@ -37,7 +37,7 @@
 *
 * postUnsubscribeContext - 
 */
-std::string postUnsubscribeContext(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string postUnsubscribeContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   UnsubscribeContextResponse  uncr;
   std::string                 answer;

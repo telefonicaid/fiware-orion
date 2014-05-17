@@ -57,7 +57,7 @@ static int replyIx = 0;
 *
 * restReply - 
 */
-void restReply(ConnectionInfo* ciP, std::string answer)
+void restReply(ConnectionInfo* ciP, const std::string& answer)
 {
   MHD_Response*  response;
 
@@ -98,7 +98,7 @@ void restReply(ConnectionInfo* ciP, std::string answer)
 * 'request' is simply 'forwarded' from restErrorReplyGet, the 'request' can
 * have various contents - for that the different strings of 'request'. 
 */
-static std::string tagGet(std::string request)
+static std::string tagGet(const std::string& request)
 {
   if ((request == "registerContext") || (request == "/ngsi9/registerContext") || (request == "/NGSI9/registerContext") || (request == "registerContextRequest"))
     return "registerContextResponse";
@@ -146,7 +146,7 @@ static std::string tagGet(std::string request)
 * Where the payload type is matched against the request URL, the incoming 'request' is a
 * request and not a response.
 */
-std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string indent, std::string request, HttpStatusCode code, std::string details)
+std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, const std::string& indent, const std::string& request, HttpStatusCode code, const std::string& details)
 {
    std::string   tag = tagGet(request);
    StatusCode    errorCode(code, details, "errorCode");
