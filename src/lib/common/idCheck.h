@@ -1,5 +1,5 @@
-#ifndef ID_CHECK_H
-#define ID_CHECK_H
+#ifndef SRC_LIB_COMMON_IDCHECK_H_
+#define SRC_LIB_COMMON_IDCHECK_H_
 
 /*
 *
@@ -35,4 +35,4 @@
 */
 extern std::string idCheck(const std::string& s);
 
-#endif
+#endif  // SRC_LIB_COMMON_IDCHECK_H_

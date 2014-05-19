@@ -1,5 +1,5 @@
-#ifndef FORMAT_H
-#define FORMAT_H
+#ifndef SRC_LIB_COMMON_FORMAT_H_
+#define SRC_LIB_COMMON_FORMAT_H_
 
 /*
 *
@@ -63,4 +63,4 @@ extern Format stringToFormat(const std::string& s);
 */
 extern Format formatParse(const std::string& format, std::string* charsetP);
 
-#endif
+#endif  // SRC_LIB_COMMON_FORMAT_H_

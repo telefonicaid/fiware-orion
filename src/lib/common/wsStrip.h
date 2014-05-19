@@ -1,5 +1,5 @@
-#ifndef WS_STRIP_H
-#define WS_STRIP_H
+#ifndef SRC_LIB_COMMON_WSSTRIP_H_
+#define SRC_LIB_COMMON_WSSTRIP_H_
 
 /*
 *
@@ -34,4 +34,4 @@
 */
 extern char* wsStrip(char* s);
 
-#endif
+#endif  // SRC_LIB_COMMON_WSSTRIP_H_

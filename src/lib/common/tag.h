@@ -1,5 +1,5 @@
-#ifndef TAG_H
-#define TAG_H
+#ifndef SRC_LIB_COMMON_TAG_H_
+#define SRC_LIB_COMMON_TAG_H_
 
 /*
 *
@@ -35,7 +35,14 @@
 *
 * startTag -  
 */
-extern std::string startTag(const std::string& indent, const std::string& tagName, Format format, bool showTag = true);
+extern std::string startTag
+(
+  const std::string&  indent,
+  const std::string&  tagName,
+  Format              format,
+  bool                showTag = true
+);
+
 extern std::string startTag
 (
     const std::string&  indent,
@@ -53,7 +60,15 @@ extern std::string startTag
 *
 * endTag -  
 */
-extern std::string endTag(const std::string& indent, const std::string& tagName, Format format, bool comma = false, bool isVector = false, bool nl = true);
+extern std::string endTag
+(
+  const std::string&  indent,
+  const std::string&  tagName,
+  Format              format,
+  bool                comma    = false,
+  bool                isVector = false,
+  bool                nl       = true
+);
 
 
 
@@ -61,9 +76,37 @@ extern std::string endTag(const std::string& indent, const std::string& tagName,
 *
 * valueTag -  
 */
-extern std::string valueTag(const std::string& indent, const std::string& tagName, const std::string& value, Format format, bool showComma = false, bool isAssociation = false, bool isVectorElement = false);
-extern std::string valueTag(const std::string& indent, const std::string& tagName, int value,         Format format, bool showComma = false, bool isAssociation = false);
-extern std::string valueTag(const std::string& indent, const std::string& xmlTag, const std::string& jsonTag, const std::string& value, Format format, bool showComma = false, bool isAssociation = false);
+extern std::string valueTag
+(
+  const std::string&  indent,
+  const std::string&  tagName,
+  const std::string&  value,
+  Format              format,
+  bool                showComma       = false,
+  bool                isAssociation   = false,
+  bool                isVectorElement = false
+);
+
+extern std::string valueTag
+(
+  const std::string&  indent,
+  const std::string&  tagName,
+  int                 value,
+  Format              format,
+  bool                showComma     = false,
+  bool                isAssociation = false
+);
+
+extern std::string valueTag
+(
+  const std::string&  indent,
+  const std::string&  xmlTag,
+  const std::string&  jsonTag,
+  const std::string&  value,
+  Format              format,
+  bool                showComma     = false,
+  bool                isAssociation = false
+);
 
 
 
@@ -71,7 +114,13 @@ extern std::string valueTag(const std::string& indent, const std::string& xmlTag
 *
 * startArray -
 */
-extern std::string startArray(const std::string& indent, const std::string& tagName, Format format, bool showTag = true);
+extern std::string startArray
+(
+  const std::string&  indent,
+  const std::string&  tagName,
+  Format              format,
+  bool                showTag = true
+);
 
 
 
@@ -81,4 +130,4 @@ extern std::string startArray(const std::string& indent, const std::string& tagN
 */
 extern std::string endArray(const std::string& indent, const std::string& tagName, Format format);
 
-#endif
+#endif  // SRC_LIB_COMMON_TAG_H_

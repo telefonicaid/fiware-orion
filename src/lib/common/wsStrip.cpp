@@ -24,7 +24,7 @@
 */
 #include <string.h>
 
-#include "wsStrip.h"
+#include "common/wsStrip.h"
 
 
 
@@ -34,20 +34,20 @@
 */
 char* wsStrip(char* s)
 {
-   // 1. beginning
-   while ((*s == ' ') || (*s == '\t') || (*s == '\n'))
-      ++s;
+  // 1. beginning
+  while ((*s == ' ') || (*s == '\t') || (*s == '\n'))
+    ++s;
 
-   if (*s == 0)
-      return s;
+  if (*s == 0)
+    return s;
 
-   // 2. end
-   char* end = &s[strlen(s) - 1];
-   while ((end > s) && ((*end == ' ') || (*end == '\t') || (*end == '\n')))
-   {   
-      *end = 0;
-      --end;
-   }
+  // 2. end
+  char* end = &s[strlen(s) - 1];
+  while ((end > s) && ((*end == ' ') || (*end == '\t') || (*end == '\n')))
+  {
+    *end = 0;
+    --end;
+  }
 
-   return s;
+  return s;
 }
