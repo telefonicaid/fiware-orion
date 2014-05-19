@@ -39,9 +39,9 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
   }
 
   // Translate request from CoAP to HTTP and send it to MHD
-  MemoryStruct* httpResponse = NULL; // Will contain HTTP Response
+  std::string httpResponse; // Will contain HTTP Response
   httpResponse = sendHttpRequest(host, port, request);
-  if (httpResponse == NULL)
+  if (httpResponse == "")
   {
     // Could not get an answer
   }
@@ -61,9 +61,9 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
   // Prepare appropriate response in CoAP
   coapResponse->setVersion(1);
   coapResponse->setMessageID(request->getMessageID());
-  coapResponse->setToken(request->getTokenPointer(),request->getTokenLength());
+  //coapResponse->setToken(request->getTokenPointer(),request->getTokenLength());
 
-  //response->setToken((uint8_t*)"\1\16",2);
+  //coapResponse->setToken((uint8_t*)"\1\16",2);
 
 //  char *payload = (char*)"This is a mundanely worded test payload.";
 
@@ -112,7 +112,7 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
 
   delete request;
 
-  coapResponse->printHuman();
+  //coapResponse->printHuman();
 
   // send the packet
   ssize_t sent = sendto(sockfd, coapResponse->getPDUPointer(), coapResponse->getPDULength(), 0, (sockaddr*)recvFrom, addrLen);
@@ -126,6 +126,8 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
   {
     LM_V(("Sent: %ld",sent));
   }
+
+  delete coapResponse;
 
   return 0;
 }
@@ -187,6 +189,9 @@ void Coap::serve()
   LM_V(("Listening for packets..."));
   while (1)
   {
+    // zero out the buffer
+    memset(buffer, 0, COAP_BUFFER_SIZE);
+
     // receive packet
     ret = recvfrom(sd, &buffer, COAP_BUFFER_SIZE, 0, (sockaddr*)&recvAddr, &recvAddrLen);
     if (ret == -1)
@@ -194,6 +199,13 @@ void Coap::serve()
       LM_V(("Error receiving data"));
       return;
     }
+
+    std::string bufferString;
+    bufferString.assign(buffer);
+
+//    uint8_t* data = (uint8_t*)this->body.c_str();
+//    std::size_t length = this->body.length();
+//    pdu->setPayload(data, length);
 
     recvPDU = new CoapPDU((uint8_t*)buffer, COAP_BUFFER_SIZE, COAP_BUFFER_SIZE);
 

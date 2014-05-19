@@ -4,11 +4,10 @@
 #include "logMsg/traceLevels.h"
 
 #include <stdlib.h>  // atoi
+#include <sstream>   // istringstream
 
-HttpMessage::HttpMessage(MemoryStruct* data)
+HttpMessage::HttpMessage(std::string theMessage)
 {
-  theMessage.assign(data->memory, data->size);
-
   httpCode = 0;
   contentLength = 0;
   contentType = "";
@@ -33,13 +32,12 @@ HttpMessage::HttpMessage(MemoryStruct* data)
 
     if (isHeader)
     {
-      // Is it a header or the firts line with HTTP code?
+      // Is it a header or the first line with the HTTP code?
       int pos = line.find(":");
       if (pos < 0)
       {
         // Get HTTP code
         httpCode = atoi(line.substr(9, 3).c_str());
-        std::cout << httpCode;
       }
       else
       {
@@ -59,13 +57,10 @@ HttpMessage::HttpMessage(MemoryStruct* data)
     }
     else
     {
-      // We are parsing the body now
+      // We are parsing the body now (as is)
       body += line;
     }
   }
-
-  //LM_V(("body:\n%s", body.c_str()));
-
 }
 
 CoapPDU* HttpMessage::toCoap()

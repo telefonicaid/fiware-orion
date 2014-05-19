@@ -16,6 +16,7 @@
 #include <errno.h>
 #include <math.h>
 #include <string>
+#include <sstream>
 #include <string.h>
 
 #include <curl/curl.h>
@@ -49,7 +50,7 @@ size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *user
 *
 * sendHttpRequest -
 */
-MemoryStruct* sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
+std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
 {
   char*         url                      = NULL;
   int           recvURILen               = 0;
@@ -139,9 +140,11 @@ MemoryStruct* sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
 
 
     // Set Content-length
-    std::string string = "Content-length: " + request->getPayloadLength();
-    headers = curl_slist_append(headers, string.c_str());
-    LM_V(("Got: '%s'", string.c_str()));
+    std::stringstream contentLengthStringStream;
+    contentLengthStringStream << request->getPayloadLength();
+    std::string finalString = "Content-length: " + contentLengthStringStream.str();
+    headers = curl_slist_append(headers, finalString.c_str());
+    LM_V(("Got: '%s'", finalString.c_str()));
 
     // Set Expect
     headers = curl_slist_append(headers, "Expect: ");
@@ -156,7 +159,8 @@ MemoryStruct* sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
     // --- Set contents
     //u_int8_t* payload = new u_int8_t[request->getPayloadLength()];
 
-    u_int8_t* payload = request->getPayloadCopy();
+//    u_int8_t* payload = request->getPayloadCopy();
+    char* payload = (char*)request->getPayloadCopy();
 
 
     // --- Prepare CURL handle with obtained options
@@ -167,7 +171,7 @@ MemoryStruct* sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); // Put headers in place
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)httpResponse); // Custom data for response handling
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payload);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
 
 
     // --- Do HTTP Request
@@ -182,7 +186,10 @@ MemoryStruct* sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
     curl_easy_cleanup(curl);
   }
 
-  return httpResponse;
+  std::string ret;
+  ret.assign(httpResponse->memory, httpResponse->size);
+//  return httpResponse;
+  return ret;
 }
 
 

@@ -4,11 +4,6 @@
 #include <string>
 #include "cantcoap.h"
 
-struct MemoryStruct {
-  char   *memory;
-  size_t  size;
-};
-
 class HttpMessage
 {
     std::string theMessage;
@@ -19,7 +14,7 @@ class HttpMessage
     std::string body;
 
   public:
-    HttpMessage(MemoryStruct *data);
+    HttpMessage(std::string theMessage);
 
     CoapPDU* toCoap();
 };
