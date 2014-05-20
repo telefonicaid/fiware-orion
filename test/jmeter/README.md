@@ -22,7 +22,7 @@ This is the Jmeter scripts repository for the Orion Context Broker, used for Per
 	6- fill the report in Google doc
 
 #### Scripts:
-1. **orionPerformanceTest.jmx**  (used for Max Performance, Mongo Impact, Scale UP, Scale OUT). It can used for one standalone VM or a balanced cluster of VM with 4 nodes maximum.
+1. **orionPerformanceTest.jmx**  (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It can used for one standalone VM or a balanced cluster of VM with 4 nodes maximum.
 	+ Properties:
 		* PROJECT    - project name (DEFAULT by default)
 		* TESTNAME   - test name (orionPerformanceTest by default)
@@ -40,3 +40,30 @@ This is the Jmeter scripts repository for the Orion Context Broker, used for Per
 		
 #### Comments:
     /tmp/error_xxxxxxxxxxxxxxxxxxx.html is created, because does not have access at loadosophia, the token is wrong. We only store datas manually when finished test
+	
+2. **multiplesAttributes_bug_memory_leak.jmx** (used by simulate memory leak issue) (http://stackoverflow.com/questions/23386094/orion-context-broker-possible-memory-leak)
+	+Properties:
+		* OPERATION - SUBSCRIBER or nothing (default) (used only one time for create subscriptions)
+		* HOST      - IP or hostname of ContextBroker VM (130.206.80.132 by default)
+		* PORT      - ContextBroker port (1026 by default)
+		* MON_PORT  - serverAgent port for Monitoring (3450 by default)
+	
+	Scenario:
+		I have 19 entities of type "House" with 
+		* 8-9 attributes that are updated every 10 seconds
+		* 15 attributes that are updated every 5 minutes
+		* 2 attributes that are updated between 2 seconds to 20 minutes.
+
+		I have 1 entity of type "House" with 
+		* 6 attributes that are updated every 10 seconds
+		* 15 attributes that are updated every 5 minutes
+		* 2 attributes that are updated between 2 seconds to 20 minutes. 
+
+		I have 1 entity of type "House" with 
+		* 31 attributes that are updated every 10 seconds
+		* 3 attributes that are updated every 5 minutes
+
+		I have 17 entities of type "Vehicle" with 2 (2 seconds to very long time) 
+		* 2 attributes that are updated every 2 seconds to infinite
+
+		
