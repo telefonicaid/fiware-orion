@@ -1,27 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
- Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
-
- This file is part of Orion Context Broker.
-
- Orion Context Broker is free software: you can redistribute it and/or
- modify it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation, either version 3 of the
- License, or (at your option) any later version.
-
- Orion Context Broker is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
- General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
-
- For those usages not covered by this license please contact with
- fermin at tid dot es
- 
- Authors: Ivan Arias and Xavier Val
--->
 <jmeterTestPlan version="1.2" properties="2.6" jmeter="2.11 r1554548">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Orion Performance Test" enabled="true">
@@ -46,6 +23,7 @@
             <stringProp name="Argument.name">outputDir</stringProp>
             <stringProp name="Argument.value">/tmp/JMeter_result/result_${__time(YMDHMS,)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">output csv path</stringProp>
           </elementProp>
           <elementProp name="PROJECT" elementType="Argument">
             <stringProp name="Argument.name">PROJECT</stringProp>
@@ -57,56 +35,66 @@
             <stringProp name="Argument.name">TEST_NAME</stringProp>
             <stringProp name="Argument.value">${__P(TEST_NAME,OrionPerfTest)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">test name</stringProp>
           </elementProp>
           <elementProp name="RUNTIME" elementType="Argument">
             <stringProp name="Argument.name">RUNTIME</stringProp>
             <stringProp name="Argument.value">${__P(RUNTIME,30)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">test time </stringProp>
           </elementProp>
           <elementProp name="THREADS" elementType="Argument">
             <stringProp name="Argument.name">THREADS</stringProp>
             <stringProp name="Argument.value">${__P(THREADS,1)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">threads number</stringProp>
           </elementProp>
           <elementProp name="RAMPUP" elementType="Argument">
             <stringProp name="Argument.name">RAMPUP</stringProp>
             <stringProp name="Argument.value">${__P(RAMPUP,0)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">rampup threads</stringProp>
           </elementProp>
           <elementProp name="ITERATIONS" elementType="Argument">
             <stringProp name="Argument.name">ITERATIONS</stringProp>
             <stringProp name="Argument.value">${__P(ITERATIONS,1)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">iterations number</stringProp>
           </elementProp>
           <elementProp name="HOST" elementType="Argument">
             <stringProp name="Argument.name">HOST</stringProp>
             <stringProp name="Argument.value">${__P(HOST,127.0.0.1)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">main host or balancer </stringProp>
           </elementProp>
           <elementProp name="NODE_1" elementType="Argument">
             <stringProp name="Argument.name">NODE_1</stringProp>
             <stringProp name="Argument.value">${__P(NODE_1,127.0.0.1)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">node 1 in balancer load</stringProp>
           </elementProp>
           <elementProp name="NODE_2" elementType="Argument">
             <stringProp name="Argument.name">NODE_2</stringProp>
             <stringProp name="Argument.value">${__P(NODE_2,127.0.0.1)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">node 2 in balancer load</stringProp>
           </elementProp>
           <elementProp name="NODE_3" elementType="Argument">
             <stringProp name="Argument.name">NODE_3</stringProp>
             <stringProp name="Argument.value">${__P(NODE_3,127.0.0.1)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">node 3 in balancer load</stringProp>
           </elementProp>
           <elementProp name="NODE_4" elementType="Argument">
             <stringProp name="Argument.name">NODE_4</stringProp>
             <stringProp name="Argument.value">${__P(NODE_4,127.0.0.1)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">node 4 in balancer load</stringProp>
           </elementProp>
           <elementProp name="PORT" elementType="Argument">
             <stringProp name="Argument.name">PORT</stringProp>
             <stringProp name="Argument.value">${__P(PORT,1026)}</stringProp>
-            <stringProp name="Argument.desc">[ 1026 / 80 ]</stringProp>
+            <stringProp name="Argument.desc">[ 1026 / 80 ] CB port</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="MON_PORT" elementType="Argument">
@@ -124,6 +112,7 @@
             <stringProp name="Argument.name">MAX_NODES</stringProp>
             <stringProp name="Argument.value">4</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc"> nodes number maximum</stringProp>
           </elementProp>
         </collectionProp>
       </Arguments>

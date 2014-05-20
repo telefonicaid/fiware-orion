@@ -1,0 +1,1518 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.6" jmeter="2.11 r1554548">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Memory Leak" enabled="true">
+      <stringProp name="TestPlan.comments">http://stackoverflow.com/questions/23386094/orion-context-broker-possible-memory-leak</stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="Variables definidas por el Usuario" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="General Settings" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="OPERATION" elementType="Argument">
+            <stringProp name="Argument.name">OPERATION</stringProp>
+            <stringProp name="Argument.value">${__P(OPERATION,nothing)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">SUBSCRIBER or nothing (used only one time for create subscriptions)</stringProp>
+          </elementProp>
+          <elementProp name="HOST" elementType="Argument">
+            <stringProp name="Argument.name">HOST</stringProp>
+            <stringProp name="Argument.value">${__P(HOST,130.206.80.132)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">Medium ( RAM:  4096MB VCPUs:  2 VCPU Disk:  10GB )</stringProp>
+          </elementProp>
+          <elementProp name="PORT" elementType="Argument">
+            <stringProp name="Argument.name">PORT</stringProp>
+            <stringProp name="Argument.value">${__P(PORT,1026)}</stringProp>
+            <stringProp name="Argument.desc">[ 1026 ] context Broker port</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="MON_PORT" elementType="Argument">
+            <stringProp name="Argument.name">MON_PORT</stringProp>
+            <stringProp name="Argument.value">${__P(MON_PORT,3450)}</stringProp>
+            <stringProp name="Argument.desc">[ 3450 ] Server Agent port  in remote VM </stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="outputDir" elementType="Argument">
+            <stringProp name="Argument.name">outputDir</stringProp>
+            <stringProp name="Argument.value">/tmp/JMeter_result/result_${__time(YMDHMS,)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">log path</stringProp>
+          </elementProp>
+          <elementProp name="postfixOutputDir" elementType="Argument">
+            <stringProp name="Argument.name">postfixOutputDir</stringProp>
+            <stringProp name="Argument.value">__${__time(YMDHMS,)}_IP_${__machineIP()}.csv</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">postfix csv files </stringProp>
+          </elementProp>
+          <elementProp name="UpdatePath" elementType="Argument">
+            <stringProp name="Argument.name">UpdatePath</stringProp>
+            <stringProp name="Argument.value">/NGSI10/updateContext</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">update request path</stringProp>
+          </elementProp>
+          <elementProp name="SubscriptionPath" elementType="Argument">
+            <stringProp name="Argument.name">SubscriptionPath</stringProp>
+            <stringProp name="Argument.value">/NGSI10/subscribeContext</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">subscription request path</stringProp>
+          </elementProp>
+        </collectionProp>
+      </Arguments>
+      <hashTree/>
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults" enabled="true">
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Variables definidas por el Usuario" enabled="true">
+          <collectionProp name="Arguments.arguments"/>
+        </elementProp>
+        <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
+        <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+        <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+        <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        <stringProp name="HTTPSampler.protocol">http</stringProp>
+        <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
+        <stringProp name="HTTPSampler.path"></stringProp>
+        <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+        <stringProp name="HTTPSampler.concurrentPool">4</stringProp>
+      </ConfigTestElement>
+      <hashTree/>
+      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+        <collectionProp name="HeaderManager.headers">
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">Content-Type</stringProp>
+            <stringProp name="Header.value">application/xml</stringProp>
+          </elementProp>
+        </collectionProp>
+      </HeaderManager>
+      <hashTree/>
+      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="Request Variables" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="entityTypeGroup_1" elementType="Argument">
+            <stringProp name="Argument.name">entityTypeGroup_1</stringProp>
+            <stringProp name="Argument.value">House</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">prefix</stringProp>
+          </elementProp>
+          <elementProp name="HOUSE_19_entities" elementType="Argument">
+            <stringProp name="Argument.name">HOUSE_19_entities</stringProp>
+            <stringProp name="Argument.value">19</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">threads</stringProp>
+          </elementProp>
+          <elementProp name="entityIdGroup_1" elementType="Argument">
+            <stringProp name="Argument.name">entityIdGroup_1</stringProp>
+            <stringProp name="Argument.value">House_group_1_</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">prefix</stringProp>
+          </elementProp>
+          <elementProp name="HOUSE_1_entity" elementType="Argument">
+            <stringProp name="Argument.name">HOUSE_1_entity</stringProp>
+            <stringProp name="Argument.value">1</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">threads</stringProp>
+          </elementProp>
+          <elementProp name="entityIdGroup_2" elementType="Argument">
+            <stringProp name="Argument.name">entityIdGroup_2</stringProp>
+            <stringProp name="Argument.value">House_group_2_</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">prefix</stringProp>
+          </elementProp>
+          <elementProp name="entityIdGroup_3" elementType="Argument">
+            <stringProp name="Argument.name">entityIdGroup_3</stringProp>
+            <stringProp name="Argument.value">House_group_3_</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">prefix</stringProp>
+          </elementProp>
+          <elementProp name="entityTypeGroup_2" elementType="Argument">
+            <stringProp name="Argument.name">entityTypeGroup_2</stringProp>
+            <stringProp name="Argument.value">Vehicle</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">prefix</stringProp>
+          </elementProp>
+          <elementProp name="VEHICLE_17_entities" elementType="Argument">
+            <stringProp name="Argument.name">VEHICLE_17_entities</stringProp>
+            <stringProp name="Argument.value">17</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">threads</stringProp>
+          </elementProp>
+          <elementProp name="entityIdGroup_4" elementType="Argument">
+            <stringProp name="Argument.name">entityIdGroup_4</stringProp>
+            <stringProp name="Argument.value">Vehicle_group_1_</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">prefix</stringProp>
+          </elementProp>
+          <elementProp name="delay10secs" elementType="Argument">
+            <stringProp name="Argument.name">delay10secs</stringProp>
+            <stringProp name="Argument.value">10000</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">10000</stringProp>
+          </elementProp>
+          <elementProp name="delay5mins" elementType="Argument">
+            <stringProp name="Argument.name">delay5mins</stringProp>
+            <stringProp name="Argument.value">300000</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">300000</stringProp>
+          </elementProp>
+          <elementProp name="delay2secs" elementType="Argument">
+            <stringProp name="Argument.name">delay2secs</stringProp>
+            <stringProp name="Argument.value">2000</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">2000</stringProp>
+          </elementProp>
+          <elementProp name="delay20mins" elementType="Argument">
+            <stringProp name="Argument.name">delay20mins</stringProp>
+            <stringProp name="Argument.value">1200000</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">1200000</stringProp>
+          </elementProp>
+        </collectionProp>
+      </Arguments>
+      <hashTree/>
+      <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Body Assert" enabled="true">
+        <collectionProp name="Asserion.test_strings">
+          <stringProp name="67232232">Error</stringProp>
+          <stringProp name="96784904">error</stringProp>
+          <stringProp name="2117236020">Bad Request</stringProp>
+          <stringProp name="1815858133">Not found</stringProp>
+        </collectionProp>
+        <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+        <boolProp name="Assertion.assume_success">false</boolProp>
+        <intProp name="Assertion.test_type">6</intProp>
+        <stringProp name="Assertion.scope">all</stringProp>
+      </ResponseAssertion>
+      <hashTree/>
+      <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="HTTP Code = 200" enabled="true">
+        <collectionProp name="Asserion.test_strings">
+          <stringProp name="49586">200</stringProp>
+        </collectionProp>
+        <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+        <boolProp name="Assertion.assume_success">false</boolProp>
+        <intProp name="Assertion.test_type">8</intProp>
+        <stringProp name="Assertion.scope">all</stringProp>
+      </ResponseAssertion>
+      <hashTree/>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="subscriber" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1400229932000</longProp>
+        <longProp name="ThreadGroup.end_time">1400229932000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <IfController guiclass="IfControllerPanel" testclass="IfController" testname="If OPERATION = SUBSCRIBER" enabled="true">
+          <stringProp name="IfController.condition">&quot;${OPERATION}&quot; == &quot;SUBSCRIBER&quot;</stringProp>
+          <boolProp name="IfController.evaluateAll">false</boolProp>
+        </IfController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname=" ONCHANGE subscriber group 1" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot;?&gt;&#xd;
+&lt;subscribeContextRequest&gt;&#xd;
+  &lt;entityIdList&gt;&#xd;
+    &lt;entityId type=&quot;${entityTypeGroup_1}&quot; isPattern=&quot;true&quot;&gt;&#xd;
+      &lt;id&gt;${entityIdGroup_1}.*&lt;/id&gt;&#xd;
+    &lt;/entityId&gt;&#xd;
+  &lt;/entityIdList&gt; &#xd;
+  &lt;reference&gt;http://localhost:1028/accumulate&lt;/reference&gt;&#xd;
+  &lt;duration&gt;P1M&lt;/duration&gt;&#xd;
+  &lt;notifyConditions&gt;&#xd;
+    &lt;notifyCondition&gt;&#xd;
+      &lt;type&gt;ONCHANGE&lt;/type&gt;&#xd;
+      &lt;condValueList&gt;&#xd;
+        &lt;condValue&gt;name_1&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_2&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_3&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_4&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_5&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_6&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_7&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_8&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_9&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_10&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_11&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_12&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_13&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_14&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_15&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_16&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_17&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_18&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_19&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_20&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_21&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_22&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_23&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_24&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_25&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_26&lt;/condValue&gt;&#xd;
+      &lt;/condValueList&gt;&#xd;
+    &lt;/notifyCondition&gt;&#xd;
+  &lt;/notifyConditions&gt;  &#xd;
+&lt;/subscribeContextRequest&gt;&#xd;
+</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain"></stringProp>
+            <stringProp name="HTTPSampler.port"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">${SubscriptionPath}</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <boolProp name="HTTPSampler.monitor">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname=" ONCHANGE subscriber group 2" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot;?&gt;&#xd;
+&lt;subscribeContextRequest&gt;&#xd;
+  &lt;entityIdList&gt;&#xd;
+    &lt;entityId type=&quot;${entityTypeGroup_1}&quot; isPattern=&quot;true&quot;&gt;&#xd;
+      &lt;id&gt;${entityIdGroup_2}.*&lt;/id&gt;&#xd;
+    &lt;/entityId&gt;&#xd;
+  &lt;/entityIdList&gt; &#xd;
+  &lt;reference&gt;http://localhost:1028/accumulate&lt;/reference&gt;&#xd;
+  &lt;duration&gt;P1M&lt;/duration&gt;&#xd;
+  &lt;notifyConditions&gt;&#xd;
+    &lt;notifyCondition&gt;&#xd;
+      &lt;type&gt;ONCHANGE&lt;/type&gt;&#xd;
+      &lt;condValueList&gt;&#xd;
+        &lt;condValue&gt;name_1&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_2&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_3&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_4&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_5&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_6&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_7&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_8&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_9&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_10&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_11&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_12&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_13&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_14&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_15&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_16&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_17&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_18&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_19&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_20&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_21&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_22&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_23&lt;/condValue&gt;       &#xd;
+      &lt;/condValueList&gt;&#xd;
+    &lt;/notifyCondition&gt;&#xd;
+  &lt;/notifyConditions&gt;  &#xd;
+&lt;/subscribeContextRequest&gt;&#xd;
+</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain"></stringProp>
+            <stringProp name="HTTPSampler.port"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">${SubscriptionPath}</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <boolProp name="HTTPSampler.monitor">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname=" ONCHANGE subscriber group 3" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot;?&gt;&#xd;
+&lt;subscribeContextRequest&gt;&#xd;
+  &lt;entityIdList&gt;&#xd;
+    &lt;entityId type=&quot;${entityTypeGroup_1}&quot; isPattern=&quot;true&quot;&gt;&#xd;
+      &lt;id&gt;${entityIdGroup_3}.*&lt;/id&gt;&#xd;
+    &lt;/entityId&gt;&#xd;
+  &lt;/entityIdList&gt; &#xd;
+  &lt;reference&gt;http://localhost:1028/accumulate&lt;/reference&gt;&#xd;
+  &lt;duration&gt;P1M&lt;/duration&gt;&#xd;
+  &lt;notifyConditions&gt;&#xd;
+    &lt;notifyCondition&gt;&#xd;
+      &lt;type&gt;ONCHANGE&lt;/type&gt;&#xd;
+      &lt;condValueList&gt;&#xd;
+        &lt;condValue&gt;name_1&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_2&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_3&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_4&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_5&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_6&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_7&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_8&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_9&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_10&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_11&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_12&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_13&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_14&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_15&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_16&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_17&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_18&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_19&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_20&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_21&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_22&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_23&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_24&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_25&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_26&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_27&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_28&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_29&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_30&lt;/condValue&gt;     &#xd;
+        &lt;condValue&gt;name_31&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_32&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_33&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_34&lt;/condValue&gt;           &#xd;
+      &lt;/condValueList&gt;&#xd;
+    &lt;/notifyCondition&gt;&#xd;
+  &lt;/notifyConditions&gt;  &#xd;
+&lt;/subscribeContextRequest&gt;&#xd;
+</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain"></stringProp>
+            <stringProp name="HTTPSampler.port"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">${SubscriptionPath}</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <boolProp name="HTTPSampler.monitor">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname=" ONCHANGE subscriber group 4" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot;?&gt;&#xd;
+&lt;subscribeContextRequest&gt;&#xd;
+  &lt;entityIdList&gt;&#xd;
+    &lt;entityId type=&quot;${entityTypeGroup_2}&quot; isPattern=&quot;true&quot;&gt;&#xd;
+      &lt;id&gt;${entityIdGroup_4}.*&lt;/id&gt;&#xd;
+    &lt;/entityId&gt;&#xd;
+  &lt;/entityIdList&gt; &#xd;
+  &lt;reference&gt;http://localhost:1028/accumulate&lt;/reference&gt;&#xd;
+  &lt;duration&gt;P1M&lt;/duration&gt;&#xd;
+  &lt;notifyConditions&gt;&#xd;
+    &lt;notifyCondition&gt;&#xd;
+      &lt;type&gt;ONCHANGE&lt;/type&gt;&#xd;
+      &lt;condValueList&gt;&#xd;
+        &lt;condValue&gt;name_1&lt;/condValue&gt;&#xd;
+        &lt;condValue&gt;name_2&lt;/condValue&gt;&#xd;
+      &lt;/condValueList&gt;&#xd;
+    &lt;/notifyCondition&gt;&#xd;
+  &lt;/notifyConditions&gt;  &#xd;
+&lt;/subscribeContextRequest&gt;&#xd;
+</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain"></stringProp>
+            <stringProp name="HTTPSampler.port"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">${SubscriptionPath}</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <boolProp name="HTTPSampler.monitor">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="House group 1 (19 entities 9 attributes every 10 secs)" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${HOUSE_19_entities}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
+        <longProp name="ThreadGroup.start_time">1400572444000</longProp>
+        <longProp name="ThreadGroup.end_time">1400572444000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Counter" enabled="true">
+          <stringProp name="CounterConfig.start">1</stringProp>
+          <stringProp name="CounterConfig.end">${HOUSE_19_entities}</stringProp>
+          <stringProp name="CounterConfig.incr">1</stringProp>
+          <stringProp name="CounterConfig.name">Counter_house_19</stringProp>
+          <stringProp name="CounterConfig.format"></stringProp>
+          <boolProp name="CounterConfig.per_user">false</boolProp>
+          <stringProp name="TestPlan.comments">It is used in entityId name</stringProp>
+        </CounterConfig>
+        <hashTree/>
+        <BeanShellPreProcessor guiclass="TestBeanGUI" testclass="BeanShellPreProcessor" testname="creating dynamic appends" enabled="true">
+          <boolProp name="resetInterpreter">false</boolProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="script">
+// libraries
+import java.util.*;
+import java.text.DecimalFormat;
+
+// constants
+attributeMIN=1;
+attributeMAX=9;
+RandomMAXValue = 1000;
+pos=vars.get(&quot;Counter_house_19&quot;);
+eT=vars.get(&quot;entityTypeGroup_1&quot;);
+eI=vars.get(&quot;entityIdGroup_1&quot;) + pos;
+request = &quot;&lt;?xml version=\&quot;1.0\&quot; encoding=\&quot;UTF-8\&quot;?&gt; &lt;updateContextRequest&gt;&lt;contextElementList&gt; &lt;contextElement&gt;&lt;entityId type=\&quot;&quot;+eT+&quot;\&quot; isPattern=\&quot;false\&quot;&gt;&lt;id&gt;&quot;+eI+&quot;&lt;/id&gt;&lt;/entityId&gt;&lt;contextAttributeList&gt;&quot;;
+endRequest=&quot;&lt;/contextAttributeList&gt;&lt;/contextElement&gt;&lt;/contextElementList&gt;&lt;updateAction&gt;APPEND&lt;/updateAction&gt;&lt;/updateContextRequest&gt;&quot;;
+
+// variables
+rnd = new Random();
+df = new DecimalFormat(&quot;0.00&quot;); 
+tempRequest = &quot; &quot;;
+
+//begin
+System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
+for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
+	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
+	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+}
+
+request = request + tempRequest + endRequest;
+vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
+
+
+
+</stringProp>
+        </BeanShellPreProcessor>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="append request" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${randomAttributesUpdateRequest}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${UpdatePath}</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="timer x 10 secs" enabled="true">
+          <stringProp name="ConstantTimer.delay">${delay10secs}</stringProp>
+        </ConstantTimer>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="House group 1 (19 entities 15 attributes every 5 mins)" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${HOUSE_19_entities}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
+        <longProp name="ThreadGroup.start_time">1400572444000</longProp>
+        <longProp name="ThreadGroup.end_time">1400572444000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Counter" enabled="true">
+          <stringProp name="CounterConfig.start">1</stringProp>
+          <stringProp name="CounterConfig.end">${HOUSE_19_entities}</stringProp>
+          <stringProp name="CounterConfig.incr">1</stringProp>
+          <stringProp name="CounterConfig.name">Counter_house_19</stringProp>
+          <stringProp name="CounterConfig.format"></stringProp>
+          <boolProp name="CounterConfig.per_user">false</boolProp>
+          <stringProp name="TestPlan.comments">It is used in entityId name</stringProp>
+        </CounterConfig>
+        <hashTree/>
+        <BeanShellPreProcessor guiclass="TestBeanGUI" testclass="BeanShellPreProcessor" testname="creating dynamic appends" enabled="true">
+          <boolProp name="resetInterpreter">false</boolProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="script">
+// libraries
+import java.util.*;
+import java.text.DecimalFormat;
+
+// constants
+attributeMIN=10;
+attributeMAX=24;
+RandomMAXValue = 1000;
+pos=vars.get(&quot;Counter_house_19&quot;);
+eT=vars.get(&quot;entityTypeGroup_1&quot;);
+eI=vars.get(&quot;entityIdGroup_1&quot;) + pos;
+request = &quot;&lt;?xml version=\&quot;1.0\&quot; encoding=\&quot;UTF-8\&quot;?&gt; &lt;updateContextRequest&gt;&lt;contextElementList&gt; &lt;contextElement&gt;&lt;entityId type=\&quot;&quot;+eT+&quot;\&quot; isPattern=\&quot;false\&quot;&gt;&lt;id&gt;&quot;+eI+&quot;&lt;/id&gt;&lt;/entityId&gt;&lt;contextAttributeList&gt;&quot;;
+endRequest=&quot;&lt;/contextAttributeList&gt;&lt;/contextElement&gt;&lt;/contextElementList&gt;&lt;updateAction&gt;APPEND&lt;/updateAction&gt;&lt;/updateContextRequest&gt;&quot;;
+
+// variables
+rnd = new Random();
+df = new DecimalFormat(&quot;0.00&quot;); 
+tempRequest = &quot; &quot;;
+
+//begin
+System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
+for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
+	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
+	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+}
+
+request = request + tempRequest + endRequest;
+vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
+
+
+
+</stringProp>
+        </BeanShellPreProcessor>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="append request" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${randomAttributesUpdateRequest}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${UpdatePath}</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="timer x 5 mins" enabled="true">
+          <stringProp name="ConstantTimer.delay">${delay5mins}</stringProp>
+        </ConstantTimer>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="House group 1 (19 entities 2 attributes between 2 seconds to 20 minutes)" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${HOUSE_19_entities}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
+        <longProp name="ThreadGroup.start_time">1400572444000</longProp>
+        <longProp name="ThreadGroup.end_time">1400572444000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Counter" enabled="true">
+          <stringProp name="CounterConfig.start">1</stringProp>
+          <stringProp name="CounterConfig.end">${HOUSE_19_entities}</stringProp>
+          <stringProp name="CounterConfig.incr">1</stringProp>
+          <stringProp name="CounterConfig.name">Counter_house_19</stringProp>
+          <stringProp name="CounterConfig.format"></stringProp>
+          <boolProp name="CounterConfig.per_user">false</boolProp>
+          <stringProp name="TestPlan.comments">It is used in entityId name</stringProp>
+        </CounterConfig>
+        <hashTree/>
+        <BeanShellPreProcessor guiclass="TestBeanGUI" testclass="BeanShellPreProcessor" testname="creating dynamic appends" enabled="true">
+          <boolProp name="resetInterpreter">false</boolProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="script">
+// libraries
+import java.util.*;
+import java.text.DecimalFormat;
+
+// constants
+attributeMIN=25;
+attributeMAX=26;
+RandomMAXValue = 1000;
+pos=vars.get(&quot;Counter_house_19&quot;);
+eT=vars.get(&quot;entityTypeGroup_1&quot;);
+eI=vars.get(&quot;entityIdGroup_1&quot;) + pos;
+request = &quot;&lt;?xml version=\&quot;1.0\&quot; encoding=\&quot;UTF-8\&quot;?&gt; &lt;updateContextRequest&gt;&lt;contextElementList&gt; &lt;contextElement&gt;&lt;entityId type=\&quot;&quot;+eT+&quot;\&quot; isPattern=\&quot;false\&quot;&gt;&lt;id&gt;&quot;+eI+&quot;&lt;/id&gt;&lt;/entityId&gt;&lt;contextAttributeList&gt;&quot;;
+endRequest=&quot;&lt;/contextAttributeList&gt;&lt;/contextElement&gt;&lt;/contextElementList&gt;&lt;updateAction&gt;APPEND&lt;/updateAction&gt;&lt;/updateContextRequest&gt;&quot;;
+
+// variables
+rnd = new Random();
+df = new DecimalFormat(&quot;0.00&quot;); 
+tempRequest = &quot; &quot;;
+
+//begin
+System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
+for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
+	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
+	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+}
+
+request = request + tempRequest + endRequest;
+vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
+
+
+
+</stringProp>
+        </BeanShellPreProcessor>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="append request" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${randomAttributesUpdateRequest}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${UpdatePath}</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Delay between 2 seconds to 20 minutes" enabled="true">
+          <stringProp name="ConstantTimer.delay">${delay2secs}</stringProp>
+          <stringProp name="RandomTimer.range">${delay20mins}</stringProp>
+        </UniformRandomTimer>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="House group 2 (1 entity 6 attributes every 10 secs)" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${HOUSE_1_entity}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
+        <longProp name="ThreadGroup.start_time">1400572444000</longProp>
+        <longProp name="ThreadGroup.end_time">1400572444000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Counter" enabled="true">
+          <stringProp name="CounterConfig.start">20</stringProp>
+          <stringProp name="CounterConfig.end">20</stringProp>
+          <stringProp name="CounterConfig.incr">1</stringProp>
+          <stringProp name="CounterConfig.name">Counter_house_1_1</stringProp>
+          <stringProp name="CounterConfig.format"></stringProp>
+          <boolProp name="CounterConfig.per_user">false</boolProp>
+          <stringProp name="TestPlan.comments">It is used in entityId name</stringProp>
+        </CounterConfig>
+        <hashTree/>
+        <BeanShellPreProcessor guiclass="TestBeanGUI" testclass="BeanShellPreProcessor" testname="creating dynamic appends" enabled="true">
+          <boolProp name="resetInterpreter">false</boolProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="script">
+// libraries
+import java.util.*;
+import java.text.DecimalFormat;
+
+// constants
+attributeMIN=1;
+attributeMAX=6;
+RandomMAXValue = 1000;
+pos=vars.get(&quot;Counter_house_1_1&quot;);
+eT=vars.get(&quot;entityTypeGroup_1&quot;);
+eI=vars.get(&quot;entityIdGroup_2&quot;) + pos;
+request = &quot;&lt;?xml version=\&quot;1.0\&quot; encoding=\&quot;UTF-8\&quot;?&gt; &lt;updateContextRequest&gt;&lt;contextElementList&gt; &lt;contextElement&gt;&lt;entityId type=\&quot;&quot;+eT+&quot;\&quot; isPattern=\&quot;false\&quot;&gt;&lt;id&gt;&quot;+eI+&quot;&lt;/id&gt;&lt;/entityId&gt;&lt;contextAttributeList&gt;&quot;;
+endRequest=&quot;&lt;/contextAttributeList&gt;&lt;/contextElement&gt;&lt;/contextElementList&gt;&lt;updateAction&gt;APPEND&lt;/updateAction&gt;&lt;/updateContextRequest&gt;&quot;;
+
+// variables
+rnd = new Random();
+df = new DecimalFormat(&quot;0.00&quot;); 
+tempRequest = &quot; &quot;;
+
+//begin
+System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
+for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
+	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
+	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+}
+
+request = request + tempRequest + endRequest;
+vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
+
+
+
+</stringProp>
+        </BeanShellPreProcessor>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="append request" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${randomAttributesUpdateRequest}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${UpdatePath}</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="timer x 10 secs" enabled="true">
+          <stringProp name="ConstantTimer.delay">${delay10secs}</stringProp>
+        </ConstantTimer>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="House group 2 (1 entity 15 attributes every 5 mins)" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${HOUSE_1_entity}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
+        <longProp name="ThreadGroup.start_time">1400572444000</longProp>
+        <longProp name="ThreadGroup.end_time">1400572444000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Counter" enabled="true">
+          <stringProp name="CounterConfig.start">20</stringProp>
+          <stringProp name="CounterConfig.end">20</stringProp>
+          <stringProp name="CounterConfig.incr">1</stringProp>
+          <stringProp name="CounterConfig.name">Counter_house_1_1</stringProp>
+          <stringProp name="CounterConfig.format"></stringProp>
+          <boolProp name="CounterConfig.per_user">false</boolProp>
+          <stringProp name="TestPlan.comments">It is used in entityId name</stringProp>
+        </CounterConfig>
+        <hashTree/>
+        <BeanShellPreProcessor guiclass="TestBeanGUI" testclass="BeanShellPreProcessor" testname="creating dynamic appends" enabled="true">
+          <boolProp name="resetInterpreter">false</boolProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="script">
+// libraries
+import java.util.*;
+import java.text.DecimalFormat;
+
+// constants
+attributeMIN=7;
+attributeMAX=21;
+RandomMAXValue = 1000;
+pos=vars.get(&quot;Counter_house_1_1&quot;);
+eT=vars.get(&quot;entityTypeGroup_1&quot;);
+eI=vars.get(&quot;entityIdGroup_2&quot;) + pos;
+request = &quot;&lt;?xml version=\&quot;1.0\&quot; encoding=\&quot;UTF-8\&quot;?&gt; &lt;updateContextRequest&gt;&lt;contextElementList&gt; &lt;contextElement&gt;&lt;entityId type=\&quot;&quot;+eT+&quot;\&quot; isPattern=\&quot;false\&quot;&gt;&lt;id&gt;&quot;+eI+&quot;&lt;/id&gt;&lt;/entityId&gt;&lt;contextAttributeList&gt;&quot;;
+endRequest=&quot;&lt;/contextAttributeList&gt;&lt;/contextElement&gt;&lt;/contextElementList&gt;&lt;updateAction&gt;APPEND&lt;/updateAction&gt;&lt;/updateContextRequest&gt;&quot;;
+
+// variables
+rnd = new Random();
+df = new DecimalFormat(&quot;0.00&quot;); 
+tempRequest = &quot; &quot;;
+
+//begin
+System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
+for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
+	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
+	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+}
+
+request = request + tempRequest + endRequest;
+vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
+
+
+
+</stringProp>
+        </BeanShellPreProcessor>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="append request" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${randomAttributesUpdateRequest}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${UpdatePath}</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="timer x 5 mins" enabled="true">
+          <stringProp name="ConstantTimer.delay">${delay5mins}</stringProp>
+        </ConstantTimer>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="House group 2 (1 entity 2 attributes between 2 seconds to 20 minutes)" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${HOUSE_19_entities}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
+        <longProp name="ThreadGroup.start_time">1400572444000</longProp>
+        <longProp name="ThreadGroup.end_time">1400572444000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Counter" enabled="true">
+          <stringProp name="CounterConfig.start">20</stringProp>
+          <stringProp name="CounterConfig.end">20</stringProp>
+          <stringProp name="CounterConfig.incr">1</stringProp>
+          <stringProp name="CounterConfig.name">Counter_house_1_1</stringProp>
+          <stringProp name="CounterConfig.format"></stringProp>
+          <boolProp name="CounterConfig.per_user">false</boolProp>
+          <stringProp name="TestPlan.comments">It is used in entityId name</stringProp>
+        </CounterConfig>
+        <hashTree/>
+        <BeanShellPreProcessor guiclass="TestBeanGUI" testclass="BeanShellPreProcessor" testname="creating dynamic appends" enabled="true">
+          <boolProp name="resetInterpreter">false</boolProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="script">
+// libraries
+import java.util.*;
+import java.text.DecimalFormat;
+
+// constants
+attributeMIN=22;
+attributeMAX=23;
+RandomMAXValue = 1000;
+pos=vars.get(&quot;Counter_house_1_1&quot;);
+eT=vars.get(&quot;entityTypeGroup_1&quot;);
+eI=vars.get(&quot;entityIdGroup_2&quot;) + pos;
+request = &quot;&lt;?xml version=\&quot;1.0\&quot; encoding=\&quot;UTF-8\&quot;?&gt; &lt;updateContextRequest&gt;&lt;contextElementList&gt; &lt;contextElement&gt;&lt;entityId type=\&quot;&quot;+eT+&quot;\&quot; isPattern=\&quot;false\&quot;&gt;&lt;id&gt;&quot;+eI+&quot;&lt;/id&gt;&lt;/entityId&gt;&lt;contextAttributeList&gt;&quot;;
+endRequest=&quot;&lt;/contextAttributeList&gt;&lt;/contextElement&gt;&lt;/contextElementList&gt;&lt;updateAction&gt;APPEND&lt;/updateAction&gt;&lt;/updateContextRequest&gt;&quot;;
+
+// variables
+rnd = new Random();
+df = new DecimalFormat(&quot;0.00&quot;); 
+tempRequest = &quot; &quot;;
+
+//begin
+System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
+for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
+	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
+	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+}
+
+request = request + tempRequest + endRequest;
+vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
+
+
+
+</stringProp>
+        </BeanShellPreProcessor>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="append request" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${randomAttributesUpdateRequest}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${UpdatePath}</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Delay between 2 seconds to 20 minutes" enabled="true">
+          <stringProp name="ConstantTimer.delay">${delay2secs}</stringProp>
+          <stringProp name="RandomTimer.range">${delay20mins}</stringProp>
+        </UniformRandomTimer>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="House group 3 (1 entity 31 attributes every 10 secs)" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${HOUSE_1_entity}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
+        <longProp name="ThreadGroup.start_time">1400572444000</longProp>
+        <longProp name="ThreadGroup.end_time">1400572444000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Counter" enabled="true">
+          <stringProp name="CounterConfig.start">21</stringProp>
+          <stringProp name="CounterConfig.end">21</stringProp>
+          <stringProp name="CounterConfig.incr">1</stringProp>
+          <stringProp name="CounterConfig.name">Counter_house_1_2</stringProp>
+          <stringProp name="CounterConfig.format"></stringProp>
+          <boolProp name="CounterConfig.per_user">false</boolProp>
+          <stringProp name="TestPlan.comments">It is used in entityId name</stringProp>
+        </CounterConfig>
+        <hashTree/>
+        <BeanShellPreProcessor guiclass="TestBeanGUI" testclass="BeanShellPreProcessor" testname="creating dynamic appends" enabled="true">
+          <boolProp name="resetInterpreter">false</boolProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="script">
+// libraries
+import java.util.*;
+import java.text.DecimalFormat;
+
+// constants
+attributeMIN=1;
+attributeMAX=31;
+RandomMAXValue = 1000;
+pos=vars.get(&quot;Counter_house_1_2&quot;);
+eT=vars.get(&quot;entityTypeGroup_1&quot;);
+eI=vars.get(&quot;entityIdGroup_3&quot;) + pos;
+request = &quot;&lt;?xml version=\&quot;1.0\&quot; encoding=\&quot;UTF-8\&quot;?&gt; &lt;updateContextRequest&gt;&lt;contextElementList&gt; &lt;contextElement&gt;&lt;entityId type=\&quot;&quot;+eT+&quot;\&quot; isPattern=\&quot;false\&quot;&gt;&lt;id&gt;&quot;+eI+&quot;&lt;/id&gt;&lt;/entityId&gt;&lt;contextAttributeList&gt;&quot;;
+endRequest=&quot;&lt;/contextAttributeList&gt;&lt;/contextElement&gt;&lt;/contextElementList&gt;&lt;updateAction&gt;APPEND&lt;/updateAction&gt;&lt;/updateContextRequest&gt;&quot;;
+
+// variables
+rnd = new Random();
+df = new DecimalFormat(&quot;0.00&quot;); 
+tempRequest = &quot; &quot;;
+
+//begin
+System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
+for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
+	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
+	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+}
+
+request = request + tempRequest + endRequest;
+vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
+
+
+
+</stringProp>
+        </BeanShellPreProcessor>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="append request" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${randomAttributesUpdateRequest}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${UpdatePath}</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="timer x 10 secs" enabled="true">
+          <stringProp name="ConstantTimer.delay">${delay10secs}</stringProp>
+        </ConstantTimer>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="House group 3 (1 entity 3 attributes every 5 mins)" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${HOUSE_1_entity}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
+        <longProp name="ThreadGroup.start_time">1400572444000</longProp>
+        <longProp name="ThreadGroup.end_time">1400572444000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Counter" enabled="true">
+          <stringProp name="CounterConfig.start">21</stringProp>
+          <stringProp name="CounterConfig.end">21</stringProp>
+          <stringProp name="CounterConfig.incr">1</stringProp>
+          <stringProp name="CounterConfig.name">Counter_house_1_2</stringProp>
+          <stringProp name="CounterConfig.format"></stringProp>
+          <boolProp name="CounterConfig.per_user">false</boolProp>
+          <stringProp name="TestPlan.comments">It is used in entityId name</stringProp>
+        </CounterConfig>
+        <hashTree/>
+        <BeanShellPreProcessor guiclass="TestBeanGUI" testclass="BeanShellPreProcessor" testname="creating dynamic appends" enabled="true">
+          <boolProp name="resetInterpreter">false</boolProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="script">
+// libraries
+import java.util.*;
+import java.text.DecimalFormat;
+
+// constants
+attributeMIN=1;
+attributeMAX=31;
+RandomMAXValue = 1000;
+pos=vars.get(&quot;Counter_house_1_2&quot;);
+eT=vars.get(&quot;entityTypeGroup_1&quot;);
+eI=vars.get(&quot;entityIdGroup_3&quot;) + pos;
+request = &quot;&lt;?xml version=\&quot;1.0\&quot; encoding=\&quot;UTF-8\&quot;?&gt; &lt;updateContextRequest&gt;&lt;contextElementList&gt; &lt;contextElement&gt;&lt;entityId type=\&quot;&quot;+eT+&quot;\&quot; isPattern=\&quot;false\&quot;&gt;&lt;id&gt;&quot;+eI+&quot;&lt;/id&gt;&lt;/entityId&gt;&lt;contextAttributeList&gt;&quot;;
+endRequest=&quot;&lt;/contextAttributeList&gt;&lt;/contextElement&gt;&lt;/contextElementList&gt;&lt;updateAction&gt;APPEND&lt;/updateAction&gt;&lt;/updateContextRequest&gt;&quot;;
+
+// variables
+rnd = new Random();
+df = new DecimalFormat(&quot;0.00&quot;); 
+tempRequest = &quot; &quot;;
+
+//begin
+System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
+for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
+	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
+	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+}
+
+request = request + tempRequest + endRequest;
+vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
+
+
+
+</stringProp>
+        </BeanShellPreProcessor>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="append request" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${randomAttributesUpdateRequest}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${UpdatePath}</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="timer x 10 secs" enabled="true">
+          <stringProp name="ConstantTimer.delay">${delay2secs}</stringProp>
+        </ConstantTimer>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Vehicle group 4 (17 entities 2 attributes every 2 secs)" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${VEHICLE_17_entities}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
+        <longProp name="ThreadGroup.start_time">1400572444000</longProp>
+        <longProp name="ThreadGroup.end_time">1400572444000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <CounterConfig guiclass="CounterConfigGui" testclass="CounterConfig" testname="Counter" enabled="true">
+          <stringProp name="CounterConfig.start">22</stringProp>
+          <stringProp name="CounterConfig.end">38</stringProp>
+          <stringProp name="CounterConfig.incr">1</stringProp>
+          <stringProp name="CounterConfig.name">Counter_vehicle</stringProp>
+          <stringProp name="CounterConfig.format"></stringProp>
+          <boolProp name="CounterConfig.per_user">false</boolProp>
+          <stringProp name="TestPlan.comments">It is used in entityId name</stringProp>
+        </CounterConfig>
+        <hashTree/>
+        <BeanShellPreProcessor guiclass="TestBeanGUI" testclass="BeanShellPreProcessor" testname="creating dynamic appends" enabled="true">
+          <boolProp name="resetInterpreter">false</boolProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="script">
+// libraries
+import java.util.*;
+import java.text.DecimalFormat;
+
+// constants
+attributeMIN=1;
+attributeMAX=2;
+RandomMAXValue = 1000;
+pos=vars.get(&quot;Counter_vehicle&quot;);
+eT=vars.get(&quot;entityTypeGroup_2&quot;);
+eI=vars.get(&quot;entityIdGroup_4&quot;) + pos;
+request = &quot;&lt;?xml version=\&quot;1.0\&quot; encoding=\&quot;UTF-8\&quot;?&gt; &lt;updateContextRequest&gt;&lt;contextElementList&gt; &lt;contextElement&gt;&lt;entityId type=\&quot;&quot;+eT+&quot;\&quot; isPattern=\&quot;false\&quot;&gt;&lt;id&gt;&quot;+eI+&quot;&lt;/id&gt;&lt;/entityId&gt;&lt;contextAttributeList&gt;&quot;;
+endRequest=&quot;&lt;/contextAttributeList&gt;&lt;/contextElement&gt;&lt;/contextElementList&gt;&lt;updateAction&gt;APPEND&lt;/updateAction&gt;&lt;/updateContextRequest&gt;&quot;;
+
+// variables
+rnd = new Random();
+df = new DecimalFormat(&quot;0.00&quot;); 
+tempRequest = &quot; &quot;;
+
+//begin
+System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
+for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
+	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
+	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+}
+
+request = request + tempRequest + endRequest;
+vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
+
+
+
+</stringProp>
+        </BeanShellPreProcessor>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="append request" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${randomAttributesUpdateRequest}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${UpdatePath}</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="timer x 10 secs" enabled="true">
+          <stringProp name="ConstantTimer.delay">${delay10secs}</stringProp>
+        </ConstantTimer>
+        <hashTree/>
+      </hashTree>
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="Requests/Responses Errors " enabled="true">
+        <boolProp name="ResultCollector.error_logging">true</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>true</responseData>
+            <samplerData>true</samplerData>
+            <xml>true</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>true</responseHeaders>
+            <requestHeaders>true</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <url>true</url>
+            <fileName>true</fileName>
+            <hostname>true</hostname>
+            <threadCounts>true</threadCounts>
+            <sampleCount>true</sampleCount>
+            <idleTime>true</idleTime>
+          </value>
+        </objProp>
+        <stringProp name="filename">${outputDir}/Errors${postfixOutputDir}</stringProp>
+      </ResultCollector>
+      <hashTree/>
+      <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+          </value>
+        </objProp>
+        <stringProp name="filename">${outputDir}/AggregateReport${postfixOutputDir}</stringProp>
+      </ResultCollector>
+      <hashTree/>
+      <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+          </value>
+        </objProp>
+        <stringProp name="filename">${outputDir}/TableResult${postfixOutputDir}</stringProp>
+      </ResultCollector>
+      <hashTree/>
+      <kg.apc.jmeter.perfmon.PerfMonCollector guiclass="kg.apc.jmeter.vizualizers.PerfMonGui" testclass="kg.apc.jmeter.perfmon.PerfMonCollector" testname="PerfMon Metrics Collector" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+          </value>
+        </objProp>
+        <stringProp name="filename">${outputDir}/PerfMon${postfixOutputDir}</stringProp>
+        <longProp name="interval_grouping">1000</longProp>
+        <boolProp name="graph_aggregated">false</boolProp>
+        <stringProp name="include_sample_labels"></stringProp>
+        <stringProp name="exclude_sample_labels"></stringProp>
+        <collectionProp name="metricConnections">
+          <collectionProp name="-1629844088">
+            <stringProp name="1180709214">${HOST}</stringProp>
+            <stringProp name="-1152144878">${MON_PORT}</stringProp>
+            <stringProp name="66952">CPU</stringProp>
+            <stringProp name="0"></stringProp>
+          </collectionProp>
+          <collectionProp name="364408887">
+            <stringProp reference="../../collectionProp/stringProp"/>
+            <stringProp name="-1152144878">${MON_PORT}</stringProp>
+            <stringProp name="-1993889503">Memory</stringProp>
+            <stringProp reference="../../collectionProp/stringProp[4]"/>
+          </collectionProp>
+          <collectionProp name="-2041549158">
+            <stringProp reference="../../collectionProp/stringProp"/>
+            <stringProp name="-1152144878">${MON_PORT}</stringProp>
+            <stringProp name="2112896831">Disks I/O</stringProp>
+            <stringProp reference="../../collectionProp/stringProp[4]"/>
+          </collectionProp>
+          <collectionProp name="476748903">
+            <stringProp reference="../../collectionProp/stringProp"/>
+            <stringProp name="-1152144878">${MON_PORT}</stringProp>
+            <stringProp name="-274342153">Network I/O</stringProp>
+            <stringProp reference="../../collectionProp/stringProp[4]"/>
+          </collectionProp>
+          <collectionProp name="351529034">
+            <stringProp reference="../../collectionProp/stringProp"/>
+            <stringProp name="-1152144878">${MON_PORT}</stringProp>
+            <stringProp name="82881">TCP</stringProp>
+            <stringProp reference="../../collectionProp/stringProp[4]"/>
+          </collectionProp>
+        </collectionProp>
+      </kg.apc.jmeter.perfmon.PerfMonCollector>
+      <hashTree/>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
