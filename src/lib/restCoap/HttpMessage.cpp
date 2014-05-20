@@ -41,8 +41,8 @@ HttpMessage::HttpMessage(std::string theMessage)
       }
       else
       {
-        int temp = line.find("Content-Length");
         // Get other headers
+        int temp = line.find("Content-Length");
         if (temp >= 0)
         {
           contentLength = atoi(line.substr(pos + 2).c_str());

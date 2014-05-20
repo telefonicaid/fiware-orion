@@ -192,13 +192,3 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
   return ret;
 }
 
-
-
-/* ****************************************************************************
-*
-* http2Coap -
-*/
-void http2Coap(MemoryStruct *http, CoapPDU *coap)
-{
-
-}

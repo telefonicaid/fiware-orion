@@ -61,7 +61,7 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
   // Prepare appropriate response in CoAP
   coapResponse->setVersion(1);
   coapResponse->setMessageID(request->getMessageID());
-  //coapResponse->setToken(request->getTokenPointer(),request->getTokenLength());
+  coapResponse->setToken(request->getTokenPointer(),request->getTokenLength());
 
   //coapResponse->setToken((uint8_t*)"\1\16",2);
 
@@ -238,11 +238,13 @@ void Coap::serve()
     else
     {
       // Invoke a callback thread
-      boost::thread *workerThread = new boost::thread(boost::bind(&Coap::callback, this, recvPDU, sd, &recvAddr));
-      workerThread->get_id();
-
+      //boost::thread *workerThread = new boost::thread(boost::bind(&Coap::callback, this, recvPDU, sd, &recvAddr));
+      //workerThread->get_id();
       // DEBUG: Wait for thread to finnish (like using no threads at all) for now
-      workerThread->join();
+      //workerThread->join();
+
+      // Monothreaded version
+      callback(recvPDU, sd, &recvAddr);
 
       continue;
     }

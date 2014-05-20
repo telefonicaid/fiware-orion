@@ -6,8 +6,6 @@
 
 class HttpMessage
 {
-    std::string theMessage;
-
     int httpCode;
     int contentLength;
     std::string contentType;
