@@ -6,15 +6,16 @@
 
 class HttpMessage
 {
-    int httpCode;
-    int contentLength;
-    std::string contentType;
-    std::string body;
+    int _httpCode;
+    int _contentLength;
+    std::string _contentType;
+    std::string _body;
 
   public:
     HttpMessage(std::string theMessage);
 
     CoapPDU* toCoap();
+    int contentLength() { return _contentLength; }
 };
 
 #endif // HTTPMESSAGE_H

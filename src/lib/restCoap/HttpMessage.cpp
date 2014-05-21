@@ -8,10 +8,10 @@
 
 HttpMessage::HttpMessage(std::string theMessage)
 {
-  httpCode = 0;
-  contentLength = 0;
-  contentType = "";
-  body = "";
+  _httpCode = 0;
+  _contentLength = 0;
+  _contentType = "";
+  _body = "";
 
   std::istringstream iss(theMessage);
   std::string line;
@@ -37,7 +37,7 @@ HttpMessage::HttpMessage(std::string theMessage)
       if (pos < 0)
       {
         // Get HTTP code
-        httpCode = atoi(line.substr(9, 3).c_str());
+        _httpCode = atoi(line.substr(9, 3).c_str());
       }
       else
       {
@@ -45,20 +45,20 @@ HttpMessage::HttpMessage(std::string theMessage)
         int temp = line.find("Content-Length");
         if (temp >= 0)
         {
-          contentLength = atoi(line.substr(pos + 2).c_str());
+          _contentLength = atoi(line.substr(pos + 2).c_str());
         }
 
         temp = line.find("Content-Type");
         if (temp >= 0)
         {
-          contentType = line.substr(pos + 2);
+          _contentType = line.substr(pos + 2);
         }
       }
     }
     else
     {
       // We are parsing the body now (as is)
-      body += line;
+      _body += line;
     }
   }
 }
@@ -68,22 +68,26 @@ CoapPDU* HttpMessage::toCoap()
   CoapPDU* pdu = new CoapPDU();
 
   // Set code
-  if (this->httpCode == 200)
+  switch (this->_httpCode)
   {
-    pdu->setCode(CoapPDU::COAP_VALID);
-  }
-  else
-  {
-    pdu->httpStatusToCode(this->httpCode);
+    case 200:
+      pdu->setCode(CoapPDU::COAP_VALID);
+      break;
+    case 415:
+      pdu->setCode(CoapPDU::COAP_UNSUPPORTED_CONTENT_FORMAT);
+      break;
+    default:
+      pdu->httpStatusToCode(this->_httpCode);
+      break;
   }
 
   // Set payload
-  uint8_t* data = (uint8_t*)this->body.c_str();
-  std::size_t length = this->body.length();
+  uint8_t* data = (uint8_t*)this->_body.c_str();
+  std::size_t length = this->_body.length();
   pdu->setPayload(data, length);
 
   // Set content-type
-  if (this->contentType == "application/json")
+  if (this->_contentType == "application/json")
   {
     pdu->setContentFormat(CoapPDU::COAP_CONTENT_FORMAT_APP_JSON);
   }

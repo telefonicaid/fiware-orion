@@ -17,6 +17,8 @@ class Coap
 
   public:
     int   run(const char *_host, unsigned short _port);
+
+
 };
 
 #endif // COAP_H

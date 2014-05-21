@@ -95,7 +95,8 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
     int numOptions = request->getNumOptions();
     for (int i = 0; i < numOptions ; i++)
     {
-      switch (options[i].optionNumber)
+      uint16_t opt = options[i].optionNumber;
+      switch (opt)
       {
         case CoapPDU::COAP_OPTION_URI_PATH:
         {
@@ -107,22 +108,42 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
         }
         case CoapPDU::COAP_OPTION_CONTENT_FORMAT:
         {
-          std::string string = "Content-type: ";
-          char buffer[options[i].optionValueLength + 1];
+          std::string string;
+          u_int8_t buffer[options[i].optionValueLength];
           memcpy(&buffer, options[i].optionValuePointer, options[i].optionValueLength);
-          buffer[options[i].optionValueLength] = '\0';
-          string += buffer;
+          switch (buffer[0])
+          {
+            case CoapPDU::COAP_CONTENT_FORMAT_APP_JSON:
+              string = "Content-type: application/json";
+              break;
+            case CoapPDU::COAP_CONTENT_FORMAT_APP_XML:
+              string = "Content-type: application/xml";
+              break;
+            default:
+              string = "Content-type: application/json";
+              break;
+          }
           headers = curl_slist_append(headers, string.c_str());
           LM_V(("Got CONTENT-FORMAT option: '%s'", string.c_str()));
           break;
         }
         case CoapPDU::COAP_OPTION_ACCEPT:
         {
-          std::string string = "Accept: ";
-          char buffer[options[i].optionValueLength + 1];
+          std::string string;
+          u_int8_t buffer[options[i].optionValueLength];
           memcpy(&buffer, options[i].optionValuePointer, options[i].optionValueLength);
-          buffer[options[i].optionValueLength] = '\0';
-          string += buffer;
+          switch (buffer[0])
+          {
+            case CoapPDU::COAP_CONTENT_FORMAT_APP_JSON:
+              string = "Accept: application/json";
+              break;
+            case CoapPDU::COAP_CONTENT_FORMAT_APP_XML:
+              string = "Accept: application/xml";
+              break;
+            default:
+              string = "Accept: application/json";
+              break;
+          }
           headers = curl_slist_append(headers, string.c_str());
           LM_V(("Got ACCEPT option: '%s'", string.c_str()));
           break;
@@ -140,11 +161,20 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
 
 
     // Set Content-length
-    std::stringstream contentLengthStringStream;
-    contentLengthStringStream << request->getPayloadLength();
-    std::string finalString = "Content-length: " + contentLengthStringStream.str();
-    headers = curl_slist_append(headers, finalString.c_str());
-    LM_V(("Got: '%s'", finalString.c_str()));
+    if (request->getPayloadLength() > 0)
+    {
+      std::stringstream contentLengthStringStream;
+      contentLengthStringStream << request->getPayloadLength();
+      std::string finalString = "Content-length: " + contentLengthStringStream.str();
+      headers = curl_slist_append(headers, finalString.c_str());
+      LM_V(("Got: '%s'", finalString.c_str()));
+
+      // --- Set contents
+
+      //u_int8_t* payload = request->getPayloadCopy();
+      char* payload = (char*)request->getPayloadCopy();
+      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
+    }
 
     // Set Expect
     headers = curl_slist_append(headers, "Expect: ");
@@ -156,12 +186,6 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
     if (recvURILen > 0)
       strncat(url, uriBuffer, recvURILen);
 
-    // --- Set contents
-    //u_int8_t* payload = new u_int8_t[request->getPayloadLength()];
-
-//    u_int8_t* payload = request->getPayloadCopy();
-    char* payload = (char*)request->getPayloadCopy();
-
 
     // --- Prepare CURL handle with obtained options
     curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -171,7 +195,6 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); // Put headers in place
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)httpResponse); // Custom data for response handling
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
 
 
     // --- Do HTTP Request

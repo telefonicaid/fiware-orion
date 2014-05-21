@@ -48,6 +48,30 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
 
   HttpMessage* hm = new HttpMessage(httpResponse);
 
+  if (hm->contentLength() > COAP_BUFFER_SIZE)
+  {
+    // CoAP message is too big, must send error to requester
+    CoapPDU res;
+    res.setVersion(1);
+    res.setMessageID((request->getMessageID()));
+    res.setCode(CoapPDU::COAP_REQUEST_ENTITY_TOO_LARGE);
+    res.setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
+    res.setToken(request->getTokenPointer(), request->getTokenLength());
+
+    ssize_t sent = sendto(sockfd, res.getPDUPointer(), res.getPDULength(), 0, (sockaddr*)recvFrom, addrLen);
+    if (sent < 0)
+    {
+      LM_V(("Error sending packet: %ld.",sent));
+      perror(NULL);
+      return 1;
+    }
+    else
+    {
+      LM_V(("Sent: %ld",sent));
+    }
+
+    return 1;
+  }
 
   // Translate response from HTTP to CoAP
   CoapPDU *coapResponse = hm->toCoap();
@@ -61,7 +85,7 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
   // Prepare appropriate response in CoAP
   coapResponse->setVersion(1);
   coapResponse->setMessageID(request->getMessageID());
-  coapResponse->setToken(request->getTokenPointer(),request->getTokenLength());
+  coapResponse->setToken(request->getTokenPointer(), request->getTokenLength());
 
   //coapResponse->setToken((uint8_t*)"\1\16",2);
 
