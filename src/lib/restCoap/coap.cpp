@@ -46,19 +46,21 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
     // Could not get an answer
   }
 
-  HttpMessage* hm = new HttpMessage(httpResponse);
+  boost::scoped_ptr<HttpMessage> hm(new HttpMessage(httpResponse));
 
+  // CoAP message is too big, must send error to requester
   if (hm->contentLength() > COAP_BUFFER_SIZE)
   {
-    // CoAP message is too big, must send error to requester
-    CoapPDU res;
-    res.setVersion(1);
-    res.setMessageID((request->getMessageID()));
-    res.setCode(CoapPDU::COAP_REQUEST_ENTITY_TOO_LARGE);
-    res.setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
-    res.setToken(request->getTokenPointer(), request->getTokenLength());
+    boost::scoped_ptr<CoapPDU> res;
 
-    ssize_t sent = sendto(sockfd, res.getPDUPointer(), res.getPDULength(), 0, (sockaddr*)recvFrom, addrLen);
+    res->setVersion(1);
+    res->setMessageID((request->getMessageID()));
+    res->setCode(CoapPDU::COAP_REQUEST_ENTITY_TOO_LARGE);
+    res->setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
+    res->setToken(request->getTokenPointer(), request->getTokenLength());
+
+    ssize_t sent = sendto(sockfd, res->getPDUPointer(), res->getPDULength(), 0, (sockaddr*)recvFrom, addrLen);
+
     if (sent < 0)
     {
       LM_V(("Error sending packet: %ld.",sent));
@@ -74,47 +76,18 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
   }
 
   // Translate response from HTTP to CoAP
-  CoapPDU *coapResponse = hm->toCoap();
-//  CoapPDU *coapResponse = new CoapPDU();
+  boost::scoped_ptr<CoapPDU> coapResponse(hm->toCoap());
 
-  if (coapResponse == NULL)
+  if (!coapResponse)
   {
     // Could not translate HTTP into CoAP
+    return 1;
   }
 
   // Prepare appropriate response in CoAP
   coapResponse->setVersion(1);
   coapResponse->setMessageID(request->getMessageID());
   coapResponse->setToken(request->getTokenPointer(), request->getTokenLength());
-
-  //coapResponse->setToken((uint8_t*)"\1\16",2);
-
-//  char *payload = (char*)"This is a mundanely worded test payload.";
-
-//  // respond differently, depending on method code
-//  switch (request->getCode())
-//  {
-//    case CoapPDU::COAP_EMPTY:
-//      // makes no sense, send RST
-//    break;
-//    case CoapPDU::COAP_GET:
-//      coapResponse->setCode(CoapPDU::COAP_CONTENT);
-//      coapResponse->setContentFormat(CoapPDU::COAP_CONTENT_FORMAT_TEXT_PLAIN);
-//      coapResponse->setPayload((uint8_t*)payload,strlen(payload));
-//    break;
-//    case CoapPDU::COAP_POST:
-//      coapResponse->setCode(CoapPDU::COAP_CREATED);
-//    break;
-//    case CoapPDU::COAP_PUT:
-//      coapResponse->setCode(CoapPDU::COAP_CHANGED);
-//    break;
-//    case CoapPDU::COAP_DELETE:
-//      coapResponse->setCode(CoapPDU::COAP_DELETED);
-//      coapResponse->setPayload((uint8_t*)"DELETE OK",9);
-//    break;
-//    default:
-//    break;
-//  }
 
   // type
   switch (request->getType())
@@ -151,8 +124,6 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
     LM_V(("Sent: %ld",sent));
   }
 
-  delete coapResponse;
-
   return 0;
 }
 
@@ -173,9 +144,6 @@ void Coap::serve()
   // storage for handling receive address
   struct sockaddr_storage recvAddr;
   socklen_t               recvAddrLen = sizeof(struct sockaddr_storage);
-  //struct sockaddr_in      *v4Addr;
-  //struct sockaddr_in6     *v6Addr;
-  //char                    straddr[INET6_ADDRSTRLEN];
 
   // Prepare binding address
   struct addrinfo *bindAddr = NULL;
@@ -206,11 +174,6 @@ void Coap::serve()
     return;
   }
 
-  // reuse the same PDU
-  //CoapPDU *recvPDU = new CoapPDU((uint8_t*)buffer, COAP_BUFFER_SIZE, COAP_BUFFER_SIZE);
-  CoapPDU *recvPDU = NULL;
-
-  LM_V(("Listening for packets..."));
   while (1)
   {
     // zero out the buffer
@@ -224,14 +187,7 @@ void Coap::serve()
       return;
     }
 
-    std::string bufferString;
-    bufferString.assign(buffer);
-
-//    uint8_t* data = (uint8_t*)this->body.c_str();
-//    std::size_t length = this->body.length();
-//    pdu->setPayload(data, length);
-
-    recvPDU = new CoapPDU((uint8_t*)buffer, COAP_BUFFER_SIZE, COAP_BUFFER_SIZE);
+    boost::scoped_ptr<CoapPDU> recvPDU(new CoapPDU((uint8_t*)buffer, COAP_BUFFER_SIZE, COAP_BUFFER_SIZE));
 
     // validate packet
     if (ret > COAP_BUFFER_SIZE)
@@ -262,13 +218,13 @@ void Coap::serve()
     else
     {
       // Invoke a callback thread
-      //boost::thread *workerThread = new boost::thread(boost::bind(&Coap::callback, this, recvPDU, sd, &recvAddr));
-      //workerThread->get_id();
+      boost::thread *workerThread = new boost::thread(boost::bind(&Coap::callback, this, recvPDU, sd, &recvAddr));
+      workerThread->get_id();
       // DEBUG: Wait for thread to finnish (like using no threads at all) for now
-      //workerThread->join();
+      workerThread->join();
 
       // Monothreaded version
-      callback(recvPDU, sd, &recvAddr);
+      //callback(recvPDU, sd, &recvAddr);
 
       continue;
     }
