@@ -218,7 +218,7 @@ void Coap::serve()
     else
     {
       // Invoke a callback thread
-      boost::thread *workerThread = new boost::thread(boost::bind(&Coap::callback, this, recvPDU, sd, &recvAddr));
+      boost::thread *workerThread = new boost::thread(boost::bind(&Coap::callback, this, recvPDU.get(), sd, &recvAddr));
       workerThread->get_id();
       // DEBUG: Wait for thread to finnish (like using no threads at all) for now
       workerThread->join();
