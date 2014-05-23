@@ -45,7 +45,7 @@
 #include "ngsiNotify/Notifier.h"
 
 using namespace mongo;
-
+using std::auto_ptr;
 
 
 /* ****************************************************************************

@@ -34,6 +34,10 @@
 #include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
 
+using std::string;
+using std::auto_ptr;
+using std::map;
+
 /* ****************************************************************************
  * Forward declarations
  */
