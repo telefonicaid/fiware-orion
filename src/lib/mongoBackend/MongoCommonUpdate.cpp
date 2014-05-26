@@ -735,11 +735,11 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
     DBClientConnection* connection = getMongoConnection();
 
     /* Build query */
-    std::string entIdQ       = std::string(CSUB_ENTITIES)   + "." + CSUB_ENTITY_ID;
-    std::string entTypeQ     = std::string(CSUB_ENTITIES)   + "." + CSUB_ENTITY_TYPE;
-    std::string entPatternQ  = std::string(CSUB_ENTITIES)   + "." + CSUB_ENTITY_ISPATTERN;
-    std::string condTypeQ    = std::string(CSUB_CONDITIONS) + "." + CSUB_CONDITIONS_TYPE;
-    std::string condValueQ   = std::string(CSUB_CONDITIONS) + "." + CSUB_CONDITIONS_VALUE;
+    std::string entIdQ       = CSUB_ENTITIES   "." CSUB_ENTITY_ID;
+    std::string entTypeQ     = CSUB_ENTITIES   "." CSUB_ENTITY_TYPE;
+    std::string entPatternQ  = CSUB_ENTITIES   "." CSUB_ENTITY_ISPATTERN;
+    std::string condTypeQ    = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
+    std::string condValueQ   = CSUB_CONDITIONS "." CSUB_CONDITIONS_VALUE;
 
     /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
     BSONObj queryNoPattern = BSON(
@@ -1305,8 +1305,8 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
 */
 static bool removeEntity(std::string entityId, std::string entityType, ContextElementResponse* cerP, std::string tenant) {
 
-    const std::string idString = std::string("_id.") + ENT_ENTITY_ID;
-    const std::string typeString = std::string("_id.") + ENT_ENTITY_TYPE;
+    const std::string idString   = "_id." ENT_ENTITY_ID;
+    const std::string typeString = "_id." ENT_ENTITY_TYPE;
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -1384,9 +1384,10 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     }
 
     /* Find entities (could be several ones in the case of no type or isPattern=true) */
-    const std::string idString = std::string("_id.") + ENT_ENTITY_ID;
-    const std::string typeString = std::string("_id.") + ENT_ENTITY_TYPE;
-    BSONObj query;
+    const std::string  idString   = "_id." ENT_ENTITY_ID;
+    const std::string  typeString = "_id." ENT_ENTITY_TYPE;
+    BSONObj            query;
+
     if (en.type == "") {
         query = BSON(idString << en.id);
     }

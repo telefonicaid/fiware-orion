@@ -72,10 +72,10 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
     }
     std::string attrField;
     if (scope == SCOPE_VALUE_ASSOC_SOURCE) {
-        attrField = std::string(ASSOC_ATTRS) + "." + ASSOC_ATTRS_TARGET;
+        attrField = ASSOC_ATTRS "." ASSOC_ATTRS_TARGET;
     }
     else {  // SCOPE_VALUE_ASSOC_TARGET
-        attrField = std::string(ASSOC_ATTRS) + "." + ASSOC_ATTRS_SOURCE;
+        attrField = ASSOC_ATTRS "." ASSOC_ATTRS_SOURCE;
     }
     queryB.append(attrField, BSON("$in" << attrArray.arr()));
 
