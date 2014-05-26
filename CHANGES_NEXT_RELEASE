@@ -6,3 +6,5 @@
 - Fix: The functionality to change the Log configuration via REST had stopped working. Fixed.
 - FIX: The Log configuration via REST used "/log/traceLevel", whereas the documentation states "/log/trace".
        Updated the broker to support both "/log/trace" and "/log/traceLevel"
+- Add: Generic URI parameters supported (issue #372)
+- Add: Notification mime-type selected in URI parameter 'notifyFormat' (supported values: "XML" and "JSON") (issue #372)

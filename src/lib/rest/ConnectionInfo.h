@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "logMsg/logMsg.h"
 
@@ -109,6 +110,9 @@ public:
   std::string                answer;
   int                        callNo;
   ParseData*                 parseDataP;
+
+  std::map<std::string, std::string>   uriParam;
+
   bool                       inCompoundValue;
   orion::CompoundValueNode*  compoundValueP;    // Points to current node in the tree
   orion::CompoundValueNode*  compoundValueRoot; // Points to the root of the tree

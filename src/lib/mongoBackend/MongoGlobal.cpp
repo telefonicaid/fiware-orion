@@ -410,11 +410,11 @@ void recoverOntimeIntervalThreads(std::string tenant) {
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection");
     }
     catch( const DBException &e ) {
-        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongp db exception)");
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongo db exception)");
         LM_RVE(("Mongo DBException: %s", e.what()));
     }
     catch (...) {
-        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongp generic exception)");
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongo generic exception)");
         LM_RVE(("Caugth Mongo Generic Exception"));
     }
 

@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <map>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -33,6 +34,8 @@
 #include "rest/RestService.h"
 #include "rest/rest.h"
 #include "rest/restReply.h"
+#include "rest/OrionError.h"
+#include "rest/uriParamNames.h"
 
 #include <arpa/inet.h>
 #include <sys/types.h>
@@ -81,6 +84,44 @@ static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
 __thread char                    static_buffer[STATIC_BUFFER_SIZE];
+
+
+
+/* ****************************************************************************
+*
+* uriArgumentGet - 
+*/
+static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
+{
+  ConnectionInfo*  ciP   = (ConnectionInfo*) cbDataP;
+  std::string      key   = ckey;
+  std::string      value = (val == NULL)? "" : val;
+
+  if (key == URI_PARAM_NOTIFY_FORMAT)
+  {
+    if (strcasecmp(val, "xml") == 0)
+      value = "XML";
+    else if (strcasecmp(val, "json") == 0)
+      value = "JSON";
+    else
+    {
+      OrionError error(SccBadRequest, std::string("Bad notification format: '") + value + "'. Valid values: 'XML' and 'JSON'.");
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer         = error.render(ciP->outFormat, "");
+      return MHD_YES;
+    }
+  }
+
+
+  if (val != NULL)
+    ciP->uriParam[key] = value;
+  else
+    ciP->uriParam[key] = "SET";
+
+  LM_T(LmtUriParams, ("URI parameter:   %s: %s", key.c_str(), ciP->uriParam[key].c_str()));
+
+  return MHD_YES;
+}
 
 
 
@@ -385,6 +426,19 @@ static int connectionTreat
         
     *con_cls = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
 
+    //
+    // URI parameters
+    // 
+    ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "";
+    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
+    if (ciP->httpStatusCode != SccOk)
+    {
+      LM_W(("Error in URI arguments"));
+      restReply(ciP, ciP->answer);
+      return MHD_YES;
+    }
+    LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
+
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
     ciP->tenantFromHttpHeader = ciP->httpHeaders.tenant;
     LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));
@@ -404,6 +458,19 @@ static int connectionTreat
     }
     else
       ciP->inFormat = formatParse(ciP->httpHeaders.contentType, NULL);
+
+    // Set default mime-type for notifications
+    if (ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] == "")
+    {
+      if (ciP->outFormat == XML)
+        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "XML";
+      else if (ciP->outFormat == JSON)
+        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "JSON";
+      else
+        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "XML";
+
+      LM_T(LmtUriParams, ("'default' value for notifyFormat (ciP->outFormat == %d)): '%s'", ciP->outFormat, ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
+    }
 
     return MHD_YES;
   }

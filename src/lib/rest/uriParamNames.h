@@ -1,9 +1,9 @@
-#ifndef MONGO_SUBSCRIBE_CONTEXT_H
-#define MONGO_SUBSCRIBE_CONTEXT_H
+#ifndef URI_PARAM_NAMES_H
+#define URI_PARAM_NAMES_H
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,27 +23,15 @@
 * For those usages not covered by this license please contact with
 * fermin at tid dot es
 *
-* Author: Fermin Galan Marquez
+* Author: Ken Zangelin
 */
-#include <string>
-#include <map>
-
-#include "common/Format.h"
-#include "ngsi10/SubscribeContextRequest.h"
-#include "ngsi10/SubscribeContextResponse.h"
 
 
 
 /* ****************************************************************************
 *
-* mongoSubscribeContext - 
+* Names of the URI parameters
 */
-extern HttpStatusCode mongoSubscribeContext
-(
-  SubscribeContextRequest*             requestP,
-  SubscribeContextResponse*            responseP,
-  std::string                          tenant,
-  std::map<std::string, std::string>&  uriParam
-);
+#define URI_PARAM_NOTIFY_FORMAT    "notifyFormat"
 
 #endif
