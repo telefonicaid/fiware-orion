@@ -34,6 +34,7 @@
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi/StatusCode.h"
+#include "rest/uriParamNames.h"
 
 /* ****************************************************************************
 *
@@ -47,7 +48,7 @@ HttpStatusCode mongoSubscribeContext
   std::map<std::string, std::string>&  uriParam
 )
 {
-    std::string notifyFormat = uriParam["notifyFormat"];
+    std::string notifyFormat = uriParam[URI_PARAM_NOTIFY_FORMAT];
 
     LM_T(LmtMongo, ("Subscribe Context Request: notifications sent in '%s' format", notifyFormat.c_str()));
 
