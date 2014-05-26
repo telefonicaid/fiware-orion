@@ -400,7 +400,7 @@ cppcheck:
 	cat cppcheck-result.xml | grep "error file" | wc -l
 
 sonar_metrics: unit_test coverage
-	cd BUILD_COVERAGE && gcovr -r ../src --gcov-exclude='.*parseArgs.*' --gcov-exclude='.*logMsg.*' -x -o ../coverage.xml && cd ..
+	cd BUILD_COVERAGE/src && gcovr --gcov-exclude='.*parseArgs.*' --gcov-exclude='.*logMsg.*' -x -o ../../coverage.xml && cd ../../
 	sed s#filename=\"#filename=\"src/#g coverage.xml > coverage_sonar.xml
 	cppcheck --xml -j 8 --enable=all -I src/lib/ -i src/lib/parseArgs -i src/lib/logMsg src/ 2>cppcheck-result.xml
 
