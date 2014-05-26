@@ -8,3 +8,4 @@
        Updated the broker to support both "/log/trace" and "/log/traceLevel"
 - Add: Generic URI parameters supported (issue #372)
 - Add: Notification mime-type selected in URI parameter 'notifyFormat' (supported values: "XML" and "JSON") (issue #372)
+- Fix: Changed the XML tags AttributeAssociationList and AttributeAssociation to start with lowercase 'a'. (issue #378)
