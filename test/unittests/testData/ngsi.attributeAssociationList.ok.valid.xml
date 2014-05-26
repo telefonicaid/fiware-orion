@@ -1,6 +1,6 @@
-<AttributeAssociationList>
-  <AttributeAssociation>
+<attributeAssociationList>
+  <attributeAssociation>
     <sourceAttribute>Source</sourceAttribute>
     <targetAttribute>Target</targetAttribute>
-  </AttributeAssociation>
-</AttributeAssociationList>
+  </attributeAssociation>
+</attributeAssociationList>

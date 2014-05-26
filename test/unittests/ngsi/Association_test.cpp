@@ -22,7 +22,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
+#include "unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -37,9 +37,11 @@
 TEST(Association, ok)
 {
    Association           a;
-   AttributeAssociation* aa = new AttributeAssociation();
+   AttributeAssociation* aa       = new AttributeAssociation();
+   const char*           outfile  = "ngsi.association.ok.middle.xml";
    std::string           out;
-   std::string           expected = "  <entityAssociation>\n    <sourceEntityId type=\"source\" isPattern=\"false\">\n      <id>Source</id>\n    </sourceEntityId>\n    <targetEntityId type=\"target\" isPattern=\"false\">\n      <id>Target</id>\n    </targetEntityId>\n  </entityAssociation>\n  <AttributeAssociationList>\n    <AttributeAssociation>\n      <sourceAttribute>Source</sourceAttribute>\n      <targetAttribute>Target</targetAttribute>\n    </AttributeAssociation>\n  </AttributeAssociationList>\n";
+
+   utInit();
 
    a.entityAssociation.source.fill("Source", "source", "false");
    a.entityAssociation.target.fill("Target", "target", "false");
@@ -52,8 +54,11 @@ TEST(Association, ok)
    out = a.check(RegisterContext, XML, "", "", 0);
    EXPECT_STREQ("OK", out.c_str());
 
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
    out = a.render(XML, "", false);
-   EXPECT_STREQ(expected.c_str(), out.c_str());
+   EXPECT_STREQ(expectedBuf, out.c_str());
 
    a.release();
+
+   utExit();
 }
