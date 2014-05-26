@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include "rest/uriParamNames.h"
+
 #include "unittest.h"
 #include "testInit.h"
 
@@ -102,7 +104,7 @@ void utInit(void)
   //
   // Default mime type for notifications: application/xml
   //
-  uriParams["notifyFormat"] = "XML";
+  uriParams[URI_PARAM_NOTIFY_FORMAT] = "XML";
 }
 
 
