@@ -37,7 +37,7 @@
 *
 * postSubscribeContext - 
 */
-std::string postSubscribeContext(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string postSubscribeContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   SubscribeContextResponse  scr;
   std::string               answer;

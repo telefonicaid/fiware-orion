@@ -47,7 +47,7 @@ typedef struct UpdateContextResponse
   UpdateContextResponse(StatusCode& _errorCode);
   ~UpdateContextResponse();
 
-  std::string render(RequestType requestType, Format format, std::string indent);  
+  std::string render(RequestType requestType, Format format, const std::string& indent);  
   void        release(void);
 } UpdateContextResponse;
 

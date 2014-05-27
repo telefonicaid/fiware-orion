@@ -40,10 +40,10 @@
 */
 extern HttpStatusCode mongoSubscribeContext
 (
-  SubscribeContextRequest*             requestP,
-  SubscribeContextResponse*            responseP,
-  std::string                          tenant,
-  std::map<std::string, std::string>&  uriParam
+  SubscribeContextRequest*                   requestP,
+  SubscribeContextResponse*                  responseP,
+  const std::string&                         tenant,
+  std::map<std::string, std::string>&        uriParam
 );
 
 #endif

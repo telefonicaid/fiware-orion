@@ -37,7 +37,7 @@
 *
 * putSubscriptionConvOp - 
 */
-extern std::string putSubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+extern std::string putSubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
 
 #endif
 

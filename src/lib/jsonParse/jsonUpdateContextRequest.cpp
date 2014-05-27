@@ -34,7 +34,7 @@
 #include "ngsi/Metadata.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "jsonParse/JsonNode.h"
-#include "jsonParse/jsonNullTreat.h"
+#include "parse/nullTreat.h"
 #include "rest/ConnectionInfo.h"
 
 
@@ -43,7 +43,7 @@
 *
 * contextElement - 
 */
-static std::string contextElement(std::string path, std::string value, ParseData* reqDataP)
+static std::string contextElement(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("new contextElement"));
   reqDataP->upcr.ceP = new ContextElement();
@@ -64,7 +64,7 @@ static std::string contextElement(std::string path, std::string value, ParseData
 *
 * entityIdId - 
 */
-static std::string entityIdId(std::string path, std::string value, ParseData* reqDataP)
+static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
    reqDataP->upcr.ceP->entityId.id = value;
    LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->upcr.ceP->entityId.id.c_str()));
@@ -78,7 +78,7 @@ static std::string entityIdId(std::string path, std::string value, ParseData* re
 *
 * entityIdType - 
 */
-static std::string entityIdType(std::string path, std::string value, ParseData* reqDataP)
+static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
    reqDataP->upcr.ceP->entityId.type = value;
    LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->upcr.ceP->entityId.type.c_str()));
@@ -92,7 +92,7 @@ static std::string entityIdType(std::string path, std::string value, ParseData* 
 *
 * entityIdIsPattern - 
 */
-static std::string entityIdIsPattern(std::string path, std::string value, ParseData* reqDataP)
+static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
@@ -107,7 +107,7 @@ static std::string entityIdIsPattern(std::string path, std::string value, ParseD
 *
 * attributeDomainName - 
 */
-static std::string attributeDomainName(std::string path, std::string value, ParseData* reqDataP)
+static std::string attributeDomainName(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
    reqDataP->upcr.ceP->attributeDomainName.set(value);
    LM_T(LmtParse, ("Got an attributeDomainName: '%s'", reqDataP->upcr.ceP->attributeDomainName.get().c_str()));
@@ -121,7 +121,7 @@ static std::string attributeDomainName(std::string path, std::string value, Pars
 *
 * attribute - 
 */
-static std::string attribute(std::string path, std::string value, ParseData* reqDataP)
+static std::string attribute(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
 
@@ -138,7 +138,7 @@ static std::string attribute(std::string path, std::string value, ParseData* req
 *
 * attributeName - 
 */
-static std::string attributeName(std::string path, std::string value, ParseData* reqDataP)
+static std::string attributeName(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   reqDataP->upcr.attributeP->name = value;
   LM_T(LmtParse, ("Set 'name' to '%s' for a contextElement Attribute", reqDataP->upcr.attributeP->name.c_str()));
@@ -152,7 +152,7 @@ static std::string attributeName(std::string path, std::string value, ParseData*
 *
 * attributeType - 
 */
-static std::string attributeType(std::string path, std::string value, ParseData* reqDataP)
+static std::string attributeType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   reqDataP->upcr.attributeP->type = value;
   LM_T(LmtParse, ("Set 'type' to '%s' for a contextElement attribute", reqDataP->upcr.attributeP->type.c_str()));
@@ -166,7 +166,7 @@ static std::string attributeType(std::string path, std::string value, ParseData*
 *
 * attributeValue - 
 */
-static std::string attributeValue(std::string path, std::string value, ParseData* parseDataP)
+static std::string attributeValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   parseDataP->lastContextAttribute = parseDataP->upcr.attributeP;
   LM_T(LmtCompoundValue, ("Set parseDataP->lastContextAttribute to: %p", parseDataP->lastContextAttribute));
@@ -183,7 +183,7 @@ static std::string attributeValue(std::string path, std::string value, ParseData
 *
 * metadata - 
 */
-static std::string metadata(std::string path, std::string value, ParseData* reqDataP)
+static std::string metadata(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Creating a metadata"));
 
@@ -204,7 +204,7 @@ static std::string metadata(std::string path, std::string value, ParseData* reqD
 *
 * metadataName - 
 */
-static std::string metadataName(std::string path, std::string value, ParseData* reqDataP)
+static std::string metadataName(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a metadata name: '%s'", value.c_str()));
   reqDataP->upcr.contextMetadataP->name = value;
@@ -218,7 +218,7 @@ static std::string metadataName(std::string path, std::string value, ParseData* 
 *
 * metadataType - 
 */
-static std::string metadataType(std::string path, std::string value, ParseData* reqDataP)
+static std::string metadataType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a metadata type: '%s'", value.c_str()));
   reqDataP->upcr.contextMetadataP->type = value;
@@ -232,7 +232,7 @@ static std::string metadataType(std::string path, std::string value, ParseData* 
 *
 * metadataValue - 
 */
-static std::string metadataValue(std::string path, std::string value, ParseData* reqDataP)
+static std::string metadataValue(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a metadata value: '%s'", value.c_str()));
   reqDataP->upcr.contextMetadataP->value = value;
@@ -246,7 +246,7 @@ static std::string metadataValue(std::string path, std::string value, ParseData*
 *
 * domainMetadata - 
 */
-static std::string domainMetadata(std::string path, std::string value, ParseData* reqDataP)
+static std::string domainMetadata(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Creating a reg metadata"));
 
@@ -265,7 +265,7 @@ static std::string domainMetadata(std::string path, std::string value, ParseData
 *
 * domainMetadataName - 
 */
-static std::string domainMetadataName(std::string path, std::string value, ParseData* reqDataP)
+static std::string domainMetadataName(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a reg metadata name: '%s'", value.c_str()));
   reqDataP->upcr.domainMetadataP->name = value;
@@ -279,7 +279,7 @@ static std::string domainMetadataName(std::string path, std::string value, Parse
 *
 * domainMetadataType - 
 */
-static std::string domainMetadataType(std::string path, std::string value, ParseData* reqDataP)
+static std::string domainMetadataType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a reg metadata type: '%s'", value.c_str()));
   reqDataP->upcr.domainMetadataP->type = value;
@@ -293,7 +293,7 @@ static std::string domainMetadataType(std::string path, std::string value, Parse
 *
 * domainMetadataValue - 
 */
-static std::string domainMetadataValue(std::string path, std::string value, ParseData* reqDataP)
+static std::string domainMetadataValue(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a reg metadata value: '%s'", value.c_str()));
   reqDataP->upcr.domainMetadataP->value = value;
@@ -307,7 +307,7 @@ static std::string domainMetadataValue(std::string path, std::string value, Pars
 *
 * updateAction - 
 */
-static std::string updateAction(std::string path, std::string value, ParseData* reqDataP)
+static std::string updateAction(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a registration id: '%s'", value.c_str()));
   reqDataP->upcr.res.updateActionType.set(value);

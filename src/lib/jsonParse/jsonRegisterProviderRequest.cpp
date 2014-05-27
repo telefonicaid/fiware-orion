@@ -33,7 +33,7 @@
 #include "jsonParse/jsonParse.h"
 #include "jsonParse/jsonRegisterProviderRequest.h"
 #include "jsonParse/JsonNode.h"
-#include "jsonParse/jsonNullTreat.h"
+#include "parse/nullTreat.h"
 #include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"
 
@@ -43,7 +43,7 @@
 *
 * contextMetadata - 
 */
-static std::string contextMetadata(std::string path, std::string value, ParseData* reqData)
+static std::string contextMetadata(const std::string& path, const std::string& value, ParseData* reqData)
 {
    LM_T(LmtParse, ("Got a metadata"));
    reqData->rpr.metadataP = new Metadata();
@@ -58,7 +58,7 @@ static std::string contextMetadata(std::string path, std::string value, ParseDat
 *
 * contextMetadataName - 
 */
-static std::string contextMetadataName(std::string path, std::string value, ParseData* reqData)
+static std::string contextMetadataName(const std::string& path, const std::string& value, ParseData* reqData)
 {
    LM_T(LmtParse, ("Got a metadata name '%s'", value.c_str()));
    reqData->rpr.metadataP->name = value;
@@ -71,7 +71,7 @@ static std::string contextMetadataName(std::string path, std::string value, Pars
 *
 * contextMetadataType - 
 */
-static std::string contextMetadataType(std::string path, std::string value, ParseData* reqData)
+static std::string contextMetadataType(const std::string& path, const std::string& value, ParseData* reqData)
 {
    LM_T(LmtParse, ("Got a metadata type '%s'", value.c_str()));
    reqData->rpr.metadataP->type = value;
@@ -85,7 +85,7 @@ static std::string contextMetadataType(std::string path, std::string value, Pars
 *
 * contextMetadataValue - 
 */
-static std::string contextMetadataValue(std::string path, std::string value, ParseData* reqData)
+static std::string contextMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
    LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
    reqData->rpr.metadataP->value = value;
@@ -98,7 +98,7 @@ static std::string contextMetadataValue(std::string path, std::string value, Par
 *
 * duration - 
 */
-static std::string duration(std::string path, std::string value, ParseData* reqData)
+static std::string duration(const std::string& path, const std::string& value, ParseData* reqData)
 {
    LM_T(LmtParse, ("Got a duration '%s'", value.c_str()));
    reqData->rpr.res.duration.set(value);
@@ -111,7 +111,7 @@ static std::string duration(std::string path, std::string value, ParseData* reqD
 *
 * providingApplication - 
 */
-static std::string providingApplication(std::string path, std::string value, ParseData* reqData)
+static std::string providingApplication(const std::string& path, const std::string& value, ParseData* reqData)
 {
    LM_T(LmtParse, ("Got a providingApplication '%s'", value.c_str()));
    reqData->rpr.res.providingApplication.set(value);
@@ -124,7 +124,7 @@ static std::string providingApplication(std::string path, std::string value, Par
 *
 * registrationId - 
 */
-static std::string registrationId(std::string path, std::string value, ParseData* reqData)
+static std::string registrationId(const std::string& path, const std::string& value, ParseData* reqData)
 {
    LM_T(LmtParse, ("Got a registrationId '%s'", value.c_str()));
    reqData->rpr.res.registrationId.set(value);

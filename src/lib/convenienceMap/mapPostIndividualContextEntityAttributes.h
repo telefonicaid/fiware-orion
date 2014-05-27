@@ -37,6 +37,6 @@
 *
 * mapPostIndividualContextEntityAttributes - 
 */
-extern HttpStatusCode mapPostIndividualContextEntityAttributes(std::string entityId, AppendContextElementRequest* request, AppendContextElementResponse* response, ConnectionInfo* ciP);
+extern HttpStatusCode mapPostIndividualContextEntityAttributes(const std::string& entityId, AppendContextElementRequest* request, AppendContextElementResponse* response, ConnectionInfo* ciP);
 
 #endif

@@ -40,7 +40,7 @@
 *
 * mongoQueryContext - 
 */
-HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResponse* responseP, std::string tenant)
+HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResponse* responseP, const std::string& tenant)
 {
     reqSemTake(__FUNCTION__, "ngsi10 query request");
 

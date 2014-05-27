@@ -47,15 +47,15 @@ public:
   std::string  tag;        // Help variable for the 'render' method
 
   EntityId();
-  EntityId(std::string _id, std::string _type, std::string _isPattern = "", std::string _tag = "entityId");
+  EntityId(const std::string& _id, const std::string& _type, const std::string& _isPattern = "", const std::string& _tag = "entityId");
 
-  void         tagSet(std::string tagName);
-  std::string  render(Format format, std::string indent, bool comma = false, bool isInVector = false, std::string assocTag = "");
-  std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void         fill(std::string _id, std::string _type, std::string _isPattern);
-  void         present(std::string indent, int ix);
+  void         tagSet(const std::string& tagName);
+  std::string  render(Format format, const std::string& indent, bool comma = false, bool isInVector = false, const std::string& assocTag = "");
+  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  void         fill(const std::string& _id, const std::string& _type, const std::string& _isPattern);
+  void         present(const std::string& indent, int ix);
   void         release(void);
-  std::string  toString(bool useIsPattern = false, std::string delimiter = ", ");
+  std::string  toString(bool useIsPattern = false, const std::string& delimiter = ", ");
 };
 
 #endif

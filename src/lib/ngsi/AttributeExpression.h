@@ -40,12 +40,12 @@ typedef struct AttributeExpression
 {
   std::string   string;
 
-  std::string   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void          set(std::string value);
+  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  void          set(const std::string& value);
   std::string   get(void);
   bool          isEmpty(void);
-  std::string   render(Format format, std::string indent, bool comma);
-  void          present(std::string indent);
+  std::string   render(Format format, const std::string& indent, bool comma);
+  void          present(const std::string& indent);
   const char*   c_str();
   void          release(void);
 } AttributeExpression;

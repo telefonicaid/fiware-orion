@@ -70,7 +70,7 @@ char  fwdHost[64];
 *
 * exitFunction - 
 */
-void exitFunction(int code, std::string reason)
+void exitFunction(int code, const std::string& reason)
 {
   LM_E(("Orion library asks to exit %d: '%s', but no exit is allowed inside unit tests", code, reason.c_str()));
 }

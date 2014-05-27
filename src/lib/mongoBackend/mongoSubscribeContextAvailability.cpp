@@ -41,7 +41,7 @@
 *
 * mongoSubscribeContextAvailability - 
 */
-HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityRequest* requestP, SubscribeContextAvailabilityResponse* responseP, Format inFormat, std::string tenant)
+HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityRequest* requestP, SubscribeContextAvailabilityResponse* responseP, Format inFormat, const std::string& tenant)
 {
     reqSemTake(__FUNCTION__, "ngsi9 subscribe request");
 

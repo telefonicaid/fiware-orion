@@ -33,6 +33,6 @@
 *
 * idCheck - 
 */
-extern std::string idCheck(std::string s);
+extern std::string idCheck(const std::string& s);
 
 #endif

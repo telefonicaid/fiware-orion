@@ -38,7 +38,7 @@
 *
 * mongoUnsubscribeContextAvailability - 
 */
-HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilityRequest* requestP, UnsubscribeContextAvailabilityResponse* responseP, std::string tenant)
+HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilityRequest* requestP, UnsubscribeContextAvailabilityResponse* responseP, const std::string& tenant)
 {
   reqSemTake(__FUNCTION__, "ngsi9 unsubscribe request");
 

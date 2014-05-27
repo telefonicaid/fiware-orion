@@ -43,7 +43,7 @@
 *
 * doNotification -
 */
-static void doNotification(OnIntervalThreadParams* params, std::string tenant) {
+static void doNotification(OnIntervalThreadParams* params, const std::string& tenant) {
 
     std::string err;
 

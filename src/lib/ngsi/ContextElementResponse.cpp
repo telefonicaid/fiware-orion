@@ -36,7 +36,7 @@
 *
 * ContextElementResponse::render - 
 */
-std::string ContextElementResponse::render(RequestType requestType, Format format, std::string indent, bool comma)
+std::string ContextElementResponse::render(RequestType requestType, Format format, const std::string& indent, bool comma)
 {
   std::string xmlTag   = "contextElementResponse";
   std::string jsonTag  = "contextElement";
@@ -68,7 +68,7 @@ void ContextElementResponse::release(void)
 *
 * ContextElementResponse::check - 
 */
-std::string ContextElementResponse::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ContextElementResponse::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string res;
 
@@ -84,7 +84,7 @@ std::string ContextElementResponse::check(RequestType requestType, Format format
 *
 * ContextElementResponse::present - 
 */
-void ContextElementResponse::present(std::string indent, int ix)
+void ContextElementResponse::present(const std::string& indent, int ix)
 {
    contextElement.present(indent, ix);
    statusCode.present(indent);

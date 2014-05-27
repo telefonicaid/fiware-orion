@@ -40,7 +40,7 @@
 *
 * mongoUpdateContextSubscription - 
 */
-HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* requestP, UpdateContextSubscriptionResponse* responseP, Format inFormat, std::string tenant)
+HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* requestP, UpdateContextSubscriptionResponse* responseP, Format inFormat, const std::string& tenant)
 {
   reqSemTake(__FUNCTION__, "ngsi10 update subscription request");
 

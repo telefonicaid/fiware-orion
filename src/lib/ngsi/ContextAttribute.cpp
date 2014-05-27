@@ -81,7 +81,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
 *
 * ContextAttribute::ContextAttribute - 
 */
-ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::string _value)
+ContextAttribute::ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value)
 {
    LM_T(LmtClone, ("Creating a ContextAttribute '%s':'%s':'%s', setting its compound to NULL", _name.c_str(), _type.c_str(), _value.c_str()));
    name                  = _name;
@@ -95,7 +95,7 @@ ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::st
 *
 * ContextAttribute::ContextAttribute -
 */
-ContextAttribute::ContextAttribute(std::string _name, std::string _type, orion::CompoundValueNode* _compoundValueP)
+ContextAttribute::ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP)
 {
   LM_T(LmtClone, ("Creating a ContextAttribute, maintaing a pointer to compound value (at %p)", _compoundValueP));
 
@@ -137,7 +137,7 @@ std::string ContextAttribute::getLocation()
 *
 * render - 
 */
-std::string ContextAttribute::render(Format format, std::string indent, bool comma)
+std::string ContextAttribute::render(Format format, const std::string& indent, bool comma)
 {
   std::string  out                    = "";
   std::string  xmlTag                 = "contextAttribute";
@@ -181,7 +181,7 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
 *
 * ContextAttribute::check - 
 */
-std::string ContextAttribute::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ContextAttribute::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   if (name == "")
     return "missing attribute name";
@@ -212,7 +212,7 @@ std::string ContextAttribute::check(RequestType requestType, Format format, std:
 *
 * ContextAttribute::present - 
 */
-void ContextAttribute::present(std::string indent, int ix)
+void ContextAttribute::present(const std::string& indent, int ix)
 {
   PRINTF("%sAttribute %d:\n",    indent.c_str(), ix);
   PRINTF("%s  Name:       %s\n", indent.c_str(), name.c_str());

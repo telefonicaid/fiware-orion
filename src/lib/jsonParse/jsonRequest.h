@@ -56,6 +56,6 @@ typedef struct JsonRequest
 *
 * jsonTreat - 
 */
-extern std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parseDataP, RequestType request, std::string payloadWord, JsonRequest** reqPP);
+extern std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parseDataP, RequestType request, const std::string& payloadWord, JsonRequest** reqPP);
 
 #endif

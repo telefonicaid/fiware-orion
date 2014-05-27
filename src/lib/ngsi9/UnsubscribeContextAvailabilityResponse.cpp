@@ -75,7 +75,7 @@ UnsubscribeContextAvailabilityResponse::~UnsubscribeContextAvailabilityResponse(
 *
 * UnsubscribeContextAvailabilityResponse::render - 
 */
-std::string UnsubscribeContextAvailabilityResponse::render(RequestType requestType, Format format, std::string indent)
+std::string UnsubscribeContextAvailabilityResponse::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "unsubscribeContextAvailabilityResponse";

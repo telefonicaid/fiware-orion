@@ -993,7 +993,7 @@ void sigHandler(int sigNo)
 *
 * orionExit - 
 */
-void orionExit(int code, std::string reason)
+void orionExit(int code, const std::string& reason)
 {
   LM_E((reason.c_str()));
   exit(code);

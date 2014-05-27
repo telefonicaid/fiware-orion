@@ -101,7 +101,7 @@ bool isFalse(const std::string& s)
 *
 * getTimer -
 */
-Timer* getTimer() {
+Timer* getTimer(void) {
     return timer;
 }
 
@@ -171,7 +171,7 @@ long long toSeconds(int value, char what, bool dayPart)
 * This is common code for Duration and Throttling (at least)
 *
 */
-long long parse8601(std::string s)
+long long parse8601(const std::string& s)
 {
     if (s == "")
         return -1;

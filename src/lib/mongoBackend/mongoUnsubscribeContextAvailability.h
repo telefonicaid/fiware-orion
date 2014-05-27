@@ -36,6 +36,6 @@
 *
 * mongoUnsubscribeContextAvailability - 
 */
-extern HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilityRequest* requestP, UnsubscribeContextAvailabilityResponse* responseP, std::string tenant = "");
+extern HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilityRequest* requestP, UnsubscribeContextAvailabilityResponse* responseP, const std::string& tenant = "");
 
 #endif

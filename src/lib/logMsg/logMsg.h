@@ -876,10 +876,10 @@ do {                                                                     \
 */
 #define LM_T(tLev, s)                                                         \
 do {                                                                          \
-  char* text;                                                                 \
-                                                                              \
   if ((!lmSilent) && lmOk('T', tLev) == LmsOk)                                \
   {                                                                           \
+    char* text;                                                               \
+                                                                              \
     if ((text = lmTextGet s) != NULL)                                         \
     {                                                                         \
       lmOut(text, 'T', __FILE__, __LINE__, (char*) __FUNCTION__, tLev, NULL); \

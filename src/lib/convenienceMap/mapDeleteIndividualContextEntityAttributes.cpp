@@ -39,7 +39,7 @@
 *
 * mapDeleteIndividualContextEntityAttributes - 
 */
-HttpStatusCode mapDeleteIndividualContextEntityAttributes(std::string entityId, StatusCode* response, ConnectionInfo* ciP)
+HttpStatusCode mapDeleteIndividualContextEntityAttributes(const std::string& entityId, StatusCode* response, ConnectionInfo* ciP)
 {
   HttpStatusCode         ms;
 

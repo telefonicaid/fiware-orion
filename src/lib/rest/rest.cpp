@@ -83,7 +83,7 @@ static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
-__thread char                    static_buffer[STATIC_BUFFER_SIZE];
+__thread char                    static_buffer[STATIC_BUFFER_SIZE + 1];
 
 
 
@@ -172,7 +172,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 *
 * wantedOutputSupported - 
 */
-static Format wantedOutputSupported(std::string acceptList, std::string* charsetP)
+static Format wantedOutputSupported(const std::string& acceptList, std::string* charsetP)
 {
   std::vector<std::string>  vec;
   char* copy;
@@ -342,8 +342,6 @@ static int outFormatCheck(ConnectionInfo* ciP)
 */
 static int contentTypeCheck(ConnectionInfo* ciP)
 {
-  std::string details = "";
-
   //
   // Four cases:
   //   1. If there is no payload, the Content-Type is not interesting
@@ -489,7 +487,7 @@ static int connectionTreat
       if (ciP->httpHeaders.contentLength <= PAYLOAD_MAX_SIZE)
       {
         if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
-          ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength);
+          ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
         else
           ciP->payload = static_buffer;
 
@@ -553,6 +551,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
+      // LM_V(("Starting HTTPS daemon on IPv4 %s port %d", bindIp, port));
       mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_SSL, // MHD_USE_SELECT_INTERNALLY
                                    htons(port),
                                    NULL,
@@ -640,17 +639,17 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 */
 void restInit
 (
-  RestService*       _restServiceV,
-  IpVersion          _ipVersion,
-  const char*        _bindAddress,
-  unsigned short     _port,
-  std::string        _multitenant,
-  std::string        _rushHost,
-  unsigned short     _rushPort,
-  const char*        _httpsKey,
-  const char*        _httpsCertificate,
-  RestServeFunction  _serveFunction,
-  bool               _acceptTextXml
+  RestService*        _restServiceV,
+  IpVersion           _ipVersion,
+  const char*         _bindAddress,
+  unsigned short      _port,
+  const std::string&  _multitenant,
+  const std::string&  _rushHost,
+  unsigned short      _rushPort,
+  const char*         _httpsKey,
+  const char*         _httpsCertificate,
+  RestServeFunction   _serveFunction,
+  bool                _acceptTextXml
 )
 {
   const char* key  = _httpsKey;

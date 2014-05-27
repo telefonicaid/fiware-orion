@@ -36,7 +36,7 @@
 *
 * UnsubscribeContextRequest::render - 
 */
-std::string UnsubscribeContextRequest::render(RequestType requestType, Format format, std::string indent)
+std::string UnsubscribeContextRequest::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "unsubscribeContextRequest";
@@ -54,7 +54,7 @@ std::string UnsubscribeContextRequest::render(RequestType requestType, Format fo
 *
 * UnsubscribeContextRequest::check - 
 */
-std::string UnsubscribeContextRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string UnsubscribeContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   UnsubscribeContextResponse  response;
   std::string                 res;
@@ -74,7 +74,7 @@ std::string UnsubscribeContextRequest::check(RequestType requestType, Format for
 *
 * UnsubscribeContextRequest::present - 
 */
-void UnsubscribeContextRequest::present(std::string indent)
+void UnsubscribeContextRequest::present(const std::string& indent)
 {
    subscriptionId.present(indent);
 }

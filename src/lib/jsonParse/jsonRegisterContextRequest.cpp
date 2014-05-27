@@ -34,7 +34,7 @@
 #include "ngsi/Metadata.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "jsonParse/JsonNode.h"
-#include "jsonParse/jsonNullTreat.h"
+#include "parse/nullTreat.h"
 #include "rest/ConnectionInfo.h"
 
 
@@ -43,7 +43,7 @@
 *
 * contextRegistration - 
 */
-static std::string contextRegistration(std::string path, std::string value, ParseData* reqDataP)
+static std::string contextRegistration(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   //LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
   reqDataP->rcr.crP = new ContextRegistration();
@@ -61,7 +61,7 @@ static std::string contextRegistration(std::string path, std::string value, Pars
 *
 * entityId - 
 */
-static std::string entityId(std::string path, std::string value, ParseData* reqDataP)
+static std::string entityId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
 
@@ -82,7 +82,7 @@ static std::string entityId(std::string path, std::string value, ParseData* reqD
 *
 * entityIdId - 
 */
-static std::string entityIdId(std::string path, std::string value, ParseData* reqDataP)
+static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
    reqDataP->rcr.entityIdP->id = value;
    LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->rcr.entityIdP->id.c_str()));
@@ -96,7 +96,7 @@ static std::string entityIdId(std::string path, std::string value, ParseData* re
 *
 * entityIdType - 
 */
-static std::string entityIdType(std::string path, std::string value, ParseData* reqDataP)
+static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
    reqDataP->rcr.entityIdP->type = value;
    LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->rcr.entityIdP->type.c_str()));
@@ -110,7 +110,7 @@ static std::string entityIdType(std::string path, std::string value, ParseData* 
 *
 * entityIdIsPattern - 
 */
-static std::string entityIdIsPattern(std::string path, std::string value, ParseData* reqDataP)
+static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
@@ -131,7 +131,7 @@ static std::string entityIdIsPattern(std::string path, std::string value, ParseD
 *
 * crAttribute - 
 */
-static std::string crAttribute(std::string path, std::string value, ParseData* reqDataP)
+static std::string crAttribute(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
 
@@ -148,7 +148,7 @@ static std::string crAttribute(std::string path, std::string value, ParseData* r
 *
 * craName - 
 */
-static std::string craName(std::string path, std::string value, ParseData* reqDataP)
+static std::string craName(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   reqDataP->rcr.attributeP->name = value;
   LM_T(LmtParse, ("Set 'name' to '%s' for a contextRegistrationAttribute", reqDataP->rcr.attributeP->name.c_str()));
@@ -162,7 +162,7 @@ static std::string craName(std::string path, std::string value, ParseData* reqDa
 *
 * craType - 
 */
-static std::string craType(std::string path, std::string value, ParseData* reqDataP)
+static std::string craType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   reqDataP->rcr.attributeP->type = value;
   LM_T(LmtParse, ("Set 'type' to '%s' for a contextRegistrationAttribute", reqDataP->rcr.attributeP->type.c_str()));
@@ -176,7 +176,7 @@ static std::string craType(std::string path, std::string value, ParseData* reqDa
 *
 * craIsDomain - 
 */
-static std::string craIsDomain(std::string path, std::string value, ParseData* reqDataP)
+static std::string craIsDomain(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   if (!isTrue(value) && !isFalse(value))
     return "invalid isDomain (boolean) value for context registration attribute: '" + value + "'";
@@ -193,7 +193,7 @@ static std::string craIsDomain(std::string path, std::string value, ParseData* r
 *
 * craMetadata - 
 */
-static std::string craMetadata(std::string path, std::string value, ParseData* reqDataP)
+static std::string craMetadata(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Creating a metadata"));
 
@@ -214,7 +214,7 @@ static std::string craMetadata(std::string path, std::string value, ParseData* r
 *
 * craMetadataName - 
 */
-static std::string craMetadataName(std::string path, std::string value, ParseData* reqDataP)
+static std::string craMetadataName(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a metadata name: '%s'", value.c_str()));
   reqDataP->rcr.attributeMetadataP->name = value;
@@ -228,7 +228,7 @@ static std::string craMetadataName(std::string path, std::string value, ParseDat
 *
 * craMetadataType - 
 */
-static std::string craMetadataType(std::string path, std::string value, ParseData* reqDataP)
+static std::string craMetadataType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a metadata type: '%s'", value.c_str()));
   reqDataP->rcr.attributeMetadataP->type = value;
@@ -242,7 +242,7 @@ static std::string craMetadataType(std::string path, std::string value, ParseDat
 *
 * craMetadataValue - 
 */
-static std::string craMetadataValue(std::string path, std::string value, ParseData* reqDataP)
+static std::string craMetadataValue(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a metadata value: '%s'", value.c_str()));
   reqDataP->rcr.attributeMetadataP->value = value;
@@ -256,7 +256,7 @@ static std::string craMetadataValue(std::string path, std::string value, ParseDa
 *
 * regMetadata - 
 */
-static std::string regMetadata(std::string path, std::string value, ParseData* reqDataP)
+static std::string regMetadata(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Creating a reg metadata"));
 
@@ -275,7 +275,7 @@ static std::string regMetadata(std::string path, std::string value, ParseData* r
 *
 * regMetadataName - 
 */
-static std::string regMetadataName(std::string path, std::string value, ParseData* reqDataP)
+static std::string regMetadataName(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a reg metadata name: '%s'", value.c_str()));
   reqDataP->rcr.registrationMetadataP->name = value;
@@ -289,7 +289,7 @@ static std::string regMetadataName(std::string path, std::string value, ParseDat
 *
 * regMetadataType - 
 */
-static std::string regMetadataType(std::string path, std::string value, ParseData* reqDataP)
+static std::string regMetadataType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a reg metadata type: '%s'", value.c_str()));
   reqDataP->rcr.registrationMetadataP->type = value;
@@ -303,7 +303,7 @@ static std::string regMetadataType(std::string path, std::string value, ParseDat
 *
 * regMetadataValue - 
 */
-static std::string regMetadataValue(std::string path, std::string value, ParseData* reqDataP)
+static std::string regMetadataValue(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a reg metadata value: '%s'", value.c_str()));
   reqDataP->rcr.registrationMetadataP->value = value;
@@ -317,7 +317,7 @@ static std::string regMetadataValue(std::string path, std::string value, ParseDa
 *
 * providingApplication - 
 */
-static std::string providingApplication(std::string path, std::string value, ParseData* reqDataP)
+static std::string providingApplication(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a providing application: '%s'", value.c_str()));
   reqDataP->rcr.crP->providingApplication.set(value);
@@ -331,7 +331,7 @@ static std::string providingApplication(std::string path, std::string value, Par
 *
 * duration - 
 */
-static std::string duration(std::string path, std::string value, ParseData* reqDataP)
+static std::string duration(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a duration: '%s'. Saving in %p", value.c_str(), &reqDataP->rcr.res.duration));
   reqDataP->rcr.res.duration.set(value);
@@ -345,7 +345,7 @@ static std::string duration(std::string path, std::string value, ParseData* reqD
 *
 * registrationId - 
 */
-static std::string registrationId(std::string path, std::string value, ParseData* reqDataP)
+static std::string registrationId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a registration id: '%s'", value.c_str()));
   reqDataP->rcr.res.registrationId.set(value);

@@ -33,7 +33,7 @@
 #include "jsonParse/jsonParse.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonUpdateContextAttributeRequest.h"
-#include "jsonParse/jsonNullTreat.h"
+#include "parse/nullTreat.h"
 #include "rest/ConnectionInfo.h"
 
 
@@ -42,7 +42,7 @@
 *
 * attributeType - 
 */
-static std::string attributeType(std::string path, std::string value, ParseData* reqData)
+static std::string attributeType(const std::string& path, const std::string& value, ParseData* reqData)
 {
   reqData->upcar.res.type = value;
 
@@ -55,7 +55,7 @@ static std::string attributeType(std::string path, std::string value, ParseData*
 *
 * attributeValue - 
 */
-static std::string attributeValue(std::string path, std::string value, ParseData* reqData)
+static std::string attributeValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
   reqData->upcar.res.contextValue = value;
 
@@ -68,7 +68,7 @@ static std::string attributeValue(std::string path, std::string value, ParseData
 *
 * contextMetadata - 
 */
-static std::string contextMetadata(std::string path, std::string value, ParseData* reqData)
+static std::string contextMetadata(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Creating a metadata"));
   reqData->upcar.metadataP = new Metadata();
@@ -82,7 +82,7 @@ static std::string contextMetadata(std::string path, std::string value, ParseDat
 *
 * contextMetadataName - 
 */
-static std::string contextMetadataName(std::string path, std::string value, ParseData* reqData)
+static std::string contextMetadataName(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata name: '%s'", value.c_str()));
   reqData->upcar.metadataP->name = value;
@@ -95,7 +95,7 @@ static std::string contextMetadataName(std::string path, std::string value, Pars
 *
 * contextMetadataType - 
 */
-static std::string contextMetadataType(std::string path, std::string value, ParseData* reqData)
+static std::string contextMetadataType(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata type: '%s'", value.c_str()));
   reqData->upcar.metadataP->type = value;
@@ -108,7 +108,7 @@ static std::string contextMetadataType(std::string path, std::string value, Pars
 *
 * contextMetadataValue - 
 */
-static std::string contextMetadataValue(std::string path, std::string value, ParseData* reqData)
+static std::string contextMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata value: '%s'", value.c_str()));
   reqData->upcar.metadataP->value = value;

@@ -36,7 +36,7 @@
 *
 * startTag -  
 */
-std::string startTag(std::string indent, std::string tagName, Format format, bool showTag)
+std::string startTag(const std::string& indent, const std::string& tagName, Format format, bool showTag)
 {
   if (format == XML)
      return indent + "<" + tagName + ">\n";
@@ -57,7 +57,7 @@ std::string startTag(std::string indent, std::string tagName, Format format, boo
 *
 * startTag -  
 */
-std::string startTag(std::string indent, std::string xmlTag, std::string jsonTag, Format format, bool isVector, bool showTag, bool isCompoundVector)
+std::string startTag(const std::string& indent, const std::string& xmlTag, const std::string& jsonTag, Format format, bool isVector, bool showTag, bool isCompoundVector)
 {
   if (format == XML)
   {
@@ -87,7 +87,7 @@ std::string startTag(std::string indent, std::string xmlTag, std::string jsonTag
 *
 * endTag -  
 */
-std::string endTag(std::string indent, std::string tagName, Format format, bool comma, bool isVector, bool nl)
+std::string endTag(const std::string& indent, const std::string& tagName, Format format, bool comma, bool isVector, bool nl)
 {
   if (format == XML)
     return indent + "</" + tagName + ">\n";
@@ -107,7 +107,7 @@ std::string endTag(std::string indent, std::string tagName, Format format, bool 
 *
 * valueTag -  
 */
-std::string valueTag(std::string indent, std::string tagName, std::string value, Format format, bool showComma, bool isAssociation, bool isVectorElement)
+std::string valueTag(const std::string& indent, const std::string& tagName, const std::string& value, Format format, bool showComma, bool isAssociation, bool isVectorElement)
 {
   if (format == XML)
     return indent + "<" + tagName + ">" + value + "</" + tagName + ">" + "\n";
@@ -137,7 +137,7 @@ std::string valueTag(std::string indent, std::string tagName, std::string value,
 *
 * valueTag -  
 */
-std::string valueTag(std::string indent, std::string tagName, int value, Format format, bool showComma, bool isAssociation)
+std::string valueTag(const std::string& indent, const std::string& tagName, int value, Format format, bool showComma, bool isAssociation)
 {
    char val[32];
 
@@ -158,7 +158,7 @@ std::string valueTag(std::string indent, std::string tagName, int value, Format 
 *
 * valueTag -  
 */
-std::string valueTag(std::string indent, std::string xmlTag, std::string jsonTag, std::string value, Format format, bool showComma, bool isAssociation)
+std::string valueTag(const std::string& indent, const std::string& xmlTag, const std::string& jsonTag, const std::string& value, Format format, bool showComma, bool isAssociation)
 {
    if (format == XML)
      return indent + "<" + xmlTag + ">" + value + "</" + xmlTag + ">" + "\n";

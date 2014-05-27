@@ -44,7 +44,7 @@
 *
 * Payload: UpdateContextAttributeRequest
 */
-std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   UpdateContextRequest            request;
   UpdateContextResponse           response;

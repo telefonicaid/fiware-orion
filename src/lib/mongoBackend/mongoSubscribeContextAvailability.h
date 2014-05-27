@@ -37,6 +37,6 @@
 *
 * mongoSubscribeContextAvailability - 
 */
-extern HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityRequest* requestP, SubscribeContextAvailabilityResponse* responseP, Format inFormat = XML, std::string tenant = "");
+extern HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityRequest* requestP, SubscribeContextAvailabilityResponse* responseP, Format inFormat = XML, const std::string& tenant = "");
 
 #endif

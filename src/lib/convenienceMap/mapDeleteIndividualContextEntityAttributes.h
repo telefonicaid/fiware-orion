@@ -36,6 +36,6 @@
 *
 * mapDeleteIndividualContextEntityAttributes - 
 */
-extern HttpStatusCode mapDeleteIndividualContextEntityAttributes(std::string entityId, StatusCode* response, ConnectionInfo* ciP);
+extern HttpStatusCode mapDeleteIndividualContextEntityAttributes(const std::string& entityId, StatusCode* response, ConnectionInfo* ciP);
 
 #endif

@@ -35,7 +35,7 @@
 *
 * mongoNofityContextAvailability -
 */
-HttpStatusCode mongoNotifyContextAvailability(NotifyContextAvailabilityRequest* requestP, NotifyContextAvailabilityResponse* responseP, std::string tenant) {
+HttpStatusCode mongoNotifyContextAvailability(NotifyContextAvailabilityRequest* requestP, NotifyContextAvailabilityResponse* responseP, const std::string& tenant) {
 
     reqSemTake(__FUNCTION__, "mongo ngsi9 notification");
 

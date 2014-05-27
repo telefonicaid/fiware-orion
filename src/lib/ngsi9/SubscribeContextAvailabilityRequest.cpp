@@ -53,7 +53,7 @@ SubscribeContextAvailabilityRequest::SubscribeContextAvailabilityRequest()
 *
 * SubscribeContextAvailabilityRequest::render - 
 */
-std::string SubscribeContextAvailabilityRequest::render(RequestType requestType, Format format, std::string indent)
+std::string SubscribeContextAvailabilityRequest::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string out                      = "";
   std::string tag                      = "subscribeContextAvailabilityRequest";
@@ -80,7 +80,7 @@ std::string SubscribeContextAvailabilityRequest::render(RequestType requestType,
 *
 * SubscribeContextAvailabilityRequest::check - 
 */
-std::string SubscribeContextAvailabilityRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string SubscribeContextAvailabilityRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   SubscribeContextAvailabilityResponse response;
   std::string                          res;
@@ -122,7 +122,7 @@ void SubscribeContextAvailabilityRequest::release(void)
 *
 * SubscribeContextAvailabilityRequest::present - 
 */
-void SubscribeContextAvailabilityRequest::present(std::string indent)
+void SubscribeContextAvailabilityRequest::present(const std::string& indent)
 {
    entityIdVector.present(indent);
    attributeList.present(indent);

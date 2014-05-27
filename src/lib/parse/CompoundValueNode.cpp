@@ -81,7 +81,7 @@ CompoundValueNode::CompoundValueNode(Type _type)
 *
 * CompoundValueNode - constructor for all nodes except toplevel
 */
-CompoundValueNode::CompoundValueNode(CompoundValueNode* _container, std::string _path, std::string _name, std::string _value, int _siblingNo, Type _type, int _level)
+CompoundValueNode::CompoundValueNode(CompoundValueNode* _container, const std::string& _path, const std::string& _name, const std::string& _value, int _siblingNo, Type _type, int _level)
 {
   container = _container;
   rootP     = container->rootP;
@@ -198,7 +198,7 @@ CompoundValueNode* CompoundValueNode::add(const Type _type, const std::string& _
 *
 * shortShow - 
 */
-void CompoundValueNode::shortShow(std::string indent)
+void CompoundValueNode::shortShow(const std::string& indent)
 {
   if ((rootP == this) && (type == Vector))
     LM_F(("%s%s (toplevel vector)", indent.c_str(), name.c_str()));
@@ -221,7 +221,7 @@ void CompoundValueNode::shortShow(std::string indent)
 *
 * show - 
 */
-void CompoundValueNode::show(std::string indent)
+void CompoundValueNode::show(const std::string& indent)
 {
 
   if (name != "")
@@ -320,7 +320,7 @@ void CompoundValueNode::check(void)
 *
 * render - 
 */
-std::string CompoundValueNode::render(Format format, std::string indent)
+std::string CompoundValueNode::render(Format format, const std::string& indent)
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;

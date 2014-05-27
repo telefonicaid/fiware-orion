@@ -49,7 +49,7 @@ void ContextElementVector::push_back(ContextElement* item)
 *
 * ContextElementVector::render - 
 */
-std::string ContextElementVector::render(RequestType requestType, Format format, std::string indent, bool comma)
+std::string ContextElementVector::render(RequestType requestType, Format format, const std::string& indent, bool comma)
 {
   std::string  out     = "";
   std::string  xmlTag  = "contextElementList";
@@ -74,7 +74,7 @@ std::string ContextElementVector::render(RequestType requestType, Format format,
 *
 * ContextElementVector::present - 
 */
-void ContextElementVector::present(std::string indent)
+void ContextElementVector::present(const std::string& indent)
 {
    PRINTF("%lu ContextElements", (unsigned long) vec.size());
 
@@ -127,7 +127,7 @@ unsigned int ContextElementVector::size(void)
 *
 * ContextElementVector::check - 
 */
-std::string ContextElementVector::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ContextElementVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   if (requestType == UpdateContext)
   {

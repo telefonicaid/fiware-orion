@@ -34,7 +34,7 @@
 *
 * mongoNofityContext -
 */
-HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextResponse* responseP, std::string tenant) {
+HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextResponse* responseP, const std::string& tenant) {
 
     reqSemTake(__FUNCTION__, "ngsi10 notification");
 

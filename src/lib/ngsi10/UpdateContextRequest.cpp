@@ -51,7 +51,7 @@ void UpdateContextRequest::init(void)
 *
 * UpdateContextRequest::render - 
 */
-std::string UpdateContextRequest::render(RequestType requestType, Format format, std::string indent)
+std::string UpdateContextRequest::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string  out = "";
   std::string  tag = "updateContextRequest";
@@ -73,7 +73,7 @@ std::string UpdateContextRequest::render(RequestType requestType, Format format,
 *
 * UpdateContextRequest::check - 
 */
-std::string UpdateContextRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string UpdateContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string            res;
   UpdateContextResponse  response;
@@ -111,7 +111,7 @@ void UpdateContextRequest::release(void)
 *
 * UpdateContextRequest::present - 
 */
-void UpdateContextRequest::present(std::string indent)
+void UpdateContextRequest::present(const std::string& indent)
 {
   if (!lmTraceIsSet(LmtDump))
     return;

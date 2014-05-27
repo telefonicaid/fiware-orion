@@ -36,7 +36,7 @@
 *
 * postUpdateContext - 
 */
-std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   UpdateContextResponse  upcr;
   std::string            answer;

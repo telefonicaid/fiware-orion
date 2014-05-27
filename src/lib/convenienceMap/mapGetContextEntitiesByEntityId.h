@@ -37,6 +37,6 @@
 *
 * mapGetContextEntitiesByEntityId - 
 */
-extern HttpStatusCode mapGetContextEntitiesByEntityId(std::string id, DiscoverContextAvailabilityResponse* response, ConnectionInfo* ciP);
+extern HttpStatusCode mapGetContextEntitiesByEntityId(const std::string& id, DiscoverContextAvailabilityResponse* response, ConnectionInfo* ciP);
 
 #endif

@@ -109,7 +109,7 @@ public:
    // Constructors/Destructors   
    CompoundValueNode();
    CompoundValueNode(Type _type);
-   CompoundValueNode(CompoundValueNode* _container, std::string _path, std::string _name, std::string _value, int _siblingNo, Type _type, int _level = -1);
+   CompoundValueNode(CompoundValueNode* _container, const std::string& _path, const std::string& _name, const std::string& _value, int _siblingNo, Type _type, int _level = -1);
    ~CompoundValueNode();
 
    CompoundValueNode*  clone(void);
@@ -117,11 +117,11 @@ public:
    CompoundValueNode*  add(const Type _type, const std::string& _name, const std::string& _value = "");
    void                check(void);
    std::string         finish(void);
-   std::string         render(Format format, std::string indent);
+   std::string         render(Format format, const std::string& indent);
 
    static const char*  typeName(const Type _type);
-   void                shortShow(std::string indent);
-   void                show(std::string indent);
+   void                shortShow(const std::string& indent);
+   void                show(const std::string& indent);
 
    bool                isVector(void)   { return (type == Vector); }
    bool                isObject(void)   { return (type == Object); }

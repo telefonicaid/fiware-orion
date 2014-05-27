@@ -31,7 +31,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "jsonParse/JsonNode.h"
-#include "jsonParse/jsonNullTreat.h"
+#include "parse/nullTreat.h"
 #include "jsonParse/jsonNotifyContextAvailabilityRequest.h"
 
 #include "rest/ConnectionInfo.h"
@@ -42,7 +42,7 @@
 *
 * subscriptionId - 
 */
-static std::string subscriptionId(std::string path, std::string value, ParseData* parseDataP)
+static std::string subscriptionId(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a subscriptionId: '%s'", value.c_str()));
   parseDataP->ncar.res.subscriptionId.set(value);
@@ -55,7 +55,7 @@ static std::string subscriptionId(std::string path, std::string value, ParseData
 *
 * contextRegistrationResponse - 
 */
-static std::string contextRegistrationResponse(std::string path, std::string value, ParseData* parseDataP)
+static std::string contextRegistrationResponse(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a contextRegistrationResponse"));
 
@@ -71,7 +71,7 @@ static std::string contextRegistrationResponse(std::string path, std::string val
 *
 * entityId - 
 */
-static std::string entityId(std::string path, std::string value, ParseData* parseDataP)
+static std::string entityId(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId"));
 
@@ -87,7 +87,7 @@ static std::string entityId(std::string path, std::string value, ParseData* pars
 *
 * entityIdId - 
 */
-static std::string entityIdId(std::string path, std::string value, ParseData* parseDataP)
+static std::string entityIdId(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId.Id: '%s'", value.c_str()));
 
@@ -101,7 +101,7 @@ static std::string entityIdId(std::string path, std::string value, ParseData* pa
 *
 * entityIdType - 
 */
-static std::string entityIdType(std::string path, std::string value, ParseData* parseDataP)
+static std::string entityIdType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId.Type: '%s'", value.c_str()));
 
@@ -115,7 +115,7 @@ static std::string entityIdType(std::string path, std::string value, ParseData* 
 *
 * entityIdIsPattern - 
 */
-static std::string entityIdIsPattern(std::string path, std::string value, ParseData* parseDataP)
+static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId.IsPattern: '%s'", value.c_str()));
 
@@ -129,7 +129,7 @@ static std::string entityIdIsPattern(std::string path, std::string value, ParseD
 *
 * attribute - 
 */
-static std::string attribute(std::string path, std::string value, ParseData* parseDataP)
+static std::string attribute(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("got an attribute"));
 
@@ -144,7 +144,7 @@ static std::string attribute(std::string path, std::string value, ParseData* par
 *
 * attributeName - 
 */
-static std::string attributeName(std::string path, std::string value, ParseData* parseDataP)
+static std::string attributeName(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("got an attributeName: '%s'", value.c_str()));
 
@@ -158,7 +158,7 @@ static std::string attributeName(std::string path, std::string value, ParseData*
 *
 * attributeType - 
 */
-static std::string attributeType(std::string path, std::string value, ParseData* parseDataP)
+static std::string attributeType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("got an attributeType: '%s'", value.c_str()));
 
@@ -172,7 +172,7 @@ static std::string attributeType(std::string path, std::string value, ParseData*
 *
 * attributeIsDomain - 
 */
-static std::string attributeIsDomain(std::string path, std::string value, ParseData* parseDataP)
+static std::string attributeIsDomain(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("got an attributeIsDomain: '%s'", value.c_str()));
 
@@ -186,7 +186,7 @@ static std::string attributeIsDomain(std::string path, std::string value, ParseD
 *
 * attributeMetadata - 
 */
-static std::string attributeMetadata(std::string path, std::string value, ParseData* parseDataP)
+static std::string attributeMetadata(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeMetadata: '%s'", value.c_str()));
 
@@ -202,7 +202,7 @@ static std::string attributeMetadata(std::string path, std::string value, ParseD
 *
 * attributeMetadataName - 
 */
-static std::string attributeMetadataName(std::string path, std::string value, ParseData* parseDataP)
+static std::string attributeMetadataName(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeMetadataName: '%s'", value.c_str()));
   parseDataP->ncar.attributeMetadataP->name = value;
@@ -215,7 +215,7 @@ static std::string attributeMetadataName(std::string path, std::string value, Pa
 *
 * attributeMetadataType - 
 */
-static std::string attributeMetadataType(std::string path, std::string value, ParseData* parseDataP)
+static std::string attributeMetadataType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeMetadataType: '%s'", value.c_str()));
   parseDataP->ncar.attributeMetadataP->type = value;
@@ -228,7 +228,7 @@ static std::string attributeMetadataType(std::string path, std::string value, Pa
 *
 * attributeMetadataValue - 
 */
-static std::string attributeMetadataValue(std::string path, std::string value, ParseData* parseDataP)
+static std::string attributeMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeMetadataValue: '%s'", value.c_str()));
   parseDataP->ncar.attributeMetadataP->value = value;
@@ -241,7 +241,7 @@ static std::string attributeMetadataValue(std::string path, std::string value, P
 *
 * registrationMetadata - 
 */
-static std::string registrationMetadata(std::string path, std::string value, ParseData* parseDataP)
+static std::string registrationMetadata(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a registrationMetadata: '%s'", value.c_str()));
   parseDataP->ncar.regMetadataP = new Metadata();
@@ -256,7 +256,7 @@ static std::string registrationMetadata(std::string path, std::string value, Par
 *
 * registrationMetadataName - 
 */
-static std::string registrationMetadataName(std::string path, std::string value, ParseData* parseDataP)
+static std::string registrationMetadataName(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a registrationMetadataName: '%s'", value.c_str()));
   parseDataP->ncar.regMetadataP->name = value;
@@ -269,7 +269,7 @@ static std::string registrationMetadataName(std::string path, std::string value,
 *
 * registrationMetadataType - 
 */
-static std::string registrationMetadataType(std::string path, std::string value, ParseData* parseDataP)
+static std::string registrationMetadataType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a registrationMetadataType: '%s'", value.c_str()));
   parseDataP->ncar.regMetadataP->type = value;
@@ -282,7 +282,7 @@ static std::string registrationMetadataType(std::string path, std::string value,
 *
 * registrationMetadataValue - 
 */
-static std::string registrationMetadataValue(std::string path, std::string value, ParseData* parseDataP)
+static std::string registrationMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a registrationMetadataValue: '%s'", value.c_str()));
   parseDataP->ncar.regMetadataP->value = value;
@@ -295,7 +295,7 @@ static std::string registrationMetadataValue(std::string path, std::string value
 *
 * providingApplication - 
 */
-static std::string providingApplication(std::string path, std::string value, ParseData* parseDataP)
+static std::string providingApplication(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a providingApplication: '%s'", value.c_str()));
 

@@ -28,11 +28,12 @@
 #include <string>
 
 
+struct ParseData;
 
 /* ****************************************************************************
 *
 * jsonNullTreat - 
 */
-extern std::string jsonNullTreat(std::string path, std::string value, void* reqDataP);
+extern std::string jsonNullTreat(const std::string& path, const std::string& value, ParseData* reqDataP);
 
 #endif

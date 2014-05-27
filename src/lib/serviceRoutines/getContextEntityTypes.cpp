@@ -39,7 +39,7 @@
 *
 * getContextEntityTypes - 
 */
-std::string getContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string getContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string                          typeName     = compV[2];
   std::string                          answer;

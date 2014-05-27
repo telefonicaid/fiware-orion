@@ -40,7 +40,7 @@
 *
 * getIndividualContextEntityAttributes - 
 */
-std::string getIndividualContextEntityAttributes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string getIndividualContextEntityAttributes(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string             answer;
   std::string             entityId = compV[2];

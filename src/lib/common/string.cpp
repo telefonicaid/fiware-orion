@@ -40,7 +40,7 @@
 *
 * checkGroupIPv6 -
 */
-bool checkGroupIPv6(std::string in)
+static bool checkGroupIPv6(std::string in)
 {
   // Can receive for example:
   // :, 2001:, db8:, 0DB8:
@@ -52,7 +52,7 @@ bool checkGroupIPv6(std::string in)
   if (in.length() > 5) return false;
 
   bool resu = true;
-  for (uint i=0; i < in.length() - 1 ; i++) 
+  for (uint i = 0; i < in.length() - 1 ; i++) 
   {
      if (isxdigit(in[i]) == false)
      {
@@ -68,7 +68,7 @@ bool checkGroupIPv6(std::string in)
 *
 * isIPv6 -
 */
-bool isIPv6(std::string in)
+bool isIPv6(const std::string& in)
 {
    // An IP v6 have between two and seven character ":"
    //  ::
@@ -87,7 +87,7 @@ bool isIPv6(std::string in)
       partip = staux.substr(0, pos+1);
       resu += partip;
 
-      if (checkGroupIPv6(partip)== false)
+      if (checkGroupIPv6(partip) == false)
          return false;
 
       partip = staux.substr(pos+1);
@@ -103,7 +103,7 @@ bool isIPv6(std::string in)
 *
 * getIPv6Port -
 */
-bool getIPv6Port(std::string in, std::string& outIp, std::string& outPort)
+bool getIPv6Port(const std::string& in, std::string& outIp, std::string& outPort)
 {
    size_t pos; 
    std::string partip;
@@ -136,7 +136,7 @@ bool getIPv6Port(std::string in, std::string& outIp, std::string& outPort)
 *
 * stringSplit - 
 */
-int stringSplit(std::string in, char delimiter, std::vector<std::string>& outV)
+int stringSplit(const std::string& in, char delimiter, std::vector<std::string>& outV)
 {
   char* s          = strdup(in.c_str());
   char* toFree     = s;
@@ -194,7 +194,7 @@ int stringSplit(std::string in, char delimiter, std::vector<std::string>& outV)
 * argument is not a valid URL. Otherwise, it returns true.
 *
 */
-bool parseUrl(std::string url, std::string& host, int& port, std::string& path, std::string& protocol)
+bool parseUrl(const std::string& url, std::string& host, int& port, std::string& path, std::string& protocol)
 {
     /* Sanity check */
     if (url == "") {
@@ -342,7 +342,7 @@ bool onlyWs(const char* s)
 *
 * string2coords - 
 */
-bool string2coords(std::string s, double& latitude, double& longitude)
+bool string2coords(const std::string& s, double& latitude, double& longitude)
 {
   char* initial = strdup(s.c_str());
   char* cP      = initial;
@@ -412,7 +412,7 @@ void coords2string(std::string& s, double latitude, double longitude, int decima
 *
 * versionParse -
 */
-bool versionParse(std::string version, int& mayor, int& minor, std::string& bugFix)
+bool versionParse(const std::string& version, int& mayor, int& minor, std::string& bugFix)
 {
    char* copy = strdup(version.c_str());
    char* s    = wsStrip(copy);

@@ -42,7 +42,7 @@
 *
 * DELETE /ngsi10/contextEntities/{entityID}/attributes/{attributeName}/{valueID}
 */
-std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   UpdateContextRequest            request;
   UpdateContextResponse           response;
