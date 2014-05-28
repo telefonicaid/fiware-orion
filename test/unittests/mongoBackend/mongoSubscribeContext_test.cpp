@@ -35,6 +35,7 @@
 #include "ngsi/NotifyCondition.h"
 
 #include "mongo/client/dbclient.h"
+#include "rest/uriParamNames.h"
 
 
 
@@ -431,9 +432,9 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T1_C0_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    uriParams["notifyFormat"] = "JSON";
+    uriParams[URI_PARAM_NOTIFY_FORMAT] = "JSON";
     ms = mongoSubscribeContext(&req, &res, "", uriParams);
-    uriParams["notifyFormat"] = "XML";
+    uriParams[URI_PARAM_NOTIFY_FORMAT] = "XML";
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3894,7 +3895,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_C1_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    uriParams["notifyFormat"] = "JSON";
+    uriParams[URI_PARAM_NOTIFY_FORMAT] = "JSON";
     ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
@@ -3963,7 +3964,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_C1)
     //
     // FIXME P2: Call utInit/utExit IN ALL THESE TESTS !!!
     //           This line saves all the tests in this file.
-    uriParams["notifyFormat"] = "XML";
+    uriParams[URI_PARAM_NOTIFY_FORMAT] = "XML";
     
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
