@@ -135,7 +135,7 @@ fi
 
 # ------------------------------------------------------------------------------
 #
-# Preparations
+# Preparations - cd to the test directory
 #
 if [ ! -d $dir ]
 then
@@ -147,7 +147,7 @@ cd $dir
 
 # ------------------------------------------------------------------------------
 #
-# Number of test cases
+# Preparations - number of test cases
 #
 fileList=$(find . -name "$testFilter" | sort | sed 's/^.\///')
 typeset -i noOfTests
@@ -219,6 +219,42 @@ function fileCreation()
     sed -n '/--SHELL-INIT--/,/^--/p' $path  | grep -v "^--" > $TEST_SHELL_INIT
   else
     errorMsg "($path): --SHELL-INIT-- part is missing"
+  fi
+
+  #
+  # Extract the test shell script
+  #
+  if [ $(grep "\-\-SHELL\-\-" $path | wc -l) -eq 1 ]
+  then
+    TEST_SHELL=${filename}.shell
+    vMsg "Creating $TEST_SHELL at $PWD"
+    sed -n '/--SHELL--/,/^--/p' $path  | grep -v "^--" > $TEST_SHELL
+  else
+    errorMsg "($path): --SHELL-- part is missing"
+  fi
+
+  #
+  # Extract the REGEXPECT part
+  #
+  if [ $(grep "\-\-REGEXPECT\-\-" $path | wc -l) -eq 1 ]
+  then
+    TEST_REGEXPECT=${filename}.regexpect
+    vMsg "Creating $TEST_REGEXPECT at $PWD"
+    sed -n '/--REGEXPECT--/,/^--/p' $path  | grep -v "^--" > $TEST_REGEXPECT
+  else
+    errorMsg "($path): --REGEXPECT-- part is missing"
+  fi
+
+  #
+  # Extract the teardown script
+  #
+  if [ $(grep "\-\-TEARDOWN\-\-" $path | wc -l) -eq 1 ]
+  then
+    TEST_TEARDOWN=${filename}.teardown
+    vMsg "Creating $TEST_TEARDOWN at $PWD"
+    sed -n '/--TEARDOWN--/,/^--/p' $path  | grep -v "^--" > $TEST_TEARDOWN
+  else
+    errorMsg "($path): --TEARDOWN-- part is missing"
   fi
 }
 
