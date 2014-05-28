@@ -2004,7 +2004,9 @@ def CheckBraces(filename, clean_lines, linenum, error):
 
 
   #
-  # Removed by KZ
+  # Removed by KZ - this is the 'a start bracket must not be on a new line'
+  #                 IMHO this is crazy. Something invented by authors of books to save
+  #                 paper. No need for this in a file.
   #
   # if Match(r'\s*{\s*$', line):
     # We allow an open brace to start a line in the case where someone
@@ -2020,7 +2022,7 @@ def CheckBraces(filename, clean_lines, linenum, error):
 
   # An else clause should be on the same line as the preceding closing brace.
   #
-  # Removed by KZ
+  # Removed by KZ - '} else {'  is just TOO UGLY. My eyes bleed
   #
   #if Match(r'\s*else\s*', line):
   #  prevline = GetPreviousNonBlankLine(clean_lines, linenum)[0]
@@ -2236,7 +2238,12 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, class_state,
   # The "$Id:...$" comment may also get very long without it being the
   # developers fault.
   #
-  # Changed by KZ from 100/80 to 150/120
+  # Changed by KZ from 100/80 to 150/120 - A long long time ago when we were
+  #               working with monochrome monitors and without X-Windows, this
+  #               rule with 80 chars was good. Today ... we have Full HD displays 
+  #               and scrollbars.
+  #               Splitting lines in various lines sometimes make the code hard to read.
+  #               
   #
   if (not line.startswith('#include') and not is_header_guard and
       not Match(r'^\s*//.*http(s?)://\S*$', line) and
@@ -2860,7 +2867,8 @@ def CheckCStyleCast(filename, linenum, line, raw_line, cast_type, pattern,
 
   # At this point, all that should be left is actual casts.
   #
-  # Removed by KZ
+  # Removed by KZ - I have nothing against these C++ typecasts
+  #                 but the compiler gave me problems.
   #
   # error(filename, linenum, 'readability/casting', 4,
   #       'Using C-style cast.  Use %s<%s>(...) instead' %
