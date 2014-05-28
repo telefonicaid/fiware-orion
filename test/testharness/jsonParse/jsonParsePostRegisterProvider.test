@@ -23,13 +23,13 @@
 --NAME--
 JSON Parse Post RegisterProvider
 --SHELL-INIT--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 echo "1: ***********************************"
 url="/ngsi9/contextEntities/Room1"
@@ -87,5 +87,5 @@ Date: REGEX(.*)
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 --TEARDOWN--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 brokerStop CB

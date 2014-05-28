@@ -23,13 +23,13 @@
 --NAME--
 JSON Parse ContextEntityAttributes
 --SHELL-INIT--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 # Make a registration using conv op /NGSI9/contextEntities/ENTITY_ID/attributes
 echo "1: ++++++++++++++++++++"
@@ -251,5 +251,5 @@ Date: REGEX(.*)
 
 9: ++++++++++++++++++++
 --TEARDOWN--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 brokerStop CB

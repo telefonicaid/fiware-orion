@@ -23,13 +23,13 @@
 --NAME--
 JSON Parse Post UpdateContext
 --SHELL-INIT--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 echo "1: ***********************************"
 
 url="/NGSI10/updateContext"
@@ -257,5 +257,5 @@ Date: REGEX(.*)
 }
 4: ***********************************
 --TEARDOWN--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 brokerStop CB

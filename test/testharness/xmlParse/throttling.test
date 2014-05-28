@@ -23,13 +23,13 @@
 --NAME--
 XML throttling
 --SHELL-INIT--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 echo "1: +++++++++++++++++++++++++++++"
 
@@ -95,5 +95,5 @@ Date: REGEX(.*)
 </subscribeContextResponse>
 3: +++++++++++++++++++++++++++++
 --TEARDOWN--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 brokerStop CB

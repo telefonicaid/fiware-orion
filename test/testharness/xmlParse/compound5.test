@@ -23,13 +23,13 @@
 --NAME--
 Compound Values for UpdateContextRequest 5
 --SHELL-INIT--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB 0-1
 
 --SHELL--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 #   5. ok:  contextValue is a vector with one item
 echo "5: +++++++++++++++++++++++++++++++++"
@@ -87,5 +87,5 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 --TEARDOWN--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 brokerStop CB

@@ -39,7 +39,7 @@ then
   exit 1
 fi
 
-
+export CONTEXTBROKER_HARNESS_FUNCTIONS_SOURCED="YES"
 
 # ------------------------------------------------------------------------------
 #
@@ -556,4 +556,3 @@ function dbInsertEntity()
 
   echo "$jsCode ; $ent ; $doc ; $cmd" | mongo $db
 }
-

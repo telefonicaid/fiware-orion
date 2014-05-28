@@ -23,13 +23,13 @@
 --NAME--
 JSON Parse BadVerb DiscoverContextAvailability
 --SHELL-INIT--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 echo "+++++ Starting +++++++++++++++"
 url="/NGSI9/registerContext"
@@ -132,5 +132,5 @@ Date: REGEX(.*)
 
 +++++ Discovery Done +++++++++++++++
 --TEARDOWN--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 brokerStop CB

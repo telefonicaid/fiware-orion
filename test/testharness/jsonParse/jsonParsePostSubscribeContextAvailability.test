@@ -23,13 +23,13 @@
 --NAME--
 JSON Parse Post SubscribeContextAvailability
 --SHELL-INIT--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 url="/NGSI9/subscribeContextAvailability"
 payload='{
@@ -79,5 +79,5 @@ Date: REGEX(.*)
     "subscriptionId": "REGEX([0-9a-f]{24})"
 }
 --TEARDOWN--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 brokerStop CB

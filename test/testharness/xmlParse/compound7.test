@@ -23,13 +23,13 @@
 --NAME--
 Compound Values for UpdateContextRequest 7
 --SHELL-INIT--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB 0-1
 
 --SHELL--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 #   7. err: contextValue is a vector with five items + one item with a bad name
 echo "7: +++++++++++++++++++++++++++++++++"
@@ -77,5 +77,5 @@ Date: REGEX(.*)
   </errorCode>
 </updateContextResponse>
 --TEARDOWN--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 brokerStop CB

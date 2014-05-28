@@ -23,13 +23,13 @@
 --NAME--
 XML Parse BadVerb DiscoverContextAvailability
 --SHELL-INIT--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 echo "+++++ Registration +++++"
 url="/NGSI9/registerContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
@@ -127,5 +127,5 @@ Date: REGEX(.*)
 
 +++++ Discovery Done +++++
 --TEARDOWN--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 brokerStop CB

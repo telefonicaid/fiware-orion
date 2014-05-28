@@ -23,13 +23,13 @@
 --NAME--
 Compound Values for UpdateContextRequest 2
 --SHELL-INIT--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB 0-1
 
 --SHELL--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 #   2. ok:  One string 's1' == 'STRING' as compound value (contextValue is a struct)
 echo "2: +++++++++++++++++++++++++++++++++"
@@ -87,5 +87,5 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 --TEARDOWN--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 brokerStop CB

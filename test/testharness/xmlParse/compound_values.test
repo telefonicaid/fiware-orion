@@ -37,13 +37,13 @@
 --NAME--
 Compound Values for UpdateContextRequest
 --SHELL-INIT--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 # 0. ok:  No compound value
 echo "0: +++++++++++++++++++++++++++++++++"
@@ -512,5 +512,5 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 --TEARDOWN--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 brokerStop CB

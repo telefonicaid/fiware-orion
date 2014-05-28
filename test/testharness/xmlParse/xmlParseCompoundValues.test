@@ -23,13 +23,13 @@
 --NAME--
 XML Parse Compound Values
 --SHELL-INIT--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 
 # 1. Compound contextValue without vector
 echo "1: +++++++++++++++++++++++++++++++++"
@@ -493,6 +493,6 @@ Date: REGEX(.*)
   </errorCode>
 </updateContextResponse>
 --TEARDOWN--
-source ../harnessFunctions.sh
+source harnessFunctions.sh
 brokerStop CB
 
