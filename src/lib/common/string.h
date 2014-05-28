@@ -1,5 +1,5 @@
-#ifndef STRING_H
-#define STRING_H
+#ifndef SRC_LIB_COMMON_STRING_H_
+#define SRC_LIB_COMMON_STRING_H_
 
 /*
 *
@@ -52,7 +52,7 @@ extern bool parseUrl(const std::string& url, std::string& host, int& port, std::
 *
 * i2s - integer to string
 */
-extern char* i2s(int i, char* placeholder);
+extern char* i2s(int i, char* placeholder, int placeholderSize);
 
 /* ****************************************************************************
 *
@@ -76,7 +76,7 @@ extern bool string2coords(const std::string& s, double& latitude, double& longit
 *
 * coords2string - 
 */
-extern void coords2string(std::string& s, double latitude, double longitude, int decimals = 6);
+extern void coords2string(std::string* s, double latitude, double longitude, int decimals = 6);
 
 /* ****************************************************************************
 *
@@ -88,6 +88,6 @@ bool versionParse(const std::string& version, int& mayor, int& minor, std::strin
 *
 * atoF - 
 */
-extern double atoF(const char* string, std::string& errorMsg);
+extern double atoF(const char* string, std::string* errorMsg);
 
-#endif
+#endif  // SRC_LIB_COMMON_STRING_H_
