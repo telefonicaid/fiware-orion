@@ -520,17 +520,17 @@ static bool updateAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
 static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute* ca) {
 
     BSONArrayBuilder mdToAdd;
-    unsigned int mdToAddSize = 0;
+
     for (unsigned int ix = 0; ix < ca->metadataVector.size(); ++ix) {
         Metadata* md = ca->metadataVector.get(ix);
         if (!isNotCustomMetadata(md->name)) {
-            mdToAddSize++;
             mdToAdd.append(BSON("name" << md->name << "type" << md->type << "value" << md->value));
             LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
                             md->name.c_str(), md->type.c_str(), md->value.c_str()));
         }
     }
-    if (mdToAddSize > 0) {
+
+    if (mdToAdd.arrSize() > 0) {
         mdV = mdToAdd.arr();
         return true;
     }   
