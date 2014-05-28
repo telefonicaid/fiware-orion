@@ -191,7 +191,7 @@ _ERROR_CATEGORIES = [
   'runtime/threadsafe_fn',
   'runtime/virtual',
   'whitespace/blank_line',
-#  'whitespace/braces',
+  'whitespace/braces',
   'whitespace/comma',
   'whitespace/comments',
   'whitespace/end_of_line',
