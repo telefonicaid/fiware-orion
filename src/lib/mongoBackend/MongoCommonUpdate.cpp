@@ -265,10 +265,10 @@ static bool bsonCustomMetadataToBson(BSONObj& newMdV, BSONObj& attr) {
 
     BSONArrayBuilder mdNewVBuilder;
     BSONObj mdV = attr.getField(ENT_ATTRS_MD).embeddedObject();
-    unsigned int mdVSize = 0;
+
     for( BSONObj::iterator i = mdV.begin(); i.more(); ) {
         BSONObj md = i.next().embeddedObject();
-        mdVSize++;
+
         if (md.hasField(ENT_ATTRS_MD_TYPE)) {
             mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
                                       ENT_ATTRS_MD_TYPE << md.getStringField(ENT_ATTRS_MD_TYPE) <<
@@ -280,7 +280,7 @@ static bool bsonCustomMetadataToBson(BSONObj& newMdV, BSONObj& attr) {
          }
      }
 
-     if (mdVSize > 0) {
+     if (mdNewVBuilder.arrSize() > 0) {
          newMdV = mdNewVBuilder.arr();
          return true;
      }
@@ -326,14 +326,12 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         BSONArrayBuilder mdNewVBuilder;
 
         /* First add the metadata elements comming in the request */
-        unsigned int mdNewVSize = 0;
         for (unsigned int ix = 0; ix < ca.metadataVector.size() ; ++ix) {
             Metadata* md = ca.metadataVector.get(ix);
             /* Skip not custom metadata */
             if (isNotCustomMetadata(md->name)) {
                 continue;
             }
-            mdNewVSize++;
             if (md->type == "") {
                 mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md->name << ENT_ATTRS_MD_VALUE << md->value));
             }
@@ -343,7 +341,7 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         }
 
         /* Second, for each metadata previously in the metadata vector but *not included in the request*, add it as is */
-        unsigned int mdVSize = 0;
+        int mdVSize = 0;
         BSONObj mdV;
         if (attr.hasField(ENT_ATTRS_MD)) {
             mdV = attr.getField(ENT_ATTRS_MD).embeddedObject();
@@ -351,7 +349,6 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
                 BSONObj md = i.next().embeddedObject();
                 mdVSize++;
                 if (!hasMetadata(md.getStringField(ENT_ATTRS_MD_NAME), md.getStringField(ENT_ATTRS_MD_TYPE), ca)) {
-                    mdNewVSize++;
                     if (md.hasField(ENT_ATTRS_MD_TYPE)) {
                         mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
                                            ENT_ATTRS_MD_TYPE << md.getStringField(ENT_ATTRS_MD_TYPE) <<
@@ -366,7 +363,7 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         }
 
         BSONObj mdNewV = mdNewVBuilder.arr();
-        if (mdNewVSize > 0) {
+        if (mdNewVBuilder.arrSize() > 0) {
             newAttr.appendArray(ENT_ATTRS_MD, mdNewV);
         }
 
@@ -375,7 +372,7 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
             /* In the case of simple value, we check if the value of the attribute changed or the metadata changed (the later
              * one is done checking if the size of the original and final metadata vectors is different and, if they are of the
              * same size, checking if the vectors are not equal) */
-            if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value || mdNewVSize != mdVSize || !equalMetadataVectors(mdV, mdNewV)) {
+            if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value || mdNewVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV)) {
                 *actualUpdate = true;
             }
         }
