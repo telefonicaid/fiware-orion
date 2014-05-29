@@ -31,6 +31,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/ContextAttributeVector.h"
+#include "ngsi/Request.h"
 
 
 
@@ -49,14 +50,21 @@ ContextAttributeVector::ContextAttributeVector()
 *
 * ContextAttributeVector::render - 
 */
-std::string ContextAttributeVector::render(Format format, std::string indent, bool comma)
+std::string ContextAttributeVector::render(RequestType request, Format format, const std::string& indent, bool comma)
 {
   std::string out      = "";
   std::string xmlTag   = "contextAttributeList";
   std::string jsonTag  = "attributes";
 
   if (vec.size() == 0)
+  {
+     if (((request == IndividualContextEntityAttribute)
+         || (request == AttributeValueInstance)
+         || (request == IndividualContextEntityAttributes)) && format == XML)
+      return indent + "<contextAttributeList></contextAttributeList>\n";
+
     return "";
+  }
 
   out += startTag(indent, xmlTag, jsonTag, format, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
@@ -72,7 +80,7 @@ std::string ContextAttributeVector::render(Format format, std::string indent, bo
 *
 * ContextAttributeVector::check - 
 */
-std::string ContextAttributeVector::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ContextAttributeVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -91,7 +99,7 @@ std::string ContextAttributeVector::check(RequestType requestType, Format format
 *
 * ContextAttributeVector::present - 
 */
-void ContextAttributeVector::present(std::string indent)
+void ContextAttributeVector::present(const std::string& indent)
 {
    PRINTF("%lu ContextAttributes", (unsigned long) vec.size());
 
@@ -116,9 +124,11 @@ void ContextAttributeVector::push_back(ContextAttribute* item)
 *
 * ContextAttributeVector::get - 
 */
-ContextAttribute* ContextAttributeVector::get(int ix)
+ContextAttribute* ContextAttributeVector::get(unsigned int ix)
 {
-  return vec[ix];
+  if (ix < vec.size())
+    return vec[ix];
+  return NULL;
 }
 
 

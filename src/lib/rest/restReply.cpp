@@ -27,7 +27,7 @@
 #include "logMsg/logMsg.h"
 
 #include "common/Format.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 #include "ngsi9/RegisterContextResponse.h"
@@ -51,61 +51,19 @@
 #include "logMsg/traceLevels.h"
 
 
-/* ****************************************************************************
-*
-* formatedAnswer - 
-*/
-std::string formatedAnswer
-(
-  Format       format,
-  std::string  header,
-  std::string  tag1,
-  std::string  value1,
-  std::string  tag2,
-  std::string  value2
-)
-{
-   std::string answer;
 
-   if (format == XML)
-   {
-      answer  = std::string("<")   + header + ">\n";
-      answer += std::string("  <") + tag1   + ">" + value1 + "</" + tag1 + ">\n";
-      answer += std::string("  <") + tag2   + ">" + value2 + "</" + tag2 + ">\n";
-      answer += std::string("</")  + header + ">";
-   }
-   else if (format == JSON)
-   {
-      answer  = std::string("{\n");
-      answer += std::string("  \"") + header + "\":\n";
-      answer += std::string("  {\n");
-      answer += std::string("  \"") + tag1   + "\": \"" + value1 + "\",\n";
-      answer += std::string("  \"") + tag2   + "\": \"" + value2 + "\"\n";
-      answer += std::string("  }\n");
-      answer += std::string("}");
-   }
-   else
-      answer = header + ": " + tag1 + "=" + value1 + ", " + tag2 + "=" + value2;
-
-   return answer;
-}
-
-
-
-char savedResponse[2 * 1024 * 1024];
 static int replyIx = 0;
 /* ****************************************************************************
 *
 * restReply - 
 */
-int restReply(ConnectionInfo* ciP, std::string answer)
+void restReply(ConnectionInfo* ciP, const std::string& answer)
 {
-  int            ret;
   MHD_Response*  response;
 
   ++replyIx;
-  LM_T(LmtOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answer.length(), ciP->httpStatusCode));
-  LM_T(LmtOutPayload, ("Response payload: '%s'", answer.c_str()));
+  LM_T(LmtServiceOutPayload, ("Response %d: responding with %d bytes, Status Code %d", replyIx, answer.length(), ciP->httpStatusCode));
+  LM_T(LmtServiceOutPayload, ("Response payload: '%s'", answer.c_str()));
 
   if (answer == "")
     response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_NO, MHD_NO);
@@ -113,13 +71,10 @@ int restReply(ConnectionInfo* ciP, std::string answer)
     response = MHD_create_response_from_data(answer.length(), (void*) answer.c_str(), MHD_YES, MHD_YES);
 
   if (!response)
-    LM_RE(MHD_NO, ("MHD_create_response_from_buffer FAILED"));
+    LM_RVE(("MHD_create_response_from_buffer FAILED"));
 
-  if (ciP->httpHeader.size() != 0)
-  {
-     for (unsigned int hIx = 0; hIx < ciP->httpHeader.size(); ++hIx)
-        MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
-  }
+  for (unsigned int hIx = 0; hIx < ciP->httpHeader.size(); ++hIx)
+    MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
 
   if (answer != "")
   {
@@ -129,43 +84,8 @@ int restReply(ConnectionInfo* ciP, std::string answer)
       MHD_add_response_header(response, "Content-Type", "application/json");
   }
 
-  ret = MHD_queue_response(ciP->connection, ciP->httpStatusCode, response);
+  MHD_queue_response(ciP->connection, ciP->httpStatusCode, response);
   MHD_destroy_response(response);
-
-  if (ret != MHD_YES)
-  {
-    if (strlen(answer.c_str()) > sizeof(savedResponse))
-    {
-       std::string errorAnswer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, 500, "response too large", "Maximum size of responses has been set to 2Mb");
-       LM_W(("answer too large: %d bytes (max allowed is %d bytes", strlen(answer.c_str()), sizeof(savedResponse)));
-       savedResponse[0] = 0;
-       restReply(ciP, errorAnswer);
-       return MHD_NO;
-    }
-    else
-    {
-       strcpy(savedResponse, answer.c_str());
-       LM_T(LmtSavedResponse, ("MHD_queue_response failed - saved the answer for later"));
-    }
-    return MHD_YES;
-  }
-
-  return MHD_NO;
-}
-
-
-
-/* ****************************************************************************
-*
-* restReply - 
-*/
-int restReply(ConnectionInfo* ciP, std::string reason, std::string detail)
-{
-  std::string  answer;
-
-  answer = formatedAnswer(ciP->outFormat, "orionError", "reason", reason, "detail", detail);
-
-  return restReply(ciP, answer);
 }
 
 
@@ -178,7 +98,7 @@ int restReply(ConnectionInfo* ciP, std::string reason, std::string detail)
 * 'request' is simply 'forwarded' from restErrorReplyGet, the 'request' can
 * have various contents - for that the different strings of 'request'. 
 */
-static std::string tagGet(std::string request)
+static std::string tagGet(const std::string& request)
 {
   if ((request == "registerContext") || (request == "/ngsi9/registerContext") || (request == "/NGSI9/registerContext") || (request == "registerContextRequest"))
     return "registerContextResponse";
@@ -226,17 +146,17 @@ static std::string tagGet(std::string request)
 * Where the payload type is matched against the request URL, the incoming 'request' is a
 * request and not a response.
 */
-std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string indent, std::string request, int code, std::string reasonPhrase, std::string detail)
+std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, const std::string& indent, const std::string& request, HttpStatusCode code, const std::string& details)
 {
    std::string   tag = tagGet(request);
-   ErrorCode     errorCode(code, reasonPhrase, detail);
+   StatusCode    errorCode(code, details, "errorCode");
    std::string   reply;
 
    ciP->httpStatusCode = SccOk;
 
    if (tag == "registerContextResponse")
    {
-      RegisterContextResponse rcr("0", errorCode);
+      RegisterContextResponse rcr("000000000000000000000000", errorCode);
       reply =  rcr.render(RegisterContext, format, indent);
    }
    else if (tag == "discoverContextAvailabilityResponse")
@@ -246,7 +166,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string in
    }
    else if (tag == "subscribeContextAvailabilityResponse")
    {
-      SubscribeContextAvailabilityResponse scar("0", errorCode);
+      SubscribeContextAvailabilityResponse scar("000000000000000000000000", errorCode);
       reply =  scar.render(SubscribeContextAvailability, format, indent);
    }
    else if (tag == "updateContextAvailabilitySubscriptionResponse")
@@ -297,7 +217,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, std::string in
    }
    else if (tag == "StatusCode")
    {
-     StatusCode sc((HttpStatusCode) code, reasonPhrase, detail);
+     StatusCode sc(code, details);
      reply = sc.render(format, indent);
    }
    else

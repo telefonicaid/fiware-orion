@@ -1,5 +1,5 @@
-#ifndef STATISTICS_H
-#define STATISTICS_H
+#ifndef SRC_LIB_COMMON_STATISTICS_H_
+#define SRC_LIB_COMMON_STATISTICS_H_
 
 /*
 *
@@ -89,6 +89,13 @@ extern int noOfStatisticsRequests;
 extern int noOfInvalidRequests;
 extern int noOfRegisterResponses;
 
+extern int noOfRtSubscribeContextAvailabilityResponse;
+extern int noOfRtUpdateContextAvailabilitySubscriptionResponse;
+extern int noOfRtUnsubscribeContextAvailabilityResponse;
+extern int noOfRtUnsubscribeContextResponse;
+extern int noOfRtSubscribeResponse;
+extern int noOfRtSubscribeError;
+
 
 
 /* ****************************************************************************
@@ -97,4 +104,4 @@ extern int noOfRegisterResponses;
 */
 extern void statisticsUpdate(RequestType request, Format inFormat);
 
-#endif
+#endif  // SRC_LIB_COMMON_STATISTICS_H_

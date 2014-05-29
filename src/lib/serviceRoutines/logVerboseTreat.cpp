@@ -39,7 +39,7 @@
 *
 * logVerboseTreat - 
 */
-std::string logVerboseTreat(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string logVerboseTreat(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string out;
   if ((components == 2) && (ciP->method == "GET"))
@@ -52,7 +52,7 @@ std::string logVerboseTreat(ConnectionInfo* ciP, int components, std::vector<std
     else if (lmVerbose2 == true)  verboseLevel = (char*) "2";
     else if (lmVerbose  == true)  verboseLevel = (char*) "1";
 
-    out = orionReply(ciP, "verbose level", verboseLevel);
+    out = orionReply(ciP, "verboseLevel", verboseLevel);
    }
    else if ((components == 2) && (ciP->method == "DELETE"))
    {
@@ -62,7 +62,7 @@ std::string logVerboseTreat(ConnectionInfo* ciP, int components, std::vector<std
      lmVerbose4 = false;
      lmVerbose5 = false;
 
-     out = orionReply(ciP, "verbose level", "all verbose levels reset");
+     out = orionReply(ciP, "verboseLevel", "all verbose levels reset");
    }
    else if ((components == 3) && (ciP->method == "PUT") && (compV[2] == "off"))
    {
@@ -72,7 +72,7 @@ std::string logVerboseTreat(ConnectionInfo* ciP, int components, std::vector<std
      lmVerbose4 = false;
      lmVerbose5 = false;
 
-     out = orionReply(ciP, "verbose level", "all verbose levels reset");
+     out = orionReply(ciP, "verboseLevel", "all verbose levels reset");
    }
    else if ((components == 3) && (ciP->method == "PUT") && (compV[2] == "0"))
    {
@@ -82,7 +82,7 @@ std::string logVerboseTreat(ConnectionInfo* ciP, int components, std::vector<std
      lmVerbose4 = false;
      lmVerbose5 = false;
 
-     out = orionReply(ciP, "verbose level", "all verbose levels reset");
+     out = orionReply(ciP, "verboseLevel", "all verbose levels reset");
    }
    else if ((components == 3) && (ciP->method == "PUT") && (compV[2] == "1"))
    {
@@ -92,7 +92,7 @@ std::string logVerboseTreat(ConnectionInfo* ciP, int components, std::vector<std
      lmVerbose4 = false;
      lmVerbose5 = false;
 
-     out = orionReply(ciP, "verbose level", "verbose level set to 1");
+     out = orionReply(ciP, "verboseLevel", "verbose level set to 1");
    }
    else if ((components == 3) && (ciP->method == "PUT") && (compV[2] == "2"))
    {
@@ -102,7 +102,7 @@ std::string logVerboseTreat(ConnectionInfo* ciP, int components, std::vector<std
      lmVerbose4 = false;
      lmVerbose5 = false;
 
-     out = orionReply(ciP, "verbose level", "verbose level set to 2");
+     out = orionReply(ciP, "verboseLevel", "verbose level set to 2");
    }
    else if ((components == 3) && (ciP->method == "PUT") && (compV[2] == "3"))
    {
@@ -112,7 +112,7 @@ std::string logVerboseTreat(ConnectionInfo* ciP, int components, std::vector<std
      lmVerbose4 = false;
      lmVerbose5 = false;
 
-     out = orionReply(ciP, "verbose level", "verbose level set to 3");
+     out = orionReply(ciP, "verboseLevel", "verbose level set to 3");
    }
    else if ((components == 3) && (ciP->method == "PUT") && (compV[2] == "4"))
    {
@@ -122,7 +122,7 @@ std::string logVerboseTreat(ConnectionInfo* ciP, int components, std::vector<std
      lmVerbose4 = true;
      lmVerbose5 = false;
 
-     out = orionReply(ciP, "verbose level", "verbose level set to 4");
+     out = orionReply(ciP, "verboseLevel", "verbose level set to 4");
    }
    else if ((components == 3) && (ciP->method == "PUT") && (compV[2] == "5"))
    {
@@ -132,10 +132,10 @@ std::string logVerboseTreat(ConnectionInfo* ciP, int components, std::vector<std
      lmVerbose4 = true;
      lmVerbose5 = true;
 
-     out = orionReply(ciP, "verbose level", "verbose level set to 5");
+     out = orionReply(ciP, "verboseLevel", "verbose level set to 5");
    }
    else
-     out = orionReply(ciP, "verbose level", "bad URL or Verb");
+     out = orionReply(ciP, "verboseLevel", "bad URL or Verb");
 
    return out;
 }

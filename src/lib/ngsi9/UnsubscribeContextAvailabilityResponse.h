@@ -43,11 +43,11 @@ typedef struct UnsubscribeContextAvailabilityResponse
   StatusCode     statusCode;        // Mandatory
 
   UnsubscribeContextAvailabilityResponse();
-  UnsubscribeContextAvailabilityResponse(ErrorCode& errorCode);
+  UnsubscribeContextAvailabilityResponse(StatusCode& sc);
   UnsubscribeContextAvailabilityResponse(SubscriptionId _subscriptionId);
   ~UnsubscribeContextAvailabilityResponse();
 
-  std::string render(RequestType requestType, Format format, std::string indent);
+  std::string render(RequestType requestType, Format format, const std::string& indent);
 } UnsubscribeContextAvailabilityResponse;
 
 #endif

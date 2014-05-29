@@ -43,21 +43,28 @@
 */
 Duration::Duration()
 {
-    seconds = 0;
+  seconds = 0;
+  valid   = false;
+  used    = false;
 }
 
 /* ****************************************************************************
 *
 * Duration::check - 
 */
-std::string Duration::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string Duration::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   if (string == "")
     return "OK";
 
   if (parse() == -1)
-     return "syntax error in duration string";
+  {
+    valid = false;
+    LM_E(("syntax error in duration string"));
+    return "syntax error in duration string";
+  }
 
+  valid = true;
   return "OK";
 }
 
@@ -67,9 +74,10 @@ std::string Duration::check(RequestType requestType, Format format, std::string 
 *
 * Duration::set - 
 */
-void Duration::set(std::string value)
+void Duration::set(const std::string& value)
 {
   string = value;
+  parse(); // just to flag valid/invalid
 }
 
 
@@ -89,7 +97,7 @@ std::string Duration::get(void)
 */
 bool Duration::isEmpty(void)
 {
-  if ((string == "") || (string == "not in use"))
+  if (string == "")
     return true;
 
   return false;
@@ -100,9 +108,12 @@ bool Duration::isEmpty(void)
 *
 * Duration::parse - 
 */
-int Duration::parse(void)
+long long Duration::parse(void)
 {
   seconds = parse8601(string);
+
+  valid = (seconds == -1)? false : true;
+
   return seconds;
 }
 
@@ -110,12 +121,12 @@ int Duration::parse(void)
 *
 * Duration::present - 
 */
-void Duration::present(std::string indent)
+void Duration::present(const std::string& indent)
 {
   if (string != "")
     PRINTF("%sDuration: %s\n", indent.c_str(), string.c_str());
   else
-     PRINTF("%sNo Duration\n", indent.c_str());
+    PRINTF("%sNo Duration\n", indent.c_str());
 }
 
 
@@ -124,9 +135,12 @@ void Duration::present(std::string indent)
 *
 * Duration::render - 
 */
-std::string Duration::render(Format format, std::string indent, bool comma)
+std::string Duration::render(Format format, const std::string& indent, bool comma)
 {
   if (string == "")
+    return "";
+
+  if (valid == false)
     return "";
 
   return valueTag(indent, "duration", string, format, comma);

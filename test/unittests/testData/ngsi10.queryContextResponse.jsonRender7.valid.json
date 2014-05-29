@@ -1,0 +1,23 @@
+{
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "EType",
+        "isPattern" : "false",
+        "id" : "E01",
+        "attributeDomainName" : "AttrDomain",
+        "attributes" : [
+          {
+            "name" : "ca7",
+            "type" : "string",
+            "value" : "context attribute 7"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}

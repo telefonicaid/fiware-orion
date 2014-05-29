@@ -30,6 +30,7 @@
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 #include "rest/restReply.h"
+#include "rest/OrionError.h"
 #include "xmlParse/xmlRegisterContextRequest.h"
 #include "xmlParse/xmlRegisterContextResponse.h"
 #include "xmlParse/xmlDiscoverContextAvailabilityRequest.h"
@@ -116,6 +117,7 @@ static XmlRequest xmlRequest[] =
   { IndividualContextEntity,               "POST", "appendContextElementRequest",                  acerParseVector,  acerInit,  acerRelease,  acerPresent,  acerCheck  },
 
   { IndividualContextEntityAttribute,      "POST", "updateContextAttributeRequest",                upcarParseVector, upcarInit, upcarRelease, upcarPresent, upcarCheck },
+  { IndividualContextEntityAttribute,      "PUT",  "updateContextAttributeRequest",                upcarParseVector, upcarInit, upcarRelease, upcarPresent, upcarCheck },
   { AttributeValueInstance,                "PUT",  "updateContextAttributeRequest",                upcarParseVector, upcarInit, upcarRelease, upcarPresent, upcarCheck },
   { IndividualContextEntityAttributes,     "POST", "appendContextElementRequest",                  acerParseVector,  acerInit,  acerRelease,  acerPresent,  acerCheck  },
   { IndividualContextEntityAttributes,     "PUT",  "updateContextElementRequest",                  ucerParseVector,  ucerInit,  ucerRelease,  ucerPresent,  ucerCheck  },
@@ -163,40 +165,38 @@ static XmlRequest* xmlRequestGet(RequestType request, std::string method)
 
 /* ****************************************************************************
 *
-* xmlDocPrepare - 
-*/
-static xml_node<>* xmlDocPrepare(char* xml)
-{
-  xml_document<> doc;
-
-  try
-  {
-    doc.parse<0>(xml);     // 0 means default parse flags
-  }
-  catch (parse_error& e)
-  {
-    LM_RE(NULL, ("PARSE ERROR: %s", e.what()));
-  }
-
-  xml_node<>* father = doc.first_node();
-
-  return father;
-}
-
-
-
-/* ****************************************************************************
-*
 * xmlTreat -
 */
 std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseDataP, RequestType request, std::string payloadWord, XmlRequest** reqPP)
 {
-  xml_node<>*   father    = xmlDocPrepare((char*) content);
-  XmlRequest*   reqP      = xmlRequestGet(request, ciP->method);
+  xml_document<> doc;
+  char*          xmlPayload = (char*) content;
+
+  try
+  {
+    doc.parse<0>(xmlPayload);
+  }
+  catch (parse_error& e)
+  {
+    LM_F(("doc:\n----------------------------------------------\n%s\n------------------------------------", content));
+    std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", "unknown", SccBadRequest, "XML Parse Error");
+    LM_RE(errorReply, ("PARSE ERROR: %s", e.what()));
+  }
+  catch (...)
+  {
+    LM_F(("doc:\n----------------------------------------------\n%s\n------------------------------------", content));
+    std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", "unknown", SccBadRequest, "XML Parse Error");
+    LM_RE(errorReply, ("GENERIC ERROR during doc.parse"));
+  }
+
+  xml_node<>*   father = doc.first_node();
+  XmlRequest*   reqP   = xmlRequestGet(request, ciP->method);
+
+  ciP->parseDataP = parseDataP;
 
   if (father == NULL)
   {
-    std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", "unknown", SccBadRequest, "Parse Error", "");
+    std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", "unknown", SccBadRequest, "XML Parse Error");
     LM_RE(errorReply, ("Parse Error"));
   }
 
@@ -204,12 +204,14 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
   {
     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", requestType(request),
                                                SccBadRequest,
-                                               "no request treating object found",
                                                std::string("Sorry, no request treating object found for RequestType '") + requestType(request) + "', method '" + ciP->method + "'");
 
     LM_RE(errorReply, ("Sorry, no request treating object found for RequestType %d (%s), method %s", request, requestType(request), ciP->method.c_str()));
   }
 
+
+  if (reqPP != NULL)
+    *reqPP = reqP;
 
   //
   // Checking that the payload matches the URL
@@ -232,7 +234,7 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
 
     if (strncasecmp(payloadWord.c_str(), payloadStart, payloadWord.length()) != 0)
     {
-      errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, "Invalid payload", std::string("Expected '") + payloadWord + "' payload, got '" + payloadStart + "'");
+      errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, std::string("Expected '") + payloadWord + "' payload, got '" + payloadStart + "'");
       LM_RE(errorReply, ("Invalid payload: wanted: '%s', got '%s'", payloadWord.c_str(), payloadStart));
     }
   }
@@ -241,25 +243,17 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
     return "OK";
 
   reqP->init(parseDataP);
-  xmlParse(NULL, father, "", "", reqP->parseVector, parseDataP);
+  ciP->httpStatusCode = SccOk;
+  xmlParse(ciP, NULL, father, "", "", reqP->parseVector, parseDataP);
+  if (ciP->httpStatusCode != SccOk)
+    return restErrorReplyGet(ciP, ciP->outFormat, "", payloadWord, ciP->httpStatusCode, ciP->answer);
 
+  LM_T(LmtParseCheck, ("Calling check for XML parsed tree (%s)", ciP->payloadWord));
   std::string check = reqP->check(parseDataP, ciP);
   if (check != "OK")
      LM_E(("check(%s): %s", reqP->keyword.c_str(), check.c_str()));
 
   reqP->present(parseDataP);
-
-  // -----------------------------
-  //
-  // Can't release here ...
-  // reqP->release(parseDataP);
-  //
-  // pass request pointer to father that will know when the free can be executed.
-  //
-  if (reqPP != NULL)
-  {
-    *reqPP = reqP;
-  }
 
   return check;
 }

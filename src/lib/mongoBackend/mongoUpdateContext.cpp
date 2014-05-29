@@ -25,9 +25,11 @@
 #include <string>
 #include <string.h>
 
-#include "common/globals.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
+#include "common/globals.h"
+#include "common/sem.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonUpdate.h"
@@ -36,35 +38,23 @@
 #include "ngsi10/UpdateContextResponse.h"
 #include "ngsi/NotifyCondition.h"
 
-#include "common/sem.h"
-
 /* ****************************************************************************
 *
 * mongoUpdateContext - 
 */
-HttpStatusCode mongoUpdateContext(UpdateContextRequest* requestP, UpdateContextResponse* responseP)
+HttpStatusCode mongoUpdateContext(UpdateContextRequest* requestP, UpdateContextResponse* responseP, const std::string& tenant)
 {
-
-   /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-   semTake();
-
-   /* FIXME: This check is done already, should be removed. */
-    if (strcasecmp(requestP->updateActionType.c_str(), "update") != 0 &&
-        strcasecmp(requestP->updateActionType.c_str(), "append") != 0 &&
-        strcasecmp(requestP->updateActionType.c_str(), "delete") != 0) {
-
-        responseP->errorCode.fill(SccReceiverInternalError, "Unknown updateContext action", std::string("offending action: ") + requestP->updateActionType.get());
-        LM_SRE(SccOk, ("Unknown updateContext action '%s'", requestP->updateActionType.get().c_str()));
-    }
+    reqSemTake(__FUNCTION__, "ngsi10 update request");
 
     /* Process each ContextElement */
     for (unsigned int ix= 0; ix < requestP->contextElementVector.size(); ++ix) {        
-        processContextElement(requestP->contextElementVector.get(ix), responseP, requestP->updateActionType.get());
+        processContextElement(requestP->contextElementVector.get(ix), responseP, requestP->updateActionType.get(), tenant);
     }
 
     /* Note that although individual processContextElements() invokations returns MsConnectionError, this
        error get "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
        consider the overall mongoUpdateContext() as MsOk. */
 
-    LM_SR(SccOk);
+    reqSemGive(__FUNCTION__, "ngsi10 update request");
+    return SccOk;
 }

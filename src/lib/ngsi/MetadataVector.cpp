@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
@@ -36,7 +37,7 @@
 *
 * MetadataVector::MetadataVector -
 */
-MetadataVector::MetadataVector(std::string _tag) {
+MetadataVector::MetadataVector(const std::string& _tag) {
   vec.clear();
   tagSet(_tag);
 }
@@ -45,7 +46,7 @@ MetadataVector::MetadataVector(std::string _tag) {
 *
 * MetadataVector::tagSet -
 */
-void MetadataVector::tagSet(std::string tagName)
+void MetadataVector::tagSet(const std::string& tagName)
 {
   tag = tagName;
 }
@@ -56,7 +57,7 @@ void MetadataVector::tagSet(std::string tagName)
 *
 * MetadataVector::render - 
 */
-std::string MetadataVector::render(Format format, std::string indent, bool comma)
+std::string MetadataVector::render(Format format, const std::string& indent, bool comma)
 {
   std::string out     = "";
   std::string jsonTag = "metadatas";
@@ -79,7 +80,7 @@ std::string MetadataVector::render(Format format, std::string indent, bool comma
 *
 * MetadataVector::check - 
 */
-std::string MetadataVector::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string MetadataVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -98,7 +99,7 @@ std::string MetadataVector::check(RequestType requestType, Format format, std::s
 *
 * MetadataVector::present - 
 */
-void MetadataVector::present(std::string metadataType, std::string indent)
+void MetadataVector::present(const std::string& metadataType, const std::string& indent)
 {
    PRINTF("%lu %s Metadata%s\n", (unsigned long) vec.size(), metadataType.c_str(), (vec.size() == 1)? "" : "s");
 

@@ -34,6 +34,8 @@
 #include "mongoBackend/mongoRegisterContext.h"
 #include "ngsi9/RegisterContextResponse.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
+#include "rest/ConnectionInfo.h"
+
 #include "testInit.h"
 
 
@@ -78,16 +80,16 @@ static void prepareDatabase(std::string id, std::string type)
 */
 TEST(mapDeleteIndividualContextEntityAttributes, notFound)
 {
-  HttpStatusCode  ms;
   StatusCode      sc;
   std::string     id = "XXX";
+  ConnectionInfo  ci;
 
   prepareDatabase("ID", "TYPE");
 
-  ms = mapDeleteIndividualContextEntityAttributes(id, &sc);
+  mapDeleteIndividualContextEntityAttributes(id, &sc, &ci);
 
   EXPECT_EQ(SccContextElementNotFound, sc.code);
-  EXPECT_STREQ("Entity Not Found", sc.reasonPhrase.c_str());
+  EXPECT_STREQ("No context element found", sc.reasonPhrase.c_str());
   EXPECT_STREQ("XXX", sc.details.c_str());
 }
 
@@ -99,8 +101,9 @@ TEST(mapDeleteIndividualContextEntityAttributes, notFound)
 */
 TEST(mapDeleteIndividualContextEntityAttributes, ok)
 {
-  std::string  id        = "ID";
-  std::string  type      = "TYPE";
+  std::string     id        = "ID";
+  std::string     type      = "TYPE";
+  ConnectionInfo  ci;
 
   /* Set timer */
   Timer* t = new Timer();
@@ -108,10 +111,9 @@ TEST(mapDeleteIndividualContextEntityAttributes, ok)
 
   prepareDatabase("ID", "TYPE");
 
-  HttpStatusCode ms;
   StatusCode  sc;
 
-  ms = mapDeleteIndividualContextEntityAttributes(id, &sc);
+  mapDeleteIndividualContextEntityAttributes(id, &sc, &ci);
   EXPECT_EQ(SccOk, sc.code);
   EXPECT_STREQ("OK", sc.reasonPhrase.c_str());
   EXPECT_STREQ("", sc.details.c_str());

@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/postIndividualContextEntityAttributes.h"
@@ -34,7 +32,6 @@
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "testDataFromFile.h"
 #include "unittest.h"
 
 
@@ -65,38 +62,41 @@ TEST(putAttributeValueInstance, notFound)
   ConnectionInfo ci1("/ngsi10/contextEntities/E1/attributes/A1/left",  "PUT", "1.1");
   ConnectionInfo ci2("/ngsi10/contextEntities/E1/attributes/A1/right",  "PUT", "1.1");
   ConnectionInfo ci3("/ngsi10/contextEntities/E1/attributes/A1/left",  "PUT", "1.1");
-  std::string    expected1   = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>Entity Not Found</reasonPhrase>\n  <details>E1</details>\n</statusCode>\n";
-  std::string    expected2  = "<statusCode>\n  <code>400</code>\n  <reasonPhrase>unmatching metadata ID value URI/payload</reasonPhrase>\n  <details>right vs left</details>\n</statusCode>\n";
-  std::string    expected3  = "<statusCode>\n  <code>404</code>\n  <reasonPhrase>Entity Not Found</reasonPhrase>\n  <details>E1</details>\n</statusCode>\n";
-  const char*    fileName   = "ngsi10.putAttributeValueInstance.A1-left.ok.postponed.xml";
-  const char*    fileName2  = "ngsi10.putAttributeValueInstance.noIdMetadata.postponed.xml";
+  const char*    infile1   = "ngsi10.putAttributeValueInstance.A1-left.ok.postponed.xml";
+  const char*    infile2   = "ngsi10.putAttributeValueInstance.noIdMetadata.postponed.xml";
+  const char*    outfile1  = "ngsi10.statusCode.putAttributeValueInstance1.ok.valid.xml";
+  const char*    outfile2  = "ngsi10.statusCode.putAttributeValueInstance2.ok.valid.xml";
+  const char*    outfile3  = "ngsi10.statusCode.putAttributeValueInstance3.ok.valid.xml";
   std::string    out;
 
   utInit();
   
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   ci1.outFormat    = XML;
   ci1.inFormat     = XML;
   ci1.payload      = testBuf;
   ci1.payloadSize  = strlen(testBuf);
   out             = restService(&ci1, rs);
-  EXPECT_EQ(expected1, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   ci2.outFormat    = XML;
   ci2.inFormat     = XML;
   ci2.payload      = testBuf;
   ci2.payloadSize  = strlen(testBuf);
   out             = restService(&ci2, rs);
-  EXPECT_EQ(expected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName2)) << "Error getting test data from '" << fileName2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   ci3.outFormat    = XML;
   ci3.inFormat     = XML;
   ci3.payload      = testBuf;
   ci3.payloadSize  = strlen(testBuf);
   out             = restService(&ci3, rs);
-  EXPECT_EQ(expected3, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }
@@ -111,29 +111,31 @@ TEST(putAttributeValueInstance, found)
 {
   ConnectionInfo ci1("/ngsi10/contextEntities/E1/attributes",          "POST", "1.1");
   ConnectionInfo ci2("/ngsi10/contextEntities/E1/attributes/A1/left",  "PUT", "1.1");
-  std::string    expected1    = "<appendContextElementResponse>\n  <contextResponseList>\n    <contextAttributeResponse>\n      <contextAttributeList>\n        <contextAttribute>\n          <name>A1</name>\n          <type></type>\n          <contextValue></contextValue>\n          <metadata>\n            <contextMetadata>\n              <name>ID</name>\n              <type>string</type>\n              <value>left</value>\n            </contextMetadata>\n          </metadata>\n        </contextAttribute>\n      </contextAttributeList>\n      <statusCode>\n        <code>200</code>\n        <reasonPhrase>OK</reasonPhrase>\n      </statusCode>\n    </contextAttributeResponse>\n  </contextResponseList>\n</appendContextElementResponse>\n";
-  std::string    expected2    = "<statusCode>\n  <code>200</code>\n  <reasonPhrase>OK</reasonPhrase>\n</statusCode>\n";
-  const char*    fileName1    = "ngsi10.IndividualContextEntityAttributes.A1-left.postponed.xml";
-  const char*    fileName2    = "ngsi10.putAttributeValueInstance.A1-left.ok.postponed.xml";
+  const char*    infile1    = "ngsi10.IndividualContextEntityAttributes.A1-left.postponed.xml";
+  const char*    infile2    = "ngsi10.putAttributeValueInstance.A1-left.ok.postponed.xml";
+  const char*    outfile1   = "ngsi10.appendContextElementResponse.putAttributeValueInstance.valid.xml";
+  const char*    outfile2   = "ngsi10.statusCode.putAttributeValueInstance.valid.xml";
   std::string    out;
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName1)) << "Error getting test data from '" << fileName1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   ci1.outFormat    = XML;
   ci1.inFormat     = XML;
   ci1.payload      = testBuf;
   ci1.payloadSize  = strlen(testBuf);
   out              = restService(&ci1, rs);
-  EXPECT_EQ(expected1, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName2)) << "Error getting test data from '" << fileName2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   ci2.outFormat    = XML;
   ci2.inFormat     = XML;
   ci2.payload      = testBuf;
   ci2.payloadSize  = strlen(testBuf);
   out              = restService(&ci2, rs);
-  EXPECT_EQ(expected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -33,7 +31,7 @@
 #include "rest/ConnectionInfo.h"
 #include "xmlParse/xmlRequest.h"
 
-#include "testDataFromFile.h"
+#include "unittest.h"
 
 
 
@@ -44,10 +42,15 @@
 TEST(NotifyContextAvailabilityRequest, ok_xml)
 {
   ParseData       parseData;
-  const char*     fileName = "ngsi9.notifyContextAvailabilityRequest.ok.valid.xml";
+  const char*     inFile  = "ngsi9.notifyContextAvailabilityRequest.ok.valid.xml";
+  const char*     outFile = "ngsi9.notifyContextAvailabilityRequestRendered.ok.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
+  std::string     rendered;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   lmTraceLevelSet(LmtDump, true);
   std::string result = xmlTreat(testBuf, &ci, &parseData, NotifyContextAvailability, "notifyContextAvailabilityRequest", NULL);
@@ -56,12 +59,12 @@ TEST(NotifyContextAvailabilityRequest, ok_xml)
 
   NotifyContextAvailabilityRequest* ncarP = &parseData.ncar.res;
 
-  std::string     rendered = ncarP->render(NotifyContext, XML, "");
-  std::string     expected = "<notifyContextAvailabilityRequest>\n  <subscriptionId>012345678901234567890123</subscriptionId>\n  <contextRegistrationResponseList>\n    <contextRegistrationResponse>\n      <contextRegistration>\n        <entityIdList>\n          <entityId type=\"Room\" isPattern=\"false\">\n            <id>ConferenceRoom</id>\n          </entityId>\n          <entityId type=\"Room\" isPattern=\"false\">\n            <id>OfficeRoom</id>\n          </entityId>\n        </entityIdList>\n        <contextRegistrationAttributeList>\n          <contextRegistrationAttribute>\n            <name>temperature</name>\n            <type>degree</type>\n            <isDomain>false</isDomain>\n            <registrationMetadata>\n              <contextMetadata>\n                <name>ID</name>\n                <type>string</type>\n                <value>1110</value>\n              </contextMetadata>\n            </registrationMetadata>\n          </contextRegistrationAttribute>\n        </contextRegistrationAttributeList>\n        <registrationMetadata>\n          <contextMetadata>\n            <name>ID</name>\n            <type>string</type>\n            <value>2212</value>\n          </contextMetadata>\n        </registrationMetadata>\n        <providingApplication>http://192.168.100.1:70/application\n\t\t\t\t</providingApplication>\n      </contextRegistration>\n    </contextRegistrationResponse>\n  </contextRegistrationResponseList>\n</notifyContextAvailabilityRequest>\n";
-
-  EXPECT_EQ(expected, rendered);
+  rendered = ncarP->render(NotifyContext, XML, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   ncarP->release();
+  
+  utExit();
 }
 
 
@@ -73,8 +76,11 @@ TEST(NotifyContextAvailabilityRequest, ok_xml)
 TEST(NotifyContextAvailabilityRequest, ok_json)
 {
   ParseData       parseData;
-  const char*     fileName = "notifyContextAvailabilityRequest_ok.json";
+  const char*     fileName = "ngsi9.notifyContextAvailabilityRequest.ok2.valid.json";
   ConnectionInfo  ci("", "POST", "1.1");
+  std::string     out;
+
+  utInit();
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
@@ -82,18 +88,21 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
 
   lmTraceLevelSet(LmtDump, true);
-  std::string result = jsonTreat(testBuf, &ci, &parseData, NotifyContextAvailability, "notifyContextAvailabilityRequest", NULL);
-  EXPECT_EQ("OK", result);
+  out = jsonTreat(testBuf, &ci, &parseData, NotifyContextAvailability, "notifyContextAvailabilityRequest", NULL);
+  EXPECT_EQ("OK", out);
   lmTraceLevelSet(LmtDump, false);
 
   NotifyContextAvailabilityRequest* ncarP = &parseData.ncar.res;
 
-  std::string     rendered = ncarP->render(NotifyContext, JSON, "");
-  std::string     expected = "{\n  \"subscriptionId\" : \"012345678901234567890123\",\n  \"contextRegistrationResponses\" : [\n    {\n      \"contextRegistration\" : {\n        \"entities\" : [\n          {\n            \"type\" : \"Room\",\n            \"isPattern\" : \"false\",\n            \"id\" : \"ConferenceRoom\"\n          },\n          {\n            \"type\" : \"Room\",\n            \"isPattern\" : \"false\",\n            \"id\" : \"OfficeRoom\"\n          }\n        ],\n        \"attributes\" : [\n          {\n            \"name\" : \"temperature\",\n            \"type\" : \"degree\",\n            \"isDomain\" : \"false\",\n            \"metadatas\" : [\n              {\n                \"name\" : \"ID\",\n                \"type\" : \"string\",\n                \"value\" : \"1110\"\n              }\n            ]\n          }\n        ],\n        \"metadatas\" : [\n          {\n            \"name\" : \"ID\",\n            \"type\" : \"string\",\n            \"value\" : \"2212\"\n          }\n        ],\n        \"providingApplication\" : \"http://192.168.100.1:70/application\"\n      }\n    }\n  ]\n}\n";
+  const char*     outfile = "ngsi9.notifyContextAvailabilityRequest.ok.valid.json";
 
-  EXPECT_EQ(expected, rendered);
+  out = ncarP->render(NotifyContext, JSON, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ncarP->release();
+  
+  utExit();
 }
 
 
@@ -105,14 +114,19 @@ TEST(NotifyContextAvailabilityRequest, ok_json)
 TEST(NotifyContextAvailabilityRequest, badEntityAttribute_xml)
 {
   ParseData       parseData;
-  const char*     fileName = "ngsi9.notifyContextAvailabilityRequest.entityAttribute.invalid.xml";
+  const char*     infile  = "ngsi9.notifyContextAvailabilityRequest.entityAttribute.invalid.xml";
+  const char*     outfile = "ngsi9.notifyContextAvailabilityResponse.invalidEntityAttribute.valid.xml";
   ConnectionInfo  ci("", "POST", "1.1");
-  std::string     expected = "<notifyContextAvailabilityResponse>\n  <responseCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </responseCode>\n</notifyContextAvailabilityResponse>\n";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  utInit();
 
-  std::string result = xmlTreat(testBuf, &ci, &parseData, NotifyContextAvailability, "notifyContextAvailabilityRequest", NULL);
-  EXPECT_EQ(expected, result);
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  std::string out = xmlTreat(testBuf, &ci, &parseData, NotifyContextAvailability, "notifyContextAvailabilityRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+  
+  utExit();
 }
 
 
@@ -124,19 +138,87 @@ TEST(NotifyContextAvailabilityRequest, badEntityAttribute_xml)
 TEST(NotifyContextAvailabilityRequest, check)
 {
   NotifyContextAvailabilityRequest  ncr;
-  std::string                       check;
-  std::string                       expected1 = "OK";
-  std::string                       expected2 = "<notifyContextAvailabilityResponse>\n  <responseCode>\n    <code>400</code>\n    <reasonPhrase>predetected error</reasonPhrase>\n  </responseCode>\n</notifyContextAvailabilityResponse>\n";
-  std::string                       expected3 = "<notifyContextAvailabilityResponse>\n  <responseCode>\n    <code>400</code>\n    <reasonPhrase>bad length (24 chars expected)</reasonPhrase>\n  </responseCode>\n</notifyContextAvailabilityResponse>\n";
+  std::string                       out;
+  const char*                       outfile1 = "ngsi9.notifyContextAvailabilityResponse.predetectedError.valid.xml";
+  const char*                       outfile2 = "ngsi9.notifyContextAvailabilityResponse.invalidSubscriptionId.valid.xml";
 
-  // check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
-  check = ncr.check(NotifyContextAvailability, XML, "", "", 0);
-  EXPECT_EQ(expected1, check);
+  utInit();
 
-  check = ncr.check(NotifyContextAvailability, XML, "", "predetected error", 0);
-  EXPECT_EQ(expected2, check);
+  out = ncr.check(NotifyContextAvailability, XML, "", "", 0);
+  EXPECT_EQ("OK", out);
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  out = ncr.check(NotifyContextAvailability, XML, "", "predetected error", 0);
+  EXPECT_STREQ(expectedBuf, out.c_str());
  
   ncr.subscriptionId.set("12345");
-  check = ncr.check(NotifyContextAvailability, XML, "", "", 0);
-  EXPECT_EQ(expected3, check);
+  out = ncr.check(NotifyContextAvailability, XML, "", "", 0);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+  
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* json_render - 
+*/
+TEST(NotifyContextAvailabilityRequest, json_render)
+{
+  const char*                          filename1  = "ngsi10.notifyContextAvailabilityRequest.jsonRender1.valid.json";
+  const char*                          filename2  = "ngsi10.notifyContextAvailabilityRequest.jsonRender2.valid.json";
+  NotifyContextAvailabilityRequest*    ncarP;
+  std::string                          rendered;
+  ContextRegistrationResponse*         crrP;
+  EntityId*                            eidP  = new EntityId("E01", "EType", "false");
+
+  utInit();
+
+  //
+  // Both subscriptionId and contextRegistrationResponseVector are MANDATORY.
+  // Just two tests here:
+  //  1. contextRegistrationResponseVector with ONE contextRegistrationResponse instance
+  //  2. contextRegistrationResponseVector with TWO contextRegistrationResponse instances
+  //
+
+
+
+  // Preparation
+  ncarP = new NotifyContextAvailabilityRequest();
+  ncarP->subscriptionId.set("012345678901234567890123");
+
+  crrP = new ContextRegistrationResponse();
+  ncarP->contextRegistrationResponseVector.push_back(crrP);
+  crrP->contextRegistration.entityIdVector.push_back(eidP);
+  crrP->contextRegistration.providingApplication.set("http://www.tid.es/NotifyContextAvailabilityRequestTest");
+
+  // Test 1. contextRegistrationResponseVector with ONE contextRegistrationResponse instance
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
+  rendered = ncarP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  
+
+  
+  // Test 2. contextRegistrationResponseVector with TWO contextRegistrationResponse instances
+  Metadata*                     mdP   = new Metadata("M01", "MType", "123");
+  ContextRegistrationAttribute* craP  = new ContextRegistrationAttribute("CRA1", "CType", "false");
+
+  eidP->fill("E02", "EType", "false");
+  crrP = new ContextRegistrationResponse();
+  ncarP->contextRegistrationResponseVector.push_back(crrP);
+
+  crrP->contextRegistration.entityIdVector.push_back(eidP);
+  crrP->contextRegistration.entityIdVectorPresent = true;
+  crrP->contextRegistration.contextRegistrationAttributeVector.push_back(craP);
+  crrP->contextRegistration.registrationMetadataVector.push_back(mdP);
+
+  crrP->contextRegistration.providingApplication.set("http://www.tid.es/NotifyContextAvailabilityRequestTest2");
+  
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
+  rendered = ncarP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  
+  utExit();
 }

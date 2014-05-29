@@ -4,8 +4,6 @@
       <contextRegistration>
         <entityIdList>
           <entityId type="Room" isPattern="false">
-			<type>Room</type>
-			<isPattern>false</isPattern>
           </entityId>
           <entityId type="Room" isPattern="false">
             <id>OfficeRoom</id>

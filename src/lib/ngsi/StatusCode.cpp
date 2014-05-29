@@ -32,7 +32,6 @@
 #include "common/Format.h"
 #include "rest/HttpStatusCode.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
 
 
 
@@ -54,32 +53,51 @@ StatusCode::StatusCode()
 *
 * StatusCode::StatusCode - 
 */
-StatusCode::StatusCode(HttpStatusCode _code, std::string _reasonPhrase, std::string _details)
+StatusCode::StatusCode(const std::string& _tag)
 {
-  code          = _code;
-  reasonPhrase  = _reasonPhrase;
-  details       = _details;
-  tag           = "statusCode";
+  code         = SccNone;
+  reasonPhrase = "";
+  details      = "";
+  tag          = _tag;
 }
 
 
 
 /* ****************************************************************************
 *
+* StatusCode::StatusCode - 
+*/
+StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _tag)
+{
+  code          = _code;
+  reasonPhrase  = httpStatusCodeString(code);
+  details       = _details;
+  tag           = _tag;
+}
+
+
+/* ****************************************************************************
+*
 * StatusCode::render - 
 */
-std::string StatusCode::render(Format format, std::string indent, bool comma)
+std::string StatusCode::render(Format format, const std::string& indent, bool comma, bool showTag)
 {
   std::string out  = "";
 
-  out += startTag(indent, tag, format);
+  if (code == SccNone)
+  {
+    fill(SccReceiverInternalError, "");
+    details += " - ZERO code set to 500";
+  }
+
+  out += startTag(indent, tag, format, showTag);
   out += valueTag(indent + "  ", "code", code, format, true);
   out += valueTag(indent + "  ", "reasonPhrase", reasonPhrase, format, details != "");
 
   if (details != "")
      out += valueTag(indent + "  ", "details", details, format, false);
 
-  out += endTag(indent, tag, format, comma, false);
+  out += endTag(indent, tag, format, comma);
 
   return out;
 }
@@ -90,10 +108,10 @@ std::string StatusCode::render(Format format, std::string indent, bool comma)
 *
 * StatusCode::fill - 
 */
-void StatusCode::fill(HttpStatusCode _code, std::string _reasonPhrase, std::string _details)
+void StatusCode::fill(HttpStatusCode _code, const std::string& _details)
 {
    code          = _code;
-   reasonPhrase  = _reasonPhrase;
+   reasonPhrase  = httpStatusCodeString(code);
    details       = _details;
 }
 
@@ -101,26 +119,11 @@ void StatusCode::fill(HttpStatusCode _code, std::string _reasonPhrase, std::stri
 
 /* ****************************************************************************
 *
-* StatusCode::fill - 
-*/
-void StatusCode::fill(ErrorCode* ecP)
-{
-   code          = (HttpStatusCode) ecP->code;
-   reasonPhrase  = ecP->reasonPhrase;
-   details       = ecP->details;
-}
-
-/* ****************************************************************************
-*
 * StatusCode::fill -
-*
-* FIXME P3: having StatusCode and ErrorCode actually being the same type lead to this dirty duplication
 */
-void StatusCode::fill(StatusCode* ecP)
+void StatusCode::fill(StatusCode* scP)
 {
-   code          = (HttpStatusCode) ecP->code;
-   reasonPhrase  = ecP->reasonPhrase;
-   details       = ecP->details;
+   fill(scP->code, scP->details);
 }
 
 
@@ -129,9 +132,9 @@ void StatusCode::fill(StatusCode* ecP)
 *
 * StatusCode::check - 
 */
-std::string StatusCode::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string StatusCode::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
-  if (code == 0)
+  if (code == SccNone)
     return "no code";
 
   if (reasonPhrase == "")
@@ -146,11 +149,12 @@ std::string StatusCode::check(RequestType requestType, Format format, std::strin
 *
 * StatusCode::present - 
 */
-void StatusCode::present(std::string indent)
+void StatusCode::present(const std::string& indent)
 {
-   PRINTF("%sCode:            %d",   indent.c_str(), code);
-   PRINTF("%sReasonPhrase:    '%s'", indent.c_str(), reasonPhrase.c_str());
-   PRINTF("%sDetail:          '%s'", indent.c_str(), details.c_str());
+   PRINTF("%sCode:            %d\n",   indent.c_str(), code);
+   PRINTF("%sReasonPhrase:    '%s'\n", indent.c_str(), reasonPhrase.c_str());
+   PRINTF("%sDetail:          '%s'\n", indent.c_str(), details.c_str());
+   PRINTF("%sTag:             '%s'\n", indent.c_str(), tag.c_str());
 }
 
 
@@ -161,7 +165,9 @@ void StatusCode::present(std::string indent)
 */
 void StatusCode::release(void)
 {
-   /* This method is included for the sake of homogeneity */
+  code         = SccNone;
+  reasonPhrase = "";
+  details      = "";
 }
 
 
@@ -170,7 +176,7 @@ void StatusCode::release(void)
 *
 * tagSet - 
 */
-void StatusCode::tagSet(std::string _tag)
+void StatusCode::tagSet(const std::string& _tag)
 {
   tag = _tag;
 }

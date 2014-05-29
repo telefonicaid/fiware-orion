@@ -22,12 +22,10 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-
+#include "unittest.h"
 
 /* ****************************************************************************
 *
@@ -39,17 +37,21 @@ static RestService rs[] =
    { "",       InvalidRequest,                        0, {                                                          }, "", NULL                                      }
 };
 
-
-
 /* ****************************************************************************
 *
-* check - 
+* ok - 
 */
 TEST(badRequest, ok)
 {
   ConnectionInfo ci("/xxx/badbadbad",  "GET", "1.1");
-  std::string    out      = restService(&ci, rs);
-  std::string    expected = "<orionError>\n  <code>400</code>\n  <reasonPhrase>bad request</reasonPhrase>\n  <details>service '/xxx/badbadbad' not found</details>\n</orionError>\n";
+  std::string    out;
+  const char*    outfile = "orion.badRequest.valid.xml";
 
-  EXPECT_EQ(expected, out);
+  utInit();
+
+  out = restService(&ci, rs);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }

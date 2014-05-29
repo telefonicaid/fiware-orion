@@ -73,7 +73,7 @@ static int registrationId(xml_node<>* node, ParseData* reqData)
 static int errorCodeCode(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a errorCode code: '%s'", node->value()));
-  reqData->rcrs.res.errorCode.code = atoi(node->value());
+  reqData->rcrs.res.errorCode.code = (HttpStatusCode) atoi(node->value());
   return 0;
 }
 
@@ -86,7 +86,7 @@ static int errorCodeCode(xml_node<>* node, ParseData* reqData)
 static int errorCodeReasonPhrase(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got an errorCode reason phrase: '%s'", node->value()));
-  reqData->rcrs.res.errorCode.reasonPhrase = node->value();
+  reqData->rcrs.res.errorCode.reasonPhrase = node->value(); // OK - parsing step
   return 0;
 }
 

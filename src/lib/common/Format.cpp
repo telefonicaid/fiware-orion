@@ -22,8 +22,8 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
 #include <string.h>
+#include <string>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -39,37 +39,37 @@
 */
 const char* formatToString(Format format)
 {
-   switch (format)
-   {
-   case XML:      return "XML";
-   case JSON:     return "JSON";
-   case TEXT:     return "TEXT";
-   case HTML:     return "HTML";
-   case NOFORMAT: return "NOFORMAT";
-   }
+  switch (format)
+  {
+  case XML:      return "XML";
+  case JSON:     return "JSON";
+  case TEXT:     return "TEXT";
+  case HTML:     return "HTML";
+  case NOFORMAT: return "NOFORMAT";
+  }
 
-   return "Unknown format";
+  return "Unknown format";
 }
 
 /* ****************************************************************************
 *
 * stringToFormat
 */
-Format stringToFormat(std::string s)
+Format stringToFormat(const std::string& s)
 {
-    if (s == "XML")
-        return XML;
-    else if (s == "JSON")
-        return JSON;
-    else
-        return NOFORMAT;
+  if (s == "XML")
+    return XML;
+  else if (s == "JSON")
+    return JSON;
+  else
+    return NOFORMAT;
 }
 
 /* ****************************************************************************
 *
 * formatParse - 
 */
-Format formatParse(std::string formatString, std::string* charsetP)
+Format formatParse(const std::string& formatString, std::string* charsetP)
 {
   char* s;
   char* cP = (char*) formatString.c_str();
@@ -81,8 +81,8 @@ Format formatParse(std::string formatString, std::string* charsetP)
     s = wsStrip(s);
     if (strncmp(s, "charset=", 8) == 0)
     {
-       if (charsetP != NULL)
-          *charsetP = std::string(&s[8]);
+      if (charsetP != NULL)
+        *charsetP = std::string(&s[8]);
     }
   }
 

@@ -28,6 +28,7 @@
 #include <string>
 
 #include "rest/HttpStatusCode.h"
+#include "rest/ConnectionInfo.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 
 
@@ -36,6 +37,6 @@
 *
 * mapGetContextEntitiesByEntityId - 
 */
-extern HttpStatusCode mapGetContextEntitiesByEntityId(std::string id, DiscoverContextAvailabilityResponse* response);
+extern HttpStatusCode mapGetContextEntitiesByEntityId(const std::string& id, DiscoverContextAvailabilityResponse* response, ConnectionInfo* ciP);
 
 #endif

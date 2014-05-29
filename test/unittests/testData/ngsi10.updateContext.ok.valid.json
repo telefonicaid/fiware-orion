@@ -1,0 +1,47 @@
+{
+	"contextElements": [
+		{
+			"type": "Room",
+			"isPattern": "false",
+			"id": "ConferenceRoom",
+			"attributes": [
+				{
+					"name": "temperature",
+					"type": "degree",
+					"value": "20",
+					"metadatas": [
+						{
+							"name": "attributeValueIdentifier",
+							"type": "long",
+							"value": "1"
+						},
+						{
+							"name": "attributeValueIdentifier",
+							"type": "long",
+							"value": "2"
+						},
+						{
+							"name": "attributeValueIdentifier",
+							"type": "long",
+							"value": "3"
+						}
+					]
+				}
+			],
+      "attributeDomainName" : "ATTR_DOMAIN_NAME",
+      "domainMetadatas" : [
+        {
+          "name"  : "dmName",
+          "type"  : "dmType",
+          "value" : "dmValue"
+        },
+        {
+          "name"  : "dmName2",
+          "type"  : "dmType2",
+          "value" : "dmValue2"
+        }
+      ]
+		}
+	],
+	"updateAction": "UPDATE"
+}

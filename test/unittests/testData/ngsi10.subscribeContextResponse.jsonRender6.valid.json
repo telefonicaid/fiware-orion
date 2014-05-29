@@ -1,0 +1,7 @@
+{
+  "subscribeResponse" : {
+    "subscriptionId" : "012345678901234567890123",
+    "duration" : "PT1H",
+    "throttling" : "PT1M"
+  }
+}

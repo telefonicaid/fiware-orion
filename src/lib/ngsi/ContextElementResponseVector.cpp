@@ -38,7 +38,7 @@
 *
 * ContextElementResponseVector::render - 
 */
-std::string ContextElementResponseVector::render(Format format, std::string indent, bool comma)
+std::string ContextElementResponseVector::render(RequestType requestType, Format format, const std::string& indent, bool comma)
 {
   std::string xmlTag   = "contextResponseList";
   std::string jsonTag  = "contextResponses";
@@ -50,7 +50,7 @@ std::string ContextElementResponseVector::render(Format format, std::string inde
   out += startTag(indent, xmlTag, jsonTag, format, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ", ix < (vec.size() - 1));
+    out += vec[ix]->render(requestType, format, indent + "  ", ix < (vec.size() - 1));
 
   out += endTag(indent, xmlTag, format, comma, true);
 
@@ -63,7 +63,7 @@ std::string ContextElementResponseVector::render(Format format, std::string inde
 *
 * ContextElementResponseVector::check - 
 */
-std::string ContextElementResponseVector::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ContextElementResponseVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -82,7 +82,7 @@ std::string ContextElementResponseVector::check(RequestType requestType, Format 
 *
 * ContextElementResponseVector::present - 
 */
-void ContextElementResponseVector::present(std::string indent)
+void ContextElementResponseVector::present(const std::string& indent)
 {
    PRINTF("%lu ContextElementResponses", (unsigned long) vec.size());
 
@@ -107,9 +107,11 @@ void ContextElementResponseVector::push_back(ContextElementResponse* item)
 *
 * ContextElementResponseVector::get - 
 */
-ContextElementResponse* ContextElementResponseVector::get(int ix)
+ContextElementResponse* ContextElementResponseVector::get(unsigned int ix)
 {
-  return vec[ix];
+  if (ix < vec.size())
+    return vec[ix];
+  return NULL;
 }
 
 

@@ -29,14 +29,16 @@
 
 #include "ngsi/Request.h"
 #include "common/Format.h"
+#include "orionTypes/areas.h"
+
+using namespace orion;
+
 
 /* ****************************************************************************
 *
 * Defined scopes so far
 */
-//FIXME: SCOPE_TYPE_ASSOC is not very good as string token, we should talk with NEC
-//to use a better one
-#define SCOPE_TYPE_ASSOC           "Include Associations"
+#define SCOPE_TYPE_ASSOC           "IncludeAssociations"
 #define SCOPE_VALUE_ASSOC_SOURCE   "SOURCES"
 #define SCOPE_VALUE_ASSOC_TARGET   "TARGETS"
 #define SCOPE_VALUE_ASSOC_ALL      "ALL"
@@ -50,12 +52,16 @@ typedef struct Scope
   std::string  type;    // Mandatory
   std::string  value;   // Mandatory
 
-  Scope();
-  Scope(std::string _type, std::string _value);
+  orion::AreaType     areaType;
+  orion::Circle       circle;
+  orion::Polygon      polygon;
 
-  std::string render(Format format, std::string indent, bool notLastInVector);
-  std::string check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void        present(std::string indent, int ix);
+  Scope();
+  Scope(const std::string& _type, const std::string& _value);
+
+  std::string render(Format format, const std::string& indent, bool notLastInVector);
+  std::string check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  void        present(const std::string& indent, int ix);
   void        release(void);
 } Scope;
 

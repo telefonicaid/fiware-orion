@@ -48,7 +48,7 @@ Throttling::Throttling()
 *
 * Throttling::parse -
 */
-int Throttling::parse(void)
+long long Throttling::parse(void)
 {
     seconds = parse8601(string);
     return seconds;
@@ -59,7 +59,7 @@ int Throttling::parse(void)
 *
 * Throttling::check - 
 */
-std::string Throttling::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string Throttling::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
    // FIXME - make Throttling and Duration inherit from same class
    //         that implements the 'parse' method
@@ -90,7 +90,7 @@ bool Throttling::isEmpty(void)
 *
 * Throttling::set - 
 */
-void Throttling::set(std::string value)
+void Throttling::set(const std::string& value)
 {
   string = value;
 }
@@ -112,7 +112,7 @@ std::string Throttling::get(void)
 *
 * Throttling::present - 
 */
-void Throttling::present(std::string indent)
+void Throttling::present(const std::string& indent)
 {
   if (string != "")
     PRINTF("%sThrottling: %s\n", indent.c_str(), string.c_str());
@@ -126,7 +126,7 @@ void Throttling::present(std::string indent)
 *
 * Throttling::render - 
 */
-std::string Throttling::render(Format format, std::string indent, bool comma)
+std::string Throttling::render(Format format, const std::string& indent, bool comma)
 {
   if (string == "")
     return "";

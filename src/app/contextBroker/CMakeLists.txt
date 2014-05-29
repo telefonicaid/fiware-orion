@@ -27,18 +27,20 @@ SET (HEADERS
 
 
 SET (STATIC_LIBS
+    common
     mongoBackend
     ngsiNotify
     serviceRoutines
     convenienceMap
-    mongoBackend    
+    mongoBackend
     rest
     jsonParse
     xmlParse
     convenience
     ngsi9
     ngsi10
-    ngsi    
+    ngsi
+    parse
     common
     lm
     pa
@@ -65,7 +67,7 @@ ADD_EXECUTABLE(contextBroker ${SOURCES} ${HEADERS})
 IF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS"))
   MESSAGE("Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
-ELSEIF(${DISTRO} STREQUAL "openSUSE_12.3")
+ELSEIF(${DISTRO} STREQUAL "openSUSE_13.1")
   MESSAGE("openSUSE DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto)
 ELSEIF(${DISTRO} STREQUAL "CentOS_6.3")

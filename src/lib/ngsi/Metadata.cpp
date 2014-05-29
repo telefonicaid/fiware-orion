@@ -24,6 +24,7 @@
 */
 #include <stdio.h>
 
+#include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
@@ -49,7 +50,7 @@ Metadata::Metadata()
 *
 * Metadata::Metadata - 
 *
-* FIXME 8: Copy also the Association!
+* FIXME P9: Copy also the Association!
 *  
 */ 
 Metadata::Metadata(Metadata* mP)
@@ -67,7 +68,7 @@ Metadata::Metadata(Metadata* mP)
 *
 * Metadata::Metadata - 
 */ 
-Metadata::Metadata(std::string _name, std::string _type, std::string _value)
+Metadata::Metadata(const std::string& _name, const std::string& _type, const std::string& _value)
 {
   name  = _name;
   type  = _type;
@@ -80,7 +81,7 @@ Metadata::Metadata(std::string _name, std::string _type, std::string _value)
 *
 * Metadata::render - 
 */
-std::string Metadata::render(Format format, std::string indent, bool comma)
+std::string Metadata::render(Format format, const std::string& indent, bool comma)
 {
   std::string out     = "";
   std::string tag  = "contextMetadata";
@@ -105,7 +106,7 @@ std::string Metadata::render(Format format, std::string indent, bool comma)
 *
 * Metadata::check - 
 */
-std::string Metadata::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string Metadata::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   if (name == "")
     return "missing metadata name";
@@ -125,7 +126,7 @@ std::string Metadata::check(RequestType requestType, Format format, std::string 
 *
 * Metadata::present - 
 */
-void Metadata::present(std::string metadataType, int ix, std::string indent)
+void Metadata::present(const std::string& metadataType, int ix, const std::string& indent)
 {
   PRINTF("%s%s Metadata %d:\n",   indent.c_str(), metadataType.c_str(), ix);
   PRINTF("%s  Name:     %s\n", indent.c_str(), name.c_str());

@@ -28,6 +28,8 @@
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/UpdateContextElementResponse.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/HttpStatusCode.h"
 
 
 
@@ -35,6 +37,6 @@
 *
 * mapPutIndividualContextEntity - 
 */
-extern HttpStatusCode mapPutIndividualContextEntity(std::string entityId, UpdateContextElementRequest* ucerP, UpdateContextElementResponse* response);
+extern HttpStatusCode mapPutIndividualContextEntity(const std::string& entityId, UpdateContextElementRequest* ucerP, UpdateContextElementResponse* response, ConnectionInfo* ciP);
 
 #endif

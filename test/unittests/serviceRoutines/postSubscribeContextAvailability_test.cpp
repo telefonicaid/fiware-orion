@@ -22,20 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/postSubscribeContextAvailability.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "testDataFromFile.h"
-#include "commonMocks.h"
-
-using ::testing::_;
-using ::testing::Throw;
-using ::testing::Return;
+#include "unittest.h"
 
 
 
@@ -59,19 +52,14 @@ static RestService rs[] =
 TEST(postSubscribeContextAvailability, ok)
 {
   ConnectionInfo ci("/ngsi9/subscribeContextAvailability",  "POST", "1.1");
-  std::string    expectedStart  = "<subscribeContextAvailabilityResponse>\n  <subscriptionId>";
-  const char*    fileName       = "ngsi9.subscribeContextAvailabilityRequest.subscriptionIdNot24Chars.invalid.xml";
+  const char*    infile   = "ngsi9.subscribeContextAvailabilityRequest.ok2.valid.xml";
+  const char*    outfile  = "ngsi9.subscribeContextAvailabilityResponse.ok2.middle.xml";
   std::string    out;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  utInit();
 
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  NotifierMock* notifierMock = new NotifierMock();
-  setNotifier(notifierMock);
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   ci.outFormat    = XML;
   ci.inFormat     = XML;
@@ -79,11 +67,14 @@ TEST(postSubscribeContextAvailability, ok)
   ci.payloadSize  = strlen(testBuf);
   out             = restService(&ci, rs);
 
-  char* outStart = (char*) out.c_str();
-  outStart[expectedStart.length()] = 0;
+  char* outStart  = (char*) out.c_str();
 
-  EXPECT_STREQ(expectedStart.c_str(), outStart);
+  // Remove last char in expectedBuf
+  expectedBuf[strlen(expectedBuf) - 1] = 0;
 
-  delete timerMock;
-  delete notifierMock;
+  // Shorten'out' to be of same length as expectedBuf
+  outStart[strlen(expectedBuf)]    = 0;
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }

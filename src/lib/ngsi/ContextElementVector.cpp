@@ -49,7 +49,7 @@ void ContextElementVector::push_back(ContextElement* item)
 *
 * ContextElementVector::render - 
 */
-std::string ContextElementVector::render(Format format, std::string indent, bool comma)
+std::string ContextElementVector::render(RequestType requestType, Format format, const std::string& indent, bool comma)
 {
   std::string  out     = "";
   std::string  xmlTag  = "contextElementList";
@@ -61,7 +61,7 @@ std::string ContextElementVector::render(Format format, std::string indent, bool
   out += startTag(indent, xmlTag, jsonTag, format, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
+    out += vec[ix]->render(requestType, format, indent + "  ", ix != vec.size() - 1);
 
   out += endTag(indent, xmlTag, format, comma);
 
@@ -74,7 +74,7 @@ std::string ContextElementVector::render(Format format, std::string indent, bool
 *
 * ContextElementVector::present - 
 */
-void ContextElementVector::present(std::string indent)
+void ContextElementVector::present(const std::string& indent)
 {
    PRINTF("%lu ContextElements", (unsigned long) vec.size());
 
@@ -127,7 +127,7 @@ unsigned int ContextElementVector::size(void)
 *
 * ContextElementVector::check - 
 */
-std::string ContextElementVector::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ContextElementVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   if (requestType == UpdateContext)
   {

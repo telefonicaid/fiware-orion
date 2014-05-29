@@ -1,0 +1,5 @@
+<orionError>
+  <code>400</code>
+  <reasonPhrase>Bad Request</reasonPhrase>
+  <details>ngsi9 service '/ngsi9/badbadbad' not found</details>
+</orionError>

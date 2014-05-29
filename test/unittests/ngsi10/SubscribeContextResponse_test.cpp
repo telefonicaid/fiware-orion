@@ -22,9 +22,9 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "ngsi10/SubscribeContextResponse.h"
+
+#include "unittest.h"
 
 
 
@@ -35,15 +35,108 @@
 TEST(SubscribeContextResponse, constructorsAndRender)
 {
   SubscribeContextResponse  scr1;
-  ErrorCode                 ec(SccOk, "RP", "D");
+  StatusCode                ec(SccOk, "D");
   SubscribeContextResponse  scr2(ec);
-  std::string               rendered;
-  std::string               expected = "<subscribeContextResponse>\n  <subscribeError>\n    <errorCode>\n      <code>200</code>\n      <reasonPhrase>RP</reasonPhrase>\n      <details>D</details>\n    </errorCode>\n  </subscribeError>\n</subscribeContextResponse>\n";
+  std::string               out;
+  const char*               outfile = "ngsi10.subscribeContextResponse.ok.valid.xml";
 
-  EXPECT_STREQ("0", scr1.subscribeError.subscriptionId.get().c_str());
-  EXPECT_STREQ("0", scr2.subscribeError.subscriptionId.get().c_str());
-  EXPECT_STREQ("RP", scr2.subscribeError.errorCode.reasonPhrase.c_str());
+  utInit();
 
-  rendered = scr2.render(SubscribeContext, XML, "");
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+  EXPECT_STREQ("000000000000000000000000", scr1.subscribeError.subscriptionId.get().c_str());
+  EXPECT_STREQ("000000000000000000000000", scr2.subscribeError.subscriptionId.get().c_str());
+  EXPECT_STREQ("OK", scr2.subscribeError.errorCode.reasonPhrase.c_str());
+
+  out = scr2.render(SubscribeContext, XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* jsonRender - 
+*/
+TEST(SubscribeContextResponse, json_render)
+{
+  const char*                filename1  = "ngsi10.subscribeContextResponse.jsonRender1.valid.json";
+  const char*                filename2  = "ngsi10.subscribeContextResponse.jsonRender2.valid.json";
+  const char*                filename3  = "ngsi10.subscribeContextResponse.jsonRender3.valid.json";
+  const char*                filename4  = "ngsi10.subscribeContextResponse.jsonRender4.valid.json";
+  const char*                filename5  = "ngsi10.subscribeContextResponse.jsonRender5.valid.json";
+  const char*                filename6  = "ngsi10.subscribeContextResponse.jsonRender6.valid.json";
+  SubscribeContextResponse*  scrP;
+  std::string                out;
+
+  utInit();
+
+  // Preparations
+  scrP = new SubscribeContextResponse();
+
+  // 1. subscribeError, -subscriptionId, with details
+  // 2. subscribeError, +subscriptionId, no details
+  // 3. subscribeResponse: +subscription -duration -throttling
+  // 4. subscribeResponse: +subscription -duration +throttling
+  // 5. subscribeResponse: +subscription +duration -throttling
+  // 6. subscribeResponse: +subscription +duration +throttling
+
+  // 1.
+  scrP->subscribeError.errorCode.fill(SccBadRequest, "details");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
+  out = scrP->render(SubscribeContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+
+
+  // 2.
+  scrP->subscribeError.errorCode.fill(SccBadRequest);
+  scrP->subscribeError.subscriptionId.set("012345678901234567890123");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
+  out = scrP->render(SubscribeContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  scrP->subscribeError.errorCode.fill(SccNone);
+
+
+
+  // 3.
+  scrP->subscribeResponse.subscriptionId.set("012345678901234567890123");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
+  out = scrP->render(SubscribeContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+
+
+  // 4.
+  scrP->subscribeResponse.throttling.set("PT1M");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
+  out = scrP->render(SubscribeContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+
+
+  // 5.
+  scrP->subscribeResponse.throttling.set("");
+  scrP->subscribeResponse.duration.set("PT1H");
+  
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename5)) << "Error getting test data from '" << filename5 << "'";
+  out = scrP->render(SubscribeContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+
+
+  // 6.
+  scrP->subscribeResponse.throttling.set("PT1M");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename6)) << "Error getting test data from '" << filename6 << "'";
+  out = scrP->render(SubscribeContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }

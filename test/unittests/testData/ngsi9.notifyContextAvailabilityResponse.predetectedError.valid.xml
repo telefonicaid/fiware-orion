@@ -1,0 +1,7 @@
+<notifyContextAvailabilityResponse>
+  <responseCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>predetected error</details>
+  </responseCode>
+</notifyContextAvailabilityResponse>

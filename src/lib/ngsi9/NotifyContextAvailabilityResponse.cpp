@@ -31,7 +31,6 @@
 #include "common/tag.h"
 #include "common/globals.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
 #include "ngsi9/NotifyContextAvailabilityResponse.h"
 #include "rest/HttpStatusCode.h"
 
@@ -43,7 +42,7 @@
 */
 NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse()
 {
-   responseCode.fill(SccOk, "", "");
+  responseCode.fill(SccOk);
 }
 
 
@@ -61,20 +60,9 @@ NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse(StatusCode&
 
 /* ****************************************************************************
 *
-* NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse -
-*/
-NotifyContextAvailabilityResponse::NotifyContextAvailabilityResponse(ErrorCode& ec)
-{
-   responseCode.fill(&ec);
-}
-
-
-
-/* ****************************************************************************
-*
 * NotifyContextAvailabilityResponse::render -
 */
-std::string NotifyContextAvailabilityResponse::render(RequestType requestType, Format format, std::string indent)
+std::string NotifyContextAvailabilityResponse::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "notifyContextAvailabilityResponse";
@@ -94,7 +82,7 @@ std::string NotifyContextAvailabilityResponse::render(RequestType requestType, F
 *
 * NotifyContextAvailabilityResponse::present -
 */
-void NotifyContextAvailabilityResponse::present(std::string indent)
+void NotifyContextAvailabilityResponse::present(const std::string& indent)
 {
   PRINTF("%sNotifyContextAvailabilityResponse:", indent.c_str());
   responseCode.present(indent + "  ");

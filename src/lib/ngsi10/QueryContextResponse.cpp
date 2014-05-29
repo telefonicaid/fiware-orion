@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "common/string.h"
 #include "common/tag.h"
+#include "rest/HttpStatusCode.h"
+#include "ngsi/StatusCode.h"
 #include "ngsi10/QueryContextResponse.h"
 
 
@@ -38,9 +40,7 @@
 */
 QueryContextResponse::QueryContextResponse()
 {
-  errorCode.code         = NO_ERROR_CODE;
-  errorCode.reasonPhrase = "";
-  errorCode.details      = "";
+  errorCode.tagSet("errorCode");
 }
 
 
@@ -48,9 +48,10 @@ QueryContextResponse::QueryContextResponse()
 *
 * QueryContextResponse::QueryContextResponse - 
 */
-QueryContextResponse::QueryContextResponse(ErrorCode _errorCode)
+QueryContextResponse::QueryContextResponse(StatusCode& _errorCode)
 {
-  errorCode = _errorCode;
+  errorCode.fill(&_errorCode);
+  errorCode.tagSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -67,15 +68,25 @@ QueryContextResponse::~QueryContextResponse()
 *
 * QueryContextResponse::render - 
 */
-std::string QueryContextResponse::render(RequestType requestType, Format format, std::string indent)
+std::string QueryContextResponse::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "queryContextResponse";
 
   out += startTag(indent, tag, format, false);
 
-  if (errorCode.code == NO_ERROR_CODE)
-     out += contextElementResponseVector.render(format, indent + "  ");
+  if ((errorCode.code == SccNone) || (errorCode.code == SccOk))
+  {
+    if (contextElementResponseVector.size() == 0)
+    {
+      errorCode.fill(SccContextElementNotFound);
+      out += errorCode.render(format, indent + "  ");
+    }
+    else 
+    {
+      out += contextElementResponseVector.render(QueryContext, format, indent + "  ");
+    }
+  }
   else
      out += errorCode.render(format, indent + "  ");
 

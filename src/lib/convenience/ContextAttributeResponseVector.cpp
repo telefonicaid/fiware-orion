@@ -36,18 +36,24 @@
 *
 * ContextAttributeResponseVector::render - 
 */
-std::string ContextAttributeResponseVector::render(Format format, std::string indent)
+std::string ContextAttributeResponseVector::render(RequestType request, Format format, std::string indent)
 {
-  std::string out = "";
-  std::string tag = "contextResponseList";
+  std::string out     = "";
+  std::string xmlTag  = "contextResponseList";
+  std::string jsonTag = "contextResponses";
 
   if (vec.size() == 0)
-    return "";
+  {
+    if (request == IndividualContextEntityAttributes)
+      return indent + "<contextAttributeList></contextAttributeList>\n";
 
-  out += startTag(indent, tag, format);
+    return "";
+  }
+
+  out += startTag(indent, xmlTag, jsonTag, format, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ");
-  out += endTag(indent, tag, format);
+    out += vec[ix]->render(request, format, indent + "  ");
+  out += endTag(indent, xmlTag, format, false, true);
 
   return out;
 }
@@ -58,13 +64,13 @@ std::string ContextAttributeResponseVector::render(Format format, std::string in
 *
 * ContextAttributeResponseVector::check - 
 */
-std::string ContextAttributeResponseVector::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ContextAttributeResponseVector::check(RequestType request, Format format, std::string indent, std::string predetectedError, int counter)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
      std::string res;
 
-     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+     if ((res = vec[ix]->check(request, format, indent, predetectedError, counter)) != "OK")
        return res;
   }
 

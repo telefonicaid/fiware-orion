@@ -30,7 +30,7 @@
 #include <sstream>
 
 #include "ngsi/ContextRegistrationResponseVector.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 
 
 
@@ -41,13 +41,13 @@
 typedef struct DiscoverContextAvailabilityResponse
 {
   ContextRegistrationResponseVector   responseVector;     // Optional
-  ErrorCode                           errorCode;          // Optional
+  StatusCode                          errorCode;          // Optional
 
   DiscoverContextAvailabilityResponse();
   ~DiscoverContextAvailabilityResponse();
-  DiscoverContextAvailabilityResponse(ErrorCode& _errorCode);
+  DiscoverContextAvailabilityResponse(StatusCode& _errorCode);
 
-  std::string  render(RequestType requestType, Format format, std::string indent);  
+  std::string  render(RequestType requestType, Format format, const std::string& indent);  
   void         release();
 } DiscoverContextAvailabilityResponse;
 

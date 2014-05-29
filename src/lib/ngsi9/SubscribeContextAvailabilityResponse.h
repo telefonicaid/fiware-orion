@@ -29,7 +29,7 @@
 
 #include "ngsi/SubscriptionId.h"
 #include "ngsi/Duration.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 
 
 
@@ -41,14 +41,14 @@ typedef struct SubscribeContextAvailabilityResponse
 {
   SubscriptionId   subscriptionId;    // Mandatory
   Duration         duration;          // Optional
-  ErrorCode        errorCode;         // Optional
+  StatusCode       errorCode;         // Optional
 
   SubscribeContextAvailabilityResponse();
   ~SubscribeContextAvailabilityResponse();
-  SubscribeContextAvailabilityResponse(std::string _subscriptionId, std::string _duration);
-  SubscribeContextAvailabilityResponse(std::string _subscriptionId, ErrorCode _errorCode);
+  SubscribeContextAvailabilityResponse(const std::string& _subscriptionId, const std::string& _duration);
+  SubscribeContextAvailabilityResponse(const std::string& _subscriptionId, StatusCode& _errorCode);
 
-   std::string render(RequestType requestType, Format format, std::string indent);
+   std::string render(RequestType requestType, Format format, const std::string& indent);
 } SubscribeContextAvailabilityResponse;
 
 #endif

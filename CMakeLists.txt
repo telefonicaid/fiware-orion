@@ -99,9 +99,15 @@ endif (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
 
 # -Wunused-but-set-variable is available from gcc 4.6.0 but can be set in 4.5.x
 # OS X comes with gcc 4.2.1 (10.7) and does not accept this flag
-if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-but-set-variable")
-endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+# 
+# no-unused-but-set-variable (commented, not active):
+#   if the following piece of 'compiler directives' is uncommented, we no longer get warnings for
+#   variables that are defined but not used.
+#   For now we want these warnings as we desire as strict compilaton as possible.
+#
+#if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+#    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-but-set-variable")
+#endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 #
 # Enabling testing
@@ -156,6 +162,7 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/ngsi9)
   ADD_SUBDIRECTORY(src/lib/ngsi10)
   ADD_SUBDIRECTORY(src/lib/ngsiNotify)
+  ADD_SUBDIRECTORY(src/lib/parse)
   ADD_SUBDIRECTORY(src/lib/jsonParse)
   ADD_SUBDIRECTORY(src/lib/xmlParse)
   ADD_SUBDIRECTORY(src/lib/rest)

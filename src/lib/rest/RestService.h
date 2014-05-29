@@ -40,7 +40,7 @@
 *
 * RestServiceHandler - 
 */
-typedef std::string (*RestServiceHandler)(ConnectionInfo* ciP, int compononts, std::vector<std::string> compV);
+typedef std::string (*RestServiceHandler)(ConnectionInfo* ciP, int compononts, std::vector<std::string>& compV);
 
 
 
@@ -48,13 +48,13 @@ typedef std::string (*RestServiceHandler)(ConnectionInfo* ciP, int compononts, s
 *
 * RestService - 
 */
-typedef std::string (*RestTreat)(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* reqDataP);
+typedef std::string (*RestTreat)(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* reqDataP);
 typedef struct RestService
 {
   std::string   verb;
   RequestType   request;
   int           components;
-  std::string   compV[6];
+  std::string   compV[7];
   std::string   payloadWord;
   RestTreat     treat;
 } RestService;

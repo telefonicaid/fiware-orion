@@ -30,7 +30,7 @@
 
 #include "common/Format.h"
 #include "convenience/ContextAttributeResponseVector.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 
 
 
@@ -46,9 +46,11 @@
 typedef struct AppendContextElementResponse
 {
   ContextAttributeResponseVector   contextResponseVector;   // Optional, but mandatory if success
-  ErrorCode                        errorCode;               // Optional, but mandatory if failure
+  StatusCode                       errorCode;               // Optional, but mandatory if failure
 
-  std::string render(Format format, std::string indent);
+  AppendContextElementResponse();
+
+  std::string render(RequestType requestType, Format format, std::string indent);
   std::string check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
   void        present(void);
   void        release(void);

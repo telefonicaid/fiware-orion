@@ -37,12 +37,12 @@
 *
 * postUnsubscribeContext - 
 */
-std::string postUnsubscribeContext(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string postUnsubscribeContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   UnsubscribeContextResponse  uncr;
   std::string                 answer;
 
-  mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr);
+  ciP->httpStatusCode = mongoUnsubscribeContext(&parseDataP->uncr.res, &uncr, ciP->tenant);
   answer = uncr.render(UnsubscribeContext, ciP->outFormat, "");
 
   return answer;

@@ -24,58 +24,134 @@
 */
 
 #include <regex.h>
+#include "mongo/client/dbclient.h"
 
-#include "common/globals.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/globals.h"
+#include "common/sem.h"
+#include "common/string.h"
+
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoOntimeintervalOperations.h"
-
-#include "mongo/client/dbclient.h"
 
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/AttributeList.h"
 #include "ngsi/ContextElementResponseVector.h"
 #include "ngsi/Duration.h"
-
+#include "parse/CompoundValueNode.h"
+#include "ngsi/Restriction.h"
 #include "ngsiNotify/Notifier.h"
 
 using namespace mongo;
+
+
+
+/* ****************************************************************************
+*
+* RECONNECT_RETRIES - number of retries after connect
+* RECONNECT_DELAY   - number of millisecs to sleep between retries
+*/
+#define RECONNECT_RETRIES 100
+#define RECONNECT_DELAY   1000  // One second
+
+
 
 /* ****************************************************************************
 *
 * Globals
 */
-static DBClientConnection* connection;
-static char* entitiesCollectionName = NULL;
-static char* registrationsCollectionName = NULL;
-static char* subscribeContextCollectionName = NULL;
-static char* subscribeContextAvailabilityCollectionName = NULL;
-static char* assocationsCollectionName = NULL;
-static Notifier* notifier = NULL;
+static DBClientConnection*  connection;
+static int                  mongoVersionMayor = -1;
+static int                  mongoVersionMinor = -1;
+static std::string          dbPrefix;
+static std::string          entitiesCollectionName;
+static std::string          registrationsCollectionName;
+static std::string          subscribeContextCollectionName;
+static std::string          subscribeContextAvailabilityCollectionName;
+static std::string          assocationsCollectionName;
+static Notifier*            notifier;
+
+/* ****************************************************************************
+*
+* Forward declarations
+*/
+static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElement& be);
+static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElement& be);
 
 /* ****************************************************************************
 *
 * mongoConnect -
 */
-bool mongoConnect(const char* host, const char* db, const char* username, const char* passwd) {
+bool mongoConnect(const char* host, const char* db, const char* username, const char* passwd, bool multitenant) {
 
     std::string err;
+
+    mongoSemTake(__FUNCTION__, "connecting to mongo");
 
     /* The first argument to true is to use autoreconnect */
     connection = new DBClientConnection(true);
 
-    if (!connection->connect(host, err)) {
-        LM_RE(false, ("MongoDB connection fails: '%s'", err.c_str()));
+    bool connected = false;
+    int  retries   = RECONNECT_RETRIES;
+
+    for (int tryNo = 0; tryNo < retries; ++tryNo)
+    {
+      if (connection->connect(host, err))
+      {
+        connected = true;
+        break;
+      }
+
+      if (tryNo == 0)
+        LM_W(("Cannot connect to mongo - doing %d retries with a %d microsecond interval", retries, RECONNECT_DELAY));
+      else
+        LM_VVVVV(("Try %d connecting to mongo failed", tryNo));
+
+      usleep(RECONNECT_DELAY * 1000); // usleep accepts microseconds
     }
 
-    if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0) {
-        if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err)) {
-            LM_RE(false, ("Auth error (db=%s, username=%s, pswd=%s): %s", db, username, passwd, err.c_str()));
+    if (connected == false)
+    {
+      mongoSemGive(__FUNCTION__, "connecting to mongo failed");
+      LM_RE(false, ("MongoDB connection failed, after %d retries: '%s'", retries, err.c_str()));
+    }
+
+    /* Authentication is different depending if multiserive is used or not. In the case of not
+     * using multiservice, we authenticate in the single-service database. In the case of using
+     * multiservice, it isn't a default database that we know at contextBroker start time (when
+     * this connection function is invoked) so we authenticate on the admin database, which provides
+     * access to any database */
+    if (multitenant) {
+        if (strlen(username) != 0 && strlen(passwd) != 0) {
+            if (!connection->auth("admin", std::string(username), std::string(passwd), err)) {
+                mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
+                LM_RE(false, ("Auth error (db=admin, username=%s, pswd=%s): %s", username, passwd, err.c_str()));
+            }
+        }
+    }
+    else {
+        if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0) {
+            if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err)) {
+                mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
+                LM_RE(false, ("Auth error (db=%s, username=%s, pswd=%s): %s", db, username, passwd, err.c_str()));
+            }
         }
     }
 
+    /* Get mongo version with the 'buildinfo' command */
+    BSONObj result;
+    std::string extra;
+    connection->runCommand("admin", BSON("buildinfo" << 1), result);
+    std::string versionString = std::string(result.getStringField("version"));
+    if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra)) {
+        mongoSemGive(__FUNCTION__, "wrong mongo version format");
+        LM_RE(false, ("wrong mongo version format: <%s>", versionString.c_str()));
+    }
+    LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)", versionString.c_str(), mongoVersionMayor, mongoVersionMinor, extra.c_str()));
+
+    mongoSemGive(__FUNCTION__, "connecting to mongo");
     return true;
 }
 
@@ -88,7 +164,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
 */
 bool mongoConnect(const char* host) {
 
-    return mongoConnect(host, "", "", "");
+    return mongoConnect(host, "", "", "", false);
 }
 
 /* ****************************************************************************
@@ -153,134 +229,213 @@ DBClientConnection* getMongoConnection(void) {
 
 /*****************************************************************************
 *
-* setEntitiesCollectionName -
+* setDbPrefix -
 */
-void setEntitiesCollectionName(const char* name) {
+extern void setDbPrefix(std::string _dbPrefix) {
+    dbPrefix = _dbPrefix;
+}
 
-    if (entitiesCollectionName != NULL) {
-        free(entitiesCollectionName);
+/*****************************************************************************
+*
+* getOrionDatabases -
+*
+*/
+extern void getOrionDatabases(std::vector<std::string>& dbs) {
+
+    BSONObj result;
+    mongoSemTake(__FUNCTION__, "get Orion databases");
+    connection->runCommand("admin", BSON("listDatabases" << 1), result);
+    mongoSemGive(__FUNCTION__, "get Orion databases");
+
+    std::vector<BSONElement> databases = result.getField("databases").Array();
+
+    for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i) {
+        BSONObj db = (*i).Obj();
+        std::string dbName = STR_FIELD(db, "name");
+        std::string prefix = dbPrefix + "-";
+        if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0) {
+            LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
+            dbs.push_back(dbName);
+        }
     }
 
-    entitiesCollectionName = strdup(name);
+}
+
+/*****************************************************************************
+*
+* setEntitiesCollectionName -
+*/
+void setEntitiesCollectionName(std::string name) {
+    entitiesCollectionName = name;
 }
 
 /*****************************************************************************
 *
 * setRegistrationsCollectionName -
 */
-void setRegistrationsCollectionName(const char* name) {
-
-    if (registrationsCollectionName != NULL) {
-        free(registrationsCollectionName);
-    }
-
-    registrationsCollectionName = strdup(name);
-
+void setRegistrationsCollectionName(std::string name) {
+    registrationsCollectionName = name;
 }
 
 /*****************************************************************************
 *
 * setSubscribeContextCollectionName -
 */
-void setSubscribeContextCollectionName(const char* name) {
-
-    if (subscribeContextCollectionName != NULL) {
-        free(subscribeContextCollectionName);
-    }
-
-    subscribeContextCollectionName = strdup(name);
-
+void setSubscribeContextCollectionName(std::string name) {
+    subscribeContextCollectionName = name;
 }
 
 /*****************************************************************************
 *
 * setSubscribeContextAvailabilityCollectionName -
 */
-void setSubscribeContextAvailabilityCollectionName(const char* name) {
-
-    if (subscribeContextAvailabilityCollectionName != NULL) {
-        free(subscribeContextAvailabilityCollectionName);
-    }
-
-    subscribeContextAvailabilityCollectionName = strdup(name);
-
+void setSubscribeContextAvailabilityCollectionName(std::string name) {
+    subscribeContextAvailabilityCollectionName = name;
 }
 
 /*****************************************************************************
 *
 * setAssociationsCollectionName -
 */
-extern void setAssociationsCollectionName(const char* name) {
-    if (assocationsCollectionName != NULL) {
-        free(assocationsCollectionName);
+extern void setAssociationsCollectionName(std::string name) {
+    assocationsCollectionName = name;
+}
+
+/*****************************************************************************
+*
+* composeCollectionName -
+*
+* Common helper function for composing collection names
+*/
+static std::string composeCollectionName(std::string tenant, std::string colName) {
+    std::string result;
+    if (tenant == "") {
+        result = dbPrefix + "." + colName;
     }
-
-    assocationsCollectionName = strdup(name);
-
+    else {
+        /* Note that we can not use "." as database delimiter. A database cannot contain this
+         * character, http://docs.mongodb.org/manual/reference/limits/#Restrictions-on-Database-Names-for-Unix-and-Linux-Systems */
+        result = dbPrefix + "-" + tenant + "." + colName;
+    }
+    return result;
 }
 
 /*****************************************************************************
 *
 * getEntitiesCollectionName -
 */
-const char* getEntitiesCollectionName(void) {
-    return entitiesCollectionName;
+std::string getEntitiesCollectionName(std::string tenant) {
+    return composeCollectionName(tenant, entitiesCollectionName);
 }
 
 /*****************************************************************************
 *
 * getRegistrationsCollectionName -
 */
-const char* getRegistrationsCollectionName(void) {
-    return registrationsCollectionName;
+std::string getRegistrationsCollectionName(std::string tenant) {
+    return composeCollectionName(tenant, registrationsCollectionName);
 }
 
 /*****************************************************************************
 *
 * getSubscribeContextCollectionName -
 */
-const char* getSubscribeContextCollectionName(void) {
-    return subscribeContextCollectionName;
+std::string getSubscribeContextCollectionName(std::string tenant) {
+    return composeCollectionName(tenant, subscribeContextCollectionName);
 }
 
 /*****************************************************************************
 *
 * getSubscribeContextAvailabilityCollectionName -
 */
-const char* getSubscribeContextAvailabilityCollectionName(void) {
-    return subscribeContextAvailabilityCollectionName;
+std::string getSubscribeContextAvailabilityCollectionName(std::string tenant) {
+    return composeCollectionName(tenant, subscribeContextAvailabilityCollectionName);
 }
 
 /*****************************************************************************
 *
 * getAssociationsCollectionName -
 */
-extern const char* getAssociationsCollectionName(void) {
-    return assocationsCollectionName;
+std::string getAssociationsCollectionName(std::string tenant) {
+    return composeCollectionName(tenant, assocationsCollectionName);
 }
 
 /*****************************************************************************
 *
-* resetDb -
-*
-* This function has to be called after mongoConnect(), setRegistrationsCollectionName()
-* and setEntitiesCollectionName(). As sanify check, this is checked at the begining,
-* returning "false" in that case.
-*
+* mongoLocationCapable -
 */
-bool resetDb(void) {
-    // FIXME: this needs a try/catch to capture problems
-    if ( connection != NULL && entitiesCollectionName != NULL && registrationsCollectionName != NULL) {
-        connection->dropCollection(entitiesCollectionName);
-        connection->dropCollection(registrationsCollectionName);
-        connection->dropCollection(subscribeContextCollectionName);
-        connection->dropCollection(subscribeContextAvailabilityCollectionName);
-        connection->dropCollection(assocationsCollectionName);
-        return true;
-    }
-    return false;
-
+bool mongoLocationCapable(void) {
+    /* Geo location based in 2dsphere indexes was introduced in MongoDB 2.4 */
+    return ((mongoVersionMayor == 2) && (mongoVersionMinor >= 4)) || (mongoVersionMayor > 2);
 }
+
+/*****************************************************************************
+*
+* ensureLocationIndex -
+*/
+void ensureLocationIndex(std::string tenant) {
+    /* Ensure index for entity locations, in the case of using 2.4 */
+    if (mongoLocationCapable()) {
+        std::string index = ENT_LOCATION "." ENT_LOCATION_COORDS;
+        connection->ensureIndex(getEntitiesCollectionName(tenant).c_str(), BSON(index << "2dsphere" ));
+        LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenant.c_str()));
+    }
+}
+
+/* ****************************************************************************
+*
+* recoverOntimeIntervalThreads -
+*/
+void recoverOntimeIntervalThreads(std::string tenant) {
+
+    /* Look for ONTIMEINTERVAL subscriptions in database */
+    std::string condType= CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
+    BSONObj query = BSON(condType << ON_TIMEINTERVAL_CONDITION);
+
+    DBClientConnection* connection = getMongoConnection();
+    auto_ptr<DBClientCursor> cursor;
+    try {
+        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), query.toString().c_str()));
+        mongoSemTake(__FUNCTION__, "query in SubscribeContextCollection");
+        cursor = connection->query(getSubscribeContextCollectionName(tenant).c_str(), query);
+
+        /*
+         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+         * exception ourselves
+         */
+        if (cursor.get() == NULL) {
+            throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
+        }
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection");
+    }
+    catch( const DBException &e ) {
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongo db exception)");
+        LM_RVE(("Mongo DBException: %s", e.what()));
+    }
+    catch (...) {
+        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongo generic exception)");
+        LM_RVE(("Caugth Mongo Generic Exception"));
+    }
+
+    /* For each one of the subscriptions found, create threads */
+    while (cursor->more()) {
+
+        BSONObj sub = cursor->next();
+        std::string subId = sub.getField("_id").OID().str();
+
+        std::vector<BSONElement> condV = sub.getField(CSUB_CONDITIONS).Array();
+        for (unsigned int ix = 0; ix < condV.size(); ++ix) {
+            BSONObj condition = condV[ix].embeddedObject();
+            if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0) {
+               int interval = condition.getIntField(CSUB_CONDITIONS_VALUE);
+               LM_T(LmtNotifier, ("creating ONTIMEINTERVAL for subscription %s with interval %d (tenant %s)", subId.c_str(), interval, tenant.c_str()));
+               processOntimeIntervalCondition(subId, interval, tenant);
+            }
+        }
+    }
+}
+
 
 /* ****************************************************************************
 *
@@ -367,41 +522,176 @@ bool includedAttribute(ContextAttribute attr, AttributeList* attrsV) {
 
 /* ****************************************************************************
 *
-* processEntitityPatternFalse -
+* fillQueryEntFalse -
 */
-static void processEntitityPatternFalse(BSONArrayBuilder* arrayP, EntityId* enP, bool withType = true) {
+static void fillQueryEntFalse(BSONArrayBuilder& ba, EntityId* enP, bool withType = true) {
 
     if (withType) {
-        arrayP->append(BSON(ENT_ENTITY_ID << enP->id << ENT_ENTITY_TYPE << enP->type));
+        ba.append(BSON(ENT_ENTITY_ID << enP->id << ENT_ENTITY_TYPE << enP->type));
         LM_T(LmtMongo, ("Entity query token (isPattern=false): {id: %s, type: %s}", enP->id.c_str(), enP->type.c_str()));
     }
     else {
-        arrayP->append(enP->id);
+        ba.append(enP->id);
         LM_T(LmtMongo, ("Entity query token (isPattern=false): {id: %s}", enP->id.c_str()));
+    }
+}
+
+/* ****************************************************************************
+*
+* fillQueryEntTrue -
+*/
+static void fillQueryEntTrue(BSONArrayBuilder& ba, EntityId* enP) {
+
+    BSONObjBuilder     ent;
+    const std::string  idString   = "_id." ENT_ENTITY_ID;
+    const std::string  typeString = "_id." ENT_ENTITY_TYPE;
+
+    ent.appendRegex(idString, enP->id);
+    if (enP->type != "") {
+        ent.append(typeString, enP->type);
+    }
+
+    BSONObj entObj = ent.obj();
+    ba.append(entObj);
+
+    LM_T(LmtMongo, ("Entity query token (isPattern=true): '%s'", entObj.toString().c_str()));
+}
+
+/* ****************************************************************************
+*
+* addCompoundNode -
+*
+*/
+static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
+{
+  if ((e.type() != String) && (e.type() != Object) && (e.type() != Array))
+    LM_RVE(("unknown BSON type"));
+
+  orion::CompoundValueNode* child = new orion::CompoundValueNode(orion::CompoundValueNode::Object);
+  child->name = e.fieldName();
+
+  switch (e.type())
+  {
+  case String:
+    child->type  = orion::CompoundValueNode::String;
+    child->value = e.String();
+    break;
+
+  case Object:
+    compoundObjectResponse(child, e);
+    break;
+
+  case Array:
+    compoundVectorResponse(child, e);
+    break;
+  default:
+    /* We need the default clause to avoid 'enumeration value X not handled in switch' errors due to -Werror=switch at compilation time */
+    break;
+  }
+
+  cvP->add(child);
+}
+
+/* ****************************************************************************
+*
+* compoundObjectResponse -
+*
+*/
+static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElement& be) {
+    BSONObj obj = be.embeddedObject();
+    cvP->type = orion::CompoundValueNode::Object;
+    for( BSONObj::iterator i = obj.begin(); i.more(); ) {
+        BSONElement e = i.next();
+        addCompoundNode(cvP, e);
     }
 
 }
 
 /* ****************************************************************************
 *
-* processEntitityPatternFalse -
+* compoundVectorResponse -
 */
-static void processEntitityPatternTrue(BSONArrayBuilder* arrayP, EntityId* enP) {
+static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElement& be) {
+    std::vector<BSONElement> vec = be.Array();
+    cvP->type = orion::CompoundValueNode::Vector;
+    for( unsigned int ix = 0; ix < vec.size(); ++ix) {
+        BSONElement e = vec[ix];
+        addCompoundNode(cvP, e);
 
-    BSONObjBuilder enObjB;
+    }
+}
 
-    const std::string idString = std::string("_id.") + ENT_ENTITY_ID;
-    const std::string typeString = std::string("_id.") + ENT_ENTITY_TYPE;
+/* *****************************************************************************
+*
+* processAreaScope -
+*
+* Returns true if a location was found, false otherwise
+*/
+static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
 
-    enObjB.appendRegex(idString, enP->id);
-    if (enP->type != "") {
-        enObjB.append(typeString, enP->type);
+    unsigned int geoScopes = 0;
+    for (unsigned int ix = 0; ix < scoV.size(); ++ix) {
+        Scope* sco = scoV.get(ix);        
+
+        if (sco->type == FIWARE_LOCATION) {
+            geoScopes++;
+        }
+
+        if (geoScopes == 1) {
+
+            if (!mongoLocationCapable()) {
+                LM_W(("location scope was found but your MongoDB version doesn't support it. Please upgrade MongoDB server to 2.4 or newer"));
+                return false;
+            }
+
+            // FIXME P2: current version only support one geolocation scope. If the client includes several ones,
+            // only the first is taken into account
+            bool inverted = false;
+
+            BSONObj geoWithin;
+            if (sco->areaType== orion::CircleType) {
+                double radians = sco->circle.radius() / EARTH_RADIUS_METERS;
+                geoWithin = BSON("$centerSphere" << BSON_ARRAY(BSON_ARRAY( sco->circle.center.latitude() << sco->circle.center.longitude()) << radians ));
+                inverted = sco->circle.inverted();
+            }
+            else if (sco->areaType== orion::PolygonType) {
+                BSONArrayBuilder vertex;
+                double x0 = 0;
+                double y0 = 0;
+                for (unsigned int jx = 0; jx < sco->polygon.vertexList.size() ; ++jx) {
+                    double x = sco->polygon.vertexList[jx]->latitude();
+                    double y = sco->polygon.vertexList[jx]->longitude();
+                    if (jx == 0) {
+                        x0 = x;
+                        y0 = y;
+                    }
+                    vertex.append(BSON_ARRAY(x << y));
+                }
+                /* MongoDB query API needs to "close" the polygon with the same point that the initial point */
+                vertex.append(BSON_ARRAY(x0 << y0));
+
+                /* Note that MongoDB query API uses an ugly "double array" structure for coordinates */
+                geoWithin = BSON("$geometry" << BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(vertex.arr())));
+
+                inverted = sco->polygon.inverted();
+            }
+            else {
+                LM_RE(false, ("unknown area type"));
+            }
+
+            if (inverted) {
+                areaQuery = BSON("$not" << BSON("$geoWithin" << geoWithin));
+            }
+            else {
+                areaQuery = BSON("$geoWithin" << geoWithin);
+            }
+        }
     }
 
-    BSONObj enObj = enObjB.obj();
-    arrayP->append(enObj);
-
-    LM_T(LmtMongo, ("Entity query token (isPattern=true): '%s'", enObj.toString().c_str()));
+    if (geoScopes > 1) {
+        LM_W(("current version supports only one area scope: %d were found, the first one was used", geoScopes));
+    }
+    return (geoScopes > 0);
 
 }
 
@@ -413,93 +703,126 @@ static void processEntitityPatternTrue(BSONArrayBuilder* arrayP, EntityId* enP) 
 * a vector with entities and a vector with attributes as input and returns the corresponding
 * ContextElementResponseVector or error.
 *
-* Note thte includeEmpty argument. This is used if we don't want the result to include empty
-* attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is amited at
+* Note the includeEmpty argument. This is used if we don't want the result to include empty
+* attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is aimed at
 * subscribeContext case, as empty values can cause problems in the case of federating Context
 * Brokers (the notifyContext is processed as an updateContext and in the latter case, an
 * empty value causes an error)
 *
 */
-bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty) {
+bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty, std::string tenant) {
 
     DBClientConnection* connection = getMongoConnection();
 
-    /* Build query (entities part) */
-    // FIXME P2: this implementation need to be refactored for cleanup
+    /* Query structure is as follows
+     *
+     * {
+     *    "$or": [ ... ],            (always)
+     *    "attrs.name": { ... },     (only if attributes are used in the query)
+     *    "location.coords": { ... } (only in the case of geo queries)
+     *  }
+     *
+     */
 
-    /* We store isPattern=true and isPattern=false entities in different arrays, that will
-     * be used in the final composition of the query */
-    BSONArrayBuilder entitiesPatternFalseWithoutType;
-    BSONArrayBuilder entitiesPatternFalseWithType;
-    BSONArrayBuilder entitiesPatternTrue;
+    BSONObjBuilder finalQuery;
+
+    /* Part 1: entities */
+    BSONArrayBuilder orEnt;
+
+    BSONArrayBuilder entFalseWType;
+    BSONArrayBuilder entFalseWOType;
     for (unsigned int ix = 0; ix < enV.size(); ++ix) {
         if (isTrue(enV.get(ix)->isPattern)) {
-            processEntitityPatternTrue(&entitiesPatternTrue, enV.get(ix));
+            /* Part 1.1: add from 0 to N objects (in entTrue) to the $or array for entities
+             * with isPatter=true. Note we are using the builder for the $or vector itself,
+             * as in this case entities can be "directly" inserted. For the other two parts, we
+             * just accumulate in this loop, as they need additional BSON composition before be
+             * inserted in the $or array */
+            fillQueryEntTrue(orEnt, enV.get(ix));
         }
         else {
+            /* Accumulating for later BSON composition (Part 1.2 and Part 1.3 below)*/
             if (enV.get(ix)->type == "") {
-                processEntitityPatternFalse(&entitiesPatternFalseWithoutType, enV.get(ix), false);
+                fillQueryEntFalse(entFalseWOType, enV.get(ix), false);
             }
             else {
-                processEntitityPatternFalse(&entitiesPatternFalseWithType, enV.get(ix), true);
+                fillQueryEntFalse(entFalseWType, enV.get(ix), true);
             }
         }
     }
 
-    /* Build query (attributes part) */
+    /* Part 1.2: add up to one object in the $or array for entities isPattern=false with type
+     * (check size to avoid "{ _id: { $in: {} } }" that would make the query fail) */
+    if (entFalseWType.arrSize() > 0) {
+        orEnt.append(BSON("_id" << BSON("$in" << entFalseWType.arr())));
+    }
 
+    /* Part 1.3: add up to one object to the $or array for entities isPattern=false without type
+     * (check size to avoid "{ _id: { $in: {} } }" that would make the query fail) */
+    if (entFalseWOType.arrSize() > 0) {
+        std::string idId = "_id." ENT_ENTITY_ID;
+        orEnt.append(BSON(idId << BSON("$in" << entFalseWOType.arr())));
+    }
+
+    /* Finally the result of the 3 parts is appended to the final query */
+    finalQuery.append("$or", orEnt.arr());
+
+    /* Part 2: attributes */
     BSONArrayBuilder attrs;
     for (unsigned int ix = 0; ix < attrL.size(); ++ix) {
         std::string attrName = attrL.get(ix);
         attrs.append(attrName);
         LM_T(LmtMongo, ("Attribute query token: '%s'", attrName.c_str()));
     }
-    std::string attrNames = std::string(ENT_ATTRS) + "." + ENT_ATTRS_NAME;
-
-    /* Compose final query */
-    BSONObjBuilder queryBuilder;
-
-    if (entitiesPatternFalseWithType.arrSize() > 0) {
-        /* We need this checking to avoid a ugly "{ _id: { $in: {} } }" in the $or array
-         * that would make the query fail */
-        entitiesPatternTrue.append(BSON("_id" << BSON("$in" << entitiesPatternFalseWithType.arr())));
-    }
-    if (entitiesPatternFalseWithoutType.arrSize() > 0) {
-        /* We need this checking to avoid a ugly "{ _id.id: { $in: {} } }" in the $or array
-         * that would make the query fail */
-        std::string idId = std::string("_id.") + ENT_ENTITY_ID;
-        entitiesPatternTrue.append(BSON(idId << BSON("$in" << entitiesPatternFalseWithoutType.arr())));
-    }
-
-    /* The $or clause could be omitted if entitiesPatternTrue is empty, but we can assume that
-     * it has no impact on MongoDB query optimizer */
-    queryBuilder.append("$or", entitiesPatternTrue.arr());
+    std::string attrNames = ENT_ATTRS "." ENT_ATTRS_NAME;
     if (attrs.arrSize() > 0) {
         /* If we don't do this checking, the {$in: [] } in the attribute name part will
          * make the query fail*/
-        queryBuilder.append(attrNames, BSON("$in" << attrs.arr()));
+        finalQuery.append(attrNames, BSON("$in" << attrs.arr()));
     }
-    BSONObj query = queryBuilder.obj();
+
+    /* Part 3: geo-location */
+    BSONObj areaQuery;
+    if (processAreaScope(res.scopeVector, areaQuery)) {
+       std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
+       finalQuery.append(locCoords, areaQuery);
+    }
 
     /* Do the query on MongoDB */
+    BSONObj query = finalQuery.obj();
     auto_ptr<DBClientCursor> cursor;
     try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(), query.toString().c_str()));
-        cursor = connection->query(getEntitiesCollectionName(), query);
-        /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-         * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
-         * exception ourselves */
+        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
+        mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
+        cursor = connection->query(getEntitiesCollectionName(tenant).c_str(), query);
+
+        /*
+         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+         * exception ourselves
+         */
         if (cursor.get() == NULL) {
-            throw DBException("Null cursor", 0);
+           throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
+        mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
     }
     catch( const DBException &e ) {
 
-        *err = std::string("collection: ") + getEntitiesCollectionName() +
+        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo db exception)");
+        *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
 
-       LM_RE(false,(err->c_str()));
+        LM_RE(false,(err->c_str()));
+    }
+    catch(...) {
+
+        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo generic exception)");
+        *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
+                " - query(): " + query.toString() +
+                " - exception: " + "generic";
+
+        LM_RE(false, (err->c_str()));
     }
 
     /* Process query result */
@@ -508,7 +831,7 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
         ContextElementResponse* cer = new ContextElementResponse();
-        cer->statusCode.fill(SccOk, "OK");
+        cer->statusCode.fill(SccOk);
 
         /* Entity part */
 
@@ -517,6 +840,12 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
         cer->contextElement.entityId.id = STR_FIELD(queryEntity, ENT_ENTITY_ID);
         cer->contextElement.entityId.type = STR_FIELD(queryEntity, ENT_ENTITY_TYPE);
         cer->contextElement.entityId.isPattern = "false";
+
+        /* Get the location attribute (if it exists) */
+        std::string locAttr;
+        if (r.hasElement(ENT_LOCATION)) {
+            locAttr = r.getObjectField(ENT_LOCATION).getStringField(ENT_LOCATION_ATTRNAME);
+        }
 
         /* Attributes part */
 
@@ -529,18 +858,61 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
 
             ca.name = STR_FIELD(queryAttr, ENT_ATTRS_NAME);
             ca.type = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
-            ca.value = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
 
-            if (!includeEmpty && ca.value.length() == 0) {
-                continue;
-            }
-
+            /* Note that includedAttribute decision is based on name and type. Value is set only if
+             * decision is positive */
             if (includedAttribute(ca, &attrL)) {
 
-                ContextAttribute* caP = new ContextAttribute(ca.name, ca.type, ca.value);                                
+                ContextAttribute* caP;
+                if (queryAttr.getField(ENT_ATTRS_VALUE).type() == String) {
+                    ca.value = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
+                    if (!includeEmpty && ca.value.length() == 0) {
+                        continue;
+                    }
+                    caP = new ContextAttribute(ca.name, ca.type, ca.value);
+                }
+                else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Object) {
+                    caP = new ContextAttribute(ca.name, ca.type);
+                    caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Object);
+                    compoundObjectResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
+                }
+                else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Array) {
+                    caP = new ContextAttribute(ca.name, ca.type);
+                    caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);
+                    compoundVectorResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
+                }
+                else {
+                    LM_E(("unknown BSON type"));
+                    continue;
+                }
+
+                /* Setting ID (if found) */
                 if (STR_FIELD(queryAttr, ENT_ATTRS_ID) != "") {
                     Metadata* md = new Metadata(NGSI_MD_ID, "string", STR_FIELD(queryAttr, ENT_ATTRS_ID));
                     caP->metadataVector.push_back(md);
+                }
+                if (locAttr == ca.name) {
+                    Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WSG84);
+                    caP->metadataVector.push_back(md);
+                }
+
+                /* Setting custom metadata (if any) */
+                if (queryAttr.hasField(ENT_ATTRS_MD)) {
+                    std::vector<BSONElement> metadataV = queryAttr.getField(ENT_ATTRS_MD).Array();
+                    for (unsigned int ix = 0; ix < metadataV.size(); ++ix) {
+
+                        BSONObj metadata = metadataV[ix].embeddedObject();
+                        Metadata* md;
+
+                        if (metadata.hasField(ENT_ATTRS_TYPE)) {
+                            md = new Metadata(STR_FIELD(metadata, ENT_ATTRS_MD_NAME), STR_FIELD(metadata, ENT_ATTRS_MD_TYPE), STR_FIELD(metadata, ENT_ATTRS_MD_VALUE));
+                        }
+                        else {
+                            md = new Metadata(STR_FIELD(metadata, ENT_ATTRS_MD_NAME), "", STR_FIELD(metadata, ENT_ATTRS_MD_VALUE));
+                        }
+
+                        caP->metadataVector.push_back(md);
+                    }
                 }
 
                 cer->contextElement.contextAttributeVector.push_back(caP);
@@ -548,7 +920,7 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, ContextElementRespon
 
         }
 
-        cer->statusCode.fill(SccOk, "OK");
+        cer->statusCode.fill(SccOk);
 
         cerV->push_back(cer);
     }
@@ -657,19 +1029,16 @@ static void processContextRegistrationElement (BSONObj cr, EntityIdVector enV, A
 * ContextRegistrationResponseVector or error.
 *
 */
-bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistrationResponseVector* crrV, std::string* err) {
+bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistrationResponseVector* crrV, std::string* err, std::string tenant) {
 
     DBClientConnection* connection = getMongoConnection();
 
     /* Build query based on arguments */
     // FIXME P2: this implementation need to be refactored for cleanup
-    std::string contextRegistrationEntities = std::string(REG_CONTEXT_REGISTRATION) + "." + REG_ENTITIES;
-    std::string contextRegistrationEntitiesId = std::string(REG_CONTEXT_REGISTRATION) + "." + REG_ENTITIES +
-            "." + REG_ENTITY_ID;
-    std::string contextRegistrationEntitiesType = std::string(REG_CONTEXT_REGISTRATION) + "." + REG_ENTITIES +
-            "." + REG_ENTITY_TYPE;
-    std::string contextRegistrationAttrsNames = std::string(REG_CONTEXT_REGISTRATION) + "." + REG_ATTRS +
-            "." + REG_ATTRS_NAME;
+    std::string contextRegistrationEntities     = REG_CONTEXT_REGISTRATION "." REG_ENTITIES;
+    std::string contextRegistrationEntitiesId   = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ID;
+    std::string contextRegistrationEntitiesType = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_TYPE;
+    std::string contextRegistrationAttrsNames   = REG_CONTEXT_REGISTRATION "." REG_ATTRS    "." REG_ATTRS_NAME;
 
     BSONArrayBuilder entityOr;
     BSONArrayBuilder entitiesWithType;
@@ -712,7 +1081,7 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
     /* The $or clause could be omitted if it contains only one element, but we can assume that
      * it has no impact on MongoDB query optimizer */
     queryBuilder.append("$or", entityOr.arr());
-    queryBuilder.append(REG_EXPIRATION, BSON("$gt" << getCurrentTime()));
+    queryBuilder.append(REG_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
     if (attrs.arrSize() > 0) {
         /* If we don't do this checking, the {$in: [] } in the attribute name part will
          * make the query fail*/
@@ -723,15 +1092,29 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
     /* Do the query on MongoDB */
     //FIXME P2: use field selector to include the only relevant field: contextRegistration array (e.g. "expiration" is not needed)
     auto_ptr<DBClientCursor> cursor;
+
     try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(), query.toString().c_str()));
-        cursor = connection->query(getRegistrationsCollectionName(), query);
+        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(tenant).c_str(), query.toString().c_str()));
+        mongoSemTake(__FUNCTION__, "query in RegistrationsCollection");
+        cursor = connection->query(getRegistrationsCollectionName(tenant).c_str(), query);
+        mongoSemGive(__FUNCTION__, "query in RegistrationsCollection");
     }
     catch( const DBException &e ) {
 
-        *err = std::string("collection: ") + getRegistrationsCollectionName() +
+        mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo db exception)");
+        *err = std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
+
+        return false;
+    }
+    catch(...) {
+
+        mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo generic exception)");
+        *err = std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
+                " - query(): " + query.toString() +
+                " - exception: " + "generic";
+
         return false;
     }
 
@@ -839,12 +1222,14 @@ AttributeList subToAttributeList(BSONObj sub) {
 * is returned. This is used in the caller to know if lastNotification field in the
 * subscription document in csubs collection has to be modified or not.
 */
-bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, ConditionValueList* condValues, std::string subId, std::string notifyUrl, Format format) {
+bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, ConditionValueList* condValues, std::string subId, std::string notifyUrl, Format format, std::string tenant) {
 
     std::string err;
     NotifyContextRequest ncr;
 
-    if (!entitiesQuery(enV, attrL, &ncr.contextElementResponseVector, &err, false)) {
+    // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
+    Restriction res;
+    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant)) {
         ncr.contextElementResponseVector.release();
         LM_RE(false, (err.c_str()));
     }
@@ -861,7 +1246,8 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
              * Note that in this case we do a query for all the attributes, not restricted to attrV */
             ContextElementResponseVector allCerV;
             AttributeList emptyList;
-            if (!entitiesQuery(enV, emptyList, &allCerV, &err, false)) {
+            // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
+            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false, tenant)) {
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
                 LM_RE(false, (err.c_str()));
@@ -869,7 +1255,7 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
 
             if (isCondValueInContextElementResponse(condValues, &allCerV)) {
                 /* Send notification */
-                getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, format);
+                getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, format);
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
                 return true;
@@ -878,7 +1264,7 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
             allCerV.release();
         }
         else {
-            getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, format);
+            getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, format);
             ncr.contextElementResponseVector.release();
             return true;
         }
@@ -892,9 +1278,9 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
 *
 * processOntimeIntervalCondition -
 */
-void processOntimeIntervalCondition(std::string subId, int interval) {
+void processOntimeIntervalCondition(std::string subId, int interval, std::string tenant) {
 
-    getNotifier()->createIntervalThread(subId, interval);
+    getNotifier()->createIntervalThread(subId, interval, tenant);
 
 }
 
@@ -903,7 +1289,7 @@ void processOntimeIntervalCondition(std::string subId, int interval) {
 * processConditionVector -
 *
 */
-BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format) {
+BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format, std::string tenant) {
 
     BSONArrayBuilder conds;
     *notificationDone = false;
@@ -919,7 +1305,7 @@ BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV
             conds.append(BSON(CSUB_CONDITIONS_TYPE << ON_TIMEINTERVAL_CONDITION <<
                               CSUB_CONDITIONS_VALUE << interval.seconds));
 
-            processOntimeIntervalCondition(subId, interval.seconds);
+            processOntimeIntervalCondition(subId, interval.seconds, tenant);
         }
         else if (nc->type == ON_CHANGE_CONDITION) {
 
@@ -937,7 +1323,8 @@ BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV
                                      &(nc->condValueList),
                                      subId,
                                      url,
-                                     format)) {
+                                     format,
+                                     tenant)) {
 
                 *notificationDone = true;
             }
@@ -954,11 +1341,11 @@ BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV
 *
 * mongoUpdateCasubNewNotification -
 *
-* This methos is pretty similar to the mongoUpdateCsubNewNotification in mongoOntimeintervalOperations module.
+* This method is pretty similar to the mongoUpdateCsubNewNotification in mongoOntimeintervalOperations module.
 * However, it doesn't take semaphore
 *
 */
-static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::string* err) {
+static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::string* err, std::string tenant) {
 
     LM_T(LmtMongo, ("Update NGSI9 Subscription New Notification"));
 
@@ -968,14 +1355,23 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
     try {
         BSONObj query = BSON("_id" << OID(subId));
         BSONObj update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CASUB_COUNT << 1));
-        LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextAvailabilityCollectionName(),
+        LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextAvailabilityCollectionName(tenant).c_str(),
                         query.toString().c_str(),
                         update.toString().c_str()));
-        connection->update(getSubscribeContextAvailabilityCollectionName(), query, update);
+
+        mongoSemTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
+        connection->update(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), query, update);
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
     }
     catch( const DBException &e ) {
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo db exception)");
         *err = e.what();
         LM_RE(SccOk, ("Database error '%s'", err->c_str()));
+    }
+    catch(...) {
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo generic exception)");
+        *err = "Database error - exception thrown";
+        LM_RE(SccOk, ("Database error - exception thrown"));
     }
 
     return SccOk;
@@ -998,12 +1394,12 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
 * This method returns true if the notification was actually send. Otherwise, false
 * is returned.
 */
-bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl, Format format) {
+bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl, Format format, std::string tenant) {
 
     std::string err;
     NotifyContextAvailabilityRequest ncar;
 
-    if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err)) {
+    if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant)) {
        ncar.contextRegistrationResponseVector.release();
        LM_RE(false, (err.c_str()));
     }
@@ -1013,11 +1409,11 @@ bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, st
         /* Complete the fields in NotifyContextRequest */
         ncar.subscriptionId.set(subId);
 
-        getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, format);
+        getNotifier()->sendNotifyContextAvailabilityRequest(&ncar, notifyUrl, tenant, format);
         ncar.contextRegistrationResponseVector.release();
 
         /* Update database fields due to new notification */
-        if (mongoUpdateCasubNewNotification(subId, &err) != SccOk) {
+        if (mongoUpdateCasubNewNotification(subId, &err, tenant) != SccOk) {
             LM_RE(false, ("error invoking mongoUpdateCasubNewNotification: '%s'", err.c_str()));
         }
 

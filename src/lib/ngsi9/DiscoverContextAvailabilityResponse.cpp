@@ -41,9 +41,7 @@
 */
 DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse()
 {
-  errorCode.code         = NO_ERROR_CODE;
-  errorCode.reasonPhrase = "";
-  errorCode.details      = "";
+  errorCode.tagSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -61,9 +59,10 @@ DiscoverContextAvailabilityResponse::~DiscoverContextAvailabilityResponse()
 *
 * DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse - 
 */
-DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(ErrorCode& _errorCode)
+DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(StatusCode& _errorCode)
 {
-  errorCode = _errorCode;
+  errorCode.fill(&_errorCode);
+  errorCode.tagSet("errorCode");
 }
 
 
@@ -72,7 +71,7 @@ DiscoverContextAvailabilityResponse::DiscoverContextAvailabilityResponse(ErrorCo
 *
 * DiscoverContextAvailabilityResponse::render - 
 */
-std::string DiscoverContextAvailabilityResponse::render(RequestType requestType, Format format, std::string indent)
+std::string DiscoverContextAvailabilityResponse::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string  out = "";
   std::string  tag = "discoverContextAvailabilityResponse";
@@ -84,7 +83,7 @@ std::string DiscoverContextAvailabilityResponse::render(RequestType requestType,
   //
   out += startTag(indent, tag, format, false);
 
-  if (errorCode.code == NO_ERROR_CODE)
+  if (errorCode.code == SccNone)
      out += responseVector.render(format, indent + "  ", false);
   else
      out += errorCode.render(format, indent + "  ", false);

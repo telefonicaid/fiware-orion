@@ -1,0 +1,8 @@
+<contextRegistrationResponse>
+  <contextRegistration>
+  </contextRegistration>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+  </errorCode>
+</contextRegistrationResponse>

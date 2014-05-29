@@ -47,7 +47,7 @@ SubscribeContextRequest::SubscribeContextRequest()
 *
 * SubscribeContextRequest::render - 
 */
-std::string SubscribeContextRequest::render(RequestType requestType, Format format, std::string indent)
+std::string SubscribeContextRequest::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string  out                             = "";
   std::string  tag                             = "subscribeContextRequest";
@@ -87,7 +87,7 @@ std::string SubscribeContextRequest::render(RequestType requestType, Format form
 *
 * SubscribeContextRequest::check - 
 */
-std::string SubscribeContextRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string SubscribeContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   SubscribeContextResponse response;
   std::string              res;
@@ -102,7 +102,7 @@ std::string SubscribeContextRequest::check(RequestType requestType, Format forma
       ((res = notifyConditionVector.check(SubscribeContext, format, indent, predetectedError, counter)) != "OK") ||
       ((res = throttling.check(SubscribeContext, format, indent, predetectedError, counter))            != "OK"))
   {
-    response.subscribeError.errorCode.fill(SccBadRequest, "invalid payload", res);
+    response.subscribeError.errorCode.fill(SccBadRequest, std::string("invalid payload: ") + res);
     return response.render(SubscribeContext, format, indent);
   }
 
@@ -115,7 +115,7 @@ std::string SubscribeContextRequest::check(RequestType requestType, Format forma
 *
 * SubscribeContextRequest::present - 
 */
-void SubscribeContextRequest::present(std::string indent)
+void SubscribeContextRequest::present(const std::string& indent)
 {
   entityIdVector.present(indent + "  ");
   attributeList.present(indent + "  ");

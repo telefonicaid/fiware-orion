@@ -48,7 +48,7 @@ UpdateContextSubscriptionRequest::UpdateContextSubscriptionRequest()
 *
 * UpdateContextSubscriptionRequest::render - 
 */
-std::string UpdateContextSubscriptionRequest::render(RequestType requestType, Format format, std::string indent)
+std::string UpdateContextSubscriptionRequest::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string out                             = "";
   std::string tag                             = "updateContextSubscriptionRequest";
@@ -67,7 +67,7 @@ std::string UpdateContextSubscriptionRequest::render(RequestType requestType, Fo
   out += startTag(indent, tag, format, false);
   out += duration.render(format, indent + "  ", commaAfterDuration);
   out += restriction.render(format, indent + "  ", restrictions, commaAfterRestriction);
-  out += subscriptionId.render(format, indent + "  ", commaAfterSubscriptionId);
+  out += subscriptionId.render(UpdateContextSubscription, format, indent + "  ", commaAfterSubscriptionId);
   out += notifyConditionVector.render(format, indent + "  ", commaAfterNotifyConditionVector);
   out += throttling.render(format, indent + "  ", commaAfterThrottling);
   out += endTag(indent, tag, format);
@@ -81,16 +81,15 @@ std::string UpdateContextSubscriptionRequest::render(RequestType requestType, Fo
 *
 * UpdateContextSubscriptionRequest::check - 
 */
-std::string UpdateContextSubscriptionRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string UpdateContextSubscriptionRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string                       res;
   UpdateContextSubscriptionResponse response;
 
   if (predetectedError != "")
   {
-    response.subscribeError.subscriptionId         = subscriptionId;
-    response.subscribeError.errorCode.code         = SccBadRequest;
-    response.subscribeError.errorCode.reasonPhrase = predetectedError;
+    response.subscribeError.subscriptionId = subscriptionId;
+    response.subscribeError.errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (((res = duration.check(UpdateContextSubscription, format, indent, predetectedError, counter))              != "OK") ||
            ((res = restriction.check(UpdateContextSubscription, format, indent, predetectedError, restrictions))      != "OK") ||
@@ -98,9 +97,8 @@ std::string UpdateContextSubscriptionRequest::check(RequestType requestType, For
            ((res = notifyConditionVector.check(UpdateContextSubscription, format, indent, predetectedError, counter)) != "OK") ||
            ((res = throttling.check(UpdateContextSubscription, format, indent, predetectedError, counter))            != "OK"))
   {
-    response.subscribeError.subscriptionId         = subscriptionId;
-    response.subscribeError.errorCode.code         = SccBadRequest;
-    response.subscribeError.errorCode.reasonPhrase = res;
+    response.subscribeError.subscriptionId = subscriptionId;
+    response.subscribeError.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
@@ -114,7 +112,7 @@ std::string UpdateContextSubscriptionRequest::check(RequestType requestType, For
 *
 * UpdateContextSubscriptionRequest::present - 
 */
-void UpdateContextSubscriptionRequest::present(std::string indent)
+void UpdateContextSubscriptionRequest::present(const std::string& indent)
 {
   duration.present(indent);
   restriction.present(indent);

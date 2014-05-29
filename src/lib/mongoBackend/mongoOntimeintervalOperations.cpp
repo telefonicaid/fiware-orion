@@ -22,16 +22,16 @@
 *
 * Author: Fermin Galan Marquez
 */
-
-#include "mongoOntimeintervalOperations.h"
-
-#include "common/globals.h"
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-#include "MongoGlobal.h"
 #include "mongo/client/dbclient.h"
 
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
+#include "common/globals.h"
 #include "common/sem.h"
+
+#include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/mongoOntimeintervalOperations.h"
 
 using namespace mongo;
 
@@ -39,31 +39,41 @@ using namespace mongo;
 *
 * mongoGetContextSubscriptionInfo -
 */
-HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscriptionInfo* csiP, std::string* err) {
+HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, ContextSubscriptionInfo* csiP, std::string* err, const std::string& tenant) {
 
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
+    reqSemTake(__FUNCTION__, "get info on subscriptions");
 
     LM_T(LmtMongo, ("Get Subscription Info operation"));
 
     DBClientConnection* connection = getMongoConnection();
 
     /* Search for the document */
+    LM_T(LmtMongo, ("findOne() in '%s' collection by _id '%s'", getSubscribeContextCollectionName(tenant).c_str(), subId.c_str()));
     BSONObj sub;
     try {
-        LM_T(LmtMongo, ("findOne() in '%s' collection by _id '%s'", getSubscribeContextCollectionName(), subId.c_str()));
-        sub = connection->findOne(getSubscribeContextCollectionName(), BSON("_id" << OID(subId)));
+        mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
+        sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(subId)));
+        mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
     }
     catch( const DBException &e ) {
+        mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo db exception)");
+        reqSemGive(__FUNCTION__, "get info on subscriptions (mongo db exception)");
         *err = e.what();
-        LM_SRE(SccOk,("Database error '%s'", err->c_str()));
+        LM_RE(SccOk, ("Database error '%s'", err->c_str()));
+    }
+    catch(...) {
+        mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo generic exception)");
+        reqSemGive(__FUNCTION__, "get info on subscriptions (mongo generic exception)");
+        *err = "Database error: received generic exception";
+        LM_RE(SccOk, ("Database error '%s'", "received generic exception"));
     }
 
     LM_T(LmtMongo, ("retrieved subscription: %s", sub.toString().c_str()));
 
     /* Check if we found anything */
     if (sub.isEmpty()) {
-        LM_SR(SccOk);
+        reqSemGive(__FUNCTION__, "get info on subscriptions (nothing found)");
+        return SccOk;
     }
 
     /* Build the ContextSubcriptionInfo object */
@@ -82,7 +92,9 @@ HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscri
         csiP->attributeList.push_back(attrs[ix].String());
     }
 
-    csiP->expiration = sub.getIntField(CSUB_EXPIRATION);    
+    BSONElement be = sub.getField(CSUB_EXPIRATION);
+    csiP->expiration = be.numberLong();
+
     csiP->url = STR_FIELD(sub, CSUB_REFERENCE);
     if (sub.hasElement(CSUB_LASTNOTIFICATION)) {
         csiP->lastNotification = sub.getIntField(CSUB_LASTNOTIFICATION);
@@ -91,33 +103,37 @@ HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscri
         csiP->lastNotification = -1;
     }
 
-    csiP->throttling = sub.hasField(CSUB_THROTTLING) ? sub.getIntField(CSUB_THROTTLING) : -1;
+    csiP->throttling = sub.hasField(CSUB_THROTTLING) ? sub.getField(CSUB_THROTTLING).numberLong() : -1;
 
     /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
-    csiP->format = sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML;
+    std::string fmt = STR_FIELD(sub, CSUB_FORMAT);
+    csiP->format = sub.hasField(CSUB_FORMAT)? stringToFormat(fmt) : XML;
 
-    LM_SR(SccOk);
+    reqSemGive(__FUNCTION__, "get info on subscriptions");
+    return SccOk;
 }
 
 /* ****************************************************************************
 *
 * mongoGetContextElementResponses -
 */
-HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList attrL, ContextElementResponseVector* cerV, std::string* err) {
-
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
-
-    LM_T(LmtMongo, ("Get Notify Context Request operation"));
+HttpStatusCode mongoGetContextElementResponses(const EntityIdVector& enV, const AttributeList& attrL, ContextElementResponseVector* cerV, std::string* err, const std::string& tenant) {
 
     /* This function is basically a wrapper of mongoBackend internal entitiesQuery() function */
 
-    if (!entitiesQuery(enV, attrL, cerV, err, true)) {
+    reqSemTake(__FUNCTION__, "get context-element responses");
+    LM_T(LmtMongo, ("Get Notify Context Request operation"));
+
+    // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
+    Restriction res;
+    if (!entitiesQuery(enV, attrL, res, cerV, err, true, tenant)) {
+        reqSemGive(__FUNCTION__, "get context-element responses (no entities found)");
         cerV->release();
-        LM_SRE(SccOk, ((*err).c_str()));
+        LM_RE(SccOk, ((*err).c_str()));
     }
 
-    LM_SR(SccOk);
+    reqSemGive(__FUNCTION__, "get context-element responses");
+    return SccOk;
 }
 
 /* ****************************************************************************
@@ -125,9 +141,9 @@ HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList
 * mongoUpdateCsubNewNotification -
 *
 */
-HttpStatusCode mongoUpdateCsubNewNotification(std::string subId, std::string* err) {
+HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::string* err, const std::string& tenant) {
 
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
+    reqSemTake(__FUNCTION__, "update subscription notifications");
 
     LM_T(LmtMongo, ("Update NGI10 Subscription New Notification"));
 
@@ -137,18 +153,27 @@ HttpStatusCode mongoUpdateCsubNewNotification(std::string subId, std::string* er
     try {
         BSONObj query = BSON("_id" << OID(subId));
         BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CSUB_COUNT << 1));
-        LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextCollectionName(),
+        LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextCollectionName(tenant).c_str(),
                         query.toString().c_str(),
                         update.toString().c_str()));
-        connection->update(getSubscribeContextCollectionName(), query, update);
+
+        mongoSemTake(__FUNCTION__, "update in SubscribeContextCollection");
+        connection->update(getSubscribeContextCollectionName(tenant).c_str(), query, update);
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection");
     }
     catch( const DBException &e ) {
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
+        reqSemGive(__FUNCTION__, "update subscription notifications (mongo db exception)");
         *err = e.what();
-        LM_SRE(SccOk,("Database error '%s'", err->c_str()));
+        LM_E(("Database error '%s'", err->c_str()));
+    }
+    catch(...) {
+        mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
+        reqSemGive(__FUNCTION__, "update subscription notifications (mongo generic exception)");
+        *err = "Generic Exception";
+        LM_E(("Database error: '%s'", err->c_str()));
     }
 
-    LM_SR(SccOk);
-
+    reqSemGive(__FUNCTION__, "update subscription notifications");
+    return SccOk;
 }
-
-

@@ -34,6 +34,8 @@
 #include "mongoBackend/mongoRegisterContext.h"
 #include "ngsi9/RegisterContextResponse.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
+#include "rest/ConnectionInfo.h"
+
 #include "testInit.h"
 
 
@@ -81,6 +83,7 @@ TEST(mapPostIndividualContextEntityAttribute, notFoundThenFound)
   HttpStatusCode                 ms;
   UpdateContextAttributeRequest  request;
   StatusCode                     response;
+  ConnectionInfo                 ci;
 
   /* Set timer */
   Timer* t = new Timer();
@@ -88,12 +91,15 @@ TEST(mapPostIndividualContextEntityAttribute, notFoundThenFound)
 
   prepareDatabase("MPICE", "ttt");
 
-  ms = mapPostIndividualContextEntityAttribute("MPICE", "A1", &request, &response);
+  ms = mapPostIndividualContextEntityAttribute("MPICE", "A1", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(200, response.code);
 
-  ms = mapPostIndividualContextEntityAttribute("MPICE2", "A9", &request, &response);
+  ms = mapPostIndividualContextEntityAttribute("MPICE2", "A9", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
-  // FIXME P9: Why is there a 200 OK here?
+
+  // FIXME P9:  Why is there a 200 OK here?
+  //            To be removed when the convenienceMap library is removed.
+  //            See issue #117
   EXPECT_EQ(200, response.code);
 }

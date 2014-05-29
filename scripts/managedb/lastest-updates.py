@@ -24,6 +24,10 @@ from pymongo import MongoClient, DESCENDING
 from datetime import datetime 
 from sys import argv
 
+# This script can be easily adapted to used creation date instead of modification date
+# just changing the following variable to 'creDate'
+refDate = 'modDate'
+
 def printAttrs(attrHash, max):
     # Given that each entity can have N attributes where N can be greater than 1, we need to add a second level
     # of limit control (beyong the ".limit(max)" in the mongo query)
@@ -56,27 +60,27 @@ client = MongoClient('localhost', 27017)
 col = client[db]['entities']
 
 if type == 'entities':
-    query['modDate'] = {'$exists': True}
-    for doc in col.find(query).sort('modDate', direction=DESCENDING).limit(max):
-        modDate = int(doc['modDate'])
-        dateString = datetime.fromtimestamp(modDate).strftime('%Y-%m-%d %H:%M:%S')
+    query[refDate] = {'$exists': True}
+    for doc in col.find(query).sort(refDate, direction=DESCENDING).limit(max):
+        date = int(doc[refDate])
+        dateString = datetime.fromtimestamp(date).strftime('%Y-%m-%d %H:%M:%S')
         entityString = doc['_id']['id'] + ' (' + doc['_id']['type'] + ')'
         print '-- ' + dateString + ': ' + entityString
 elif type == 'attributes':
     # Attributes are stored in a hash. The key of the hash is the modification date, so it is actually a 
     # hash of lists (due to several attributes could have the same modification date)
     attrHash = { } 
-    query['attrs.modDate'] = {'$exists': True}
-    for doc in col.find(query).sort('modDate', direction=DESCENDING).limit(max):
+    query['attrs.' + refDate] = {'$exists': True}
+    for doc in col.find(query).sort(refDate, direction=DESCENDING).limit(max):
         entityString = doc['_id']['id'] + ' (' + doc['_id']['type'] + ')'
         for attr in doc['attrs']:
-           if attr.has_key('modDate'):
-              modDate = int(attr['modDate'])
+           if attr.has_key(refDate):
+              date = int(attr[refDate])
               attrString = attr['name'] + ' - ' + entityString
-              if attrHash.has_key(modDate):
-                  attrHash[modDate].append(attrString)
+              if attrHash.has_key(date):
+                  attrHash[date].append(attrString)
               else:
-                  attrHash[modDate] = [attrString]
+                  attrHash[date] = [attrString]
     printAttrs(attrHash, max)
 else:
     print 'Unsuported type: <' + type + '>'

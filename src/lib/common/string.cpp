@@ -22,21 +22,123 @@
 *
 * Author: Ken Zangelin
 */
-#include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <string>
 #include <vector>
-#include <stdio.h>
+
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/string.h"
+#include "common/wsStrip.h"
 
 #define DEFAULT_HTTP_PORT 80
+
+
+/* ****************************************************************************
+*
+* checkGroupIPv6 -
+*/
+static bool checkGroupIPv6(std::string in)
+{
+  // Can receive for example:
+  // :, 2001:, db8:, 0DB8:
+
+  if (in.empty()) return false;
+
+  if (in == ":") return true;
+
+  if (in.length() > 5) return false;
+
+  bool resu = true;
+  for (uint i = 0; i < in.length() - 1 ; i++)
+  {
+    if (isxdigit(in[i]) == false)
+    {
+      resu = false;
+      break;
+    }
+  }
+  return resu;
+}
+
+
+/* ****************************************************************************
+*
+* isIPv6 -
+*/
+bool isIPv6(const std::string& in)
+{
+  // An IP v6 have between two and seven character ":"
+  //  ::
+  //  2001:0db8:85a3:08d3:1319:8a2e:0370:7334
+
+  size_t pos;
+  std::string partip;
+  std::string resu;
+  std::string staux = in;
+  int cont = 0;
+
+  pos = staux.find(":");
+  while (pos != std::string::npos)
+  {
+    cont++;
+    partip = staux.substr(0, pos+1);
+    resu += partip;
+
+    if (checkGroupIPv6(partip) == false)
+      return false;
+
+    partip = staux.substr(pos+1);
+    staux = partip;
+
+    pos = staux.find(":");
+  }
+
+  return ((cont > 1) && (cont < 8));
+}
+
+
+/* ****************************************************************************
+*
+* getIPv6Port -
+*/
+bool getIPv6Port(const std::string& in, std::string& outIp, std::string& outPort)
+{
+  size_t pos;
+  std::string partip;
+  std::string resu;
+  std::string staux = in;
+
+  // Split IP and port
+  pos = staux.find(":");
+  while (pos != std::string::npos)
+  {
+    partip = staux.substr(0, pos+1);
+    resu += partip;
+    partip = staux.substr(pos+1);
+    staux = partip;
+    pos = staux.find(":");
+  }
+
+
+  if (resu.empty())
+    return false;
+
+  outIp = resu.substr(0, resu.length() - 1);
+  outPort = staux;
+
+  return isIPv6(resu);
+}
+
 
 /* ****************************************************************************
 *
 * stringSplit - 
 */
-int stringSplit(std::string in, char delimiter, std::vector<std::string>& outV)
+int stringSplit(const std::string& in, char delimiter, std::vector<std::string>& outV)
 {
   char* s          = strdup(in.c_str());
   char* toFree     = s;
@@ -46,9 +148,9 @@ int stringSplit(std::string in, char delimiter, std::vector<std::string>& outV)
 
   // 1. Skip leading delimiters
   while (*s == delimiter)
-     ++s;
+    ++s;
   start = s;
-  
+
 
   // 2. Empty string?
   if (*s == 0)
@@ -86,6 +188,7 @@ int stringSplit(std::string in, char delimiter, std::vector<std::string>& outV)
   return components;
 }
 
+
 /* ****************************************************************************
 *
 * parseUrl -
@@ -94,42 +197,59 @@ int stringSplit(std::string in, char delimiter, std::vector<std::string>& outV)
 * argument is not a valid URL. Otherwise, it returns true.
 *
 */
-bool parseUrl(std::string url, std::string& host, int& port, std::string& path)
+bool parseUrl(const std::string& url, std::string& host, int& port, std::string& path, std::string& protocol)
 {
+  /* Sanity check */
+  if (url == "") {
+    return false;
+  }
 
-    /* Sanity check */
-    if (url == "") {
-        return false;
-    }
+  /* First: split by the first '/' to get host:ip and path */
+  std::vector<std::string>  urlTokens;
+  int                       components = stringSplit(url, '/', urlTokens);
 
-    /* First: split by the first '/' to get host:ip and path */
-    std::vector<std::string>  urlTokens;
-    int                       components = stringSplit(url, '/', urlTokens);
+  protocol = urlTokens[0];
 
-    /* http://some.host.com/my/path
-     *      ^^             ^  ^
-     *      ||             |  |
-     * -----  ------------- -- ----
-     *   0          2       3    4  position in urlTokens vector
-     *   1  23             4  5     coponentes
-     */
+  /* http://some.host.com/my/path
+   *      ^^             ^  ^
+   *      ||             |  |
+   * -----  ------------- -- ----
+   *   0          2       3    4  position in urlTokens vector
+   *   1  23             4  5     coponentes
+   */
 
-    if ((components < 3) || (components == 3 && urlTokens[2].length() == 0)) {
-        return false;
-    }
+  if ((components < 3) || (components == 3 && urlTokens[2].length() == 0)) {
+    return false;
+  }
 
-    path = "";
-    /* Note that components could be 3, in which case we don't enter in the for. This is
-     * the case of URL without '/' like eg. "http://www.google.com" */
-    for (int ix = 3; ix < components; ++ix ) {
-        path += "/" + urlTokens[ix];
-    }
-    if (path == "") {
-        /* Minimum path is always "/" */
-        path = "/";
-    }
+  path = "";
+  /* Note that components could be 3, in which case we don't enter in the for. This is
+   * the case of URL without '/' like eg. "http://www.google.com" */
+  for (int ix = 3; ix < components; ++ix)
+    path += "/" + urlTokens[ix];
 
-    /* Second: split third token for host and port */
+  if (path == "")
+  {
+    /* Minimum path is always "/" */
+    path = "/";
+  }
+
+  /* Second: split third token for host and port */
+
+  std::string  auxIp;
+  std::string  auxPort;
+
+  // First we check if it is IPv6
+  if (getIPv6Port(urlTokens[2], auxIp, auxPort))
+  {
+    // IPv6
+    host = auxIp;
+    port = atoi(auxPort.c_str());
+    LM_VVV(("Parsed IPv6: '%s' and port: '%d'", host.c_str(), port));
+  }
+  else
+  {
+    // IPv4
     std::vector<std::string>  hostTokens;
     components = stringSplit(urlTokens[2], ':', hostTokens);
 
@@ -142,21 +262,18 @@ bool parseUrl(std::string url, std::string& host, int& port, std::string& path)
      */
 
     /* Sanity check */
-    if (components > 2) {
-        return false;
-    }
+    if (components > 2)
+      return false;
 
     host = hostTokens[0];
 
-    if (components == 2) {
-        port = atoi(hostTokens[1].c_str());
-    }
-    else {
-        port = DEFAULT_HTTP_PORT;
-    }
+    if (components == 2)
+      port = atoi(hostTokens[1].c_str());
+    else
+      port = DEFAULT_HTTP_PORT;
+  }
 
-    return true;
-
+  return true;
 }
 
 
@@ -164,11 +281,12 @@ bool parseUrl(std::string url, std::string& host, int& port, std::string& path)
 *
 * i2s - integer to string
 */
-char* i2s(int i, char* placeholder)
+char* i2s(int i, char* placeholder, int placeholderSize)
 {
-  sprintf(placeholder, "%d", i);
+  snprintf(placeholder, placeholderSize, "%d", i);
   return placeholder;
 }
+
 
 /* ****************************************************************************
 *
@@ -176,7 +294,6 @@ char* i2s(int i, char* placeholder)
 */
 std::string parsedUptime(int uptime)
 {
-
   char s[50];
 
   int seconds;
@@ -193,6 +310,245 @@ std::string parsedUptime(int uptime)
   days = hours / 24;
   hours = hours % 24;
 
-  sprintf(s, "%d d, %d h, %d m, %d s", days, hours, minutes, seconds);
+  snprintf(s, sizeof(s), "%d d, %d h, %d m, %d s", days, hours, minutes, seconds);
   return std::string(s);
+}
+
+
+/* ****************************************************************************
+*
+* onlyWs - 
+*/
+bool onlyWs(const char* s)
+{
+  if (*s == 0)
+    return true;
+
+  while (*s != 0)
+  {
+    if ((*s != ' ') && (*s != '\t') && (*s != '\n'))
+      return false;
+
+    ++s;
+  }
+
+  return true;
+}
+
+
+/* ****************************************************************************
+*
+* string2coords - 
+*/
+bool string2coords(const std::string& s, double& latitude, double& longitude)
+{
+  char* initial = strdup(s.c_str());
+  char* cP      = initial;
+  char* comma;
+  char* number1;
+  char* number2;
+
+  cP = wsStrip(cP);
+
+  comma = strchr(cP, ',');
+  if (comma == NULL)
+  {
+    free(initial);
+    return false;
+  }
+  *comma = 0;
+  ++comma;
+
+  number1 = cP;
+  number2 = comma;
+
+  number1 = wsStrip(number1);
+  number2 = wsStrip(number2);
+
+  std::string err;
+  double oldLatitude = latitude;
+  double oldLongitude = longitude;
+  latitude = atoF(number1, &err);
+  if (err.length() > 0)
+  {
+    latitude = oldLatitude;
+    free(initial);
+    return false;
+  }
+  else
+  {
+    longitude = atoF(number2, &err);
+    if (err.length() > 0)
+    {
+      /* Rollback latitude */
+      latitude = oldLatitude;
+      longitude = oldLongitude;
+      free(initial);
+      return false;
+    }
+  }
+
+  free(initial);
+  return true;
+}
+
+
+/* ****************************************************************************
+*
+* coords2string - 
+*/
+void coords2string(std::string* s, double latitude, double longitude, int decimals)
+{
+  char buf[256];
+  char format[32];
+
+  snprintf(format, sizeof(format), "%%.%df, %%.%df", decimals, decimals);
+  snprintf(buf,    sizeof(buf),    format,           latitude, longitude);
+
+  *s = buf;
+}
+
+
+/* ****************************************************************************
+*
+* versionParse -
+*/
+bool versionParse(const std::string& version, int& mayor, int& minor, std::string& bugFix)
+{
+  char* copy = strdup(version.c_str());
+  char* s    = wsStrip(copy);
+  char* dotP;
+
+
+  //
+  // mayor number
+  //
+  dotP = strchr(s, '.');
+  if (dotP == NULL)
+  {
+    free(copy);
+    return false;
+  }
+
+  *dotP = 0;
+  ++dotP;
+
+  s = wsStrip(s);
+  mayor = atoi(s);
+  if (strspn(s, "0123456789") != strlen(s))
+  {
+    free(copy);
+    return false;
+  }
+  s = dotP;
+
+
+  //
+  // minor number
+  // If no dot is found, no bugFix 'version' is present.
+  // Just zero the 'bugFix' and keep the remaining string in minor.
+  //
+  bool bugFixEmpty = false;
+
+  dotP = strchr(s, '.');
+  if (dotP != NULL)
+  {
+    *dotP = 0;
+    ++dotP;
+  }
+  else
+  {
+    bugFix = "";
+    bugFixEmpty = true;
+  }
+
+  s = wsStrip(s);
+  minor = atoi(s);
+  if (strspn(s, "0123456789") != strlen(s))
+  {
+    free(copy);
+    return false;
+  }
+
+  if (bugFixEmpty == true)
+  {
+    free(copy);
+    return true;
+  }
+
+  s = dotP;
+
+
+
+  //
+  // bugfix
+  //
+  s = wsStrip(s);
+  bugFix = s;
+
+  free(copy);
+  return true;
+}
+
+
+/* ****************************************************************************
+*
+* atoF - 
+*/
+double atoF(const char* string, std::string* errorMsg)
+{
+  char* cP = (char*) string;
+  int   noOf;
+
+  *errorMsg = "";
+
+  if (string[0] == 0)
+  {
+    *errorMsg = "empty string";
+    return 0.0;
+  }
+
+  if ((*cP == '-') || (*cP == '+'))
+  {
+    ++cP;
+
+    if (!isdigit(*cP) && (*cP != '.'))
+      // the check on '.' is to allow e.g. '-.7' and '+.7'
+    {
+      *errorMsg = "non-digit after unary minus/plus";
+      return 0.0;
+    }
+  }
+
+  // Number of dots
+  noOf = 0;
+  char* tmp = cP;
+  while (*tmp != 0)
+  {
+    if (*tmp == '.')
+    {
+      ++noOf;
+      if (tmp[1] == 0)
+      {
+        *errorMsg = "last character in a double cannot be a dot";
+        return 0.0;
+      }
+    }
+
+    ++tmp;
+  }
+
+  if (noOf > 1)
+  {
+    *errorMsg = "more than one dot";
+    return 0.0;
+  }
+
+  if (strspn(cP, ".0123456789") != strlen(cP))
+  {
+    *errorMsg = "invalid characters in string to convert";
+    return 0.0;
+  }
+
+  return atof(string);
 }

@@ -42,7 +42,7 @@
 *
 * POST /ngsi9/contextEntityTypes/{entityType}
 */
-std::string postContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string postContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string  entityType    = compV[2];
   
@@ -51,7 +51,7 @@ std::string postContextEntityTypes(ConnectionInfo* ciP, int components, std::vec
 
   // Now call postRegisterContext (postRegisterContext doesn't use the parameters 'components' and 'compV')
   std::string answer = postRegisterContext(ciP, components, compV, parseDataP);
-  parseDataP->rpr.res.release();
+  parseDataP->rcr.res.release();
 
   return answer;
 }

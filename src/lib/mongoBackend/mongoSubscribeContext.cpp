@@ -27,25 +27,32 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
-#include "common/sem.h"
 #include "common/Format.h"
+#include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoSubscribeContext.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi/StatusCode.h"
+#include "rest/uriParamNames.h"
 
 /* ****************************************************************************
 *
 * mongoSubscribeContext - 
 */
-HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, SubscribeContextResponse* responseP, Format inFormat)
+HttpStatusCode mongoSubscribeContext
+(
+  SubscribeContextRequest*             requestP,
+  SubscribeContextResponse*            responseP,
+  const std::string&                   tenant,
+  std::map<std::string, std::string>&  uriParam
+)
 {
+    std::string notifyFormat = uriParam[URI_PARAM_NOTIFY_FORMAT];
 
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
+    LM_T(LmtMongo, ("Subscribe Context Request: notifications sent in '%s' format", notifyFormat.c_str()));
 
-    LM_T(LmtMongo, ("Subscribe Context Request"));
+    reqSemTake(__FUNCTION__, "ngsi10 subscribe request");
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -55,8 +62,8 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
     }
 
     /* Calculate expiration (using the current time and the duration field in the request) */
-    int expiration = getCurrentTime() + requestP->duration.parse();
-    LM_T(LmtMongo, ("Subscription expiration: %d", expiration));
+    long long expiration = getCurrentTime() + requestP->duration.parse();
+    LM_T(LmtMongo, ("Subscription expiration: %lu", expiration));
 
     /* Create the mongoDB subscription document */
     BSONObjBuilder sub;
@@ -95,7 +102,8 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
                                              requestP->attributeList, oid.str(),
                                              requestP->reference.get(),
                                              &notificationDone,
-                                             inFormat);
+                                             (notifyFormat == "XML")? XML : JSON,
+                                             tenant);
     sub.append(CSUB_CONDITIONS, conds);
     if (notificationDone) {
         sub.append(CSUB_LASTNOTIFICATION, getCurrentTime());
@@ -103,31 +111,43 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
     }
 
     /* Adding format to use in notifications */
-    sub.append(CSUB_FORMAT, std::string(formatToString(inFormat)));
+    sub.append(CSUB_FORMAT, notifyFormat);
 
     /* Insert document in database */
     BSONObj subDoc = sub.obj();
+    LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), subDoc.toString().c_str()));
     try {
-        LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextCollectionName(), subDoc.toString().c_str()));
-        connection->insert(getSubscribeContextCollectionName(), subDoc);
+        mongoSemTake(__FUNCTION__, "insert into SubscribeContextCollection");
+        connection->insert(getSubscribeContextCollectionName(tenant).c_str(), subDoc);
+        mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection");
     }
     catch( const DBException &e ) {
-        responseP->subscribeError.errorCode.fill(
-            SccReceiverInternalError,
-            "Database Error",
-            std::string("collection: ") + getSubscribeContextCollectionName() +
-                " - insert(): " + subDoc.toString() +
-                " - exception: " + e.what()
-        );
+        mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection (mongo db exception)");
+        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo db exception)");
+        responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
+                                                 std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
+                                                 " - insert(): " + subDoc.toString() +
+                                                 " - exception: " + e.what());
 
-        LM_SRE(SccOk,("Database error '%s'", responseP->subscribeError.errorCode.reasonPhrase.c_str()));
+        LM_RE(SccOk, ("Database error '%s'", responseP->subscribeError.errorCode.reasonPhrase.c_str()));
     }    
+    catch(...) {
+        mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection (mongo generic exception)");
+        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo generic exception)");
+        responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
+                                                 std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
+                                                 " - insert(): " + subDoc.toString() +
+                                                 " - exception: " + "generic");
+
+        LM_RE(SccOk, ("Database error '%s'", responseP->subscribeError.errorCode.reasonPhrase.c_str()));
+    }    
+
+    reqSemGive(__FUNCTION__, "ngsi10 subscribe request");
 
     /* Fill the response element */
     responseP->subscribeResponse.duration = requestP->duration;
     responseP->subscribeResponse.subscriptionId.set(oid.str());
     responseP->subscribeResponse.throttling = requestP->throttling;
 
-    LM_SR(SccOk);
-
+    return SccOk;
 }

@@ -1,0 +1,7 @@
+<queryContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>too few vertices for a polygon</details>
+  </errorCode>
+</queryContextResponse>

@@ -33,6 +33,7 @@ function usage()
 
   echo $0 "[-u (usage)]"
   echo "${spaces} [-v (verbose)]"
+  echo "${spaces} [-f <filter-string>]"
 
   exit $exitCode
 }
@@ -51,22 +52,28 @@ function vMsg()
   fi
 }
 
+
+
 # ------------------------------------------------------------------------------
 #
 # command line options
 #
 verbose="off"
+filter=""
 
 while [ "$#" != 0 ]
 do
   if   [ "$1" == "-u" ];             then usage 0;
   elif [ "$1" == "-v" ];             then verbose=on;
+  elif [ "$1" == "-f" ];             then filter=$2; shift;
  else
     echo $0: bad parameter/option: "'"${1}"'"
     usage 1
   fi
   shift
 done
+
+
 
 # -----------------------------------------------------------------------------
 #
@@ -87,25 +94,52 @@ SRC_TOP=$(pwd)
 cd - > /dev/null
 vMsg Git repo home: $SRC_TOP
 
-# -----------------------------------------------------------------------------
-# starting actual work
 
+
+# -----------------------------------------------------------------------------
+#
+# Variables
+#
 typeset -i files
 typeset -i errors
 files=0
 errors=0
 exitValue=0
-for FILE in $(find $SRC_TOP/test/ -name "*.json" | grep -v '\.invalid\.json'$)
+
+
+
+# -----------------------------------------------------------------------------
+#
+# Actual work
+#
+for FILE in $(find $SRC_TOP/test/ -name "*.json" | grep -v '\.invalid\.json'$ | grep -v '\.middle\.json'$)
 do
+  if [ "$filter" != "" ]
+  then
+    echo $FILE | grep $filter > /dev/null 2>&1
+    if [ $? != 0 ]
+    then
+      continue
+    fi
+  fi
+
+  vMsg Checking $FILE
   cat $FILE | python -m json.tool > /dev/null
   if [ "$?" -eq "1" ]; then
-    echo "File $FILE is not a well-formed JSON document"
+    echo "*** Error: $FILE is not a well-formed JSON document"
     exitValue=1
     errors=$errors+1
   fi
+
   files=$files+1
 done
 
+
+# -----------------------------------------------------------------------------
+#
+# Report
+#
+vMsg
 echo $0: $files json files examined
 echo $0: $errors erroneous json files found
 

@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/NotifyCondition.h"
+
+#include "unittest.h"
 
 
 
@@ -39,9 +39,12 @@ TEST(NotifyCondition, Creation)
 {
   NotifyCondition nc;
 
-  nc.restriction.set("Hola");
+  utInit();
 
+  nc.restriction.set("Hola");
   EXPECT_TRUE(nc.restriction.get() == "Hola");
+
+  utExit();
 }
 
 
@@ -53,14 +56,21 @@ TEST(NotifyCondition, Creation)
 TEST(NotifyCondition, render)
 {
   NotifyCondition  nc;
-  std::string      expected1xml  = "<notifyCondition>\n  <type></type>\n</notifyCondition>\n";
-  std::string      expected1json = "{\n  \"type\" : \"\"\n}\n";
-  std::string      rendered;
+  const char*      outfile1 = "ngsi.notifyCondition.render.middle.xml";
+  const char*      outfile2 = "ngsi.notifyCondition.render.middle.json";
+  std::string      out;
 
-  rendered = nc.render(XML, "", false);
-  EXPECT_STREQ(expected1xml.c_str(), rendered.c_str());
-  rendered = nc.render(JSON, "", false);
-  EXPECT_STREQ(expected1json.c_str(), rendered.c_str());
+  utInit();
+
+  out = nc.render(XML, "", false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  out = nc.render(JSON, "", false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -73,8 +83,12 @@ TEST(NotifyCondition, present)
 {
   NotifyCondition  nc;
 
+  utInit();
+
   nc.present("", -1);
   nc.present("", 0);
+
+  utExit();
 }
 
 
@@ -86,16 +100,18 @@ TEST(NotifyCondition, present)
 TEST(NotifyCondition, check)
 {
   NotifyCondition  nc;
-  std::string      expected1 = "empty type for NotifyCondition";
-  std::string      expected2 = "invalid notify condition type: 'XXX'";
   std::string      checked;
 
+  utInit();
+
   checked = nc.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected1.c_str(), checked.c_str());
+  EXPECT_STREQ("empty type for NotifyCondition", checked.c_str());
   
   nc.type = "XXX";
   checked = nc.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected2.c_str(), checked.c_str());
+  EXPECT_STREQ("invalid notify condition type: 'XXX'", checked.c_str());
 
   nc.release();
+
+  utExit();
 }

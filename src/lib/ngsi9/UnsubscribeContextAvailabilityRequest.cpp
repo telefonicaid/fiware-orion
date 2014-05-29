@@ -46,7 +46,7 @@ UnsubscribeContextAvailabilityRequest::UnsubscribeContextAvailabilityRequest()
 *
 * UnsubscribeContextAvailabilityRequest::UnsubscribeContextAvailabilityRequest - 
 */
-UnsubscribeContextAvailabilityRequest::UnsubscribeContextAvailabilityRequest(SubscriptionId _subscriptionId)
+UnsubscribeContextAvailabilityRequest::UnsubscribeContextAvailabilityRequest(SubscriptionId& _subscriptionId)
 {
    subscriptionId.set(_subscriptionId.get());
 }
@@ -57,20 +57,18 @@ UnsubscribeContextAvailabilityRequest::UnsubscribeContextAvailabilityRequest(Sub
 *
 * UnsubscribeContextAvailabilityRequest::check - 
 */
-std::string UnsubscribeContextAvailabilityRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string UnsubscribeContextAvailabilityRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
    UnsubscribeContextAvailabilityResponse  response(subscriptionId);
    std::string                             res;
 
   if (predetectedError != "")
   {
-    response.statusCode.code         = SccBadRequest;
-    response.statusCode.reasonPhrase = predetectedError;
+    response.statusCode.fill(SccBadRequest, predetectedError);
   }
   else if ((res = subscriptionId.check(UnsubscribeContextAvailability, format, indent, predetectedError, counter)) != "OK")
   {
-    response.statusCode.code         = SccBadRequest;
-    response.statusCode.reasonPhrase = res;
+    response.statusCode.fill(SccBadRequest, res);
   }
   else
     return "OK";

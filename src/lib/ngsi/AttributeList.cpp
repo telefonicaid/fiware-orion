@@ -39,7 +39,7 @@
 *
 * render - 
 */
-std::string AttributeList::render(Format format, std::string indent, bool comma)
+std::string AttributeList::render(Format format, const std::string& indent, bool comma)
 {
   std::string  out = "";
   std::string  tag = "attributeList";
@@ -63,7 +63,7 @@ std::string AttributeList::render(Format format, std::string indent, bool comma)
 *
 * AttributeList::check - 
 */
-std::string AttributeList::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string AttributeList::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
@@ -80,7 +80,7 @@ std::string AttributeList::check(RequestType requestType, Format format, std::st
 *
 * AttributeList::present - 
 */
-void AttributeList::present(std::string indent)
+void AttributeList::present(const std::string& indent)
 {
   PRINTF("%sAttribute List\n",    indent.c_str());
 
@@ -105,7 +105,7 @@ void AttributeList::release(void)
 *
 * push_back - 
 */
-void AttributeList::push_back(std::string attributeName)
+void AttributeList::push_back(const std::string& attributeName)
 {
   attributeV.push_back(attributeName);
 }

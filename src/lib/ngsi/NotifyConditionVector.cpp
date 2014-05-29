@@ -36,7 +36,7 @@
 *
 * NotifyConditionVector::render - 
 */
-std::string NotifyConditionVector::render(Format format, std::string indent, bool comma)
+std::string NotifyConditionVector::render(Format format, const std::string& indent, bool comma)
 {
   std::string out = "";
   std::string tag = "notifyConditions";
@@ -58,7 +58,7 @@ std::string NotifyConditionVector::render(Format format, std::string indent, boo
 *
 * NotifyConditionVector::check - 
 */
-std::string NotifyConditionVector::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string NotifyConditionVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -77,7 +77,7 @@ std::string NotifyConditionVector::check(RequestType requestType, Format format,
 *
 * NotifyConditionVector::present - 
 */
-void NotifyConditionVector::present(std::string indent)
+void NotifyConditionVector::present(const std::string& indent)
 {
   PRINTF("%lu NotifyConditions", (unsigned long) vec.size());
 

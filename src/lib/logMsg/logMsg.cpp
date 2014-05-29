@@ -32,6 +32,7 @@
 #include <string.h>             /* strncat, strdup, memset                   */
 #include <stdarg.h>             /* va_start, va_arg, va_end                  */
 #include <stdlib.h>             /* atoi                                      */
+#include <semaphore.h>          /* sem_init, sem_wait, sem_post              */
 
 #if !defined(__APPLE__)
 #include <malloc.h>             /* free                                      */
@@ -43,6 +44,7 @@
 #include <sys/time.h>           /* gettimeofday                              */
 #include <time.h>               /* time, gmtime_r, ...                       */
 #include <sys/timeb.h>          /* timeb, ftime, ...                         */
+
 #include "logMsg/time.h" //
 
 // We have a problem of cross-dependency between au and logMsg
@@ -68,6 +70,32 @@ static bool  lmOutHookActive = false;
 static void* lmOutHookParam  = NULL;
 char*        progName;               /* needed for messages (and by lmLib) */
 char         progNameV[512];         /* where to store progName            */
+
+
+static sem_t sem;
+
+static void semInit(void)
+{
+  sem_init(&sem, 0, 1);
+}
+
+static void semTake(void)
+{
+  static int firstTime = 1;
+
+  if (firstTime == 1)
+  {
+    semInit();
+    firstTime = 0;
+  }
+
+  sem_wait(&sem);
+}
+
+static void semGive(void)
+{
+  sem_post(&sem);
+}
 
 
 
@@ -265,6 +293,7 @@ bool  lmFix                        = false;
 bool  lmAssertAtExit               = false;
 LmxFp lmxFp                        = NULL;
 bool  lmNoTracesToFileIfHookActive = false;
+bool  lmSilent                     = false;
 
 
 
@@ -1457,6 +1486,8 @@ char* lmTextGet(const char* format, ...)
 */
 LmStatus lmOk(char type, int tLev)
 {
+    if (lmSilent == true)
+        return LmsNull;
     if ((type == 'T') && (tLevel[tLev] == false))
         return LmsNull;
     if ((type == 'D') && (lmDebug == false))
@@ -1533,15 +1564,15 @@ LmStatus lmFdRegister(int fd, const char* format, const char* timeFormat, const 
     
     if ((fd >= 0) && (strcmp(info, "stdout") != 0))
     {
-        strftime(dt, 256, "%A %d %h %H:%M:%S %Y", &tmP);
-        snprintf(startMsg, sizeof(startMsg),
-                   "%s log\n-----------------\nStarted %s\nCleared at ...\n",
-                   progName, dt);
+      strftime(dt, 256, "%A %d %h %H:%M:%S %Y", &tmP);
+      snprintf(startMsg, sizeof(startMsg),
+               "%s log\n-----------------\nStarted %s\nCleared at ...\n",
+               progName, dt);
 
-        sz = strlen(startMsg);
+      sz = strlen(startMsg);
 
-        if (write(fd, startMsg, sz) != sz)
-            return LmsWrite;
+      if (write(fd, startMsg, sz) != sz)
+        return LmsWrite;
     }
 
     fds[index].fd    = fd;
@@ -1715,6 +1746,8 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
     
     memset(format, 0, sizeof(format));
 
+    semTake();
+
     if ((type != 'H') && lmOutHook && lmOutHookActive == true)
     {
         time_t secondsNow = time(NULL);
@@ -1766,15 +1799,15 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
         sz = strlen(line);
         
         if (fds[i].write != NULL)
-            fds[i].write(line);
+          fds[i].write(line);
         else
         {
-           ssize_t ans = write(fds[i].fd, line, sz);
-           ans = 0;
-           if ( ans > 0 )
-           {
-               // Nothing to do if write fails since we cannot "log" ;)
-           }
+          int nb = write(fds[i].fd, line, sz);
+
+          if (nb == -1)
+            printf("LOG error: write(%d): %s\n", fds[i].fd, strerror(errno));
+          else if (nb != sz)
+            printf("LOG error: written %d bytes only (wanted %d)\n", nb, sz);
         }
     }
     
@@ -1798,6 +1831,8 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
     }
     else if ((type == 'X') || (type == 'x'))
     {
+        semGive();
+
         if (exitFunction != NULL)
             exitFunction(tLev, exitInput, text, (char*) stre);
 
@@ -1825,6 +1860,7 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
                 if ((s = lmClear(i, keepLines, lastLines)) != LmsOk)
                 {
                     free(line);
+                    semGive();
                     return s;
                 }
             }
@@ -1832,6 +1868,7 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
     }
 
     free(line);
+    semGive();
     return LmsOk;
 }
 
@@ -2137,10 +2174,11 @@ LmStatus lmReopen(int index)
             snprintf(buf, sizeof(buf), "Cleared at %s  (a reopen ...)\n",tm);
             if (write(fd, buf, strlen(buf)) != (int) strlen(buf))
             {
-                s = LmsWrite;
-                free(line);
-                break;
+              s = LmsWrite;
+              free(line);
+              break;
             }   
+
             ++newLogLines;
             free(line);
             break;
@@ -2148,12 +2186,12 @@ LmStatus lmReopen(int index)
         
         if ((nb = write(fd, line, len)) != len)
         {
-            s = LmsWrite;
-            free(line);
-            break;
+          s = LmsWrite;
+          free(line);
+          break;
         }
         else
-            ++newLogLines;
+          ++newLogLines;
     }
 
     if (fd != -1)
@@ -2356,11 +2394,15 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
         return LmsFopen;
     }
 
+    semTake();
     rewind(fP);
 
     lrV = (LineRemove*) malloc(sizeof(LineRemove) * (logLines + 4));
     if (lrV == NULL)
-        return LmsMalloc;
+    {
+      semGive();
+      return LmsMalloc;
+    }
 
     initialLrv = lrV;
     memset(lrV, 0, sizeof(LineRemove) * (logLines + 4));
@@ -2416,20 +2458,22 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
         fclose(fP);
         lseek(fds[index].fd, fdPos, SEEK_SET);
         ::free((char*) lrV);
+        semGive();
         return LmsOpen;
     }
 
 #define CLEANUP(str, s) \
 { \
     if (str != NULL)                       \
-        perror(str);                   \
+        perror(str);                       \
     close(fd);                             \
     fclose(fP);                            \
     lseek(fds[index].fd, fdPos, SEEK_SET); \
     if (lrV != NULL)                       \
-        ::free((void*) lrV);                 \
+        ::free((void*) lrV);               \
     lrV = NULL;                            \
     unlink(tmpName);                       \
+    semGive();                             \
     return s;                              \
 }
 
@@ -2437,18 +2481,21 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
     {
         if (lrV[i].remove == false)
         {
-            char*  line = (char*) calloc(1, LINE_MAX);
-            char*  lineP;
+            char*  line  = (char*) calloc(1, LINE_MAX);
 
             if (fseek(fP, lrV[i].offset, SEEK_SET) != 0)
                 CLEANUP("fseek", LmsFseek);
 
-            lineP = fgets(line, LINE_MAX, fP);
+            if (fgets(line, LINE_MAX, fP) == NULL)
+              break;
+
             if (strncmp(line, "Cleared at", 10) != 0)
             {
                 len = strlen(line);
                 if (write(fd, line, len) != len)
-                    CLEANUP("write", LmsWrite);
+                {
+                  CLEANUP("write", LmsWrite);
+                }
             }
 
             if (newLogLines == 2)
@@ -2463,7 +2510,9 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
                 
                 snprintf(buf, sizeof(buf), "Cleared at %s\n", tm);
                 if (write(fd, buf, strlen(buf)) != (int) strlen(buf))
-                    CLEANUP("write", LmsWrite);
+                {
+                  CLEANUP("write", LmsWrite);
+                }
             }
 
             ++newLogLines;
@@ -2490,6 +2539,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
     if (fds[index].fd == -1)
     {
         fds[index].state = Free;
+        semGive();
         return LmsOpen;
     }
         
@@ -2498,6 +2548,7 @@ LmStatus lmClear(int index, int keepLines, int lastLines)
     logLines = newLogLines;
     LOG_OUT(("Set logLines to %d", logLines));
     free(line);
+    semGive();
     return LmsOk;
 }
 
@@ -2722,4 +2773,15 @@ int lmFirstDiskFileDescriptor(void)
     }
 
     return -1;
+}
+
+
+
+/* ****************************************************************************
+*
+* lmLogLinesGet - 
+*/
+int lmLogLinesGet(void)
+{
+  return logLines;
 }

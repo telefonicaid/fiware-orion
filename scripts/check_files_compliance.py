@@ -27,7 +27,7 @@ import re
 from sys import argv
 
 header = []
-header.append('[#|\*] +Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U$')
+header.append('[#|\*] +Copyright 201[3|4] Telefonica Investigacion y Desarrollo, S.A.U$')
 header.append('[#|\*]$')
 header.append('[#|\*] +This file is part of Orion Context Broker.$')
 header.append('[#|\*]$')
@@ -82,6 +82,10 @@ def ignore(root, file):
     if 'BUILD_' in root or '.git' in root:
         return True
 
+    # Files in the rpm/SRPMS, rpm/SOURCES or rpm/RPMS directories are not processed
+    if 'SRPMS' in root or 'SOURCES' or 'RPMS'in root:
+        return True
+
     # Files in the test/valdring directory ending with .out are not processed
     if 'valgrind' in root and file.endswith('.out'):
         return True
@@ -110,7 +114,7 @@ def ignore(root, file):
     # Particular cases of files that are also ignored
     if file == '.gitignore' or file == '.valgrindrc' or file == '.valgrindSuppressions' \
         or file == 'README.md' or file == 'LICENSE' or file == 'ContributionPolicy.txt' \
-        or file == 'compileInfo.h':
+        or file == 'CHANGES_NEXT_RELEASE' or file == 'compileInfo.h':
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
         or file == 'cmake2junit.xsl'):
@@ -123,7 +127,7 @@ def supported_extension(root, file):
     if file.endswith('.py') or file.endswith('.cpp') or file.endswith('.h') or file.endswith('.xml')\
         or file.endswith('.json') or file.endswith('.test') or file.endswith('.vtest') or file.endswith('.txt')\
         or file.endswith('.sh') or file == 'makefile' or file == 'Makefile' or file.endswith('.spec') \
-        or file.endswith('.cfg') or file.endswith('.DISABLED') or file.endswith('.xtest') or file.endswith('.centos'):
+        or file.endswith('.cfg') or file.endswith('.DISABLED') or file.endswith('.xtest') or file.endswith('.centos') or file.endswith('.js'):
         return True
 
     if 'config' in root and file == 'contextBroker':

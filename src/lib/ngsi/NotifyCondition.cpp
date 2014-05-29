@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <stdio.h>
+#include <string.h>
 #include <string>
 
 #include "common/globals.h"
@@ -36,7 +37,7 @@
 *
 * NotifyCondition::render - 
 */
-std::string NotifyCondition::render(Format format, std::string indent, bool notLastInVector)
+std::string NotifyCondition::render(Format format, const std::string& indent, bool notLastInVector)
 {
   std::string out = "";
   std::string tag = "notifyCondition";
@@ -64,7 +65,7 @@ std::string NotifyCondition::render(Format format, std::string indent, bool notL
 *
 * FIXME: P5 - in case of errors a formated result string should be returned ... ?
 */
-std::string NotifyCondition::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string NotifyCondition::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string res;
 
@@ -91,7 +92,7 @@ std::string NotifyCondition::check(RequestType requestType, Format format, std::
 *
 * NotifyCondition::present - 
 */
-void NotifyCondition::present(std::string indent, int ix)
+void NotifyCondition::present(const std::string& indent, int ix)
 {
   std::string indent2 = indent + "  ";
 

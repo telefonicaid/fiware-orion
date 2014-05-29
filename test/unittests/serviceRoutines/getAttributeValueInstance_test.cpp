@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/postIndividualContextEntityAttributes.h"
@@ -34,7 +32,6 @@
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "testDataFromFile.h"
 #include "unittest.h"
 
 
@@ -63,14 +60,15 @@ static RestService rs[] =
 TEST(getAttributeValueInstance, notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/E1/attributes/A1/left",  "GET", "1.1");
-  std::string    expected    = "<contextAttributeResponse>\n  <statusCode>\n    <code>404</code>\n    <reasonPhrase>The ContextElement requested is not found</reasonPhrase>\n    <details>E1-A1</details>\n  </statusCode>\n</contextAttributeResponse>\n";
+  const char*    outfile = "ngsi10.contextAttributeResponse.notFound.valid.xml";
   std::string    out;
 
   utInit();
   
   ci.outFormat = XML;
   out          = restService(&ci, rs);
-  EXPECT_EQ(expected, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }
@@ -85,24 +83,26 @@ TEST(getAttributeValueInstance, found)
 {
   ConnectionInfo ci1("/ngsi10/contextEntities/E1/attributes",          "POST", "1.1");
   ConnectionInfo ci2("/ngsi10/contextEntities/E1/attributes/A1/left",  "GET", "1.1");
-  std::string    expected1    = "<appendContextElementResponse>\n  <contextResponseList>\n    <contextAttributeResponse>\n      <contextAttributeList>\n        <contextAttribute>\n          <name>A1</name>\n          <type></type>\n          <contextValue></contextValue>\n          <metadata>\n            <contextMetadata>\n              <name>ID</name>\n              <type>string</type>\n              <value>left</value>\n            </contextMetadata>\n          </metadata>\n        </contextAttribute>\n      </contextAttributeList>\n      <statusCode>\n        <code>200</code>\n        <reasonPhrase>OK</reasonPhrase>\n      </statusCode>\n    </contextAttributeResponse>\n  </contextResponseList>\n</appendContextElementResponse>\n";
-  std::string    expected2    = "<contextAttributeResponse>\n  <contextAttributeList>\n    <contextAttribute>\n      <name>A1</name>\n      <type></type>\n      <contextValue>10</contextValue>\n      <metadata>\n        <contextMetadata>\n          <name>ID</name>\n          <type>string</type>\n          <value>left</value>\n        </contextMetadata>\n      </metadata>\n    </contextAttribute>\n  </contextAttributeList>\n  <statusCode>\n    <code>200</code>\n    <reasonPhrase>OK</reasonPhrase>\n  </statusCode>\n</contextAttributeResponse>\n";
-  const char*    fileName     = "ngsi10.IndividualContextEntityAttributes.A1-left.postponed.xml";
+  const char*    outfile1  = "ngsi10.appendContextElementResponse.ok1.valid.xml";
+  const char*    outfile2  = "ngsi10.appendContextElementResponse.ok2.valid.xml";
+  const char*    infile    = "ngsi10.IndividualContextEntityAttributes.A1-left.postponed.xml";
   std::string    out;
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   ci1.outFormat    = XML;
   ci1.inFormat     = XML;
   ci1.payload      = testBuf;
   ci1.payloadSize  = strlen(testBuf);
   out              = restService(&ci1, rs);
-  EXPECT_EQ(expected1, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   ci2.outFormat    = XML;
   out              = restService(&ci2, rs);
-  EXPECT_EQ(expected2, out);  
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

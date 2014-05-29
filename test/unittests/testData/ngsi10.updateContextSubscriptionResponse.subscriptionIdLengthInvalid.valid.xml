@@ -1,0 +1,10 @@
+<updateContextSubscriptionResponse>
+  <subscribeError>
+    <subscriptionId>12345</subscriptionId>
+    <errorCode>
+      <code>400</code>
+      <reasonPhrase>Bad Request</reasonPhrase>
+      <details>bad length (24 chars expected)</details>
+    </errorCode>
+  </subscribeError>
+</updateContextSubscriptionResponse>

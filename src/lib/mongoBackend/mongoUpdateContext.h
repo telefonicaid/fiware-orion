@@ -36,6 +36,6 @@
 *
 * mongoUpdateContext - 
 */
-extern HttpStatusCode mongoUpdateContext(UpdateContextRequest* requestP, UpdateContextResponse* responseP);
+extern HttpStatusCode mongoUpdateContext(UpdateContextRequest* requestP, UpdateContextResponse* responseP, const std::string& tenant = "");
 
 #endif

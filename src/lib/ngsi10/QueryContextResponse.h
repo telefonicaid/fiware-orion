@@ -31,7 +31,7 @@
 
 #include "ngsi/ContextElementResponseVector.h"
 #include "common/Format.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 
 
 
@@ -46,13 +46,13 @@
 typedef struct QueryContextResponse
 {
   ContextElementResponseVector  contextElementResponseVector;  // Optional
-  ErrorCode                     errorCode;                     // Optional
+  StatusCode                    errorCode;                     // Optional
 
   QueryContextResponse();
-  QueryContextResponse(ErrorCode _errorCode);
+  QueryContextResponse(StatusCode& _errorCode);
   ~QueryContextResponse();
 
-  std::string render(RequestType requestType, Format format, std::string indent);  
+  std::string render(RequestType requestType, Format format, const std::string& indent);  
 } QueryContextResponse;
 
 #endif

@@ -26,6 +26,7 @@
 * Author: Fermin Galan Marquez
 */
 #include <string>
+#include <map>
 
 #include "common/Format.h"
 #include "ngsi10/SubscribeContextRequest.h"
@@ -37,6 +38,12 @@
 *
 * mongoSubscribeContext - 
 */
-extern HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, SubscribeContextResponse* responseP, Format inFormat = XML);
+extern HttpStatusCode mongoSubscribeContext
+(
+  SubscribeContextRequest*                   requestP,
+  SubscribeContextResponse*                  responseP,
+  const std::string&                         tenant,
+  std::map<std::string, std::string>&        uriParam
+);
 
 #endif

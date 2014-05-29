@@ -1,5 +1,5 @@
-#ifndef SEM_H
-#define SEM_H
+#ifndef SRC_LIB_COMMON_SEM_H_
+#define SRC_LIB_COMMON_SEM_H_
 
 /*
 *
@@ -25,23 +25,26 @@
 *
 * Author: Fermin Galan
 */
+#include <stdio.h>
 
 /* ****************************************************************************
 *
 * semInit -
 */
-extern int semInit(void);
+extern int semInit(int shared = 0, int takenInitially = 1);
 
 /* ****************************************************************************
 *
 * semTake -
 */
-extern int semTake(void);
+extern int reqSemTake(const char* who, const char* what);
+extern int mongoSemTake(const char* who, const char* what);
 
 /* ****************************************************************************
 *
 * semGive -
 */
-int semGive(void);
+int reqSemGive(const char* who, const char* what = NULL);
+int mongoSemGive(const char* who, const char* what = NULL);
 
-#endif
+#endif  // SRC_LIB_COMMON_SEM_H_

@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/Reference.h"
+
+#include "unittest.h"
 
 
 
@@ -41,8 +41,12 @@ TEST(Reference, check)
   std::string  checked;
   std::string  expected = "OK";
   
+  utInit();
+
   checked = reference.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(checked.c_str(), expected.c_str());
+  EXPECT_STREQ("OK", checked.c_str());
+
+  utExit();
 }
 
 
@@ -53,7 +57,9 @@ TEST(Reference, check)
 */
 TEST(Reference, isEmptySetAndGet)
 {
-  Reference    reference;
+  Reference  reference;
+
+  utInit();
 
   reference.set("REF");
   EXPECT_STREQ("REF", reference.get().c_str());
@@ -61,6 +67,8 @@ TEST(Reference, isEmptySetAndGet)
 
   reference.set("");
   EXPECT_TRUE(reference.isEmpty());
+
+  utExit();
 }
 
 
@@ -73,11 +81,15 @@ TEST(Reference, present)
 {
   Reference   reference;
 
+  utInit();
+
   reference.set("");
   reference.present("");
 
   reference.set("STR");
   reference.present("");
+
+  utExit();
 }
 
 
@@ -89,21 +101,26 @@ TEST(Reference, present)
 TEST(Reference, render)
 {
   Reference    reference;
-  std::string  rendered;
-  std::string  expected1 = "";
-  std::string  expected2 = "<reference>REF</reference>\n";
-  std::string  expected3 = "\"reference\" : \"REF\"\n";
+  std::string  out;
+  const char*  outfile1 = "ngsi.reference.render.middle.xml";
+  const char*  outfile2 = "ngsi.reference.render.middle.json";
+
+  utInit();
 
   reference .set("");
-  rendered = reference.render(XML, "", false);
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  out = reference.render(XML, "", false);
+  EXPECT_STREQ("", out.c_str());
 
   reference .set("REF");
-  rendered = reference.render(XML, "", false);
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  out = reference.render(XML, "", false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  rendered = reference.render(JSON, "", false);
-  EXPECT_STREQ(expected3.c_str(), rendered.c_str());
+  out = reference.render(JSON, "", false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -116,6 +133,10 @@ TEST(Reference, c_str)
 {
   Reference   reference;
 
+  utInit();
+
   reference.set("STR");
   EXPECT_STREQ("STR", reference.c_str());
+
+  utExit();
 }

@@ -14,5 +14,4 @@
 	<reference>http://10.1.1.1:80/test/interfaceNotification
 	</reference>
 	<duration>PT1M</duration>
-	<subscriptionId>12458896</subscriptionId>
 </subscribeContextAvailabilityRequest>

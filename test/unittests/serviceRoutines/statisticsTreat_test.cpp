@@ -22,13 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "common/Timer.h"
 #include "common/globals.h"
 #include "serviceRoutines/statisticsTreat.h"
 #include "serviceRoutines/badVerbGetDeleteOnly.h"
 #include "rest/RestService.h"
+
+#include "unittest.h"
 
 
 
@@ -54,13 +54,16 @@ static RestService rs[] =
 TEST(statisticsTreat, delete)
 {
   ConnectionInfo ci("/statistics",  "DELETE", "1.1");
-  std::string    expected  = "<orion>\n  <message>All statistics counter reset</message>\n</orion>\n";
+  const char*    outfile   = "orion.statistics.ok.valid.xml";
   std::string    out;
 
-  setTimer(new Timer());
-  out       = restService(&ci, rs);
+  utInit();
 
-  EXPECT_EQ(expected, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  out       = restService(&ci, rs);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -72,15 +75,24 @@ TEST(statisticsTreat, delete)
 TEST(statisticsTreat, get)
 {
   ConnectionInfo ci("/statistics",  "GET", "1.1");
-  std::string    expectedStart  = "<orion>\n  <xmlRequests>1</xmlRequests>\n  <statisticsRequests>1</statisticsRequests>\n";
+  const char*    outfile   = "orion.statistics2.ok.valid.xml";
   std::string    out;
 
-  setTimer(new Timer());
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   out = restService(&ci, rs);
   
   char* outStart = (char*) out.c_str();
-  outStart[expectedStart.length()] = 0;
-  EXPECT_STREQ(expectedStart.c_str(), outStart);
+
+  // Remove last char in expectedBuf
+  expectedBuf[strlen(expectedBuf) - 1] = 0;
+
+  // Shorten'out' to be of same length as expectedBuf
+  outStart[strlen(expectedBuf)]    = 0;
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -92,13 +104,15 @@ TEST(statisticsTreat, get)
 TEST(statisticsTreat, badVerb)
 {
   ConnectionInfo ci("/statistics",  "POLLUTE", "1.1");
-  std::string    expected  = ""; // no payload for bad verb, only http headers to indicate the error
   std::string    out;
 
-  setTimer(new Timer());
+  utInit();
+
   out = restService(&ci, rs);
 
-  EXPECT_EQ(expected, out);
+  EXPECT_EQ("", out);
   EXPECT_EQ("Allow",        ci.httpHeader[0]);
   EXPECT_EQ("GET, DELETE",  ci.httpHeaderValue[0]);
+
+  utExit();
 }

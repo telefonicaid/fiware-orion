@@ -37,20 +37,26 @@
 *
 * Duration - 
 */
-typedef struct Duration
+class Duration
 {
+public:
   std::string   string;
-  unsigned int  seconds; 
+  long long     seconds; 
 
+private:
+  bool          used;
+  bool          valid;
+
+public:
   Duration();
-  void          set(std::string value);
+  void          set(const std::string& value);
   std::string   get(void);
   bool          isEmpty(void);
-  std::string   render(Format format, std::string indent, bool comma = true);
-  std::string   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  int           parse(void);
-  void          present(std::string indent);
+  std::string   render(Format format, const std::string& indent, bool comma = true);
+  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  long long     parse(void);
+  void          present(const std::string& indent);
   void          release(void);
-} Duration;
+};
 
 #endif

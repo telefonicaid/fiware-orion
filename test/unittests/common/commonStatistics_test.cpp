@@ -72,6 +72,13 @@ TEST(commonStatistics, statisticsUpdate)
   noOfXmlRequests                            = 0;
   noOfJsonRequests                           = 0;
 
+  noOfRtSubscribeContextAvailabilityResponse          = 0;
+  noOfRtUpdateContextAvailabilitySubscriptionResponse = 0;
+  noOfRtUnsubscribeContextAvailabilityResponse        = 0;
+  noOfRtUnsubscribeContextResponse                    = 0;
+  noOfRtSubscribeResponse                             = 0;
+  noOfRtSubscribeError                                = 0;
+
   statisticsUpdate(RegisterContext, XML);
   statisticsUpdate(DiscoverContextAvailability, JSON);
   statisticsUpdate(SubscribeContextAvailability, XML);
@@ -105,6 +112,12 @@ TEST(commonStatistics, statisticsUpdate)
   statisticsUpdate(StatisticsRequest, XML);
   statisticsUpdate(InvalidRequest, JSON);
   statisticsUpdate(RegisterResponse, XML);
+  statisticsUpdate(RtSubscribeContextAvailabilityResponse, JSON);
+  statisticsUpdate(RtUpdateContextAvailabilitySubscriptionResponse, XML);
+  statisticsUpdate(RtUnsubscribeContextAvailabilityResponse, JSON);
+  statisticsUpdate(RtUnsubscribeContextResponse, XML);
+  statisticsUpdate(RtSubscribeResponse, JSON);
+  statisticsUpdate(RtSubscribeError, XML);
 
   EXPECT_EQ(1, noOfRegistrations);
   EXPECT_EQ(1, noOfDiscoveries);
@@ -138,7 +151,13 @@ TEST(commonStatistics, statisticsUpdate)
   EXPECT_EQ(1, noOfStatisticsRequests);
   EXPECT_EQ(1, noOfInvalidRequests);
   EXPECT_EQ(1, noOfRegisterResponses);
+  EXPECT_EQ(1, noOfRtSubscribeContextAvailabilityResponse);
+  EXPECT_EQ(1, noOfRtUpdateContextAvailabilitySubscriptionResponse);
+  EXPECT_EQ(1, noOfRtUnsubscribeContextAvailabilityResponse);
+  EXPECT_EQ(1, noOfRtUnsubscribeContextResponse);
+  EXPECT_EQ(1, noOfRtSubscribeResponse);
+  EXPECT_EQ(1, noOfRtSubscribeError);
 
-  EXPECT_EQ(16, noOfXmlRequests);
-  EXPECT_EQ(17, noOfJsonRequests);
+  EXPECT_EQ(19, noOfXmlRequests);
+  EXPECT_EQ(20, noOfJsonRequests);
 }

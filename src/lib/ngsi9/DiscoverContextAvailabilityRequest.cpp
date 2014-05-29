@@ -63,27 +63,24 @@ void DiscoverContextAvailabilityRequest::release(void)
 *
 * DiscoverContextAvailabilityRequest::check - 
 */
-std::string DiscoverContextAvailabilityRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string DiscoverContextAvailabilityRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   DiscoverContextAvailabilityResponse  response;
   std::string                          res;
 
   if (predetectedError != "")
   {
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = predetectedError;
+    response.errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (entityIdVector.size() == 0)
   {
-     response.errorCode.code         = SccContextElementNotFound;
-     response.errorCode.reasonPhrase = "No context element found";
+    response.errorCode.fill(SccContextElementNotFound);
   }
   else if (((res = entityIdVector.check(DiscoverContextAvailability, format, indent, predetectedError, restrictions))                      != "OK") ||
            ((res = attributeList.check(DiscoverContextAvailability, format, indent, predetectedError, restrictions))                       != "OK") ||
            ((restrictions != 0) && ((res = restriction.check(DiscoverContextAvailability, format, indent, predetectedError, restrictions)) != "OK")))
   {
-     response.errorCode.code         = SccBadRequest;
-     response.errorCode.reasonPhrase = res;
+    response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
@@ -97,7 +94,7 @@ std::string DiscoverContextAvailabilityRequest::check(RequestType requestType, F
 *
 * DiscoverContextAvailabilityRequest::present - 
 */
-void DiscoverContextAvailabilityRequest::present(std::string indent)
+void DiscoverContextAvailabilityRequest::present(const std::string& indent)
 {
    entityIdVector.present(indent);
    attributeList.present(indent);

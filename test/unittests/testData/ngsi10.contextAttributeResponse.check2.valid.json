@@ -1,0 +1,19 @@
+{
+  "attributes" : [
+    {
+      "name" : "caName",
+      "type" : "caType",
+      "value" : "caValue"
+    },
+    {
+      "name" : "",
+      "type" : "caType",
+      "value" : "caValue"
+    }
+  ],
+  "statusCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "missing attribute name"
+  }
+}

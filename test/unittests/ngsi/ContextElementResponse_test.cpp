@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextElementResponse.h"
+
+#include "unittest.h"
 
 
 
@@ -40,6 +40,8 @@ TEST(ContextElementResponse, check)
    ContextElementResponse  cer;
    std::string             out;
    
+   utInit();
+
    out = cer.check(UpdateContext, XML, "", "", 0);
    EXPECT_STREQ("empty entityId:id", out.c_str());
 
@@ -50,9 +52,11 @@ TEST(ContextElementResponse, check)
    out = cer.check(UpdateContext, XML, "", "", 0);
    EXPECT_STREQ("no code", out.c_str());
 
-   cer.statusCode.fill(SccOk, "reason", "details");
+   cer.statusCode.fill(SccOk, "details");
    out = cer.check(UpdateContext, XML, "", "", 0);
    EXPECT_STREQ("OK", out.c_str());
+
+   utExit();
 }
 
 
@@ -64,20 +68,27 @@ TEST(ContextElementResponse, check)
 TEST(ContextElementResponse, render)
 {
    ContextElementResponse  cer;
-   std::string             expected1xml  = "<contextElementResponse>\n  <contextElement>\n    <entityId type=\"Type\" isPattern=\"false\">\n      <id>ID</id>\n    </entityId>\n  </contextElement>\n  <statusCode>\n    <code>200</code>\n    <reasonPhrase>reason</reasonPhrase>\n    <details>details</details>\n  </statusCode>\n</contextElementResponse>\n";
-   std::string             expected1json = "{\n  \"contextElement\" : {\n    \"type\" : \"Type\",\n    \"isPattern\" : \"false\",\n    \"id\" : \"ID\"\n  },\n  \"statusCode\" : {\n    \"code\" : \"200\",\n    \"reasonPhrase\" : \"reason\",\n    \"details\" : \"details\"\n  }\n}\n";
+   const char*             outfile1 = "ngsi.contextElementResponse.render.middle.xml";
+   const char*             outfile2 = "ngsi.contextElementResponse.render.middle.json";
    std::string             out;
+
+   utInit();
 
    cer.contextElement.entityId.id         = "ID";
    cer.contextElement.entityId.type       = "Type";
    cer.contextElement.entityId.isPattern  = "false";
 
-   cer.statusCode.fill(SccOk, "reason", "details");
+   cer.statusCode.fill(SccOk, "details");
 
-   out = cer.render(XML, "");
-   EXPECT_STREQ(expected1xml.c_str(), out.c_str());
-   out = cer.render(JSON, "");
-   EXPECT_STREQ(expected1json.c_str(), out.c_str());
+   out = cer.render(UpdateContextElement, XML, "");
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+   EXPECT_STREQ(expectedBuf, out.c_str());
+
+   out = cer.render(UpdateContextElement, JSON, "");
+   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+   EXPECT_STREQ(expectedBuf, out.c_str());
+
+   utExit();
 }
 
 
@@ -89,11 +100,15 @@ TEST(ContextElementResponse, present)
 {
    ContextElementResponse cer;
 
+   utInit();
+
    cer.contextElement.entityId.id         = "ID";
    cer.contextElement.entityId.type       = "Type";
    cer.contextElement.entityId.isPattern  = "false";
 
-   cer.statusCode.fill(SccOk, "reason", "details");
+   cer.statusCode.fill(SccOk, "details");
 
    cer.present("", 0);
+
+   utExit();
 }

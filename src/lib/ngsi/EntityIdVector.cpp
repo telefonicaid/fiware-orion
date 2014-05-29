@@ -26,6 +26,9 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/EntityIdVector.h"
@@ -36,7 +39,7 @@
 *
 * EntityIdVector::render - 
 */
-std::string EntityIdVector::render(Format format, std::string indent, bool comma)
+std::string EntityIdVector::render(Format format, const std::string& indent, bool comma)
 {
   std::string out     = "";
   std::string xmlTag  = "entityIdList";
@@ -60,7 +63,7 @@ std::string EntityIdVector::render(Format format, std::string indent, bool comma
 *
 * EntityIdVector::check - 
 */
-std::string EntityIdVector::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string EntityIdVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   // Only OK to be empty if part of a ContextRegistration
   if ((requestType == DiscoverContextAvailability)           ||
@@ -93,7 +96,7 @@ std::string EntityIdVector::check(RequestType requestType, Format format, std::s
 *
 * EntityIdVector::present - 
 */
-void EntityIdVector::present(std::string indent)
+void EntityIdVector::present(const std::string& indent)
 {
    PRINTF("%lu EntityIds:\n", (unsigned long) vec.size());
 

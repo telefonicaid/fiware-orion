@@ -40,7 +40,7 @@
 *
 * postIndividualContextEntity - 
 */
-std::string postIndividualContextEntity(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string postIndividualContextEntity(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string                   entityId = compV[2];
   std::string                   answer;
@@ -48,8 +48,8 @@ std::string postIndividualContextEntity(ConnectionInfo* ciP, int components, std
   
   LM_T(LmtConvenience, ("CONVENIENCE: got a 'POST' request for entityId '%s'", entityId.c_str()));
 
-  ciP->httpStatusCode = mapPostIndividualContextEntity(entityId, &parseDataP->acer.res, &response);
-  answer = response.render(ciP->outFormat, "");
+  ciP->httpStatusCode = mapPostIndividualContextEntity(entityId, &parseDataP->acer.res, &response, ciP);
+  answer = response.render(IndividualContextEntity, ciP->outFormat, "");
   response.release();
 
   return answer;

@@ -31,6 +31,8 @@
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
+#include "rest/HttpStatusCode.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -38,7 +40,7 @@
 *
 * mapGetIndividualContextEntity - 
 */
-HttpStatusCode mapGetIndividualContextEntity(std::string entityId, ContextElementResponse* response)
+HttpStatusCode mapGetIndividualContextEntity(const std::string& entityId, ContextElementResponse* response, ConnectionInfo* ciP)
 {
    HttpStatusCode        ms;
    QueryContextRequest   qcRequest;
@@ -49,18 +51,18 @@ HttpStatusCode mapGetIndividualContextEntity(std::string entityId, ContextElemen
    response->contextElement.entityId.fill(entityId, "", "false");
 
    qcRequest.entityIdVector.push_back(&entity);
-   ms = mongoQueryContext(&qcRequest, &qcResponse);
+   ms = mongoQueryContext(&qcRequest, &qcResponse, ciP->tenant);
 
    if ((ms != SccOk) || (qcResponse.contextElementResponseVector.size() == 0))
    {
      // Here I fill in statusCode for the response
-     response->statusCode.fill(SccContextElementNotFound, "Entity Not Found", entityId);
+     response->statusCode.fill(SccContextElementNotFound, std::string("Entity id: '") + entityId + "'");
      LM_RE(ms, ("entityId '%s' not found", entityId.c_str()));
    }
 
    std::vector<ContextAttribute*> attrV = qcResponse.contextElementResponseVector.get(0)->contextElement.contextAttributeVector.vec;
    for (unsigned int ix = 0; ix < attrV.size() ; ++ix) {
-       ContextAttribute* ca = new ContextAttribute(attrV[ix]->name, attrV[ix]->type, attrV[ix]->value);
+       ContextAttribute* ca = new ContextAttribute(attrV[ix]);
        response->contextElement.contextAttributeVector.push_back(ca);
    }
    response->statusCode.fill(&qcResponse.contextElementResponseVector.get(0)->statusCode);

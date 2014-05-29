@@ -26,6 +26,7 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "common/sem.h"
 
 #include "mongoBackend/MongoGlobal.h"
@@ -39,10 +40,9 @@
 *
 * mongoQueryContext - 
 */
-HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResponse* responseP)
+HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResponse* responseP, const std::string& tenant)
 {
-    /* Take semaphore. The LM_S* macros combine semaphore release with return */
-    semTake();
+    reqSemTake(__FUNCTION__, "ngsi10 query request");
 
     LM_T(LmtMongo, ("QueryContext Request"));    
 
@@ -52,16 +52,15 @@ HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResp
     }
 
     std::string err;
-    if (!entitiesQuery(requestP->entityIdVector, requestP->attributeList, &(responseP->contextElementResponseVector), &err, true)) {
-        responseP->errorCode.fill(SccReceiverInternalError, "Database Error", err);
-        LM_SRE(SccOk,(responseP->errorCode.details.c_str()));
+    if (!entitiesQuery(requestP->entityIdVector, requestP->attributeList, requestP->restriction, &responseP->contextElementResponseVector, &err, true, tenant)) {
+        responseP->errorCode.fill(SccReceiverInternalError, err);
+        LM_E((responseP->errorCode.details.c_str()));
     }
-
-    if (responseP->contextElementResponseVector.size() == 0) {
+    else if (responseP->contextElementResponseVector.size() == 0) {
       /* If query hasn't any result we have to fill the status code part in the response */
-      responseP->errorCode.fill(SccContextElementNotFound, "No context elements found");
-      LM_SR(SccOk);
+      responseP->errorCode.fill(SccContextElementNotFound);
     }
 
-    LM_SR(SccOk);
+    reqSemGive(__FUNCTION__, "ngsi10 query request");
+    return SccOk;
 }

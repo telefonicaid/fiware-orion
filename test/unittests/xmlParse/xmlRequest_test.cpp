@@ -22,13 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
+#include "rest/ConnectionInfo.h"
 #include "xmlParse/xmlRequest.h"
 
 #include "unittest.h"
@@ -45,47 +44,49 @@ TEST(xmlRequest, parseError)
   ConnectionInfo  ci2("/ngsi/registerContext123", "POST", "1.1");
   ConnectionInfo  ci3("/ngsi/registerContext", "POST", "1.1");
   ConnectionInfo  ci4("/version", "POST", "1.1");
-  const char*     fileName  = "ngsi9.registerContextRequest.parseError.invalid.xml"; 
-  const char*     fileName2 = "ngsi9.registerContextRequest.ok.valid.xml"; 
-  const char*     fileName3 = "ngsi9.registerContextRequest.errorInFirstLine.invalid.xml";
-
   ParseData       parseData;
-  std::string     expected  = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Parse Error</reasonPhrase>\n</orionError>\n";
-  std::string     expected2 = "<orionError>\n  <code>400</code>\n  <reasonPhrase>no request treating object found</reasonPhrase>\n  <details>Sorry, no request treating object found for RequestType '', method 'POST'</details>\n</orionError>\n";
-  std::string     expected3 = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Parse Error</reasonPhrase>\n</orionError>\n";
-  std::string     expected4 = "<registerContextResponse>\n  <registrationId>0</registrationId>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Invalid payload</reasonPhrase>\n    <details>Expected 'discovery' payload, got 'registerContextRequest'</details>\n  </errorCode>\n</registerContextResponse>\n";
-  std::string     expected5 = "not ok";
+  const char*     infile1  = "ngsi9.registerContextRequest.parseError.invalid.xml"; 
+  const char*     infile2  = "ngsi9.registerContextRequest.ok.valid.xml"; 
+  const char*     infile3  = "ngsi9.registerContextRequest.errorInFirstLine.invalid.xml";
+  const char*     outfile1 = "orion.error.parseError.valid.xml";
+  const char*     outfile2 = "orion.error.noRequestTreatingObjectFound.valid.xml";
+  const char*     outfile3 = "orion.error.parseError.valid.xml";
+  const char*     outfile4 = "ngsi9.registerContextResponse.invalidPayload.valid.xml";
   std::string     out;
 
   utInit();
 
   // Parse Error
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   ci.inFormat  = XML;
   ci.outFormat = XML;
   out  = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_EQ(expected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Request not found
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName2)) << "Error getting test data from '" << fileName2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   ci2.inFormat  = XML;
   ci2.outFormat = XML;
   out  = xmlTreat(testBuf, &ci2, &parseData, (RequestType) (RegisterContext + 1000), "registerContextRequest", NULL);
-  EXPECT_EQ(expected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Error in first line '<?xml version="1.0" encoding="UTF-8"?>'
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName3)) << "Error getting test data from '" << fileName3 << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile3)) << "Error getting test data from '" << infile3 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   ci3.inFormat  = XML;
   ci3.outFormat = XML;
   out  = xmlTreat(testBuf, &ci3, &parseData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_EQ(expected3, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Payload word differs
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName2)) << "Error getting test data from '" << fileName2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
   ci.inFormat  = XML;
   ci.outFormat = XML;
   out  = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "discovery", NULL);
-  EXPECT_EQ(expected4, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

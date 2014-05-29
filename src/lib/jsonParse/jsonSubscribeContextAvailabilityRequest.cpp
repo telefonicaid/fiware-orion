@@ -31,9 +31,10 @@
 #include "common/globals.h"
 #include "ngsi/EntityId.h"
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
-#include "jsonParse/jsonNullTreat.h"
+#include "parse/nullTreat.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonSubscribeContextAvailabilityRequest.h"
+#include "parse/nullTreat.h"
 
 
 
@@ -41,15 +42,15 @@
 *
 * entityId - 
 */
-static std::string entityId(std::string path, std::string value, ParseData* reqDataP)
+static std::string entityId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
 
   reqDataP->scar.entityIdP = new EntityId();
 
   LM_T(LmtNew, ("New entityId at %p", reqDataP->scar.entityIdP));
-  reqDataP->scar.entityIdP->id        = "not in use";
-  reqDataP->scar.entityIdP->type      = "not in use";
+  reqDataP->scar.entityIdP->id        = "";
+  reqDataP->scar.entityIdP->type      = "";
   reqDataP->scar.entityIdP->isPattern = "false";
 
   reqDataP->scar.res.entityIdVector.push_back(reqDataP->scar.entityIdP);
@@ -64,7 +65,7 @@ static std::string entityId(std::string path, std::string value, ParseData* reqD
 *
 * entityIdId - 
 */
-static std::string entityIdId(std::string path, std::string value, ParseData* reqDataP)
+static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
    reqDataP->scar.entityIdP->id = value;
    LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->scar.entityIdP->id.c_str()));
@@ -78,7 +79,7 @@ static std::string entityIdId(std::string path, std::string value, ParseData* re
 *
 * entityIdType - 
 */
-static std::string entityIdType(std::string path, std::string value, ParseData* reqDataP)
+static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
    reqDataP->scar.entityIdP->type = value;
    LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->scar.entityIdP->type.c_str()));
@@ -92,12 +93,12 @@ static std::string entityIdType(std::string path, std::string value, ParseData* 
 *
 * entityIdIsPattern - 
 */
-static std::string entityIdIsPattern(std::string path, std::string value, ParseData* reqDataP)
+static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
   if (!isTrue(value) && !isFalse(value))
-    return "bad 'isPattern' value: '" + value + "'";
+    return "invalid isPattern (boolean) value for entity: '" + value + "'";
 
   reqDataP->scar.entityIdP->isPattern = value;
 
@@ -110,7 +111,7 @@ static std::string entityIdIsPattern(std::string path, std::string value, ParseD
 *
 * attribute - 
 */
-static std::string attribute(std::string path, std::string value, ParseData* reqDataP)
+static std::string attribute(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an attribute: '%s'", value.c_str()));
 
@@ -125,7 +126,7 @@ static std::string attribute(std::string path, std::string value, ParseData* req
 *
 * reference - 
 */
-static std::string reference(std::string path, std::string value, ParseData* reqDataP)
+static std::string reference(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a reference: '%s'", value.c_str()));
 
@@ -140,7 +141,7 @@ static std::string reference(std::string path, std::string value, ParseData* req
 *
 * duration - 
 */
-static std::string duration(std::string path, std::string value, ParseData* reqDataP)
+static std::string duration(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   std::string s;
 
@@ -160,7 +161,7 @@ static std::string duration(std::string path, std::string value, ParseData* reqD
 *
 * restriction - 
 */
-static std::string restriction(std::string path, std::string value, ParseData* reqDataP)
+static std::string restriction(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a restriction"));
 
@@ -175,7 +176,7 @@ static std::string restriction(std::string path, std::string value, ParseData* r
 *
 * attributeExpression - 
 */
-static std::string attributeExpression(std::string path, std::string value, ParseData* reqDataP)
+static std::string attributeExpression(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an attributeExpression: '%s'", value.c_str()));
 
@@ -190,7 +191,7 @@ static std::string attributeExpression(std::string path, std::string value, Pars
 *
 * scope - 
 */
-static std::string scope(std::string path, std::string value, ParseData* reqDataP)
+static std::string scope(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a scope"));
 
@@ -206,12 +207,10 @@ static std::string scope(std::string path, std::string value, ParseData* reqData
 *
 * scopeType - 
 */
-static std::string scopeType(std::string path, std::string value, ParseData* reqDataP)
+static std::string scopeType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a scope type: '%s'", value.c_str()));
-
   reqDataP->scar.scopeP->type = value;
-
   return "OK";
 }
 
@@ -221,27 +220,10 @@ static std::string scopeType(std::string path, std::string value, ParseData* req
 *
 * scopeValue - 
 */
-static std::string scopeValue(std::string path, std::string value, ParseData* reqDataP)
+static std::string scopeValue(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a scope value: '%s'", value.c_str()));
-
   reqDataP->scar.scopeP->value = value;
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* subscriptionId - 
-*/
-static std::string subscriptionId(std::string path, std::string value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a subscriptionId: '%s'", value.c_str()));
-
-  reqDataP->scar.res.subscriptionId.set(value);
-
   return "OK";
 }
 
@@ -253,19 +235,21 @@ static std::string subscriptionId(std::string path, std::string value, ParseData
 */
 JsonNode jsonScarParseVector[] =
 {
+  { "/entities",                           jsonNullTreat        },
   { "/entities/entity",                    entityId             },
   { "/entities/entity/id",                 entityIdId           },
   { "/entities/entity/type",               entityIdType         },
   { "/entities/entity/isPattern",          entityIdIsPattern    },
+  { "/attributes",                         jsonNullTreat        },
   { "/attributes/attribute",               attribute            },
   { "/reference",                          reference            },
   { "/duration",                           duration             },
   { "/restriction",                        restriction          },
   { "/restriction/attributeExpression",    attributeExpression  },
+  { "/restriction/scopes",                 jsonNullTreat        },
   { "/restriction/scopes/scope",           scope,               },
   { "/restriction/scopes/scope/type",      scopeType            },
   { "/restriction/scopes/scope/value",     scopeValue           },
-  { "/subscriptionId",                     subscriptionId       },
   { "LAST", NULL }
 };
 

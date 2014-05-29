@@ -33,6 +33,6 @@
 *
 * mongoNofityContext -
 */
-extern HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextResponse* responseP);
+extern HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextResponse* responseP, const std::string& tenant = "");
 
 #endif

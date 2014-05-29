@@ -1,6 +1,8 @@
 #ifndef HTTP_STATUS_CODE_H
 #define HTTP_STATUS_CODE_H
 
+#include <string>
+
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -36,7 +38,7 @@ typedef enum HttpStatusCode
   SccOk                     = 200,   // Success
   SccBadRequest             = 400,   // The request is not well formed
   SccForbidden              = 403,   // The request is not allowed
-  SccContextElementNotFound = 404,   // The ContextElement requested is not found
+  SccContextElementNotFound = 404,   // No context element found
   SccBadVerb                = 405,   // Request ok but verb/method NOT OK
   SccNotAcceptable          = 406,   // The Accept header in the request is not supported
   SccLengthRequired         = 411,   // Content-Length header missing
@@ -53,4 +55,13 @@ typedef enum HttpStatusCode
   SccNotImplemented         = 501    // The given operation is not implemented
 } HttpStatusCode;
 
+
+
+/* ****************************************************************************
+*
+* httpStatusCodeString - 
+*/
+extern std::string httpStatusCodeString(HttpStatusCode code);
+
 #endif
+

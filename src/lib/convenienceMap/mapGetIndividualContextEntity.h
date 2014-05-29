@@ -27,6 +27,8 @@
 */
 #include "mongoBackend/MongoGlobal.h"
 #include "ngsi/ContextElementResponse.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/HttpStatusCode.h"
 
 
 
@@ -34,6 +36,6 @@
 *
 * mapGetIndividualContextEntity - 
 */
-extern HttpStatusCode mapGetIndividualContextEntity(std::string entityId, ContextElementResponse* response);
+extern HttpStatusCode mapGetIndividualContextEntity(const std::string& entityId, ContextElementResponse* response, ConnectionInfo* ciP);
 
 #endif

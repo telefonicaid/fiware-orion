@@ -22,13 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
+
+#include "unittest.h"
 
 
 
@@ -39,28 +38,36 @@
 TEST(StatusCode, render)
 {
   StatusCode    sc1;
-  StatusCode    sc2(SccOk, "REASON", "");
-  StatusCode    sc3(SccOk, "REASON", "DETAILS");
-  StatusCode    sc4(SccOk, "REASON", "DETAILS");
-  std::string   rendered;
-  std::string   expected1 = "<statusCode>\n  <code>0</code>\n  <reasonPhrase></reasonPhrase>\n</statusCode>\n";
-  std::string   expected2 = "<statusCode>\n  <code>200</code>\n  <reasonPhrase>REASON</reasonPhrase>\n</statusCode>\n";
-  std::string   expected3 = "<statusCode>\n  <code>200</code>\n  <reasonPhrase>REASON</reasonPhrase>\n  <details>DETAILS</details>\n</statusCode>\n";
-  std::string   expected4 = "\"statusCode\" : {\n  \"code\" : \"200\",\n  \"reasonPhrase\" : \"REASON\",\n  \"details\" : \"DETAILS\"\n}\n";
+  StatusCode    sc2(SccOk, "");
+  StatusCode    sc3(SccOk, "DETAILS");
+  StatusCode    sc4(SccOk, "DETAILS");
+  std::string   out;
+  const char*   outfile1  = "ngsi.statusCode.render1.valid.xml";
+  const char*   outfile2  = "ngsi.statusCode.render2.valid.xml";
+  const char*   outfile3  = "ngsi.statusCode.render3.valid.xml";
+  const char*   outfile4  = "ngsi.statusCode.render4.middle.json";
 
-  rendered = sc1.render(XML, "");
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  utInit();
 
-  rendered = sc2.render(XML, "");
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  out = sc1.render(XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  rendered = sc3.render(XML, "");
-  EXPECT_STREQ(expected3.c_str(), rendered.c_str());
+  out = sc2.render(XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  rendered = sc4.render(JSON, "");
-  EXPECT_STREQ(expected4.c_str(), rendered.c_str());
+  out = sc3.render(XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  out = sc4.render(JSON, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   sc1.release(); // just to exercise the code ...
+
+  utExit();
 }
 
 
@@ -72,25 +79,28 @@ TEST(StatusCode, render)
 TEST(StatusCode, fill)
 {
   StatusCode    sc;
-  StatusCode    sc2(SccOk, "Reason", "Details");
-  ErrorCode     ec(SccBadRequest, "Bad request", "Very bad request :-)");
-  std::string   rendered;
-  std::string   expected1 = "<statusCode>\n  <code>200</code>\n  <reasonPhrase></reasonPhrase>\n</statusCode>\n";
+  StatusCode    sc2(SccOk, "Details");
+  StatusCode    ec(SccBadRequest, "Very bad request :-)");
+  std::string   out;
 
-  sc.fill(SccForbidden, "R", "D");
+  utInit();
+
+  sc.fill(SccForbidden, "D");
   EXPECT_EQ(sc.code, SccForbidden);
-  EXPECT_STREQ(sc.reasonPhrase.c_str(), "R");
+  EXPECT_STREQ(sc.reasonPhrase.c_str(), "Forbidden");
   EXPECT_STREQ(sc.details.c_str(), "D");
 
   sc.fill(&sc2);
   EXPECT_EQ(sc.code, SccOk);
-  EXPECT_STREQ(sc.reasonPhrase.c_str(), "Reason");
+  EXPECT_STREQ(sc.reasonPhrase.c_str(), "OK");
   EXPECT_STREQ(sc.details.c_str(), "Details");
 
   sc.fill(&ec);
   EXPECT_EQ(sc.code, SccBadRequest);
-  EXPECT_STREQ(sc.reasonPhrase.c_str(), "Bad request");
+  EXPECT_STREQ(sc.reasonPhrase.c_str(), "Bad Request");
   EXPECT_STREQ(sc.details.c_str(), "Very bad request :-)");
+
+  utExit();
 }
 
 
@@ -101,22 +111,23 @@ TEST(StatusCode, fill)
 */
 TEST(StatusCode, check)
 {
-  StatusCode    sc(SccOk, "REASON", "");
-  std::string   rendered;
-  std::string   expected1 = "OK";
-  std::string   expected2 = "no code";
-  std::string   expected3 = "no reason phrase";
+  StatusCode    sc(SccOk, "");
+  std::string   out;
 
-  rendered = sc.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  utInit();
 
-  sc.fill((HttpStatusCode) 0, "XXX", "YYY");
-  rendered = sc.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  out = sc.check(RegisterContext, XML, "", "", 0);
+  EXPECT_STREQ("OK", out.c_str());
 
-  sc.fill(SccOk, "", "YYY");
-  rendered = sc.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ(expected3.c_str(), rendered.c_str());
+  sc.fill(SccNone, "YYY");
+  out = sc.check(RegisterContext, XML, "", "", 0);
+  EXPECT_STREQ("no code", out.c_str());
+
+  sc.fill(SccOk, "YYY");
+  out = sc.check(RegisterContext, XML, "", "", 0);
+  EXPECT_STREQ("OK", out.c_str());
+
+  utExit();
 }
 
 
@@ -127,12 +138,10 @@ TEST(StatusCode, check)
 */
 TEST(StatusCode, present)
 {
-  StatusCode    sc(SccOk, "REASON", "");
-  std::string   rendered;
-  std::string   expected1 = "<statusCode>\n  <code>200</code>\n  <reasonPhrase></reasonPhrase>\n</statusCode>\n";
+  StatusCode    sc(SccOk, "");
+  std::string   out;
 
+  utInit();
   sc.present("");
+  utExit();
 }
-
-
-

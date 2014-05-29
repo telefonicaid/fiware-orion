@@ -23,10 +23,7 @@
 * Author: Fermin Galan
 */
 #include "gtest/gtest.h"
-#include "testInit.h"
-
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
+#include "unittest.h"
 
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -38,13 +35,8 @@
 #include "ngsi/NotifyCondition.h"
 
 #include "mongo/client/dbclient.h"
+#include "rest/uriParamNames.h"
 
-#include "commonMocks.h"
-
-using ::testing::_;
-using ::testing::MatchesRegex;
-using ::testing::Throw;
-using ::testing::Return;
 
 
 /* ****************************************************************************
@@ -324,9 +316,9 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T1_C0)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -349,7 +341,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T1_C0)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -415,9 +407,9 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T1_C0_JSON)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -440,7 +432,9 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T1_C0_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, JSON);
+    uriParams[URI_PARAM_NOTIFY_FORMAT] = "JSON";
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
+    uriParams[URI_PARAM_NOTIFY_FORMAT] = "XML";
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -506,9 +500,9 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T1_C0)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -533,7 +527,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T1_C0)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */    
     EXPECT_EQ(SccOk, ms);
@@ -601,11 +595,11 @@ TEST(mongoSubscribeContext, Ent1_Attr0_TN_C0)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -631,7 +625,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_TN_C0)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -700,11 +694,11 @@ TEST(mongoSubscribeContext, Ent1_AttrN_TN_C0)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -732,7 +726,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_TN_C0)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -803,9 +797,9 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -828,7 +822,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -896,9 +890,9 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -923,7 +917,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -992,9 +986,9 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1020,7 +1014,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1093,9 +1087,9 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1119,7 +1113,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1187,9 +1181,9 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1218,7 +1212,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1293,9 +1287,9 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1321,7 +1315,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1391,11 +1385,11 @@ TEST(mongoSubscribeContext, Ent1_Attr0_TN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1427,7 +1421,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1506,11 +1500,11 @@ TEST(mongoSubscribeContext, Ent1_Attr0_TN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1540,7 +1534,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_TN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1614,11 +1608,11 @@ TEST(mongoSubscribeContext, Ent1_AttrN_TN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1652,7 +1646,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1733,11 +1727,11 @@ TEST(mongoSubscribeContext, Ent1_AttrN_TN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1769,7 +1763,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_TN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1846,9 +1840,9 @@ TEST(mongoSubscribeContext, EntN_Attr0_T1_C0)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1873,7 +1867,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_T1_C0)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1946,9 +1940,9 @@ TEST(mongoSubscribeContext, EntN_AttrN_T1_C0)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1975,7 +1969,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_T1_C0)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2048,11 +2042,11 @@ TEST(mongoSubscribeContext, EntN_Attr0_TN_C0)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2080,7 +2074,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_TN_C0)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2153,11 +2147,11 @@ TEST(mongoSubscribeContext, EntN_AttrN_TN_C0)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2187,7 +2181,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_TN_C0)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2262,9 +2256,9 @@ TEST(mongoSubscribeContext, EntN_Attr0_T0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2289,7 +2283,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2361,9 +2355,9 @@ TEST(mongoSubscribeContext, EntN_AttrN_T0_C1)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2390,7 +2384,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2463,9 +2457,9 @@ TEST(mongoSubscribeContext, EntN_Attr0_T0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2493,7 +2487,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2570,9 +2564,9 @@ TEST(mongoSubscribeContext, EntN_Attr0_T0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2598,7 +2592,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2670,9 +2664,9 @@ TEST(mongoSubscribeContext, EntN_AttrN_T0_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2702,7 +2696,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2781,9 +2775,9 @@ TEST(mongoSubscribeContext, EntN_AttrN_T0_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2811,7 +2805,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2885,11 +2879,11 @@ TEST(mongoSubscribeContext, EntN_Attr0_TN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2923,7 +2917,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3006,11 +3000,11 @@ TEST(mongoSubscribeContext, EntN_Attr0_TN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3042,7 +3036,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_TN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3120,11 +3114,11 @@ TEST(mongoSubscribeContext, EntN_AttrN_TN_CN)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3160,7 +3154,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3245,11 +3239,11 @@ TEST(mongoSubscribeContext, EntN_AttrN_TN_CNbis)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3283,7 +3277,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_TN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3364,9 +3358,9 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T1_C0_throttling)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3390,7 +3384,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T1_C0_throttling)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3456,9 +3450,9 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T1_C0_throttling)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3484,7 +3478,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T1_C0_throttling)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3552,9 +3546,9 @@ TEST(mongoSubscribeContext, EntN_Attr0_T1_C0_throttling)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3580,7 +3574,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_T1_C0_throttling)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3653,9 +3647,9 @@ TEST(mongoSubscribeContext, EntN_AttrN_T1_C0_throttling)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3683,7 +3677,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_T1_C0_throttling)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3769,9 +3763,9 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -3794,7 +3788,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3876,9 +3870,9 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_C1_JSON)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -3901,7 +3895,8 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_C1_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res, JSON);
+    uriParams[URI_PARAM_NOTIFY_FORMAT] = "JSON";
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3962,11 +3957,15 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_C1_JSON)
 */
 TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_C1)
 {
-
     HttpStatusCode           ms;
     SubscribeContextRequest  req;
     SubscribeContextResponse res;
 
+    //
+    // FIXME P2: Call utInit/utExit IN ALL THESE TESTS !!!
+    //           This line saves all the tests in this file.
+    uriParams[URI_PARAM_NOTIFY_FORMAT] = "XML";
+    
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
@@ -3981,9 +3980,9 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4008,7 +4007,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4090,9 +4089,9 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4117,7 +4116,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_C1_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4215,9 +4214,9 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4242,7 +4241,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4340,9 +4339,9 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_T0_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer3);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4367,7 +4366,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_T0_C1_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4456,9 +4455,9 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4483,7 +4482,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_T0_C1)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4572,9 +4571,9 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_T0_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4599,7 +4598,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_T0_C1_disjoint)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4702,9 +4701,9 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4729,7 +4728,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_T0_C1)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4832,9 +4831,9 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_T0_C1_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer4);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4859,7 +4858,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_T0_C1_disjoint)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4943,9 +4942,9 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4971,7 +4970,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5059,9 +5058,9 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5087,7 +5086,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_CN_partial)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5176,9 +5175,9 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5202,7 +5201,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5282,9 +5281,9 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CN_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5312,7 +5311,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CN_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5400,9 +5399,9 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CN_partial)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5430,7 +5429,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CN_partial)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5518,9 +5517,9 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CN_partial_disjoint)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5548,7 +5547,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CN_partial_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5636,9 +5635,9 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5664,7 +5663,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5748,11 +5747,11 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_TN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -5784,7 +5783,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5877,11 +5876,11 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_TN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -5911,7 +5910,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_TN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5997,11 +5996,11 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_TN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -6035,7 +6034,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6128,11 +6127,11 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_TN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -6164,7 +6163,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_TN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6263,9 +6262,9 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6290,7 +6289,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6380,9 +6379,9 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_T0_C1)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6409,7 +6408,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6504,9 +6503,9 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_T0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6534,7 +6533,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6633,9 +6632,9 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_T0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6661,7 +6660,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6751,9 +6750,9 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_T0_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6783,7 +6782,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6878,9 +6877,9 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_T0_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6908,7 +6907,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7002,11 +7001,11 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_TN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -7040,7 +7039,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7143,11 +7142,11 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_TN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -7179,7 +7178,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_TN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7273,11 +7272,11 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_TN_CN)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -7313,7 +7312,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7414,11 +7413,11 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_TN_CNbis)
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -7452,7 +7451,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_TN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7533,9 +7532,9 @@ TEST(mongoSubscribeContext, defaultDuration)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread(MatchesRegex("[0-9a-f]{24}"), 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -7557,7 +7556,7 @@ TEST(mongoSubscribeContext, defaultDuration)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7627,14 +7626,14 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
     // FIXME: note that processOntimeIntervalCondition() is called before the document is
     // inserted in database. Same will happend with processOnChangeCondition(). Maybe
     // a better approach is to create thread and sendNotifyContextRequest only in case of successful document
     // inserting. Once fixed, change Times(1) to Time(0). Add also a new test to check on
     // processOnChangeCondition()
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -7658,13 +7657,13 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     mongoConnect(connectionMock);  
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContext(&req, &res);
+    ms = mongoSubscribeContext(&req, &res, "", uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
-    EXPECT_EQ("0", res.subscribeError.subscriptionId.get());
+    EXPECT_EQ("000000000000000000000000", res.subscribeError.subscriptionId.get());
     EXPECT_EQ(SccReceiverInternalError, res.subscribeError.errorCode.code);
-    EXPECT_EQ("Database Error", res.subscribeError.errorCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.subscribeError.errorCode.reasonPhrase);
 
     std::string s1 = res.subscribeError.errorCode.details.substr(0, 56);
     std::string s2 = res.subscribeError.errorCode.details.substr(56+24, res.subscribeError.errorCode.details.size()-56-24);

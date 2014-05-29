@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/postContextEntityTypes.h"
@@ -31,13 +29,7 @@
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "testDataFromFile.h"
-#include "testInit.h"
-#include "commonMocks.h"
-
-using ::testing::_;
-using ::testing::Throw;
-using ::testing::Return;
+#include "unittest.h"
 
 
 
@@ -47,10 +39,10 @@ using ::testing::Return;
 */
 static RestService rs[] = 
 {
-  { "POST",   ContextEntityTypeAttributeContainer,   4, { "ngsi9", "contextEntityTypes", "*", "attributes"     }, "registerProviderRequest",                      postContextEntityTypes                    },
-  { "*",      ContextEntityTypeAttributeContainer,   4, { "ngsi9", "contextEntityTypes", "*", "attributes"     }, "",                                             badVerbGetPostOnly                        },
-  { "*",      InvalidRequest,                        0, { "*", "*", "*", "*", "*", "*"                         }, "",                                             badRequest                                },
-  { "",       InvalidRequest,                        0, {                                                      }, "",                                             NULL                                      }
+  { "POST", ContextEntityTypeAttributeContainer, 4, { "ngsi9", "contextEntityTypes", "*", "attributes" }, "registerProviderRequest", postContextEntityTypes },
+  { "*",    ContextEntityTypeAttributeContainer, 4, { "ngsi9", "contextEntityTypes", "*", "attributes" }, "",                        badVerbGetPostOnly     },
+  { "*",    InvalidRequest,                      0, { "*", "*", "*", "*", "*", "*"                     }, "",                        badRequest             },
+  { "",     InvalidRequest,                      0, {                                                  }, "",                        NULL                   }
 };
 
 
@@ -61,24 +53,20 @@ static RestService rs[] =
 */
 TEST(postContextEntityTypeAttributeContainer, ok)
 {
+  ConnectionInfo ci("/ngsi9/contextEntityTypes/TYPE_123/attributes",  "POST", "1.1");
+  const char*    infile      = "ngsi9.registerProviderRequest.noRegistrationId.postponed.xml";
+  const char*    outfile     = "ngsi9.registerContextResponse.noRegistrationId.middle.xml";
+  std::string    out;
+
+  utInit();
+
   // Avoid forwarding of messages
   extern int fwdPort;
   int saved = fwdPort;
-
-  setupDatabase();
-
   fwdPort = 0;
 
-  ConnectionInfo ci("/ngsi9/contextEntityTypes/TYPE_123/attributes",  "POST", "1.1");
-  std::string    expectedStart = "<registerContextResponse>\n  <duration>PT1S</duration>\n  <registrationId>";
-  const char*    fileName      = "ngsi9.registerProviderRequest.noRegistrationId.postponed.xml";
-  std::string    out;
-
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
-  setTimer(timerMock);
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   ci.outFormat    = XML;
   ci.inFormat     = XML;
@@ -87,9 +75,15 @@ TEST(postContextEntityTypeAttributeContainer, ok)
   out             = restService(&ci, rs);
 
   char* outStart  = (char*) out.c_str();
-  outStart[expectedStart.length()] = 0;
-  EXPECT_EQ(expectedStart, outStart);
 
-  delete timerMock;
+  // Remove last char in expectedBuf
+  expectedBuf[strlen(expectedBuf) - 1] = 0;
+
+  // Shorten'out' to be of same length as expectedBuf
+  outStart[strlen(expectedBuf)]    = 0;
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
   fwdPort = saved;
+
+  utExit();
 }

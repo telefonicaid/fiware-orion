@@ -49,7 +49,7 @@ void ContextRegistrationVector::push_back(ContextRegistration* item)
 *
 * ContextRegistrationVector::render - 
 */
-std::string ContextRegistrationVector::render(Format format, std::string indent, bool comma)
+std::string ContextRegistrationVector::render(Format format, const std::string& indent, bool comma)
 {
   std::string  out     = "";
   std::string  xmlTag  = "contextRegistrationList";
@@ -61,7 +61,7 @@ std::string ContextRegistrationVector::render(Format format, std::string indent,
   out += startTag(indent, xmlTag, jsonTag, format, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
+    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1, true);
 
   out += endTag(indent, xmlTag, format, comma, comma);
 
@@ -74,7 +74,7 @@ std::string ContextRegistrationVector::render(Format format, std::string indent,
 *
 * ContextRegistrationVector::present - 
 */
-void ContextRegistrationVector::present(std::string indent)
+void ContextRegistrationVector::present(const std::string& indent)
 {
    PRINTF("%lu ContextRegistrations", (unsigned long) vec.size());
 
@@ -127,7 +127,7 @@ unsigned int ContextRegistrationVector::size(void)
 *
 * ContextRegistrationVector::check - 
 */
-std::string ContextRegistrationVector::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ContextRegistrationVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

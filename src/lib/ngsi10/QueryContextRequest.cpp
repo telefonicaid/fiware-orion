@@ -50,7 +50,7 @@ QueryContextRequest::QueryContextRequest()
 *
 * QueryContextRequest::render - 
 */
-std::string QueryContextRequest::render(RequestType requestType, Format format, std::string indent)
+std::string QueryContextRequest::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string   out                      = "";
   std::string   tag                      = "queryContextRequest";
@@ -74,22 +74,20 @@ std::string QueryContextRequest::render(RequestType requestType, Format format, 
 *
 * QueryContextRequest::check - 
 */
-std::string QueryContextRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string QueryContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string           res;
   QueryContextResponse  response;
 
   if (predetectedError != "")
   {
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = predetectedError;
+    response.errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (((res = entityIdVector.check(QueryContext, format, indent, predetectedError, 0))         != "OK") ||
            ((res = attributeList.check(QueryContext, format, indent, predetectedError, 0))          != "OK") ||
            ((res = restriction.check(QueryContext, format, indent, predetectedError, restrictions)) != "OK"))
   {
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = res;
+    response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
@@ -103,7 +101,7 @@ std::string QueryContextRequest::check(RequestType requestType, Format format, s
 *
 * QueryContextRequest::present - 
 */
-void QueryContextRequest::present(std::string indent)
+void QueryContextRequest::present(const std::string& indent)
 {
   entityIdVector.present(indent);
   attributeList.present(indent);
@@ -128,7 +126,7 @@ void QueryContextRequest::release(void)
 *
 * QueryContextRequest::fill - 
 */
-void QueryContextRequest::fill(std::string entityId, std::string entityType, std::string attributeName)
+void QueryContextRequest::fill(const std::string& entityId, const std::string& entityType, const std::string& attributeName)
 {
   EntityId* eidP = new EntityId(entityId, entityType, "true");
 

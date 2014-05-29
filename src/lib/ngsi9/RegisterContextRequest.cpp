@@ -24,6 +24,9 @@
 */
 #include <string>
 
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/Format.h"
@@ -39,7 +42,7 @@
 *
 * RegisterContextRequest::render - 
 */
-std::string RegisterContextRequest::render(RequestType requestType, Format format, std::string indent)
+std::string RegisterContextRequest::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string  out                                 = "";
   std::string  xmlTag                              = "registerContextRequest";
@@ -51,9 +54,9 @@ std::string RegisterContextRequest::render(RequestType requestType, Format forma
 
   out += startTag(indent, xmlTag, "", format, false, false);
 
-  out += contextRegistrationVector.render(format, indent + "  ", commaAfterContextRegistrationVector);
-  out += duration.render(format,                  indent + "  ", commaAfterDuration);
-  out += registrationId.render(format,            indent + "  ", commaAfterRegistrationId);
+  out += contextRegistrationVector.render(format,       indent + "  ", commaAfterContextRegistrationVector);
+  out += duration.render(format,                        indent + "  ", commaAfterDuration);
+  out += registrationId.render(RegisterContext, format, indent + "  ", commaAfterRegistrationId);
 
   out += endTag(indent, xmlTag, format, false);
 
@@ -66,7 +69,7 @@ std::string RegisterContextRequest::render(RequestType requestType, Format forma
 *
 * RegisterContextRequest::check - 
 */
-std::string RegisterContextRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string RegisterContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   RegisterContextResponse  response(this);
   std::string              res;
@@ -74,22 +77,19 @@ std::string RegisterContextRequest::check(RequestType requestType, Format format
   if (predetectedError != "")
   {
     LM_E(("predetectedError not empty"));
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = predetectedError;
+    response.errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (contextRegistrationVector.size() == 0)
   {
     LM_E(("contextRegistrationVector.size() == 0"));
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = "Empty Context Registration List";
+    response.errorCode.fill(SccBadRequest, "Empty Context Registration List");
   }
   else if (((res = contextRegistrationVector.check(RegisterContext, format, indent, predetectedError, counter)) != "OK") ||
            ((res = duration.check(RegisterContext, format, indent, predetectedError, counter))                  != "OK") ||
            ((res = registrationId.check(RegisterContext, format, indent, predetectedError, counter))            != "OK"))
   {
-    LM_E(("Some check method failed"));
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = res;
+    LM_E(("Some check method failed: %s", res.c_str()));
+    response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
@@ -117,7 +117,7 @@ void RegisterContextRequest::release(void)
 *
 * RegisterContextRequest::fill - 
 */
-void RegisterContextRequest::fill(RegisterProviderRequest& rpr, std::string entityId, std::string entityType, std::string attributeName)
+void RegisterContextRequest::fill(RegisterProviderRequest& rpr, const std::string& entityId, const std::string& entityType, const std::string& attributeName)
 {
   ContextRegistration*          crP        = new ContextRegistration();
   EntityId*                     entityIdP  = new EntityId(entityId, entityType, "false");

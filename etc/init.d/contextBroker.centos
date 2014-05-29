@@ -43,11 +43,14 @@
 # fermin at tid dot es
 
 
+. /etc/rc.d/init.d/functions
+
 PARAM=$1
 NAME=contextBroker
+EXECUTABLE=/usr/bin/${NAME}
 
 # Load the environment
-if [ -f /etc/sysconfig/${NAME} ]; then
+if [[ -f /etc/sysconfig/${NAME} ]]; then
     . /etc/sysconfig/${NAME}
 else
    echo "Configuration file /etc/sysconfig/${NAME} not found"
@@ -55,45 +58,47 @@ else
    exit 1
 fi
 
-if [ -z "${BROKER_DATABASE_HOST}" ] &&  [ "${PARAM}" != "stop" ]; then
+if [[ -z "${BROKER_DATABASE_HOST}" ]] &&  [[ "${PARAM}" != "stop" ]]; then
     echo "Database configuration incomplete for the ${NAME}"
     echo "Edit /etc/sysconfig/${NAME} with the relevant settings"
     exit 1
 fi
 
 # Note that some parameters are not always included
-if [ -z "${BROKER_DATABASE_USER}" ]; then
-    BROKER_OPTS=$(echo "-port ${BROKER_PORT} " \
-            "-logDir ${BROKER_LOG_DIR} " \
-            "-pidpath ${BROKER_PID_FILE} " \
-            "-dbhost ${BROKER_DATABASE_HOST}" \
-            "-db ${BROKER_DATABASE_NAME} " \
-            "${BROKER_EXTRA_OPS} ")
+if [[ -z "${BROKER_DATABASE_USER}" ]]; then
+    BROKER_OPTS="-port ${BROKER_PORT}  \
+            -logDir ${BROKER_LOG_DIR}  \
+            -pidpath ${BROKER_PID_FILE}  \
+            -dbhost ${BROKER_DATABASE_HOST} \
+            -db ${BROKER_DATABASE_NAME} \
+            ${BROKER_EXTRA_OPS} "
 else
-    BROKER_OPTS=$(echo "-port ${BROKER_PORT} " \
-            "-logDir ${BROKER_LOG_DIR} " \
-            "-pidpath ${BROKER_PID_FILE} " \
-            "-dbhost ${BROKER_DATABASE_HOST}" \
-            "-db ${BROKER_DATABASE_NAME} " \
-            "-dbuser ${BROKER_DATABASE_USER} " \
-            "-dbpwd ${BROKER_DATABASE_PASSWORD} " \
-            "${BROKER_EXTRA_OPS} ")
+    BROKER_OPTS="-port ${BROKER_PORT} \
+            -logDir ${BROKER_LOG_DIR} \
+            -pidpath ${BROKER_PID_FILE} \
+            -dbhost ${BROKER_DATABASE_HOST} \
+            -db ${BROKER_DATABASE_NAME} \
+            -dbuser ${BROKER_DATABASE_USER} \
+            -dbpwd ${BROKER_DATABASE_PASSWORD} \
+            ${BROKER_EXTRA_OPS}"
 fi
 
 broker_start()
 {
     printf "%-50s" "Starting ${NAME}..."
-    if [ -x /usr/bin/${NAME} ]; then
-        su $BROKER_USER -c "/usr/bin/${NAME} ${BROKER_OPTS} > /dev/null 2>&1"
+    if [[ -x ${EXECUTABLE} ]]; then
+        su $BROKER_USER -c "${EXECUTABLE} ${BROKER_OPTS} &> /dev/null "
+        sleep 2 # wait some time to leave contextbroker start
         PID=$(cat ${BROKER_PID_FILE})
-        if [ -z PID ]; then
-            printf "%s\n" "Fail"
+        if [[ -z "${PID}" ]]; then
+            printf "%s" "pidfile not found"
+            printf "%s\n" "$(failure)" 
             exit 1
         else
-            printf "%s\n" "Ok"
+            printf "%s\n" "$(success)"
         fi
     else
-        printf "%s\n" "Fail - missing ${NAME} executable"
+        printf "%s\n" "Fail - missing ${EXECUTABLE} executable"
         exit 1
     fi
    
@@ -105,35 +110,29 @@ broker_stop()
     if [ -f "${BROKER_PID_FILE}" ]; then
         kill -HUP $(cat ${BROKER_PID_FILE})
         rm -f ${BROKER_PID_FILE}
-        printf "%s\n" "Ok"
+        printf "%s\n" "$(success)"
     else
-        printf "%s\n" "pidfile not found"
+        printf "%s\n" "$(failure)"
     fi
 }
 
 broker_status()
 {
-    printf "%-50s" "Checking $NAME..."
-    if [ -f ${BROKER_PID_FILE} ]; then
-        PID=$(cat ${BROKER_PID_FILE})
-        if [ -z "`ps axf | grep ${PID} | grep -v grep`" ]; then
-            printf "%s\n" "Process dead but pidfile exists"
-            exit 1   # Treat as an error condition
-        else
-            echo "Running"
-        fi
-    else
-        printf "%s\n" "Service not running"
-    fi
+    status -p ${BROKER_PID_FILE} ${EXECUTABLE}
 }
+
 
 case ${PARAM} in
 
     'start')
+        echo "Starting..."
+        status -p ${BROKER_PID_FILE} ${EXECUTABLE} && exit 0
         broker_start
         ;;
 
     'stop')
+        echo "Stopping..."
+        status -p ${BROKER_PID_FILE} ${EXECUTABLE} || exit 0
         broker_stop
         ;;
 

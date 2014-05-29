@@ -18,254 +18,284 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Cross request payload error in XML
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source ../harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
-if [ "$VALGRIND" == "" ]; then
-  $CB_START_CMD
-  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-  sleep 1
-else
-  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
-  # Waiting for valgrind to start (sleep 10)
-  sleep 10s
-fi
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
+dbInit CB
+brokerStart CB
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<discoverContextAvailabilityRequest/>
-EOF
+source ../harnessFunctions.sh
+
+url='/NGSI9/registerContext'
+payload='<?xml version="1.0"?>
+<discoverContextAvailabilityRequest/>'
+curlXml ${url} "${payload}"
 echo "1: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF
+url='/NGSI9/discoverContextAvailability'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
 echo "2: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/subscribeContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF
+url='/NGSI9/subscribeContextAvailability'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
 echo "3: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/updateContextAvailabilitySubscription -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF
+url='/NGSI9/updateContextAvailabilitySubscription'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
 echo "4: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/unsubscribeContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF
+url='/NGSI9/unsubscribeContextAvailability'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
 echo "5: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF
+url='/NGSI10/queryContext'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
 echo "6: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF
+url='/NGSI10/updateContext'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
 echo "7: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF
+url='/NGSI10/subscribeContext'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
 echo "8: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContextSubscription -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF
+url='/NGSI10/updateContextSubscription'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
 echo "9: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-<registerContextRequest/>
-EOF
+url='/NGSI10/unsubscribeContext'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
 echo "10: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/notSupportedRequest -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-  <registerContextRequest/>
-EOF
+url='/NGSI9/notSupportedRequest'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
 echo "11: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/notSupportedRequest -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-  <registerContextRequest/>
-EOF
+url='/NGSI10/notSupportedRequest'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
 echo "12: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/notSupportedRequest -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-  <registerContextRequest/>
-EOF
+url='/notSupportedRequest'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
 echo "13: ++++++++++++++++++++"
 
---EXPECT--
+--REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 315
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
-  <registrationId>0</registrationId>
+  <registrationId>000000000000000000000000</registrationId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Invalid payload</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Expected 'registerContextRequest' payload, got 'discoverContextAvailabilityRequest'</details>
   </errorCode>
 </registerContextResponse>
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 279
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Invalid payload</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Expected 'discoverContextAvailabilityRequest' payload, got 'registerContextRequest'</details>
   </errorCode>
 </discoverContextAvailabilityResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 342
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextAvailabilityResponse>
-  <subscriptionId>0</subscriptionId>
+  <subscriptionId>000000000000000000000000</subscriptionId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Invalid payload</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Expected 'subscribeContextAvailabilityRequest' payload, got 'registerContextRequest'</details>
   </errorCode>
 </subscribeContextAvailabilityResponse>
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 369
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextAvailabilitySubscriptionResponse>
-  <subscriptionId>No Subscription ID</subscriptionId>
+  <subscriptionId>000000000000000000000000</subscriptionId>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Invalid payload</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Expected 'updateContextAvailabilitySubscriptionRequest' payload, got 'registerContextRequest'</details>
   </errorCode>
 </updateContextAvailabilitySubscriptionResponse>
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 350
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <unsubscribeContextAvailabilityResponse>
-  <subscriptionId>No Subscription ID</subscriptionId>
+  <subscriptionId>000000000000000000000000</subscriptionId>
   <statusCode>
     <code>400</code>
-    <reasonPhrase>Invalid payload</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Expected 'unsubscribeContextAvailabilityRequest' payload, got 'registerContextRequest'</details>
   </statusCode>
 </unsubscribeContextAvailabilityResponse>
 5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 234
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Invalid payload</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Expected 'queryContextRequest' payload, got 'registerContextRequest'</details>
   </errorCode>
 </queryContextResponse>
 6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 237
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <errorCode>
     <code>400</code>
-    <reasonPhrase>Invalid payload</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Expected 'updateContextRequest' payload, got 'registerContextRequest'</details>
   </errorCode>
 </updateContextResponse>
 7: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 295
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeError>
     <errorCode>
       <code>400</code>
-      <reasonPhrase>Invalid payload</reasonPhrase>
+      <reasonPhrase>Bad Request</reasonPhrase>
       <details>Expected 'subscribeContextRequest' payload, got 'registerContextRequest'</details>
     </errorCode>
   </subscribeError>
 </subscribeContextResponse>
 8: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 384
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextSubscriptionResponse>
   <subscribeError>
-    <subscriptionId>0</subscriptionId>
+    <subscriptionId>000000000000000000000000</subscriptionId>
     <errorCode>
       <code>400</code>
-      <reasonPhrase>Invalid payload</reasonPhrase>
+      <reasonPhrase>Bad Request</reasonPhrase>
       <details>Expected 'updateContextSubscriptionRequest' payload, got 'registerContextRequest'</details>
     </errorCode>
   </subscribeError>
 </updateContextSubscriptionResponse>
 9: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 314
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <unsubscribeContextResponse>
-  <subscriptionId>0</subscriptionId>
+  <subscriptionId>000000000000000000000000</subscriptionId>
   <statusCode>
     <code>400</code>
-    <reasonPhrase>Invalid payload</reasonPhrase>
+    <reasonPhrase>Bad Request</reasonPhrase>
     <details>Expected 'unsubscribeContextRequest' payload, got 'registerContextRequest'</details>
   </statusCode>
 </unsubscribeContextResponse>
 10: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 163
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <orionError>
   <code>400</code>
-  <reasonPhrase>bad ngsi9 request</reasonPhrase>
+  <reasonPhrase>Bad Request</reasonPhrase>
   <details>ngsi9 service '/NGSI9/notSupportedRequest' not found</details>
 </orionError>
 11: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 165
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <orionError>
   <code>400</code>
-  <reasonPhrase>bad ngsi10 request</reasonPhrase>
+  <reasonPhrase>Bad Request</reasonPhrase>
   <details>ngsi10 service '/NGSI10/notSupportedRequest' not found</details>
 </orionError>
 12: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 151
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <orionError>
   <code>400</code>
-  <reasonPhrase>bad request</reasonPhrase>
+  <reasonPhrase>Bad Request</reasonPhrase>
   <details>service '/notSupportedRequest' not found</details>
 </orionError>
 13: ++++++++++++++++++++
 --TEARDOWN--
-if [ "$VALGRIND" == "" ]; then
-  kill $(cat ${BROKER_PID_FILE})
-  rm /tmp/orion_${BROKER_PORT}.pid
-else
-  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
-  # Waiting for valgrind to terminate (sleep 10)
-  sleep 10
-fi
+source ../harnessFunctions.sh
+brokerStop CB

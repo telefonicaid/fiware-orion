@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/ScopeVector.h"
@@ -36,7 +38,7 @@
 *
 * ScopeVector::render - 
 */
-std::string ScopeVector::render(Format format, std::string indent, bool comma)
+std::string ScopeVector::render(Format format, const std::string& indent, bool comma)
 {
   std::string out = "";
   std::string tag = "scope";
@@ -58,14 +60,17 @@ std::string ScopeVector::render(Format format, std::string indent, bool comma)
 *
 * ScopeVector::check - 
 */
-std::string ScopeVector::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ScopeVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    {
+      LM_E(("error for scope %d: %s", ix, res.c_str()));
       return res;
+    }
   }
 
   return "OK";
@@ -77,7 +82,7 @@ std::string ScopeVector::check(RequestType requestType, Format format, std::stri
 *
 * ScopeVector::present - 
 */
-void ScopeVector::present(std::string indent)
+void ScopeVector::present(const std::string& indent)
 {
   if (vec.size() == 0)
     PRINTF("No scopes\n");

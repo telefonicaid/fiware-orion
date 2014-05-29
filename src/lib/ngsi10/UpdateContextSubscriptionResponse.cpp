@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "common/Format.h"
 #include "common/tag.h"
+#include "ngsi/StatusCode.h"
 #include "ngsi/SubscribeResponse.h"
 #include "ngsi/SubscribeError.h"
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
@@ -38,15 +39,17 @@
 * UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse -
 */
 UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse() {
+   subscribeError.errorCode.tagSet("errorCode");
 }
 
 /* ****************************************************************************
 *
 * UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse -
 */
-UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse(ErrorCode& errorCode) {
-   subscribeError.subscriptionId.set("0");
-   subscribeError.errorCode = errorCode;
+UpdateContextSubscriptionResponse::UpdateContextSubscriptionResponse(StatusCode& errorCode) {
+   subscribeError.subscriptionId.set("000000000000000000000000");
+   subscribeError.errorCode.fill(&errorCode);
+   subscribeError.errorCode.tagSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -61,14 +64,14 @@ UpdateContextSubscriptionResponse::~UpdateContextSubscriptionResponse() {
 *
 * UpdateContextSubscriptionResponse::render - 
 */
-std::string UpdateContextSubscriptionResponse::render(RequestType requestType, Format format, std::string indent)
+std::string UpdateContextSubscriptionResponse::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string out  = "";
   std::string tag  = "updateContextSubscriptionResponse";
 
   out += startTag(indent, tag, format, false);
 
-  if (subscribeError.errorCode.code == NO_ERROR_CODE)
+  if (subscribeError.errorCode.code == SccNone)
      out += subscribeResponse.render(format, indent + "  ", false);
   else
      out += subscribeError.render(UpdateContextSubscription, format, indent + "  ", false);

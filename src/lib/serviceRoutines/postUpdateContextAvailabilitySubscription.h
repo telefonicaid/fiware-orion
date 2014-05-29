@@ -37,6 +37,6 @@
 *
 * postUpdateContextAvailabilitySubscription - 
 */
-extern std::string postUpdateContextAvailabilitySubscription(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+extern std::string postUpdateContextAvailabilitySubscription(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
 
 #endif

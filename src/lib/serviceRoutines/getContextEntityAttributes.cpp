@@ -39,14 +39,14 @@
 *
 * getContextEntityAttributes - 
 */
-std::string getContextEntityAttributes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string getContextEntityAttributes(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string                          entityId = compV[2];
   std::string                          answer;
   DiscoverContextAvailabilityResponse  response;
 
   LM_T(LmtConvenience, ("CONVENIENCE: got a 'GET' request for entityId '%s'", entityId.c_str()));
-  ciP->httpStatusCode = mapGetContextEntityAttributes(entityId, &response);
+  ciP->httpStatusCode = mapGetContextEntityAttributes(entityId, &response, ciP);
   answer = response.render(DiscoverContextAvailability, ciP->outFormat, "");
   response.release();
 

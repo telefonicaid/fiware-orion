@@ -37,7 +37,7 @@
 *
 * postSubscribeContextAvailability - 
 */
-std::string postSubscribeContextAvailability(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string postSubscribeContextAvailability(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   SubscribeContextAvailabilityResponse  scar;
   std::string                           answer;
@@ -46,7 +46,7 @@ std::string postSubscribeContextAvailability(ConnectionInfo* ciP, int components
   // used to do the subscription, so we are passing ciP->inFormat. This is just an heuristic, the client could want
   // for example to use XML in the subscription message but wants notifications in JSON. We need a more
   // flexible approach, to be implemented
-  mongoSubscribeContextAvailability(&parseDataP->scar.res, &scar, ciP->inFormat);
+  ciP->httpStatusCode = mongoSubscribeContextAvailability(&parseDataP->scar.res, &scar, ciP->inFormat, ciP->tenant);
   answer = scar.render(SubscribeContextAvailability, ciP->outFormat, "");
 
   return answer;

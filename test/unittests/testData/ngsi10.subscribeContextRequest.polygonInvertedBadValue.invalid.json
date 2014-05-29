@@ -1,0 +1,57 @@
+{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    }
+  ],
+  "attributes": [
+    "lightstatus"
+  ],
+  "reference": "127.0.0.1",
+  "duration": "P5Y",
+  "restriction": {
+    "attributeExpression": "testRestriction",
+    "scopes" : [
+      {
+        "type" : "TEST-TYPE",
+        "value" : "test-value"
+      },
+      {
+        "type" : "FIWARE_Location",
+        "value" : {
+          "polygon" : {
+            "vertices" : [
+              {
+                "latitude" : "10",
+                "longitude" : "20"
+              },
+              {
+                "latitude" : "20",
+                "longitude" : "30"
+              },
+              {
+                "latitude" : "30",
+                "longitude" : "40"
+              }
+            ],
+            "inverted" : "2"
+          }
+        }
+      }
+    ]
+  },
+  "notifyConditions": [
+    {
+      "type": "ONTIMEINTERVAL",
+      "condValues": [
+        "temperature",
+        "lightstatus"
+      ]
+      ,
+      "restriction": "restriction"
+    }
+  ],
+  "throttling": "P5Y"
+}

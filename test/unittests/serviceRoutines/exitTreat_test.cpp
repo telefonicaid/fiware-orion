@@ -22,10 +22,10 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "serviceRoutines/exitTreat.h"
 #include "rest/RestService.h"
+
+#include "unittest.h"
 
 
 
@@ -59,22 +59,32 @@ TEST(exitTreat, error)
   ConnectionInfo ci1("/exit",  "GET", "1.1");
   ConnectionInfo ci2("/exit/nadadenada",  "GET", "1.1");
   ConnectionInfo ci3("/exit/harakiri",  "GET", "1.1");
-
-  std::string    expected1  = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad request</reasonPhrase>\n  <details>Password requested</details>\n</orionError>\n";
-  std::string    expected2  = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad request</reasonPhrase>\n  <details>Request denied - password erroneous</details>\n</orionError>\n";
-  std::string    expected3  = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad request</reasonPhrase>\n  <details>no such service</details>\n</orionError>\n";
+  const char*    outfile1 = "orion.exit.error1.valid.xml";
+  const char*    outfile2 = "orion.exit.error2.valid.xml";
+  const char*    outfile3 = "orion.exit.error3.valid.xml";
   std::string    out;
+
+  utInit();
 
   harakiri = true;
 
   out = restService(&ci1, rs);
-  EXPECT_EQ(expected1, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out =restService(&ci2, rs);
-  EXPECT_EQ(expected2, out);
+  out = restService(&ci2, rs);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   harakiri = false;
-
   out = restService(&ci3, rs);
-  EXPECT_EQ(expected3, out);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  harakiri = true;
+  out = restService(&ci3, rs);
+  EXPECT_STREQ("DIE", out.c_str());
+  harakiri = false;
+
+  utExit();
 }

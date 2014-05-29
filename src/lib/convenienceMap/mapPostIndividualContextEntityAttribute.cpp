@@ -29,6 +29,8 @@
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "mongoBackend/mongoUpdateContext.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/HttpStatusCode.h"
 
 
 
@@ -36,7 +38,7 @@
 *
 * mapPostIndividualContextEntityAttribute - 
 */
-HttpStatusCode mapPostIndividualContextEntityAttribute(std::string entityId, std::string attributeName, UpdateContextAttributeRequest* request, StatusCode* response)
+HttpStatusCode mapPostIndividualContextEntityAttribute(const std::string& entityId, const std::string& attributeName, UpdateContextAttributeRequest* request, StatusCode* response, ConnectionInfo* ciP)
 {
    HttpStatusCode         ms;
    UpdateContextRequest   ucRequest;
@@ -50,9 +52,9 @@ HttpStatusCode mapPostIndividualContextEntityAttribute(std::string entityId, std
    ucRequest.contextElementVector.push_back(&ce);
    ucRequest.updateActionType.set("Append");
 
-   ms = mongoUpdateContext(&ucRequest, &ucResponse);
+   ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant);
 
-   response->fill(SccOk, "OK", "");
+   response->fill(SccOk);
    
    return ms;
 }

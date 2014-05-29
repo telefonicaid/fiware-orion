@@ -46,13 +46,19 @@ NotifyContextAvailabilityRequest::NotifyContextAvailabilityRequest()
 *
 * NotifyContextAvailabilityRequest::render -
 */
-std::string NotifyContextAvailabilityRequest::render(RequestType requestType, Format format, std::string indent)
+std::string NotifyContextAvailabilityRequest::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "notifyContextAvailabilityRequest";
 
+  //
+  // Note on JSON commas:
+  //  Both subscriptionId and contextRegistrationResponseVector are MANDATORY.
+  //  Always comma for subscriptionId.
+  //  With an empty contextRegistrationResponseVector there would be no notification
+  //
   out += startTag(indent, tag, format, false);
-  out += subscriptionId.render(format, indent + "  ", true);
+  out += subscriptionId.render(NotifyContextAvailability, format, indent + "  ", true);
   out += contextRegistrationResponseVector.render(format, indent  + "  ", false);
   out += endTag(indent, tag, format);
 
@@ -65,21 +71,19 @@ std::string NotifyContextAvailabilityRequest::render(RequestType requestType, Fo
 *
 * NotifyContextAvailabilityRequest::check - 
 */
-std::string NotifyContextAvailabilityRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string NotifyContextAvailabilityRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string                        res;
   NotifyContextAvailabilityResponse  response;
 
   if (predetectedError != "")
   {
-    response.responseCode.code         = SccBadRequest;
-    response.responseCode.reasonPhrase = predetectedError;
+    response.responseCode.fill(SccBadRequest, predetectedError);
   }
   else if (((res = subscriptionId.check(QueryContext, format, indent, predetectedError, 0))                    != "OK") ||
            ((res = contextRegistrationResponseVector.check(QueryContext, format, indent, predetectedError, 0)) != "OK"))
   {
-    response.responseCode.code         = SccBadRequest;
-    response.responseCode.reasonPhrase = res;
+    response.responseCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
@@ -92,7 +96,7 @@ std::string NotifyContextAvailabilityRequest::check(RequestType requestType, For
 *
 * NotifyContextAvailabilityRequest::present -
 */
-void NotifyContextAvailabilityRequest::present(std::string indent)
+void NotifyContextAvailabilityRequest::present(const std::string& indent)
 {
   subscriptionId.present(indent);
   contextRegistrationResponseVector.present(indent);

@@ -1,0 +1,258 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# fermin at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Log configuration via REST
+
+--SHELL-INIT--
+source harnessFunctions.sh
+
+dbInit CB
+brokerStart CB 1-2
+
+--SHELL--
+source harnessFunctions.sh
+
+echo "=== 1. GET verbose level"
+curl localhost:${BROKER_PORT}/log/verbose
+echo
+echo
+
+echo "=== 2. PUT verbose level"
+curl localhost:${BROKER_PORT}/log/verbose/5 -X PUT
+echo
+echo
+
+echo "=== 3. GET verbose level"
+curl localhost:${BROKER_PORT}/log/verbose
+echo
+echo
+
+echo "=== 4. DELETE verbose level"
+curl localhost:${BROKER_PORT}/log/verbose -X DELETE
+echo
+echo
+
+echo "=== 5. GET verbose level"
+curl localhost:${BROKER_PORT}/log/verbose
+echo
+echo
+
+
+echo "=== 6. POST verbose level"
+curl localhost:${BROKER_PORT}/log/verbose/5 -X POST --include
+echo
+echo
+
+
+echo "=== 7. GET trace level"
+curl localhost:${BROKER_PORT}/log/traceLevel
+echo
+echo
+
+
+echo "=== 8. PUT trace level"
+curl localhost:${BROKER_PORT}/log/trace/5-10 -X PUT
+echo
+echo
+
+
+echo "=== 9. GET trace level"
+curl localhost:${BROKER_PORT}/log/traceLevel
+echo
+echo
+
+
+echo "=== 10. POST trace level"
+curl localhost:${BROKER_PORT}/log/trace/101-102,105 -X POST --include
+echo
+echo
+
+
+echo "=== 11. PUT trace level"
+curl localhost:${BROKER_PORT}/log/traceLevel/19,21-25 -X PUT
+echo
+echo
+
+
+echo "=== 12. GET trace level"
+curl localhost:${BROKER_PORT}/log/trace
+echo
+echo
+
+
+echo "=== 13. DELETE trace level"
+curl localhost:${BROKER_PORT}/log/traceLevel/23 -X DELETE
+echo
+echo
+
+
+echo "=== 14. GET trace level"
+curl localhost:${BROKER_PORT}/log/traceLevel
+echo
+echo
+
+
+echo "=== 15. DELETE trace level"
+curl localhost:${BROKER_PORT}/log/traceLevel -X DELETE
+echo
+echo
+
+
+echo "=== 16. GET trace level"
+curl localhost:${BROKER_PORT}/log/traceLevel
+echo
+echo
+
+
+--REGEXPECT--
+=== 1. GET verbose level
+<orion>
+  <log>
+    <verboseLevel>5</verboseLevel>
+  </log>
+</orion>
+
+
+=== 2. PUT verbose level
+<orion>
+  <log>
+    <verboseLevel>verbose level set to 5</verboseLevel>
+  </log>
+</orion>
+
+
+=== 3. GET verbose level
+<orion>
+  <log>
+    <verboseLevel>5</verboseLevel>
+  </log>
+</orion>
+
+
+=== 4. DELETE verbose level
+<orion>
+  <log>
+    <verboseLevel>all verbose levels reset</verboseLevel>
+  </log>
+</orion>
+
+
+=== 5. GET verbose level
+<orion>
+  <log>
+    <verboseLevel>0</verboseLevel>
+  </log>
+</orion>
+
+
+=== 6. POST verbose level
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: GET, PUT, DELETE
+Date: REGEX(.*)
+
+
+
+=== 7. GET trace level
+<orion>
+  <log>
+    <tracelevels>1-2</tracelevels>
+  </log>
+</orion>
+
+
+=== 8. PUT trace level
+<orion>
+  <log>
+    <tracelevels>5-10</tracelevels>
+  </log>
+</orion>
+
+
+=== 9. GET trace level
+<orion>
+  <log>
+    <tracelevels>5-10</tracelevels>
+  </log>
+</orion>
+
+
+=== 10. POST trace level
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST, GET, PUT, DELETE
+Date: REGEX(.*)
+
+
+
+=== 11. PUT trace level
+<orion>
+  <log>
+    <tracelevels>19,21-25</tracelevels>
+  </log>
+</orion>
+
+
+=== 12. GET trace level
+<orion>
+  <log>
+    <tracelevels>19, 21-25</tracelevels>
+  </log>
+</orion>
+
+
+=== 13. DELETE trace level
+<orion>
+  <log>
+    <tracelevels removed>23</tracelevels removed>
+  </log>
+</orion>
+
+
+=== 14. GET trace level
+<orion>
+  <log>
+    <tracelevels>19, 21-22, 24-25</tracelevels>
+  </log>
+</orion>
+
+
+=== 15. DELETE trace level
+<orion>
+  <log>
+    <tracelevels>all trace levels off</tracelevels>
+  </log>
+</orion>
+
+
+=== 16. GET trace level
+<orion>
+  <log>
+    <tracelevels>empty</tracelevels>
+  </log>
+</orion>
+
+
+--TEARDOWN--
+source harnessFunctions.sh
+brokerStop CB

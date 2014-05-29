@@ -37,7 +37,7 @@
 *
 * postUpdateContextSubscription - 
 */
-std::string postUpdateContextSubscription(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string postUpdateContextSubscription(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   UpdateContextSubscriptionResponse  ucsr;
   std::string                        answer;
@@ -48,7 +48,7 @@ std::string postUpdateContextSubscription(ConnectionInfo* ciP, int components, s
   // used to do the subscription, so we are passing ciP->inFomat. This is just an heuristic, the client could want
   // for example to use XML in the subscription message but wants notifications in JSON. We need a more
   // flexible approach, to be implemented
-  mongoUpdateContextSubscription(&parseDataP->ucsr.res, &ucsr, ciP->inFormat);
+  ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res, &ucsr, ciP->inFormat, ciP->tenant);
   answer = ucsr.render(UpdateContextSubscription, ciP->outFormat, "");
   return answer;
 }

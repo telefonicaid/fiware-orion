@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
 #include "ngsi9/NotifyContextAvailabilityResponse.h"
 
 
@@ -39,15 +38,12 @@
 */
 TEST(NotifyContextAvailabilityResponse, all)
 {
-  StatusCode                         sc(SccBadRequest, "status", "status details");
-  ErrorCode                          ec(SccForbidden,  "error",  "error details");
+  StatusCode                         sc(SccBadRequest, "status details");
   NotifyContextAvailabilityResponse  ncr1;
   NotifyContextAvailabilityResponse  ncr2(sc);
-  NotifyContextAvailabilityResponse  ncr3(ec);
   
   EXPECT_EQ(ncr1.responseCode.code, SccOk);
   EXPECT_EQ(ncr2.responseCode.code, SccBadRequest);
-  EXPECT_EQ(ncr3.responseCode.code, SccForbidden);
 
   ncr1.render(NotifyContextAvailability, XML, "");
   ncr1.present("");

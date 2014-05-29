@@ -3,10 +3,10 @@
     <entityIdList>
       <entityId type="Room" isPattern="false">
         <id>ConferenceRoom</id>
+        <type>Room</type>
       </entityId>
       <entityId type="Room" isPattern="false">
         <id>OfficeRoom</id>
-        <type>Room</type>
       </entityId>
     </entityIdList>
     <attributeList>

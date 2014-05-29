@@ -1,0 +1,7 @@
+<queryContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>invalid isPattern (boolean) value for entity: 'fralse'</details>
+  </errorCode>
+</queryContextResponse>

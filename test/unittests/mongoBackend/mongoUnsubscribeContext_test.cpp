@@ -121,9 +121,9 @@ TEST(mongoUnsubscribeContext, subscriptionNotFound)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -140,8 +140,8 @@ TEST(mongoUnsubscribeContext, subscriptionNotFound)
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("51307b66f481db11bf869999", res.subscriptionId.get());
     EXPECT_EQ(SccContextElementNotFound, res.statusCode.code);
-    EXPECT_EQ("Subscription Not Found", res.statusCode.reasonPhrase);
-    EXPECT_EQ(0, res.statusCode.details.size());
+    EXPECT_EQ("No context element found", res.statusCode.reasonPhrase);
+    EXPECT_EQ("subscriptionId: '51307b66f481db11bf869999'", res.statusCode.details);
 
     /* Check database (untouched) */
     DBClientConnection* connection = getMongoConnection();
@@ -168,9 +168,9 @@ TEST(mongoUnsubscribeContext, unsubscribe)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -224,9 +224,9 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -244,7 +244,7 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("51307b66f481db11bf860001", res.subscriptionId.get());
     EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
-    EXPECT_EQ("Database Error", res.statusCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.csubs "
               "- findOne() _id: 51307b66f481db11bf860001 "
               "- exception: boom!!", res.statusCode.details);
@@ -295,9 +295,9 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -315,7 +315,7 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("51307b66f481db11bf860001", res.subscriptionId.get());
     EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
-    EXPECT_EQ("Database Error", res.statusCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.csubs "
               "- remove() _id: 51307b66f481db11bf860001 "
               "- exception: boom!!", res.statusCode.details);

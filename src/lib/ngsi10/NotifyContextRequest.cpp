@@ -36,15 +36,22 @@
 *
 * NotifyContextRequest::render -
 */
-std::string NotifyContextRequest::render(RequestType requestType, Format format, std::string indent)
+std::string NotifyContextRequest::render(RequestType requestType, Format format, const std::string& indent)
 {
-  std::string out = "";
-  std::string tag = "notifyContextRequest";
+  std::string  out                                  = "";
+  std::string  tag                                  = "notifyContextRequest";
+  bool         contextElementResponseVectorRendered = contextElementResponseVector.size() != 0;
 
+  //
+  // Note on JSON commas:
+  //   subscriptionId and originator are MANDATORY.
+  //   The only doubt here if whether originator should end in a comma.
+  //   This doubt is taken care of by the variable 'contextElementResponseVectorRendered'
+  //
   out += startTag(indent, tag, format, false);
-  out += subscriptionId.render(format, indent + "  ", true);
-  out += originator.render(format, indent  + "  ", true);
-  out += contextElementResponseVector.render(format, indent  + "  ", false);
+  out += subscriptionId.render(NotifyContext, format, indent + "  ", true);
+  out += originator.render(format, indent  + "  ", contextElementResponseVectorRendered);
+  out += contextElementResponseVector.render(NotifyContext, format, indent  + "  ", false);
   out += endTag(indent, tag, format);
 
   return out;
@@ -55,22 +62,20 @@ std::string NotifyContextRequest::render(RequestType requestType, Format format,
 *
 * NotifyContextRequest::check
 */
-std::string NotifyContextRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string NotifyContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string            res;
   NotifyContextResponse  response;
    
   if (predetectedError != "")
   {
-    response.responseCode.code         = SccBadRequest;
-    response.responseCode.reasonPhrase = predetectedError;
+    response.responseCode.fill(SccBadRequest, predetectedError);
   }
   else if (((res = subscriptionId.check(QueryContext, format, indent, predetectedError, 0))               != "OK") ||
            ((res = originator.check(QueryContext, format, indent, predetectedError, 0))                   != "OK") ||
            ((res = contextElementResponseVector.check(QueryContext, format, indent, predetectedError, 0)) != "OK"))
   {
-    response.responseCode.code         = SccBadRequest;
-    response.responseCode.reasonPhrase = res;
+    response.responseCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
@@ -83,7 +88,7 @@ std::string NotifyContextRequest::check(RequestType requestType, Format format, 
 *
 * NotifyContextRequest::present -
 */
-void NotifyContextRequest::present(std::string indent)
+void NotifyContextRequest::present(const std::string& indent)
 {
   subscriptionId.present(indent);
   originator.present(indent);

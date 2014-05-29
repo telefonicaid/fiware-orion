@@ -36,6 +36,8 @@
 #include "serviceRoutines/postRegisterContext.h"
 #include "serviceRoutines/getContextEntitiesByEntityId.h"
 
+#include "unittest.h"
+
 
 
 /* ****************************************************************************
@@ -61,8 +63,12 @@ TEST(Convenience, emptyPath)
   std::string               response;
   std::string               expected = "Empty URL";
 
+  utInit();
+
   response = restService(&ci, restServiceV);
   EXPECT_STREQ(expected.c_str(), response.c_str());
+
+  utExit();
 }
 
 
@@ -78,19 +84,30 @@ TEST(Convenience, shortPath)
   ConnectionInfo  ci3("ngsi8", "GET", "1.1");
   ConnectionInfo  ci4("ngsi10/nada", "GET", "1.1");
   std::string     out;
-  std::string     expected = "<orionError>\n  <code>400</code>\n  <reasonPhrase>bad request</reasonPhrase>\n  <details>Service not recognized</details>\n</orionError>\n";
+  const char*     outfile1 = "ngsi.convenience.shortPath.postponed.xml";
+  const char*     outfile2 = "ngsi.convenience.shortPath2.postponed.xml";
+  const char*     outfile3 = "ngsi.convenience.shortPath3.postponed.xml";
+  const char*     outfile4 = "ngsi.convenience.shortPath4.postponed.xml";
 
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   out = restService(&ci1, restServiceV);
-  EXPECT_EQ(expected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   out = restService(&ci2, restServiceV);
-  EXPECT_EQ(expected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
   out = restService(&ci3, restServiceV);
-  EXPECT_EQ(expected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
   out = restService(&ci4, restServiceV);
-  EXPECT_EQ(expected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -103,10 +120,16 @@ TEST(Convenience, badPathNgsi9)
 {
   ConnectionInfo            ci("ngsi9/badpathcomponent", "GET", "1.1");
   std::string               out;
-  std::string               expected = "<orionError>\n  <code>400</code>\n  <reasonPhrase>bad request</reasonPhrase>\n  <details>Service not recognized</details>\n</orionError>\n";
+  const char*               outfile = "ngsi.convenience.badPathNgsi9.postponed.xml";
+
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   out = restService(&ci, restServiceV);
-  EXPECT_EQ(expected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -119,8 +142,13 @@ TEST(Convenience, badPathNgsi10)
 {
   ConnectionInfo            ci("ngsi10/badpathcomponent", "GET", "1.1");
   std::string               out;
-  std::string               expected = "<orionError>\n  <code>400</code>\n  <reasonPhrase>bad request</reasonPhrase>\n  <details>Service not recognized</details>\n</orionError>\n";
+  const char*               outfile = "ngsi10.convenience.badPathNgsi10.postponed.xml";
 
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   out = restService(&ci, restServiceV);
-  EXPECT_EQ(expected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }

@@ -43,7 +43,7 @@ EntityAssociation::EntityAssociation() : source("", "", "", "sourceEntityId"), t
 *
 * render - 
 */
-std::string EntityAssociation::render(Format format, std::string indent, bool comma)
+std::string EntityAssociation::render(Format format, const std::string& indent, bool comma)
 {
   std::string out;
   std::string tag = "entityAssociation";
@@ -62,7 +62,7 @@ std::string EntityAssociation::render(Format format, std::string indent, bool co
 *
 * check - 
 */
-std::string EntityAssociation::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string EntityAssociation::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string res;
 

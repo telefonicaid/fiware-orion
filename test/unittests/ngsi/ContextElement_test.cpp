@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextElementVector.h"
+
+#include "unittest.h"
 
 
 
@@ -38,6 +38,8 @@
 TEST(ContextElement, Check)
 {
   ContextElement ce;
+
+  utInit();
 
   ce.entityId.id = "";
   EXPECT_EQ(ce.check(UpdateContext, XML, "", "", 0), "empty entityId:id");
@@ -72,19 +74,24 @@ TEST(ContextElement, Check)
   EXPECT_EQ(ceVector.check(UpdateContext, XML, "", "", 0), "OK");
 
   // render
-  std::string cs2expect1xml  = "<contextElement>\n  <entityId type=\"\" isPattern=\"\">\n    <id>id</id>\n  </entityId>\n</contextElement>\n";
-  std::string cs2expect1json = "\"contextElement\" : {\n  \"type\" : \"\",\n  \"isPattern\" : \"\",\n  \"id\" : \"id\"\n}\n";
-  std::string out;
+  const char*  outfile1 = "ngsi.contextelement.check.middle.xml";
+  const char*  outfile2 = "ngsi.contextelement.check.middle.json";
+  std::string  out;
 
-  out = ce2.render(XML, "", false);
-  EXPECT_STREQ(cs2expect1xml.c_str(), out.c_str());
-  out = ce2.render(JSON, "", false);
-  EXPECT_STREQ(cs2expect1json.c_str(), out.c_str());
+  out = ce2.render(UpdateContextElement, XML, "", false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  out = ce2.render(UpdateContextElement, JSON, "", false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   // present
   ce2.present("", -1);
   ce2.present("", 1);
 
   m.name  = "";
-  EXPECT_EQ(ceVector.check(UpdateContext, XML, "", "", 0), "missing metadata name");
+  EXPECT_EQ("missing metadata name", ceVector.check(UpdateContext, XML, "", "", 0));
+
+  utExit();
 }

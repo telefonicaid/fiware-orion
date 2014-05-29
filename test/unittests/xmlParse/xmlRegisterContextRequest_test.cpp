@@ -30,6 +30,7 @@
 #include "xmlParse/xmlRequest.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
+#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
@@ -42,14 +43,14 @@
 TEST(xmlRegisterContextRequest, association)
 {
   ConnectionInfo  ci("/ngsi9/registerContext", "POST", "1.1");
-  const char*     fileName = "ngsi9.registerContextRequest.entityAssociation.postponed.xml"; 
+  const char*     inFile = "ngsi9.registerContextRequest.entityAssociation.postponed.xml"; 
   ParseData       parseData;
   std::string     expected = "OK";
   std::string     out;
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
 
   ci.inFormat  = XML;
   ci.outFormat = XML;
@@ -68,19 +69,20 @@ TEST(xmlRegisterContextRequest, association)
 TEST(xmlRegisterContextRequest, invalidSourceEntityId)
 {
   ConnectionInfo  ci("/ngsi9/registerContext", "POST", "1.1");
-  const char*     fileName = "ngsi9.registerContextRequest.invalidSourceEntityId.invalid.xml"; 
+  const char*     inFile = "ngsi9.registerContextRequest.invalidSourceEntityId.invalid.xml"; 
+  const char*     outFile1 = "ngsi9.registerContextResponse.invalidSourceEntityId.valid.xml";
   ParseData       parseData;
-  std::string     expected = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   std::string     out;
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile1)) << "Error getting test data from '" << outFile1 << "'";
 
   ci.inFormat  = XML;
   ci.outFormat = XML;
   out  = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_EQ(expected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }
@@ -94,19 +96,20 @@ TEST(xmlRegisterContextRequest, invalidSourceEntityId)
 TEST(xmlRegisterContextRequest, invalidTargetEntityId)
 {
   ConnectionInfo  ci("/ngsi9/registerContext", "POST", "1.1");
-  const char*     fileName = "ngsi9.registerContextRequest.invalidTargetEntityId.invalid.xml"; 
+  const char*     inFile  = "ngsi9.registerContextRequest.invalidTargetEntityId.invalid.xml"; 
+  const char*     outFile = "ngsi9.registerContextResponse.invalidTargetEntityId.valid.xml";
   ParseData       parseData;
-  std::string     expected = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>unsupported attribute for EntityId</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   std::string     out;
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   ci.inFormat  = XML;
   ci.outFormat = XML;
   out  = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_EQ(expected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }
@@ -120,19 +123,20 @@ TEST(xmlRegisterContextRequest, invalidTargetEntityId)
 TEST(xmlRegisterContextRequest, twoEntityIdLists)
 {
   ConnectionInfo  ci("/ngsi9/registerContext", "POST", "1.1");
-  const char*     fileName = "ngsi9.registerContextRequest.twoEntityIdLists.invalid.xml"; 
+  const char*     inFile  = "ngsi9.registerContextRequest.twoEntityIdLists.invalid.xml"; 
+  const char*     outFile = "ngsi9.registerContextResponse.twoEntityIdLists.valid.xml"; 
   ParseData       parseData;
-  std::string     expected = "<registerContextResponse>\n  <duration>PT1H</duration>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Got an entityIdList when one was present already</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
   std::string     out;
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile)) << "Error getting test data from '" << outFile << "'";
 
   ci.inFormat  = XML;
   ci.outFormat = XML;
   out  = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
-  EXPECT_EQ(expected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

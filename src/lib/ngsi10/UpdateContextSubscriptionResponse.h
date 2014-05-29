@@ -29,6 +29,7 @@
 
 #include "ngsi/SubscribeResponse.h"
 #include "ngsi/SubscribeError.h"
+#include "ngsi/StatusCode.h"
 #include "common/Format.h"
 
 
@@ -43,10 +44,10 @@ typedef struct UpdateContextSubscriptionResponse
   SubscribeError        subscribeError;        // Optional - but one of the two MUST be present!
 
   UpdateContextSubscriptionResponse();
-  UpdateContextSubscriptionResponse(ErrorCode& errorCode);
+  UpdateContextSubscriptionResponse(StatusCode& errorCode);
   ~UpdateContextSubscriptionResponse();
 
-  std::string render(RequestType requestType, Format format, std::string indent);
+  std::string render(RequestType requestType, Format format, const std::string& indent);
 } UpdateContextSubscriptionResponse;
 
 #endif

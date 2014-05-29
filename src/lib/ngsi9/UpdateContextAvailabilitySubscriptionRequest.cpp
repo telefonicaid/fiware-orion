@@ -50,11 +50,11 @@ UpdateContextAvailabilitySubscriptionRequest::UpdateContextAvailabilitySubscript
 *
 * UpdateContextAvailabilitySubscriptionRequest::render - 
 */
-std::string UpdateContextAvailabilitySubscriptionRequest::render(RequestType requestType, Format format, std::string indent)
+std::string UpdateContextAvailabilitySubscriptionRequest::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string   out                      = "";
   std::string   tag                      = "updateContextAvailabilitySubscriptionRequest";
-  bool          subscriptionRendered     = true; // FIXME P9: Right now subscriptionId ALWAYS renders
+  bool          subscriptionRendered     = subscriptionId.rendered(requestType);
   bool          restrictionRendered      = restrictions != 0;
   bool          durationRendered         = duration.get() != "";
   bool          attributeListRendered    = attributeList.size() != 0;
@@ -69,7 +69,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::render(RequestType req
   out += attributeList.render(format,  indent + "  ", commaAfterAttributeList);
   out += duration.render(format,       indent + "  ", commaAfterDuration);
   out += restriction.render(format,    indent + "  ", restrictions, commaAfterRestriction);
-  out += subscriptionId.render(format, indent + "  ", commaAfterSubscriptionId);
+  out += subscriptionId.render(UpdateContextAvailabilitySubscription, format, indent + "  ", commaAfterSubscriptionId);
   out += endTag(indent, tag, format);
 
   return out;
@@ -81,7 +81,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::render(RequestType req
 *
 * UpdateContextAvailabilitySubscriptionRequest::present - 
 */
-void UpdateContextAvailabilitySubscriptionRequest::present(std::string indent)
+void UpdateContextAvailabilitySubscriptionRequest::present(const std::string& indent)
 {
    entityIdVector.present(indent + "  ");
    attributeList.present(indent + "  ");
@@ -96,7 +96,7 @@ void UpdateContextAvailabilitySubscriptionRequest::present(std::string indent)
 *
 * UpdateContextAvailabilitySubscriptionRequest::check - 
 */
-std::string UpdateContextAvailabilitySubscriptionRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string UpdateContextAvailabilitySubscriptionRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string                                    res;
   UpdateContextAvailabilitySubscriptionResponse  response;
@@ -105,8 +105,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::check(RequestType requ
 
   if (predetectedError != "")
   {
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = predetectedError;
+    response.errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (((res = entityIdVector.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))      != "OK") ||
            ((res = attributeList.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))       != "OK") ||
@@ -114,8 +113,7 @@ std::string UpdateContextAvailabilitySubscriptionRequest::check(RequestType requ
            ((res = restriction.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))         != "OK") ||
            ((res = subscriptionId.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))      != "OK"))
   {
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = res;
+    response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";

@@ -22,17 +22,14 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "testDataFromFile.h"
+#include "unittest.h"
 
-#include "testInit.h"
 
 
 /* ****************************************************************************
@@ -54,17 +51,17 @@ static RestService rs[] =
 */
 TEST(postQueryContext, notFound)
 {
-  lmTraceSet("0-255");
-
-  setupDatabase();
-
   ConnectionInfo ci("/ngsi10/queryContext",  "POST", "1.1");
-  std::string    expected      = "<queryContextResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>No context elements found</reasonPhrase>\n  </errorCode>\n</queryContextResponse>\n";
-  const char*    fileName      = "ngsi10.queryContextRequest.entityIdNotFound.valid.xml";
+  const char*    infile      = "ngsi10.queryContextRequest.entityIdNotFound.valid.xml";
+  const char*    outfile     = "ngsi10.queryContextResponse.entityIdNotFound.valid.xml";
   std::string    out;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
-  // LM_M(("payload: %s", testBuf));
+  utInit();
+
+  lmTraceSet("0-255");
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   ci.outFormat    = XML;
   ci.inFormat     = XML;
@@ -72,5 +69,7 @@ TEST(postQueryContext, notFound)
   ci.payloadSize  = strlen(testBuf);
   out             = restService(&ci, rs);
 
-  EXPECT_STREQ(expected.c_str(), out.c_str());
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }

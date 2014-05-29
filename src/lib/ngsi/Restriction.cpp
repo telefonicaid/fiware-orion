@@ -38,7 +38,7 @@
 *
 * Restriction::check - 
 */
-std::string Restriction::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string Restriction::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string res;
 
@@ -66,7 +66,7 @@ std::string Restriction::check(RequestType requestType, Format format, std::stri
 *
 * Restriction::present - 
 */
-void Restriction::present(std::string indent)
+void Restriction::present(const std::string& indent)
 {
   attributeExpression.present(indent);
   scopeVector.present(indent);
@@ -78,7 +78,7 @@ void Restriction::present(std::string indent)
 *
 * Restriction::render - 
 */
-std::string Restriction::render(Format format, std::string indent, int restrictions, bool comma)
+std::string Restriction::render(Format format, const std::string& indent, int restrictions, bool comma)
 {
   std::string  tag = "restriction";
   std::string  out = "";

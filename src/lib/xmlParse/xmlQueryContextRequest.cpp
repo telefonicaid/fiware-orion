@@ -30,6 +30,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "orionTypes/areas.h"
 #include "ngsi/Request.h"
 #include "ngsi/ContextAttribute.h"
 #include "ngsi/EntityId.h"
@@ -38,6 +39,8 @@
 #include "xmlParse/XmlNode.h"
 #include "xmlParse/xmlQueryContextRequest.h"
 #include "xmlParse/xmlParse.h"
+
+using namespace orion;
 
 
 
@@ -158,12 +161,184 @@ static int scopeType(xml_node<>* node, ParseData* reqDataP)
 *
 * scopeValue - 
 */
-static int scopeValue(xml_node<>* node, ParseData* reqDataP)
+static int scopeValue(xml_node<>* node, ParseData* reqData)
 {
-  LM_T(LmtParse, ("Got a scopeValue: '%s'", node->value()));
+  if (reqData->qcr.scopeP->type == FIWARE_LOCATION)
+  {
+    //
+    // If the scope type is 'FIWARE_Location', then the value of this scope is stored in 'circle' or 'polygon'.
+    // The field 'value' is not used as more complexity is needed.
+    // scopeP->value is here set to FIWARE_LOCATION, in an attempt to warn a future use of 'scopeP->value' when
+    // instead 'circle' or 'polygon' should be used.
+    //
+    reqData->qcr.scopeP->value = FIWARE_LOCATION;
+    LM_T(LmtParse, ("Preparing scopeValue for '%s'", reqData->qcr.scopeP->type.c_str()));
+  }
+  else
+  {
+    reqData->qcr.scopeP->value = node->value();
+    LM_T(LmtParse, ("Got a scopeValue: '%s' for scopeType '%s'", node->value(), reqData->qcr.scopeP->type.c_str()));
+  }
 
-  reqDataP->qcr.scopeP->value = node->value();
+  return 0;
+}
 
+
+
+/* ****************************************************************************
+*
+* circle - 
+*/
+static int circle(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a circle"));
+  reqData->qcr.scopeP->areaType = orion::CircleType;
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* circleCenterLatitude - 
+*/
+static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a circleCenterLatitude: %s", node->value()));
+  reqData->qcr.scopeP->circle.center.latitudeSet(node->value());
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* circleCenterLongitude - 
+*/
+static int circleCenterLongitude(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a circleCenterLongitude: %s", node->value()));
+  reqData->qcr.scopeP->circle.center.longitudeSet(node->value());
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* circleRadius - 
+*/
+static int circleRadius(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a circleRadius: %s", node->value()));
+  reqData->qcr.scopeP->circle.radiusSet(node->value());
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* circleInverted - 
+*/
+static int circleInverted(xml_node<>* node, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a circleInverted: %s", node->value()));
+
+  parseDataP->qcr.scopeP->circle.invertedSet(node->value());
+
+  if (!isTrue(node->value()) && !isFalse(node->value()))
+  {
+    parseDataP->errorString = std::string("bad string for circle/inverted: '") + node->value() + "'";
+    return 1;
+  }
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* polygon - 
+*/
+static int polygon(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a polygon"));
+  reqData->qcr.scopeP->areaType = orion::PolygonType;
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonInverted - 
+*/
+static int polygonInverted(xml_node<>* node, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got a polygonInverted: %s", node->value()));
+
+  parseDataP->qcr.scopeP->polygon.invertedSet(node->value());
+  if (!isTrue(node->value()) && !isFalse(node->value()))
+  {
+    parseDataP->errorString = std::string("bad string for polygon/inverted: '") + node->value() + "'";
+    return 1;
+  }
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonVertexList - 
+*/
+static int polygonVertexList(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a polygonVertexList"));
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonVertex - 
+*/
+static int polygonVertex(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a polygonVertex - creating new vertex for the vertex list"));
+  reqData->qcr.vertexP = new orion::Point();
+  reqData->qcr.scopeP->polygon.vertexList.push_back(reqData->qcr.vertexP);
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonVertexLatitude - 
+*/
+static int polygonVertexLatitude(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a polygonVertexLatitude: %s", node->value()));
+  reqData->qcr.vertexP->latitudeSet(node->value());
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* polygonVertexLongitude - 
+*/
+static int polygonVertexLongitude(xml_node<>* node, ParseData* reqData)
+{
+  LM_T(LmtParse, ("Got a polygonVertexLongitude: %s", node->value()));
+  reqData->qcr.vertexP->longitudeSet(node->value());
   return 0;
 }
 
@@ -242,6 +417,19 @@ XmlNode qcrParseVector[] =
   { "/queryContextRequest/restriction/scope/operationScope",            operationScope       },
   { "/queryContextRequest/restriction/scope/operationScope/scopeType",  scopeType            },
   { "/queryContextRequest/restriction/scope/operationScope/scopeValue", scopeValue           },
+
+  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle",                              circle                  },
+  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle/centerLatitude",               circleCenterLatitude    },
+  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle/centerLongitude",              circleCenterLongitude   },
+  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle/radius",                       circleRadius            },
+  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle/inverted",                     circleInverted          },
+
+  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/polygon",                             polygon                 },
+  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/polygon/inverted",                    polygonInverted         },
+  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList",                  polygonVertexList       },
+  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex",           polygonVertex           },
+  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex/latitude",  polygonVertexLatitude   },
+  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex/longitude", polygonVertexLongitude  },
 
   { "LAST", NULL }
 };

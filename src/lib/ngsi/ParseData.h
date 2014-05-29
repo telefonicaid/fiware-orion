@@ -1,5 +1,5 @@
-#ifndef REQUEST_DATA_H
-#define REQUEST_DATA_H
+#ifndef PARSE_DATA_H
+#define PARSE_DATA_H
 
 /*
 *
@@ -28,6 +28,7 @@
 #include <string>
 
 #include "common/Format.h"
+#include "orionTypes/areas.h"
 #include "ngsi/AttributeAssociation.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextRegistrationAttribute.h"
@@ -102,6 +103,7 @@ typedef struct QueryContextData
    QueryContextRequest  res;
    EntityId*            entityIdP;
    Scope*               scopeP;
+   orion::Point*        vertexP;
 } QueryContextData;
 
 
@@ -131,6 +133,7 @@ typedef struct SubscribeContextData
    Restriction*                   restrictionP;
    NotifyCondition*               notifyConditionP;
    Scope*                         scopeP;
+   orion::Point*                  vertexP;
 } SubscribeContextData;
 
 
@@ -226,6 +229,7 @@ typedef struct UpdateContextSubscriptionData
   UpdateContextSubscriptionRequest  res;
   NotifyCondition*                  notifyConditionP;
   Scope*                            scopeP;
+  orion::Point*                     vertexP;
 } UpdateContextSubscriptionData;
 
 
@@ -287,8 +291,13 @@ typedef struct UpdateContextAttributeData
 */
 typedef struct ParseData
 {
-  std::string                                 errorString;
+  ParseData()
+  {
+    lastContextAttribute = NULL;
+  }
 
+  std::string                                 errorString;
+  ContextAttribute*                           lastContextAttribute;
   RegisterContextData                         rcr;
   DiscoverContextAvailabilityData             dcar;
   SubscribeContextAvailabilityData            scar;

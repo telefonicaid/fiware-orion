@@ -22,11 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
+
 #include "common/globals.h"
+
+#include "unittest.h"
+
 
 
 /* ****************************************************************************
@@ -37,19 +39,23 @@ TEST(commonGlobals, isTrue)
 {
    bool bTrue;
 
-   bTrue = isTrue("TRUE");
-   EXPECT_TRUE(bTrue) << "'TRUE' should be true";
-   bTrue = isTrue("True");
-   EXPECT_TRUE(bTrue) << "'True' should be true";
    bTrue = isTrue("true");
-   EXPECT_TRUE(bTrue) << "'true' should be true";
+   EXPECT_TRUE(bTrue);
+   bTrue = isTrue("1");
+   EXPECT_TRUE(bTrue);
 
+   bTrue = isTrue("TRUE");
+   EXPECT_FALSE(bTrue);
+   bTrue = isTrue("True");
+   EXPECT_FALSE(bTrue);
    bTrue = isTrue("YES");
-   EXPECT_TRUE(bTrue) << "'YES' should be true";
+   EXPECT_FALSE(bTrue);
    bTrue = isTrue("Yes");
-   EXPECT_TRUE(bTrue) << "'Yes' should be true";
+   EXPECT_FALSE(bTrue);
    bTrue = isTrue("yes");
-   EXPECT_TRUE(bTrue) << "'yes' should be true";
+   EXPECT_FALSE(bTrue);
+   bTrue = isTrue("0");
+   EXPECT_FALSE(bTrue);
 }
 
 
@@ -62,19 +68,23 @@ TEST(commonGlobals, isFalse)
 {
    bool bFalse;
 
-   bFalse = isFalse("FALSE");
-   EXPECT_TRUE(bFalse) << "'FALSE' should be false";
-   bFalse = isFalse("False");
-   EXPECT_TRUE(bFalse) << "'False' should be false";
    bFalse = isFalse("false");
-   EXPECT_TRUE(bFalse) << "'false' should be false";
+   EXPECT_TRUE(bFalse);
+   bFalse = isFalse("0");
+   EXPECT_TRUE(bFalse);
 
+   bFalse = isFalse("FALSE");
+   EXPECT_FALSE(bFalse);
+   bFalse = isFalse("False");
+   EXPECT_FALSE(bFalse);
    bFalse = isFalse("NO");
-   EXPECT_TRUE(bFalse) << "'NO' should be false";
+   EXPECT_FALSE(bFalse);
    bFalse = isFalse("No");
-   EXPECT_TRUE(bFalse) << "'No' should be false";
+   EXPECT_FALSE(bFalse);
    bFalse = isFalse("no");
-   EXPECT_TRUE(bFalse) << "'no' should be false";
+   EXPECT_FALSE(bFalse);
+   bFalse = isFalse("1");
+   EXPECT_FALSE(bFalse);
 }
 
 
@@ -135,6 +145,36 @@ TEST(commonGlobals, parse8601)
 
    secs = parse8601("P3Y1M1DT1H1M11S");
    EXPECT_EQ(threeYearsOneMonthOneDayOneHourOneMinuteAndElevenSeconds, secs) << "parse error for 'P3Y1M1DT1H1M11S'";
+
+   //
+   // Errors
+   //
+   secs = parse8601("");
+   EXPECT_EQ(-1, secs);
+
+   secs = parse8601("Q1");
+   EXPECT_EQ(-1, secs);
+
+   secs = parse8601("P");
+   EXPECT_EQ(-1, secs);
+
+   secs = parse8601("Px");
+   EXPECT_EQ(-1, secs);
+
+   secs = parse8601("P4");
+   EXPECT_EQ(-1, secs);
+
+   secs = parse8601("P4Y1");
+   EXPECT_EQ(-1, secs);
+
+   secs = parse8601("PT4Y");
+   EXPECT_EQ(-1, secs);
+
+   secs = parse8601("PT99Y");
+   EXPECT_EQ(-1, secs);
+
+   secs = parse8601("PY99");
+   EXPECT_EQ(-1, secs);
 }
 
 
@@ -146,6 +186,7 @@ TEST(commonGlobals, parse8601)
 TEST(commonGlobals, toSeconds)
 {
   int secs;
+  long long longsecs;
 
   // 3 years
   secs = toSeconds(3, 'Y', true);
@@ -182,4 +223,30 @@ TEST(commonGlobals, toSeconds)
   // error
   secs = toSeconds(3, 'f', false);
   EXPECT_EQ(-1, secs);
+
+  longsecs = toSeconds(30, 'Y', true);
+  EXPECT_EQ(946080000, longsecs);
+
+  longsecs = toSeconds(300, 'Y', true);
+  EXPECT_EQ(9460800000L, longsecs);
+}
+
+
+/* ****************************************************************************
+*
+* getCurrentTime - 
+*/
+TEST(commonGlobals, getCurrentTime)
+{
+  int now;
+
+  // 1. No timer
+  setTimer(NULL);
+  now = getCurrentTime();
+  EXPECT_EQ(-1, now);
+
+  utInit();  // timer is set up inside utInit
+  now = getCurrentTime();
+  EXPECT_TRUE(now != -1);
+  utExit();
 }

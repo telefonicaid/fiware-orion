@@ -30,60 +30,226 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/wsStrip.h"
+#include "common/string.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/EntityId.h"
+#include "parse/CompoundValueNode.h"
+#include "parse/compoundValue.h"
+#include "rest/ConnectionInfo.h"
 #include "xmlParse/XmlNode.h"
 #include "xmlParse/xmlParse.h"
+
+
+/* ****************************************************************************
+*
+* compoundValueRootV - 
+*
+* The vector 'compoundValueRootV' contains a list of all the paths where we allow
+* a compound value
+*/
+static const char* compoundValueRootV[] =
+{
+  "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue",
+  "/appendContextElementRequest/contextAttributeList/contextAttribute/contextValue"
+};
 
 
 
 /* ****************************************************************************
 *
-* xmlParse - 
+* isCompoundValuePath - 
+*
+* This function examines a path to see whether we are inside a compound value or not.
+*
+* If the path doesn't belong to any compond, FALSE is returned, else TRUE.
 */
-void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std::string fatherPath, XmlNode* parseVector, ParseData* reqDataP)
+static bool isCompoundValuePath(const char* path)
 {
-  if (node == NULL)
-    return;
+  unsigned int len;
 
-  if (node->name() == NULL)
-    return;
+  for (unsigned int ix = 0; ix < sizeof(compoundValueRootV) / sizeof(compoundValueRootV[0]); ++ix)
+  {
+    len = strlen(compoundValueRootV[ix]);
 
-  if (node->name()[0] == 0)
-    return;
+    if (strlen(path) < len)
+      continue;
 
-  std::string path = fatherPath + "/" + node->name();
+    if (strncmp(compoundValueRootV[ix], path, len) == 0)
+      return true;
+  }
+
+  return false;
+}
 
 
-  //
-  // Lookup node in the node vector
-  //
-  bool treated = false;
+
+/* ****************************************************************************
+*
+* treat - 
+*
+* This is the function that actually treats a node, bu calling its treat function
+* provided by src/lib/xmlRequest - the entry point of XML parsing.
+*
+* It simple compares the current path with the paths in the incoming vector 'parseVector'
+* and if a hit is found calls the 'treat' function of that hit (the instance of the vector).
+*
+* If no hit is found it means that the path of the current XML node is unknown.
+* This will result in either a 'PARSE ERROR' or thatthe node is part of a Compound.
+*/
+static bool treat(xml_node<>* node, const std::string& path, XmlNode* parseVector, ParseData* parseDataP)
+{
   for (unsigned int ix = 0; parseVector[ix].path != "LAST"; ++ix)
   {
     if (path == parseVector[ix].path)
     {
       int r;
 
-      if ((r = parseVector[ix].treat(node, reqDataP)) != 0)
-      {
-        fprintf(stderr, "parse vector treat function error: %d\n", r);
+      if ((r = parseVector[ix].treat(node, parseDataP)) != 0)
         LM_E(("parse vector treat function error: %d", r));
-      }
 
-      treated = true;
-      break;
+      return true; // Node has been treated
     }
   }
 
-  if (treated == false)
-    LM_W(("Warning: node '%s' not treated (%s)", path.c_str(), node->name()));
+  return false; // Node was not found in the parse vector
+}
+
+
+
+/* ****************************************************************************
+*
+* eatCompound - consume the compound tree
+*
+* Three types of tree nodes here (4 actually);
+*   - toplevel node
+*   - string
+*   - object node
+*   - vector node
+*/
+void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_node<>* node, const std::string& indent)
+{
+  if (containerP == NULL) // toplevel)
+  {
+    std::string xmlAttribute = xmlTypeAttributeGet(node);
+    
+    if (xmlAttribute == "vector")
+      containerP = new CompoundValueNode(orion::CompoundValueNode::Vector);
+    else if (xmlAttribute =="")
+      containerP = new CompoundValueNode(orion::CompoundValueNode::Object);
+    else
+    {
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer = std::string("Bad value for XML attribute 'type' for '") + node->name() + "': '" + xmlAttribute + "'";
+      LM_W(("ERROR: '%s'", ciP->answer.c_str()));
+      return;
+    }
+    ciP->compoundValueRoot = containerP;
+  }
+  else
+  {
+    std::string value = wsStrip(node->value());
+    std::string name  = wsStrip(node->name());
+
+    if (value == "")  // Object OR Vector
+    {
+      std::string xmlAttribute = xmlTypeAttributeGet(node);
+    
+      if (xmlAttribute == "vector")
+        containerP = containerP->add(orion::CompoundValueNode::Vector, name);
+      else if (xmlAttribute == "")
+        containerP = containerP->add(orion::CompoundValueNode::Object, name);
+      else
+      {
+        ciP->httpStatusCode = SccBadRequest;
+        ciP->answer = std::string("Bad value for XML attribute 'type' for '") + name + "': '" + xmlAttribute + "'";
+        LM_W(("ERROR: '%s'", ciP->answer.c_str()));
+        return;
+      }
+    }
+    else // String
+      containerP->add(orion::CompoundValueNode::String, name, value);
+  }
 
   xml_node<>* child = node->first_node();
-
   while (child != NULL)
   {
-    xmlParse(node, child, indentation + "  ", path, parseVector, reqDataP);
+    if (child->name()[0] != 0)
+      eatCompound(ciP, containerP, child, indent + "  ");
+    child = child->next_sibling();
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* xmlParse - 
+*
+* This function is called once (actually it is not that simple) for each node in
+* the tree that the XML parser has built for us.
+* 
+*
+* In the node '<contextValue>', isCompoundValuePath returns TRUE.
+* Under "<contextValue>", we have either a simple string or a Compound Value Tree.
+* In the case of a "simple string" the value of the current node is NON EMPTY,
+* and as the node is treated already in the previous call to 'treat()', no further action is needed.
+*
+* If a node is NOT TREATED and it is NOT a compound, a parse error is issued
+*/
+void xmlParse
+(
+   ConnectionInfo*     ciP,
+   xml_node<>*         father,
+   xml_node<>*         node,
+   const std::string&  indentation,
+   const std::string&  fatherPath,
+   XmlNode*            parseVector,
+   ParseData*          parseDataP
+)
+{
+  std::string  value            = wsStrip(node->value());
+  std::string  name             = wsStrip(node->name());
+  std::string  path             = fatherPath + "/" + name;
+  bool         treated          = treat(node, path, parseVector, parseDataP);
+
+  if (isCompoundValuePath(path.c_str()) && (value == "") && (node->first_node() != NULL))
+  {
+    //
+    // Count children (to avoid false compounds because of just en empty sttribute value)
+    // 
+    xml_node<>* child    = node->first_node();
+    int         children = 0;
+    while (child != NULL)
+    {
+      if (child->name()[0] != 0)
+        ++children;
+      child = child->next_sibling();
+    }
+    
+    if (children == 0) // NOT a compound value
+      return;
+
+    eatCompound(ciP, NULL, node, "");
+    compoundValueEnd(ciP, parseDataP);
+    return;
+  }
+  else  if (treated == false)
+  {
+    ciP->httpStatusCode = SccBadRequest;
+    if (ciP->answer == "")
+      ciP->answer = std::string("Unknown XML field: '") + name.c_str() + "'";
+    LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), fatherPath.c_str()));
+    return;
+  }
+
+  // Recursive calls for all children of this node
+  xml_node<>* child = node->first_node();
+  while (child != NULL)
+  {
+    if ((child != NULL) && (child->name() != NULL) && (onlyWs(child->name()) == false))
+      xmlParse(ciP, node, child, indentation + "  ", path, parseVector, parseDataP);
+
     child = child->next_sibling();
   }
 }
@@ -93,8 +259,15 @@ void xmlParse(xml_node<>* father, xml_node<>* node, std::string indentation, std
 /* ****************************************************************************
 *
 * xmlNullTreat - 
+*
+* Some of the nodes in the XML tree are known but no action needs to ne taken.
+* Especially the start of a container.
+*
+* We need this to distinguish between XML nodes that are 'ok but no treatment needed' and
+* XML nodes that are just 'not recognized' and should give a parse error (or they belong
+* to a Compound).
 */
-int nullTreat(xml_node<>* node, ParseData* reqDataP)
+int nullTreat(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtNullNode, ("Not treating node '%s'", node->name()));
   return 0;
@@ -104,7 +277,9 @@ int nullTreat(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* entityIdParse - 
+* entityIdParse - help routine for the XML node entityId
+*
+* Created mainly to not copy the XML attribute lookup stuff
 */
 std::string entityIdParse(RequestType requestType, xml_node<>* node, EntityId* entityIdP)
 {
@@ -125,4 +300,52 @@ std::string entityIdParse(RequestType requestType, xml_node<>* node, EntityId* e
   }
 
   return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* xmlTypeAttributeGet - 
+*
+* This function looks for the presence of the XML attribute 'type'.
+* This attribute is used in Compound Values to indicate that a container is
+* a vector and not a structure.
+* Vectors don't exist in XML, all containers are considered 'objects', but as
+* vectors exist in JSON and we support both formats we need a way to have vectors
+* in XML.
+* The way we have chosen is to use an XML attribute with the name 'type' and its
+* only allowed values is "vector".
+*
+* This function returns:
+* - "vector"       if 'type="vector"' found as an XML attribute
+* - ""             if no XML attribute at all is found
+* - error string   in all other cases.
+*
+* The following XML attribute is considered an error:
+* - type="object"
+* - vector="yes"
+* - etc, etc.
+*/
+std::string xmlTypeAttributeGet(xml_node<>* node)
+{
+  std::string type = "";   // Value of the XML attribute 'vector' - initialized to the empty string
+
+  // Loop over all XML attrributes of the node
+  for (xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute())
+  {
+    // We only accept 'type' as valid XML attribute - any other name of attribute is considered an error
+    if (attr->name() == std::string("type"))
+    {
+       if (type != "") // set already? 
+         return "more than one 'type' attribute";
+
+       type = attr->value(); // save the value of the attribute 'type'
+    }
+    else  // XML attribute whose name != 'type': ERROR
+      return std::string("unknown attribute '") + attr->name() + "'";
+  }
+
+  // Returning the value of the XML attribute 'type' (or the emnpty string, if not found)
+  return type;
 }

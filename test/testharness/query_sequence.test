@@ -18,46 +18,15 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 Query SEQ
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
-if [ "$VALGRIND" == "" ]; then
-  $CB_START_CMD
-  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-  sleep 1
-else
-  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
-  # Waiting for valgrind to start (sleep 10)
-  sleep 10s
-fi
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
+dbInit CB
+brokerStart CB
 
 --SHELL--
 
@@ -92,32 +61,37 @@ echo "1: ++++++++++++++++++++"
 EOF
 echo "2: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
-  <registerContextRequest>
-    <contextRegistrationList>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Room" isPattern="false">
-            <id>ConferenceRoom</id>
-          </entityId>
-          <entityId type="Room" isPattern="false">
-            <id>OfficeRoom</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:1028/application</providingApplication>
-      </contextRegistration>
-    </contextRegistrationList>
-    <duration>PT1H</duration>
-    <registrationId></registrationId>
-  </registerContextRequest>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue>12</contextValue>
+          </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue>14</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>
 EOF
 echo "3: ++++++++++++++++++++"
 
@@ -272,21 +246,21 @@ echo "12: ++++++++++++++++++++"
 <?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p2300</contextValue>
-                </contextAttribute>
-            <contextAttribute>
+          <type>clima</type>
+          <contextValue>p2300</contextValue>
+        </contextAttribute>
+        <contextAttribute>
           <name>lightstatus</name>
-                  <type>light</type>
-                  <contextValue>L23</contextValue>
-                </contextAttribute>
+          <type>light</type>
+          <contextValue>L23</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
@@ -315,21 +289,21 @@ echo "14: ++++++++++++++++++++"
   <contextElementList>
         <contextElement>
           <entityId type="Room" isPattern="false">
-                <id>ConferenceRoom</id>
+            <id>ConferenceRoom</id>
           </entityId>
           <contextAttributeList>
             <contextAttribute>
-          <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p23</contextValue>
-                </contextAttribute>
+              <name>pressure</name>
+              <type>clima</type>
+              <contextValue>p23</contextValue>
+            </contextAttribute>
             <contextAttribute>
-          <name>lightstatus</name>
-                  <type>light</type>
-                  <contextValue>L23</contextValue>
-                </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
+              <name>lightstatus</name>
+              <type>light</type>
+              <contextValue>L23</contextValue>
+            </contextAttribute>
+          </contextAttributeList>
+        </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>
@@ -371,32 +345,37 @@ echo "16: ++++++++++++++++++++"
 EOF
 echo "17: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
-  <registerContextRequest>
-    <contextRegistrationList>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Room" isPattern="false">
-            <id>ConferenceRoom2</id>
-          </entityId>
+<updateContextRequest>
+  <contextElementList>
+        <contextElement>
           <entityId type="Room" isPattern="false">
             <id>OfficeRoom2</id>
           </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:1028/application</providingApplication>
-      </contextRegistration>
-    </contextRegistrationList>
-    <duration>PT1H</duration>
-    <registrationId></registrationId>
-  </registerContextRequest>
+          <contextAttributeList>
+            <contextAttribute>
+              <name>temperature</name>
+              <type>degree</type>
+              <contextValue>12</contextValue>
+            </contextAttribute>
+          </contextAttributeList>
+        </contextElement>
+        <contextElement>
+          <entityId type="Room" isPattern="false">
+            <id>ConferenceRoom2</id>
+          </entityId>
+          <contextAttributeList>
+            <contextAttribute>
+              <name>temperature</name>
+              <type>degree</type>
+              <contextValue>14</contextValue>
+            </contextAttribute>
+          </contextAttributeList>
+        </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>
 EOF
 echo "18: ++++++++++++++++++++"
 
@@ -435,7 +414,7 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 1: ++++++++++++++++++++
@@ -443,61 +422,163 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 2: ++++++++++++++++++++
 <?xml version="1.0"?>
-<registerContextResponse>
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
 3: ++++++++++++++++++++
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 4: ++++++++++++++++++++
 <?xml version="1.0"?>
 <queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
-  </errorCode>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>12</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
 </queryContextResponse>
 5: ++++++++++++++++++++
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 6: ++++++++++++++++++++
 <?xml version="1.0"?>
 <queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
-  </errorCode>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>14</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
 </queryContextResponse>
 7: ++++++++++++++++++++
 <?xml version="1.0"?>
 <queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
-  </errorCode>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>14</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>12</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
 </queryContextResponse>
 8: ++++++++++++++++++++
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 9: ++++++++++++++++++++
@@ -505,7 +586,7 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 10: ++++++++++++++++++++
@@ -513,16 +594,32 @@ EOF
 <queryContextResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 11: ++++++++++++++++++++
 <?xml version="1.0"?>
 <queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
-  </errorCode>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>12</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
 </queryContextResponse>
 12: ++++++++++++++++++++
 <?xml version="1.0"?>
@@ -563,6 +660,11 @@ EOF
           <id>OfficeRoom</id>
         </entityId>
         <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>12</contextValue>
+          </contextAttribute>
           <contextAttribute>
             <name>pressure</name>
             <type>clima</type>
@@ -622,6 +724,11 @@ EOF
         </entityId>
         <contextAttributeList>
           <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>14</contextValue>
+          </contextAttribute>
+          <contextAttribute>
             <name>pressure</name>
             <type>clima</type>
             <contextValue>p23</contextValue>
@@ -645,6 +752,11 @@ EOF
         </entityId>
         <contextAttributeList>
           <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>12</contextValue>
+          </contextAttribute>
+          <contextAttribute>
             <name>pressure</name>
             <type>clima</type>
             <contextValue>p2300</contextValue>
@@ -666,24 +778,110 @@ EOF
 16: ++++++++++++++++++++
 <?xml version="1.0"?>
 <queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
-  </errorCode>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>12</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
 </queryContextResponse>
 17: ++++++++++++++++++++
 <?xml version="1.0"?>
-<registerContextResponse>   
-  <duration>PT1H</duration>
-  <registrationId>REGEX([0-9a-f]{24})</registrationId>
-</registerContextResponse>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom2</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom2</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
 18: ++++++++++++++++++++
 <?xml version="1.0"?>
 <queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context elements found</reasonPhrase>
-  </errorCode>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>14</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom2</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>14</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
 </queryContextResponse>
 19: ++++++++++++++++++++
 <?xml version="1.0"?>
@@ -695,6 +893,11 @@ EOF
           <id>ConferenceRoom</id>
         </entityId>
         <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>14</contextValue>
+          </contextAttribute>
           <contextAttribute>
             <name>pressure</name>
             <type>clima</type>
@@ -712,14 +915,26 @@ EOF
         <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom2</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>14</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
   </contextResponseList>
 </queryContextResponse>
 --TEARDOWN--
-if [ "$VALGRIND" == "" ]; then
-  kill $(cat ${BROKER_PID_FILE})
-  rm /tmp/orion_${BROKER_PORT}.pid
-else
-  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
-  # Waiting for valgrind to terminate (sleep 10)
-  sleep 10
-fi
+source harnessFunctions.sh
+brokerStop CB

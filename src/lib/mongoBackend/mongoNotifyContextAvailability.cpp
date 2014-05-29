@@ -23,22 +23,21 @@
 * Author: Fermín Galán
 */
 
-#include "mongoNotifyContextAvailability.h"
+#include "common/sem.h"
 
+#include "mongoBackend/mongoNotifyContextAvailability.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonRegister.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
-#include "common/sem.h"
 
 /* ****************************************************************************
 *
 * mongoNofityContextAvailability -
 */
-HttpStatusCode mongoNotifyContextAvailability(NotifyContextAvailabilityRequest* requestP, NotifyContextAvailabilityResponse* responseP) {
+HttpStatusCode mongoNotifyContextAvailability(NotifyContextAvailabilityRequest* requestP, NotifyContextAvailabilityResponse* responseP, const std::string& tenant) {
 
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
+    reqSemTake(__FUNCTION__, "mongo ngsi9 notification");
 
     /* We ignore "subscriptionId" and "originator" in the request, as we don't have anything interesting
      * to do with them */
@@ -58,10 +57,10 @@ HttpStatusCode mongoNotifyContextAvailability(NotifyContextAvailabilityRequest* 
      * point of view, notifyContextAvailability is considered as a new registration (as no registratinId is
      * received in the notification message) */
     RegisterContextResponse rcres;
-    processRegisterContext(&rcr, &rcres, NULL);
+    processRegisterContext(&rcr, &rcres, NULL, tenant);
 
-    responseP->responseCode.fill(SccOk, "OK");
+    responseP->responseCode.fill(SccOk);
 
-    LM_SR(SccOk);
+    reqSemGive(__FUNCTION__, "mongo ngsi9 notification");
+    return SccOk;
 }
-

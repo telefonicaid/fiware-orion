@@ -1,0 +1,10 @@
+{
+  "attributeDomainName" : "ADN",
+  "attributes" : [
+    {
+      "name" : "caName",
+      "type" : "caType",
+      "value" : "121"
+    }
+  ]
+}

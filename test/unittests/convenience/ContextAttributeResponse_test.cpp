@@ -30,58 +30,134 @@
 #include "common/Format.h"
 #include "convenience/ContextAttributeResponse.h"
 
+#include "unittest.h"
+
 
 
 /* ****************************************************************************
 *
-* render - 
+* render_xml - 
 */
-TEST(ContextAttributeResponse, render)
+TEST(ContextAttributeResponse, render_xml)
 {
   ContextAttribute          ca("caName", "caType", "caValue");
   ContextAttributeResponse  car;
   std::string               out;
 
-  car.contextAttributeVector.push_back(&ca);
-  car.statusCode.fill(SccOk, "OK"); 
+  utInit();
 
-  out = car.render(XML, "");
+  car.contextAttributeVector.push_back(&ca);
+  car.statusCode.fill(SccOk);
+
+  out = car.render(ContextEntityAttributes, XML, "");
+
+  utExit();
 }
 
 
 
 /* ****************************************************************************
 *
-* check - 
+* render_json - 
 */
-TEST(ContextAttributeResponse, check)
+TEST(ContextAttributeResponse, render_json)
 {
   ContextAttribute          ca("caName", "caType", "caValue");
   ContextAttributeResponse  car;
   std::string               out;
-  std::string               expected1 = "OK";
-  std::string               expected2 = "<contextAttributeResponse>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>PRE Error</reasonPhrase>\n  </statusCode>\n</contextAttributeResponse>\n";
-  std::string               expected3 = "<contextAttributeResponse>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>missing attribute name</reasonPhrase>\n  </statusCode>\n</contextAttributeResponse>\n";
 
-  // 1. OK
+  utInit();
+
   car.contextAttributeVector.push_back(&ca);
   car.statusCode.fill(SccOk, "OK"); 
 
+  out = car.render(ContextEntityAttributes, JSON, "");
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* check_xml - 
+*/
+TEST(ContextAttributeResponse, check_xml)
+{
+  ContextAttribute          ca("caName", "caType", "caValue");
+  ContextAttributeResponse  car;
+  std::string               out;
+  const char*               outfile1 = "ngsi10.contextAttributeResponse.check3.valid.xml";
+  const char*               outfile2 = "ngsi10.contextAttributeResponse.check4.valid.xml";
+
+  utInit();
+
+  // 1. OK
+  car.contextAttributeVector.push_back(&ca);
+  car.statusCode.fill(SccOk); 
+
   out = car.check(UpdateContextAttribute, XML, "", "", 0);
-  EXPECT_STREQ(expected1.c_str(), out.c_str());
+  EXPECT_STREQ("OK", out.c_str());
 
 
   // 2. predetectedError
   out = car.check(UpdateContextAttribute, XML, "", "PRE Error", 0);
-  EXPECT_STREQ(expected2.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   // 3. Bad ContextAttribute
   ContextAttribute          ca2("", "caType", "caValue");
   car.contextAttributeVector.push_back(&ca2);
   
+  LM_M(("car.contextAttributeVector.size: %d - calling ContextAttributeResponse::check", car.contextAttributeVector.size()));
   out = car.check(UpdateContextAttribute, XML, "", "", 0);
-  EXPECT_STREQ(expected3.c_str(), out.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* check_json - 
+*/
+TEST(ContextAttributeResponse, check_json)
+{
+  ContextAttribute          ca("caName", "caType", "caValue");
+  ContextAttributeResponse  car;
+  std::string               out;
+  const char*               outfile1 = "ngsi10.contextAttributeResponse.check3.valid.json";
+  const char*               outfile2 = "ngsi10.contextAttributeResponse.check4.valid.json";
+
+  utInit();
+
+  // 1. OK
+  car.contextAttributeVector.push_back(&ca);
+  car.statusCode.fill(SccOk, "OK"); 
+
+  out = car.check(UpdateContextAttribute, JSON, "", "", 0);
+  EXPECT_STREQ("OK", out.c_str());
+
+
+  // 2. predetectedError
+  out = car.check(UpdateContextAttribute, JSON, "", "PRE Error", 0);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+
+  // 3. Bad ContextAttribute
+  ContextAttribute          ca2("", "caType", "caValue");
+  car.contextAttributeVector.push_back(&ca2);
+  
+  LM_M(("car.contextAttributeVector.size: %d - calling ContextAttributeResponse::check", car.contextAttributeVector.size()));
+  out = car.check(UpdateContextAttribute, JSON, "", "", 0);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -95,10 +171,14 @@ TEST(ContextAttributeResponse, present)
   ContextAttribute          ca("caName", "caType", "caValue");
   ContextAttributeResponse  car;
 
+  utInit();
+
   car.contextAttributeVector.push_back(&ca);
-  car.statusCode.fill(SccOk, "OK");
+  car.statusCode.fill(SccOk);
 
   car.present("");
+
+  utExit();
 }
 
 
@@ -112,8 +192,12 @@ TEST(ContextAttributeResponse, release)
   ContextAttribute*         caP = new ContextAttribute("caName", "caType", "caValue");
   ContextAttributeResponse  car;
 
+  utInit();
+
   car.contextAttributeVector.push_back(caP);
-  car.statusCode.fill(SccOk, "OK");
+  car.statusCode.fill(SccOk);
 
   car.release();
+
+  utExit();
 }

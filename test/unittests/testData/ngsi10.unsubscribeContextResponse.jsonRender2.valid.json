@@ -1,0 +1,7 @@
+{
+  "subscriptionId" : "012345678901234567890123",
+  "statusCode" : {
+    "code" : "200",
+    "reasonPhrase" : "OK"
+  }
+}

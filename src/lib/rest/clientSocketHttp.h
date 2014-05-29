@@ -30,29 +30,33 @@
 
 #include "ConnectionInfo.h"
 
-
-#define  TAM_BUF        8192
-
+#define TAM_BUF          (8 * 1024)            // 8 KB  (for HTTP responses and pre-payload bytes in request, which will be very small)
+#define MAX_STA_MSG_SIZE (20 * 1024)           // 20 KB (HTTP request static buffer)
+#define MAX_DYN_MSG_SIZE (8 * 1024 * 1024)     // 8 MB  (maximum length of the HTTP request dynamic buffer)
 
 /***************************************************************************
 *
-* socketHttpConnect - 
+* socketHttpConnect -
 */
-extern int socketHttpConnect(std::string host, unsigned short port);
-
+extern int socketHttpConnect(const std::string& host, unsigned short port);
 
 
 /* ****************************************************************************
 *
 * sendHttpSocket - 
 */
-extern std::string sendHttpSocket( std::string ip,
-                                   unsigned short port, 
-                                   std::string verb,
-                                   std::string resource, 
-                                   std::string content_type, 
-                                   std::string content,
-                                   bool waitForResponse = true
-                                   );
+extern std::string sendHttpSocket
+(
+  const std::string&     ip,
+  unsigned short         port, 
+  const std::string&     protocol,
+  const std::string&     verb,
+  const std::string&     tenant,
+  const std::string&     resource, 
+  const std::string&     content_type, 
+  const std::string&     content,
+  bool                   useRush,
+  bool                   waitForResponse = true
+);
 
 #endif

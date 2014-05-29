@@ -30,7 +30,7 @@
 #include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
 
 
@@ -41,15 +41,17 @@
 */
 UpdateContextAvailabilitySubscriptionResponse::UpdateContextAvailabilitySubscriptionResponse()
 {
+  errorCode.tagSet("errorCode");
 }
 
 /* ****************************************************************************
 *
 * UpdateContextAvailabilitySubscriptionResponse::UpdateContextAvailabilitySubscriptionResponse - 
 */
-UpdateContextAvailabilitySubscriptionResponse::UpdateContextAvailabilitySubscriptionResponse(ErrorCode& _errorCode)
+UpdateContextAvailabilitySubscriptionResponse::UpdateContextAvailabilitySubscriptionResponse(StatusCode& _errorCode)
 {
-   errorCode = _errorCode;
+  errorCode.fill(&_errorCode);
+  errorCode.tagSet("errorCode");
 }
 
 /* ****************************************************************************
@@ -71,17 +73,17 @@ UpdateContextAvailabilitySubscriptionResponse::~UpdateContextAvailabilitySubscri
 *
 * UpdateContextAvailabilitySubscriptionResponse::render - 
 */
-std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType requestType, Format format, std::string indent, int counter)
+std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType requestType, Format format, const std::string& indent, int counter)
 {
   std::string  out                = "";
   std::string  tag                = "updateContextAvailabilitySubscriptionResponse";
   bool         durationRendered   = !duration.isEmpty();
-  bool         errorCodeRendered  = (errorCode.code != NO_ERROR_CODE);
+  bool         errorCodeRendered  = (errorCode.code != SccNone);
 
   out += startTag(indent, tag, format, false);
 
-  out += subscriptionId.render(format, indent + "  ", durationRendered || errorCodeRendered);
-  out += duration.render(format, indent + "  ", errorCodeRendered);
+  out += subscriptionId.render(RtUpdateContextAvailabilitySubscriptionResponse, format, indent + "  ", errorCodeRendered || durationRendered);
+  out += duration.render(format,       indent + "  ", errorCodeRendered);
 
   if (errorCodeRendered)
      out += errorCode.render(format, indent + "  ", false);
@@ -95,20 +97,18 @@ std::string UpdateContextAvailabilitySubscriptionResponse::render(RequestType re
 *
 * UpdateContextAvailabilitySubscriptionResponse::check - 
 */
-std::string UpdateContextAvailabilitySubscriptionResponse::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string UpdateContextAvailabilitySubscriptionResponse::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string  res;
 
   if (predetectedError != "")
   {
-    errorCode.code         = SccBadRequest;
-    errorCode.reasonPhrase = predetectedError;
+    errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (((res = subscriptionId.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter)) != "OK") ||
            ((res = duration.check(UpdateContextAvailabilitySubscription, format, indent, predetectedError, counter))       != "OK"))
   {
-    errorCode.code         = SccBadRequest;
-    errorCode.reasonPhrase = res;
+    errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";

@@ -18,52 +18,22 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 XML Parse ContextEntityAttributes
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source ../harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
-if [ "$VALGRIND" == "" ]; then
-  $CB_START_CMD
-  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-  sleep 1
-else
-  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
-  # Waiting for valgrind to start (sleep 10)
-  sleep 10s
-fi
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
+dbInit CB
+brokerStart CB
 
 --SHELL--
+source ../harnessFunctions.sh
 echo "1: ++++++++++++++++++++"
 # Make a registration using conv op /NGSI9/contextEntities/ENTITY_ID/attributes
-OUT=$((curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI9/contextEntities/ENTITY_ID/attributes"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
     <contextMetadata>
@@ -79,29 +49,29 @@ OUT=$((curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes 
   </metadata>
   <duration>PT1H</duration>
   <providingApplication>http://kz.tid.es/abc</providingApplication>
-</registerProviderRequest>
-EOF)
-REG_ID=$(echo "$OUT" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$OUT"
+</registerProviderRequest>'
+curlXml ${url} "${payload}"
 
+REG_ID=$(echo "$response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
 # Make a discovery to see that the registration went OK
 echo "2: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
       <entityId type="" isPattern="true">
         <id>ENTITY_ID</id>
       </entityId>
     </entityIdList>
-  </discoverContextAvailabilityRequest>
-EOF
+  </discoverContextAvailabilityRequest>'
+curlXml ${url} "${payload}"
 
 # Modify the first registration
 echo "3: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format -) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+
+url="/NGSI9/contextEntities/ENTITY_ID/attributes"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
     <contextMetadata>
@@ -117,38 +87,41 @@ echo "3: ++++++++++++++++++++"
   </metadata>
   <duration>PT2H</duration>
   <providingApplication>http://kz.tid.es/abc2</providingApplication>
-  <registrationId>$REG_ID</registrationId>
-</registerProviderRequest>
-EOF
+  <registrationId>'$REG_ID'</registrationId>
+</registerProviderRequest>'
+curlXml ${url} "${payload}"
+
 echo "4: ++++++++++++++++++++"
 
 # Now discover that very registration again to see the change
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
       <entityId type="" isPattern="true">
         <id>ENTITY_ID</id>
       </entityId>
     </entityIdList>
-  </discoverContextAvailabilityRequest>
-EOF
+  </discoverContextAvailabilityRequest>'
+curlXml ${url} "${payload}"
+
 echo "5: ++++++++++++++++++++"
 
 # Now try the GET method
-curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes -s -S | xmllint --format -
+curlXmlNoPayload "/NGSI9/contextEntities/ENTITY_ID/attributes"
+
 echo "6: ++++++++++++++++++++"
 
 # And a GET that fails
-curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID2/attributes -s -S | xmllint --format -
+curlXmlNoPayload "/NGSI9/contextEntities/ENTITY_ID2/attributes"
 echo "7: ++++++++++++++++++++"
 
 # DELETE and PUT should give errors
-curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes -s -S -X DELETE --include
-echo "8: ++++++++++++++++++++"
+curlXmlNoPayload "/NGSI9/contextEntities/ENTITY_ID/attributes" "-X DELETE"
 
-(curl localhost:${BROKER_PORT}/NGSI9/contextEntities/ENTITY_ID/attributes -s -S -X PUT --include --header 'Content-Type: application/xml' -d @-) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "8: ++++++++++++++++++++"
+url="/NGSI9/contextEntities/ENTITY_ID/attributes"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
     <contextMetadata>
@@ -164,18 +137,29 @@ echo "8: ++++++++++++++++++++"
   </metadata>
   <duration>PT2H</duration>
   <providingApplication>http://kz.tid.es/abc2</providingApplication>
-</registerProviderRequest>
-EOF
+</registerProviderRequest>'
+curlXml ${url} "${payload}" "-X PUT"
+
 echo "9: ++++++++++++++++++++"
 
 --REGEXPECT--
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 497
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -192,12 +176,22 @@ echo "9: ++++++++++++++++++++"
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT2H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 498
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -214,6 +208,11 @@ echo "9: ++++++++++++++++++++"
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 498
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -230,11 +229,16 @@ echo "9: ++++++++++++++++++++"
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 185
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <errorCode>
     <code>404</code>
-    <reasonPhrase>No context element registrations found</reasonPhrase>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </discoverContextAvailabilityResponse>
 7: ++++++++++++++++++++
@@ -251,11 +255,5 @@ Date: REGEX(.*)
 
 9: ++++++++++++++++++++
 --TEARDOWN--
-if [ "$VALGRIND" == "" ]; then
-  kill $(cat ${BROKER_PID_FILE})
-  rm /tmp/orion_${BROKER_PORT}.pid
-else
-  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
-  # Waiting for valgrind to terminate (sleep 10)
-  sleep 10
-fi
+source ../harnessFunctions.sh
+brokerStop CB

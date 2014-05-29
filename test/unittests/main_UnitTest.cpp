@@ -40,7 +40,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "ngsiNotify/Notifier.h"
 
-#include "testInit.h"
+#include "unittest.h"
 
 
 
@@ -63,6 +63,21 @@ bool  harakiri          = true;
 int   logFd             = -1;
 int   fwdPort           = -1;
 char  fwdHost[64];
+
+
+
+/* ****************************************************************************
+*
+* exitFunction - 
+*/
+void exitFunction(int code, const std::string& reason)
+{
+  LM_E(("Orion library asks to exit %d: '%s', but no exit is allowed inside unit tests", code, reason.c_str()));
+}
+
+
+const char* orionUnitTestVersion = "0.0.1-unittest";
+
 
 
 /* ****************************************************************************
@@ -90,21 +105,10 @@ int main(int argC, char** argV)
     paParse(paArgs, 1, argV, 1, false);
 
   LM_M(("Init tests"));
+  orionInit(exitFunction, orionUnitTestVersion);
   setupDatabase();
-
-  /* Initialize the semaphore used by mongoBackend */
-  if (semInit() != 0)
-    LM_X(1, ("Error initializing semaphore: %s\n", strerror(errno)));
-
-  /* Set timer object (singleton) */
-  setTimer(new Timer());
-
-  /* Set notifier object (singleton) */
-  setNotifier(new Notifier());
 
   LM_M(("Run all tests"));
   ::testing::InitGoogleMock(&argC, argV);
   return RUN_ALL_TESTS();
 }
-
-

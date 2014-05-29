@@ -33,6 +33,7 @@
 #include "mongoBackend/mongoDiscoverContextAvailability.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi/EntityId.h"
+#include "ngsi/Scope.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 
@@ -795,7 +796,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoEntity)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("No context element registrations found", res.errorCode.reasonPhrase);
+    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
     EXPECT_EQ(0,res.responseVector.size());
 
@@ -843,7 +844,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoAttribute)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("No context element registrations found", res.errorCode.reasonPhrase);
+    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
     EXPECT_EQ(0,res.responseVector.size());
 
@@ -1597,7 +1598,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternFail)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("No context element registrations found", res.errorCode.reasonPhrase);
+    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.errorCode.details.size());
     EXPECT_EQ(0,res.responseVector.size());
 
@@ -1849,7 +1850,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, sourceAssociations)
   EntityId en("E2", "T2");
   req.entityIdVector.push_back(&en);
   req.attributeList.push_back("A1");
-  Scope sc("Include Associations", "SOURCES");
+  Scope sc(SCOPE_TYPE_ASSOC, "SOURCES");
   req.restriction.scopeVector.push_back(&sc);
 
   /* Prepare mock */
@@ -1928,7 +1929,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, targetAssociations)
     EntityId en("E1", "T1");
     req.entityIdVector.push_back(&en);
     req.attributeList.push_back("A4");
-    Scope sc("Include Associations", "TARGETS");
+    Scope sc(SCOPE_TYPE_ASSOC, "TARGETS");
     req.restriction.scopeVector.push_back(&sc);
 
     /* Prepare mock */
@@ -2027,7 +2028,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
-    EXPECT_EQ("Database Error", res.errorCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.registrations "
               "- query(): { $or: [ { contextRegistration.entities: { $in: [ { id: \"E3\", type: \"T3\" }, { type: \"T3\", id: \"E3\" } ] } }, { contextRegistration.entities.id: { $in: {} } } ], expiration: { $gt: 1360232700 } } "
               "- exception: boom!!", res.errorCode.details);
@@ -2064,7 +2065,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDBQueryAssociationFail)
     EntityId en("E1", "T1");
     req.entityIdVector.push_back(&en);
     req.attributeList.push_back("A4");
-    Scope sc("Include Associations", "TARGETS");
+    Scope sc(SCOPE_TYPE_ASSOC, "TARGETS");
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -2073,10 +2074,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDBQueryAssociationFail)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
-    EXPECT_EQ("Database Error", res.errorCode.reasonPhrase);
-    EXPECT_EQ("collection: unittest.associations "
-              "- query(): { srcEnt: { $in: [ { id: \"E1\", type: \"T1\" } ] }, attrs.src: { $in: [ \"A4\" ] } } "
-              "- exception: boom!!", res.errorCode.details);
+    EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
+    EXPECT_EQ("Database error: collection: unittest.associations - query(): { srcEnt: { $in: [ { id: \"E1\", type: \"T1\" } ] }, attrs.src: { $in: [ \"A4\" ] } } - exception: boom!!", res.errorCode.details);
     EXPECT_EQ(0,res.responseVector.size());
 
     /* Release mock */

@@ -24,12 +24,14 @@
 #
 #####
 
+export CONTEXTBROKER_TESTENV_SOURCED=YES
+
 # BROKER_PORT - the port/socket where contextBroker will listen for connections
 if [ -z "${BROKER_PORT}" ]; then
     BROKER_PORT=9999
 fi
-if [ -z "${BROKER_PORT_AUX}" ]; then
-    BROKER_PORT_AUX=9998
+if [ -z "${BROKER2_PORT}" ]; then
+    BROKER2_PORT=9998
 fi
 
 if [ -z "${CM_PORT}" ]; then
@@ -40,6 +42,12 @@ fi
 if [ -z "${LISTENER_PORT}" ]; then
     LISTENER_PORT=9997
 fi
+
+# LISTENER2_PORT - the port/socket where listening application for some test cases involving more than one listerner instance
+if [ -z "${LISTENER2_PORT}" ]; then
+    LISTENER2_PORT=9977
+fi
+
 
 # MAXIMUM_WAIT - maximum time to wait in some processes during startup
 if [ -z "${MAXIMUM_WAIT}" ]; then
@@ -55,8 +63,8 @@ fi
 if [ -z "${BROKER_PID_FILE}" ]; then
     BROKER_PID_FILE=/tmp/orion_${BROKER_PORT}.pid
 fi
-if [ -z "${BROKER_PID_FILE_AUX}" ]; then
-    BROKER_PID_FILE_AUX=/tmp/orion_${BROKER_PORT_AUX}.pid
+if [ -z "${BROKER_PID2_FILE}" ]; then
+    BROKER_PID2_FILE=/tmp/orion_${BROKER2_PORT}.pid
 fi
 
 ## Database configuration for orion-broker
@@ -66,8 +74,8 @@ fi
 if [ -z "${BROKER_DATABASE_NAME}" ]; then
     BROKER_DATABASE_NAME=testharness
 fi
-if [ -z "${BROKER_DATABASE_AUX_NAME}" ]; then
-    BROKER_DATABASE_AUX_NAME=testharness2
+if [ -z "${BROKER_DATABASE2_NAME}" ]; then
+    BROKER_DATABASE2_NAME=testharness2
 fi
 if [ -z "${BROKER_DATABASE_USER}" ]; then
     BROKER_DATABASE_USER=orion
@@ -76,7 +84,7 @@ if [ -z "${BROKER_DATABASE_PASSWORD}" ]; then
     BROKER_DATABASE_PASSWORD=orion
 fi
 
-export BROKER_USER BROKER_PORT BROKER_PORT_AUX LISTENER_PORT BROKER_LOG_DIR BROKER_PID_FILE BROKER_PID_FILE_AUX BROKER_DATABASE_HOST BROKER_DATABASE_NAME BROKER_DATABASE_AUX_NAME BROKER_DATABASE_USER BROKER_DATABASE_PASSWORD CM_PORT
+export BROKER_USER BROKER_PORT BROKER2_PORT LISTENER_PORT LISTENER2_PORT BROKER_LOG_DIR BROKER_PID_FILE BROKER_PID2_FILE BROKER_DATABASE_HOST BROKER_DATABASE_NAME BROKER_DATABASE2_NAME BROKER_DATABASE_USER BROKER_DATABASE_PASSWORD CM_PORT MAXIMUM_WAIT
 
 #
 # The following two lines are commented because they destroy "git diff" in some cases

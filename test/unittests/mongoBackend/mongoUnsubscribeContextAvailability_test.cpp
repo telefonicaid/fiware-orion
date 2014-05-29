@@ -100,7 +100,7 @@ TEST(mongoUnsubscribeContextAvailability, subscriptionNotFound)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -117,7 +117,7 @@ TEST(mongoUnsubscribeContextAvailability, subscriptionNotFound)
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("51307b66f481db11bf869999", res.subscriptionId.get());
     EXPECT_EQ(SccContextElementNotFound, res.statusCode.code);
-    EXPECT_EQ("Subscription Not Found", res.statusCode.reasonPhrase);
+    EXPECT_EQ("No context element found", res.statusCode.reasonPhrase);
     EXPECT_EQ(0, res.statusCode.details.size());
 
     /* Check database (untouched) */
@@ -143,7 +143,7 @@ TEST(mongoUnsubscribeContextAvailability, unsubscribe)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -195,7 +195,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbFindOneFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -213,7 +213,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbFindOneFail)
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("51307b66f481db11bf860001", res.subscriptionId.get());
     EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
-    EXPECT_EQ("Database Error", res.statusCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.casubs "
               "- findOne() _id: 51307b66f481db11bf860001 "
               "- exception: boom!!", res.statusCode.details);
@@ -260,7 +260,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbRemoveFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -278,7 +278,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbRemoveFail)
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("51307b66f481db11bf860001", res.subscriptionId.get());
     EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
-    EXPECT_EQ("Database Error", res.statusCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.casubs "
               "- remove() _id: 51307b66f481db11bf860001 "
               "- exception: boom!!", res.statusCode.details);

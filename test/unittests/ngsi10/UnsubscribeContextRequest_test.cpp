@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -35,6 +33,9 @@
 #include "xmlParse/xmlParse.h"
 #include "jsonParse/jsonRequest.h"
 
+#include "unittest.h"
+
+
 
 /* ****************************************************************************
 *
@@ -44,17 +45,19 @@ TEST(UnsubscribeContextRequest, badSubscriptionId_xml)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.unsubscribeContextRequest.subscriptionId.invalid.xml";
-  std::string     rendered;
-  std::string     expected = "<unsubscribeContextResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>Invalid Subscription Id: bad length (24 chars expected)</reasonPhrase>\n    <details>12345D</details>\n  </statusCode>\n</unsubscribeContextResponse>\n";
+  const char*     infile   = "ngsi10.unsubscribeContextRequest.subscriptionId.invalid.xml";
+  const char*     outfile1 = "ngsi10.unsubscribeContextResponse.invalidSubscriptionId.valid.xml";
+  const char*     outfile2 = "ngsi10.unsubscribeContextResponse.invalidSubscriptionId2.valid.xml";
+  std::string     out;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
 
   lmTraceLevelSet(LmtDump, true);
-  std::string result = xmlTreat(testBuf, &ci, &reqData, UnsubscribeContext, "unsubscribeContextRequest", NULL);
+  out = xmlTreat(testBuf, &ci, &reqData, UnsubscribeContext, "unsubscribeContextRequest", NULL);
   lmTraceLevelSet(LmtDump, false);
 
-  EXPECT_STREQ(expected.c_str(), result.c_str());
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   //
   // With the data obtained, render, present and release methods are exercised
@@ -63,9 +66,10 @@ TEST(UnsubscribeContextRequest, badSubscriptionId_xml)
   
   ucrP->present(""); // No output
 
-  expected = "<unsubscribeContextRequest>\n  <subscriptionId>12345D</subscriptionId>\n</unsubscribeContextRequest>\n";
-  rendered = ucrP->render(UnsubscribeContext, XML, "");
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+
+  out = ucrP->render(UnsubscribeContext, XML, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucrP->release();
 }
@@ -80,23 +84,26 @@ TEST(UnsubscribeContextRequest, badSubscriptionId_json)
 {
   ParseData       reqData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "unsubscribeContextRequest_badSubscriptionId.json";
+  const char*     infile   = "ngsi10.unsubscribeContextRequest.badSubscriptionId.invalid.json";
+  std::string     out;
+  const char*     outfile2 = "ngsi10.unsubscribeContextResponse.badSubscriptionId2.valid.json";
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
   lmTraceLevelSet(LmtDump, true);
-  std::string result = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContext, "unsubscribeContextRequest", NULL);
+  out = jsonTreat(testBuf, &ci, &reqData, UnsubscribeContext, "unsubscribeContextRequest", NULL);
   lmTraceLevelSet(LmtDump, false);
-
+  EXPECT_STREQ("OK", out.c_str());
+  
   UnsubscribeContextRequest*  ucrP = &reqData.uncr.res;
 
   ucrP->present("");
-  std::string expected = "{\n  \"subscriptionId\" : \"012345678901234567890123\"\n}\n";
-  std::string rendered = ucrP->render(UnsubscribeContext, JSON, "");
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  out = ucrP->render(UnsubscribeContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucrP->release();
-
 }

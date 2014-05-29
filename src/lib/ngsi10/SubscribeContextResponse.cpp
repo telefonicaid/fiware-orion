@@ -44,31 +44,33 @@ SubscribeContextResponse::~SubscribeContextResponse() {
 */
 SubscribeContextResponse::SubscribeContextResponse()
 {
-   subscribeError.subscriptionId.set("0");
+   subscribeError.errorCode.tagSet("errorCode");
+   subscribeError.subscriptionId.set("000000000000000000000000");
 }
 
 /* ****************************************************************************
 *
 * SubscribeContextResponse::SubscribeContextResponse - 
 */
-SubscribeContextResponse::SubscribeContextResponse(ErrorCode& errorCode)
+SubscribeContextResponse::SubscribeContextResponse(StatusCode& errorCode)
 {
-   subscribeError.subscriptionId.set("0");
-   subscribeError.errorCode = errorCode;
+   subscribeError.subscriptionId.set("000000000000000000000000");
+   subscribeError.errorCode.fill(&errorCode);
+   subscribeError.errorCode.tagSet("errorCode");
 }
 
 /* ****************************************************************************
 *
 * SubscribeContextResponse::render - 
 */
-std::string SubscribeContextResponse::render(RequestType requestType, Format format, std::string indent)
+std::string SubscribeContextResponse::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string out     = "";
   std::string tag     = "subscribeContextResponse";
 
   out += startTag(indent, tag, format, false);
 
-  if (subscribeError.errorCode.code == NO_ERROR_CODE)
+  if (subscribeError.errorCode.code == SccNone)
      out += subscribeResponse.render(format, indent + "  ", false);
   else
      out += subscribeError.render(SubscribeContext, format, indent + "  ", false);

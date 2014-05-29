@@ -49,14 +49,14 @@ AppendContextElementRequest::AppendContextElementRequest()
 *
 * render - 
 */
-std::string AppendContextElementRequest::render(Format format, std::string indent)
+std::string AppendContextElementRequest::render(RequestType requestType, Format format, std::string indent)
 {
   std::string tag = "appendContextElementRequest";
   std::string out = "";
 
-  out += startTag(indent, tag, format);
-  out += attributeDomainName.render(format, indent + "  ");
-  out += contextAttributeVector.render(format, indent + "  ");
+  out += startTag(indent, tag, format, false);
+  out += attributeDomainName.render(format, indent + "  ", true);
+  out += contextAttributeVector.render(requestType, format, indent + "  ");
   out += domainMetadataVector.render(format, indent + "  ");
   out += endTag(indent, tag, format);
 
@@ -74,8 +74,7 @@ std::string AppendContextElementRequest::render(Format format, std::string inden
 -
 *   else if ((res = attributeDomainName.check(AppendContextElement, format, indent, predetectedError, counter)) != "OK")
 *   {
-*     response.errorCode.code         = SccBadRequest;
-*     response.errorCode.reasonPhrase = res;
+*     response.errorCode.fill(SccBadRequest, res):
 *   }
 *
 */
@@ -86,23 +85,20 @@ std::string AppendContextElementRequest::check(RequestType requestType, Format f
 
    if (predetectedError != "")
    {
-     response.errorCode.code         = SccBadRequest;
-     response.errorCode.reasonPhrase = predetectedError;
+     response.errorCode.fill(SccBadRequest, predetectedError);
    }
    else if ((res = contextAttributeVector.check(AppendContextElement, format, indent, predetectedError, counter)) != "OK")
    {
-     response.errorCode.code         = SccBadRequest;
-     response.errorCode.reasonPhrase = res;
+     response.errorCode.fill(SccBadRequest, res);
    }
    else if ((res = domainMetadataVector.check(AppendContextElement, format, indent, predetectedError, counter)) != "OK")
    {
-     response.errorCode.code         = SccBadRequest;
-     response.errorCode.reasonPhrase = res;
+     response.errorCode.fill(SccBadRequest, res);
    }
    else
      return "OK";
    
-   return response.render(format, indent);
+   return response.render(requestType, format, indent);
 }
 
 

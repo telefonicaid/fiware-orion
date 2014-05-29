@@ -36,7 +36,7 @@
 *
 * deleteSubscriptionConvOp - 
 */
-std::string deleteSubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string deleteSubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string                        subscriptionId = compV[2];
   UnsubscribeContextRequest*         uncrP          = &parseDataP->uncr.res;

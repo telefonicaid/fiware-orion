@@ -18,197 +18,178 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
 --NAME--
 JSON Parse Post UpdateContextSubscription
 --SHELL-INIT--
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-  # Wait some time so the broker can finish properly
-  sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-  if [ $running_broker -ne 0 ]; then
-    # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
-    sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-    if [ $running_broker -ne 0 ]; then
-      echo "Existing contextBroker is inmortal, can not be killed!"
-      exit 1
-    fi
-  fi
-fi
+source ../harnessFunctions.sh
 
-echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
-if [ "$VALGRIND" == "" ]; then
-  $CB_START_CMD
-  # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
-  sleep 1
-else
-  valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
-  # Waiting for valgrind to start (sleep 10)
-  sleep 10s
-fi
-
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
-if [ $running_broker -ne 1 ]; then
-  echo "Unable to start contextBroker"
-  exit 1
-fi
+dbInit CB
+brokerStart CB
 
 --SHELL--
+source ../harnessFunctions.sh
 echo "1: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContextSubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
-{
-	"duration": "P5Y",
-	"restriction": {
-		"attributeExpression" : "AE",
-		"scopes": [
-			{
-				"type" : "t1",
-				"value" : "v1"
-			},
-			{
-				"type" : "t2",
-				"value" : "v2"
-			}
-		]
-	},
-	"subscriptionId": "9212ce4b0c214479be429e2b",
-	"notifyConditions": [
-		{
-			"type": "ONCHANGE",
-			"condValues": [
-				"CondValue1",
-				"CondValue2"
-			],
-			"restriction": "restriction"
-		}
-	],
-	"throttling": "P5Y"
-}
-EOF
+url="/NGSI10/updateContextSubscription"
+payload='{
+  "duration": "P5Y",
+  "restriction": {
+    "attributeExpression" : "AE",
+    "scopes": [
+      {
+        "type" : "t1",
+        "value" : "v1"
+      },
+      {
+        "type" : "t2",
+        "value" : "v2"
+      }
+    ]
+  },
+  "subscriptionId": "9212ce4b0c214479be429e2b",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [
+        "CondValue1",
+        "CondValue2"
+      ],
+      "restriction": "restriction"
+    }
+  ],
+  "throttling": "P5Y"
+}'
+curlJson ${url} "${payload}"
+
 echo "2: ***********************************"
-OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
-{
-	"entities": [
-		{
-			"type": "Room",
-			"isPattern": "false",
-			"id": "ConferenceRoom"
-		},
-		{
-			"type": "Room",
-			"isPattern": "false",
-			"id": "OfficeRoom"
-		}
-	],
-	"attributes": [
-		"temperature",
-		"occupancy",
-		"lightstatus"
-	],
-	"reference": "127.0.0.1",
-	"duration": "P5Y",
-	"restriction": {
-		"attributeExpression": "testRestriction",
-		"scopes" : [
-			{
-				"type" : "t1",
-				"value" : "v1"
-			},
-			{
-				"type" : "t2",
-				"value" : "v2"
-			}
-		]
-	},
-	"notifyConditions": [
-		{
-			"type": "ONCHANGE",
-			"condValues": [
-				"CondValue1",
-				"CondValue2"
-			]
-			,
-			"restriction": "restriction"
-		}
-	],
-	"throttling": "P5Y"
-}
-EOF)
-SUB_ID=$(echo "$OUT" | grep subscriptionId | awk -F\" '{ print $4}')
-echo "$OUT"
+url="/NGSI10/subscribeContext"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "occupancy",
+    "lightstatus"
+  ],
+  "reference": "127.0.0.1",
+  "duration": "P5Y",
+  "restriction": {
+    "attributeExpression": "testRestriction",
+    "scopes" : [
+      {
+        "type" : "t1",
+        "value" : "v1"
+      },
+      {
+        "type" : "t2",
+        "value" : "v2"
+      }
+    ]
+  },
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [
+        "CondValue1",
+        "CondValue2"
+      ]
+      ,
+      "restriction": "restriction"
+    }
+  ],
+  "throttling": "P5Y"
+}'
+curlJson ${url} "${payload}"
+
+SUB_ID=$(echo "$response" | grep subscriptionId | awk -F\" '{ print $4}')
 
 echo "3: ***********************************"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContextSubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- ) << EOF
-{
-	"duration": "P4Y",
-	"restriction": {
-		"attributeExpression" : "AE",
-		"scopes": [
-			{
-				"type" : "t1",
-				"value" : "v1"
-			},
-			{
-				"type" : "t2",
-				"value" : "v2"
-			}
-		]
-	},
-	"subscriptionId": "${SUB_ID}",
-	"notifyConditions": [
-		{
-			"type": "ONCHANGE",
-			"condValues": [
-				"CondValue1",
-				"CondValue2"
-			],
-			"restriction": "restriction"
-		}
-	],
-	"throttling": "P4Y"
-}
-EOF
+url="/NGSI10/updateContextSubscription"
+payload='{
+  "duration": "P4Y",
+  "restriction": {
+    "attributeExpression" : "AE",
+    "scopes": [
+      {
+        "type" : "t1",
+        "value" : "v1"
+      },
+      {
+        "type" : "t2",
+        "value" : "v2"
+      }
+    ]
+  },
+  "subscriptionId": "'${SUB_ID}'",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [
+        "CondValue1",
+        "CondValue2"
+      ],
+      "restriction": "restriction"
+    }
+  ],
+  "throttling": "P4Y"
+}'
+curlJson ${url} "${payload}"
+
 echo "4: ***********************************"
 --REGEXPECT--
 1: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
-  "subscribeError" : {
-    "subscriptionId" : "REGEX([0-9a-f]{24})",
-    "errorCode" : {
-      "code" : "404",
-      "reasonPhrase" : "Subscription Not Found"
+    "subscribeError": {
+        "errorCode": {
+            "code": "404",
+            "reasonPhrase": "No context element found"
+        },
+        "subscriptionId": "REGEX([0-9a-f]{24})"
     }
-  }
 }
 2: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 134
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
-  "subscribeResponse" : {
-    "subscriptionId" : "REGEX([0-9a-f]{24})",
-    "duration" : "P5Y",
-    "throttling" : "P5Y"
-  }
+    "subscribeResponse": {
+        "duration": "P5Y", 
+        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "throttling": "P5Y"
+    }
 }
 3: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 134
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
-  "subscribeResponse" : {
-    "subscriptionId" : "REGEX([0-9a-f]{24})",
-    "duration" : "P4Y",
-    "throttling" : "P4Y"
-  }
+    "subscribeResponse": {
+        "duration": "P4Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "P4Y"
+    }
 }
 4: ***********************************
 --TEARDOWN--
-if [ "$VALGRIND" == "" ]; then
-  kill $(cat ${BROKER_PID_FILE})
-  rm /tmp/orion_${BROKER_PORT}.pid
-else
-  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
-  # Waiting for valgrind to terminate (sleep 10)
-  sleep 10
-fi
+source ../harnessFunctions.sh
+brokerStop CB

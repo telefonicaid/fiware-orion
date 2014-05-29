@@ -32,6 +32,11 @@
 #include "ngsi/Request.h"
 #include "ngsi/Association.h"
 
+/* Metadata interpreted by Orion Context Broker, i.e. not custom metadata */
+#define NGSI_MD_ID       "ID"
+#define NGSI_MD_LOCATION "location"
+#define NGSI_MD_CREDATE  "creDate"    // FIXME P5: to be used for creDate (currenly only in DB)
+#define NGSI_MD_MODDATE  "modDate"    // FIXME P5: to be used for modDate (currenly only in DB)
 
 
 /* ****************************************************************************
@@ -52,11 +57,11 @@ typedef struct Metadata
 
   Metadata();
   Metadata(Metadata* mP);
-  Metadata(std::string _name, std::string _type, std::string _value = "");
+  Metadata(const std::string& _name, const std::string& _type, const std::string& _value = "");
 
-  std::string  render(Format format, std::string indent, bool comma = false);
-  std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void         present(std::string metadataType, int ix, std::string indent);  
+  std::string  render(Format format, const std::string& indent, bool comma = false);
+  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  void         present(const std::string& metadataType, int ix, const std::string& indent);  
   void         release(void);
 } Metadata;
 

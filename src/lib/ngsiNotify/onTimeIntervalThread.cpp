@@ -22,30 +22,28 @@
 *
 * Author: Fermin Galan
 */
-
-#include "onTimeIntervalThread.h"
-
 #include <string>
 #include <stdio.h>
 #include <unistd.h>      // needed for sleep in Debian 7
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-
-#include "Notifier.h"
-#include "mongoBackend/mongoOntimeintervalOperations.h"
-#include "ContextSubscriptionInfo.h"
-
+#include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
-#include "ngsi/NotifyCondition.h"
+#include "mongoBackend/mongoOntimeintervalOperations.h"
 #include "ngsi/Duration.h"
+#include "ngsi/NotifyCondition.h"
+#include "ngsiNotify/ContextSubscriptionInfo.h"
+#include "ngsiNotify/Notifier.h"
+#include "ngsiNotify/onTimeIntervalThread.h"
 
 /* ****************************************************************************
 *
 * doNotification -
 */
-static void doNotification(OnIntervalThreadParams* params) {
+static void doNotification(OnIntervalThreadParams* params, const std::string& tenant) {
 
     std::string err;
 
@@ -53,7 +51,7 @@ static void doNotification(OnIntervalThreadParams* params) {
      * OnIntervalThreadParams coming for the csubs document at thread creation time
      * from mongoBackend, we always needs that to get fresh lastNotification */
     ContextSubscriptionInfo csi;
-    if (mongoGetContextSubscriptionInfo(params->subId, &csi, &err) != SccOk) {
+    if (mongoGetContextSubscriptionInfo(params->subId, &csi, &err, tenant) != SccOk) {
         LM_RVE(("error invoking mongoGetContextSubscriptionInfo: '%s'", err.c_str()));
     }
 
@@ -67,7 +65,7 @@ static void doNotification(OnIntervalThreadParams* params) {
 
             /* Query database for data */
             NotifyContextRequest ncr;
-            if (mongoGetContextElementResponses(csi.entityIdVector, csi.attributeList, &(ncr.contextElementResponseVector), &err) != SccOk) {
+            if (mongoGetContextElementResponses(csi.entityIdVector, csi.attributeList, &(ncr.contextElementResponseVector), &err, tenant) != SccOk) {
                 csi.release();
                 ncr.contextElementResponseVector.release();
                 LM_RVE(("error invoking mongoGetContextElementResponses: '%s'", err.c_str()));
@@ -80,12 +78,12 @@ static void doNotification(OnIntervalThreadParams* params) {
                 ncr.originator.set("localhost");
                 ncr.subscriptionId.set(params->subId);
 
-                params->notifier->sendNotifyContextRequest(&ncr, csi.url, csi.format);
+                params->notifier->sendNotifyContextRequest(&ncr, csi.url, tenant, csi.format);
 
                 ncr.contextElementResponseVector.release();
 
                 /* Update database fields due to new notification */
-                if (mongoUpdateCsubNewNotification(params->subId, &err) != SccOk) {
+                if (mongoUpdateCsubNewNotification(params->subId, &err, tenant) != SccOk) {
                     csi.release();
                     LM_RVE(("error invoking mongoUpdateCsubNewNotification: '%s'", err.c_str()));
                 }
@@ -117,7 +115,7 @@ void* startOnIntervalThread(void* p) {
 
         /* Do the work (we put this in a function due to error conditions would produce an
          * early interruption of the process) */
-        doNotification(params);
+        doNotification(params, params->tenant);
 
         /* Sleeps for interval */
         sleep(params->interval);
@@ -125,51 +123,4 @@ void* startOnIntervalThread(void* p) {
 
     /* This line is useless, but the compiler complaints if I don't use a "return" statement... */
     return 0;
-}
-
-/* ****************************************************************************
-*
-* recoverOntimeIntervalThreads -
-*/
-extern void recoverOntimeIntervalThreads() {
-
-    /* Look for ONTIMEINTERVAL subscriptions in database */
-    std::string condType= std::string(CSUB_CONDITIONS) + "."  + CSUB_CONDITIONS_TYPE;
-    BSONObj query = BSON(condType << ON_TIMEINTERVAL_CONDITION);
-
-    DBClientConnection* connection = getMongoConnection();
-    auto_ptr<DBClientCursor> cursor;
-    try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(), query.toString().c_str()));
-        cursor = connection->query(getSubscribeContextCollectionName(), query);
-        /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-         * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
-         * exception ourselves */
-        if (cursor.get() == NULL) {
-            throw DBException("Null cursor", 0);
-        }
-    }
-    catch( const DBException &e ) {
-        LM_RVE(("DBException: %s", e.what()));
-    }
-
-    /* For each one of the subscriptions found, create threads */
-    while (cursor->more()) {
-
-        BSONObj sub = cursor->next();
-        std::string subId = sub.getField("_id").OID().str();
-
-        std::vector<BSONElement> condV = sub.getField(CSUB_CONDITIONS).Array();
-        for (unsigned int ix = 0; ix < condV.size(); ++ix) {
-            BSONObj condition = condV[ix].embeddedObject();
-            if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0) {
-               int interval = condition.getIntField(CSUB_CONDITIONS_VALUE);
-               LM_T(LmtNotifier, ("creating ONTIMEINTERVAL for subscription %s with interval %d", subId.c_str(), interval));
-               processOntimeIntervalCondition(subId, interval);
-
-            }
-        }
-
-    }
-
 }

@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 
 #include "common/globals.h"
@@ -32,12 +30,8 @@
 #include "serviceRoutines/badRequest.h"
 #include "rest/RestService.h"
 
-#include "testDataFromFile.h"
+#include "unittest.h"
 
-#include "commonMocks.h"
-
-using ::testing::Throw;
-using ::testing::Return;
 
 
 /* ****************************************************************************
@@ -60,16 +54,14 @@ static RestService rs[] =
 TEST(putIndividualContextEntity, notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity011",  "PUT", "1.1");  
-  std::string    expected    = "<updateContextElementResponse>\n  <errorCode>\n    <code>404</code>\n    <reasonPhrase>Entity Not Found</reasonPhrase>\n    <details>entity011</details>\n  </errorCode>\n</updateContextElementResponse>\n";
-  const char*    fileName    = "ngsi10.updateContextElementRequest.valid.xml";
+  const char*    infile    = "ngsi10.updateContextElementRequest.valid.xml";
+  const char*    outfile   = "ngsi10.updateContextElementResponse.putIndividualContextEntity.notFound.valid.xml";
   std::string    out;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  utInit();
 
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   ci.outFormat    = XML;
   ci.inFormat     = XML;
@@ -77,8 +69,7 @@ TEST(putIndividualContextEntity, notFound)
   ci.payloadSize  = strlen(testBuf);
   out             = restService(&ci, rs);
 
-  EXPECT_EQ(expected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  delete timerMock;
-  setTimer(NULL);
+  utExit();
 }

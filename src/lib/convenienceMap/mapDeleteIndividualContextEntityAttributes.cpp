@@ -30,6 +30,8 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/HttpStatusCode.h"
 
 
 
@@ -37,7 +39,7 @@
 *
 * mapDeleteIndividualContextEntityAttributes - 
 */
-HttpStatusCode mapDeleteIndividualContextEntityAttributes(std::string entityId, StatusCode* response)
+HttpStatusCode mapDeleteIndividualContextEntityAttributes(const std::string& entityId, StatusCode* response, ConnectionInfo* ciP)
 {
   HttpStatusCode         ms;
 
@@ -50,7 +52,7 @@ HttpStatusCode mapDeleteIndividualContextEntityAttributes(std::string entityId, 
   ucRequest.contextElementVector.push_back(ceP);
   ucRequest.updateActionType.set("Delete");
 
-  ms = mongoUpdateContext(&ucRequest, &ucResponse);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant);
 
   *response = ucResponse.contextElementResponseVector.get(0)->statusCode;
 

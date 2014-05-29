@@ -44,7 +44,7 @@
 *
 * Payload: UpdateContextAttributeRequest
 */
-std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   UpdateContextRequest            request;
   UpdateContextResponse           response;
@@ -52,9 +52,7 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   std::string                     attributeName = compV[4];
   std::string                     valueId       = compV[5];
   UpdateContextAttributeRequest*  upcarP        = &parseDataP->upcar.res;
-  ContextAttribute*               attributeP    = new ContextAttribute(attributeName, "", "false");
   bool                            idFound       = false;
-  ContextElement                  ce;
 
   //
   // Any metadata ID in the payload?
@@ -71,13 +69,18 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
       {
         std::string out;
 
-        out = restErrorReplyGet(ciP, ciP->outFormat, "", "StatusCode", SccBadRequest, "unmatching metadata ID value URI/payload", valueId + " vs " + mP->value);
+        out = restErrorReplyGet(ciP, ciP->outFormat, "", "StatusCode", SccBadRequest,
+                                std::string("unmatching metadata ID value URI/payload: '") + valueId + "' vs '" + mP->value + "'");
         return out;
       }
       else
         idFound = true;
     }
   }
+
+
+  ContextAttribute*               attributeP    = new ContextAttribute(attributeName, "", upcarP->contextValue);
+  ContextElement*                 ceP           = new ContextElement();
 
   // Copy the metadata vector of the input payload
   attributeP->metadataVector.fill(upcarP->metadataVector);
@@ -90,31 +93,32 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   }
 
   // Filling the rest of the structure for mongoUpdateContext
-  ce.entityId.fill(entityId, "", "false");
-  ce.attributeDomainName.set("");
-  ce.contextAttributeVector.push_back(attributeP);
-  request.contextElementVector.push_back(&ce);
+  ceP->entityId.fill(entityId, "", "false");
+  ceP->attributeDomainName.set("");
+  ceP->contextAttributeVector.push_back(attributeP);
+  request.contextElementVector.push_back(ceP);
   request.updateActionType.set("UPDATE");
 
-  response.errorCode.code = NO_ERROR_CODE;
-  mongoUpdateContext(&request, &response);
+  response.errorCode.code = SccNone;
+  ciP->httpStatusCode = mongoUpdateContext(&request, &response, ciP->tenant);
   
   StatusCode statusCode;
   if (response.contextElementResponseVector.size() == 0)
-    statusCode.fill(SccContextElementNotFound, "The ContextElement requested is not found", entityId + "-" + attributeName);
+    statusCode.fill(SccContextElementNotFound, std::string("Entity-Attribute pair: '") + entityId + "-" + attributeName + "'");
   else if (response.contextElementResponseVector.size() == 1)
   {
     ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
 
-    if (response.errorCode.code != NO_ERROR_CODE)
+    if (response.errorCode.code != SccNone)
       statusCode.fill(&response.errorCode);
     else if (cerP->statusCode.code != SccNone)
       statusCode.fill(&cerP->statusCode);
     else
-      statusCode.fill(SccOk, "OK", "");
+      statusCode.fill(SccOk);
   }
   else
-    statusCode.fill(SccReceiverInternalError, "Internal Error", "More than one response from putAttributeValueInstance::mongoUpdateContext");
+    statusCode.fill(SccReceiverInternalError, "More than one response from putAttributeValueInstance::mongoUpdateContext");
 
-  return statusCode.render(ciP->outFormat, "", false);
+  request.release();
+  return statusCode.render(ciP->outFormat, "", false, false);
 }

@@ -42,7 +42,7 @@
 *
 * POST /ngsi9/contextEntityTypes/{typeName}/attributes/{attributeName}
 */
-std::string postContextEntityTypeAttribute(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string postContextEntityTypeAttribute(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string  entityIdType   = compV[2];
   std::string  attributeName  = compV[4];  
@@ -52,7 +52,7 @@ std::string postContextEntityTypeAttribute(ConnectionInfo* ciP, int components, 
 
   // Now call postRegisterContext (postRegisterContext doesn't use the parameters 'components' and 'compV')
   std::string answer = postRegisterContext(ciP, components, compV, parseDataP);
-  parseDataP->rpr.res.release();
+  parseDataP->rcr.res.release();
 
   return answer;
 }

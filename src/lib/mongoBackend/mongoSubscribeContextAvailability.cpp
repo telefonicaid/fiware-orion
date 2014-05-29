@@ -41,10 +41,9 @@
 *
 * mongoSubscribeContextAvailability - 
 */
-HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityRequest* requestP, SubscribeContextAvailabilityResponse* responseP, Format inFormat)
+HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityRequest* requestP, SubscribeContextAvailabilityResponse* responseP, Format inFormat, const std::string& tenant)
 {
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
+    reqSemTake(__FUNCTION__, "ngsi9 subscribe request");
 
     LM_T(LmtMongo, ("Subscribe Context Availability Request"));
 
@@ -56,7 +55,7 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
     }
 
     /* Calculate expiration (using the current time and the duration field in the request) */
-    int expiration = getCurrentTime() + requestP->duration.parse();
+    long long expiration = getCurrentTime() + requestP->duration.parse();
     LM_T(LmtMongo, ("Subscription expiration: %d", expiration));
 
     /* Create the mongoDB subscription document */
@@ -97,27 +96,38 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
     /* Insert document in database */
     BSONObj subDoc = sub.obj();
     try {
-        LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextAvailabilityCollectionName(), subDoc.toString().c_str()));
-        connection->insert(getSubscribeContextAvailabilityCollectionName(), subDoc);
+        LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextAvailabilityCollectionName(tenant).c_str(), subDoc.toString().c_str()));
+
+        mongoSemTake(__FUNCTION__, "insert into SubscribeContextAvailabilityCollection");
+        connection->insert(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), subDoc);
+        mongoSemGive(__FUNCTION__, "insert into SubscribeContextAvailabilityCollection");
     }
     catch( const DBException &e ) {
-        responseP->errorCode.fill(
-            SccReceiverInternalError,
-            "Database Error",
-            std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
-                " - insert(): " + subDoc.toString() +
-                " - exception: " + e.what()
-        );
-
-        LM_SRE(SccOk,("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
+        mongoSemGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (mongo db exception)");
+        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo db exception)");
+        responseP->errorCode.fill(SccReceiverInternalError,
+                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
+                                  " - insert(): " + subDoc.toString() +
+                                  " - exception: " + e.what());
+        LM_RE(SccOk, ("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
+    }
+    catch(...) {
+        mongoSemGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (mongo generic exception)");
+        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo generic exception)");
+        responseP->errorCode.fill(SccReceiverInternalError,
+                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
+                                  " - insert(): " + subDoc.toString() +
+                                  " - exception: " + "generic");
+        LM_RE(SccOk, ("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
     }
 
     /* Send notifications for matching context registrations */
-    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.str(), requestP->reference.get(), inFormat);
+    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.str(), requestP->reference.get(), inFormat, tenant);
 
     /* Fill the response element */
     responseP->duration = requestP->duration;
     responseP->subscriptionId.set(oid.str());
 
-    LM_SR(SccOk);
+    reqSemGive(__FUNCTION__, "ngsi9 subscribe request");
+    return SccOk;
 }

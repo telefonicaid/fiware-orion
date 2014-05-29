@@ -1,0 +1,7 @@
+<notifyContextResponse>
+  <responseCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>invalid isPattern (boolean) value for entity: 'phalse'</details>
+  </responseCode>
+</notifyContextResponse>

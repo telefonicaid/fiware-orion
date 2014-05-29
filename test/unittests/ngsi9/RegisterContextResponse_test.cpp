@@ -29,6 +29,8 @@
 
 #include "ngsi9/RegisterContextResponse.h"
 
+#include "unittest.h"
+
 
 
 /* ****************************************************************************
@@ -38,44 +40,96 @@
 TEST(RegisterContextResponse, constructors)
 {
   RegisterContextResponse* rcr1 = new RegisterContextResponse();
-  RegisterContextResponse  rcr2("REG_ID2", "PT1S");
+  RegisterContextResponse  rcr2("012301230123012301230123", "PT1S");
   RegisterContextRequest   rcr;
   RegisterContextResponse  rcr3(&rcr);
-  ErrorCode                ec(SccBadRequest, "Reason", "Detail");
+  StatusCode               ec(SccBadRequest, "Detail");
   RegisterContextResponse  rcr4("012345678901234567890123", ec);
   RegisterContextResponse  rcr5("012345678901234567890123", "PT1M");
 
   std::string              out;
-  std::string              expected1 = "<registerContextResponse>\n  <duration>PT1S</duration>\n  <registrationId>REG_ID2</registrationId>\n</registerContextResponse>\n";
-  std::string              expected2 = "<registerContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>bad length (24 chars expected)</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
-  std::string              expected3 = "<registerContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>Forced Error</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
-  std::string              expected4 = "<registerContextResponse>\n  <errorCode>\n    <code>400</code>\n    <reasonPhrase>syntax error in duration string</reasonPhrase>\n  </errorCode>\n</registerContextResponse>\n";
+  const char*              outFile1  = "ngsi9.registerContextResponse.constructors1.valid.xml";
+  const char*              outFile2  = "ngsi9.registerContextResponse.constructors2.valid.xml";
+  const char*              outFile3  = "ngsi9.registerContextResponse.constructors3.valid.xml";
+  const char*              outFile4  = "ngsi9.registerContextResponse.constructors4.valid.xml";
+
   std::string              expected5 = "OK";
 
   EXPECT_STREQ("", rcr1->registrationId.get().c_str());
   rcr1->release();
   delete rcr1;
 
-  EXPECT_EQ("REG_ID2", rcr2.registrationId.get());
+  EXPECT_EQ("012301230123012301230123", rcr2.registrationId.get());
   EXPECT_STREQ("", rcr3.registrationId.get().c_str());
   EXPECT_EQ("012345678901234567890123", rcr4.registrationId.get());
   EXPECT_EQ(SccBadRequest, rcr4.errorCode.code);
   
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile1)) << "Error getting test data from '" << outFile1 << "'";
   out = rcr2.render(RegisterContext, XML, "");
-  EXPECT_EQ(expected1, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
+  rcr2.registrationId.set("12345");
   out = rcr2.check(RegisterContext, XML, "", "", 0);
-  EXPECT_EQ(expected2, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile3)) << "Error getting test data from '" << outFile3 << "'";
   out = rcr2.check(RegisterContext, XML, "", "Forced Error", 0);
-  EXPECT_EQ(expected3, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile4)) << "Error getting test data from '" << outFile4 << "'";
   rcr2.duration.set("dddd");
   out = rcr2.check(RegisterContext, XML, "", "", 0);
-  EXPECT_EQ(expected4, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
   
   out = rcr5.check(RegisterContext, XML, "", "", 0);
   EXPECT_EQ(expected5, out);
 
   rcr2.present("");
+}
+
+
+
+/* ****************************************************************************
+*
+* jsonRender - 
+*/
+TEST(RegisterContextResponse, jsonRender)
+{
+  RegisterContextResponse rcr;
+  std::string             rendered;
+  const char*             filename1 = "ngsi9.registerContextResponse.registrationIdOnly.valid.json";
+  const char*             filename2 = "ngsi9.registerContextResponse.registrationIdAndDuration.valid.json";
+  const char*             filename3 = "ngsi9.registerContextResponse.registrationIdAndErrorCode.valid.json";
+  const char*             filename4 = "ngsi9.registerContextResponse.registrationIdAndDurationAndErrorCode.valid.json";
+   
+  utInit();
+
+  // 1. Only registrationId
+  rcr.registrationId.set("012345678901234567890123");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
+  rendered = rcr.render(RegisterContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+  // 2. registrationId and duration
+  rcr.duration.set("PT1S");
+  
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
+  rendered = rcr.render(RegisterContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+  // 3. registrationId and errorCode
+  rcr.duration.set("");
+  rcr.errorCode.fill(SccBadRequest, "no details");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
+  rendered = rcr.render(RegisterContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  
+  // 4. registrationId and duration and errorCode
+  rcr.duration.set("PT2S");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename4)) << "Error getting test data from '" << filename4 << "'";
+  rendered = rcr.render(RegisterContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, rendered.c_str());
+
+  utExit();
 }

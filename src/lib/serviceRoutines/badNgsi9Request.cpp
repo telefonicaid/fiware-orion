@@ -39,11 +39,11 @@
 *
 * badNgsi9Request - 
 */
-std::string badNgsi9Request(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string badNgsi9Request(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string answer;
 
-  answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, "bad ngsi9 request", std::string("ngsi9 service '") + ciP->url + "' not found");
+  answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("ngsi9 service '") + ciP->url + "' not found");
 
   return answer;
 }

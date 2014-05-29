@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 
 #include "serviceRoutines/putIndividualContextEntityAttributes.h"
@@ -54,13 +52,14 @@ static RestService rs[] =
 TEST(putIndividualContextEntityAttributes, notFound)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity101/attributes",  "PUT", "1.1");
-  std::string    expected    = "<updateContextElementResponse>\n  <contextResponseList>\n    <contextAttributeResponse>\n      <statusCode>\n        <code>404</code>\n        <reasonPhrase>Entity Not Found</reasonPhrase>\n        <details>entity101</details>\n      </statusCode>\n    </contextAttributeResponse>\n  </contextResponseList>\n</updateContextElementResponse>\n";
-  const char*    fileName    = "ngsi10.updateContextElementRequest.valid.xml";
+  const char*    infile    = "ngsi10.updateContextElementRequest.valid.xml";
+  const char*    outfile   = "ngsi10.updateContextElementResponse.notFound.valid.xml";
   std::string    out;
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   ci.outFormat    = XML;
   ci.inFormat     = XML;
@@ -68,7 +67,7 @@ TEST(putIndividualContextEntityAttributes, notFound)
   ci.payloadSize  = strlen(testBuf);
   out             = restService(&ci, rs);
 
-  EXPECT_EQ(expected, out);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
 }

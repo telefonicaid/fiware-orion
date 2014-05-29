@@ -549,9 +549,9 @@ TEST(mongoUpdateContextSubscription, subscriptionNotFound)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -571,7 +571,7 @@ TEST(mongoUpdateContextSubscription, subscriptionNotFound)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.subscriptionId.isEmpty());
     EXPECT_EQ(SccContextElementNotFound, res.subscribeError.errorCode.code);
-    EXPECT_EQ("Subscription Not Found", res.subscribeError.errorCode.reasonPhrase);
+    EXPECT_EQ("No context element found", res.subscribeError.errorCode.reasonPhrase);
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
     /* Release connection */
@@ -595,9 +595,9 @@ TEST(mongoUpdateContextSubscription, updateDuration)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -697,9 +697,9 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);    
 
@@ -781,9 +781,9 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -866,9 +866,9 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T1_C0)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -949,9 +949,9 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T1_C0_JSON)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1032,9 +1032,9 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T1_C0)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1117,11 +1117,11 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_C0)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1208,11 +1208,11 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_C0)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1301,9 +1301,9 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_C1)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1386,9 +1386,9 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_C1)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1472,9 +1472,9 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CN)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1565,9 +1565,9 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CNbis)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1651,9 +1651,9 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CN)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1747,9 +1747,9 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CNbis)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -1835,11 +1835,11 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CN)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -1942,11 +1942,11 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CNbis)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2042,11 +2042,11 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CN)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2151,11 +2151,11 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CNbis)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2254,9 +2254,9 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T1_C0)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2344,9 +2344,9 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T1_C0)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2434,11 +2434,11 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_C0)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2529,11 +2529,11 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_C0)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -2626,9 +2626,9 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_C1)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2715,9 +2715,9 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_C1)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2805,9 +2805,9 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CN)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2902,9 +2902,9 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CNbis)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2992,9 +2992,9 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CN)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -3091,9 +3091,9 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CNbis)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -3183,11 +3183,11 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CN)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3294,11 +3294,11 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CNbis)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3398,11 +3398,11 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CN)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3511,11 +3511,11 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CNbis)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -3634,9 +3634,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "",XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -3739,9 +3739,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1_JSON)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "",JSON))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -3842,9 +3842,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -3947,9 +3947,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1_disjoint)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4068,9 +4068,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860022"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4189,9 +4189,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1_disjoint)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860022"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4301,9 +4301,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4413,9 +4413,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1_disjoint)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4539,9 +4539,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860022"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4665,9 +4665,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1_disjoint
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860022"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4772,9 +4772,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "",XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -4886,9 +4886,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN_partial)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "",XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5006,9 +5006,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CNbis)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "",XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5106,9 +5106,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_disjoint)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5220,9 +5220,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5334,9 +5334,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial_disjoint)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5448,9 +5448,9 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CNbis)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -5556,11 +5556,11 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CN)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "",XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -5683,11 +5683,11 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CNbis)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "",XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -5801,11 +5801,11 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CN)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -5928,11 +5928,11 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CNbis)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860002"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -6059,9 +6059,9 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_C1)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6172,9 +6172,9 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_C1)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6290,9 +6290,9 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CN)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6415,9 +6415,9 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CNbis)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6529,9 +6529,9 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CN)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6650,9 +6650,9 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CNbis)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -6768,11 +6768,11 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CN)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -6905,11 +6905,11 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CNbis)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860003"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -7031,11 +7031,11 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CN)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", XML))
             .Times(2);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -7166,11 +7166,11 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CNbis)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860004"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify4.me", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 60, ""))
             .Times(1);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -7278,9 +7278,9 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60))
+    EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
             .Times(1);
     setNotifier(notifierMock);
 
@@ -7375,9 +7375,9 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
             .Times(0);
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -7396,7 +7396,7 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.subscribeError.subscriptionId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.subscribeError.errorCode.code);
-    EXPECT_EQ("Database Error", res.subscribeError.errorCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.subscribeError.errorCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.csubs "
               "- findOne() _id: 51307b66f481db11bf860001 "
               "- exception: boom!!", res.subscribeError.errorCode.details);
@@ -7437,9 +7437,9 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
             .Times(0);
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
             .Times(0);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
             .Times(0);    
-    EXPECT_CALL(*notifierMock, createIntervalThread(_,_))
+    EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -7463,7 +7463,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.subscribeError.subscriptionId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.subscribeError.errorCode.code);
-    EXPECT_EQ("Database Error", res.subscribeError.errorCode.reasonPhrase);
+    EXPECT_EQ("Internal Server Error", res.subscribeError.errorCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.csubs "
               "- update() _id: 51307b66f481db11bf860001 "
               "- update() doc: { entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: {}, reference: \"http://notify1.me\", expiration: 1360250700, conditions: {}, lastNotification: 15000000, format: \"XML\" } "

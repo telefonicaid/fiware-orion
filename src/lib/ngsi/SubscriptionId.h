@@ -41,15 +41,16 @@ typedef struct SubscriptionId
   std::string   string;
 
   SubscriptionId();
-  SubscriptionId(std::string subId);
+  SubscriptionId(const std::string& subId);
 
-  void          set(std::string value);
+  void          set(const std::string& value);
   std::string   get(void);
   bool          isEmpty(void);
-  std::string   render(Format format, std::string indent, bool comma = false);
-  std::string   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void          present(std::string indent);
+  std::string   render(RequestType container, Format format, const std::string& indent, bool comma = false);
+  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  void          present(const std::string& indent);
   void          release(void);
+  bool          rendered(RequestType container);
 } SubscriptionId;
 
 #endif

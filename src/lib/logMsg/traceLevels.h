@@ -43,23 +43,31 @@ typedef enum TraceLevels
   LmtUrlParse,
   LmtHttpRequest,
   LmtHttpHeaders,
-  LmtHttpDaemon,
+  LmtHttpDaemon = 25,
   LmtHttpUnsupportedHeader,
   LmtMhd,
   LmtSavedResponse,
   LmtIncompletePayload,
+  LmtTenant = 30,
+  LmtUriParams,
 
   /* Parser (40-59) */
   LmtParse    = 40,
-  LmtInPayload,
-  LmtOutPayload,
   LmtParsedPayload,
-
+  LmtParseCheck,
   LmtPresent,
   LmtNew,
-  LmtTreat,
+  LmtTreat = 45,
   LmtDump,
   LmtNullNode,
+  LmtCompoundValue,
+  LmtCompoundValueAdd,
+  LmtCompoundValueLookup = 50,
+  LmtCompoundValueRender,
+  LmtCompoundValueRaw,
+  LmtCompoundValueContainer,
+  LmtCompoundValueStep,
+  LmtCompoundValueShow = 55,
 
   /* RestService and Service (60-79) */
   LmtService     = 60,
@@ -83,10 +91,23 @@ typedef enum TraceLevels
   /* Notifications (160-179) */
   LmtNotifier = 160,
 
-  /* Others (>=180) */
-  LmtCm = 180,
+  /* Input/Output payloads (180-199) */
+  LmtServiceInputPayload = 180,
+  LmtServiceOutPayload,
+  LmtClientInputPayload,
+  LmtClientOutputPayload = 183, // Very important for harness test notification_different_sizes
+  LmtPartialPayload,
+  LmtClientOutputPayloadDump,
+
+  /* Semaphores (200-201) */
+  LmtReqSem = 200,
+  LmtMongoSem,
+
+  /* Others (>=210) */
+  LmtCm = 210,
   LmtIotaXmlReg,
   LmtIotaXmlObs,
+  LmtRush
 } TraceLevels;
 
 

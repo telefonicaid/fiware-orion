@@ -44,6 +44,6 @@
         <providingApplication>http://localhost:1028/application</providingApplication>
       </contextRegistration>
     </contextRegistrationList>
-    <duration>invalid duration</duration>
+    <duration>PT0R</duration>
     <registrationId></registrationId>
   </registerContextRequest>

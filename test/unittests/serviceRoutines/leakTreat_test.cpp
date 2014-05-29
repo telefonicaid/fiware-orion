@@ -22,10 +22,10 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "serviceRoutines/leakTreat.h"
 #include "rest/RestService.h"
+
+#include "unittest.h"
 
 
 
@@ -46,26 +46,41 @@ static RestService rs[] =
 *
 * error - 
 */
+extern bool harakiri;
 TEST(leakTreat, error)
 {
   ConnectionInfo ci1("/leak",  "GET", "1.1");
   ConnectionInfo ci2("/leak/nadadenada",  "GET", "1.1");
   ConnectionInfo ci3("/leak/harakiri",  "GET", "1.1");
+  const char*    outfile1 = "orion.leak.passwordRequested.valid.xml";
+  const char*    outfile2 = "orion.leak.passwordErroneous.valid.xml";
+  const char*    outfile3 = "orion.leak.noSuchService.valid.xml";
+  const char*    outfile4 = "orion.leak.ok.valid.xml";
+  std::string    out;
 
-  extern bool harakiri;
+  utInit();
+
   harakiri = true;
 
-  std::string    expected1  = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad request</reasonPhrase>\n  <details>Password requested</details>\n</orionError>\n";
-  std::string    expected2  = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad request</reasonPhrase>\n  <details>Request denied - password erroneous</details>\n</orionError>\n";
+  out = restService(&ci1, rs);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  std::string    out1       = restService(&ci1, rs);
-  std::string    out2       = restService(&ci2, rs);
-
-  EXPECT_STREQ(expected1.c_str(), out1.c_str());
-  EXPECT_STREQ(expected2.c_str(), out2.c_str());
+  out = restService(&ci2, rs);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   harakiri = false;
-  std::string    expected3  = "<orionError>\n  <code>400</code>\n  <reasonPhrase>Bad request</reasonPhrase>\n  <details>no such service</details>\n</orionError>\n";
-  std::string    out3       = restService(&ci3, rs);
-  EXPECT_STREQ(expected3.c_str(), out3.c_str());
+  out       = restService(&ci3, rs);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  harakiri = true;
+  out       = restService(&ci3, rs);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  harakiri = false;
+
+  utExit();
 }

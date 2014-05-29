@@ -30,6 +30,7 @@
 
 #include "common/globals.h"
 #include "convenienceMap/mapDeleteIndividualContextEntityAttribute.h"
+#include "rest/ConnectionInfo.h"
 
 #include "commonMocks.h"
 
@@ -79,15 +80,15 @@ static void prepareDatabase(std::string id, std::string type)
 */
 TEST(mapDeleteIndividualContextEntityAttribute, notFound)
 {
-  HttpStatusCode  ms;
   StatusCode      sc;
+  ConnectionInfo  ci;
 
   prepareDatabase("ID", "NAME");
 
-  ms = mapDeleteIndividualContextEntityAttribute("ID2", "NAME2", &sc);
+  mapDeleteIndividualContextEntityAttribute("ID2", "NAME2", &sc, &ci);
 
   EXPECT_EQ(SccContextElementNotFound, sc.code);
-  EXPECT_STREQ("Entity Not Found", sc.reasonPhrase.c_str());
+  EXPECT_STREQ("No context element found", sc.reasonPhrase.c_str());
   EXPECT_STREQ("ID2", sc.details.c_str());
 
   mongoDisconnect();
@@ -101,13 +102,12 @@ TEST(mapDeleteIndividualContextEntityAttribute, notFound)
 */
 TEST(mapDeleteIndividualContextEntityAttribute, ok)
 {
-  std::string  id        = "ID";
-  std::string  name      = "A1";
+  std::string     id        = "ID";
+  std::string     name      = "A1";
+  ConnectionInfo  ci;
+  StatusCode      sc;
 
   prepareDatabase("ID", "TYPE");
-
-  HttpStatusCode ms;
-  StatusCode     sc;
 
   TimerMock* timerMock = new TimerMock();
   ON_CALL(*timerMock, getCurrentTime())
@@ -116,7 +116,7 @@ TEST(mapDeleteIndividualContextEntityAttribute, ok)
 
   LM_M(("-------------------------------------------------"));
   LM_M(("getTimer: %p", getTimer()));
-  ms = mapDeleteIndividualContextEntityAttribute(id, name, &sc);
+  mapDeleteIndividualContextEntityAttribute(id, name, &sc, &ci);
   LM_M(("getTimer: %p", getTimer()));
 
   EXPECT_EQ(SccOk, sc.code);

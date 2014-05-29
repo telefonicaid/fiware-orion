@@ -23,21 +23,20 @@
 * Author: Fermín Galán
 */
 
-#include "mongoNotifyContext.h"
+#include "common/sem.h"
 
+#include "mongoBackend/mongoNotifyContext.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonUpdate.h"
-#include "common/sem.h"
 #include "ngsi10/UpdateContextResponse.h"
 
 /* ****************************************************************************
 *
 * mongoNofityContext -
 */
-HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextResponse* responseP) {
+HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextResponse* responseP, const std::string& tenant) {
 
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
+    reqSemTake(__FUNCTION__, "ngsi10 notification");
 
     /* We ignore "subscriptionId" and "originator" in the request, as we don't have anything interesting
      * to do with them */
@@ -46,10 +45,11 @@ HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextR
     for (unsigned int ix= 0; ix < requestP->contextElementResponseVector.size(); ++ix) {
         /* We use 'ucr' to conform processContextElement signature but we are not doing anything with that */
         UpdateContextResponse ucr;
-        processContextElement(&requestP->contextElementResponseVector.get(ix)->contextElement, &ucr, "append");
+        processContextElement(&requestP->contextElementResponseVector.get(ix)->contextElement, &ucr, "append", tenant);
     }
 
-    responseP->responseCode.fill(SccOk, "OK");
+    reqSemGive(__FUNCTION__, "ngsi10 notification");
+    responseP->responseCode.fill(SccOk);
 
-    LM_SR(SccOk);
+    return SccOk;
 }

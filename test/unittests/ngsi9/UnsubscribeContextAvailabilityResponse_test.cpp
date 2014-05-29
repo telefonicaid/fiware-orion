@@ -22,11 +22,10 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "ngsi9/UnsubscribeContextAvailabilityResponse.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
+
+#include "unittest.h"
 
 
 
@@ -39,19 +38,63 @@ TEST(UnsubscribeContextAvailabilityResponse, constructorsAndRender)
   UnsubscribeContextAvailabilityResponse  ucar1;
   SubscriptionId                          subscriptionId;
 
+  utInit();
+
   subscriptionId.set("111122223333444455556666");
 
   UnsubscribeContextAvailabilityResponse  ucar2(subscriptionId);
-  ErrorCode                               ec(SccBadRequest, "RP", "D");
+  StatusCode                              ec(SccBadRequest, "D");
   UnsubscribeContextAvailabilityResponse  ucar3(ec);
-  std::string                             rendered;
-  std::string                             expected = "<unsubscribeContextAvailabilityResponse>\n  <subscriptionId>No Subscription ID</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>RP</reasonPhrase>\n    <details>D</details>\n  </statusCode>\n</unsubscribeContextAvailabilityResponse>\n";
-;
+  std::string                             out;
+  const char*                             outfile = "ngsi9.unsubscribeContextAvailabilityResponse.constructorsAndRender.valid.xml";
 
   EXPECT_EQ(0,                    ucar1.statusCode.code);
   EXPECT_EQ(subscriptionId.get(), ucar2.subscriptionId.get());
   EXPECT_EQ(SccBadRequest,        ucar3.statusCode.code);
 
-  rendered = ucar3.render(UnsubscribeContext, XML, "");
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+  out = ucar3.render(UnsubscribeContext, XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* jsonRender - 
+*
+*/
+TEST(UnsubscribeContextAvailabilityResponse, jsonRender)
+{
+  const char*                              filename1  = "ngsi9.unsubscribeContextAvailabilityResponse.jsonRender1.valid.json";
+  const char*                              filename2  = "ngsi9.unsubscribeContextAvailabilityResponse.jsonRender2.valid.json";
+  UnsubscribeContextAvailabilityResponse*  ucasP;
+  std::string                              out;
+
+  utInit();
+
+  // Preparations
+  ucasP = new UnsubscribeContextAvailabilityResponse();
+  ucasP->subscriptionId.set("012345678901234567890123");
+
+  // 1. short and ok statusCode
+  ucasP->statusCode.fill(SccOk);
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
+  out = ucasP->render(UpdateContextAvailabilitySubscription, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  
+  // 2. Long and !OK statusCode
+  ucasP->statusCode.fill(SccBadRequest, "no details");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
+  out = ucasP->render(UpdateContextAvailabilitySubscription, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  free(ucasP);
+
+  utExit();
 }

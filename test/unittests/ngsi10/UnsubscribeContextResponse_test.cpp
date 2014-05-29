@@ -22,11 +22,10 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "ngsi10/UnsubscribeContextResponse.h"
 #include "ngsi/StatusCode.h"
-#include "ngsi/ErrorCode.h"
+
+#include "unittest.h"
 
 
 
@@ -37,19 +36,64 @@
 TEST(UnsubscribeContextResponse, constructorsAndRender)
 {
   UnsubscribeContextResponse  uncr1;
-  StatusCode                  sc(SccOk, "RP", "D");
+  StatusCode                  sc(SccOk, "D");
   UnsubscribeContextResponse  uncr2(sc);
-  ErrorCode                   ec(SccBadRequest, "RP", "D");
+  StatusCode                  ec(SccBadRequest, "D");
   UnsubscribeContextResponse  uncr3(ec);
-  std::string                 rendered;
-  std::string                 expected = "<unsubscribeContextResponse>\n  <subscriptionId>0</subscriptionId>\n  <statusCode>\n    <code>400</code>\n    <reasonPhrase>RP</reasonPhrase>\n    <details>D</details>\n  </statusCode>\n</unsubscribeContextResponse>\n";
+  std::string                 out;
+  const char*                 outfile = "ngsi10.unsubscribeContextResponse.constructorsAndRender.ok.valid.xml";
+
+  utInit();
 
   EXPECT_EQ(0,             uncr1.statusCode.code);
   EXPECT_EQ(SccOk,         uncr2.statusCode.code);
   EXPECT_EQ(SccBadRequest, uncr3.statusCode.code);
 
-  rendered = uncr3.render(UnsubscribeContext, XML, "");
-  EXPECT_STREQ(expected.c_str(), rendered.c_str());
+  out = uncr3.render(UnsubscribeContext, XML, "");
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   uncr1.release();
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* jsonRender - 
+*/
+TEST(UnsubscribeContextResponse, jsonRender)
+{
+  const char*                  infile1  = "ngsi10.unsubscribeContextResponse.jsonRender1.valid.json";
+  const char*                  infile2  = "ngsi10.unsubscribeContextResponse.jsonRender2.valid.json";
+  UnsubscribeContextResponse*  uncrP;
+  std::string                  out;
+
+  utInit();
+
+  // Preparations
+  uncrP = new UnsubscribeContextResponse();
+
+  // 1. 400, with details
+  uncrP->subscriptionId.set("012345678901234567890123");
+  uncrP->statusCode.fill(SccBadRequest, "details");
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
+  out = uncrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+
+  // 2. 200, no details
+  uncrP->subscriptionId.set("012345678901234567890123");
+  uncrP->statusCode.fill(SccOk);
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
+  out = uncrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  delete uncrP;
+
+  utExit();
 }

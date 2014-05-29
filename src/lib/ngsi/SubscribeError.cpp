@@ -26,7 +26,7 @@
 
 #include "common/Format.h"
 #include "common/tag.h"
-#include "ngsi/ErrorCode.h"
+#include "ngsi/StatusCode.h"
 #include "ngsi/Request.h"
 #include "ngsi/SubscribeError.h"
 
@@ -38,6 +38,7 @@
 */
 SubscribeError::SubscribeError()
 {
+  errorCode.tagSet("errorCode");
 }
 
 
@@ -46,7 +47,7 @@ SubscribeError::SubscribeError()
 *
 * SubscribeError::render - 
 */
-std::string SubscribeError::render(RequestType requestType, Format format, std::string indent, bool comma)
+std::string SubscribeError::render(RequestType requestType, Format format, const std::string& indent, bool comma)
 {
   std::string out = "";
   std::string tag = "subscribeError";
@@ -56,9 +57,17 @@ std::string SubscribeError::render(RequestType requestType, Format format, std::
   // subscriptionId is Mandatory if part of updateContextSubscriptionResponse
   // errorCode is Mandatory so, the JSON comma is always TRUE
   if (requestType == UpdateContextSubscription)
-     out += subscriptionId.render(format, indent + "  ", true);
-  else if ((requestType == SubscribeContext) && (subscriptionId.get() != "0") && (subscriptionId.get() != ""))
-     out += subscriptionId.render(format, indent + "  ", true);
+  {
+    //
+    // NOTE: the subscriptionId must have come from the request. 
+    //       If the field is empty, we are in unit tests and I here set it to all zeroes
+    //
+    if (subscriptionId.get() == "")
+      subscriptionId.set("000000000000000000000000");
+    out += subscriptionId.render(requestType, format, indent + "  ", true);
+  }
+  else if ((requestType == SubscribeContext) && (subscriptionId.get() != "000000000000000000000000") && (subscriptionId.get() != ""))
+    out += subscriptionId.render(requestType, format, indent + "  ", true);
 
   out += errorCode.render(format, indent + "  ");
 
@@ -73,7 +82,7 @@ std::string SubscribeError::render(RequestType requestType, Format format, std::
 *
 * check - 
 */
-std::string SubscribeError::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string SubscribeError::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
    return "OK";
 }

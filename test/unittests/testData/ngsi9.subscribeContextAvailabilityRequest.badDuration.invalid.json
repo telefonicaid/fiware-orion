@@ -1,0 +1,34 @@
+{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "occupancy",
+    "lightstatus"
+  ],
+  "reference": "http://10.1.1.1:80/test/interfaceNotification",
+  "duration": "fT1M",
+  "restriction" : {
+    "attributeExpression" : "ATTR_EXPR",
+    "scopes" : [
+      {
+        "value" : "sv1",
+        "type"  : "st1"
+      },
+      {
+        "value" : "sv2",
+        "type"  : "st2"
+      }
+    ]
+  }
+}

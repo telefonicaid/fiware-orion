@@ -37,6 +37,6 @@
 *
 * postIndividualContextEntity - 
 */
-extern std::string postIndividualContextEntity(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+extern std::string postIndividualContextEntity(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
 
 #endif

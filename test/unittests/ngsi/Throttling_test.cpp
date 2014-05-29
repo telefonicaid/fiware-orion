@@ -22,12 +22,12 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/Throttling.h"
+
+#include "unittest.h"
 
 
 
@@ -39,6 +39,8 @@ TEST(Throttling, setGetIsEmptyAndParse)
 {
   Throttling  t;
 
+  utInit();
+
   t.set("PT5S");
   EXPECT_STREQ("PT5S", t.get().c_str());
   EXPECT_EQ(5, t.parse());
@@ -46,6 +48,8 @@ TEST(Throttling, setGetIsEmptyAndParse)
 
   t.set("");
   EXPECT_TRUE(t.isEmpty());
+
+  utExit();
 }
 
 
@@ -58,21 +62,22 @@ TEST(Throttling, check)
 {
   Throttling   t;
   std::string  checked;
-  std::string  expected1 = "OK";
-  std::string  expected2 = "OK";
-  std::string  expected3 = "syntax error in throttling string";
+
+  utInit();
 
   t.set("");
   checked = t.check(RegisterContext, XML, "", "", 0);
-  EXPECT_EQ(expected1, checked);
+  EXPECT_EQ("OK", checked);
 
   t.set("PT5S");
   checked = t.check(RegisterContext, XML, "", "", 0);
-  EXPECT_EQ(expected2, checked);
+  EXPECT_EQ("OK", checked);
 
   t.set("xxxPT5S");
   checked = t.check(RegisterContext, XML, "", "", 0);
-  EXPECT_EQ(expected3, checked);
+  EXPECT_EQ("syntax error in throttling string", checked);
+
+  utExit();
 }
 
 
@@ -84,23 +89,30 @@ TEST(Throttling, check)
 TEST(Throttling, render)
 {
   Throttling   t;
-  std::string  rendered;
+  std::string  out;
   std::string  expected1 = "";
-  std::string  expected2 = "<throttling>PT1S</throttling>\n";
-  std::string  expected3 = "\"throttling\" : \"PT1S\"\n";
+  const char*  outfile1 = "ngsi.throttling.render.middle.xml";
+  const char*  outfile2 = "ngsi.throttling.render.middle.json";
+
+  utInit();
 
   t.set("");
-  rendered = t.render(XML, "", false);
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
-  rendered = t.render(JSON, "", false);
-  EXPECT_STREQ(expected1.c_str(), rendered.c_str());
+  out = t.render(XML, "", false);
+  EXPECT_STREQ("", out.c_str());
+
+  out = t.render(JSON, "", false);
+  EXPECT_STREQ("", out.c_str());
 
   t.set("PT1S");
-  rendered = t.render(XML, "", false);
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  out = t.render(XML, "", false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  rendered = t.render(JSON, "", false);
-  EXPECT_STREQ(expected3.c_str(), rendered.c_str());
+  out = t.render(JSON, "", false);
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }
 
 
@@ -113,9 +125,13 @@ TEST(Throttling, present)
 {
   Throttling   t;
 
+  utInit();
+
   t.set("PT1S");
   t.present("");
 
   t.set("");
   t.present("");
+
+  utExit();
 }

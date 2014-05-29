@@ -42,6 +42,7 @@
 */
 UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 {
+  metadataVector.tagSet("metadata");
 }
 
 
@@ -52,13 +53,13 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 */
 std::string UpdateContextAttributeRequest::render(Format format, std::string indent)
 {
-  std::string tag = "updateContexAttributeRequest";
+  std::string tag = "updateContextAttributeRequest";
   std::string out = "";
   std::string indent2 = indent + "  ";
 
-  out += startTag(indent, tag, format);
-  out += valueTag(indent2, "type", type, format);
-  out += valueTag(indent2, "contextValue", contextValue, format);
+  out += startTag(indent, tag, format, false);
+  out += valueTag(indent2, "type", type, format, true);
+  out += valueTag(indent2, "contextValue", contextValue, format, true);
   out += metadataVector.render(format, indent2);
   out += endTag(indent, tag, format);
 
@@ -81,18 +82,15 @@ std::string UpdateContextAttributeRequest::check(RequestType requestType, Format
 
   if (predetectedError != "")
   {
-    response.code         = SccBadRequest;
-    response.reasonPhrase = predetectedError;
+    response.fill(SccBadRequest, predetectedError);
   }
   else if (contextValue == "")
   {
-    response.code         = SccBadRequest;
-    response.reasonPhrase = "empty context value";
+    response.fill(SccBadRequest, "empty context value");
   }
   else if ((res = metadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
   {
-    response.code         = SccBadRequest;
-    response.reasonPhrase = res;
+    response.fill(SccBadRequest, res);
   }
   else
     return "OK";

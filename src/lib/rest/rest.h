@@ -30,20 +30,57 @@
 
 #include "rest/RestService.h"
 
+#define  MAX_LEN_IP   64
+
+/* ****************************************************************************
+*
+*  IpVersion -
+*/
+typedef enum IpVersion 
+{
+  IPV4     = 1,
+  IPV6     = 2,
+  IPDUAL   = 3
+} IpVersion;
+
+
+
+/* ****************************************************************************
+*
+* ipVersionUsed - 
+*/
+extern IpVersion       ipVersionUsed;  
+extern std::string     rushHost;
+extern unsigned short  rushPort;
+extern std::string     multitenant;
+
+
+
+/* ****************************************************************************
+*
+* RestServeFunction - 
+*/
+typedef void (*RestServeFunction)(ConnectionInfo* ciP);
+
 
 
 /* ****************************************************************************
 *
 * restInit - 
 */
-extern void restInit(char* bindIp, unsigned short port, RestService* restServiceV);
-
-
-
-/* ****************************************************************************
-*
-* restStart - 
-*/
-extern int restStart(void);
+extern void restInit
+(
+   RestService*        _restServiceV,
+   IpVersion           _ipVersion,
+   const char*         _bindAddress,
+   unsigned short      _port,
+   const std::string&  _multitenant   = "off",
+   const std::string&  _rushHost      = "",
+   unsigned short      _rushPort      = 0,
+   const char*         _httpsKey      = NULL,
+   const char*         _httpsCert     = NULL,
+   RestServeFunction   _serveFunction = NULL,
+   bool                _acceptTextXml = false
+);
 
 #endif

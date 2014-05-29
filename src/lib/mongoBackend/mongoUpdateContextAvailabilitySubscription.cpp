@@ -29,54 +29,69 @@
 
 #include "common/globals.h"
 #include "common/Format.h"
+#include "common/sem.h"
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContextAvailabilitySubscription.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionRequest.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
 
-#include "common/sem.h"
-
 /* ****************************************************************************
 *
 * mongoUpdateContextAvailabilitySubscription - 
 */
-HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabilitySubscriptionRequest* requestP, UpdateContextAvailabilitySubscriptionResponse* responseP, Format inFormat)
+HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabilitySubscriptionRequest* requestP, UpdateContextAvailabilitySubscriptionResponse* responseP, Format inFormat, const std::string& tenant)
 {
-  /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-  semTake();
-
   LM_T(LmtMongo, ("Update Context Subscription"));
+  reqSemTake(__FUNCTION__, "ngsi9 update subscription request");
 
   DBClientConnection* connection = getMongoConnection();
 
   /* Look for document */
-  BSONObj sub;
+  BSONObj  sub;
   try {
       OID id = OID(requestP->subscriptionId.get());
-      sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << id));
-      if (sub.isEmpty()) {
-          responseP->errorCode.fill(SccContextElementNotFound, "Subscription Not Found");
-          LM_SR(SccOk);
-      }
+
+      mongoSemTake(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection");
+      sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), BSON("_id" << id));
+      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection");
   }
   catch( const AssertionException &e ) {
       /* This happens when OID format is wrong */
       // FIXME: this checking should be done at parsing stage, without progressing to
       // mongoBackend. By the moment we can live this here, but we should remove in the future
       // (old issue #95)
-      responseP->errorCode.fill(SccContextElementNotFound, "Subscription Not Found");
-      LM_SR(SccOk);
+      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (mongo assertion exception)");
+      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo assertion exception)");
+
+      responseP->errorCode.fill(SccContextElementNotFound);
+      return SccOk;
   }
   catch( const DBException &e ) {
-      responseP->errorCode.fill(
-          SccReceiverInternalError,
-         "Database Error",
-          std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
-             " - findOne() _id: " + requestP->subscriptionId.get() +
-             " - exception: " + e.what()
-      );
-      LM_SR(SccOk);
+      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (mongo db exception)");
+      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)");
+
+      responseP->errorCode.fill(SccReceiverInternalError,
+                                std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
+                                " - findOne() _id: " + requestP->subscriptionId.get() +
+                                " - exception: " + e.what());
+      return SccOk;
+  }
+  catch(...) {
+      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (mongo generic exception)");
+      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo generic exception)");
+
+      responseP->errorCode.fill(SccReceiverInternalError,
+                                std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
+                                " - findOne() _id: " + requestP->subscriptionId.get() +
+                                " - exception: " + "generic");
+      return SccOk;
+  }
+
+  if (sub.isEmpty()) {
+     responseP->errorCode.fill(SccContextElementNotFound);
+     reqSemGive(__FUNCTION__, "ngsi9 update subscription request (no subscriptions found)");
+     return SccOk;
   }
 
   /* We start with an empty BSONObjBuilder and process requestP for all the fields that can
@@ -116,12 +131,12 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
 
   /* Duration (optional) */
   if (requestP->duration.isEmpty()) {
-      newSub.append(CASUB_EXPIRATION, sub.getIntField(CASUB_EXPIRATION));
+      newSub.append(CASUB_EXPIRATION, sub.getField(CASUB_EXPIRATION).numberLong());
   }
   else {
-      int expiration = getCurrentTime() + requestP->duration.parse();
+      long long expiration = getCurrentTime() + requestP->duration.parse();
       newSub.append(CASUB_EXPIRATION, expiration);
-      LM_T(LmtMongo, ("New subscription expiration: %d", expiration));
+      LM_T(LmtMongo, ("New subscription expiration: %l", expiration));
   }
 
   /* Reference is not updatable, so it is appended directly */
@@ -142,27 +157,40 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
 
   /* Update document in MongoDB */
   BSONObj update = newSub.obj();
+  LM_T(LmtMongo, ("update() in '%s' collection _id '%s': %s}", getSubscribeContextAvailabilityCollectionName(tenant).c_str(),
+                  requestP->subscriptionId.get().c_str(),
+                  update.toString().c_str()));
   try {
-      LM_T(LmtMongo, ("update() in '%s' collection _id '%s': %s}", getSubscribeContextAvailabilityCollectionName(),
-                         requestP->subscriptionId.get().c_str(),
-                         update.toString().c_str()));
-      connection->update(getSubscribeContextAvailabilityCollectionName(), BSON("_id" << OID(requestP->subscriptionId.get())), update);
+      mongoSemTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
+      connection->update(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), BSON("_id" << OID(requestP->subscriptionId.get())), update);
+      mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
   }
   catch( const DBException &e ) {
-      responseP->errorCode.fill(
-          SccReceiverInternalError,
-          "Database Error",
-          std::string("collection: ") + getSubscribeContextAvailabilityCollectionName() +
-              " - update() _id: " + requestP->subscriptionId.get().c_str() +
-              " - update() doc: " + update.toString() +
-              " - exception: " + e.what()
-       );
+      mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo db exception)");
+      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)");
 
-      LM_SR(SccOk);
+      responseP->errorCode.fill(SccReceiverInternalError,
+                                std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
+                                " - update() _id: " + requestP->subscriptionId.get().c_str() +
+                                " - update() doc: " + update.toString() +
+                                " - exception: " + e.what());
+
+      return SccOk;
+  }
+  catch(...) {
+      mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo generic exception)");
+      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo generic exception)");
+
+      responseP->errorCode.fill(SccReceiverInternalError,
+                                std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
+                                " - update() _id: " + requestP->subscriptionId.get().c_str() +
+                                " - update() doc: " + update.toString() +
+                                " - exception: " + "generic");
+      return SccOk;
   }
 
   /* Send notifications for matching context registrations */
-  processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, requestP->subscriptionId.get(), STR_FIELD(sub, CASUB_REFERENCE), inFormat);
+  processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, requestP->subscriptionId.get(), STR_FIELD(sub, CASUB_REFERENCE), inFormat, tenant);
 
   /* Duration is an optional parameter, it is only added in the case they
    * was used for update */
@@ -172,5 +200,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
 
   responseP->subscriptionId = requestP->subscriptionId;
 
-  LM_SR(SccOk);
+  reqSemGive(__FUNCTION__, "ngsi9 update subscription request");
+
+  return SccOk;
 }

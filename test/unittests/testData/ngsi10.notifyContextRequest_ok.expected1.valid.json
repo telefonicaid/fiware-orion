@@ -12,7 +12,7 @@
           {
             "name" : "temperature",
             "type" : "Room",
-            "contextValue" : "10",
+            "value" : "10",
             "metadatas" : [
               {
                 "name" : "ID",
@@ -29,7 +29,7 @@
           {
             "name" : "temperature",
             "type" : "Room",
-            "contextValue" : "10",
+            "value" : "10",
             "metadatas" : [
               {
                 "name" : "ID",

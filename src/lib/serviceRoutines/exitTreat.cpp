@@ -34,6 +34,7 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "rest/rest.h"
+#include "rest/restReply.h"
 #include "serviceRoutines/exitTreat.h"
 
 
@@ -42,14 +43,14 @@
 *
 * exitTreat - 
 */
-std::string exitTreat(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string exitTreat(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
    std::string password = "XXX";
    std::string out;
 
    if (harakiri == false)
    {
-     OrionError orionError(SccBadRequest, "Bad request", "no such service");
+     OrionError orionError(SccBadRequest, "no such service");
 
      ciP->httpStatusCode = SccOk;
      out = orionError.render(ciP->outFormat, "");
@@ -61,21 +62,18 @@ std::string exitTreat(ConnectionInfo* ciP, int components, std::vector<std::stri
 
    if (components == 1)
    {
-      OrionError orionError(SccBadRequest, "Bad request", "Password requested");
+      OrionError orionError(SccBadRequest, "Password requested");
       ciP->httpStatusCode = SccOk;
       out = orionError.render(ciP->outFormat, "");
    }
    else if (password != "harakiri")
    {
-      OrionError orionError(SccBadRequest, "Bad request", "Request denied - password erroneous");
+      OrionError orionError(SccBadRequest, "Request denied - password erroneous");
       ciP->httpStatusCode = SccOk;
       out = orionError.render(ciP->outFormat, "");
    }
    else
    {
-      // Cleanup for valgrind
-      free(ciP->payload);
-      delete ciP;
       mongoDisconnect();
       compV.clear();
       return "DIE";

@@ -53,19 +53,22 @@ SubscribeContextAvailabilityRequest::SubscribeContextAvailabilityRequest()
 *
 * SubscribeContextAvailabilityRequest::render - 
 */
-std::string SubscribeContextAvailabilityRequest::render(RequestType requestType, Format format, std::string indent)
+std::string SubscribeContextAvailabilityRequest::render(RequestType requestType, Format format, const std::string& indent)
 {
-  std::string out      = "";
-  std::string tag      = "subscribeContextAvailabilityRequest";
-  std::string indent2  = indent + "  ";
+  std::string out                      = "";
+  std::string tag                      = "subscribeContextAvailabilityRequest";
+  std::string indent2                  = indent + "  ";
+  bool        commaAfterEntityIdVector = (restrictions > 0) || !duration.isEmpty() || !reference.isEmpty() || (attributeList.size() != 0);
+  bool        commaAfterAttributeList  = (restrictions > 0) || !duration.isEmpty() || !reference.isEmpty();
+  bool        commaAfterReference      = (restrictions > 0) || !duration.isEmpty();
+  bool        commaAfterDuration       = restrictions > 0;
 
   out += startTag(indent, tag, format, false);
-  out += entityIdVector.render(format, indent2);
-  out += attributeList.render(format, indent2);
-  out += reference.render(format, indent2, true); // FIXME P9: durationRendered || restrictionRendered || subscriptionIdRendered
-  out += duration.render(format, indent2, true);  // FIXME P9: restrictionRendered || subscriptionIdRendered
+  out += entityIdVector.render(format, indent2, commaAfterEntityIdVector);
+  out += attributeList.render(format, indent2, commaAfterAttributeList);
+  out += reference.render(format, indent2, commaAfterReference);
+  out += duration.render(format, indent2, commaAfterDuration);
   out += restriction.render(format, indent2);
-  out += subscriptionId.render(format, indent2);
   out += endTag(indent, tag, format);
 
   return out;
@@ -77,15 +80,14 @@ std::string SubscribeContextAvailabilityRequest::render(RequestType requestType,
 *
 * SubscribeContextAvailabilityRequest::check - 
 */
-std::string SubscribeContextAvailabilityRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string SubscribeContextAvailabilityRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   SubscribeContextAvailabilityResponse response;
   std::string                          res;
 
   if (predetectedError != "")
   {
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = predetectedError;
+    response.errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (((res = entityIdVector.check(SubscribeContextAvailability, format, indent, predetectedError, counter))   != "OK") ||
            ((res = attributeList.check(SubscribeContextAvailability, format, indent, predetectedError, counter))    != "OK") ||
@@ -93,8 +95,7 @@ std::string SubscribeContextAvailabilityRequest::check(RequestType requestType, 
            ((res = duration.check(SubscribeContextAvailability, format, indent, predetectedError, counter))         != "OK") ||
            ((res = restriction.check(SubscribeContextAvailability, format, indent, predetectedError, restrictions)) != "OK"))
   {
-    response.errorCode.code         = SccBadRequest;
-    response.errorCode.reasonPhrase = res;
+    response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
@@ -121,12 +122,11 @@ void SubscribeContextAvailabilityRequest::release(void)
 *
 * SubscribeContextAvailabilityRequest::present - 
 */
-void SubscribeContextAvailabilityRequest::present(std::string indent)
+void SubscribeContextAvailabilityRequest::present(const std::string& indent)
 {
    entityIdVector.present(indent);
    attributeList.present(indent);
    reference.present(indent);
    duration.present(indent);
    restriction.present(indent);   
-   subscriptionId.present(indent);
 }

@@ -1,0 +1,8 @@
+{
+  "contextRegistration" : {
+  },
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request"
+  }
+}

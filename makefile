@@ -33,9 +33,18 @@ ifndef CPU_COUNT
 	CPU_COUNT:=$(shell cat /proc/cpuinfo | grep processor | wc -l)
 endif
 
+ifndef ORION_WS
+	ORION_WS:=$(shell pwd)
+endif
+
+# Directory for the rpm stage
+ifndef TOPDIR
+	RPM_TOPDIR=$(ORION_WS)/rpm
+endif
+
 # Version for the contextBroker-* packages (except contextBroker-fiware)
 ifndef BROKER_VERSION
-	BROKER_VERSION:=$(shell grep "\#define ORION_VERSION" src/app/contextBroker/version.h | sed -e 's/^.* "//' -e 's/"//')
+	BROKER_VERSION:=$(shell grep "\#define ORION_VERSION" src/app/contextBroker/version.h | sed -e 's/^.* "//' -e 's/"//' | sed -e 's/-/_/g')
 endif
 
 # Release ID for the contextBroker-* packages (execept contextBroker-fiware)
@@ -110,7 +119,7 @@ install_debug: debug
 
 install_scripts:
 	cp scripts/accumulator-server.py $(INSTALL_DIR)/bin 
-	cp scripts/garbage-collector.py $(INSTALL_DIR)/bin
+	cp scripts/managedb/garbage-collector.py $(INSTALL_DIR)/bin
 
 install_coverage: prepare_coverage
 	cd BUILD_COVERAGE && make install DESTDIR=$(DESTDIR)
@@ -172,6 +181,12 @@ post_install_libs:
 	cp src/lib/serviceRoutines/*.h /usr/local/include/contextBroker/serviceRoutines
 	cp $(CMAKE_BUILD_TYPE)/src/lib/serviceRoutines/libserviceRoutines.a  /usr/local/lib
 
+	cd /usr/local/include/contextBroker  && rm -rf orionTypes && mkdir -p orionTypes
+	cp src/lib/orionTypes/*.h /usr/local/include/contextBroker/orionTypes
+	
+	cd /usr/local/include/contextBroker  && rm -rf parse && mkdir -p parse
+	cp src/lib/parse/*.h /usr/local/include/contextBroker/parse
+	cp $(CMAKE_BUILD_TYPE)/src/lib/parse/libparse.a  /usr/local/lib
 
 
 # Requires root access, i.e. use 'sudo make install_libs' to install
@@ -184,14 +199,10 @@ install_debug_libs: debug
 
 
 rpm: 
-	mkdir -p ~/rpmbuild/BUILD
-	mkdir -p ~/rpmbuild/RPMS
-	mkdir -p ~/rpmbuild/SOURCES
-	mkdir -p ~/rpmbuild/SPECS
-	mkdir -p ~/rpmbuild/SRPMS
-	rm -f ~/rpmbuild/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	git archive --format tar --prefix=contextBroker-$(BROKER_VERSION)/ HEAD |  gzip >  $(HOME)/rpmbuild/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
-	rpmbuild -ba rpm/contextBroker.spec \
+	rm -f rpm/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
+	git archive --format tar --prefix=contextBroker-$(BROKER_VERSION)/ HEAD |  gzip >  $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
+	rpmbuild -ba $(RPM_TOPDIR)/SPECS/contextBroker.spec \
+		--define '_topdir $(RPM_TOPDIR)' \
 		--define 'broker_version $(BROKER_VERSION)' \
 		--define 'broker_release $(BROKER_RELEASE)' \
 		--define 'fiware_version $(FIWARE_VERSION)' \
@@ -247,7 +258,7 @@ clean:
 	rm -rf BUILD_UNITTEST
 
 lint_all:
-	scripts/cpplint.py src/*.cpp src/*.h
+	scripts/linter.sh
 
 lint_changed:
 	git diff --name-only | grep "\.cpp\|\.h" | xargs scripts/cpplint.py
@@ -375,7 +386,7 @@ coverage_functional_test: install_coverage
 
 valgrind:
 	@echo For detailed info: tail -f /tmp/valgrindTestSuiteLog
-	(cd test/valgrind; ./valgrindTestSuite.sh)
+	test/valgrind/valgrindTestSuite.sh
 
 files_compliance:
 	scripts/check_files_compliance.py .

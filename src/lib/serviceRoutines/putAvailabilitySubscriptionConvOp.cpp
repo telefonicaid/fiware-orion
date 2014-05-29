@@ -37,7 +37,7 @@
 *
 * putAvailabilitySubscriptionConvOp - 
 */
-std::string putAvailabilitySubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string putAvailabilitySubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string                                    subscriptionId  = compV[2];
   UpdateContextAvailabilitySubscriptionRequest*  ucasP           = &parseDataP->ucas.res;
@@ -46,7 +46,8 @@ std::string putAvailabilitySubscriptionConvOp(ConnectionInfo* ciP, int component
   {
     std::string out;
 
-    out = restErrorReplyGet(ciP, ciP->outFormat, "", "updateContextAvailabilitySubscription", SccBadRequest, "unmatching subscriptionId URI/payload", subscriptionId);
+    out = restErrorReplyGet(ciP, ciP->outFormat, "", "updateContextAvailabilitySubscription", SccBadRequest,
+                            std::string("unmatching subscriptionId URI/payload: '") + subscriptionId + "' vs '" + ucasP->subscriptionId.get() + "'");
     return out;
   }
 

@@ -26,8 +26,8 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-#include "common/sem.h"
 #include "common/statistics.h"
+#include "common/sem.h"
 #include "mongoBackend/mongoDiscoverContextAvailability.h"
 #include "rest/HttpStatusCode.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -42,8 +42,16 @@ using namespace mongo;
 *
 * associationsQuery -
 */
-bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scope, MetadataVector* mdV, std::string* err) {
-
+static bool associationsQuery
+(
+  EntityIdVector*       enV,
+  AttributeList*        attrL,
+  const std::string&    scope,
+  MetadataVector*       mdV,
+  std::string*          err,
+  const std::string&    tenant
+)
+{
     DBClientConnection* connection = getMongoConnection();
 
     /* Note that SCOPE_VALUE_ASSOC_SOURCE means that the argument is a target (so we use ASSOC_TARGET_ENT and
@@ -53,8 +61,8 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
 
     /* Build query (entity part) */
     BSONArrayBuilder enArray;
-    for (unsigned int ix = 0; ix < enV.size() ; ++ix) {
-        enArray.append(BSON(ASSOC_ENT_ID << enV.get(ix)->id << ASSOC_ENT_TYPE << enV.get(ix)->type));
+    for (unsigned int ix = 0; ix < enV->size(); ++ix) {
+        enArray.append(BSON(ASSOC_ENT_ID << enV->get(ix)->id << ASSOC_ENT_TYPE << enV->get(ix)->type));
     }
     BSONObj queryEn;
     if (scope == SCOPE_VALUE_ASSOC_SOURCE) {
@@ -67,15 +75,15 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
 
     /* Build query (attribute part) */
     BSONArrayBuilder attrArray;
-    for (unsigned int ix = 0; ix < attrL.size() ; ++ix) {
-        attrArray.append(attrL.get(ix));
+    for (unsigned int ix = 0; ix < attrL->size() ; ++ix) {
+        attrArray.append(attrL->get(ix));
     }
     std::string attrField;
     if (scope == SCOPE_VALUE_ASSOC_SOURCE) {
-        attrField = std::string(ASSOC_ATTRS) + "." + ASSOC_ATTRS_TARGET;
+        attrField = ASSOC_ATTRS "." ASSOC_ATTRS_TARGET;
     }
     else {  // SCOPE_VALUE_ASSOC_TARGET
-        attrField = std::string(ASSOC_ATTRS) + "." + ASSOC_ATTRS_SOURCE;
+        attrField = ASSOC_ATTRS "." ASSOC_ATTRS_SOURCE;
     }
     queryB.append(attrField, BSON("$in" << attrArray.arr()));
 
@@ -83,20 +91,35 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
     BSONObj query = queryB.obj();
     auto_ptr<DBClientCursor> cursor;
     try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getAssociationsCollectionName(), query.toString().c_str()));
-        cursor = connection->query(getAssociationsCollectionName(), query);
-        /* We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-         * raising an exceiption the query() method set the cursos to NULL. In this case, we raise the
-         * exception ourselves */
+        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getAssociationsCollectionName(tenant).c_str(), query.toString().c_str()));
+
+        mongoSemTake(__FUNCTION__, "query in AssociationsCollection");
+        cursor = connection->query(getAssociationsCollectionName(tenant).c_str(), query);
+
+        /*
+         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+         * exception ourselves
+         */
         if (cursor.get() == NULL) {
-            throw DBException("Null cursor", 0);
+            throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
+        mongoSemGive(__FUNCTION__, "query in AssociationsCollection");
     }
     catch( const DBException &e ) {
 
-        *err = std::string("collection: ") + getAssociationsCollectionName() +
+        mongoSemGive(__FUNCTION__, "query in AssociationsCollection (DBException)");
+        *err = std::string("collection: ") + getAssociationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
+        return false;
+    }
+    catch(...) {
+
+        mongoSemGive(__FUNCTION__, "query in AssociationsCollection (Generic Exception)");
+        *err = std::string("collection: ") + getAssociationsCollectionName(tenant).c_str() +
+                " - query(): " + query.toString() +
+                " - exception: " + "generic";
         return false;
     }
 
@@ -130,30 +153,27 @@ bool associationsQuery(EntityIdVector enV, AttributeList attrL, std::string scop
         }
 
         mdV->push_back(md);
-
     }
 
     return true;
-
-
 }
 
 /* ****************************************************************************
 *
-* associationsDiscoverConvextAvailability -
+* associationsDiscoverContextAvailability -
 */
-static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, std::string scope) {
+static HttpStatusCode associationsDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, const std::string& scope, const std::string& tenant) {
 
     if (scope == SCOPE_VALUE_ASSOC_ALL) {
         LM_W(("%s scope not supported", SCOPE_VALUE_ASSOC_ALL));
-        responseP->errorCode.fill(SccNotImplemented, "Not supported scope", SCOPE_VALUE_ASSOC_ALL);
+        responseP->errorCode.fill(SccNotImplemented, std::string("Not supported scope: '") + SCOPE_VALUE_ASSOC_ALL + "'");
         return SccOk;
     }
 
     MetadataVector mdV;
     std::string err;
-    if (!associationsQuery(requestP->entityIdVector, requestP->attributeList, scope, &mdV, &err)) {
-        responseP->errorCode.fill(SccReceiverInternalError, "Database Error", err);
+    if (!associationsQuery(&requestP->entityIdVector, &requestP->attributeList, scope, &mdV, &err, tenant)) {
+        responseP->errorCode.fill(SccReceiverInternalError, std::string("Database error: ") + err);
         LM_RE(SccOk,(responseP->errorCode.details.c_str()));
     }
 
@@ -184,8 +204,8 @@ static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAva
         }
 
         ContextRegistrationResponseVector crrV;
-        if (!registrationsQuery(enV, attrL, &crrV, &err)) {
-            responseP->errorCode.fill(SccReceiverInternalError, "Database Error", err);
+        if (!registrationsQuery(enV, attrL, &crrV, &err, tenant)) {
+            responseP->errorCode.fill(SccReceiverInternalError, err);
             LM_RE(SccOk,(responseP->errorCode.details.c_str()));
         }
 
@@ -208,17 +228,17 @@ static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAva
 *
 * conventionalDiscoverContextAvailability -
 */
-static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP) {
+static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, const std::string& tenant) {
     std::string err;
-    if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err)) {
-        responseP->errorCode.fill(SccReceiverInternalError, "Database Error", err);
+    if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err, tenant)) {
+        responseP->errorCode.fill(SccReceiverInternalError, err);
         LM_RE(SccOk,(responseP->errorCode.details.c_str()));
     }
 
     if (responseP->responseVector.size() == 0) {
         /* If the responseV is empty, we haven't found any entity and have to fill the status code part in the
          * response */
-        responseP->errorCode.fill(SccContextElementNotFound, "No context element registrations found", "");
+        responseP->errorCode.fill(SccContextElementNotFound);
         return SccOk;
     }
 
@@ -229,10 +249,9 @@ static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAva
 *
 * mongoDiscoverContextAvailability - 
 */
-HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP)
+HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, const std::string& tenant)
 {
-  /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-  semTake();
+  reqSemTake(__FUNCTION__, "mongo ngsi9 discovery request");
 
   LM_T(LmtMongo, ("DiscoverContextAvailability Request"));  
 
@@ -248,17 +267,19 @@ HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityReque
     std::string scopeValue = requestP->restriction.scopeVector.get(0)->value;
 
     if (scopeType == SCOPE_TYPE_ASSOC) {
-      HttpStatusCode ms = associationsDiscoverConvextAvailability(requestP, responseP, scopeValue);
-      LM_SR(ms);
+      HttpStatusCode ms = associationsDiscoverContextAvailability(requestP, responseP, scopeValue, tenant);
+      reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request (association)");
+      return ms;
     }
     else {
       LM_W(("Unsupported scope (%s, %s), doing conventional discoverContextAvailability", scopeType.c_str(), scopeValue.c_str()));
     }
   }
 
-  HttpStatusCode hsCode = conventionalDiscoverContextAvailability(requestP, responseP);
+  HttpStatusCode hsCode = conventionalDiscoverContextAvailability(requestP, responseP, tenant);
   if (hsCode != SccOk)
     ++noOfDiscoveryErrors;
 
-  LM_SR(hsCode);
+  reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request");
+  return hsCode;
 }

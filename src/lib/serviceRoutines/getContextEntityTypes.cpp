@@ -39,14 +39,14 @@
 *
 * getContextEntityTypes - 
 */
-std::string getContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string getContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string                          typeName     = compV[2];
   std::string                          answer;
   DiscoverContextAvailabilityResponse  response;
 
   LM_T(LmtConvenience, ("CONVENIENCE: got a  'GET' request for entity type '%s'", typeName.c_str()));
-  ciP->httpStatusCode = mapGetContextEntityTypes(typeName, &response);
+  ciP->httpStatusCode = mapGetContextEntityTypes(typeName, &response, ciP);
   answer = response.render(DiscoverContextAvailability, ciP->outFormat, "");
   response.release();
   

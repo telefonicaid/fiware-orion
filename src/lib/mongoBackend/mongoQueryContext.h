@@ -36,6 +36,6 @@
 *
 * mongoQueryContext - 
 */
-extern HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResponse* responseP);
+extern HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResponse* responseP, const std::string& tenant = "");
 
 #endif

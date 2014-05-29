@@ -22,8 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -33,7 +31,7 @@
 #include "xmlParse/xmlRequest.h"
 #include "xmlParse/xmlParse.h"
 
-#include "testDataFromFile.h"
+#include "unittest.h"
 
 
 
@@ -56,16 +54,20 @@ TEST(UpdateContextSubscriptionRequest, badLength_xml)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName = "ngsi10.updateContextSubscription.subscriptionIdLength.invalid.xml";
-  const char*     expected1 = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <subscriptionId>12345</subscriptionId>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>bad length (24 chars expected)</reasonPhrase>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
+  const char*     infile  = "ngsi10.updateContextSubscription.subscriptionIdLength.invalid.xml";
+  const char*     outfile = "ngsi10.updateContextSubscriptionResponse.subscriptionIdLengthInvalid.valid.xml";
+  std::string     out;
 
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   lmTraceLevelSet(LmtDump, true);
-  std::string result = xmlTreat(testBuf, &ci, &parseData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  out = xmlTreat(testBuf, &ci, &parseData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
   lmTraceLevelSet(LmtDump, false);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_STREQ(expected1, result.c_str());
 
   //
   // With the data obtained, render, present and release methods are exercised
@@ -74,24 +76,27 @@ TEST(UpdateContextSubscriptionRequest, badLength_xml)
   
   ucsrP->present(""); // No output
 
-  std::string rendered;
-  std::string checked;
-  std::string expected2 = "<updateContextSubscriptionRequest>\n  <duration>P50Y</duration>\n  <restriction>\n    <attributeExpression>AttriTest</attributeExpression>\n    <scope>\n      <operationScope>\n        <type>st1</type>\n        <value>sv1</value>\n      </operationScope>\n      <operationScope>\n        <type>st2</type>\n        <value>sv2</value>\n      </operationScope>\n    </scope>\n  </restriction>\n  <subscriptionId>12345</subscriptionId>\n  <notifyConditions>\n    <notifyCondition>\n      <type>ONCHANGE</type>\n      <condValueList>\n        <condValue>CondValue3</condValue>\n        <condValue>CondValue4</condValue>\n      </condValueList>\n    </notifyCondition>\n  </notifyConditions>\n  <throttling>P5Y</throttling>\n</updateContextSubscriptionRequest>\n";
-  std::string expected3 = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <subscriptionId>12345</subscriptionId>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>FORCED ERROR</reasonPhrase>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
-  std::string expected4 = "<updateContextSubscriptionResponse>\n  <subscribeError>\n    <subscriptionId>12345</subscriptionId>\n    <errorCode>\n      <code>400</code>\n      <reasonPhrase>syntax error in duration string</reasonPhrase>\n    </errorCode>\n  </subscribeError>\n</updateContextSubscriptionResponse>\n";
+  const char*     outfile2 = "ngsi10.updateContextSubscriptionResponse.ok.valid.xml";
+  const char*     outfile3 = "ngsi10.updateContextSubscriptionResponse.forcedError.valid.xml";
+  const char*     outfile4 = "ngsi10.updateContextSubscriptionResponse.badDuration.valid.xml";
 
-  rendered = ucsrP->render(UpdateContextSubscription, XML, "");
-  EXPECT_STREQ(expected2.c_str(), rendered.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  out = ucsrP->render(UpdateContextSubscription, XML, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  checked  = ucsrP->check(UpdateContextSubscription, XML, "", "FORCED ERROR", 0);
-  EXPECT_STREQ(expected3.c_str(), checked.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  out  = ucsrP->check(UpdateContextSubscription, XML, "", "FORCED ERROR", 0);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
   ucsrP->duration.set("XXXYYYZZZ");
-  checked  = ucsrP->check(UpdateContextSubscription, XML, "", "", 0);
-  EXPECT_STREQ(expected4.c_str(), checked.c_str());
+  out  = ucsrP->check(UpdateContextSubscription, XML, "", "", 0);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucsrP->present("");
   ucsrP->release();
+
+  utExit();
 }
 
 
@@ -104,24 +109,25 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName  = "updateContextSubscription_badLength.json";
-  std::string     rendered;
-  std::string     checked;
-  const char*     expectedFile1 = "ngsi10.updateContextSubscriptionRequest_badLength.expected1.valid.json";
-  const char*     expectedFile2 = "ngsi10.updateContextSubscriptionRequest_badLength.expected2.valid.json";
-  const char*     expectedFile3 = "ngsi10.updateContextSubscriptionRequest_badLength.expected3.valid.json";
-  const char*     expectedFile4 = "ngsi10.updateContextSubscriptionRequest_badLength.expected4.valid.json";
+  std::string     out;
+  const char*     infile   = "ngsi10.updateContextSubscriptionRequest.badLength.invalid.json";
+  const char*     outfile1 = "ngsi10.updateContextSubscriptionRequest.badLength.expected1.valid.json";
+  const char*     outfile2 = "ngsi10.updateContextSubscriptionRequest.badLength.expected2.valid.json";
+  const char*     outfile3 = "ngsi10.updateContextSubscriptionRequest.badLength.expected3.valid.json";
+  const char*     outfile4 = "ngsi10.updateContextSubscriptionRequest.badLength.expected4.valid.json";
   
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), expectedFile1)) << "Error getting test data from '" << expectedFile1 << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   lmTraceLevelSet(LmtDump, true);
-  rendered = jsonTreat(testBuf, &ci, &parseData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  out = jsonTreat(testBuf, &ci, &parseData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
   lmTraceLevelSet(LmtDump, false);
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   //
   // With the data obtained, render, present and release methods are exercised
@@ -130,21 +136,23 @@ TEST(UpdateContextSubscriptionRequest, badLength_json)
   
   ucsrP->present(""); // No output
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), expectedFile2)) << "Error getting test data from '" << expectedFile2 << "'";
-  rendered = ucsrP->render(UpdateContextSubscription, JSON, "");
-  EXPECT_STREQ(expectedBuf, rendered.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  out = ucsrP->render(UpdateContextSubscription, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), expectedFile3)) << "Error getting test data from '" << expectedFile3 << "'";
-  checked  = ucsrP->check(UpdateContextSubscription, JSON, "", "FORCED ERROR", 0);
-  EXPECT_STREQ(expectedBuf, checked.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  out  = ucsrP->check(UpdateContextSubscription, JSON, "", "FORCED ERROR", 0);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucsrP->duration.set("XXXYYYZZZ");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), expectedFile4)) << "Error getting test data from '" << expectedFile4 << "'";
-  checked  = ucsrP->check(UpdateContextSubscription, JSON, "", "", 0);
-  EXPECT_STREQ(expectedBuf, checked.c_str());
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
+  out  = ucsrP->check(UpdateContextSubscription, JSON, "", "", 0);
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
   ucsrP->present("");
   ucsrP->release();
+
+  utExit();
 }
 
 
@@ -157,14 +165,525 @@ TEST(UpdateContextSubscriptionRequest, invalidDuration_json)
 {
   ParseData       parseData;
   ConnectionInfo  ci("", "POST", "1.1");
-  const char*     fileName  = "updateContextSubscription_invalidDuration.json";
-  std::string     expected  = "{\n  \"subscribeError\" : {\n    \"subscriptionId\" : \"9212ce4b0c214479be429e2b\",\n    \"errorCode\" : {\n      \"code\" : \"400\",\n      \"reasonPhrase\" : \"syntax error in duration string\"\n    }\n  }\n}\n";
+  const char*     infile   = "ngsi10.updateContextSubscriptionRequest.duration.invalid.json";
+  const char*     outfile  = "ngsi10.updateContextSubscriptionResponse.invalidDuration.valid.json";
   
-  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), fileName)) << "Error getting test data from '" << fileName << "'";
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   ci.inFormat  = JSON;
   ci.outFormat = JSON;
 
-  std::string result = jsonTreat(testBuf, &ci, &parseData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
-  EXPECT_EQ(expected, result);
+  std::string out = jsonTreat(testBuf, &ci, &parseData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleOk - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleOk)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleOk.postponed.xml";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     result;
+
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  result = xmlTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleInverted - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInverted)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleInverted.postponed.xml";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  out = xmlTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ("OK", out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleInvertedBadValue - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedBadValue)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleInvertedBadValue.postponed.xml";
+  const char*     outfile = "ngsi10.updateContextSubscriptionResponse.circleInvertedBadValue.valid.xml";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  out = xmlTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleZeroRadius - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleZeroRadius)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleZeroRadius.postponed.xml";
+  const char*     outfile = "ngsi10.updateContextSubscriptionResponse.circleZeroRadius.valid.xml";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  out = xmlTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleOkJson - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleOkJson)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleOk.postponed.json";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     result;
+
+  utInit();
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  result = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleInvertedJson - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedJson)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleInverted.postponed.json";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  utInit();
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  out = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ("OK", out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleInvertedBadValueJson - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleInvertedBadValueJson)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleInvertedBadValue.postponed.json";
+  const char*     outfile = "ngsi10.updateContextSubscriptionResponse.circleInvertedBadValue.valid.json";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  utInit();
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  out = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationCircleZeroRadiusJson - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationCircleZeroRadiusJson)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.circleZeroRadius.postponed.json";
+  const char*     outfile = "ngsi10.updateContextSubscriptionResponse.circleZeroRadius.valid.json";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  utInit();
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  out = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonOk - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOk)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonOk.postponed.xml";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     result;
+
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  result = xmlTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonInverted - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInverted)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonInverted.postponed.xml";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     result;
+
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  result = xmlTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonInvertedBadValue - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedBadValue)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonInvertedBadValue.postponed.xml";
+  const char*     outfile = "ngsi10.updateContextSubscriptionResponse.polygonInvertedBadValue.valid.xml";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  out = xmlTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonNoVertices - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonNoVertices)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonNoVertices.postponed.xml";
+  const char*     outfile = "ngsi10.updateContextSubscriptionResponse.polygonNoVertices.valid.xml";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  out = xmlTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonOneVertex - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOneVertex)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonOneVertex.postponed.xml";
+  const char*     outfile = "ngsi10.updateContextSubscriptionResponse.polygonOneVertex.valid.xml";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  out = xmlTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonTwoVertices - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonTwoVertices)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonTwoVertices.postponed.xml";
+  const char*     outfile = "ngsi10.updateContextSubscriptionResponse.polygonTwoVertices.valid.xml";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  utInit();
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  out = xmlTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonOkJson - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOkJson)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonOk.postponed.json";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     result;
+
+  utInit();
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  result = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonInvertedJson - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedJson)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonInverted.postponed.json";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     result;
+
+  utInit();
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  result = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ("OK", result.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonInvertedBadValueJson - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonInvertedBadValueJson)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonInvertedBadValue.postponed.json";
+  const char*     outfile = "ngsi10.updateContextSubscriptionResponse.polygonInvertedBadValue.valid.json";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  utInit();
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  out = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonNoVerticesJson - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonNoVerticesJson)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonNoVertices.postponed.json";
+  const char*     outfile = "ngsi10.updateContextSubscriptionResponse.polygonNoVertices.valid.json";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  utInit();
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  out = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonOneVertexJson - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonOneVertexJson)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonOneVertex.postponed.json";
+  const char*     outfile = "ngsi10.updateContextSubscriptionResponse.polygonOneVertex.valid.json";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  utInit();
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  out = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeGeolocationPolygonTwoVerticesJson - 
+*/
+TEST(UpdateContextSubscriptionRequest, scopeGeolocationPolygonTwoVerticesJson)
+{
+  ParseData       reqData;
+  const char*     inFile  = "ngsi10.updateContextSubscriptionRequest.polygonTwoVertices.postponed.json";
+  const char*     outfile = "ngsi10.updateContextSubscriptionResponse.polygonTwoVertices.valid.json";
+  ConnectionInfo  ci("/ngsi10/updateContextSubscription", "POST", "1.1");
+  std::string     out;
+
+  utInit();
+
+  ci.inFormat  = JSON;
+  ci.outFormat = JSON;
+
+  EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFile)) << "Error getting test data from '" << inFile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+
+  out = jsonTreat(testBuf, &ci, &reqData, UpdateContextSubscription, "updateContextSubscriptionRequest", NULL);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  utExit();
 }

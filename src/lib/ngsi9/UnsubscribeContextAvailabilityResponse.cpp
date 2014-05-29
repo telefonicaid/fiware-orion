@@ -46,11 +46,11 @@ UnsubscribeContextAvailabilityResponse::UnsubscribeContextAvailabilityResponse()
 *
 * UnsubscribeContextAvailabilityResponse::UnsubscribeContextAvailabilityResponse - 
 */
-UnsubscribeContextAvailabilityResponse::UnsubscribeContextAvailabilityResponse(ErrorCode& errorCode)
+UnsubscribeContextAvailabilityResponse::UnsubscribeContextAvailabilityResponse(StatusCode& sc)
 {
-   subscriptionId.set("");
+  subscriptionId.set("");
 
-   statusCode.fill(&errorCode);
+  statusCode.fill(&sc);
 }
 
 /* ****************************************************************************
@@ -75,14 +75,14 @@ UnsubscribeContextAvailabilityResponse::~UnsubscribeContextAvailabilityResponse(
 *
 * UnsubscribeContextAvailabilityResponse::render - 
 */
-std::string UnsubscribeContextAvailabilityResponse::render(RequestType requestType, Format format, std::string indent)
+std::string UnsubscribeContextAvailabilityResponse::render(RequestType requestType, Format format, const std::string& indent)
 {
-  std::string out     = "";
+  std::string out = "";
   std::string tag = "unsubscribeContextAvailabilityResponse";
 
   out += startTag(indent, tag, format, false);
 
-  out += subscriptionId.render(format, indent + "  ", true);  // always json comma - statusCode is mandatory
+  out += subscriptionId.render(RtUnsubscribeContextAvailabilityResponse, format, indent + "  ", true);  // always json comma - statusCode is mandatory
   out += statusCode.render(format, indent + "  ");
 
   out += endTag(indent, tag, format);

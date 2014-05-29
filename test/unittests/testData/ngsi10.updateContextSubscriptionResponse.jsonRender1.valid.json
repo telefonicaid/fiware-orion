@@ -1,0 +1,10 @@
+{
+  "subscribeError" : {
+    "subscriptionId" : "000000000000000000000000",
+    "errorCode" : {
+      "code" : "400",
+      "reasonPhrase" : "Bad Request",
+      "details" : "details"
+    }
+  }
+}

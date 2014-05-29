@@ -39,11 +39,11 @@
 *
 * badRequest - 
 */
-std::string badRequest(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string badRequest(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string answer;
 
-  answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, "bad request", std::string("service '") + ciP->url + "' not found");
+  answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("service '") + ciP->url + "' not found");
 
   return answer;
 }

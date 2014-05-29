@@ -27,12 +27,11 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
-#include "common/sem.h"
 #include "common/statistics.h"
+#include "common/sem.h"
 #include "mongoBackend/mongoRegisterContext.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonRegister.h"
-#include "ngsi/ErrorCode.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
@@ -45,11 +44,9 @@ using namespace mongo;
 *
 * mongoRegisterContext - 
 */
-HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterContextResponse* responseP)
+HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterContextResponse* responseP, const std::string& tenant)
 {    
-
-    /* Take semaphore. The LM_S* family of macros combines semaphore release with return */
-    semTake();
+    reqSemTake(__FUNCTION__, "ngsi9 register request");
 
     LM_T(LmtMongo, ("Register Context Request"));
 
@@ -57,43 +54,66 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
 
     /* Check if new registration */
     if (requestP->registrationId.isEmpty()) {
-        HttpStatusCode result = processRegisterContext(requestP, responseP, NULL);
-        LM_SR(result);
+        HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant);
+        reqSemGive(__FUNCTION__, "ngsi9 register request");
+        return result;
     }
 
     /* It is not a new registration, so it should be an update */
+    BSONObj reg;
+    OID     id;
     try {
-        OID id = OID(requestP->registrationId.get());
-        BSONObj reg = connection->findOne(getRegistrationsCollectionName(), BSON("_id" << id));
-        if (reg.isEmpty()) {
-            responseP->errorCode.fill(SccContextElementNotFound, "Registration Not Found");
-            responseP->registrationId = requestP->registrationId;
-            ++noOfRegistrationUpdateErrors;
-            LM_SR(SccOk);
-        }
 
-        HttpStatusCode result = processRegisterContext(requestP, responseP, &id);
-        LM_SR(result);
+        id = OID(requestP->registrationId.get());
+
+        mongoSemTake(__FUNCTION__, "findOne from RegistrationsCollection");
+        reg = connection->findOne(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << id));
+        mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection");
     }
     catch( const AssertionException &e ) {
+        mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection (AssertionException)");
+        reqSemGive(__FUNCTION__, "ngsi9 register request");
+
         /* This happens when OID format is wrong */
         // FIXME: this checking should be done at parsing stage, without progressing to
         // mongoBackend. By the moment we can live this here, but we should remove in the future
-        responseP->errorCode.fill(SccContextElementNotFound, "Registration Not Found");
+        responseP->errorCode.fill(SccContextElementNotFound);
         responseP->registrationId = requestP->registrationId;
         ++noOfRegistrationUpdateErrors;
-        LM_SR(SccOk);
+        return SccOk;
     }
     catch( const DBException &e ) {
-        responseP->errorCode.fill(
-            SccReceiverInternalError,
-           "Database Error",
-            std::string("collection: ") + getRegistrationsCollectionName() +
-               " - findOne() _id: " + requestP->registrationId.get() +
-               " - exception: " + e.what()
-        );
+        mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection (DBException)");
+        reqSemGive(__FUNCTION__, "ngsi9 register request");
+
+        responseP->errorCode.fill(SccReceiverInternalError,
+                                  std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
+                                  " - findOne() _id: " + requestP->registrationId.get() +
+                                  " - exception: " + e.what());
         ++noOfRegistrationUpdateErrors;
-        LM_SR(SccOk);
+        return SccOk;
+    }
+    catch(...) {
+        mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection (Generic Exception)");
+        reqSemGive(__FUNCTION__, "ngsi9 register request");
+
+        responseP->errorCode.fill(SccReceiverInternalError,
+                                  std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
+                                  " - findOne() _id: " + requestP->registrationId.get() +
+                                  " - exception: " + "generic");
+        ++noOfRegistrationUpdateErrors;
+        return SccOk;
     }
 
+    if (reg.isEmpty()) {
+       reqSemGive(__FUNCTION__, "ngsi9 register request (no registrations found)");
+       responseP->errorCode.fill(SccContextElementNotFound, std::string("registration id: '") + requestP->registrationId.get() + "'");
+       responseP->registrationId = requestP->registrationId;
+       ++noOfRegistrationUpdateErrors;
+       return SccOk;
+    }
+
+    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant);
+    reqSemGive(__FUNCTION__, "ngsi9 register request");
+    return result;
 }

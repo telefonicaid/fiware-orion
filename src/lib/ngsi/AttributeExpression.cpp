@@ -37,7 +37,7 @@
 *
 * AttributeExpression::check - 
 */
-std::string AttributeExpression::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string AttributeExpression::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   return "OK";
 }
@@ -50,7 +50,7 @@ std::string AttributeExpression::check(RequestType requestType, Format format, s
 */
 bool AttributeExpression::isEmpty(void)
 {
-  if ((string == "") || (string == "not in use"))
+  if (string == "")
     return true;
 
   return false;
@@ -62,7 +62,7 @@ bool AttributeExpression::isEmpty(void)
 *
 * AttributeExpression::set - 
 */
-void AttributeExpression::set(std::string value)
+void AttributeExpression::set(const std::string& value)
 {
   string = value;
 }
@@ -84,7 +84,7 @@ std::string AttributeExpression::get(void)
 *
 * AttributeExpression::present - 
 */
-void AttributeExpression::present(std::string indent)
+void AttributeExpression::present(const std::string& indent)
 {
   if (string != "")
     PRINTF("%sAttributeExpression: %s\n", indent.c_str(), string.c_str());
@@ -98,7 +98,7 @@ void AttributeExpression::present(std::string indent)
 *
 * AttributeExpression::render - 
 */
-std::string AttributeExpression::render(Format format, std::string indent, bool comma)
+std::string AttributeExpression::render(Format format, const std::string& indent, bool comma)
 {
   if (string == "")
     return "";

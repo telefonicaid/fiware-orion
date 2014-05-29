@@ -37,7 +37,7 @@ using namespace mongo;
 * processRegisterContext -
 *
 */
-extern HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, RegisterContextResponse* responseP, OID* id);
+extern HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, RegisterContextResponse* responseP, OID* id, std::string tenant);
 
 
 #endif
