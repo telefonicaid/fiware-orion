@@ -182,6 +182,20 @@ rm -rf  /usr/share/contextBroker
 
 
 %changelog
+* Fri May 30 2014 Fermin Galan <fermin@tid.es> 0.13.0-1 (FIWARE-3.4.2-1)
+- Add: Rush can now be used as relayer for the broker, using the option '-rush' (issue #251)
+- Add: Custom metadata support (issue #252)
+- Add: Multi-service/tenant support, using the option -multiservice (issue #322)
+- Add: Generic URI parameters supported (issue #372)
+- Add: Notification mime-type selected in URI parameter 'notifyFormat' (supported values: "XML" and "JSON") (issue #372)
+- Fix: Raising error on updateContext with location metadata doesn't involve actual change of location attribute (issue #351)
+- Fix: The functionality to change the Log configuration via REST had stopped working. Fixed.
+- FIX: The Log configuration via REST used "/log/traceLevel", whereas the documentation states "/log/trace".
+       Updated the broker to support both "/log/trace" and "/log/traceLevel"
+- Fix: Changed the XML tags AttributeAssociationList and AttributeAssociation to start with lowercase 'a'. (issue #378)
+- Fix: Concatenation of strings now done by the compiler (in numerous places). (issue #384)
+- Fix: Passing all complex parameters by reference or pointer (issues #263 and #354)
+
 * Wed Apr 30 2014 Fermin Galan <fermin@tid.es> 0.12.0-1 (FIWARE-3.4.1-1)
 - Add:  The broker now supports https, see CLI options '-https', '-cert' and '-key'
 - Add:  New command line option '--silent', to suppress all log messages except errors. (Issue #291)
