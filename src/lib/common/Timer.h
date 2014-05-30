@@ -1,5 +1,5 @@
-#ifndef TIMER_H
-#define TIMER_H
+#ifndef SRC_LIB_COMMON_TIMER_H_
+#define SRC_LIB_COMMON_TIMER_H_
 
 /*
 *
@@ -26,14 +26,17 @@
 * Author: Fermin Galan
 */
 
-class Timer {
 
-public:
 
-    virtual ~Timer(void);
-
-    virtual int getCurrentTime(void);
-
+/* ****************************************************************************
+*
+* Timer - 
+*/
+class Timer
+{
+ public:
+  virtual ~Timer(void);
+  virtual int getCurrentTime(void);
 };
 
-#endif
+#endif  // SRC_LIB_COMMON_TIMER_H_

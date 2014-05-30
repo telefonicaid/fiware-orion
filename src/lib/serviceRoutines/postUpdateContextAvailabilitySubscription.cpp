@@ -36,7 +36,7 @@
 *
 * postUpdateContextAvailabilitySubscription - 
 */
-std::string postUpdateContextAvailabilitySubscription(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string postUpdateContextAvailabilitySubscription(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   UpdateContextAvailabilitySubscriptionResponse  ucas;
   std::string                                    answer;

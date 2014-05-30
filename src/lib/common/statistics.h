@@ -1,5 +1,5 @@
-#ifndef STATISTICS_H
-#define STATISTICS_H
+#ifndef SRC_LIB_COMMON_STATISTICS_H_
+#define SRC_LIB_COMMON_STATISTICS_H_
 
 /*
 *
@@ -104,4 +104,4 @@ extern int noOfRtSubscribeError;
 */
 extern void statisticsUpdate(RequestType request, Format inFormat);
 
-#endif
+#endif  // SRC_LIB_COMMON_STATISTICS_H_

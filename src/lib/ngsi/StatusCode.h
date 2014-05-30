@@ -48,16 +48,16 @@ typedef struct StatusCode
   std::string     tag;              // tag to be rendered
 
   StatusCode();
-  StatusCode(std::string _tag);
-  StatusCode(HttpStatusCode _code, std::string _details, std::string _tag = "statusCode");
+  StatusCode(const std::string& _tag);
+  StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _tag = "statusCode");
 
-  std::string  render(Format format, std::string indent, bool comma = false, bool showTag = true);
-  std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void         fill(HttpStatusCode _code, std::string _details = "");
+  std::string  render(Format format, const std::string& indent, bool comma = false, bool showTag = true);
+  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  void         fill(HttpStatusCode _code, const std::string& _details = "");
   void         fill(StatusCode* scP);
-  void         present(std::string indent);
+  void         present(const std::string& indent);
   void         release(void);
-  void         tagSet(std::string _tag);
+  void         tagSet(const std::string& _tag);
 } StatusCode;
 
 #endif

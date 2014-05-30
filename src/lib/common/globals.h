@@ -1,5 +1,5 @@
-#ifndef GLOBALS_H
-#define GLOBALS_H
+#ifndef SRC_LIB_COMMON_GLOBALS_H_
+#define SRC_LIB_COMMON_GLOBALS_H_
 
 /*
 *
@@ -25,9 +25,12 @@
 *
 * Author: Ken Zangelin
 */
+#include <stdint.h>
 
 #include <string>
-#include "Timer.h"
+
+#include "common/Timer.h"
+
 
 
 /* ****************************************************************************
@@ -49,7 +52,7 @@
 *
 * OrionExitFunction - 
 */
-typedef void (*OrionExitFunction)(int exitCode, std::string reason);
+typedef void (*OrionExitFunction)(int exitCode, const std::string& reason);
 
 
 
@@ -86,7 +89,7 @@ extern bool isFalse(const std::string& s);
 *
 * getTimer -
 */
-extern Timer* getTimer();
+extern Timer* getTimer(void);
 
 /*****************************************************************************
 *
@@ -104,7 +107,7 @@ extern int getCurrentTime(void);
 *
 * toSeconds -
 */
-extern long long toSeconds(int value, char what, bool dayPart);
+extern int64_t toSeconds(int value, char what, bool dayPart);
 
 /*****************************************************************************
 *
@@ -113,6 +116,6 @@ extern long long toSeconds(int value, char what, bool dayPart);
 * This is common code for Duration and Throttling (at least)
 *
 */
-extern long long parse8601(std::string s);
+extern int64_t parse8601(const std::string& s);
 
-#endif
+#endif  // SRC_LIB_COMMON_GLOBALS_H_

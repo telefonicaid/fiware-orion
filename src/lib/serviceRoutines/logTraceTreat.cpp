@@ -40,7 +40,7 @@
 *
 * logTraceTreat - 
 */
-std::string logTraceTreat(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string logTraceTreat(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string out  = "OK";
   std::string path = "";

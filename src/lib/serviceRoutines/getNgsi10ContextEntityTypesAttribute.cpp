@@ -41,7 +41,7 @@
 *
 * GET /ngsi10/contextEntityTypes/{typeName}/attributes/{attributeName}
 */
-std::string getNgsi10ContextEntityTypesAttribute(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string getNgsi10ContextEntityTypesAttribute(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string typeName      = compV[2];
   std::string attributeName = compV[4];

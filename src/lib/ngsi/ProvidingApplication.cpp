@@ -38,7 +38,7 @@
 *
 * ProvidingApplication::check - 
 */
-std::string ProvidingApplication::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ProvidingApplication::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   if (isEmpty())
      return "no providing application";
@@ -63,7 +63,7 @@ bool ProvidingApplication::isEmpty(void)
 *
 * ProvidingApplication::set - 
 */
-void ProvidingApplication::set(std::string value)
+void ProvidingApplication::set(const std::string& value)
 {
   string = value;
 }
@@ -85,7 +85,7 @@ std::string ProvidingApplication::get(void)
 *
 * ProvidingApplication::present - 
 */
-void ProvidingApplication::present(std::string indent)
+void ProvidingApplication::present(const std::string& indent)
 {
   if (string != "")
     PRINTF("%sProvidingApplication: %s\n", indent.c_str(), string.c_str());
@@ -99,7 +99,7 @@ void ProvidingApplication::present(std::string indent)
 *
 * ProvidingApplication::render - 
 */
-std::string ProvidingApplication::render(Format format, std::string indent, bool comma)
+std::string ProvidingApplication::render(Format format, const std::string& indent, bool comma)
 {
   if (string == "")
     return "";

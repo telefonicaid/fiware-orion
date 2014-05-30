@@ -125,7 +125,7 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
     bool ret = true;
     for (std::map<string, BSONObj*>::iterator it = subs->begin(); it != subs->end(); ++it) {
 
-        //FIXME P8: see old issue #90
+        //FIXME P8: see issue #371
         //BSONObj sub = *(it->second);
         std::string mapSubId = it->first;
         BSONObj     sub;
@@ -257,7 +257,7 @@ static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONOb
          "}";
     LM_T(LmtMongo, ("JS function: %s", function.c_str()));
 
-    std::string entPatternQ = std::string(CSUB_ENTITIES) + "." + CSUB_ENTITY_ISPATTERN;
+    std::string entPatternQ = CSUB_ENTITIES "." CSUB_ENTITY_ISPATTERN;
 
     BSONObjBuilder queryPattern;
     queryPattern.append(entPatternQ, "true");

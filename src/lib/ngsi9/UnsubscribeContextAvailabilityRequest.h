@@ -42,9 +42,9 @@ typedef struct UnsubscribeContextAvailabilityRequest
   SubscriptionId  subscriptionId;    // Mandatory - optional according to OMA (bug in spec?)
 
   UnsubscribeContextAvailabilityRequest();
-  UnsubscribeContextAvailabilityRequest(SubscriptionId _subscriptionId);
+  UnsubscribeContextAvailabilityRequest(SubscriptionId& _subscriptionId);
 
-  std::string     check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
+  std::string     check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void            release(void);
 } UnsubscribeContextAvailabilityRequest;
 

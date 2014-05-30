@@ -47,7 +47,7 @@ ContextRegistrationResponse::ContextRegistrationResponse()
 *
 * ContextRegistrationResponse::render - 
 */
-std::string ContextRegistrationResponse::render(Format format, std::string indent, bool comma)
+std::string ContextRegistrationResponse::render(Format format, const std::string& indent, bool comma)
 {
   std::string  xmlTag            = "contextRegistrationResponse";
   std::string  jsonTag           = "contextRegistration";
@@ -72,7 +72,7 @@ std::string ContextRegistrationResponse::render(Format format, std::string inden
 *
 * ContextRegistrationResponse::check - 
 */
-std::string ContextRegistrationResponse::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ContextRegistrationResponse::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
    return contextRegistration.check(requestType, format, indent, predetectedError, counter);
 }
@@ -83,7 +83,7 @@ std::string ContextRegistrationResponse::check(RequestType requestType, Format f
 *
 * ContextRegistrationResponse::present - 
 */
-void ContextRegistrationResponse::present(std::string indent)
+void ContextRegistrationResponse::present(const std::string& indent)
 {
   contextRegistration.present(indent, -1);
   errorCode.present(indent);

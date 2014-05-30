@@ -43,9 +43,9 @@ typedef struct ContextRegistrationResponseVector
   void                          push_back(ContextRegistrationResponse* item);
   unsigned int                  size(void);
   ContextRegistrationResponse*  get(int ix);
-  std::string                   render(Format format, std::string indent, bool comma = false);
-  std::string                   check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void                          present(std::string indent);
+  std::string                   render(Format format, const std::string& indent, bool comma = false);
+  std::string                   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  void                          present(const std::string& indent);
   void                          release(void);
 } ContextRegistrationResponseVector;
 

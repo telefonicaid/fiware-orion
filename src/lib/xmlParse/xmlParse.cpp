@@ -97,7 +97,7 @@ static bool isCompoundValuePath(const char* path)
 * If no hit is found it means that the path of the current XML node is unknown.
 * This will result in either a 'PARSE ERROR' or thatthe node is part of a Compound.
 */
-static bool treat(xml_node<>* node, std::string path, XmlNode* parseVector, ParseData* parseDataP)
+static bool treat(xml_node<>* node, const std::string& path, XmlNode* parseVector, ParseData* parseDataP)
 {
   for (unsigned int ix = 0; parseVector[ix].path != "LAST"; ++ix)
   {
@@ -127,7 +127,7 @@ static bool treat(xml_node<>* node, std::string path, XmlNode* parseVector, Pars
 *   - object node
 *   - vector node
 */
-void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_node<>* node, std::string indent)
+void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_node<>* node, const std::string& indent)
 {
   if (containerP == NULL) // toplevel)
   {
@@ -199,13 +199,13 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
 */
 void xmlParse
 (
-   ConnectionInfo*  ciP,
-   xml_node<>*      father,
-   xml_node<>*      node,
-   std::string      indentation,
-   std::string      fatherPath,
-   XmlNode*         parseVector,
-   ParseData*       parseDataP
+   ConnectionInfo*     ciP,
+   xml_node<>*         father,
+   xml_node<>*         node,
+   const std::string&  indentation,
+   const std::string&  fatherPath,
+   XmlNode*            parseVector,
+   ParseData*          parseDataP
 )
 {
   std::string  value            = wsStrip(node->value());

@@ -51,7 +51,7 @@ Scope::Scope()
 *
 * Scope::Scope - 
 */
-Scope::Scope(std::string _type, std::string _value)
+Scope::Scope(const std::string& _type, const std::string& _value)
 {
   type  = _type;
   value = _value;
@@ -63,7 +63,7 @@ Scope::Scope(std::string _type, std::string _value)
 *
 * Scope::render - 
 */
-std::string Scope::render(Format format, std::string indent, bool notLastInVector)
+std::string Scope::render(Format format, const std::string& indent, bool notLastInVector)
 {
   std::string out      = "";
   std::string tag      = "operationScope";
@@ -84,7 +84,7 @@ std::string Scope::render(Format format, std::string indent, bool notLastInVecto
 *
 * Scope::check - 
 */
-std::string Scope::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string Scope::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   if (type == "FIWARE_Location")
   {
@@ -141,7 +141,7 @@ std::string Scope::check(RequestType requestType, Format format, std::string ind
 *
 * Scope::present - 
 */
-void Scope::present(std::string indent, int ix)
+void Scope::present(const std::string& indent, int ix)
 {
   if (ix == -1)
     PRINTF("%sScope:\n",       indent.c_str());

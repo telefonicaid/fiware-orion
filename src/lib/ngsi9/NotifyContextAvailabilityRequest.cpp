@@ -46,7 +46,7 @@ NotifyContextAvailabilityRequest::NotifyContextAvailabilityRequest()
 *
 * NotifyContextAvailabilityRequest::render -
 */
-std::string NotifyContextAvailabilityRequest::render(RequestType requestType, Format format, std::string indent)
+std::string NotifyContextAvailabilityRequest::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "notifyContextAvailabilityRequest";
@@ -71,7 +71,7 @@ std::string NotifyContextAvailabilityRequest::render(RequestType requestType, Fo
 *
 * NotifyContextAvailabilityRequest::check - 
 */
-std::string NotifyContextAvailabilityRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string NotifyContextAvailabilityRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string                        res;
   NotifyContextAvailabilityResponse  response;
@@ -96,7 +96,7 @@ std::string NotifyContextAvailabilityRequest::check(RequestType requestType, For
 *
 * NotifyContextAvailabilityRequest::present -
 */
-void NotifyContextAvailabilityRequest::present(std::string indent)
+void NotifyContextAvailabilityRequest::present(const std::string& indent)
 {
   subscriptionId.present(indent);
   contextRegistrationResponseVector.present(indent);

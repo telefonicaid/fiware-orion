@@ -74,7 +74,7 @@ RegisterContextResponse::RegisterContextResponse(RegisterContextRequest* rcrP)
 *
 * RegisterContextResponse::RegisterContextResponse - 
 */ 
-RegisterContextResponse::RegisterContextResponse(std::string _registrationId, std::string _duration)
+RegisterContextResponse::RegisterContextResponse(const std::string& _registrationId, const std::string& _duration)
 {
   registrationId.set(_registrationId);
   duration.set(_duration);
@@ -87,7 +87,7 @@ RegisterContextResponse::RegisterContextResponse(std::string _registrationId, st
 *
 * RegisterContextResponse::RegisterContextResponse - 
 */ 
-RegisterContextResponse::RegisterContextResponse(std::string _registrationId, StatusCode& _errorCode)
+RegisterContextResponse::RegisterContextResponse(const std::string& _registrationId, StatusCode& _errorCode)
 {
   registrationId.set(_registrationId);
   errorCode     = _errorCode;
@@ -100,7 +100,7 @@ RegisterContextResponse::RegisterContextResponse(std::string _registrationId, St
 *
 * RegisterContextResponse::render - 
 */
-std::string RegisterContextResponse::render(RequestType requestType, Format format, std::string indent)
+std::string RegisterContextResponse::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string  out = "";
   std::string  tag = "registerContextResponse";
@@ -125,7 +125,7 @@ std::string RegisterContextResponse::render(RequestType requestType, Format form
 *
 * RegisterContextResponse::check - 
 */
-std::string RegisterContextResponse::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string RegisterContextResponse::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   RegisterContextResponse  response;
   std::string              res;
@@ -151,7 +151,7 @@ std::string RegisterContextResponse::check(RequestType requestType, Format forma
 *
 * present - 
 */
-void RegisterContextResponse::present(std::string indent)
+void RegisterContextResponse::present(const std::string& indent)
 {
    registrationId.present(indent);
    duration.present(indent);

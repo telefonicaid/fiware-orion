@@ -64,12 +64,12 @@ payload='<?xml version="1.0"?>
                   <id>house_3</id>   
                 </targetEntityId>
               </entityAssociation>
-              <AttributeAssociationList>
-                <AttributeAssociation>
+              <attributeAssociationList>
+                <attributeAssociation>
                   <sourceAttribute>measurement</sourceAttribute>
                   <targetAttribute>indoorTemperature</targetAttribute>
-                </AttributeAssociation>
-              </AttributeAssociationList>
+                </attributeAssociation>
+              </attributeAssociationList>
             </value>
           </contextMetadata>   
         </registrationMetadata>

@@ -40,7 +40,7 @@
 *
 * mapGetContextEntitiesByEntityId - 
 */
-HttpStatusCode mapGetContextEntitiesByEntityId(std::string id, DiscoverContextAvailabilityResponse* response, ConnectionInfo* ciP)
+HttpStatusCode mapGetContextEntitiesByEntityId(const std::string& id, DiscoverContextAvailabilityResponse* response, ConnectionInfo* ciP)
 {
    DiscoverContextAvailabilityRequest request;
    EntityId                           entityId(id, "", "false");

@@ -48,7 +48,7 @@ UpdateContextElementResponse::UpdateContextElementResponse()
 *
 * render - 
 */
-std::string UpdateContextElementResponse::render(RequestType requestType, Format format, std::string indent)
+std::string UpdateContextElementResponse::render(RequestType requestType, Format format, const std::string& indent)
 {
    std::string tag = "updateContextElementResponse";
    std::string out = "";
@@ -71,7 +71,7 @@ std::string UpdateContextElementResponse::render(RequestType requestType, Format
 *
 * check - 
 */
-std::string UpdateContextElementResponse::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string UpdateContextElementResponse::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string res;
   

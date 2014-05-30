@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <map>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -33,6 +34,8 @@
 #include "rest/RestService.h"
 #include "rest/rest.h"
 #include "rest/restReply.h"
+#include "rest/OrionError.h"
+#include "rest/uriParamNames.h"
 
 #include "restCoap/coap.h"
 
@@ -82,7 +85,45 @@ static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static Coap*                     coapDaemon            = NULL;
 static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
-__thread char                    static_buffer[STATIC_BUFFER_SIZE];
+__thread char                    static_buffer[STATIC_BUFFER_SIZE + 1];
+
+
+
+/* ****************************************************************************
+*
+* uriArgumentGet - 
+*/
+static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, const char* val)
+{
+  ConnectionInfo*  ciP   = (ConnectionInfo*) cbDataP;
+  std::string      key   = ckey;
+  std::string      value = (val == NULL)? "" : val;
+
+  if (key == URI_PARAM_NOTIFY_FORMAT)
+  {
+    if (strcasecmp(val, "xml") == 0)
+      value = "XML";
+    else if (strcasecmp(val, "json") == 0)
+      value = "JSON";
+    else
+    {
+      OrionError error(SccBadRequest, std::string("Bad notification format: '") + value + "'. Valid values: 'XML' and 'JSON'.");
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer         = error.render(ciP->outFormat, "");
+      return MHD_YES;
+    }
+  }
+
+
+  if (val != NULL)
+    ciP->uriParam[key] = value;
+  else
+    ciP->uriParam[key] = "SET";
+
+  LM_T(LmtUriParams, ("URI parameter:   %s: %s", key.c_str(), ciP->uriParam[key].c_str()));
+
+  return MHD_YES;
+}
 
 
 
@@ -133,7 +174,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 *
 * wantedOutputSupported - 
 */
-static Format wantedOutputSupported(std::string acceptList, std::string* charsetP)
+static Format wantedOutputSupported(const std::string& acceptList, std::string* charsetP)
 {
   std::vector<std::string>  vec;
   char* copy;
@@ -302,8 +343,6 @@ static int outFormatCheck(ConnectionInfo* ciP)
 */
 static int contentTypeCheck(ConnectionInfo* ciP)
 {
-  std::string details = "";
-
   //
   // Four cases:
   //   1. If there is no payload, the Content-Type is not interesting
@@ -386,6 +425,19 @@ static int connectionTreat
         
     *con_cls = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
 
+    //
+    // URI parameters
+    // 
+    ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "";
+    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
+    if (ciP->httpStatusCode != SccOk)
+    {
+      LM_W(("Error in URI arguments"));
+      restReply(ciP, ciP->answer);
+      return MHD_YES;
+    }
+    LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
+
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
     ciP->tenantFromHttpHeader = ciP->httpHeaders.tenant;
     LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));
@@ -406,6 +458,19 @@ static int connectionTreat
     else
       ciP->inFormat = formatParse(ciP->httpHeaders.contentType, NULL);
 
+    // Set default mime-type for notifications
+    if (ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] == "")
+    {
+      if (ciP->outFormat == XML)
+        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "XML";
+      else if (ciP->outFormat == JSON)
+        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "JSON";
+      else
+        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "XML";
+
+      LM_T(LmtUriParams, ("'default' value for notifyFormat (ciP->outFormat == %d)): '%s'", ciP->outFormat, ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
+    }
+
     return MHD_YES;
   }
 
@@ -423,7 +488,7 @@ static int connectionTreat
       if (ciP->httpHeaders.contentLength <= PAYLOAD_MAX_SIZE)
       {
         if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
-          ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength);
+          ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
         else
           ciP->payload = static_buffer;
 
@@ -487,6 +552,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
+      // LM_V(("Starting HTTPS daemon on IPv4 %s port %d", bindIp, port));
       mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_SSL, // MHD_USE_SELECT_INTERNALLY
                                    htons(port),
                                    NULL,
@@ -577,17 +643,17 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 */
 void restInit
 (
-  RestService*       _restServiceV,
-  IpVersion          _ipVersion,
-  const char*        _bindAddress,
-  unsigned short     _port,
-  std::string        _multitenant,
-  std::string        _rushHost,
-  unsigned short     _rushPort,
-  const char*        _httpsKey,
-  const char*        _httpsCertificate,
-  RestServeFunction  _serveFunction,
-  bool               _acceptTextXml
+  RestService*        _restServiceV,
+  IpVersion           _ipVersion,
+  const char*         _bindAddress,
+  unsigned short      _port,
+  const std::string&  _multitenant,
+  const std::string&  _rushHost,
+  unsigned short      _rushPort,
+  const char*         _httpsKey,
+  const char*         _httpsCertificate,
+  RestServeFunction   _serveFunction,
+  bool                _acceptTextXml
 )
 {
   const char* key  = _httpsKey;

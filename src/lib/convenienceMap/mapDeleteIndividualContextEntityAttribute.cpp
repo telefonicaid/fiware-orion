@@ -38,7 +38,7 @@
 *
 * mapDeleteIndividualContextEntityAttribute - 
 */
-HttpStatusCode mapDeleteIndividualContextEntityAttribute(std::string entityId, std::string attributeName, StatusCode* response, ConnectionInfo* ciP)
+HttpStatusCode mapDeleteIndividualContextEntityAttribute(const std::string& entityId, const std::string& attributeName, StatusCode* response, ConnectionInfo* ciP)
 {
   HttpStatusCode         ms;
   UpdateContextRequest   ucRequest;

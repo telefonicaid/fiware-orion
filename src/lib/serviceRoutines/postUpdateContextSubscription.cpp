@@ -37,7 +37,7 @@
 *
 * postUpdateContextSubscription - 
 */
-std::string postUpdateContextSubscription(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string postUpdateContextSubscription(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   UpdateContextSubscriptionResponse  ucsr;
   std::string                        answer;

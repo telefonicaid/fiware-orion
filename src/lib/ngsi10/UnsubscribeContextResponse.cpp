@@ -67,7 +67,7 @@ UnsubscribeContextResponse::~UnsubscribeContextResponse()
 *
 * UnsubscribeContextResponse::render - 
 */
-std::string UnsubscribeContextResponse::render(RequestType requestType, Format format, std::string indent)
+std::string UnsubscribeContextResponse::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "unsubscribeContextResponse";

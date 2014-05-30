@@ -63,7 +63,7 @@ void DiscoverContextAvailabilityRequest::release(void)
 *
 * DiscoverContextAvailabilityRequest::check - 
 */
-std::string DiscoverContextAvailabilityRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string DiscoverContextAvailabilityRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   DiscoverContextAvailabilityResponse  response;
   std::string                          res;
@@ -94,7 +94,7 @@ std::string DiscoverContextAvailabilityRequest::check(RequestType requestType, F
 *
 * DiscoverContextAvailabilityRequest::present - 
 */
-void DiscoverContextAvailabilityRequest::present(std::string indent)
+void DiscoverContextAvailabilityRequest::present(const std::string& indent)
 {
    entityIdVector.present(indent);
    attributeList.present(indent);

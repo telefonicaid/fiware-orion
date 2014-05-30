@@ -62,7 +62,7 @@ NotifyContextResponse::NotifyContextResponse(StatusCode& sc)
 *
 * NotifyContextResponse::render -
 */
-std::string NotifyContextResponse::render(RequestType requestType, Format format, std::string indent)
+std::string NotifyContextResponse::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "notifyContextResponse";
@@ -82,7 +82,7 @@ std::string NotifyContextResponse::render(RequestType requestType, Format format
 *
 * NotifyContextResponse::present - 
 */
-void NotifyContextResponse::present(std::string indent)
+void NotifyContextResponse::present(const std::string& indent)
 {
   PRINTF("%sNotifyContextResponse:", indent.c_str());
   responseCode.present(indent + "  ");

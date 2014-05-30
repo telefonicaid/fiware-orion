@@ -46,7 +46,7 @@
 * NOTE
 *   Used by registerContextForward
 */
-static std::string fordwardRegisterContext(char* host, int port, std::string tenant, std::string payload) {
+static std::string fordwardRegisterContext(char* host, int port, const std::string& tenant, const std::string& payload) {
 
     LM_T(LmtCm, ("forwarding registerContext to: host='%s', port=%d", fwdHost, fwdPort));
     LM_T(LmtCm, ("payload (content-type: application/xml): '%s'", payload.c_str()));
@@ -127,7 +127,7 @@ static void registerContextForward(ConnectionInfo* ciP, ParseData* parseDataP, R
 *
 * postRegisterContext - 
 */
-std::string postRegisterContext(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string postRegisterContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   RegisterContextResponse  rcr;
 

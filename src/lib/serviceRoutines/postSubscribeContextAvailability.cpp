@@ -37,7 +37,7 @@
 *
 * postSubscribeContextAvailability - 
 */
-std::string postSubscribeContextAvailability(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string postSubscribeContextAvailability(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   SubscribeContextAvailabilityResponse  scar;
   std::string                           answer;

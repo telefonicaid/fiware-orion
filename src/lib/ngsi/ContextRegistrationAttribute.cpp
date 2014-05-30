@@ -44,7 +44,7 @@ ContextRegistrationAttribute::ContextRegistrationAttribute()
 *
 * ContextRegistrationAttribute::ContextRegistrationAttribute -
 */
-ContextRegistrationAttribute::ContextRegistrationAttribute(std::string _name, std::string _type, std::string _isDomain)
+ContextRegistrationAttribute::ContextRegistrationAttribute(const std::string& _name, const std::string& _type, const std::string& _isDomain)
 {
     name = _name;
     type = _type;
@@ -55,7 +55,7 @@ ContextRegistrationAttribute::ContextRegistrationAttribute(std::string _name, st
 *
 * ContextRegistrationAttribute::render - 
 */
-std::string ContextRegistrationAttribute::render(Format format, std::string indent, bool comma)
+std::string ContextRegistrationAttribute::render(Format format, const std::string& indent, bool comma)
 {
   std::string xmlTag   = "contextRegistrationAttribute";
   std::string jsonTag  = "registrationAttribute";
@@ -85,7 +85,7 @@ std::string ContextRegistrationAttribute::render(Format format, std::string inde
 *
 * ContextRegistrationAttribute::check - 
 */
-std::string ContextRegistrationAttribute::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ContextRegistrationAttribute::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string errorString;
 
@@ -111,7 +111,7 @@ std::string ContextRegistrationAttribute::check(RequestType requestType, Format 
 *
 * ContextRegistrationAttribute::present - 
 */
-void ContextRegistrationAttribute::present(int ix, std::string indent)
+void ContextRegistrationAttribute::present(int ix, const std::string& indent)
 {
   PRINTF("%sAttribute %d:\n",    indent.c_str(), ix);
   PRINTF("%s  Name:       %s\n", indent.c_str(), name.c_str());

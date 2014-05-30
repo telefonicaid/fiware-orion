@@ -40,7 +40,7 @@
 *
 * postDiscoverContextAvailability - 
 */
-std::string postDiscoverContextAvailability(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string postDiscoverContextAvailability(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   DiscoverContextAvailabilityResponse  dcar;
   std::string                          answer;

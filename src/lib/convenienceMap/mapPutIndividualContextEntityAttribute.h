@@ -38,8 +38,8 @@
 */
 extern HttpStatusCode mapPutIndividualContextEntityAttribute
 (
-  std::string                     entityId,
-  std::string                     attributeName,
+  const std::string&              entityId,
+  const std::string&              attributeName,
   UpdateContextAttributeRequest*  request,
   StatusCode*                     response,
   ConnectionInfo*                 ciP

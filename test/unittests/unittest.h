@@ -38,8 +38,17 @@
 using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;
+using ::testing::MatchesRegex;
 
 
+
+/* ****************************************************************************
+*
+* uriParams - 
+*/
+extern std::map<std::string, std::string> uriParams;
+
+ 
 
 /* ****************************************************************************
 *

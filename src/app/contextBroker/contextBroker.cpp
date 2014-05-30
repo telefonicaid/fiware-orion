@@ -993,7 +993,7 @@ void sigHandler(int sigNo)
 *
 * orionExit - 
 */
-void orionExit(int code, std::string reason)
+void orionExit(int code, const std::string& reason)
 {
   LM_E((reason.c_str()));
   exit(code);
@@ -1159,8 +1159,8 @@ static void rushParse(char* rush, std::string* rushHostP, unsigned short* rushPo
 */
 int main(int argC, char* argV[])
 {
-  unsigned short rushPort;
-  std::string    rushHost;
+  unsigned short rushPort = 0;
+  std::string    rushHost = "";
 
   signal(SIGINT,  sigHandler);
   signal(SIGTERM, sigHandler);

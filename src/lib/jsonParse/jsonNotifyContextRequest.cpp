@@ -34,7 +34,7 @@
 #include "ngsi/Metadata.h"
 
 #include "jsonParse/JsonNode.h"
-#include "jsonParse/jsonNullTreat.h"
+#include "parse/nullTreat.h"
 #include "jsonParse/jsonNotifyContextRequest.h"
 
 #include "rest/ConnectionInfo.h"
@@ -45,7 +45,7 @@
 *
 * subscriptionId - 
 */
-static std::string subscriptionId(std::string path, std::string value, ParseData* parseDataP)
+static std::string subscriptionId(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a subscriptionId: '%s'", value.c_str()));
   parseDataP->ncr.res.subscriptionId.set(value);
@@ -58,7 +58,7 @@ static std::string subscriptionId(std::string path, std::string value, ParseData
 *
 * originator - 
 */
-static std::string originator(std::string path, std::string value, ParseData* parseDataP)
+static std::string originator(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an originator: '%s'", value.c_str()));
   parseDataP->ncr.res.originator.set(value);
@@ -71,7 +71,7 @@ static std::string originator(std::string path, std::string value, ParseData* pa
 *
 * contextResponse - 
 */
-static std::string contextResponse(std::string path, std::string value, ParseData* parseDataP)
+static std::string contextResponse(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   parseDataP->ncr.cerP = new ContextElementResponse();
   parseDataP->ncr.res.contextElementResponseVector.push_back(parseDataP->ncr.cerP);
@@ -84,7 +84,7 @@ static std::string contextResponse(std::string path, std::string value, ParseDat
 *
 * entityIdId - 
 */
-static std::string entityIdId(std::string path, std::string value, ParseData* parseDataP)
+static std::string entityIdId(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   parseDataP->ncr.cerP->contextElement.entityId.id = value;
   LM_T(LmtParse, ("Set 'id' to '%s' for an entity", parseDataP->ncr.cerP->contextElement.entityId.id.c_str()));
@@ -98,7 +98,7 @@ static std::string entityIdId(std::string path, std::string value, ParseData* pa
 *
 * entityIdType - 
 */
-static std::string entityIdType(std::string path, std::string value, ParseData* parseDataP)
+static std::string entityIdType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
    parseDataP->ncr.cerP->contextElement.entityId.type = value;
    LM_T(LmtParse, ("Set 'type' to '%s' for an entity", parseDataP->ncr.cerP->contextElement.entityId.type.c_str()));
@@ -112,7 +112,7 @@ static std::string entityIdType(std::string path, std::string value, ParseData* 
 *
 * entityIdIsPattern - 
 */
-static std::string entityIdIsPattern(std::string path, std::string value, ParseData* parseDataP)
+static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
   parseDataP->ncr.cerP->contextElement.entityId.isPattern = value;
@@ -130,7 +130,7 @@ static std::string entityIdIsPattern(std::string path, std::string value, ParseD
 *
 * attributeDomainName - 
 */
-static std::string attributeDomainName(std::string path, std::string value, ParseData* parseDataP)
+static std::string attributeDomainName(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeDomainName: '%s'", value.c_str()));
   parseDataP->ncr.cerP->contextElement.attributeDomainName.set(value);
@@ -143,7 +143,7 @@ static std::string attributeDomainName(std::string path, std::string value, Pars
 *
 * attribute - 
 */
-static std::string attribute(std::string path, std::string value, ParseData* parseDataP)
+static std::string attribute(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Creating an attribute"));
   parseDataP->ncr.attributeP = new ContextAttribute();
@@ -157,7 +157,7 @@ static std::string attribute(std::string path, std::string value, ParseData* par
 *
 * attributeName - 
 */
-static std::string attributeName(std::string path, std::string value, ParseData* parseDataP)
+static std::string attributeName(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute name: '%s'", value.c_str()));
   parseDataP->ncr.attributeP->name = value;
@@ -170,7 +170,7 @@ static std::string attributeName(std::string path, std::string value, ParseData*
 *
 * attributeType - 
 */
-static std::string attributeType(std::string path, std::string value, ParseData* parseDataP)
+static std::string attributeType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute type: '%s'", value.c_str()));
   parseDataP->ncr.attributeP->type = value;
@@ -183,7 +183,7 @@ static std::string attributeType(std::string path, std::string value, ParseData*
 *
 * attributeValue - 
 */
-static std::string attributeValue(std::string path, std::string value, ParseData* parseDataP)
+static std::string attributeValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute value: '%s'", value.c_str()));
   parseDataP->ncr.attributeP->value = value;
@@ -196,7 +196,7 @@ static std::string attributeValue(std::string path, std::string value, ParseData
 *
 * statusCodeCode - 
 */
-static std::string statusCodeCode(std::string path, std::string value, ParseData* parseDataP)
+static std::string statusCodeCode(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a statusCode code: '%s'", value.c_str()));
   parseDataP->ncr.cerP->statusCode.code = (HttpStatusCode) atoi(value.c_str());
@@ -210,7 +210,7 @@ static std::string statusCodeCode(std::string path, std::string value, ParseData
 *
 * statusCodeReasonPhrase - 
 */
-static std::string statusCodeReasonPhrase(std::string path, std::string value, ParseData* parseDataP)
+static std::string statusCodeReasonPhrase(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a statusCode reasonPhrase: '%s'", value.c_str()));
   parseDataP->ncr.cerP->statusCode.reasonPhrase = value; // OK - parsing step reading reasonPhrase
@@ -223,7 +223,7 @@ static std::string statusCodeReasonPhrase(std::string path, std::string value, P
 *
 * statusCodeDetails - 
 */
-static std::string statusCodeDetails(std::string path, std::string value, ParseData* parseDataP)
+static std::string statusCodeDetails(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a statusCode details: '%s'", value.c_str()));
   parseDataP->ncr.cerP->statusCode.details = value;
@@ -236,7 +236,7 @@ static std::string statusCodeDetails(std::string path, std::string value, ParseD
 *
 * attributeMetadata - 
 */
-static std::string attributeMetadata(std::string path, std::string value, ParseData* parseDataP)
+static std::string attributeMetadata(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Creating an attributeMetadata"));
   parseDataP->ncr.attributeMetadataP = new Metadata();
@@ -250,7 +250,7 @@ static std::string attributeMetadata(std::string path, std::string value, ParseD
 *
 * attributeMetadataName - 
 */
-static std::string attributeMetadataName(std::string path, std::string value, ParseData* parseDataP)
+static std::string attributeMetadataName(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeMetadata name: '%s'", value.c_str()));
   parseDataP->ncr.attributeMetadataP->name = value;
@@ -263,7 +263,7 @@ static std::string attributeMetadataName(std::string path, std::string value, Pa
 *
 * attributeMetadataType - 
 */
-static std::string attributeMetadataType(std::string path, std::string value, ParseData* parseDataP)
+static std::string attributeMetadataType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeMetadata type: '%s'", value.c_str()));
   parseDataP->ncr.attributeMetadataP->type = value;
@@ -276,7 +276,7 @@ static std::string attributeMetadataType(std::string path, std::string value, Pa
 *
 * attributeMetadataValue - 
 */
-static std::string attributeMetadataValue(std::string path, std::string value, ParseData* parseDataP)
+static std::string attributeMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeMetadata value: '%s'", value.c_str()));
   parseDataP->ncr.attributeMetadataP->value = value;
@@ -289,7 +289,7 @@ static std::string attributeMetadataValue(std::string path, std::string value, P
 *
 * domainMetadata - 
 */
-static std::string domainMetadata(std::string path, std::string value, ParseData* parseDataP)
+static std::string domainMetadata(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Creating a domainMetadata"));
   parseDataP->ncr.domainMetadataP = new Metadata();
@@ -303,7 +303,7 @@ static std::string domainMetadata(std::string path, std::string value, ParseData
 *
 * domainMetadataName - 
 */
-static std::string domainMetadataName(std::string path, std::string value, ParseData* parseDataP)
+static std::string domainMetadataName(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a domainMetadata name: '%s'", value.c_str()));
   parseDataP->ncr.domainMetadataP->name = value;
@@ -316,7 +316,7 @@ static std::string domainMetadataName(std::string path, std::string value, Parse
 *
 * domainMetadataType - 
 */
-static std::string domainMetadataType(std::string path, std::string value, ParseData* parseDataP)
+static std::string domainMetadataType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a domainMetadata type: '%s'", value.c_str()));
   parseDataP->ncr.domainMetadataP->type = value;
@@ -329,7 +329,7 @@ static std::string domainMetadataType(std::string path, std::string value, Parse
 *
 * domainMetadataValue - 
 */
-static std::string domainMetadataValue(std::string path, std::string value, ParseData* parseDataP)
+static std::string domainMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a domainMetadata value: '%s'", value.c_str()));
   parseDataP->ncr.domainMetadataP->value = value;

@@ -1,5 +1,5 @@
-#ifndef STRING_H
-#define STRING_H
+#ifndef SRC_LIB_COMMON_STRING_H_
+#define SRC_LIB_COMMON_STRING_H_
 
 /*
 *
@@ -33,26 +33,26 @@
 *
 * isIPv6 -
 */
-extern bool isIPv6(std::string in);
+extern bool isIPv6(const std::string& in);
 
 /* ****************************************************************************
 *
 * stringSplit - 
 */
-extern int stringSplit(std::string in, char delimiter, std::vector<std::string>& outV);
+extern int stringSplit(const std::string& in, char delimiter, std::vector<std::string>& outV);
 
 /* ****************************************************************************
 *
 * parseUrl -
 *
 */
-extern bool parseUrl(std::string url, std::string& host, int& port, std::string& path, std::string& protocol);
+extern bool parseUrl(const std::string& url, std::string& host, int& port, std::string& path, std::string& protocol);
 
 /* ****************************************************************************
 *
 * i2s - integer to string
 */
-extern char* i2s(int i, char* placeholder);
+extern char* i2s(int i, char* placeholder, int placeholderSize);
 
 /* ****************************************************************************
 *
@@ -70,24 +70,24 @@ extern bool onlyWs(const char* s);
 *
 * string2coords - 
 */
-extern bool string2coords(std::string s, double& latitude, double& longitude);
+extern bool string2coords(const std::string& s, double& latitude, double& longitude);
 
 /* ****************************************************************************
 *
 * coords2string - 
 */
-extern void coords2string(std::string& s, double latitude, double longitude, int decimals = 6);
+extern void coords2string(std::string* s, double latitude, double longitude, int decimals = 6);
 
 /* ****************************************************************************
 *
 * versionParse -
 */
-bool versionParse(std::string version, int& mayor, int& minor, std::string& extra);
+bool versionParse(const std::string& version, int& mayor, int& minor, std::string& extra);
 
 /* ****************************************************************************
 *
 * atoF - 
 */
-extern double atoF(const char* string, std::string& errorMsg);
+extern double atoF(const char* string, std::string* errorMsg);
 
-#endif
+#endif  // SRC_LIB_COMMON_STRING_H_

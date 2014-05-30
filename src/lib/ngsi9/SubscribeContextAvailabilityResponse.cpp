@@ -58,7 +58,7 @@ SubscribeContextAvailabilityResponse::~SubscribeContextAvailabilityResponse()
 *
 * SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse - 
 */
-SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(std::string _subscriptionId, std::string _duration) : errorCode("errorCode")
+SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(const std::string& _subscriptionId, const std::string& _duration) : errorCode("errorCode")
 {
   subscriptionId.set(_subscriptionId);
   duration.set(_duration);
@@ -70,7 +70,7 @@ SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(std::
 *
 * SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse - 
 */
-SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(std::string _subscriptionId, StatusCode& _errorCode) : errorCode("errorCode")
+SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(const std::string& _subscriptionId, StatusCode& _errorCode) : errorCode("errorCode")
 {
   subscriptionId.set(_subscriptionId);
 
@@ -83,7 +83,7 @@ SubscribeContextAvailabilityResponse::SubscribeContextAvailabilityResponse(std::
 *
 * SubscribeContextAvailabilityResponse::render - 
 */
-std::string SubscribeContextAvailabilityResponse::render(RequestType requestType, Format format, std::string indent)
+std::string SubscribeContextAvailabilityResponse::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string  tag                = "subscribeContextAvailabilityResponse";
   std::string  out                = "";

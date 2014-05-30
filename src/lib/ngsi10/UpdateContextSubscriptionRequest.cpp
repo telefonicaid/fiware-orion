@@ -48,7 +48,7 @@ UpdateContextSubscriptionRequest::UpdateContextSubscriptionRequest()
 *
 * UpdateContextSubscriptionRequest::render - 
 */
-std::string UpdateContextSubscriptionRequest::render(RequestType requestType, Format format, std::string indent)
+std::string UpdateContextSubscriptionRequest::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string out                             = "";
   std::string tag                             = "updateContextSubscriptionRequest";
@@ -81,7 +81,7 @@ std::string UpdateContextSubscriptionRequest::render(RequestType requestType, Fo
 *
 * UpdateContextSubscriptionRequest::check - 
 */
-std::string UpdateContextSubscriptionRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string UpdateContextSubscriptionRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string                       res;
   UpdateContextSubscriptionResponse response;
@@ -112,7 +112,7 @@ std::string UpdateContextSubscriptionRequest::check(RequestType requestType, For
 *
 * UpdateContextSubscriptionRequest::present - 
 */
-void UpdateContextSubscriptionRequest::present(std::string indent)
+void UpdateContextSubscriptionRequest::present(const std::string& indent)
 {
   duration.present(indent);
   restriction.present(indent);

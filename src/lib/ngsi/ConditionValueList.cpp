@@ -39,7 +39,7 @@
 *
 * render - 
 */
-std::string ConditionValueList::render(Format format, std::string indent, bool comma)
+std::string ConditionValueList::render(Format format, const std::string& indent, bool comma)
 {
   std::string  out = "";
   std::string  tag = "condValueList";
@@ -63,7 +63,7 @@ std::string ConditionValueList::render(Format format, std::string indent, bool c
 *
 * ConditionValueList::check - 
 */
-std::string ConditionValueList::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ConditionValueList::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -80,7 +80,7 @@ std::string ConditionValueList::check(RequestType requestType, Format format, st
 *
 * ConditionValueList::present - 
 */
-void ConditionValueList::present(std::string indent)
+void ConditionValueList::present(const std::string& indent)
 {
   PRINTF("%sConditionValue List\n",    indent.c_str());
 
@@ -105,7 +105,7 @@ void ConditionValueList::release(void)
 *
 * push_back - 
 */
-void ConditionValueList::push_back(std::string attributeName)
+void ConditionValueList::push_back(const std::string& attributeName)
 {
   vec.push_back(attributeName);
 }

@@ -23,7 +23,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET (SOURCES
     jsonRequest.cpp
     jsonParse.cpp
-    jsonNullTreat.cpp
 
     jsonRegisterContextRequest.cpp
     jsonDiscoverContextAvailabilityRequest.cpp
@@ -49,7 +48,6 @@ SET (HEADERS
     jsonRequest.h
     jsonParse.h
     JsonNode.h
-    jsonNullTreat.h
 
     jsonRegisterContextRequest.h
     jsonDiscoverContextAvailabilityRequest.h

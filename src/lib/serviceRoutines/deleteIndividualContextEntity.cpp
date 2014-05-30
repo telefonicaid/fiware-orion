@@ -40,7 +40,7 @@
 *
 * deleteIndividualContextEntity - 
 */
-std::string deleteIndividualContextEntity(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string deleteIndividualContextEntity(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string  answer;
   std::string  entityId = "unknown entityId";

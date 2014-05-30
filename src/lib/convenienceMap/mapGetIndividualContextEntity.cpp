@@ -40,7 +40,7 @@
 *
 * mapGetIndividualContextEntity - 
 */
-HttpStatusCode mapGetIndividualContextEntity(std::string entityId, ContextElementResponse* response, ConnectionInfo* ciP)
+HttpStatusCode mapGetIndividualContextEntity(const std::string& entityId, ContextElementResponse* response, ConnectionInfo* ciP)
 {
    HttpStatusCode        ms;
    QueryContextRequest   qcRequest;

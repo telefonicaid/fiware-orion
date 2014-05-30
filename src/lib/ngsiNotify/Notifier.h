@@ -46,10 +46,10 @@ public:
    
     virtual ~Notifier(void);
 
-    virtual void sendNotifyContextRequest(NotifyContextRequest* ncr, std::string url, std::string tenant, Format format = XML);
-    virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr, std::string url, std::string tenant, Format format = XML);
-    virtual void createIntervalThread(std::string subId, int interval, std::string tenant);
-    virtual void destroyOntimeIntervalThreads(std::string subId);
+    virtual void sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, Format format = XML);
+    virtual void sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityRequest* ncr, const std::string& url, const std::string& tenant, Format format = XML);
+    virtual void createIntervalThread(const std::string& subId, int interval, const std::string& tenant);
+    virtual void destroyOntimeIntervalThreads(const std::string& subId);
 
 };
 

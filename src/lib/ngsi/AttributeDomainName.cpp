@@ -38,7 +38,7 @@
 *
 * AttributeDomainName::check - 
 */
-std::string AttributeDomainName::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string AttributeDomainName::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   // FIXME P3: AttributeDomainName::check always returns "OK"
   return "OK";
@@ -64,7 +64,7 @@ bool AttributeDomainName::isEmpty(void)
 *
 * AttributeDomainName::set - 
 */
-void AttributeDomainName::set(std::string value)
+void AttributeDomainName::set(const std::string& value)
 {
   string = value;
 }
@@ -86,7 +86,7 @@ std::string AttributeDomainName::get(void)
 *
 * AttributeDomainName::present - 
 */
-void AttributeDomainName::present(std::string indent)
+void AttributeDomainName::present(const std::string& indent)
 {
   if (string != "")
     PRINTF("%sAttributeDomainName: %s\n", indent.c_str(), string.c_str());
@@ -100,7 +100,7 @@ void AttributeDomainName::present(std::string indent)
 *
 * AttributeDomainName::render - 
 */
-std::string AttributeDomainName::render(Format format, std::string indent, bool comma)
+std::string AttributeDomainName::render(Format format, const std::string& indent, bool comma)
 {
   if (string == "")
     return "";

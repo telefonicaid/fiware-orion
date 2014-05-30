@@ -37,7 +37,7 @@ using namespace mongo;
 *
 * mongoSetFwdRegId -
 */
-void mongoSetFwdRegId(std::string regId, std::string fwdRegId, std::string tenant)
+void mongoSetFwdRegId(const std::string& regId, const std::string& fwdRegId, const std::string& tenant)
 {
     reqSemTake(__FUNCTION__, "Mongo Set Forward RegId");
 
@@ -75,7 +75,7 @@ void mongoSetFwdRegId(std::string regId, std::string fwdRegId, std::string tenan
 *
 * mongoGetFwdRegId -
 */
-std::string mongoGetFwdRegId(std::string regId, std::string tenant)
+std::string mongoGetFwdRegId(const std::string& regId, const std::string& tenant)
 {
     std::string retVal = "";
 

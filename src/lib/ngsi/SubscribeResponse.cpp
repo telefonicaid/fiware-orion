@@ -45,7 +45,7 @@ SubscribeResponse::SubscribeResponse()
 *
 * SubscribeResponse::render - 
 */
-std::string SubscribeResponse::render(Format format, std::string indent, bool comma)
+std::string SubscribeResponse::render(Format format, const std::string& indent, bool comma)
 {
   std::string  out                 = "";
   std::string  tag                 = "subscribeResponse";

@@ -48,7 +48,7 @@ QueryContextResponse::QueryContextResponse()
 *
 * QueryContextResponse::QueryContextResponse - 
 */
-QueryContextResponse::QueryContextResponse(StatusCode _errorCode)
+QueryContextResponse::QueryContextResponse(StatusCode& _errorCode)
 {
   errorCode.fill(&_errorCode);
   errorCode.tagSet("errorCode");
@@ -68,7 +68,7 @@ QueryContextResponse::~QueryContextResponse()
 *
 * QueryContextResponse::render - 
 */
-std::string QueryContextResponse::render(RequestType requestType, Format format, std::string indent)
+std::string QueryContextResponse::render(RequestType requestType, Format format, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "queryContextResponse";

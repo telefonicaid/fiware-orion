@@ -269,10 +269,10 @@ static bool bsonCustomMetadataToBson(BSONObj& newMdV, BSONObj& attr) {
 
     BSONArrayBuilder mdNewVBuilder;
     BSONObj mdV = attr.getField(ENT_ATTRS_MD).embeddedObject();
-    unsigned int mdVSize = 0;
+
     for( BSONObj::iterator i = mdV.begin(); i.more(); ) {
         BSONObj md = i.next().embeddedObject();
-        mdVSize++;
+
         if (md.hasField(ENT_ATTRS_MD_TYPE)) {
             mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
                                       ENT_ATTRS_MD_TYPE << md.getStringField(ENT_ATTRS_MD_TYPE) <<
@@ -284,7 +284,7 @@ static bool bsonCustomMetadataToBson(BSONObj& newMdV, BSONObj& attr) {
          }
      }
 
-     if (mdVSize > 0) {
+     if (mdNewVBuilder.arrSize() > 0) {
          newMdV = mdNewVBuilder.arr();
          return true;
      }
@@ -330,14 +330,12 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         BSONArrayBuilder mdNewVBuilder;
 
         /* First add the metadata elements comming in the request */
-        unsigned int mdNewVSize = 0;
         for (unsigned int ix = 0; ix < ca.metadataVector.size() ; ++ix) {
             Metadata* md = ca.metadataVector.get(ix);
             /* Skip not custom metadata */
             if (isNotCustomMetadata(md->name)) {
                 continue;
             }
-            mdNewVSize++;
             if (md->type == "") {
                 mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md->name << ENT_ATTRS_MD_VALUE << md->value));
             }
@@ -347,7 +345,7 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         }
 
         /* Second, for each metadata previously in the metadata vector but *not included in the request*, add it as is */
-        unsigned int mdVSize = 0;
+        int mdVSize = 0;
         BSONObj mdV;
         if (attr.hasField(ENT_ATTRS_MD)) {
             mdV = attr.getField(ENT_ATTRS_MD).embeddedObject();
@@ -355,7 +353,6 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
                 BSONObj md = i.next().embeddedObject();
                 mdVSize++;
                 if (!hasMetadata(md.getStringField(ENT_ATTRS_MD_NAME), md.getStringField(ENT_ATTRS_MD_TYPE), ca)) {
-                    mdNewVSize++;
                     if (md.hasField(ENT_ATTRS_MD_TYPE)) {
                         mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
                                            ENT_ATTRS_MD_TYPE << md.getStringField(ENT_ATTRS_MD_TYPE) <<
@@ -370,7 +367,7 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         }
 
         BSONObj mdNewV = mdNewVBuilder.arr();
-        if (mdNewVSize > 0) {
+        if (mdNewVBuilder.arrSize() > 0) {
             newAttr.appendArray(ENT_ATTRS_MD, mdNewV);
         }
 
@@ -379,7 +376,7 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
             /* In the case of simple value, we check if the value of the attribute changed or the metadata changed (the later
              * one is done checking if the size of the original and final metadata vectors is different and, if they are of the
              * same size, checking if the vectors are not equal) */
-            if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value || mdNewVSize != mdVSize || !equalMetadataVectors(mdV, mdNewV)) {
+            if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value || mdNewVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV)) {
                 *actualUpdate = true;
             }
         }
@@ -524,17 +521,17 @@ static bool updateAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
 static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute* ca) {
 
     BSONArrayBuilder mdToAdd;
-    unsigned int mdToAddSize;
+
     for (unsigned int ix = 0; ix < ca->metadataVector.size(); ++ix) {
         Metadata* md = ca->metadataVector.get(ix);
         if (!isNotCustomMetadata(md->name)) {
-            mdToAddSize++;
             mdToAdd.append(BSON("name" << md->name << "type" << md->type << "value" << md->value));
             LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
                             md->name.c_str(), md->type.c_str(), md->value.c_str()));
         }
     }
-    if (mdToAddSize > 0) {
+
+    if (mdToAdd.arrSize() > 0) {
         mdV = mdToAdd.arr();
         return true;
     }   
@@ -552,8 +549,7 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute*
 */
 static bool appendAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute* caP) {
 
-    /* In the current version (and until we close old issue 33)
-     * APPEND with existing attribute equals to UPDATE */
+    /* APPEND with existing attribute equals to UPDATE */
     BSONArrayBuilder newAttrsBuilder;
     bool updated = false;
     bool actualUpdate = false;
@@ -740,11 +736,11 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
     DBClientConnection* connection = getMongoConnection();
 
     /* Build query */
-    std::string entIdQ       = std::string(CSUB_ENTITIES)   + "." + CSUB_ENTITY_ID;
-    std::string entTypeQ     = std::string(CSUB_ENTITIES)   + "." + CSUB_ENTITY_TYPE;
-    std::string entPatternQ  = std::string(CSUB_ENTITIES)   + "." + CSUB_ENTITY_ISPATTERN;
-    std::string condTypeQ    = std::string(CSUB_CONDITIONS) + "." + CSUB_CONDITIONS_TYPE;
-    std::string condValueQ   = std::string(CSUB_CONDITIONS) + "." + CSUB_CONDITIONS_VALUE;
+    std::string entIdQ       = CSUB_ENTITIES   "." CSUB_ENTITY_ID;
+    std::string entTypeQ     = CSUB_ENTITIES   "." CSUB_ENTITY_TYPE;
+    std::string entPatternQ  = CSUB_ENTITIES   "." CSUB_ENTITY_ISPATTERN;
+    std::string condTypeQ    = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
+    std::string condValueQ   = CSUB_CONDITIONS "." CSUB_CONDITIONS_VALUE;
 
     /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
     BSONObj queryNoPattern = BSON(
@@ -830,7 +826,7 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
 
         if (subs->count(subIdStr) == 0) {
             LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
-            // FIXME P8: see old issues #90
+            // FIXME P8: see issue #371
             // subs->insert(std::pair<string, BSONObj*>(subIdStr, new BSONObj(sub)));
 
             subs->insert(std::pair<string, BSONObj*>(subIdStr, NULL));
@@ -853,7 +849,7 @@ static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::
     /* For each one of the subscriptions in the map, send notification */
     for (std::map<string, BSONObj*>::iterator it = subs->begin(); it != subs->end(); ++it) {
 
-        //FIXME P8: see old issue #90
+        //FIXME P8: see issue #371
         //BSONObj sub = *(it->second);
 
         std::string  mapSubId = it->first;
@@ -937,7 +933,7 @@ static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::
          * addTriggeredSubscriptions */
         attrL.release();
         enV.release();
-        // delete it->second; FIXME P8: see old issue #90
+        // delete it->second; FIXME P8: see issue #371
     }
 
     return true;
@@ -1171,7 +1167,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
         }
 
 #if 0
-        /* DEBUG (see old issue #90) */
+        /* DEBUG (see issue #371) */
         int ix = 0;
         for (std::map<string, BSONObj*>::iterator it = subsToNotify.begin(); it != subsToNotify.end(); ++it) {
             BSONObj b = *(it->second);
@@ -1310,8 +1306,8 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
 */
 static bool removeEntity(std::string entityId, std::string entityType, ContextElementResponse* cerP, std::string tenant) {
 
-    const std::string idString = std::string("_id.") + ENT_ENTITY_ID;
-    const std::string typeString = std::string("_id.") + ENT_ENTITY_TYPE;
+    const std::string idString   = "_id." ENT_ENTITY_ID;
+    const std::string typeString = "_id." ENT_ENTITY_TYPE;
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -1389,9 +1385,10 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     }
 
     /* Find entities (could be several ones in the case of no type or isPattern=true) */
-    const std::string idString = std::string("_id.") + ENT_ENTITY_ID;
-    const std::string typeString = std::string("_id.") + ENT_ENTITY_TYPE;
-    BSONObj query;
+    const std::string  idString   = "_id." ENT_ENTITY_ID;
+    const std::string  typeString = "_id." ENT_ENTITY_TYPE;
+    BSONObj            query;
+
     if (en.type == "") {
         query = BSON(idString << en.id);
     }
@@ -1549,7 +1546,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         }
 
 #if 0
-        /* DEBUG (see issue #90) */
+        /* DEBUG (see issue #371) */
         int ix = 0;
         for (std::map<string, BSONObj*>::iterator it = subsToNotify.begin(); it != subsToNotify.end(); ++it) {
             BSONObj b = *(it->second);

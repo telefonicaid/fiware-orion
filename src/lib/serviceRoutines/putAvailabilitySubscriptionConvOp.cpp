@@ -37,7 +37,7 @@
 *
 * putAvailabilitySubscriptionConvOp - 
 */
-std::string putAvailabilitySubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string putAvailabilitySubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string                                    subscriptionId  = compV[2];
   UpdateContextAvailabilitySubscriptionRequest*  ucasP           = &parseDataP->ucas.res;

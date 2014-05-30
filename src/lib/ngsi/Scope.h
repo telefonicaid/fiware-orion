@@ -57,11 +57,11 @@ typedef struct Scope
   orion::Polygon      polygon;
 
   Scope();
-  Scope(std::string _type, std::string _value);
+  Scope(const std::string& _type, const std::string& _value);
 
-  std::string render(Format format, std::string indent, bool notLastInVector);
-  std::string check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void        present(std::string indent, int ix);
+  std::string render(Format format, const std::string& indent, bool notLastInVector);
+  std::string check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  void        present(const std::string& indent, int ix);
   void        release(void);
 } Scope;
 

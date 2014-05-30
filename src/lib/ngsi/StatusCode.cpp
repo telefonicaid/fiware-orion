@@ -53,7 +53,7 @@ StatusCode::StatusCode()
 *
 * StatusCode::StatusCode - 
 */
-StatusCode::StatusCode(std::string _tag)
+StatusCode::StatusCode(const std::string& _tag)
 {
   code         = SccNone;
   reasonPhrase = "";
@@ -67,7 +67,7 @@ StatusCode::StatusCode(std::string _tag)
 *
 * StatusCode::StatusCode - 
 */
-StatusCode::StatusCode(HttpStatusCode _code, std::string _details, std::string _tag)
+StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _tag)
 {
   code          = _code;
   reasonPhrase  = httpStatusCodeString(code);
@@ -80,7 +80,7 @@ StatusCode::StatusCode(HttpStatusCode _code, std::string _details, std::string _
 *
 * StatusCode::render - 
 */
-std::string StatusCode::render(Format format, std::string indent, bool comma, bool showTag)
+std::string StatusCode::render(Format format, const std::string& indent, bool comma, bool showTag)
 {
   std::string out  = "";
 
@@ -108,7 +108,7 @@ std::string StatusCode::render(Format format, std::string indent, bool comma, bo
 *
 * StatusCode::fill - 
 */
-void StatusCode::fill(HttpStatusCode _code, std::string _details)
+void StatusCode::fill(HttpStatusCode _code, const std::string& _details)
 {
    code          = _code;
    reasonPhrase  = httpStatusCodeString(code);
@@ -132,7 +132,7 @@ void StatusCode::fill(StatusCode* scP)
 *
 * StatusCode::check - 
 */
-std::string StatusCode::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string StatusCode::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   if (code == SccNone)
     return "no code";
@@ -149,7 +149,7 @@ std::string StatusCode::check(RequestType requestType, Format format, std::strin
 *
 * StatusCode::present - 
 */
-void StatusCode::present(std::string indent)
+void StatusCode::present(const std::string& indent)
 {
    PRINTF("%sCode:            %d\n",   indent.c_str(), code);
    PRINTF("%sReasonPhrase:    '%s'\n", indent.c_str(), reasonPhrase.c_str());
@@ -176,7 +176,7 @@ void StatusCode::release(void)
 *
 * tagSet - 
 */
-void StatusCode::tagSet(std::string _tag)
+void StatusCode::tagSet(const std::string& _tag)
 {
   tag = _tag;
 }

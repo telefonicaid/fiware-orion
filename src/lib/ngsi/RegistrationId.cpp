@@ -39,7 +39,7 @@
 *
 * RegistrationId::check - 
 */
-std::string RegistrationId::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string RegistrationId::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string out = "OK";
 
@@ -66,7 +66,7 @@ bool RegistrationId::isEmpty(void)
 *
 * RegistrationId::set - 
 */
-void RegistrationId::set(std::string value)
+void RegistrationId::set(const std::string& value)
 {
   string = value;
 }
@@ -88,7 +88,7 @@ std::string RegistrationId::get(void)
 *
 * RegistrationId::present - 
 */
-void RegistrationId::present(std::string indent)
+void RegistrationId::present(const std::string& indent)
 {
   if (string != "")
     PRINTF("%sRegistrationId: %s\n", indent.c_str(), string.c_str());
@@ -102,7 +102,7 @@ void RegistrationId::present(std::string indent)
 *
 * RegistrationId::render - 
 */
-std::string RegistrationId::render(RequestType requestType, Format format, std::string indent, bool comma)
+std::string RegistrationId::render(RequestType requestType, Format format, const std::string& indent, bool comma)
 {
   if (string == "")
   {

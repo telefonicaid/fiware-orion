@@ -37,6 +37,6 @@
 *
 * badRequest - 
 */
-extern std::string badRequest(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+extern std::string badRequest(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
 
 #endif

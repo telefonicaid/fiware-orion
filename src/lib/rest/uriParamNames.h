@@ -1,6 +1,9 @@
+#ifndef URI_PARAM_NAMES_H
+#define URI_PARAM_NAMES_H
+
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,18 +26,12 @@
 * Author: Ken Zangelin
 */
 
-#include <string>
-
-#include "ngsi/ParseData.h"
-#include "jsonParse/jsonNullTreat.h"
-
 
 
 /* ****************************************************************************
 *
-* jsonNullTreat - 
+* Names of the URI parameters
 */
-std::string jsonNullTreat(std::string path, std::string value, ParseData* reqDataP)
-{
-  return "OK";
-}
+#define URI_PARAM_NOTIFY_FORMAT    "notifyFormat"
+
+#endif

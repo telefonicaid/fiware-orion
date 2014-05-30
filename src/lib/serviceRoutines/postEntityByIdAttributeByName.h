@@ -37,6 +37,6 @@
 *
 * postEntityByIdAttributeByName - 
 */
-extern std::string postEntityByIdAttributeByName(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+extern std::string postEntityByIdAttributeByName(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
 
 #endif
