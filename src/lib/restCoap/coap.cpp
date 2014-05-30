@@ -25,25 +25,46 @@
 #include "HttpMessage.h"
 
 
-
 /* ****************************************************************************
 *
 * callback -
 */
 int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom)
 {
-
   socklen_t addrLen = sizeof(struct sockaddr_in);
   if (recvFrom->ss_family == AF_INET6) {
     addrLen = sizeof(struct sockaddr_in6);
   }
 
-  // Translate request from CoAP to HTTP and send it to MHD
-  std::string httpResponse; // Will contain HTTP Response
+  // Translate request from CoAP to HTTP and send it to MHD through loopback
+  std::string httpResponse;
   httpResponse = sendHttpRequest(host, port, request);
   if (httpResponse == "")
   {
     // Could not get an answer
+    LM_V(("Could not get answer from HTTP module"));
+    boost::scoped_ptr<CoapPDU> res(new CoapPDU());
+
+    res->setVersion(1);
+    res->setMessageID((request->getMessageID()));
+    res->setCode(CoapPDU::COAP_INTERNAL_SERVER_ERROR);
+    res->setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
+    res->setToken(request->getTokenPointer(), request->getTokenLength());
+
+    ssize_t sent = sendto(sockfd, res->getPDUPointer(), res->getPDULength(), 0, (sockaddr*)recvFrom, addrLen);
+
+    if (sent < 0)
+    {
+      LM_V(("Error sending packet: %ld.",sent));
+      perror(NULL);
+      return 1;
+    }
+    else
+    {
+      LM_V(("Sent: %ld",sent));
+    }
+
+    return 1;
   }
 
   boost::scoped_ptr<HttpMessage> hm(new HttpMessage(httpResponse));
@@ -89,29 +110,22 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
   coapResponse->setMessageID(request->getMessageID());
   coapResponse->setToken(request->getTokenPointer(), request->getTokenLength());
 
-  // type
+  // Set type
   switch (request->getType())
   {
-    case CoapPDU::COAP_CONFIRMABLE:
-      coapResponse->setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
+  case CoapPDU::COAP_CONFIRMABLE:
+  case CoapPDU::COAP_NON_CONFIRMABLE:
+    coapResponse->setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
     break;
-    case CoapPDU::COAP_NON_CONFIRMABLE:
-      coapResponse->setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
+  case CoapPDU::COAP_ACKNOWLEDGEMENT:
+  case CoapPDU::COAP_RESET:
     break;
-    case CoapPDU::COAP_ACKNOWLEDGEMENT:
-    break;
-    case CoapPDU::COAP_RESET:
-    break;
-    default:
-      return 1;
+  default:
+    return 1;
     break;
   };
 
-  delete request;
-
-  //coapResponse->printHuman();
-
-  // send the packet
+  // Send the packet
   ssize_t sent = sendto(sockfd, coapResponse->getPDUPointer(), coapResponse->getPDULength(), 0, (sockaddr*)recvFrom, addrLen);
   if (sent < 0)
   {
@@ -141,7 +155,7 @@ void Coap::serve()
   int  recvURILen = 0;
   int  ret = 0;
 
-  // storage for handling receive address
+  // Storage for handling receive address
   struct sockaddr_storage recvAddr;
   socklen_t               recvAddrLen = sizeof(struct sockaddr_storage);
 
@@ -149,7 +163,7 @@ void Coap::serve()
   struct addrinfo *bindAddr = NULL;
   struct addrinfo hints;
 
-  LM_V(("Setting up bind address"));
+  // Setting up bind address
   memset(&hints, 0x00, sizeof(struct addrinfo));
   hints.ai_flags      = 0;
   hints.ai_socktype   = SOCK_DGRAM;
@@ -202,7 +216,6 @@ void Coap::serve()
       continue;
     }
     LM_V(("Valid CoAP PDU received"));
-    //recvPDU->printHuman();
 
     // Treat URI
     if (recvPDU->getURI(uriBuffer, COAP_URI_BUFFER_SIZE, &recvURILen) != 0)
@@ -219,12 +232,9 @@ void Coap::serve()
     {
       // Invoke a callback thread
       boost::thread *workerThread = new boost::thread(boost::bind(&Coap::callback, this, recvPDU.get(), sd, &recvAddr));
-      workerThread->get_id();
-      // DEBUG: Wait for thread to finnish (like using no threads at all) for now
-      workerThread->join();
 
-      // Monothreaded version
-      //callback(recvPDU, sd, &recvAddr);
+      // Wait for thread to finnish (like using no threads at all) for now
+      workerThread->join();
 
       continue;
     }
@@ -234,7 +244,7 @@ void Coap::serve()
     // code == 0, no payload, this is a ping request, send RST
     if ((recvPDU->getPDULength() == 0) && (recvPDU->getCode() == 0))
     {
-      LM_V(("CoAP ping request"));
+      //LM_V(("CoAP ping request"));
     }
 
   }

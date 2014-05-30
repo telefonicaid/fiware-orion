@@ -22,7 +22,6 @@
 #include <curl/curl.h>
 
 
-
 /* ****************************************************************************
 *
 * writeMemoryCallback -
@@ -202,6 +201,12 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
     if (res != CURLE_OK)
     {
       fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+
+      // --- Cleanup curl environment
+      curl_slist_free_all(headers);
+      curl_easy_cleanup(curl);
+
+      return "";
     }
 
     // --- Cleanup curl environment
@@ -211,7 +216,6 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
 
   std::string ret;
   ret.assign(httpResponse->memory, httpResponse->size);
-//  return httpResponse;
   return ret;
 }
 
