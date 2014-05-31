@@ -1220,7 +1220,7 @@ int main(int argC, char* argV[])
 #if 0
   //
   // This 'almost always outdeffed' piece of code is used whenever a change is done to the 
-  // valgrind tst suite, just to make sure that the tool actually detects memory leaks,
+  // valgrind test suite, just to make sure that the tool actually detects memory leaks,
   //
   char* x = (char*) malloc(100000);
   sprintf(x, "A hundred thousand bytes lost here");

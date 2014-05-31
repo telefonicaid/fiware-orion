@@ -524,7 +524,7 @@ then
       then
         mv /tmp/funcTest /tmp/funcTest.$file
         echo -n " FAILURE! functional test ended with error code $status. "
-        # exit 2
+        # FIXME P4: NO EXIT here - sometimes harness tests fail under valgrind ...
       fi
 
       if [ ! -f /tmp/valgrind.out ]
