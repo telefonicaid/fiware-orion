@@ -27,8 +27,9 @@ broker version
 # However, in this case, it seems to work with the double-hyphened "--version" argument.
 
 contextBroker --version
+
 --REGEXPECT--
-0.12.0-next
+0.14.0-next
 Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 Orion Context Broker is free software: you can redistribute it and/or
 modify it under the terms of the GNU Affero General Public License as

@@ -258,7 +258,7 @@ clean:
 	rm -rf BUILD_UNITTEST
 
 lint_all:
-	scripts/cpplint.py src/*.cpp src/*.h
+	scripts/linter.sh
 
 lint_changed:
 	git diff --name-only | grep "\.cpp\|\.h" | xargs scripts/cpplint.py

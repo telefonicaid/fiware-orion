@@ -160,9 +160,9 @@ static bool associationsQuery
 
 /* ****************************************************************************
 *
-* associationsDiscoverConvextAvailability -
+* associationsDiscoverContextAvailability -
 */
-static HttpStatusCode associationsDiscoverConvextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, const std::string& scope, const std::string& tenant) {
+static HttpStatusCode associationsDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, const std::string& scope, const std::string& tenant) {
 
     if (scope == SCOPE_VALUE_ASSOC_ALL) {
         LM_W(("%s scope not supported", SCOPE_VALUE_ASSOC_ALL));
@@ -267,7 +267,7 @@ HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityReque
     std::string scopeValue = requestP->restriction.scopeVector.get(0)->value;
 
     if (scopeType == SCOPE_TYPE_ASSOC) {
-      HttpStatusCode ms = associationsDiscoverConvextAvailability(requestP, responseP, scopeValue, tenant);
+      HttpStatusCode ms = associationsDiscoverContextAvailability(requestP, responseP, scopeValue, tenant);
       reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request (association)");
       return ms;
     }

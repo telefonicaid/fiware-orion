@@ -45,11 +45,11 @@ std::string idCheck(const std::string& s)
   while (*cP != 0)
   {
     if ((*cP >= '0') && (*cP <= '9'))
-      ;
+    {}
     else if ((*cP >= 'a') && (*cP <= 'f'))
-      ;
+    {}
     else if ((*cP >= 'A') && (*cP <= 'F'))
-      ;
+    {}
     else
     {
       LM_E(("invalid char: %c", *cP));

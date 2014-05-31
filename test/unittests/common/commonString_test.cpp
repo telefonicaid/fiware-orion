@@ -310,7 +310,7 @@ TEST(commonString, i2s)
   char  ph[32];
   char* p;
   
-  p = i2s(19, ph);
+  p = i2s(19, ph, sizeof(ph));
   EXPECT_STREQ("19", p);
 }
 
@@ -366,10 +366,10 @@ TEST(string, coords2string)
 {
   std::string s;
 
-  coords2string(s, 0, 1, 0);
+  coords2string(&s, 0, 1, 0);
   EXPECT_EQ("0, 1", s);
 
-  coords2string(s, 0.123, 1.123, 3);
+  coords2string(&s, 0.123, 1.123, 3);
   EXPECT_STREQ("0.123, 1.123", s.c_str());
 }
 
@@ -410,83 +410,83 @@ TEST(string, atoF)
   std::string  e;
   double       d;
 
-  d = atoF("", e);
+  d = atoF("", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("empty string", e);
   
-  d = atoF(" ", e);
+  d = atoF(" ", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("invalid characters in string to convert", e);
 
-  d = atoF("34", e);
+  d = atoF("34", &e);
   EXPECT_EQ(34, d);
   EXPECT_EQ("", e);
 
-  d = atoF("-34.0", e);
+  d = atoF("-34.0", &e);
   EXPECT_EQ(-34.0, d);
   EXPECT_EQ("", e);
 
-  d = atoF("+34.1", e);
+  d = atoF("+34.1", &e);
   EXPECT_EQ(34.1, d);
   EXPECT_EQ("", e);
 
-  d = atoF(".34", e);
+  d = atoF(".34", &e);
   EXPECT_EQ(.34, d);
   EXPECT_EQ("", e);
 
-  d = atoF("--4", e);
+  d = atoF("--4", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("non-digit after unary minus/plus", e);
 
-  d = atoF("+-4", e);
+  d = atoF("+-4", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("non-digit after unary minus/plus", e);
 
-  d = atoF("-.4", e);
+  d = atoF("-.4", &e);
   EXPECT_EQ(-0.4, d);
   EXPECT_EQ("", e);
 
-  d = atoF(".34.0", e);
+  d = atoF(".34.0", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("more than one dot", e);
 
-  d = atoF("34.", e);
+  d = atoF("34.", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("last character in a double cannot be a dot", e);
 
-  d = atoF("x34", e);
+  d = atoF("x34", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("invalid characters in string to convert", e);
 
-  d = atoF("--224", e);
+  d = atoF("--224", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("non-digit after unary minus/plus", e);
 
-  d = atoF("-.224", e);
+  d = atoF("-.224", &e);
   EXPECT_EQ(-0.224, d);
   EXPECT_EQ("", e);
 
-  d = atoF("2-24", e);
+  d = atoF("2-24", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("invalid characters in string to convert", e);
 
-  d = atoF("224-", e);
+  d = atoF("224-", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("invalid characters in string to convert", e);
 
-  d = atoF("224.-", e);
+  d = atoF("224.-", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("invalid characters in string to convert", e);
 
-  d = atoF("224.", e);
+  d = atoF("224.", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("last character in a double cannot be a dot", e);
 
-  d = atoF("2.2.4", e);
+  d = atoF("2.2.4", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("more than one dot", e);
 
-  d = atoF("2 24", e);
+  d = atoF("2 24", &e);
   EXPECT_EQ(0.0, d);
   EXPECT_EQ("invalid characters in string to convert", e);
 }
