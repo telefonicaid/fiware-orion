@@ -23,8 +23,6 @@
 --NAME--
 Create and query compound values (EVector XML)
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB 60,80
 
@@ -113,5 +111,4 @@ curl localhost:${BROKER_PORT}/ngsi10/contextEntities/EVector -s -S --header 'Con
   </statusCode>
 </contextElementResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

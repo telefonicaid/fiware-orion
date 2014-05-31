@@ -24,8 +24,6 @@
 Convenience Individual Context Entity - DELETE FAILS
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -42,5 +40,4 @@ echo "+++++ 1. delete an entity +++++"
   <details>entity01</details>
 </statusCode>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

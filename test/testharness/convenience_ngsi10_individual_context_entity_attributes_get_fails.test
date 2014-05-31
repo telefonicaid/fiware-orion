@@ -24,8 +24,6 @@
 Convenience Individual Context Entity - GET FAILS
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -51,5 +49,4 @@ echo "+++++ 1. get an entity +++++"
   </statusCode>
 </contextElementResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

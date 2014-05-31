@@ -24,8 +24,6 @@
 Convenience Individual Context Entity - GET OK
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -89,5 +87,4 @@ echo "+++++ 2. lookup the entity +++++"
   </statusCode>
 </contextElementResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

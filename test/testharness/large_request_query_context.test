@@ -23,8 +23,6 @@
 --NAME--
 Large request error for /NGSI10/queryContext
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -50,5 +48,4 @@ rm $BIGFILE
   </errorCode>
 </queryContextResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

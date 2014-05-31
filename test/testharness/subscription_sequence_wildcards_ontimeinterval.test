@@ -23,16 +23,13 @@
 --NAME--
 Subscription sequence wildcards ONINTERVAL
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 accumulatorStart
 
 --SHELL--
-
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -49,12 +46,13 @@ accumulatorStart
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-echo "1: ++++++++++++++++++++"
+</updateContextRequest>'
+curlXml "$url" "$payload"
+echo
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+echo "1: ++++++++++++++++++++"
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -71,57 +69,66 @@ echo "1: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-echo "2: ++++++++++++++++++++"
+</updateContextRequest>'
+curlXml "$url" "$payload"
+echo
 
-SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+echo "2: ++++++++++++++++++++"
+SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- 2> /dev/null | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
-        <entityId type="Room" isPattern="true">
-          <id>OfficeRoom.*</id>
-        </entityId>
+    <entityId type="Room" isPattern="true">
+      <id>OfficeRoom.*</id>
+    </entityId>
   </entityIdList>
   <attributeList>
-        <attribute>temperature</attribute>
-        <attribute>lightstatus</attribute>
+    <attribute>temperature</attribute>
+    <attribute>lightstatus</attribute>
   </attributeList>
   <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
   <duration>PT5H</duration>
   <notifyConditions>
-        <notifyCondition>
-          <type>ONTIMEINTERVAL</type>
-          <condValueList>
-                <condValue>PT2S</condValue>
-          </condValueList>
-          <restriction>restriction</restriction>
-        </notifyCondition>
+    <notifyCondition>
+      <type>ONTIMEINTERVAL</type>
+      <condValueList>
+        <condValue>PT2S</condValue>
+      </condValueList>
+      <restriction>restriction</restriction>
+    </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "$SUB_OUT"
-echo "3: ++++++++++++++++++++"
+echo
 
-#Wait 11 seconds, so we will receive 6 notifications (t=0, t=2, t=4, t=6, t=8, t=10)
+# Wait 11 seconds, so we will receive 6 notifications (t=0, t=2, t=4, t=6, t=8, t=10)
 sleep 11
 
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+echo "3: ++++++++++++++++++++"
+url=/NGSI10/unsubscribeContext
+payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
-  <subscriptionId>$SUB_ID</subscriptionId>
-</unsubscribeContextRequest>
-EOF
-echo "4: ++++++++++++++++++++"
+  <subscriptionId>'$SUB_ID'</subscriptionId>
+</unsubscribeContextRequest>'
+curlXml "$url" "$payload"
+echo
 
-#Get accumulated data (only the first notification and the notification times)
+
+# Get accumulated data (only the first notification and the notification times)
+echo "4: ++++++++++++++++++++"
 curl localhost:${LISTENER_PORT}/dump -s -S | head -n 51
 
 TIMES=$(curl localhost:${LISTENER_PORT}/times -s -S)
 echo "TIMES: $TIMES"
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 640
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -145,7 +152,13 @@ echo "TIMES: $TIMES"
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
+
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 641
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -169,6 +182,7 @@ echo "TIMES: $TIMES"
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
+
 2: ++++++++++++++++++++
 <?xml version="1.0"?>
 <subscribeContextResponse>
@@ -177,7 +191,13 @@ echo "TIMES: $TIMES"
     <duration>PT5H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
+
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 207
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <unsubscribeContextResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -186,6 +206,7 @@ echo "TIMES: $TIMES"
     <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </unsubscribeContextResponse>
+
 4: ++++++++++++++++++++
 POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 1287
@@ -240,7 +261,5 @@ Content-Type: application/xml
 =======================================
 TIMES: 0, 2, 4, 6, 8, 10
 --TEARDOWN--
-source harnessFunctions.sh
-
 brokerStop CB
 accumulatorStop

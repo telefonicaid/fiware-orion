@@ -23,48 +23,48 @@
 --NAME--
 Subscription sequence wildcards ONCHANGE update
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 accumulatorStart
 
 --SHELL--
 
-SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- 2> /dev/null | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
-        <entityId type="Room" isPattern="true">
-          <id>OfficeRoom.*</id>
-        </entityId>
+    <entityId type="Room" isPattern="true">
+      <id>OfficeRoom.*</id>
+    </entityId>
   </entityIdList>
   <attributeList>
-        <attribute>temperature</attribute>
-        <attribute>lightstatus</attribute>
+    <attribute>temperature</attribute>
+    <attribute>lightstatus</attribute>
   </attributeList>
   <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
-        <notifyCondition>
-          <type>ONCHANGE</type>
-          <condValueList>
-                <condValue>temperature</condValue>
-          </condValueList>
-          <restriction>restriction</restriction>
-        </notifyCondition>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>temperature</condValue>
+      </condValueList>
+      <restriction>restriction</restriction>
+    </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "$SUB_OUT"
-echo "1: ++++++++++++++++++++"
+echo
+
 
 # Wait a bit before doing update
 sleep 1
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+echo "1: ++++++++++++++++++++"
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -81,15 +81,17 @@ sleep 1
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-echo "2: ++++++++++++++++++++"
+</updateContextRequest>'
+curlXml "$url" "$payload"
+echo
+
 
 # to avoid a race condition in the order of notifications
 sleep 0.5s
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+echo "2: ++++++++++++++++++++"
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -106,70 +108,77 @@ sleep 0.5s
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+curlXml "$url" "$payload"
+echo
+
+
+# to avoid a race condition in the order of notifications
+sleep 0.5s
+
 echo "3: ++++++++++++++++++++"
-
-# to avoid a race condition in the order of notifications
-sleep 0.5s
-
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom2</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom2</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>temperature</name>
-                  <type>degree</type>
-                  <contextValue>t51</contextValue>
-                </contextAttribute>
+          <type>degree</type>
+          <contextValue>t51</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+curlXml "$url" "$payload"
+echo
+
+
+# to avoid a race condition in the order of notifications
+sleep 0.5s
+
 echo "4: ++++++++++++++++++++"
-
-# to avoid a race condition in the order of notifications
-sleep 0.5s
-
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom2</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom2</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>temperature</name>
-                  <type>degree</type>
-                  <contextValue>t52</contextValue>
-                </contextAttribute>
+          <type>degree</type>
+          <contextValue>t52</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+curlXml "$url" "$payload"
+echo
+
+
 echo "5: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI10/unsubscribeContext
+payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
-  <subscriptionId>$SUB_ID</subscriptionId>
-</unsubscribeContextRequest>
-EOF
-echo "6: ++++++++++++++++++++"
+  <subscriptionId>'$SUB_ID'</subscriptionId>
+</unsubscribeContextRequest>'
+curlXml "$url" "$payload"
+echo
 
-#Get accumulated data
-curl localhost:${LISTENER_PORT}/dump -s -S
+
+echo "Accumulated data:"
+curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
 
 --REGEXPECT--
 <?xml version="1.0"?>
@@ -179,7 +188,13 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
+
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 640
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -203,7 +218,13 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
+
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 640
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -227,7 +248,13 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
+
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 641
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -251,7 +278,13 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
+
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 641
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -275,7 +308,13 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
+
 5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 207
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <unsubscribeContextResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -284,7 +323,8 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </unsubscribeContextResponse>
-6: ++++++++++++++++++++
+
+Accumulated data:
 POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 739
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -418,7 +458,5 @@ Content-Type: application/xml
 
 =======================================
 --TEARDOWN--
-source harnessFunctions.sh
-
 brokerStop CB
 accumulatorStop

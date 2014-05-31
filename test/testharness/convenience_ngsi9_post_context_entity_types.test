@@ -23,8 +23,6 @@
 --NAME--
 Convenience NGSI9 Context Entity Type
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -134,5 +132,4 @@ echo "3: ++++++++++++++++++++"
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

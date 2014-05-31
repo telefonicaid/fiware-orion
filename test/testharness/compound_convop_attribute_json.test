@@ -23,8 +23,6 @@
 --NAME--
 Convop query compound values by attribute (JSON)
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -312,5 +310,4 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject/attributes/att -s -
     }
 }
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

@@ -23,13 +23,14 @@
 --NAME--
 statistics
 --SHELL-INIT--
-source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB
 
 --SHELL--
-curl localhost:${BROKER_PORT}/statistics | xmllint --format -
+curl localhost:${BROKER_PORT}/statistics 2> /dev/null | xmllint --format -
+echo
+
 --REGEXPECT--
 <?xml version="1.0"?>
 <orion>
@@ -38,6 +39,6 @@ curl localhost:${BROKER_PORT}/statistics | xmllint --format -
   <uptime_in_secs>REGEX(\d+)</uptime_in_secs>
   <measuring_interval_in_secs>REGEX(\d+)</measuring_interval_in_secs>
 </orion>
+
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

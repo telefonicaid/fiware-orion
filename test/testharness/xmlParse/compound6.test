@@ -23,14 +23,10 @@
 --NAME--
 Compound Values for UpdateContextRequest 6
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB 0-1
 
 --SHELL--
-source harnessFunctions.sh
-
 #   6. ok:  contextValue is a vector with five items
 echo "6: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
@@ -91,5 +87,4 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

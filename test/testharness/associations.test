@@ -23,13 +23,10 @@
 --NAME--
 Associations
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
 
 url="/NGSI9/registerContext"
 payload='<?xml version="1.0"?>
@@ -79,9 +76,8 @@ payload='<?xml version="1.0"?>
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
-
-echo "1: ++++++++++++++++++++"
+curlXml "$url" "$payload"
+echo
 --REGEXPECT--
 HTTP/1.1 200 OK
 Content-Length: 141
@@ -93,7 +89,6 @@ Date: REGEX(.*)
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
-1: ++++++++++++++++++++
+
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

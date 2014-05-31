@@ -23,8 +23,6 @@
 --NAME--
 Delete entity
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -172,5 +170,4 @@ echo "6: ++++++++++++++++++++"
 </queryContextResponse>
 6: ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

@@ -59,6 +59,7 @@ function harnessExit()
 function dbInit()
 {
   role=$1  
+  db=$1
 
   if [ "$role" == "CB" ]
   then
@@ -66,22 +67,10 @@ function dbInit()
   elif [ "$role" == "CM" ]
   then
     echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE2_NAME} --quiet
+  else
+    echo 'db.dropDatabase()' | mongo $db --quiet
   fi
 }
-
-# ------------------------------------------------------------------------------
-#
-# dbTenantInit -
-#
-function dbTenantInit()
-{
-  db=$1
-
-  echo 'db.dropDatabase()' | mongo $db --quiet
-
-}
-
-
 
 # ------------------------------------------------------------------------------
 #
@@ -125,7 +114,7 @@ function localBrokerStart()
     # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
     sleep 1
   else
-    valgrind $CB_START_CMD > ${TEST_BASENAME}.valgrind.out 2>&1 &
+    valgrind $CB_START_CMD > /tmp/valgrind.out 2>&1 &
     # Waiting for valgrind to start (sleep 10)
     sleep 10s
   fi
@@ -158,13 +147,13 @@ function localBrokerStop
   # Test to see if we have a broker running on $port if so kill it!
   running_broker=$(ps -fe | grep contextBroker | grep $port | wc -l)
   if [ $running_broker -ne 0 ]; then
-    kill $(ps -fe | grep contextBroker | grep $port | awk '{print $2}')
+    kill $(ps -fe | grep contextBroker | grep $port | awk '{print $2}') 2> /dev/null
     # Wait some time so the broker can finish properly
     sleep 1
     running_broker=$(ps -fe | grep contextBroker | grep $port | wc -l)
     if [ $running_broker -ne 0 ]; then
       # If the broker refuses to stop politely, kill the process by brute force
-      kill -9 $(ps -fe | grep contextBroker | grep $port | awk '{print $2}')
+      kill -9 $(ps -fe | grep contextBroker | grep $port | awk '{print $2}') 2> /dev/null
       sleep 1
       running_broker=$(ps -fe | grep contextBroker | grep $port | wc -l)
       if [ $running_broker -ne 0 ]; then
@@ -229,10 +218,13 @@ function brokerStop
   fi
 
   if [ "$VALGRIND" == "" ]; then
-    kill $(cat $pidFile)
-    rm /tmp/orion_${port}.pid
+    kill $(cat $pidFile) 2> /dev/null
+    if [ -f /tmp/orion_${port}.pid ]
+    then
+      rm -f /tmp/orion_${port}.pid 2> /dev/null
+    fi
   else
-    curl localhost:${port}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
+    curl localhost:${port}/exit/harakiri 2> /dev/null >> ${TEST_BASENAME}.valgrind.stop.out
     # Waiting for valgrind to terminate (sleep 10)
     sleep 10
   fi
@@ -254,7 +246,11 @@ function accumulatorStop()
     port=${LISTENER_PORT}
   fi
 
-  kill $(curl localhost:$port/pid -s -S)
+  apid=$(curl localhost:$port/pid -s -S 2> /dev/null)
+  if [ "$apid" != "" ]
+  then
+    kill $apid 2> /dev/null
+  fi
 
   sleep 1
 
@@ -262,14 +258,14 @@ function accumulatorStop()
 
   if [ $running_app -ne 0 ]
   then
-    kill $(ps -fe | grep accumulator-server | grep $port | awk '{print $2}')
+    kill $(ps -fe | grep accumulator-server | grep $port | awk '{print $2}') 2> /dev/null
     # Wait some time so the accumulator can finish properly
     sleep 1
     running_app=$(ps -fe | grep accumulator-server | grep $port | wc -l)
     if [ $running_app -ne 0 ]
     then
       # If the accumulator refuses to stop politely, kill the process by brute force
-      kill -9 $(ps -fe | grep accumulator-server | grep $port | awk '{print $2}')
+      kill -9 $(ps -fe | grep accumulator-server | grep $port | awk '{print $2}') 2> /dev/null
       sleep 1
       running_app=$(ps -fe | grep accumulator-server | grep $port | wc -l)
 
@@ -289,19 +285,18 @@ function accumulatorStop()
 #
 function accumulatorStart()
 {
-
   bindIp=$1
   port=$2
 
   # If port is missing, we use the default LISTENER_PORT
   if [ -z "$port" ]
   then
-    port=${LISTENER_PORT}
+    port=$LISTENER_PORT
   fi
 
   accumulatorStop $port
 
-  accumulator-server.py $port /notify $bindIp &
+  accumulator-server.py $port /notify $bindIp 2> /dev/null &
   echo accumulator running as PID $$
 
   # Wait until accumulator has started or we have waited a given maximum time
@@ -336,7 +331,10 @@ function printXmlWithHeaders()
 
   cat headers.out
 
-  echo "$text" | xmllint --format -
+  if [ "$text" != "" ]
+  then
+    echo "$text" | xmllint --format -
+  fi
 
   rm headers.out
 }
@@ -353,7 +351,10 @@ function printJsonWithHeaders()
 
   cat headers.out
 
-  echo "${text}" | python -mjson.tool
+  if [ "$text" != "" ]
+  then
+    echo "${text}" | python -mjson.tool
+  fi
 
   rm headers.out
 }
@@ -368,16 +369,16 @@ function printJsonWithHeaders()
 # 
 function curlIt()
 {
-  _outFormat=$1
-  _url=$2
-  _payload=$3
-  _contenttype=$4
-  _accept=$5
-  _extraoptions=$6
-  _httpTenant=$7
+  _outFormat="$1"
+  _url="$2"
+  _payload="$3"
+  _contenttype="$4"
+  _accept="$5"
+  _extraoptions="$6"
+  _httpTenant="$7"
 
   _params="-s -S --dump-header headers.out"
-  
+
   if [ "$_extraoptions" == "" ] && [ "$_httpTenant" != "" ]
   then
     response=$(echo ${_payload} | (curl ${_url} ${_params} --header "${_contenttype}" --header "${_accept}" --header "Expect:" --header "$_httpTenant" -d @- ))
@@ -404,18 +405,18 @@ function curlIt()
 #
 function curlXml()
 {
-  _url=$1
-  _payload=$2
-  _extraoptions=$3
+  _url="$1"
+  _payload="$2"
+  _extraoptions="$3"
   
-  curlIt "XML" "localhost:${BROKER_PORT}${_url}" "${_payload}" "Content-Type: application/xml" "Accept: application/xml" "${_extraoptions}"
+  curlIt "XML" "localhost:${BROKER_PORT}${_url}" "${_payload}" "Content-Type: application/xml" "Accept: application/xml" "$_extraoptions"
 }
 
 function curlXmlTenants()
 {
-  _url=$1
-  _payload=$2
-  _tenant=$3
+  _url="$1"
+  _payload="$2"
+  _tenant="$3"
   
   curlIt "XML" "localhost:${BROKER_PORT}${_url}" "${_payload}" "Content-Type: application/xml" "Accept: application/xml" "" "$_tenant"
 }
@@ -429,9 +430,9 @@ function curlXmlTenants()
 #
 function curlJson()
 {
-  _url=$1
-  _payload=$2
-  _extraoptions=$3
+  _url="$1"
+  _payload="$2"
+  _extraoptions="$3"
   
   curlIt "JSON" "localhost:${BROKER_PORT}${_url}" "${_payload}" "Content-Type: application/json" "Accept: application/json" "${_extraoptions}"
 }
@@ -444,11 +445,11 @@ function curlJson()
 #
 function curlNoPayload()
 {
-  _outFormat=$1
-  _url=$2
-  _extraoptions=$3
-  _contenttype=$4
-  _accept=$5
+  _outFormat="$1"
+  _url="$2"
+  _extraoptions="$3"
+  _contenttype="$4"
+  _accept="$5"
    
   _params="-s -S --dump-header headers.out "
   
@@ -473,10 +474,10 @@ function curlNoPayload()
 #
 function curlXmlNoPayload()
 {
-  _url=$1
-  _extraoptions=$2
+  _url="$1"
+  _extraoptions="$2"
   
-  curlNoPayload "XML" $_url "${_extraoptions}" "Content-Type: application/xml" "Accept: application/xml"
+  curlNoPayload "XML" "$_url" "$_extraoptions" "Content-Type: application/xml" "Accept: application/xml"
 }
 
 
@@ -489,10 +490,10 @@ function curlXmlNoPayload()
 #
 function curlJsonNoPayload()
 {
-  _url=$1
-  _extraoptions=$2
+  _url="$1"
+  _extraoptions="$2"
   
-  curlNoPayload "JSON" "$_url" "${_extraoptions}" "Content-Type: application/json" "Accept: application/json"
+  curlNoPayload "JSON" "$_url" "$_extraoptions" "Content-Type: application/json" "Accept: application/json"
 }
 
 
@@ -556,3 +557,24 @@ function dbInsertEntity()
 
   echo "$jsCode ; $ent ; $doc ; $cmd" | mongo $db
 }
+
+
+export -f dbInit
+export -f brokerStart
+export -f localBrokerStop
+export -f localBrokerStart
+export -f brokerStop
+export -f localBrokerStop
+export -f accumulatorStart
+export -f accumulatorStop
+export -f curlXml
+export -f curlIt
+export -f curlJson
+export -f printXmlWithHeaders
+export -f printJsonWithHeaders
+export -f curlXmlNoPayload
+export -f curlJsonNoPayload
+export -f curlNoPayload
+export -f curlXmlTenants
+export -f dbInsertEntity
+export -f mongoCmd

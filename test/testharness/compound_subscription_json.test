@@ -24,15 +24,11 @@
 Subscription sequence ONCHANGE with compound values JSON
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 accumulatorStart
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "1: +++++++++ Prepare subscription +++++++++++"
 (curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
@@ -271,7 +267,5 @@ Content-Type: application/json
 
 =======================================
 --TEARDOWN--
-source harnessFunctions.sh
-
 brokerStop CB
 accumulatorStop

@@ -23,8 +23,6 @@
 --NAME--
 Convenience NGSI10 Context Entity Types
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -162,5 +160,4 @@ Allow: GET
 Date: REGEX(.*)
 
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

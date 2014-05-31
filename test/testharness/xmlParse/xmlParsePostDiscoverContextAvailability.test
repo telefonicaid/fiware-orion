@@ -23,13 +23,10 @@
 --NAME--
 XML Parse Post DiscoverContextAvailability
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
 echo "+++++ Registration +++++"
 url="/NGSI9/registerContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
@@ -81,7 +78,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml "$url" "$payload"
 
 echo "+++++ Registration Done +++++"
 
@@ -102,7 +99,7 @@ payload='<?xml version="1.0"?>
       <attribute>pressure</attribute>
     </attributeList>
   </discoverContextAvailabilityRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml "$url" "$payload"
 
 echo "+++++ Discovery Done +++++"
 
@@ -152,5 +149,4 @@ Date: REGEX(.*)
 </discoverContextAvailabilityResponse>
 +++++ Discovery Done +++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

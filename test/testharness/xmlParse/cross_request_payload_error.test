@@ -23,14 +23,10 @@
 --NAME--
 Cross request payload error in XML
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 url='/NGSI9/registerContext'
 payload='<?xml version="1.0"?>
 <discoverContextAvailabilityRequest/>'
@@ -297,5 +293,4 @@ Date: REGEX(.*)
 </orionError>
 13: ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

@@ -23,8 +23,6 @@
 --NAME--
 Subscription sequence empty attributes
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 accumulatorStart
@@ -603,7 +601,5 @@ Content-Type: application/xml
 
 =======================================
 --TEARDOWN--
-source harnessFunctions.sh
-
 brokerStop CB
 accumulatorStop

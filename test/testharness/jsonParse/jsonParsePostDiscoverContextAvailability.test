@@ -23,13 +23,10 @@
 --NAME--
 JSON Parse Post DiscoverContextAvailability
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
 echo "+++++ Starting +++++++++++++++"
 url="/NGSI9/registerContext"
 payload='{
@@ -289,5 +286,4 @@ Date: REGEX(.*)
 }
 +++++ Discovery 2 Done +++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

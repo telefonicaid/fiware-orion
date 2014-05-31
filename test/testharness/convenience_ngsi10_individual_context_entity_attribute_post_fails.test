@@ -24,8 +24,6 @@
 Convenience Individual Context Entity Attribute - POST FAILS
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -59,5 +57,4 @@ EOF
   <reasonPhrase>OK</reasonPhrase>
 </statusCode>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

@@ -24,8 +24,6 @@
 Convenience Individual Context Entity - DELETE OK
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -116,5 +114,4 @@ echo "+++++ 4. lookup the entity, but nothing found, as the entity has been just
   </statusCode>
 </contextElementResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

@@ -25,6 +25,17 @@ test/testharness/*/*.sh_init
 test/testharness/*/*.sh_init.stderr
 test/testharness/*/*.sh_init.stdout
 test/testharness/*/*.out
+test/testharness/*.shell
+test/testharness/*/*.shell
+test/testharness/*.shellInit
+test/testharness/*/*.shellInit
+test/testharness/*.stdout
+test/testharness/*/*.stdout
+test/testharness/*.stderr
+test/testharness/*/*.stderr
+test/testharness/*.teardown
+test/testharness/*/*.teardown
+
 core*
 test/valgrind/*.out
 src/lib/common/compileInfo.h

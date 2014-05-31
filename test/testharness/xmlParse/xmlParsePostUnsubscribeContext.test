@@ -23,20 +23,16 @@
 --NAME--
 XML Parse Post UnsubscribeContext
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 url="/NGSI10/unsubscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextRequest>
   <subscriptionId>012345678901234567890123</subscriptionId>
 </unsubscribeContextRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}"
 
 echo "2: ***********************************"
 
@@ -81,7 +77,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </notifyConditions>
   <throttling>P5Y</throttling>
 </subscribeContextRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}"
 
 subscriptionId=$(echo "$response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
@@ -92,7 +88,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <subscriptionId>'$subscriptionId'</subscriptionId>
 </unsubscribeContextRequest>'
 
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml "$url" "$payload"
 
 echo "4: ***********************************"
 --REGEXPECT--
@@ -140,5 +136,4 @@ Date: REGEX(.*)
 </unsubscribeContextResponse>
 4: ***********************************
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

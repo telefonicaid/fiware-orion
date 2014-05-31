@@ -23,14 +23,10 @@
 --NAME--
 Check default duration
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 url="/NGSI9/registerContext"
 payload='<?xml version="1.0"?>
   <registerContextRequest>
@@ -56,7 +52,7 @@ payload='<?xml version="1.0"?>
     </contextRegistrationList>
     <registrationId></registrationId>
   </registerContextRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml "$url" "$payload"
 
 REG_ID=$(echo "$response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
@@ -78,7 +74,7 @@ payload='<?xml version="1.0"?>
       <attribute>pressure</attribute>
     </attributeList>
   </discoverContextAvailabilityRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml "$url" "$payload"
 
 --REGEXPECT--
 HTTP/1.1 200 OK
@@ -123,5 +119,4 @@ Date: REGEX(.*)
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

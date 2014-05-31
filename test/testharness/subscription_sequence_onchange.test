@@ -24,46 +24,44 @@
 Subscription sequence ONCHANGE
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 accumulatorStart
 
 --SHELL--
-source harnessFunctions.sh
 
-SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- 2> /dev/null | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
   </entityIdList>
   <attributeList>
-        <attribute>temperature</attribute>
-        <attribute>lightstatus</attribute>
+    <attribute>temperature</attribute>
+    <attribute>lightstatus</attribute>
   </attributeList>
   <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
-        <notifyCondition>
-          <type>ONCHANGE</type>
-          <condValueList>
-                <condValue>temperature</condValue>
-                <condValue>lightstatus</condValue>
-          </condValueList>          
-        </notifyCondition>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>temperature</condValue>
+        <condValue>lightstatus</condValue>
+      </condValueList>          
+    </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "$SUB_OUT"
-echo "1: ++++++++++++++++++++"
+echo
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+echo "1: ++++++++++++++++++++"
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -85,95 +83,100 @@ echo "1: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
 
-# Get notifications count
+curlXml "$url" "$payload"
+echo
+echo Notification count from mongo:
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo
+
 
 echo "2: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>temperature</name>
-                  <type>degree</type>
-                  <contextValue>t100</contextValue>
-                </contextAttribute>
-            <contextAttribute>
+          <type>degree</type>
+          <contextValue>t100</contextValue>
+        </contextAttribute>
+        <contextAttribute>
           <name>lightstatus</name>
-                  <type>light</type>
-                  <contextValue>L23</contextValue>
-                </contextAttribute>
+          <type>light</type>
+          <contextValue>L23</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-
-# Get notifications count
+</updateContextRequest>'
+curlXml "$url" "$payload"
+echo
+echo Notification count from mongo:
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo
 
 echo "3: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI10/updateContextSubscription -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI10/updateContextSubscription
+payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>P1Y</duration>
-  <subscriptionId>$SUB_ID</subscriptionId>
+  <subscriptionId>'$SUB_ID'</subscriptionId>
   <throttling>PT6S</throttling>
-</updateContextSubscriptionRequest>
-EOF
-
-# Get notifications count
+</updateContextSubscriptionRequest>'
+curlXml "$url" "$payload"
+echo
+echo Notification count from mongo:
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo
 
-echo "4: ++++++++++++++++++++"
 
-#Wait sleep >6s to reset the throttling interval
+# Wait - sleep >6s to reset the throttling interval
 sleep 10
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+echo "4: ++++++++++++++++++++"
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p5300</contextValue>
-                </contextAttribute>
-            <contextAttribute>
+          <type>clima</type>
+          <contextValue>p5300</contextValue>
+        </contextAttribute>
+        <contextAttribute>
           <name>lightstatus</name>
-                  <type>light</type>
-                  <contextValue>L53</contextValue>
-                </contextAttribute>
+          <type>light</type>
+          <contextValue>L53</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
 
-# Get notifications count
+curlXml "$url" "$payload"
+echo
+echo Notification count from mongo:
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo
+
 
 echo "5: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -195,41 +198,44 @@ echo "5: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+
+curlXml "$url" "$payload"
+echo
+
+
 echo "6: ++++++++++++++++++++"
-
-#Wait sleep >6s to reset the throttling interval
+# Wait - sleep >6s to reset the throttling interval
 sleep 10
-
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>temperature</name>
-                  <type>degree</type>
-                  <contextValue>t39</contextValue>
-                </contextAttribute>
+          <type>degree</type>
+          <contextValue>t39</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-
-# Get notifications count
+</updateContextRequest>'
+curlXml "$url" "$payload"
+echo
+echo Notification count from mongo:
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo
+
 
 echo "7: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -246,20 +252,24 @@ echo "7: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+curlXml "$url" "$payload"
+echo
+
+
 echo "8: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI10/unsubscribeContext
+payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
-  <subscriptionId>$SUB_ID</subscriptionId>
-</unsubscribeContextRequest>
-EOF
-echo "9: ++++++++++++++++++++"
+  <subscriptionId>'$SUB_ID'</subscriptionId>
+</unsubscribeContextRequest>'
+curlXml "$url" "$payload"
+echo
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+
+echo "9: ++++++++++++++++++++"
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -276,12 +286,15 @@ echo "9: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-echo "10: ++++++++++++++++++++"
+</updateContextRequest>'
+curlXml "$url" "$payload"
+echo
 
-#Get accumulated data
-curl localhost:${LISTENER_PORT}/dump -s -S 
+
+echo "Accumulated data:"
+echo "================="
+curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+echo
 
 --REGEXPECT--
 <?xml version="1.0"?>
@@ -291,7 +304,13 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
+
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 805
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -320,8 +339,16 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
+
+Notification count from mongo:
 { "count" : 1 }
+
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 809
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -350,8 +377,16 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
+
+Notification count from mongo:
 { "count" : 2 }
+
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 243
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextSubscriptionResponse>
   <subscribeResponse>
@@ -360,8 +395,16 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     <throttling>PT6S</throttling>
   </subscribeResponse>
 </updateContextSubscriptionResponse>
+
+Notification count from mongo:
 { "count" : 2 }
+
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 805
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -390,8 +433,16 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
+
+Notification count from mongo:
 { "count" : 3 }
+
 5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 805
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -420,7 +471,13 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
+
 6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 640
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -444,8 +501,16 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
+
+Notification count from mongo:
 { "count" : 4 }
+
 7: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 636
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -469,7 +534,13 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
+
 8: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 207
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <unsubscribeContextResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -478,7 +549,13 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </unsubscribeContextResponse>
+
 9: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 640
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -502,7 +579,9 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-10: ++++++++++++++++++++
+
+Accumulated data:
+=================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 738
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -650,8 +729,7 @@ Content-Type: application/xml
 </notifyContextRequest>
 
 =======================================
---TEARDOWN--
-source harnessFunctions.sh
 
+--TEARDOWN--
 brokerStop CB
 accumulatorStop

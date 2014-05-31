@@ -23,8 +23,6 @@
 --NAME--
 Notify Context processing
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -139,5 +137,4 @@ echo "3: ++++++++++++++++++++"
 </queryContextResponse>
 3: ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

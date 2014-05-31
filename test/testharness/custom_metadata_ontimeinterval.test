@@ -18,21 +18,15 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
-# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
-
 --NAME--
 Custom metadata ONTIMEINTERVAL subscription
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 accumulatorStart
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "=== 1. Create ONTIMEINTERVAL subscription"
 url="/NGSI10/subscribeContext"
 payload='{
@@ -563,7 +557,5 @@ Content-Type: application/json
 
 =======================================
 --TEARDOWN--
-source harnessFunctions.sh
-
 brokerStop CB
 accumulatorStop

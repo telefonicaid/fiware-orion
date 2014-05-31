@@ -24,15 +24,11 @@
 HTTPS simple test
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 ${PWD}/../../scripts/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
 extraParams="-https -key /tmp/harnessTest.key -cert /tmp/harnessTest.pem"
 brokerStart CB 0-255 IPV4 "$extraParams"
 --SHELL--
-source harnessFunctions.sh
-
 #
 # Register a Sensor of temperature
 #
@@ -125,6 +121,5 @@ Date: REGEX(.*)
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB
 rm -f /tmp/harnessTest.key /tmp/harnessTest.pem

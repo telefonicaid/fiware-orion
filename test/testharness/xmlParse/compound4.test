@@ -23,14 +23,10 @@
 --NAME--
 Compound Values for UpdateContextRequest 4
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB 0-1
 
 --SHELL--
-source harnessFunctions.sh
-
 #   4. err: Two items with same name in struct 's1' + 's2' + 's1'
 echo "4: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
@@ -74,5 +70,4 @@ Date: REGEX(.*)
   </errorCode>
 </updateContextResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

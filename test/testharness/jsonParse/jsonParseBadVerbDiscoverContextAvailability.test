@@ -23,14 +23,10 @@
 --NAME--
 JSON Parse BadVerb DiscoverContextAvailability
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "+++++ Starting +++++++++++++++"
 url="/NGSI9/registerContext"
 payload='{
@@ -74,7 +70,7 @@ payload='{
   ],
   "duration": "PT1M"
 }'
-curlJson "${url}" "${payload}"
+curlJson "$url" "$payload"
 
 echo "+++++ Registration Done +++++++++++++++"
 
@@ -110,7 +106,7 @@ payload='{
     ]
   }
 }'
-curlJson ${url} "${payload}" "-X BAD_VERB"
+curlJson "$url" "$payload" "-X BAD_VERB"
 
 echo "+++++ Discovery Done +++++++++++++++"
 --REGEXPECT--
@@ -132,5 +128,4 @@ Date: REGEX(.*)
 
 +++++ Discovery Done +++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

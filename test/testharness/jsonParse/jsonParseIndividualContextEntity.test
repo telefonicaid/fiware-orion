@@ -23,14 +23,10 @@
 --NAME--
 JSON Parse IndividualContextEntity
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "1: ++++++++ GET that fails +++++++++++++++++++++"
 curlJsonNoPayload "/NGSI10/contextEntities/ENTITY_ID"
 
@@ -245,6 +241,5 @@ Date: REGEX(.*)
     "reasonPhrase": "OK"
 }
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB
 

@@ -23,13 +23,10 @@
 --NAME--
 JSON Parse Post RegisterContext
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
 echo "1: ***********************************"
 url="/NGSI9/registerContext"
 payload='{
@@ -89,5 +86,4 @@ Date: REGEX(.*)
 }
 2: ***********************************
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

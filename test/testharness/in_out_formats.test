@@ -24,14 +24,10 @@
 Input and Output Format Test
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 acceptJson="Accept: application/json"
 acceptXml="Accept: application/xml"
 acceptBoth="Accept: application/xml, application/json"
@@ -373,5 +369,4 @@ Date: REGEX(.*)
 =================================================================
 
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

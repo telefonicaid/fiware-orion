@@ -23,14 +23,10 @@
 --NAME--
 Compound Values for UpdateContextRequest 1
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB 0-1
 
 --SHELL--
-source harnessFunctions.sh
-
 #   1. err: unknown path
 #INVALID_XML
 echo "1: +++++++++++++++++++++++++++++++++"
@@ -73,5 +69,4 @@ Date: REGEX(.*)
   </errorCode>
 </updateContextResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

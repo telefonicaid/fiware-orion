@@ -23,14 +23,10 @@
 --NAME--
 XML Parse Compound Values
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 # 1. Compound contextValue without vector
 echo "1: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
@@ -493,6 +489,5 @@ Date: REGEX(.*)
   </errorCode>
 </updateContextResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB
 

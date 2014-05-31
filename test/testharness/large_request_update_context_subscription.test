@@ -23,8 +23,6 @@
 --NAME--
 Large request error for /NGSI10/updateContextSubscription
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -53,5 +51,4 @@ rm $BIGFILE
   </subscribeError>
 </updateContextSubscriptionResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

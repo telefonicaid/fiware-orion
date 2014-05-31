@@ -23,14 +23,10 @@
 --NAME--
 Compound Values for UpdateContextRequest 8
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB 0-1
 
 --SHELL--
-source harnessFunctions.sh
-
 #   8. ok: two structs with two values each
 echo "8: +++++++++++++++++++++++++++++++++"
 url='/ngsi10/updateContext'
@@ -94,5 +90,4 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

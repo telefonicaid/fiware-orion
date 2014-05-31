@@ -24,15 +24,13 @@
 Convenience Individual Context Entity - PUT CREATE
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
 echo "+++++ 1. put an entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes -s -S --header 'Content-Type: application/xml' -X PUT -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url=/NGSI10/contextEntities/entity01/attributes
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
@@ -42,12 +40,13 @@ echo "+++++ 1. put an entity +++++"
       <contextValue>1</contextValue>
     </contextAttribute>
   </contextAttributeList>
-</updateContextElementRequest>
-EOF
+</updateContextElementRequest>'
+curlXml "$url" "$payload" "-X PUT"
+echo
 
 echo "+++++ 2. post an entity +++++"
-(curl localhost:{$BROKER_PORT}/ngsi10/contextEntities/entity01/attributes --header "Content-Type: application/xml" -X POST -d @- | xmllint --format -) << EOF
-<appendContextElementRequest>
+url=/NGSI10/contextEntities/entity01/attributes
+payload='<appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
     <contextAttribute>
@@ -56,12 +55,13 @@ echo "+++++ 2. post an entity +++++"
       <contextValue>2</contextValue>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+curlXml "$url" "$payload" "-X POST"
+echo
 
 echo "+++++ 3. put an entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes -s -S --header 'Content-Type: application/xml' -X PUT -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url=/NGSI10/contextEntities/entity01/attributes
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
@@ -71,13 +71,17 @@ echo "+++++ 3. put an entity +++++"
       <contextValue>3</contextValue>
     </contextAttribute>
   </contextAttributeList>
-</updateContextElementRequest>
-EOF
-
-echo "+++++ 4. done +++++"
+</updateContextElementRequest>'
+curlXml "$url" "$payload" "-X PUT"
+echo
 
 --REGEXPECT--
 +++++ 1. put an entity +++++
+HTTP/1.1 200 OK
+Content-Length: 389
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextElementResponse>
   <contextResponseList>
@@ -91,7 +95,13 @@ echo "+++++ 4. done +++++"
     </contextAttributeResponse>
   </contextResponseList>
 </updateContextElementResponse>
+
 +++++ 2. post an entity +++++
+HTTP/1.1 200 OK
+Content-Length: 489
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -110,7 +120,13 @@ echo "+++++ 4. done +++++"
     </contextAttributeResponse>
   </contextResponseList>
 </appendContextElementResponse>
+
 +++++ 3. put an entity +++++
+HTTP/1.1 200 OK
+Content-Length: 489
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextElementResponse>
   <contextResponseList>
@@ -129,7 +145,6 @@ echo "+++++ 4. done +++++"
     </contextAttributeResponse>
   </contextResponseList>
 </updateContextElementResponse>
-+++++ 4. done +++++
+
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

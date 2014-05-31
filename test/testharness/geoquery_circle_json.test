@@ -24,14 +24,10 @@
 Geo query (circle) JSON test
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "0: +++++++++ Prepare entities +++++++++++"
 
 # Create entities corresponding to the three cities
@@ -432,6 +428,4 @@ EOF
     ]
 }
 --TEARDOWN--
-source harnessFunctions.sh
-
 brokerStop CB

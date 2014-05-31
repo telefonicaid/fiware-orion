@@ -23,15 +23,11 @@
 --NAME--
 Subscription sequence ONCHANGE
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 accumulatorStart
 
 --SHELL--
-source harnessFunctions.sh
-
 SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/contextSubscriptions -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
@@ -646,7 +642,5 @@ Content-Type: application/xml
 
 =======================================
 --TEARDOWN--
-source harnessFunctions.sh
-
 brokerStop CB
 accumulatorStop

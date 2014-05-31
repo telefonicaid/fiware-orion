@@ -23,8 +23,6 @@
 --NAME--
 broker version via REST
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -33,10 +31,11 @@ brokerStart CB
 # is executed in less than one minute
 
 echo "1: +++++++++++++++++++++++++++++"
-curl localhost:${BROKER_PORT}/version | xmllint --format -
+curl localhost:${BROKER_PORT}/version 2> /dev/null | xmllint --format -
+echo
 echo "2: +++++++++++++++++++++++++++++"
-curl localhost:${BROKER_PORT}/version --header "Accept: application/json"
-echo "3: +++++++++++++++++++++++++++++"
+curl localhost:${BROKER_PORT}/version --header "Accept: application/json"  2> /dev/null
+echo
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
 <?xml version="1.0"?>
@@ -48,6 +47,7 @@ echo "3: +++++++++++++++++++++++++++++"
   <compiled_by>REGEX(.*)</compiled_by>
   <compiled_in>REGEX(.*)</compiled_in>
 </orion>
+
 2: +++++++++++++++++++++++++++++
 "orion" : {
   "version" : "REGEX(.*)",
@@ -57,7 +57,6 @@ echo "3: +++++++++++++++++++++++++++++"
   "compiled_by" : "REGEX(.*)",
   "compiled_in" : "REGEX(.*)"
 }
-3: +++++++++++++++++++++++++++++
+
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

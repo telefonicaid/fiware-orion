@@ -23,16 +23,14 @@
 --NAME--
 Convenience NGSI9 Context Entity Type
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
 
 echo "0: ++++++++++++++++++++"
 curlXmlNoPayload "/NGSI9/contextEntityTypes/Room"
+echo
 
 echo "1: ++++++++++++++++++++"
 url="/NGSI9/registerContext"
@@ -61,15 +59,17 @@ payload='<?xml version="1.0"?>
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}"
+echo
 
 echo "2: ++++++++++++++++++++"
 curlXmlNoPayload "/NGSI9/contextEntityTypes/Room"
+echo
 
 echo "3: ++++++++++++++++++++"
-
 # DELETE is not allowed
 curlXmlNoPayload "/NGSI9/contextEntityTypes/Room" "-X DELETE"
+echo
 
 --REGEXPECT--
 0: ++++++++++++++++++++
@@ -85,6 +85,7 @@ Date: REGEX(.*)
     <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </discoverContextAvailabilityResponse>
+
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 141
@@ -96,6 +97,7 @@ Date: REGEX(.*)
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
+
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 902
@@ -127,12 +129,13 @@ Date: REGEX(.*)
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
+
 3: ++++++++++++++++++++
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
 Allow: POST, GET
 Date: REGEX(.*)
 
+
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

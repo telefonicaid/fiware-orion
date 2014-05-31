@@ -1217,6 +1217,18 @@ int main(int argC, char* argV[])
   if (fg == false)
     daemonize();
 
+#if 0
+  //
+  // This 'almost always outdeffed' piece of code is used whenever a change is done to the 
+  // valgrind tst suite, just to make sure that the tool actually detects memory leaks,
+  //
+  char* x = (char*) malloc(100000);
+  sprintf(x, "A hundred thousand bytes lost here");
+  LM_V(("x: '%s'", x));
+  x = (char*) "LOST";
+  LM_V(("x: '%s'", x));
+#endif
+
   RestService* rsP = restServiceV;
   if      (ngsi9Only  && multitenant == "url") rsP = restServiceNgsi9MTenant;
   else if (!ngsi9Only && multitenant == "url") rsP = restServiceMTenant;

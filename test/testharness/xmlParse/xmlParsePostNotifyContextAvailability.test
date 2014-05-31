@@ -23,13 +23,10 @@
 --NAME--
 XML Parse Post NotifyContextAvailability
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
 echo "1: ***********************************"
 url="/NGSI9/notifyContextAvailability"
 payload='<?xml version="1.0" encoding="UTF-8"?>
@@ -73,7 +70,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
 </notifyContextAvailabilityRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml "$url" "$payload"
 
 echo "2: ***********************************"
 url="/NGSI9/notifyContextAvailability"
@@ -118,7 +115,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
 </notifyContextAvailabilityRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml "$url" "$payload"
 
 echo "3: ***********************************"
 --REGEXPECT--
@@ -151,5 +148,4 @@ Date: REGEX(.*)
 </notifyContextAvailabilityResponse>
 3: ***********************************
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

@@ -23,13 +23,10 @@
 --NAME--
 JSON throttling
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
 echo "1: +++++++++++++++++++++++++++++"
 url="/ngsi10/subscribeContext"
 payload='{
@@ -62,5 +59,4 @@ Date: REGEX(.*)
 }
 2: +++++++++++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

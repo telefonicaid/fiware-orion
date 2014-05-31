@@ -24,14 +24,10 @@
 Geo query test (polygon)
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "0: +++++++++ Prepare entities +++++++++++"
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
@@ -621,6 +617,4 @@ EOF
   </contextResponseList>
 </queryContextResponse>
 --TEARDOWN--
-source harnessFunctions.sh
-
 brokerStop CB

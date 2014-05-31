@@ -23,8 +23,6 @@
 --NAME--
 Large request error for /NGSI9/unsubscribeContextAvailability
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -51,5 +49,4 @@ rm $BIGFILE
   </statusCode>
 </unsubscribeContextAvailabilityResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

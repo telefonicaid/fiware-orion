@@ -23,14 +23,10 @@
 --NAME--
 XML Parse Post Geolocation Area Circle OK
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 ucr='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -270,8 +266,6 @@ echo '6: +++++++++++++++++++++++++++++++++++++'
 circleRadius: Got a circleRadius: 10
 circleRadius: Got a circleRadius: 10
 circleRadius: Got a circleRadius: 11
-circleRadius: Got a circleRadius: 12
 6: +++++++++++++++++++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

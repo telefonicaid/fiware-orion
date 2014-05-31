@@ -24,16 +24,14 @@
 Subscription ID metadata
 
 --SHELL-INIT--
-source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB
 accumulatorStart
 
 --SHELL--
-source harnessFunctions.sh
 
-SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- 2> /dev/null | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -58,10 +56,12 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "$SUB_OUT"
-echo "1: ++++++++++++++++++++"
+echo
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+
+echo "1: ++++++++++++++++++++"
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -97,12 +97,13 @@ echo "1: ++++++++++++++++++++"
       </contextElement>
     </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-echo "2: ++++++++++++++++++++"
+</updateContextRequest>'
 
-#Get accumulated data
+curlXml "$url" "$payload"
+echo
+echo "Accumulated data:"
 curl localhost:${LISTENER_PORT}/dump -s -S
+echo
 
 --REGEXPECT--
 <?xml version="1.0"?>
@@ -112,7 +113,13 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
+
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1246
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -155,7 +162,8 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-2: ++++++++++++++++++++
+
+Accumulated data:
 POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 1350
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -208,8 +216,8 @@ Content-Type: application/xml
 </notifyContextRequest>
 
 =======================================
+
 --TEARDOWN--
-source harnessFunctions.sh
 
 brokerStop CB
 accumulatorStop

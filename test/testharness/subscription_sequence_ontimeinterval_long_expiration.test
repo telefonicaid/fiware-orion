@@ -23,16 +23,14 @@
 --NAME--
 Subscription sequence ONTIMEINTERVAL LONG expiration check
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 accumulatorStart
 
 --SHELL--
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -49,47 +47,56 @@ accumulatorStart
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-echo "1: ++++++++++++++++++++"
+</updateContextRequest>'
+curlXml "$url" "$payload"
+echo
+
 
 # to avoid race conditions in the order of notifications
 sleep 0.5s
 
 #Subscribe for a LONG period of time (99 years - should give overflow in an int)
-SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+echo "1: ++++++++++++++++++++"
+SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- 2> /dev/null | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
   </entityIdList>
   <attributeList>
-        <attribute>temperature</attribute>
+    <attribute>temperature</attribute>
   </attributeList>
   <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
   <duration>P99Y</duration>
   <notifyConditions>
-        <notifyCondition>
-          <type>ONTIMEINTERVAL</type>
-          <condValueList>
-                <condValue>PT2S</condValue>
-          </condValueList>          
-        </notifyCondition>
+    <notifyCondition>
+      <type>ONTIMEINTERVAL</type>
+      <condValueList>
+        <condValue>PT2S</condValue>
+      </condValueList>          
+    </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "$SUB_OUT"
-echo "2: ++++++++++++++++++++"
+echo
 
-#Sleep 11 seconds. 6 subscriptions arrive (at time 0, 2, 4, 6, 8, 10) as subscription doesn't expires.
+
+# Sleep 11 seconds. 6 subscriptions arrive (at time 0, 2, 4, 6, 8, 10) as subscription doesn't expires.
 sleep 11s
 
+echo "2: ++++++++++++++++++++"
 curl localhost:${LISTENER_PORT}/dump -s -S 
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 640
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -113,6 +120,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
+
 1: ++++++++++++++++++++
 <?xml version="1.0"?>
 <subscribeContextResponse>
@@ -121,6 +129,7 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     <duration>P99Y</duration>
   </subscribeResponse>
 </subscribeContextResponse>
+
 2: ++++++++++++++++++++
 POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 738
@@ -321,7 +330,5 @@ Content-Type: application/xml
 
 =======================================
 --TEARDOWN--
-source harnessFunctions.sh
-
 brokerStop CB
 accumulatorStop

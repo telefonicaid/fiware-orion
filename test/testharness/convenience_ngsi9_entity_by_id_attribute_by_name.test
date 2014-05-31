@@ -23,8 +23,6 @@
 --NAME--
 Convenience Entity By Id Attribute By Name
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -96,5 +94,4 @@ echo "2: ++++++++++++++++++++"
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

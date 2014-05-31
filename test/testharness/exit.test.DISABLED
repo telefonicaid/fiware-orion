@@ -23,38 +23,44 @@
 --NAME--
 broker version via REST
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
 echo "1: +++++++++++++++++++++++++++++"
-curl localhost:${BROKER_PORT}/exit | xmllint --format -
+curlXmlNoPayload "/exit"
+echo
+
 echo "2: +++++++++++++++++++++++++++++"
+curlXmlNoPayload "/exit/123"
+echo
 
-#FIXME P8: without this sleep, the second response is lost. We probably
-#have some concurrency problem here that need to be fixed...
-sleep 1
-
-curl localhost:${BROKER_PORT}/exit/123 | xmllint --format -
-echo "3: +++++++++++++++++++++++++++++"
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 129
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
   <details>Password requested</details>
 </orionError>
+
 2: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 146
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
   <details>Request denied - password erroneous</details>
 </orionError>
-3: +++++++++++++++++++++++++++++
+
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

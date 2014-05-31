@@ -23,8 +23,6 @@
 --NAME--
 Erroneous Input
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -53,5 +51,4 @@ echo "2: ++++++++++++++++++++"
 </orionError>
 2: ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

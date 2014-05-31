@@ -24,8 +24,6 @@
 Convenience Individual Context Entity - PUT OK
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -100,5 +98,4 @@ EOF
   </contextResponseList>
 </updateContextElementResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

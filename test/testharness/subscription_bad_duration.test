@@ -23,8 +23,6 @@
 --NAME--
 Subscription sequence ONTIMEINTERVAL bad duration
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -108,6 +106,4 @@ echo "3: ++++++++++++++++++++"
 </subscribeContextResponse>
 3: ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
-
 brokerStop CB

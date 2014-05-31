@@ -23,16 +23,14 @@
 --NAME--
 NGSI10 Convenience PUT Attribute Value Instance
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
 
 echo "0: ++++++++++++++++++++"
-(curl localhost:{$BROKER_PORT}/ngsi10/contextEntities/E01/attributes/A1/left --header "Content-Type: application/xml" -X PUT -d @- | xmllint --format -) << EOF
-<updateContextAttributeRequest>
+url=/ngsi10/contextEntities/E01/attributes/A1/left
+payload='<updateContextAttributeRequest>
   <type>Room</type>
   <contextValue>10</contextValue>
   <metadata>
@@ -42,13 +40,18 @@ echo "0: ++++++++++++++++++++"
       <value>left</value>
     </contextMetadata>
   </metadata>
-</updateContextAttributeRequest>
-EOF
+</updateContextAttributeRequest>'
+curlXml "$url" "$payload" "-X PUT"
+echo
+
 echo "1: ++++++++++++++++++++"
-(curl localhost:{$BROKER_PORT}/ngsi10/contextEntities/E01/attributes/A1/left  | xmllint --format -)
+url=/ngsi10/contextEntities/E01/attributes/A1/left
+curlXmlNoPayload "$url" "-X GET"
+echo
+
 echo "2: ++++++++++++++++++++"
-(curl localhost:{$BROKER_PORT}/ngsi10/contextEntities/E01/attributes --header "Content-Type: application/xml" -X POST -d @- | xmllint --format -) << EOF
-<appendContextElementRequest>
+url=/ngsi10/contextEntities/E01/attributes
+payload='<appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
     <contextAttribute>
@@ -64,12 +67,13 @@ echo "2: ++++++++++++++++++++"
       </metadata>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+curlXml "$url" "$payload"
+echo
 
 echo "3: ++++++++++++++++++++"
-(curl localhost:{$BROKER_PORT}/ngsi10/contextEntities/E01/attributes/A1/left --header "Content-Type: application/xml" -X PUT -d @- | xmllint --format -) << EOF
-<updateContextAttributeRequest>
+url=/ngsi10/contextEntities/E01/attributes/A1/left
+payload='<updateContextAttributeRequest>
   <type>Room</type>
   <contextValue>10</contextValue>
   <metadata>
@@ -79,13 +83,18 @@ echo "3: ++++++++++++++++++++"
       <value>left</value>
     </contextMetadata>
   </metadata>
-</updateContextAttributeRequest>
-EOF
+</updateContextAttributeRequest>'
+curlXml "$url" "$payload" "-X PUT"
+echo
+
 echo "4: ++++++++++++++++++++"
-(curl localhost:{$BROKER_PORT}/ngsi10/contextEntities/E01/attributes/A1/left  | xmllint --format -)
+url=/ngsi10/contextEntities/E01/attributes/A1/left
+curlXmlNoPayload "$url"
+echo
+
 echo "5: ++++++++++++++++++++"
-(curl localhost:{$BROKER_PORT}/ngsi10/contextEntities/E01/attributes/A1/left --header "Content-Type: application/xml" -X POST --include -d @-) << EOF
-<updateContextAttributeRequest>
+url=/ngsi10/contextEntities/E01/attributes/A1/left
+payload='<updateContextAttributeRequest>
   <type>Room</type>
   <contextValue>10</contextValue>
   <metadata>
@@ -95,11 +104,13 @@ echo "5: ++++++++++++++++++++"
       <value>left</value>
     </contextMetadata>
   </metadata>
-</updateContextAttributeRequest>
-EOF
+</updateContextAttributeRequest>'
+curlXml "$url" "$payload" "-X POST"
+echo
+
 echo "6: ++++++++++++++++++++"
-(curl localhost:{$BROKER_PORT}/ngsi10/contextEntities/E01/attributes/A1/right --header "Content-Type: application/xml" -X PUT -d @- | xmllint --format -) << EOF
-<updateContextAttributeRequest>
+url=/ngsi10/contextEntities/E01/attributes/A1/right
+payload='<updateContextAttributeRequest>
   <type>Room</type>
   <contextValue>10</contextValue>
   <metadata>
@@ -109,24 +120,45 @@ echo "6: ++++++++++++++++++++"
       <value>left</value>
     </contextMetadata>
   </metadata>
-</updateContextAttributeRequest>
-EOF
+</updateContextAttributeRequest>'
+curlXml "$url" "$payload" "-X PUT"
+echo
+
 echo "7: ++++++++++++++++++++"
-(curl localhost:{$BROKER_PORT}/ngsi10/contextEntities/E01/attributes/A1/right -X DELETE | xmllint --format -)
+url=/ngsi10/contextEntities/E01/attributes/A1/right
+curlXmlNoPayload "$url" "-X DELETE"
+echo
+
 echo "8: ++++++++++++++++++++"
-(curl localhost:{$BROKER_PORT}/ngsi10/contextEntities/E01/attributes/A1/left -X DELETE | xmllint --format -)
+url=/ngsi10/contextEntities/E01/attributes/A1/left
+curlXmlNoPayload "$url" "-X DELETE"
+echo
+
 echo "9: ++++++++++++++++++++"
-(curl localhost:{$BROKER_PORT}/ngsi10/contextEntities/E01/attributes/A1/left  | xmllint --format -)
+url=/ngsi10/contextEntities/E01/attributes/A1/left
+curlXmlNoPayload "$url" "-X GET"
+echo
 
 --REGEXPECT--
 0: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 127
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <statusCode>
   <code>404</code>
   <reasonPhrase>No context element found</reasonPhrase>
   <details>E01</details>
 </statusCode>
+
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 268
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextAttributeResponse>
   <contextAttributeList/>
@@ -136,7 +168,13 @@ echo "9: ++++++++++++++++++++"
     <details>Entity-Attribute pair: 'E01-A1'</details>
   </statusCode>
 </contextAttributeResponse>
+
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 685
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -162,13 +200,25 @@ echo "9: ++++++++++++++++++++"
     </contextAttributeResponse>
   </contextResponseList>
 </appendContextElementResponse>
+
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <statusCode>
   <code>200</code>
   <reasonPhrase>OK</reasonPhrase>
 </statusCode>
+
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 495
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextAttributeResponse>
   <contextAttributeList>
@@ -190,33 +240,58 @@ echo "9: ++++++++++++++++++++"
     <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </contextAttributeResponse>
+
 5: ++++++++++++++++++++
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
 Allow: GET, PUT, DELETE
 Date: REGEX(.*)
 
+
 6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 170
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <statusCode>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
   <details>unmatching metadata ID value URI/payload: 'right' vs 'left'</details>
 </statusCode>
+
 7: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 198
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <statusCode>
   <code>472</code>
   <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
   <details>action: DELETE - entity: (E01, ) - offending attribute: A1</details>
 </statusCode>
+
 8: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <statusCode>
   <code>200</code>
   <reasonPhrase>OK</reasonPhrase>
 </statusCode>
+
 9: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 268
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextAttributeResponse>
   <contextAttributeList/>
@@ -226,6 +301,6 @@ Date: REGEX(.*)
     <details>Entity-Attribute pair: 'E01-A1'</details>
   </statusCode>
 </contextAttributeResponse>
+
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

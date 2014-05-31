@@ -23,16 +23,13 @@
 --NAME--
 Convenience Context Entity Attributes
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "0: ++++++++++++++++++++"
 curlXmlNoPayload "/NGSI9/contextEntities/entity01/attributes"
+echo
 
 echo "1: ++++++++++++++++++++"
 url="/NGSI9/contextEntities/entity01/attributes"
@@ -53,10 +50,12 @@ payload='<?xml version="1.0"?>
   <duration>PT1H</duration>
   <providingApplication>http://kz.tid.es/abc</providingApplication>
 </registerProviderRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml ${url} "${payload}"
+echo
 
 echo "2: ++++++++++++++++++++"
 curlXmlNoPayload "/NGSI9/contextEntities/entity01/attributes"
+echo
 
 --REGEXPECT--
 0: ++++++++++++++++++++
@@ -72,6 +71,7 @@ Date: REGEX(.*)
     <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </discoverContextAvailabilityResponse>
+
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 141
@@ -83,6 +83,7 @@ Date: REGEX(.*)
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
+
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 496
@@ -104,6 +105,6 @@ Date: REGEX(.*)
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
+
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

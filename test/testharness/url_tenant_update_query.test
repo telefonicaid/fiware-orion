@@ -23,16 +23,12 @@
 --NAME--
 URL-Tenant update and query
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
-dbTenantInit ${BROKER_DATABASE_NAME}-t_03
-dbTenantInit ${BROKER_DATABASE_NAME}-t_04
+dbInit ${BROKER_DATABASE_NAME}-t_03
+dbInit ${BROKER_DATABASE_NAME}-t_04
 brokerStart CB 0-255 IPV4 -multiservice url
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "1. Update/append entity E with URL-Tenant t_03"
 echo "++++++++++++++++++++++++++++++++++++++++++++++++++++"
 url="/t_03/NGSI10/updateContext"
@@ -242,5 +238,4 @@ Date: REGEX(.*)
   </contextResponseList>
 </queryContextResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

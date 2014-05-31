@@ -23,8 +23,6 @@
 --NAME--
 NGSI10 Convenience Subscriptions
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -113,5 +111,4 @@ Date: REGEX(.*)
 
 5: ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

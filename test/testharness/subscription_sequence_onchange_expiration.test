@@ -23,8 +23,6 @@
 --NAME--
 Subscription sequence ONCHANGE expiration check
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 accumulatorStart
@@ -234,7 +232,5 @@ Content-Type: application/xml
 =======================================
 5: ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
-
 brokerStop CB
 accumulatorStop

@@ -23,18 +23,14 @@
 --NAME--
 URL-Tenant subscribe and update
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
-dbTenantInit ${BROKER_DATABASE_NAME}-t_01
-dbTenantInit ${BROKER_DATABASE_NAME}-t_02
+dbInit ${BROKER_DATABASE_NAME}-t_01
+dbInit ${BROKER_DATABASE_NAME}-t_02
 brokerStart CB 0-255 IPV4 -multiservice url
-accumulatorStart localhost ${LISTENER_PORT}
-accumulatorStart localhost ${LISTENER2_PORT}
+accumulatorStart localhost $LISTENER_PORT
+accumulatorStart localhost $LISTENER2_PORT
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "1. Make a subscription for E/att on tenant t_01"
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
 url="/t_01/NGSI10/subscribeContext"
@@ -57,7 +53,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlXml ${url} "${payload}"
+curlXml "$url" "$payload"
 echo
 echo
 
@@ -84,7 +80,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlXml ${url} "${payload}"
+curlXml "$url" "$payload"
 echo
 echo
 
@@ -110,7 +106,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+curlXml "$url" "$payload"
 echo
 echo
 
@@ -136,21 +132,21 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+curlXml "$url" "$payload"
 echo
 echo
 
 
 echo "5. Dump accumulator t_01"
 echo "+++++++++++++++++++++++++"
-curl localhost:${LISTENER_PORT}/dump
+curl localhost:${LISTENER_PORT}/dump 2> /dev/null
 echo
 echo
 
 
 echo "6. Dump accumulator t_02"
 echo "+++++++++++++++++++++++++"
-curl localhost:${LISTENER2_PORT}/dump
+curl localhost:${LISTENER2_PORT}/dump 2> /dev/null
 echo
 
 
@@ -327,7 +323,6 @@ Content-Type: application/xml
 =======================================
 
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB
-accumulatorStop ${LISTENER_PORT}
-accumulatorStop ${LISTENER2_PORT}
+accumulatorStop $LISTENER_PORT
+accumulatorStop $LISTENER2_PORT

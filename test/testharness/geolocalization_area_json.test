@@ -24,14 +24,10 @@
 Geo-localization JSON test
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "0: ++++++++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
@@ -205,6 +201,4 @@ echo "3: ++++++++++++++++++++"
 }
 3: ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
-
 brokerStop CB

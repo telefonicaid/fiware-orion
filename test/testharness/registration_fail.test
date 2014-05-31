@@ -23,8 +23,6 @@
 --NAME--
 Registration fail
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -93,5 +91,4 @@ EOF
   </errorCode>
 </registerContextResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

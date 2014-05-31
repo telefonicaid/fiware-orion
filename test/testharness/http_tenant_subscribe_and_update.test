@@ -23,20 +23,17 @@
 --NAME--
 HTTP-Tenant subscribe and update
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
-dbTenantInit ${BROKER_DATABASE_NAME}-t_01
-dbTenantInit ${BROKER_DATABASE_NAME}-t_02
+dbInit ${BROKER_DATABASE_NAME}-t_01
+dbInit ${BROKER_DATABASE_NAME}-t_02
 brokerStart CB 0-255 IPV4 -multiservice header
-accumulatorStart localhost ${LISTENER_PORT}
-accumulatorStart localhost ${LISTENER2_PORT}
+accumulatorStart 
+accumulatorStart 127.0.0.1 $LISTENER2_PORT
 
 --SHELL--
-source harnessFunctions.sh
 
 echo "1. Make a subscription for E/att on tenant t_01"
-echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++++++++++"
 url="/NGSI10/subscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
@@ -57,13 +54,12 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlXmlTenants ${url} "${payload}" "fiware-service: t_01"
-echo
+curlXmlTenants "$url" "$payload" "fiware-service: t_01"
 echo
 
 
 echo "2. Make a subscription for E/att on tenant t_02"
-echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++++++++++"
 url="/NGSI10/subscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
@@ -84,8 +80,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlXmlTenants ${url} "${payload}" "fiware-service: t_02"
-echo
+curlXmlTenants "$url" "$payload" "fiware-service: t_02"
 echo
 
 
@@ -110,8 +105,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXmlTenants ${url} "${payload}" "fiware-service: t_01"
-echo
+curlXmlTenants "$url" "$payload" "fiware-service: t_01"
 echo
 
 
@@ -136,27 +130,25 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXmlTenants ${url} "${payload}" "fiware-service: t_02"
-echo
+curlXmlTenants "$url" "$payload" "fiware-service: t_02"
 echo
 
 
 echo "5. Dump accumulator t_01"
 echo "+++++++++++++++++++++++++"
-curl localhost:${LISTENER_PORT}/dump
-echo
+curl localhost:${LISTENER_PORT}/dump --silent
 echo
 
 
 echo "6. Dump accumulator t_02"
 echo "+++++++++++++++++++++++++"
-curl localhost:${LISTENER2_PORT}/dump
+curl localhost:${LISTENER2_PORT}/dump --silent
 echo
 
 
 --REGEXPECT--
 1. Make a subscription for E/att on tenant t_01
-+++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 192
 Content-Type: application/xml
@@ -169,10 +161,9 @@ Date: REGEX(.*)
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-
 
 2. Make a subscription for E/att on tenant t_02
-+++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 192
 Content-Type: application/xml
@@ -185,7 +176,6 @@ Date: REGEX(.*)
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-
 
 3. Update t_01/E/att
 ++++++++++++++++++++
@@ -218,7 +208,6 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 
-
 4. Update t_02/E/att
 ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -249,7 +238,6 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-
 
 5. Dump accumulator t_01
 +++++++++++++++++++++++++
@@ -287,7 +275,6 @@ Content-Type: application/xml
 </notifyContextRequest>
 
 =======================================
-
 
 6. Dump accumulator t_02
 +++++++++++++++++++++++++
@@ -327,7 +314,6 @@ Content-Type: application/xml
 =======================================
 
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB
-accumulatorStop ${LISTENER_PORT}
-accumulatorStop ${LISTENER2_PORT}
+accumulatorStop $LISTENER_PORT
+accumulatorStop $LISTENER2_PORT

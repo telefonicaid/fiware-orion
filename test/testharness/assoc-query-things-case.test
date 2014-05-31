@@ -23,14 +23,10 @@
 --NAME--
 Associations Query Things case
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 url="/NGSI9/registerContext"
 payload='<?xml version="1.0"?>
 <registerContextRequest>
@@ -53,7 +49,7 @@ payload='<?xml version="1.0"?>
   <duration>PT1H</duration>
   <registrationId></registrationId>
 </registerContextRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml "$url" "$payload"
 
 echo "1: ++++++++++++++++++++"
 
@@ -90,7 +86,7 @@ payload='<?xml version="1.0"?>
   <duration>PT1H</duration>
   <registrationId></registrationId>
 </registerContextRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml "$url" "$payload"
 
 echo "2: ++++++++++++++++++++"
 
@@ -114,7 +110,7 @@ payload='<?xml version="1.0"?>
     </scope>
   </restriction>
 </discoverContextAvailabilityRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml "$url" "$payload"
 
 echo "3: ++++++++++++++++++++"
 
@@ -197,5 +193,4 @@ Date: REGEX(.*)
 </discoverContextAvailabilityResponse>
 3: ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

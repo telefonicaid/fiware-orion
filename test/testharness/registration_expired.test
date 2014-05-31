@@ -23,8 +23,6 @@
 --NAME--
 Registration expired
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -141,6 +139,5 @@ EOF
   </errorCode>
 </discoverContextAvailabilityResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB
 

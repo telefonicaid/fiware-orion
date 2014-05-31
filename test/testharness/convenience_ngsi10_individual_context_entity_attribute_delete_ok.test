@@ -24,8 +24,6 @@
 Convenience Individual Context Entity Attribute - DELETE OK
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -77,5 +75,4 @@ echo "+++++ 2. delete the entity attribute +++++"
   <reasonPhrase>OK</reasonPhrase>
 </statusCode>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

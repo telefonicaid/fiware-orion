@@ -23,15 +23,11 @@
 --NAME--
 Tenant as HTTP header in Notification
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
-accumulatorStart localhost ${LISTENER_PORT}
+accumulatorStart localhost $LISTENER_PORT
 brokerStart CB 30,60,185 IPV4 -multiservice url
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "1. Subscribe to changes in  E/att" # reference will never be reached as it stops in the accumulator
 echo "+++++++++++++++++++++++++++++++++"
 url="/kz/NGSI10/subscribeContext"
@@ -56,7 +52,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlXml ${url} "${payload}"
+curlXml "$url" "$payload"
 echo
 echo
 
@@ -82,7 +78,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+curlXml "$url" "$payload"
 echo
 echo
 
@@ -177,6 +173,5 @@ Content-Type: application/xml
 
 =======================================
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB
 accumulatorStop

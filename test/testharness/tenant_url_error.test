@@ -23,14 +23,10 @@
 --NAME--
 Tenant URL not found when tenants not activated
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB 0-255 IPV4
 
 --SHELL--
-source harnessFunctions.sh
-
 url="/kz/NGSI9/registerContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
@@ -97,5 +93,4 @@ Date: REGEX(.*)
   <details>service '/kz/NGSI9/registerContext' not found</details>
 </orionError>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

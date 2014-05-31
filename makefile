@@ -280,7 +280,10 @@ unit_test: build_unit_test
         fi
 	@echo '------------------------------- unit_test ended ---------------------------------'
 
-functional_test: install_debug build_unit_test
+functional_test: install
+	./scripts/funcTest.sh
+
+old_functional_test: install_debug build_unit_test
 	if [ -z "${BROKER_PORT}" ]; then \
 	    echo "Execute '. scripts/testEnv.sh' before executing the tests"; \
 	    exit 1; \

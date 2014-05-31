@@ -23,13 +23,10 @@
 --NAME--
 JSON Parse Post NotifyContextAvailability
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
 echo "1: ***********************************"
 url="/NGSI9/notifyContextAvailability"
 payload='{
@@ -93,5 +90,4 @@ Date: REGEX(.*)
 }
 2: ***********************************
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

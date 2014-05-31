@@ -23,14 +23,10 @@
 --NAME--
 XML Parse BadVerb RegisterContext
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 url="/ngsi10/subscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
@@ -92,5 +88,4 @@ Date: REGEX(.*)
 
 ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

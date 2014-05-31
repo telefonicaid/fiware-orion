@@ -23,8 +23,6 @@
 --NAME--
 Convenience NGSI9 Context Entity Type Attribute Container
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -170,5 +168,4 @@ Allow: POST, GET
 Date: REGEX(.*)
 
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

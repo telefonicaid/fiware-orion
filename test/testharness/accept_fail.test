@@ -24,14 +24,9 @@
 Accept header fail
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
-
 --SHELL--
-source harnessFunctions.sh
-
 # Note that curl by default uses "Accept: */*" so this step is testing that "no header" is interpreted as
 # "Accept: */*" according to HTTP RFC
 url="localhost:${BROKER_PORT}/NGSI10/queryContext"
@@ -317,5 +312,4 @@ Date: REGEX(.*)
 }
 12: ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

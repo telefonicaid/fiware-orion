@@ -20,9 +20,10 @@
 
 --NAME--
 broker version
+--SHELL-INIT--
 --SHELL--
 contextBroker -u
---EXPECT--
+--REGEXPECT--
 Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-u' (usage)]
                       [option '--version' (show version)]
@@ -54,3 +55,5 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-cert' <certificate key file (for https)>]
                       [option '-rush' <rush host (IP:port)>]
                       [option '-multiservice' <service multi tenancy mode (off|url|header)>]
+
+--TEARDOWN--

@@ -23,14 +23,10 @@
 --NAME--
 Empty payloads errors in JSON
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 curlJson "/NGSI9/registerContext" "{}"
 echo "1: ++++++++++++++++++++"
 
@@ -247,5 +243,4 @@ Date: REGEX(.*)
 }
 13: ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

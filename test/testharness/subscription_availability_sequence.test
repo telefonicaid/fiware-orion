@@ -23,17 +23,15 @@
 --NAME--
 Subscription availability sequence
 --SHELL-INIT--
-source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB
 accumulatorStart
 
 --SHELL--
-source harnessFunctions.sh
 
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI9/registerContext
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -54,40 +52,43 @@ source harnessFunctions.sh
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>
-EOF
-echo "1: ++++++++++++++++++++"
+  </registerContextRequest>'
+curlXml "$url" "$payload"
+echo
 
-SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI9/subscribeContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+
+echo "1: ++++++++++++++++++++"
+SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI9/subscribeContextAvailability -s -S --header 'Content-Type: application/xml' -d @- 2> /dev/null | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextAvailabilityRequest>
-        <entityIdList>
-                <entityId type="Room" isPattern="false">
-                        <id>ConferenceRoom</id>
-                </entityId>
-                <entityId type="Room" isPattern="false">
-                        <id>BathRoom</id>
-                </entityId>
-        </entityIdList>
-        <attributeList>
-                <attribute>temperature</attribute>
-                <attribute>occupancy</attribute>
-                <attribute>lightstatus</attribute>
-        </attributeList>
-        <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
-        <duration>PT5H</duration>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>ConferenceRoom</id>
+    </entityId>
+    <entityId type="Room" isPattern="false">
+      <id>BathRoom</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>temperature</attribute>
+    <attribute>occupancy</attribute>
+    <attribute>lightstatus</attribute>
+  </attributeList>
+  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
+  <duration>PT5H</duration>
 </subscribeContextAvailabilityRequest>
 EOF)
 SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo "$SUB_OUT"
+echo
 
-# Get notifications count
+echo 'Notification count from mongo:'
 mongoCmd ${BROKER_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo
 
 echo "2: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI9/registerContext
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -108,16 +109,17 @@ echo "2: ++++++++++++++++++++"
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>
-EOF
+  </registerContextRequest>'
+curlXml "$url" "$payload"
+echo
 
-# Get notifications count
+echo Notification count from mongo:
 mongoCmd ${BROKER_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo
 
 echo "3: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI9/registerContext
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -138,38 +140,41 @@ echo "3: ++++++++++++++++++++"
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>
-EOF
+  </registerContextRequest>'
+curlXml "$url" "$payload"
+echo
+
 echo "4: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI9/updateContextAvailabilitySubscription -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI9/updateContextAvailabilitySubscription
+payload='<?xml version="1.0"?>
 <updateContextAvailabilitySubscriptionRequest>
-        <entityIdList>
-                <entityId type="Room" isPattern="false">
-                        <id>ConferenceRoom</id>
-                </entityId>
-                <entityId type="Room" isPattern="false">
-                        <id>LivingRoom</id>
-                </entityId>
-        </entityIdList>
-        <attributeList>
-                <attribute>temperature</attribute>
-                <attribute>occupancy</attribute>
-                <attribute>lightstatus</attribute>
-        </attributeList>
-        <duration>PT5H</duration>
-        <subscriptionId>$SUB_ID</subscriptionId>
-</updateContextAvailabilitySubscriptionRequest>
-EOF
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>ConferenceRoom</id>
+    </entityId>
+    <entityId type="Room" isPattern="false">
+      <id>LivingRoom</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>temperature</attribute>
+    <attribute>occupancy</attribute>
+    <attribute>lightstatus</attribute>
+  </attributeList>
+  <duration>PT5H</duration>
+  <subscriptionId>'$SUB_ID'</subscriptionId>
+</updateContextAvailabilitySubscriptionRequest>'
 
-# Get notifications count
+curlXml "$url" "$payload"
+echo
+echo Notification count from mongo:
 mongoCmd ${BROKER_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo
+
 
 echo "5: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI9/registerContext
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -190,132 +195,192 @@ echo "5: ++++++++++++++++++++"
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>
-EOF
+  </registerContextRequest>'
+
+curlXml "$url" "$payload"
+echo
+
+
 echo "6: ++++++++++++++++++++"
+url=/NGSI9/registerContext
+payload='<?xml version="1.0"?>
+<registerContextRequest>
+  <contextRegistrationList>
+    <contextRegistration>
+      <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>LivingRoom</id>
+        </entityId>
+      </entityIdList>
+      <contextRegistrationAttributeList>
+        <contextRegistrationAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <isDomain>false</isDomain>
+        </contextRegistrationAttribute>
+      </contextRegistrationAttributeList>
+      <providingApplication>http://sensor5:1028</providingApplication>
+    </contextRegistration>
+  </contextRegistrationList>
+  <duration>PT1H</duration>
+  <registrationId></registrationId>
+</registerContextRequest>'
 
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-  <registerContextRequest>
-    <contextRegistrationList>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Room" isPattern="false">
-            <id>LivingRoom</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://sensor5:1028</providingApplication>
-      </contextRegistration>
-    </contextRegistrationList>
-    <duration>PT1H</duration>
-    <registrationId></registrationId>
-  </registerContextRequest>
-EOF
+curlXml "$url" "$payload"
+echo
 
-# Get notifications count
+echo Notification count from mongo:
 mongoCmd ${BROKER_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
+echo
 
 echo "7: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI9/unsubscribeContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI9/unsubscribeContextAvailability
+payload='<?xml version="1.0"?>
 <unsubscribeContextAvailabilityRequest>
-        <subscriptionId>$SUB_ID</subscriptionId>
-</unsubscribeContextAvailabilityRequest>
-EOF
+  <subscriptionId>'$SUB_ID'</subscriptionId>
+</unsubscribeContextAvailabilityRequest>'
+
+curlXml "$url" "$payload"
+echo
+
 echo "8: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI9/unsubscribeContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url=/NGSI9/unsubscribeContextAvailability
+payload='<?xml version="1.0"?>
 <unsubscribeContextAvailabilityRequest>
-        <subscriptionId>$SUB_ID</subscriptionId>
-</unsubscribeContextAvailabilityRequest>
-EOF
+  <subscriptionId>'$SUB_ID'</subscriptionId>
+</unsubscribeContextAvailabilityRequest>'
+
+curlXml "$url" "$payload"
+echo
+
 echo "9: ++++++++++++++++++++"
+url=/NGSI9/registerContext
+payload='<?xml version="1.0"?>
+<registerContextRequest>
+  <contextRegistrationList>
+    <contextRegistration>
+      <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>LivingRoom</id>
+        </entityId>
+      </entityIdList>
+      <contextRegistrationAttributeList>
+        <contextRegistrationAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <isDomain>false</isDomain>
+        </contextRegistrationAttribute>
+      </contextRegistrationAttributeList>
+      <providingApplication>http://sensor6:1028</providingApplication>
+    </contextRegistration>
+  </contextRegistrationList>
+  <duration>PT1H</duration>
+  <registrationId></registrationId>
+</registerContextRequest>'
 
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
-  <registerContextRequest>
-    <contextRegistrationList>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Room" isPattern="false">
-            <id>LivingRoom</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://sensor6:1028</providingApplication>
-      </contextRegistration>
-    </contextRegistrationList>
-    <duration>PT1H</duration>
-    <registrationId></registrationId>
-  </registerContextRequest>
-EOF
-echo "10: ++++++++++++++++++++"
-
-#Get accumulated data
+curlXml "$url" "$payload"
+echo
+echo Accumulated data:
 curl localhost:${LISTENER_PORT}/dump -s -S 
+echo
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
+
 1: ++++++++++++++++++++
 <?xml version="1.0"?>
 <subscribeContextAvailabilityResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
   <duration>PT5H</duration>
 </subscribeContextAvailabilityResponse>
+
+Notification count from mongo:
 { "count" : 1 }
+
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
+
+Notification count from mongo:
 { "count" : 2 }
+
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
+
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 185
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextAvailabilitySubscriptionResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
   <duration>PT5H</duration>
 </updateContextAvailabilitySubscriptionResponse>
+
+Notification count from mongo:
 { "count" : 3 }
+
 5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
+
 6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
+
+Notification count from mongo:
 { "count" : 4 }
+
 7: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 231
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <unsubscribeContextAvailabilityResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -324,7 +389,13 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </unsubscribeContextAvailabilityResponse>
+
 8: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 253
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <unsubscribeContextAvailabilityResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -333,13 +404,20 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     <reasonPhrase>No context element found</reasonPhrase>
   </statusCode>
 </unsubscribeContextAvailabilityResponse>
+
 9: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
-10: ++++++++++++++++++++
+
+Accumulated data:
 POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 838
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -464,8 +542,7 @@ Content-Type: application/xml
 </notifyContextAvailabilityRequest>
 
 =======================================
---TEARDOWN--
-source harnessFunctions.sh
 
+--TEARDOWN--
 brokerStop CB
 accumulatorStop

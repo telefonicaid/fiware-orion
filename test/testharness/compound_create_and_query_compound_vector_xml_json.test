@@ -23,8 +23,6 @@
 --NAME--
 Create and query compound vector 2 (xml json)
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -143,5 +141,4 @@ EOF
   ]
 }
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

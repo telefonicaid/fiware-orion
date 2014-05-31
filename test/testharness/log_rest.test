@@ -24,102 +24,98 @@
 Log configuration via REST
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB 1-2
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "=== 1. GET verbose level"
-curl localhost:${BROKER_PORT}/log/verbose
+curl localhost:${BROKER_PORT}/log/verbose 2> /dev/null
 echo
 echo
 
 echo "=== 2. PUT verbose level"
-curl localhost:${BROKER_PORT}/log/verbose/5 -X PUT
+curl localhost:${BROKER_PORT}/log/verbose/5 -X PUT  2> /dev/null
 echo
 echo
 
 echo "=== 3. GET verbose level"
-curl localhost:${BROKER_PORT}/log/verbose
+curl localhost:${BROKER_PORT}/log/verbose  2> /dev/null
 echo
 echo
 
 echo "=== 4. DELETE verbose level"
-curl localhost:${BROKER_PORT}/log/verbose -X DELETE
+curl localhost:${BROKER_PORT}/log/verbose -X DELETE  2> /dev/null
 echo
 echo
 
 echo "=== 5. GET verbose level"
-curl localhost:${BROKER_PORT}/log/verbose
+curl localhost:${BROKER_PORT}/log/verbose  2> /dev/null
 echo
 echo
 
 
 echo "=== 6. POST verbose level"
-curl localhost:${BROKER_PORT}/log/verbose/5 -X POST --include
+curl localhost:${BROKER_PORT}/log/verbose/5 -X POST --include  2> /dev/null
 echo
 echo
 
 
 echo "=== 7. GET trace level"
-curl localhost:${BROKER_PORT}/log/traceLevel
+curl localhost:${BROKER_PORT}/log/traceLevel  2> /dev/null
 echo
 echo
 
 
 echo "=== 8. PUT trace level"
-curl localhost:${BROKER_PORT}/log/trace/5-10 -X PUT
+curl localhost:${BROKER_PORT}/log/trace/5-10 -X PUT  2> /dev/null
 echo
 echo
 
 
 echo "=== 9. GET trace level"
-curl localhost:${BROKER_PORT}/log/traceLevel
+curl localhost:${BROKER_PORT}/log/traceLevel  2> /dev/null
 echo
 echo
 
 
 echo "=== 10. POST trace level"
-curl localhost:${BROKER_PORT}/log/trace/101-102,105 -X POST --include
+curl localhost:${BROKER_PORT}/log/trace/101-102,105 -X POST --include  2> /dev/null
 echo
 echo
 
 
 echo "=== 11. PUT trace level"
-curl localhost:${BROKER_PORT}/log/traceLevel/19,21-25 -X PUT
+curl localhost:${BROKER_PORT}/log/traceLevel/19,21-25 -X PUT  2> /dev/null
 echo
 echo
 
 
 echo "=== 12. GET trace level"
-curl localhost:${BROKER_PORT}/log/trace
+curl localhost:${BROKER_PORT}/log/trace  2> /dev/null
 echo
 echo
 
 
 echo "=== 13. DELETE trace level"
-curl localhost:${BROKER_PORT}/log/traceLevel/23 -X DELETE
+curl localhost:${BROKER_PORT}/log/traceLevel/23 -X DELETE  2> /dev/null
 echo
 echo
 
 
 echo "=== 14. GET trace level"
-curl localhost:${BROKER_PORT}/log/traceLevel
+curl localhost:${BROKER_PORT}/log/traceLevel  2> /dev/null
 echo
 echo
 
 
 echo "=== 15. DELETE trace level"
-curl localhost:${BROKER_PORT}/log/traceLevel -X DELETE
+curl localhost:${BROKER_PORT}/log/traceLevel -X DELETE  2> /dev/null
 echo
 echo
 
 
 echo "=== 16. GET trace level"
-curl localhost:${BROKER_PORT}/log/traceLevel
+curl localhost:${BROKER_PORT}/log/traceLevel  2> /dev/null
 echo
 echo
 
@@ -254,5 +250,4 @@ Date: REGEX(.*)
 
 
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

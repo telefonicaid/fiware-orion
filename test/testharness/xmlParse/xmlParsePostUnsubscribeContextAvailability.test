@@ -23,20 +23,16 @@
 --NAME--
 XML Parse Post UnsubscribeContextAvailability
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 url="/NGSI9/unsubscribeContextAvailability"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextAvailabilityRequest>
   <subscriptionId>012345678901234567890123</subscriptionId>
 </unsubscribeContextAvailabilityRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml "$url" "$payload"
 
 echo "2: ***********************************"
 --REGEXPECT--
@@ -55,5 +51,4 @@ Date: REGEX(.*)
 </unsubscribeContextAvailabilityResponse>
 2: ***********************************
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

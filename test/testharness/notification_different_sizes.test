@@ -23,7 +23,6 @@
 --NAME--
 Notifications of different sizes
 --SHELL-INIT--
-source harnessFunctions.sh
 
 dbInit CB
 brokerStart CB
@@ -38,10 +37,9 @@ dbInsertEntity testharness E3 810000
 dbInsertEntity testharness E4 840000
 
 --SHELL--
-source harnessFunctions.sh
 
 # Close to the static buffer limit (~19 KB)
-url="localhost:${BROKER_PORT}/NGSI10/subscribeContext"
+url="/NGSI10/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -61,11 +59,13 @@ payload='<?xml version="1.0"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
-echo "1: ++++++++++++++++++++"
-sleep 1
+curlXml "$url" "$payload"
+echo
 
+sleep 1
+echo "1: ++++++++++++++++++++"
 # Passing the static buffer limit (~21 KB)
+url="/NGSI10/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -85,11 +85,14 @@ payload='<?xml version="1.0"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml "$url" "$payload"
+echo
+
+
 sleep 1
 echo "2: ++++++++++++++++++++"
-
 # Close to the dynamic buffer limit (~7.9 MB)
+url="/NGSI10/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -109,11 +112,14 @@ payload='<?xml version="1.0"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
+curlXml "$url" "$payload"
+echo
+
+
 sleep 1
 echo "3: ++++++++++++++++++++"
-
 # Passing the dynamic buffer limit, causing an error (~8.1 MB)
+url="/NGSI10/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -133,12 +139,14 @@ payload='<?xml version="1.0"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlIt "XML" ${url} "${payload}" "Content-Type: application/xml" "Accept: application/xml"
-echo "4: ++++++++++++++++++++"
+curlXml "$url" "$payload"
+echo
 
+
+echo "4: ++++++++++++++++++++"
 # The number of notifications has to be 4 (the last one was not sent)
 echo "** Notifications sent:"
-curl localhost:9997/number -s -S
+curl localhost:9997/number -s -S 2> /dev/null
 
 # The log has to show exactly 1 case of static buffer usage
 echo "** Static buffer usages:"
@@ -170,6 +178,7 @@ Date: REGEX(.*)
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
+
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 192
@@ -183,6 +192,7 @@ Date: REGEX(.*)
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
+
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 192
@@ -196,6 +206,7 @@ Date: REGEX(.*)
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
+
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 192
@@ -209,6 +220,7 @@ Date: REGEX(.*)
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
+
 4: ++++++++++++++++++++
 ** Notifications sent:
 3
@@ -223,7 +235,6 @@ Date: REGEX(.*)
  sendHttpSocket: Sending message 2 to HTTP server: sending dynamic message of 21879 bytes to HTTP server
  sendHttpSocket: Sending message 3 to HTTP server: sending dynamic message of 8100881 bytes to HTTP server
 --TEARDOWN--
-source harnessFunctions.sh
 cp /tmp/contextBrokerLog /tmp/contextBrokerLog.notification_different_sizes
 brokerStop CB
 accumulatorStop

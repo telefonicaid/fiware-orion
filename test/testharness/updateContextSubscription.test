@@ -23,8 +23,6 @@
 --NAME--
 Check subscriptionId in error for /NGSI10/updateContextSubscription
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -68,5 +66,4 @@ EOF
   </subscribeError>
 </updateContextSubscriptionResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

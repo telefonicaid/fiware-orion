@@ -23,14 +23,10 @@
 --NAME--
 XML throttling
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "1: +++++++++++++++++++++++++++++"
 
 url="/ngsi10/subscribeContext"
@@ -44,9 +40,9 @@ payload='<?xml version="1.0"?>
   <reference>http://localhost:${LISTENER_PORT}/notify</reference>
   <throttling>PT5H</throttling>
 </subscribeContextRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml"
+curlXml "$url" "$payload"
+echo
 echo "2: +++++++++++++++++++++++++++++"
-
 # Bad throttling syntax
 #INVALID_XML
 url="/ngsi10/subscribeContext"
@@ -60,8 +56,8 @@ payload='<?xml version="1.0"?>
   <reference>http://localhost:${LISTENER_PORT}/notify</reference>
   <throttling>PT5R</throttling>
 </subscribeContextRequest>'
-curlXml ${url} "${payload}" "Content-Type: application/xml"
-echo "3: +++++++++++++++++++++++++++++"
+curlXml "$url" "$payload"
+echo
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -77,6 +73,7 @@ Date: REGEX(.*)
     <throttling>PT5H</throttling>
   </subscribeResponse>
 </subscribeContextResponse>
+
 2: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 273
@@ -93,7 +90,6 @@ Date: REGEX(.*)
     </errorCode>
   </subscribeError>
 </subscribeContextResponse>
-3: +++++++++++++++++++++++++++++
+
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

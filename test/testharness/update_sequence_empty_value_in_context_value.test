@@ -23,8 +23,6 @@
 --NAME--
 Update sequence with empty contextValue - compound bug check
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -75,5 +73,4 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

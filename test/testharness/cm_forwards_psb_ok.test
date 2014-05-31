@@ -21,8 +21,6 @@
 --NAME--
 CM forwards PSB OK
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 dbInit CM
 
@@ -30,8 +28,6 @@ brokerStart CB 0-255
 brokerStart CM 0-255
 
 --SHELL--
-source harnessFunctions.sh
-
 # Do a NGSI10 request to check the operation is avoided
 response=$((curl localhost:${CM_PORT}/NGSI10/queryContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- ) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -368,7 +364,5 @@ Date: REGEX(.*)
 1
 OK
 --TEARDOWN--
-source harnessFunctions.sh
-
 brokerStop CB
 brokerStop CM

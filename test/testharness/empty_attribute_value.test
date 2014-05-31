@@ -24,14 +24,10 @@
 Accept header fail
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "1: Empty context attribute value for JSON"
 url=localhost:${BROKER_PORT}/NGSI10/updateContext
 payload='{
@@ -140,6 +136,5 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
---TEARDOWN
-source harnessFunctions.sh
+--TEARDOWN--
 brokerStop CB

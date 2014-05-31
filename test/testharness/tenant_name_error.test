@@ -23,13 +23,10 @@
 --NAME--
 Erroneous tenant url names
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB 0 IPV4 -multiservice url
 
 --SHELL--
-source harnessFunctions.sh
 
 payload='<?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
@@ -186,5 +183,4 @@ Date: REGEX(.*)
   <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
 </orionError>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

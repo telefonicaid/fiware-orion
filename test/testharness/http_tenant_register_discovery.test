@@ -23,16 +23,12 @@
 --NAME--
 HTTP-Tenant registration and discovery
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
-dbTenantInit ${BROKER_DATABASE_NAME}-t_01
-dbTenantInit ${BROKER_DATABASE_NAME}-t_02
+dbInit ${BROKER_DATABASE_NAME}-t_01
+dbInit ${BROKER_DATABASE_NAME}-t_02
 brokerStart CB 0-255 IPV4 -multiservice header
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "1. Register entity E with HTTP-Tenant t_01"
 echo "+++++++++++++++++++++++++++++++++++++++++++++++"
 url="/NGSI9/registerContext"
@@ -212,5 +208,4 @@ Date: REGEX(.*)
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

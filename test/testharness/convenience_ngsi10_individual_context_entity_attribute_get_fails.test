@@ -24,8 +24,6 @@
 Convenience Individual Context Entity Attribute - GET FAILS
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -45,5 +43,4 @@ echo "+++++ 1. get an entity +++++"
   </statusCode>
 </contextAttributeResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

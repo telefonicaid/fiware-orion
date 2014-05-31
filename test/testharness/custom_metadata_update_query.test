@@ -23,14 +23,10 @@
 --NAME--
 Custom metadata query/update
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "=== 1. Create an entity with an attribute with metadata"
 url="/NGSI10/updateContext"
 payload='{
@@ -586,5 +582,4 @@ Date: REGEX(.*)
     }
 }
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

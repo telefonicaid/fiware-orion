@@ -23,8 +23,6 @@
 --NAME--
 Create and query compound object XML-JSON
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -118,5 +116,4 @@ EOF
     ]
 }
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

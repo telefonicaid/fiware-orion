@@ -23,8 +23,6 @@
 --NAME--
 Notify Context Availability processing
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -113,5 +111,4 @@ echo "2: ++++++++++++++++++++"
 </discoverContextAvailabilityResponse>
 2: ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

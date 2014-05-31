@@ -24,16 +24,12 @@
 IPv6 Only 
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB 0-255 IPV6
 accumulatorStart 0.0.0.0 ${LISTENER_PORT}
 accumulatorStart :: ${LISTENER2_PORT}
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "1: ++++++++++++++++++++"
 curl 127.0.0.1:${BROKER_PORT}/version --max-time 10 > /dev/null 2>&1
 echo exit code: $?
@@ -148,8 +144,6 @@ exit code: 7
 5: ++++++++++++++++++++
 0
 --TEARDOWN--
-source harnessFunctions.sh
-
 brokerStop CB
 accumulatorStop ${LISTENER_PORT}
 accumulatorStop ${LISTENER2_PORT}

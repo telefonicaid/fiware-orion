@@ -24,14 +24,10 @@
 URI params and subscriptions
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 # 0. URI params for curlXml
 
 echo "Trying to ask for HTML as Notification Format"
@@ -80,5 +76,4 @@ Date: REGEX(.*)
 
 
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

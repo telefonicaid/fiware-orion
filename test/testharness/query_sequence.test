@@ -23,8 +23,6 @@
 --NAME--
 Query SEQ
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -936,5 +934,4 @@ EOF
   </contextResponseList>
 </queryContextResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

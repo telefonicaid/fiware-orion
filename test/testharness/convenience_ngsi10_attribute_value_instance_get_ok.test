@@ -24,8 +24,6 @@
 Convenience Attribute Value Instance - GET OK
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -191,5 +189,4 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
   </statusCode>
 </contextAttributeResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

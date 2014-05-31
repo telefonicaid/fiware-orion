@@ -24,14 +24,10 @@
 Location - no actual location change
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
 --SHELL--
-source harnessFunctions.sh
-
 echo "0: ++++++++++++++++++++"
 
 (curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
@@ -158,6 +154,4 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 --TEARDOWN--
-source harnessFunctions.sh
-
 brokerStop CB

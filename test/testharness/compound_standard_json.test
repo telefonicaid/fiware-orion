@@ -23,8 +23,6 @@
 --NAME--
 Create and query compound values (standard op and JSON creation)
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -457,5 +455,4 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
     }
 }
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

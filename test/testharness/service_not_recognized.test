@@ -23,8 +23,6 @@
 --NAME--
 Service not recognized
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -43,5 +41,4 @@ echo "2: +++++++++++++++++++++++++++++"
 }
 2: +++++++++++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

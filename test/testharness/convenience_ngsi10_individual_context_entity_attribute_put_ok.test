@@ -24,8 +24,6 @@
 Convenience Individual Context Entity Attribute - PUT OK
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -249,5 +247,4 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
     }
 }
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

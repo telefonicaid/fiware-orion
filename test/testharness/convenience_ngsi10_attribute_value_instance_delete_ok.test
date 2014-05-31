@@ -24,8 +24,6 @@
 Convenience Attribute Value Instance - DELETE OK
 
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB
 
@@ -138,5 +136,4 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Conte
     }
 }
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB

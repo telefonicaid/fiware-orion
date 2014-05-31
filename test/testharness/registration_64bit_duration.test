@@ -23,8 +23,6 @@
 --NAME--
 Registration OK
 --SHELL-INIT--
-source harnessFunctions.sh
-
 dbInit CB
 brokerStart CB 0
 
@@ -113,5 +111,4 @@ echo "++++++++++++++++++++"
 </discoverContextAvailabilityResponse>
 ++++++++++++++++++++
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB
