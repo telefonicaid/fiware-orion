@@ -838,7 +838,7 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
 * processSubscriptions
 *
 */
-static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
+static bool processSubscriptions(const EntityId& en, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -1349,7 +1349,7 @@ static bool removeEntity(std::string entityId, std::string entityType, ContextEl
 * processContextElement -
 *
 */
-void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, std::string action, std::string tenant) {
+void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, const std::string& action, const std::string& tenant, const std::string& servicePath) {
 
     DBClientConnection* connection = getMongoConnection();
 

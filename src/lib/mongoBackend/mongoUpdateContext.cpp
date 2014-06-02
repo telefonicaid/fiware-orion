@@ -22,8 +22,9 @@
 *
 * Author: Fermin Galan Marquez
 */
-#include <string>
 #include <string.h>
+#include <map>
+#include <string>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -37,18 +38,25 @@
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "ngsi/NotifyCondition.h"
+#include "rest/HttpStatusCode.h"
 
 /* ****************************************************************************
 *
 * mongoUpdateContext - 
 */
-HttpStatusCode mongoUpdateContext(UpdateContextRequest* requestP, UpdateContextResponse* responseP, const std::string& tenant)
+HttpStatusCode mongoUpdateContext
+(
+  UpdateContextRequest*                requestP,
+  UpdateContextResponse*               responseP,
+  const std::string&                   tenant,
+  const std::string&                   servicePath
+)
 {
     reqSemTake(__FUNCTION__, "ngsi10 update request");
 
     /* Process each ContextElement */
     for (unsigned int ix= 0; ix < requestP->contextElementVector.size(); ++ix) {        
-        processContextElement(requestP->contextElementVector.get(ix), responseP, requestP->updateActionType.get(), tenant);
+        processContextElement(requestP->contextElementVector.get(ix), responseP, requestP->updateActionType.get(), tenant, servicePath);
     }
 
     /* Note that although individual processContextElements() invokations returns MsConnectionError, this
