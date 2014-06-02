@@ -33,7 +33,7 @@ size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *user
 
   mem->memory = (char*)realloc(mem->memory, mem->size + realsize + 1);
   if(mem->memory == NULL) {
-    LM_V(("Not enough memory (realloc returned NULL)\n"));
+    //LM_V(("Not enough memory (realloc returned NULL)\n"));
     return 0;
   }
 
@@ -85,7 +85,7 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
         break;
     }
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, httpVerb.c_str());
-    LM_V(("Got an HTTP %s", httpVerb.c_str()));
+    //LM_V(("Got an HTTP %s", httpVerb.c_str()));
 
 
     // --- Prepare headers
@@ -102,7 +102,7 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
           char buffer[options[i].optionValueLength + 1];
           memcpy(&buffer, options[i].optionValuePointer, options[i].optionValueLength);
           buffer[options[i].optionValueLength] = '\0';
-          LM_V(("Got URI_PATH option: '%s'", buffer));
+          //LM_V(("Got URI_PATH option: '%s'", buffer));
           break;
         }
         case CoapPDU::COAP_OPTION_CONTENT_FORMAT:
@@ -123,7 +123,7 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
               break;
           }
           headers = curl_slist_append(headers, string.c_str());
-          LM_V(("Got CONTENT-FORMAT option: '%s'", string.c_str()));
+          //LM_V(("Got CONTENT-FORMAT option: '%s'", string.c_str()));
           break;
         }
         case CoapPDU::COAP_OPTION_ACCEPT:
@@ -144,7 +144,7 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
               break;
           }
           headers = curl_slist_append(headers, string.c_str());
-          LM_V(("Got ACCEPT option: '%s'", string.c_str()));
+          //LM_V(("Got ACCEPT option: '%s'", string.c_str()));
           break;
         }
         default:
@@ -152,7 +152,7 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
           char buffer[options[i].optionValueLength + 1];
           memcpy(&buffer, options[i].optionValuePointer, options[i].optionValueLength);
           buffer[options[i].optionValueLength] = '\0';
-          LM_V(("Got unknown option: '%s'", buffer));
+          //LM_V(("Got unknown option: '%s'", buffer));
           break;
         }
       }
@@ -166,7 +166,7 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
       contentLengthStringStream << request->getPayloadLength();
       std::string finalString = "Content-length: " + contentLengthStringStream.str();
       headers = curl_slist_append(headers, finalString.c_str());
-      LM_V(("Got: '%s'", finalString.c_str()));
+      //LM_V(("Got: '%s'", finalString.c_str()));
 
       // --- Set contents
 

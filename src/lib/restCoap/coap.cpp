@@ -42,7 +42,7 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
   if (httpResponse == "")
   {
     // Could not get an answer
-    LM_V(("Could not get answer from HTTP module"));
+    //LM_V(("Could not get answer from HTTP module"));
     boost::scoped_ptr<CoapPDU> res(new CoapPDU());
 
     res->setVersion(1);
@@ -55,13 +55,13 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
 
     if (sent < 0)
     {
-      LM_V(("Error sending packet: %ld.",sent));
+      //LM_V(("Error sending packet: %ld.",sent));
       perror(NULL);
       return 1;
     }
     else
     {
-      LM_V(("Sent: %ld",sent));
+      //LM_V(("Sent: %ld",sent));
     }
 
     return 1;
@@ -84,13 +84,13 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
 
     if (sent < 0)
     {
-      LM_V(("Error sending packet: %ld.",sent));
+      //LM_V(("Error sending packet: %ld.",sent));
       perror(NULL);
       return 1;
     }
     else
     {
-      LM_V(("Sent: %ld",sent));
+      //LM_V(("Sent: %ld",sent));
     }
 
     return 1;
@@ -129,13 +129,13 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
   ssize_t sent = sendto(sockfd, coapResponse->getPDUPointer(), coapResponse->getPDULength(), 0, (sockaddr*)recvFrom, addrLen);
   if (sent < 0)
   {
-    LM_V(("Error sending packet: %ld.",sent));
+    //LM_V(("Error sending packet: %ld.",sent));
     perror(NULL);
     return 1;
   }
   else
   {
-    LM_V(("Sent: %ld",sent));
+    //LM_V(("Sent: %ld",sent));
   }
 
   return 0;
@@ -173,17 +173,17 @@ void Coap::serve()
   int error = getaddrinfo(host, portString, &hints, &bindAddr);
   if (error)
   {
-    LM_V(("Could not start CoAP server: Error getting address info: %s.", gai_strerror(error)));
+    //LM_V(("Could not start CoAP server: Error getting address info: %s.", gai_strerror(error)));
     return;
   }
 
   // Setting up the UDP socket
-  int sd = socket(bindAddr->ai_family,bindAddr->ai_socktype,bindAddr->ai_protocol);
+  int sd = socket(bindAddr->ai_family, bindAddr->ai_socktype, bindAddr->ai_protocol);
 
   // Binding socket
-  if (bind(sd,bindAddr->ai_addr,bindAddr->ai_addrlen)!=0)
+  if (bind(sd, bindAddr->ai_addr, bindAddr->ai_addrlen) != 0)
   {
-    LM_V(("Could not start CoAP server: Error binding socket"));
+    //LM_V(("Could not start CoAP server: Error binding socket"));
     perror(NULL);
     return;
   }
@@ -197,7 +197,7 @@ void Coap::serve()
     ret = recvfrom(sd, &buffer, COAP_BUFFER_SIZE, 0, (sockaddr*)&recvAddr, &recvAddrLen);
     if (ret == -1)
     {
-      LM_V(("Error receiving data"));
+      //LM_V(("Error receiving data"));
       return;
     }
 
@@ -206,27 +206,27 @@ void Coap::serve()
     // validate packet
     if (ret > COAP_BUFFER_SIZE)
     {
-      LM_V(("PDU too large to fit in pre-allocated buffer"));
+      //LM_V(("PDU too large to fit in pre-allocated buffer"));
       continue;
     }
     recvPDU->setPDULength(ret);
     if (recvPDU->validate() != 1)
     {
-      LM_V(("Malformed CoAP packet"));
+      //LM_V(("Malformed CoAP packet"));
       continue;
     }
-    LM_V(("Valid CoAP PDU received"));
+    //LM_V(("Valid CoAP PDU received"));
 
     // Treat URI
     if (recvPDU->getURI(uriBuffer, COAP_URI_BUFFER_SIZE, &recvURILen) != 0)
     {
-      LM_V(("Error retrieving URI"));
+      //LM_V(("Error retrieving URI"));
       continue;
     }
 
     if (recvURILen == 0)
     {
-      LM_V(("There is no URI associated with this Coap PDU"));
+      //LM_V(("There is no URI associated with this Coap PDU"));
     }
     else
     {
