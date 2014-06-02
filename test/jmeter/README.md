@@ -3,7 +3,7 @@
 This is the Jmeter scripts repository for the Orion Context Broker, used for Performance tests.
 
 #### Pre-conditions:
-	1- "Jmeter" app exists in Launcher VM - (/root/test/apache-jmeter-2.11/bin)
+	1- "Jmeter" app exists in Launcher VM -  (/root/test/apache-jmeter-2.11/bin)
 	2- "ServerAgent" app exist in Launcher VM, in ContextBroker VM and Nginx VM (only in cluster case) - (/root/test/apache-jmeter-2.11)	
 	3- have a account in Loadosophia - (http://loadosophia.org)
 	4- "nginx" app exists in Balancer VM (only in cluster case)
@@ -22,7 +22,7 @@ This is the Jmeter scripts repository for the Orion Context Broker, used for Per
 	6- fill the report in Google doc
 
 #### Scripts:
-1. **orionPerformanceTest.jmx**  (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It can used for one standalone VM or a balanced cluster of VM with 4 nodes maximum.
+1. **orionPerformanceTest.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It can used for one standalone VM or a balanced cluster of VM with 4 nodes maximum.
 	+ Properties:
 		* PROJECT    - project name (DEFAULT by default)
 		* TESTNAME   - test name (orionPerformanceTest by default)
@@ -30,7 +30,7 @@ This is the Jmeter scripts repository for the Orion Context Broker, used for Per
 		* THREADS    - number of concurrent threads (1 by default)
 		* RAMPUP     - the amount of time for creating the total number of threads (0 by default)
 		* ITERATIONS - number of repetitions of each thread (1 by default)
-		* HOST       - IP or hostname (in case of clusters is Nginx) (127.0.0.1 by default)
+		* HOST       - IP or hostname (in case of clusters is Nginx)  (127.0.0.1 by default)
 		* Node_1     - IP or hostname for Node 1, only for monitoring (127.0.0.1 by default)
 		* Node_2     - IP or hostname for Node 2, only for monitoring (127.0.0.1 by default)		
 		* Node_3     - IP or hostname for Node 3, only for monitoring (127.0.0.1 by default)		
