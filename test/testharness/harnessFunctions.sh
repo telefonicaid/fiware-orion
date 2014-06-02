@@ -557,3 +557,114 @@ function dbInsertEntity()
   echo "$jsCode ; $ent ; $doc ; $cmd" | mongo $db
 }
 
+
+
+# ------------------------------------------------------------------------------
+#
+# ftCurl
+#
+# Options:
+#   -X            <HTTP method>    (default: according to curl. GET if no payload, POST if with payload)
+#   --host        <host>           (default: localhost)
+#   --port        <port>           (default: $BROKER_PORT)
+#   --url         <URL>            (default: empty string)
+#   --payload     <payload>        (default: NO PAYLOAD)
+#   --in          (input payload)  (default: xml => application/xml, If 'json': application/json)
+#   --out         (output payload  (default: xml => application/xml, If 'json': application/json)
+#   --json        (in/out JSON)    (if --in/out is used AFTER --json, it overrides) 
+#   --httpTenant  <tenant>         (tenant in HTTP header)
+#   --urlTenant   <tenant>         (tenant in URL)
+#
+# Any parameters are sent as is to 'curl'
+# 
+function ftCurl()
+{
+  #
+  # Default values
+  #
+  _method=""
+  _host="localhost"
+  _port=$BROKER_PORT
+  _url=""
+  _payload=""
+  _inFormat=application/xml
+  _outFormat=application/xml
+  _json=""
+  _httpTenant=""
+  _urlTenant=""
+  _xtra=''
+
+  while [ "$#" != 0 ]
+  do
+    if   [ "$1" == "-X" ]; then                _method="$2"; shift;
+    elif [ "$1" == "--host" ]; then            _host="$2"; shift;
+    elif [ "$1" == "--port" ]; then            _port="$2"; shift;
+    elif [ "$1" == "--url" ]; then             _url="$2"; shift;
+    elif [ "$1" == "--payload" ]; then         _payload="$2"; shift;
+    elif [ "$1" == "--in" ]; then              _inFormat="$2"; shift;
+    elif [ "$1" == "--out" ]; then             _outFormat="$2"; shift;
+    elif [ "$1" == "--json" ]; then            _inFormat=application/json; _outFormat=application/json; shift;
+    elif [ "$1" == "--httpTenant" ]; then      _httpTenant="$2"; shift;
+    elif [ "$1" == "--urlTenant" ]; then       _urlTenant="$2"; shift;
+    else                                       _xtra="$_xtra $1"; shift;
+    fi
+
+    shift
+  done
+
+
+  #
+  # Sanity check of parameters
+  #
+  if [ "$_url" == "" ]
+  then
+    echo "No URL";
+    return 1;
+  fi
+
+
+  #
+  # Fix for 'Content-Type' and 'Accept' short names 'xml' and 'json'
+  #
+  if [ "$_inFormat" == "xml" ];   then _inFormat=application/xml;   fi;
+  if [ "$_outFormat" == "xml" ];  then _outFormat=application/xml;  fi;
+  if [ "$_inFormat" == "json" ];  then _inFormat=application/json;  fi;
+  if [ "$_outFormat" == "json" ]; then _outFormat=application/json; fi;
+
+
+
+  #
+  # Cleanup 'compound' variables, so that we don't inherit values from previous calls
+  # 
+  _PAYLOAD=''
+  _METHOD=''
+  _URL=''
+  _HTTP_TENANT=''
+
+
+  #
+  # Set up the compound variables
+  #
+  if [ "$_payload" != "" ]
+  then
+     echo $_payload > payload
+    _PAYLOAD='-d @payload'
+  fi
+
+  if [ "$_method" != "" ];     then    _METHOD=' -X "'$_method'"';   fi
+  if [ "$_httpTenant" != "" ]; then    _HTTP_TENANT='--header "Fiware-Service:'$_httpTenant'"';  fi
+
+  if [ "$_urlTenant" != "" ]
+  then
+    _URL=$_host:$_port/$_tenant$_url
+  else
+    _URL=$_host:$_port$_url
+  fi
+
+  _BUILTINS='-s -S --dump-header /tmp/httpHeaders.out'
+  echo '==============================================================================================================================================================='
+  echo curl $_URL "$_PAYLOAD" $_METHOD --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $HTTP_TENANT $_BUILTINS $_xtra
+  echo '==============================================================================================================================================================='
+
+  curl $_URL "$_PAYLOAD" $_METHOD --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $HTTP_TENANT $_BUILTINS $_xtra
+}
