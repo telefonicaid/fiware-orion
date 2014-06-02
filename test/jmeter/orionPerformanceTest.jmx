@@ -1,0 +1,969 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+
+ This file is part of Orion Context Broker.
+
+ Orion Context Broker is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Affero General Public License as
+ published by the Free Software Foundation, either version 3 of the
+ License, or (at your option) any later version.
+
+ Orion Context Broker is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+ General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+
+ For those usages not covered by this license please contact with
+ fermin at tid dot es
+ 
+ Authors: Ivan Arias and Xavier Val
+-->
+<jmeterTestPlan version="1.2" properties="2.6" jmeter="2.11 r1554548">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Orion Performance Test" enabled="true">
+      <stringProp name="TestPlan.comments">Test plan with only one append</stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="Variables definidas por el Usuario" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="General Settings" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="Version" elementType="Argument">
+            <stringProp name="Argument.name">Version</stringProp>
+            <stringProp name="Argument.value"></stringProp>
+            <stringProp name="Argument.desc">Script version</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="outputDir" elementType="Argument">
+            <stringProp name="Argument.name">outputDir</stringProp>
+            <stringProp name="Argument.value">/tmp/JMeter_result/result_${__time(YMDHMS,)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="PROJECT" elementType="Argument">
+            <stringProp name="Argument.name">PROJECT</stringProp>
+            <stringProp name="Argument.value">${__P(PROJECT,DEFAULT)}</stringProp>
+            <stringProp name="Argument.desc">Project name to upload results</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="TEST_NAME" elementType="Argument">
+            <stringProp name="Argument.name">TEST_NAME</stringProp>
+            <stringProp name="Argument.value">${__P(TEST_NAME,OrionPerfTest)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="RUNTIME" elementType="Argument">
+            <stringProp name="Argument.name">RUNTIME</stringProp>
+            <stringProp name="Argument.value">${__P(RUNTIME,30)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="THREADS" elementType="Argument">
+            <stringProp name="Argument.name">THREADS</stringProp>
+            <stringProp name="Argument.value">${__P(THREADS,1)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="RAMPUP" elementType="Argument">
+            <stringProp name="Argument.name">RAMPUP</stringProp>
+            <stringProp name="Argument.value">${__P(RAMPUP,0)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="ITERATIONS" elementType="Argument">
+            <stringProp name="Argument.name">ITERATIONS</stringProp>
+            <stringProp name="Argument.value">${__P(ITERATIONS,1)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="HOST" elementType="Argument">
+            <stringProp name="Argument.name">HOST</stringProp>
+            <stringProp name="Argument.value">${__P(HOST,127.0.0.1)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="NODE_1" elementType="Argument">
+            <stringProp name="Argument.name">NODE_1</stringProp>
+            <stringProp name="Argument.value">${__P(NODE_1,127.0.0.1)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="NODE_2" elementType="Argument">
+            <stringProp name="Argument.name">NODE_2</stringProp>
+            <stringProp name="Argument.value">${__P(NODE_2,127.0.0.1)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="NODE_3" elementType="Argument">
+            <stringProp name="Argument.name">NODE_3</stringProp>
+            <stringProp name="Argument.value">${__P(NODE_3,127.0.0.1)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="NODE_4" elementType="Argument">
+            <stringProp name="Argument.name">NODE_4</stringProp>
+            <stringProp name="Argument.value">${__P(NODE_4,127.0.0.1)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="PORT" elementType="Argument">
+            <stringProp name="Argument.name">PORT</stringProp>
+            <stringProp name="Argument.value">${__P(PORT,1026)}</stringProp>
+            <stringProp name="Argument.desc">[ 1026 / 80 ]</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="MON_PORT" elementType="Argument">
+            <stringProp name="Argument.name">MON_PORT</stringProp>
+            <stringProp name="Argument.value">${__P(MON_PORT,3450)}</stringProp>
+            <stringProp name="Argument.desc">[3450-4444] Monitor Perf Port</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="now" elementType="Argument">
+            <stringProp name="Argument.name">now</stringProp>
+            <stringProp name="Argument.value">${__time(YMDHMS,)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="MAX_NODES" elementType="Argument">
+            <stringProp name="Argument.name">MAX_NODES</stringProp>
+            <stringProp name="Argument.value">4</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </Arguments>
+      <hashTree/>
+      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Settings" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="UPDATE_METHOD" elementType="Argument">
+            <stringProp name="Argument.name">UPDATE_METHOD</stringProp>
+            <stringProp name="Argument.value">APPEND</stringProp>
+            <stringProp name="Argument.desc">UPDATE / APPEND</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="ROOM_ID" elementType="Argument">
+            <stringProp name="Argument.name">ROOM_ID</stringProp>
+            <stringProp name="Argument.value">Room1</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">sample data</stringProp>
+          </elementProp>
+          <elementProp name="UPDATE_ALL" elementType="Argument">
+            <stringProp name="Argument.name">UPDATE_ALL</stringProp>
+            <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;updateContextRequest&gt;&lt;contextElementList&gt;&lt;contextElement&gt;&lt;entityId type=&quot;Room&quot; isPattern=&quot;false&quot;&gt;&lt;id&gt;Room1&lt;/id&gt;&lt;/entityId&gt;&lt;contextAttributeList&gt;&lt;contextAttribute&gt;&lt;name&gt;temperature&lt;/name&gt;&lt;type&gt;centigrade&lt;/type&gt;&lt;contextValue&gt;-11,22&lt;/contextValue&gt;&lt;/contextAttribute&gt;&lt;contextAttribute&gt;&lt;name&gt;pressure&lt;/name&gt;&lt;type&gt;mmHg&lt;/type&gt;&lt;contextValue&gt;763&lt;/contextValue&gt;&lt;/contextAttribute&gt;&lt;/contextAttributeList&gt;&lt;/contextElement&gt;&lt;/contextElementList&gt;&lt;updateAction&gt;UPDATE&lt;/updateAction&gt;&lt;/updateContextRequest&gt;</stringProp>
+            <stringProp name="Argument.desc">Temperature y pressure</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="UPDATE_PRESS" elementType="Argument">
+            <stringProp name="Argument.name">UPDATE_PRESS</stringProp>
+            <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;updateContextRequest&gt;&lt;contextElementList&gt;&lt;contextElement&gt;&lt;entityId type=&quot;Room&quot; isPattern=&quot;false&quot;&gt;&lt;id&gt;Room1&lt;/id&gt;&lt;/entityId&gt;&lt;contextAttributeList&gt;&lt;contextAttribute&gt;&lt;name&gt;pressure&lt;/name&gt;&lt;type&gt;mmHg&lt;/type&gt;&lt;contextValue&gt;9999&lt;/contextValue&gt;&lt;/contextAttribute&gt;&lt;/contextAttributeList&gt;&lt;/contextElement&gt;&lt;/contextElementList&gt;&lt;updateAction&gt;UPDATE&lt;/updateAction&gt;&lt;/updateContextRequest&gt; </stringProp>
+            <stringProp name="Argument.desc">only Pressure</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="UPDATE_TEMP" elementType="Argument">
+            <stringProp name="Argument.name">UPDATE_TEMP</stringProp>
+            <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;updateContextRequest&gt;&lt;contextElementList&gt;&lt;contextElement&gt;&lt;entityId type=&quot;Room&quot; isPattern=&quot;false&quot;&gt;&lt;id&gt;Room1&lt;/id&gt;&lt;/entityId&gt;&lt;contextAttributeList&gt;&lt;contextAttribute&gt;&lt;name&gt;temperature&lt;/name&gt;&lt;type&gt;centigrade&lt;/type&gt;&lt;contextValue&gt;100&lt;/contextValue&gt;&lt;/contextAttribute&gt;&lt;/contextAttributeList&gt;&lt;/contextElement&gt;&lt;/contextElementList&gt;&lt;updateAction&gt;UPDATE&lt;/updateAction&gt;&lt;/updateContextRequest&gt;</stringProp>
+            <stringProp name="Argument.desc">only temperature</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="UPDATE_PATTERN" elementType="Argument">
+            <stringProp name="Argument.name">UPDATE_PATTERN</stringProp>
+            <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;updateContextRequest&gt;&lt;contextElementList&gt;&lt;contextElement&gt;&lt;entityId type=&quot;Room&quot; isPattern=&quot;true&quot;&gt;&lt;id&gt;Room.*&lt;/id&gt;&lt;/entityId&gt;&lt;contextAttributeList&gt;&lt;contextAttribute&gt;&lt;name&gt;temperature&lt;/name&gt;&lt;type&gt;centigrade&lt;/type&gt;&lt;contextValue&gt;5.5&lt;/contextValue&gt;&lt;/contextAttribute&gt;&lt;contextAttribute&gt;&lt;name&gt;pressure&lt;/name&gt;&lt;type&gt;mmHg&lt;/type&gt;&lt;contextValue&gt;555&lt;/contextValue&gt;&lt;/contextAttribute&gt;&lt;/contextAttributeList&gt;&lt;/contextElement&gt;&lt;/contextElementList&gt;&lt;updateAction&gt;UPDATE&lt;/updateAction&gt;&lt;/updateContextRequest&gt;</stringProp>
+            <stringProp name="Argument.desc">update all rooms</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="QUERY_ALL" elementType="Argument">
+            <stringProp name="Argument.name">QUERY_ALL</stringProp>
+            <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;queryContextRequest&gt;&lt;entityIdList&gt;&lt;entityId type=&quot;Room&quot; isPattern=&quot;false&quot;&gt;&lt;id&gt;Room1&lt;/id&gt;&lt;/entityId&gt;&lt;/entityIdList&gt;&lt;attributeList&gt;&lt;/attributeList&gt;&lt;/queryContextRequest&gt;</stringProp>
+            <stringProp name="Argument.desc">ALL</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="QUERY_PRESS" elementType="Argument">
+            <stringProp name="Argument.name">QUERY_PRESS</stringProp>
+            <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;queryContextRequest&gt;&lt;entityIdList&gt;&lt;entityId type=&quot;Room&quot; isPattern=&quot;false&quot;&gt;&lt;id&gt;Room1&lt;/id&gt;&lt;/entityId&gt;&lt;/entityIdList&gt;&lt;attributeList&gt;&lt;attribute&gt;pressure&lt;/attribute&gt;&lt;/attributeList&gt;&lt;/queryContextRequest&gt;</stringProp>
+            <stringProp name="Argument.desc">only Pressure</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="QUERY_TEMP" elementType="Argument">
+            <stringProp name="Argument.name">QUERY_TEMP</stringProp>
+            <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;queryContextRequest&gt;&lt;entityIdList&gt;&lt;entityId type=&quot;Room&quot; isPattern=&quot;false&quot;&gt;&lt;id&gt;Room1&lt;/id&gt;&lt;/entityId&gt;&lt;/entityIdList&gt;&lt;attributeList&gt;&lt;attribute&gt;temperature&lt;/attribute&gt;&lt;/attributeList&gt;&lt;/queryContextRequest&gt;</stringProp>
+            <stringProp name="Argument.desc">only Temperature</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="QUERY_PATTERN" elementType="Argument">
+            <stringProp name="Argument.name">QUERY_PATTERN</stringProp>
+            <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;queryContextRequest&gt;&lt;entityIdList&gt;&lt;entityId type=&quot;Room&quot; isPattern=&quot;true&quot;&gt;&lt;id&gt;Room.*&lt;/id&gt;&lt;/entityId&gt;&lt;/entityIdList&gt;&lt;attributeList&gt;&lt;/attributeList&gt;&lt;/queryContextRequest&gt;</stringProp>
+            <stringProp name="Argument.desc">query all rooms</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="UPDATE_ALL_J" elementType="Argument">
+            <stringProp name="Argument.name">UPDATE_ALL_J</stringProp>
+            <stringProp name="Argument.value">{&quot;contextElements&quot;: [{&quot;type&quot;: &quot;Room&quot;,&quot;isPattern&quot;: &quot;false&quot;,&quot;id&quot;: &quot;Room1&quot;,&quot;attributes&quot;: [{&quot;name&quot;: &quot;temperature&quot;,&quot;type&quot;: &quot;centigrade&quot;,&quot;value&quot;: &quot;20.1&quot;},{&quot;name&quot;: &quot;pressure&quot;,&quot;type&quot;: &quot;mmHg&quot;,&quot;value&quot;: &quot;222&quot;}]}],&quot;updateAction&quot;: &quot;UPDATE&quot;}</stringProp>
+            <stringProp name="Argument.desc">Temperature y pressure</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="UPDATE_PRESS_J" elementType="Argument">
+            <stringProp name="Argument.name">UPDATE_PRESS_J</stringProp>
+            <stringProp name="Argument.value">{&quot;contextElements&quot;: [{&quot;type&quot;: &quot;Room&quot;,&quot;isPattern&quot;: &quot;false&quot;,&quot;id&quot;: &quot;Room1&quot;,&quot;attributes&quot;: [{&quot;name&quot;: &quot;pressure&quot;,&quot;type&quot;: &quot;mmHg&quot;,&quot;value&quot;: &quot;111.1&quot;}]}],&quot;updateAction&quot;: &quot;UPDATE&quot;}</stringProp>
+            <stringProp name="Argument.desc">only Pressure</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="UPDATE_TEMP_J" elementType="Argument">
+            <stringProp name="Argument.name">UPDATE_TEMP_J</stringProp>
+            <stringProp name="Argument.value">{&quot;contextElements&quot;: [{&quot;type&quot;: &quot;Room&quot;,&quot;isPattern&quot;: &quot;false&quot;,&quot;id&quot;: &quot;Room1&quot;,&quot;attributes&quot;: [{&quot;name&quot;: &quot;temperature&quot;,&quot;type&quot;: &quot;centigrade&quot;,&quot;value&quot;: &quot;101.01&quot;}]}],&quot;updateAction&quot;: &quot;UPDATE&quot;}</stringProp>
+            <stringProp name="Argument.desc">only temperature</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="QUERY_ALL_J" elementType="Argument">
+            <stringProp name="Argument.name">QUERY_ALL_J</stringProp>
+            <stringProp name="Argument.value">{&quot;entities&quot;: [{&quot;type&quot;: &quot;Room&quot;,&quot;isPattern&quot;: &quot;false&quot;,&quot;id&quot;: &quot;Room1&quot;}],&quot;attributes&quot; : []}</stringProp>
+            <stringProp name="Argument.desc">ALL</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="QUERY_PRESS_J" elementType="Argument">
+            <stringProp name="Argument.name">QUERY_PRESS_J</stringProp>
+            <stringProp name="Argument.value">{&quot;entities&quot;: [{&quot;type&quot;: &quot;Room&quot;,&quot;isPattern&quot;: &quot;false&quot;,&quot;id&quot;: &quot;Room1&quot;}],&quot;attributes&quot; : [&quot;pressure&quot;]}</stringProp>
+            <stringProp name="Argument.desc">only Pressure</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="QUERY_TEMP_J" elementType="Argument">
+            <stringProp name="Argument.name">QUERY_TEMP_J</stringProp>
+            <stringProp name="Argument.value">{&quot;entities&quot;: [{&quot;type&quot;: &quot;Room&quot;,&quot;isPattern&quot;: &quot;false&quot;,&quot;id&quot;: &quot;Room1&quot;}],&quot;attributes&quot; : [&quot;temperature&quot;]}</stringProp>
+            <stringProp name="Argument.desc">only Temperature</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="QUERY_PATTERN_J" elementType="Argument">
+            <stringProp name="Argument.name">QUERY_PATTERN_J</stringProp>
+            <stringProp name="Argument.value">{&quot;entities&quot;: [{&quot;type&quot;: &quot;Room&quot;,&quot;isPattern&quot;: &quot;true&quot;,&quot;id&quot;: &quot;Room.*&quot;}],&quot;attributes&quot; : []}</stringProp>
+            <stringProp name="Argument.desc">query all rooms all params</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="LOADOSOPHIA" elementType="Argument">
+            <stringProp name="Argument.name">LOADOSOPHIA</stringProp>
+            <stringProp name="Argument.value">loadosophia_upload_token</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </Arguments>
+      <hashTree/>
+      <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="Random PRESS" enabled="true">
+        <stringProp name="maximumValue">555</stringProp>
+        <stringProp name="minimumValue">000</stringProp>
+        <stringProp name="outputFormat">000</stringProp>
+        <boolProp name="perThread">false</boolProp>
+        <stringProp name="randomSeed">100</stringProp>
+        <stringProp name="variableName">PRESS</stringProp>
+      </RandomVariableConfig>
+      <hashTree/>
+      <RandomVariableConfig guiclass="TestBeanGUI" testclass="RandomVariableConfig" testname="Random TEMP" enabled="true">
+        <stringProp name="maximumValue">999</stringProp>
+        <stringProp name="minimumValue">111</stringProp>
+        <stringProp name="outputFormat">000</stringProp>
+        <boolProp name="perThread">false</boolProp>
+        <stringProp name="randomSeed">50</stringProp>
+        <stringProp name="variableName">TEMP</stringProp>
+      </RandomVariableConfig>
+      <hashTree/>
+      <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Body Assert" enabled="false">
+        <collectionProp name="Asserion.test_strings">
+          <stringProp name="67232232">Error</stringProp>
+          <stringProp name="96784904">error</stringProp>
+          <stringProp name="2117236020">Bad Request</stringProp>
+          <stringProp name="1815858133">Not found</stringProp>
+        </collectionProp>
+        <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+        <boolProp name="Assertion.assume_success">false</boolProp>
+        <intProp name="Assertion.test_type">6</intProp>
+        <stringProp name="Assertion.scope">all</stringProp>
+      </ResponseAssertion>
+      <hashTree/>
+      <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="HTTP Code = 200" enabled="true">
+        <collectionProp name="Asserion.test_strings">
+          <stringProp name="49586">200</stringProp>
+        </collectionProp>
+        <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+        <boolProp name="Assertion.assume_success">false</boolProp>
+        <intProp name="Assertion.test_type">8</intProp>
+        <stringProp name="Assertion.scope">all</stringProp>
+      </ResponseAssertion>
+      <hashTree/>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="NL - No logic ops" enabled="false">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${MAX_NODES}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${MAX_NODES}</stringProp>
+        <longProp name="ThreadGroup.start_time">1373439867000</longProp>
+        <longProp name="ThreadGroup.end_time">1373439867000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="xml" enabled="true">
+          <collectionProp name="HeaderManager.headers">
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name">Content-Type</stringProp>
+              <stringProp name="Header.value">application/xml</stringProp>
+            </elementProp>
+          </collectionProp>
+        </HeaderManager>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="NL 010 /version" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
+          <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/version</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="NL 020 /statistics" enabled="false">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
+          <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/statistics</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="NL 030 /statistics RESET" enabled="false">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
+          <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/statistics</stringProp>
+          <stringProp name="HTTPSampler.method">DELETE</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Appends" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${MAX_NODES}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${MAX_NODES}</stringProp>
+        <longProp name="ThreadGroup.start_time">1373439867000</longProp>
+        <longProp name="ThreadGroup.end_time">1373439867000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="xml" enabled="true">
+          <collectionProp name="HeaderManager.headers">
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name">Content-Type</stringProp>
+              <stringProp name="Header.value">application/xml</stringProp>
+            </elementProp>
+          </collectionProp>
+        </HeaderManager>
+        <hashTree/>
+        <RunTime guiclass="RunTimeGui" testclass="RunTime" testname="Runtime Controller" enabled="true">
+          <stringProp name="RunTime.seconds">1</stringProp>
+        </RunTime>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="U000 Append pressure&amp;temperature payload" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+&lt;updateContextRequest&gt;&#xd;
+&lt;contextElementList&gt;&#xd;
+&lt;contextElement&gt;&#xd;
+&lt;entityId type=&quot;Room&quot; isPattern=&quot;false&quot;&gt;&#xd;
+&lt;id&gt;Room1&lt;/id&gt;&#xd;
+&lt;/entityId&gt;&lt;contextAttributeList&gt;&#xd;
+&lt;contextAttribute&gt;&lt;name&gt;temperature&lt;/name&gt;&lt;type&gt;centigrade&lt;/type&gt;&#xd;
+ &lt;contextValue&gt;574&lt;/contextValue&gt;&lt;/contextAttribute&gt;&#xd;
+&lt;contextAttribute&gt;&lt;name&gt;pressure&lt;/name&gt;&lt;type&gt;mmHg&lt;/type&gt;&#xd;
+ &lt;contextValue&gt;398&lt;/contextValue&gt;&lt;/contextAttribute&gt;&lt;/contextAttributeList&gt;&#xd;
+&lt;/contextElement&gt;&lt;/contextElementList&gt;&#xd;
+&lt;updateAction&gt;APPEND&lt;/updateAction&gt;&#xd;
+&lt;/updateContextRequest&gt;</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
+            <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+            <stringProp name="HTTPSampler.path">/NGSI10/updateContext</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+            <boolProp name="HTTPSampler.monitor">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code/Reason" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="-1978490527">&lt;code&gt;200&lt;/code&gt;</stringProp>
+                <stringProp name="-1935280275">&lt;reasonPhrase&gt;OK&lt;/reasonPhrase&gt;</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">2</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="XML " enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">${ITERATIONS}</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${THREADS}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMPUP}</stringProp>
+        <longProp name="ThreadGroup.start_time">1373439867000</longProp>
+        <longProp name="ThreadGroup.end_time">1373439867000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <RunTime guiclass="RunTimeGui" testclass="RunTime" testname="Runtime Controller" enabled="true">
+          <stringProp name="RunTime.seconds">${RUNTIME}</stringProp>
+        </RunTime>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="xml" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Content-Type</stringProp>
+                <stringProp name="Header.value">application/xml</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="U010 Update pressure&amp;temperature payload - XML" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+&lt;updateContextRequest&gt;&#xd;
+&lt;contextElementList&gt;&#xd;
+&lt;contextElement&gt;&#xd;
+&lt;entityId type=&quot;Room&quot; isPattern=&quot;false&quot;&gt;&#xd;
+&lt;id&gt;Room1&lt;/id&gt;&#xd;
+&lt;/entityId&gt;&lt;contextAttributeList&gt;&#xd;
+&lt;contextAttribute&gt;&lt;name&gt;temperature&lt;/name&gt;&lt;type&gt;centigrade&lt;/type&gt;&#xd;
+ &lt;contextValue&gt;${TEMP}&lt;/contextValue&gt;&lt;/contextAttribute&gt;&#xd;
+&lt;contextAttribute&gt;&lt;name&gt;pressure&lt;/name&gt;&lt;type&gt;mmHg&lt;/type&gt;&#xd;
+  &lt;contextValue&gt;${PRESS}&lt;/contextValue&gt;&lt;/contextAttribute&gt;&lt;/contextAttributeList&gt;&#xd;
+&lt;/contextElement&gt;&lt;/contextElementList&gt;&#xd;
+&lt;updateAction&gt;UPDATE&lt;/updateAction&gt;&#xd;
+&lt;/updateContextRequest&gt;</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
+            <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+            <stringProp name="HTTPSampler.path">/NGSI10/updateContext</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+            <boolProp name="HTTPSampler.monitor">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code/Reason" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="-1978490527">&lt;code&gt;200&lt;/code&gt;</stringProp>
+                <stringProp name="-1935280275">&lt;reasonPhrase&gt;OK&lt;/reasonPhrase&gt;</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">2</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Q020 Query pressure&amp;temperature - XML" enabled="true">
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">${QUERY_ALL}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
+            <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+            <stringProp name="HTTPSampler.path">/NGSI10/queryContext</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <boolProp name="HTTPSampler.monitor">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code/Reason" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="-1978490527">&lt;code&gt;200&lt;/code&gt;</stringProp>
+                <stringProp name="-1935280275">&lt;reasonPhrase&gt;OK&lt;/reasonPhrase&gt;</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">2</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="JSON" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">${ITERATIONS}</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${THREADS}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${RAMPUP}</stringProp>
+        <longProp name="ThreadGroup.start_time">1373439867000</longProp>
+        <longProp name="ThreadGroup.end_time">1373439867000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <RunTime guiclass="RunTimeGui" testclass="RunTime" testname="Runtime Controller" enabled="true">
+          <stringProp name="RunTime.seconds">${RUNTIME}</stringProp>
+        </RunTime>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="json" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Content-Type</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Accept</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="U010 Update pressure&amp;temperature payload - JSON" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&quot;contextElements&quot;: &#xd;
+	[{&quot;type&quot;: &quot;Room&quot;,&quot;isPattern&quot;: &quot;false&quot;,&quot;id&quot;: &quot;Room1&quot;,&quot;attributes&quot;: [&#xd;
+		{&quot;name&quot;: &quot;temperature&quot;,&quot;type&quot;: &quot;centigrade&quot;,&quot;value&quot;: &quot;${TEMP}&quot;},&#xd;
+		{&quot;name&quot;: &quot;pressure&quot;,&quot;type&quot;: &quot;mmHg&quot;,&quot;value&quot;: &quot;${PRESS}&quot;}]&#xd;
+	}],&#xd;
+	&quot;updateAction&quot;: &quot;UPDATE&quot;}&#xd;
+&#xd;
+</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
+            <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+            <stringProp name="HTTPSampler.path">/NGSI10/updateContext</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+            <boolProp name="HTTPSampler.monitor">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code/Reason" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="-26353089">&quot;code&quot; : &quot;200&quot;</stringProp>
+                <stringProp name="1954386055">&quot;reasonPhrase&quot; : &quot;OK&quot;</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">2</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Q020 Query pressure&amp;temperature  - JSON" enabled="true">
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">${QUERY_ALL_J}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.desc">false</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">${HOST}</stringProp>
+            <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+            <stringProp name="HTTPSampler.path">/NGSI10/queryContext</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <boolProp name="HTTPSampler.monitor">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code/Reason" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="-26353089">&quot;code&quot; : &quot;200&quot;</stringProp>
+                <stringProp name="1954386055">&quot;reasonPhrase&quot; : &quot;OK&quot;</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">2</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+      </hashTree>
+      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>false</message>
+            <threadName>true</threadName>
+            <dataType>false</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>false</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+          </value>
+        </objProp>
+        <stringProp name="filename">${outputDir}/AggregateReport__${__time(YMDHMS,)}_IP_${HOST}_x${THREADS}Threads_x${RUNTIME}Sec.csv</stringProp>
+        <boolProp name="useGroupName">true</boolProp>
+      </ResultCollector>
+      <hashTree/>
+      <kg.apc.jmeter.perfmon.PerfMonCollector guiclass="kg.apc.jmeter.vizualizers.PerfMonGui" testclass="kg.apc.jmeter.perfmon.PerfMonCollector" testname="PerfMon Collector" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>false</assertions>
+            <subresults>false</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <url>true</url>
+            <fileName>true</fileName>
+            <hostname>true</hostname>
+            <threadCounts>true</threadCounts>
+            <sampleCount>true</sampleCount>
+            <idleTime>true</idleTime>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+        <longProp name="interval_grouping">1000</longProp>
+        <boolProp name="graph_aggregated">false</boolProp>
+        <stringProp name="include_sample_labels"></stringProp>
+        <stringProp name="exclude_sample_labels"></stringProp>
+        <collectionProp name="metricConnections">
+          <collectionProp name="-1629844088">
+            <stringProp name="1180709214">${HOST}</stringProp>
+            <stringProp name="-1152144878">${MON_PORT}</stringProp>
+            <stringProp name="66952">CPU</stringProp>
+            <stringProp name="0"></stringProp>
+          </collectionProp>
+          <collectionProp name="364408887">
+            <stringProp name="1180709214">${HOST}</stringProp>
+            <stringProp name="-1152144878">${MON_PORT}</stringProp>
+            <stringProp name="-1993889503">Memory</stringProp>
+            <stringProp name="0"></stringProp>
+          </collectionProp>
+          <collectionProp name="351529034">
+            <stringProp reference="../../collectionProp[2]/stringProp"/>
+            <stringProp reference="../../collectionProp[2]/stringProp[2]"/>
+            <stringProp name="82881">TCP</stringProp>
+            <stringProp reference="../../collectionProp[2]/stringProp[4]"/>
+          </collectionProp>
+          <collectionProp name="-750599354">
+            <stringProp name="1805916434">${NODE_1}</stringProp>
+            <stringProp reference="../../collectionProp[2]/stringProp[2]"/>
+            <stringProp name="66952">CPU</stringProp>
+            <stringProp reference="../../collectionProp[2]/stringProp[4]"/>
+          </collectionProp>
+          <collectionProp name="1243653621">
+            <stringProp reference="../../collectionProp[4]/stringProp"/>
+            <stringProp reference="../../collectionProp[2]/stringProp[2]"/>
+            <stringProp name="-1993889503">Memory</stringProp>
+            <stringProp reference="../../collectionProp[2]/stringProp[4]"/>
+          </collectionProp>
+          <collectionProp name="1230773768">
+            <stringProp reference="../../collectionProp[4]/stringProp"/>
+            <stringProp reference="../../collectionProp[2]/stringProp[2]"/>
+            <stringProp name="82881">TCP</stringProp>
+            <stringProp reference="../../collectionProp[2]/stringProp[4]"/>
+          </collectionProp>
+          <collectionProp name="-646062735">
+            <stringProp name="1805916465">${NODE_2}</stringProp>
+            <stringProp reference="../../collectionProp[2]/stringProp[2]"/>
+            <stringProp reference="../../collectionProp[4]/stringProp[3]"/>
+            <stringProp reference="../../collectionProp[2]/stringProp[4]"/>
+          </collectionProp>
+          <collectionProp name="1348190240">
+            <stringProp name="1805916465">${NODE_2}</stringProp>
+            <stringProp reference="../../collectionProp[2]/stringProp[2]"/>
+            <stringProp name="-1993889503">Memory</stringProp>
+            <stringProp reference="../../collectionProp[2]/stringProp[4]"/>
+          </collectionProp>
+          <collectionProp name="1335310387">
+            <stringProp name="1805916465">${NODE_2}</stringProp>
+            <stringProp reference="../../collectionProp[2]/stringProp[2]"/>
+            <stringProp name="82881">TCP</stringProp>
+            <stringProp reference="../../collectionProp[2]/stringProp[4]"/>
+          </collectionProp>
+          <collectionProp name="-541526116">
+            <stringProp name="1805916496">${NODE_3}</stringProp>
+            <stringProp reference="../../collectionProp[2]/stringProp[2]"/>
+            <stringProp reference="../../collectionProp[4]/stringProp[3]"/>
+            <stringProp reference="../../collectionProp[2]/stringProp[4]"/>
+          </collectionProp>
+          <collectionProp name="1452726859">
+            <stringProp name="1805916496">${NODE_3}</stringProp>
+            <stringProp reference="../../collectionProp[2]/stringProp[2]"/>
+            <stringProp reference="../../collectionProp[8]/stringProp[3]"/>
+            <stringProp reference="../../collectionProp[2]/stringProp[4]"/>
+          </collectionProp>
+          <collectionProp name="1439847006">
+            <stringProp name="1805916496">${NODE_3}</stringProp>
+            <stringProp reference="../../collectionProp[2]/stringProp[2]"/>
+            <stringProp reference="../../collectionProp[9]/stringProp[3]"/>
+            <stringProp reference="../../collectionProp[2]/stringProp[4]"/>
+          </collectionProp>
+          <collectionProp name="280586320">
+            <stringProp name="1805916527">${NODE_4}</stringProp>
+            <stringProp reference="../../collectionProp[2]/stringProp[2]"/>
+            <stringProp reference="../../collectionProp[4]/stringProp[3]"/>
+            <stringProp reference="../../collectionProp[2]/stringProp[4]"/>
+          </collectionProp>
+          <collectionProp name="-2020128001">
+            <stringProp name="1805916527">${NODE_4}</stringProp>
+            <stringProp reference="../../collectionProp[2]/stringProp[2]"/>
+            <stringProp reference="../../collectionProp[8]/stringProp[3]"/>
+            <stringProp reference="../../collectionProp[2]/stringProp[4]"/>
+          </collectionProp>
+          <collectionProp name="-2033007854">
+            <stringProp name="1805916527">${NODE_4}</stringProp>
+            <stringProp reference="../../collectionProp[2]/stringProp[2]"/>
+            <stringProp reference="../../collectionProp[9]/stringProp[3]"/>
+            <stringProp reference="../../collectionProp[2]/stringProp[4]"/>
+          </collectionProp>
+        </collectionProp>
+      </kg.apc.jmeter.perfmon.PerfMonCollector>
+      <hashTree/>
+      <kg.apc.jmeter.reporters.LoadosophiaUploader guiclass="kg.apc.jmeter.reporters.LoadosophiaUploaderGui" testclass="kg.apc.jmeter.reporters.LoadosophiaUploader" testname="Loadosophia report" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>true</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+        <stringProp name="project">${PROJECT}</stringProp>
+        <stringProp name="uploadToken">${LOADOSOPHIA}rtrtr</stringProp>
+        <stringProp name="storeDir">${outputDir}</stringProp>
+        <stringProp name="color">green</stringProp>
+        <stringProp name="title">${__time(YMD)}_${TEST_NAME}_${THREADS}_x${RUNTIME}Secs_IP-${HOST}</stringProp>
+        <boolProp name="useOnline">true</boolProp>
+      </kg.apc.jmeter.reporters.LoadosophiaUploader>
+      <hashTree/>
+      <ResultCollector guiclass="MonitorHealthVisualizer" testclass="ResultCollector" testname="Monitor Results" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="Requests/Responses Errors " enabled="false">
+        <boolProp name="ResultCollector.error_logging">true</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>true</responseData>
+            <samplerData>true</samplerData>
+            <xml>true</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>true</responseHeaders>
+            <requestHeaders>true</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <url>true</url>
+            <fileName>true</fileName>
+            <hostname>true</hostname>
+            <threadCounts>true</threadCounts>
+            <sampleCount>true</sampleCount>
+            <idleTime>true</idleTime>
+          </value>
+        </objProp>
+        <stringProp name="filename">${outputDir}/Errors__${__time(YMDHMS,)}_IP_${HOST}_x${THREADS}Threads_x${RUNTIME}Sec.csv</stringProp>
+      </ResultCollector>
+      <hashTree/>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
