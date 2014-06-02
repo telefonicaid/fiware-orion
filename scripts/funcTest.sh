@@ -386,6 +386,7 @@ function partExecute()
       exitFunction 9 $path "($path) output not as expected" $dirname/$filename.diff
       if [ "$CB_DIFF_TOOL" != "" ]
       then
+        endDate=$(date)
         $CB_DIFF_TOOL $dirname/$filename.regexpect $dirname/$filename.out
       fi
     fi
@@ -495,8 +496,14 @@ do
   testNo=$testNo+1
   startDate=$(date)
   start=$(date --date="$startDate" +%s)
+  endDate=""
   runTest $testFile
-  endDate=$(date)
+
+  if [ "$endDate" == "" ]  # Could have been set in 'partExecute'
+  then
+    endDate=$(date)
+  fi
+
   end=$(date --date="$endDate" +%s)
   typeset -i secs
   secs=$end-$start

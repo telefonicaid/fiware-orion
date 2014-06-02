@@ -237,13 +237,20 @@ function brokerStop()
 #
 function processResult()
 {
+    filename=$1
     # Get info from valgrind
-    startLine1=$(grep -n "LEAK SUMMARY" $1 | awk -F: '{ print $1 }' | head -1)
-    startLine2=$(grep -n "LEAK SUMMARY" $1 | awk -F: '{ print $1 }' | tail -1)
+    startLine1=$(grep -n "LEAK SUMMARY" $filename | awk -F: '{ print $1 }' | head -1)
+    startLine2=$(grep -n "LEAK SUMMARY" $filename | awk -F: '{ print $1 }' | tail -1)
 
+    if [ "$startLine1" == "" ] || [ "$startLine2" == "" ]
+    then
+        return
+    fi
+
+    typeset -i headEndLine1
     headEndLine1=$startLine1+7
 
-    head -$headEndLine1 $1 | tail -8 > valgrind.leakSummary
+    head -$headEndLine1 $filename | tail -8 > valgrind.leakSummary
 
     definitelyLost1=$(grep 'definitely lost' valgrind.leakSummary | awk '{ print $4 }')
     indirectlyLost1=$(grep 'indirectly lost' valgrind.leakSummary | awk '{ print $4 }')
@@ -475,6 +482,11 @@ then
     echo >> /tmp/valgrindTestSuiteLog
   done
 fi
+
+#
+# No diff tool for funcTest when running from valgrind test suite
+#
+unset CB_DIFF_TOOL
 
 if [ "$runHarness" -eq "1" ]
 then
