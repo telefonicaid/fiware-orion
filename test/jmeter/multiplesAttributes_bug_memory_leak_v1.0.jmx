@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 
  This file is part of Orion Context Broker.
 
@@ -20,7 +20,7 @@
  For those usages not covered by this license please contact with
  fermin at tid dot es
  
- Author: Ivan Arias and Xavier Val
+ Author: Ivan Arias 
 -->
 <jmeterTestPlan version="1.2" properties="2.6" jmeter="2.11 r1554548">
   <hashTree>
@@ -44,7 +44,7 @@
           </elementProp>
           <elementProp name="HOST" elementType="Argument">
             <stringProp name="Argument.name">HOST</stringProp>
-            <stringProp name="Argument.value">${__P(HOST,130.206.80.132)}</stringProp>
+            <stringProp name="Argument.value">${__P(HOST,127.0.0.1)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
             <stringProp name="Argument.desc">Medium ( RAM:  4096MB VCPUs:  2 VCPU Disk:  10GB )</stringProp>
           </elementProp>
@@ -533,8 +533,10 @@
 // libraries
 import java.util.*;
 import java.text.DecimalFormat;
+import java.text.*;
 
 // constants
+sdf = new SimpleDateFormat(&quot;yyyy-MM-dd&apos;T&apos;hh:mm:ss.S&apos;Z&apos;&quot;).format(new Date());
 attributeMIN=1;
 attributeMAX=9;
 RandomMAXValue = 1000;
@@ -553,7 +555,8 @@ tempRequest = &quot; &quot;;
 System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
 for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
 	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
-	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+//	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+    	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&lt;Measurement&gt;&lt;Timestamp&gt;&quot;+sdf+&quot;&lt;/Timestamp&gt;&lt;Value&gt;&quot;+value+&quot;&lt;/Value&gt;&lt;/Measurement&gt;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
 }
 
 request = request + tempRequest + endRequest;
@@ -629,8 +632,10 @@ vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
 // libraries
 import java.util.*;
 import java.text.DecimalFormat;
+import java.text.*;
 
 // constants
+sdf = new SimpleDateFormat(&quot;yyyy-MM-dd&apos;T&apos;hh:mm:ss.S&apos;Z&apos;&quot;).format(new Date());
 attributeMIN=10;
 attributeMAX=24;
 RandomMAXValue = 1000;
@@ -649,7 +654,8 @@ tempRequest = &quot; &quot;;
 System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
 for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
 	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
-	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+//	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+    	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&lt;Measurement&gt;&lt;Timestamp&gt;&quot;+sdf+&quot;&lt;/Timestamp&gt;&lt;Value&gt;&quot;+value+&quot;&lt;/Value&gt;&lt;/Measurement&gt;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
 }
 
 request = request + tempRequest + endRequest;
@@ -692,7 +698,7 @@ vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
         </ConstantTimer>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="House group 1 (19 entities 2 attributes between 2 seconds to 20 minutes)" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="House group 1 (19 entities 2 attributes between 2 seconds to 20 minutes randomly)" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -725,8 +731,10 @@ vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
 // libraries
 import java.util.*;
 import java.text.DecimalFormat;
+import java.text.*;
 
 // constants
+sdf = new SimpleDateFormat(&quot;yyyy-MM-dd&apos;T&apos;hh:mm:ss.S&apos;Z&apos;&quot;).format(new Date());
 attributeMIN=25;
 attributeMAX=26;
 RandomMAXValue = 1000;
@@ -745,7 +753,8 @@ tempRequest = &quot; &quot;;
 System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
 for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
 	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
-	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+//	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+    	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&lt;Measurement&gt;&lt;Timestamp&gt;&quot;+sdf+&quot;&lt;/Timestamp&gt;&lt;Value&gt;&quot;+value+&quot;&lt;/Value&gt;&lt;/Measurement&gt;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
 }
 
 request = request + tempRequest + endRequest;
@@ -822,8 +831,10 @@ vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
 // libraries
 import java.util.*;
 import java.text.DecimalFormat;
+import java.text.*;
 
 // constants
+sdf = new SimpleDateFormat(&quot;yyyy-MM-dd&apos;T&apos;hh:mm:ss.S&apos;Z&apos;&quot;).format(new Date());
 attributeMIN=1;
 attributeMAX=6;
 RandomMAXValue = 1000;
@@ -842,7 +853,8 @@ tempRequest = &quot; &quot;;
 System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
 for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
 	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
-	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+//	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+    	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&lt;Measurement&gt;&lt;Timestamp&gt;&quot;+sdf+&quot;&lt;/Timestamp&gt;&lt;Value&gt;&quot;+value+&quot;&lt;/Value&gt;&lt;/Measurement&gt;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
 }
 
 request = request + tempRequest + endRequest;
@@ -918,8 +930,10 @@ vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
 // libraries
 import java.util.*;
 import java.text.DecimalFormat;
+import java.text.*;
 
 // constants
+sdf = new SimpleDateFormat(&quot;yyyy-MM-dd&apos;T&apos;hh:mm:ss.S&apos;Z&apos;&quot;).format(new Date());
 attributeMIN=7;
 attributeMAX=21;
 RandomMAXValue = 1000;
@@ -938,7 +952,8 @@ tempRequest = &quot; &quot;;
 System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
 for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
 	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
-	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+//	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+    	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&lt;Measurement&gt;&lt;Timestamp&gt;&quot;+sdf+&quot;&lt;/Timestamp&gt;&lt;Value&gt;&quot;+value+&quot;&lt;/Value&gt;&lt;/Measurement&gt;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
 }
 
 request = request + tempRequest + endRequest;
@@ -981,7 +996,7 @@ vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
         </ConstantTimer>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="House group 2 (1 entity 2 attributes between 2 seconds to 20 minutes)" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="House group 2 (1 entity 2 attributes between 2 seconds to 20 minutes randomly)" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -1014,8 +1029,10 @@ vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
 // libraries
 import java.util.*;
 import java.text.DecimalFormat;
+import java.text.*;
 
 // constants
+sdf = new SimpleDateFormat(&quot;yyyy-MM-dd&apos;T&apos;hh:mm:ss.S&apos;Z&apos;&quot;).format(new Date());
 attributeMIN=22;
 attributeMAX=23;
 RandomMAXValue = 1000;
@@ -1034,7 +1051,8 @@ tempRequest = &quot; &quot;;
 System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
 for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
 	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
-	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+//	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+    	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&lt;Measurement&gt;&lt;Timestamp&gt;&quot;+sdf+&quot;&lt;/Timestamp&gt;&lt;Value&gt;&quot;+value+&quot;&lt;/Value&gt;&lt;/Measurement&gt;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
 }
 
 request = request + tempRequest + endRequest;
@@ -1111,8 +1129,10 @@ vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
 // libraries
 import java.util.*;
 import java.text.DecimalFormat;
+import java.text.*;
 
 // constants
+sdf = new SimpleDateFormat(&quot;yyyy-MM-dd&apos;T&apos;hh:mm:ss.S&apos;Z&apos;&quot;).format(new Date());
 attributeMIN=1;
 attributeMAX=31;
 RandomMAXValue = 1000;
@@ -1131,7 +1151,8 @@ tempRequest = &quot; &quot;;
 System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
 for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
 	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
-	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+//	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+    	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&lt;Measurement&gt;&lt;Timestamp&gt;&quot;+sdf+&quot;&lt;/Timestamp&gt;&lt;Value&gt;&quot;+value+&quot;&lt;/Value&gt;&lt;/Measurement&gt;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
 }
 
 request = request + tempRequest + endRequest;
@@ -1207,8 +1228,10 @@ vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
 // libraries
 import java.util.*;
 import java.text.DecimalFormat;
+import java.text.*;
 
 // constants
+sdf = new SimpleDateFormat(&quot;yyyy-MM-dd&apos;T&apos;hh:mm:ss.S&apos;Z&apos;&quot;).format(new Date());
 attributeMIN=1;
 attributeMAX=31;
 RandomMAXValue = 1000;
@@ -1227,7 +1250,8 @@ tempRequest = &quot; &quot;;
 System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
 for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
 	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
-	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+//	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+    	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&lt;Measurement&gt;&lt;Timestamp&gt;&quot;+sdf+&quot;&lt;/Timestamp&gt;&lt;Value&gt;&quot;+value+&quot;&lt;/Value&gt;&lt;/Measurement&gt;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
 }
 
 request = request + tempRequest + endRequest;
@@ -1303,8 +1327,10 @@ vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
 // libraries
 import java.util.*;
 import java.text.DecimalFormat;
+import java.text.*;
 
 // constants
+sdf = new SimpleDateFormat(&quot;yyyy-MM-dd&apos;T&apos;hh:mm:ss.S&apos;Z&apos;&quot;).format(new Date());
 attributeMIN=1;
 attributeMAX=2;
 RandomMAXValue = 1000;
@@ -1323,7 +1349,8 @@ tempRequest = &quot; &quot;;
 System.out.println (pos + &quot; &quot;+eT+&quot; Conxtext(s) are appending...&quot;);
 for (int i = attributeMIN; i &lt;= attributeMAX; i++) {
 	value = df.format(rnd.nextInt(RandomMAXValue) + rnd.nextDouble()); 
-	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+//	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&quot;+value+&quot;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
+    	tempRequest = tempRequest + &quot;&lt;contextAttribute&gt;&lt;name&gt;name_&quot;+i+&quot;&lt;/name&gt;&lt;type&gt;type_&quot;+i+&quot;&lt;/type&gt;&lt;contextValue&gt;&lt;Measurement&gt;&lt;Timestamp&gt;&quot;+sdf+&quot;&lt;/Timestamp&gt;&lt;Value&gt;&quot;+value+&quot;&lt;/Value&gt;&lt;/Measurement&gt;&lt;/contextValue&gt;&lt;/contextAttribute&gt;&quot;;
 }
 
 request = request + tempRequest + endRequest;
@@ -1366,7 +1393,7 @@ vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
         </ConstantTimer>
         <hashTree/>
       </hashTree>
-      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="Requests/Responses Errors " enabled="true">
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="Requests/Responses Errors " enabled="false">
         <boolProp name="ResultCollector.error_logging">true</boolProp>
         <objProp>
           <name>saveConfig</name>
@@ -1404,7 +1431,7 @@ vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
         <stringProp name="filename">${outputDir}/Errors${postfixOutputDir}</stringProp>
       </ResultCollector>
       <hashTree/>
-      <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
+      <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="false">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
@@ -1436,7 +1463,7 @@ vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
         <stringProp name="filename">${outputDir}/AggregateReport${postfixOutputDir}</stringProp>
       </ResultCollector>
       <hashTree/>
-      <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
+      <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="false">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
@@ -1468,7 +1495,7 @@ vars.put(&quot;randomAttributesUpdateRequest&quot;,request.toString());
         <stringProp name="filename">${outputDir}/TableResult${postfixOutputDir}</stringProp>
       </ResultCollector>
       <hashTree/>
-      <kg.apc.jmeter.perfmon.PerfMonCollector guiclass="kg.apc.jmeter.vizualizers.PerfMonGui" testclass="kg.apc.jmeter.perfmon.PerfMonCollector" testname="PerfMon Metrics Collector" enabled="true">
+      <kg.apc.jmeter.perfmon.PerfMonCollector guiclass="kg.apc.jmeter.vizualizers.PerfMonGui" testclass="kg.apc.jmeter.perfmon.PerfMonCollector" testname="PerfMon Metrics Collector" enabled="false">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
