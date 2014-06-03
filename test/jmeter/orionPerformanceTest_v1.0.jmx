@@ -20,7 +20,7 @@
  For those usages not covered by this license please contact with
  fermin at tid dot es
  
- Author: Ivan Arias and Xavier Val
+ Author: Ivan Arias 
 -->
 <jmeterTestPlan version="1.2" properties="2.6" jmeter="2.11 r1554548">
   <hashTree>
