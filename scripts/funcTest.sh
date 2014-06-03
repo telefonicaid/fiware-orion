@@ -42,7 +42,16 @@ testError=0
 #
 function usage()
 {
-  echo $0 "[-u (usage)] [-v (verbose)] [--filter <test filter>] [--keep (don't remove output files)] [--dryrun (don't execute any tests)] [--dir <directory>] [--stopOnError (stop at first error encountered)]"
+  sfile="Usage: "$(basename $0)
+  empty=$(echo $sfile | tr 'a-zA-z/0-9.:' ' ')
+  echo "$sfile [-u (usage)]"
+  echo "$empty [-v (verbose)]"
+  echo "$empty [--filter <test filter>]"
+  echo "$empty [--keep (don't remove output files)]"
+  echo "$empty [--dryrun (don't execute any tests)]"
+  echo "$empty [--dir <directory>]"
+  echo "$empty [--stopOnError (stop at first error encountered)]"
+  echo "$empty [ <directory or file> ]"
   exit $1
 }
 
@@ -120,6 +129,9 @@ keep=off
 stopOnError=off
 testFilter=${TEST_FILTER:-"*.test"}
 dir=test/testharness
+dirOrFile=""
+dirGiven=no
+filterGiven=no
 
 vMsg "parsing options"
 while [ "$#" != 0 ]
@@ -129,16 +141,74 @@ do
   elif [ "$1" == "--dryrun" ];      then dryrun=on;
   elif [ "$1" == "--keep" ];        then keep=on;
   elif [ "$1" == "--stopOnError" ]; then stopOnError=on;
-  elif [ "$1" == "--filter" ];      then testFilter=$2; shift;
-  elif [ "$1" == "--dir" ];         then dir=$2; shift;
+  elif [ "$1" == "--filter" ];      then testFilter="$2"; filterGiven=yes; shift;
+  elif [ "$1" == "--dir" ];         then dir="$2"; dirGiven=yes; shift;
   else
-    echo $0: bad parameter/option: "'"${1}"'";
-    usage 1
+    if [ "$dirOrFile" == "" ]
+    then
+      dirOrFile="$1"
+    else
+      echo $0: bad parameter/option: "'"${1}"'";
+      echo
+      usage 1
+    fi
   fi
   shift
 done
 
 
+
+# ------------------------------------------------------------------------------
+#
+# Check unmatching --dir and 'parameter that is a directory' AND
+#       unmatching --filter and 'parameter that is a file'
+#
+# 1. If it is a directory - just change the 'dir' variable and continue
+# 2. Else, it must be a file, or a filter.
+#    If the 
+#
+if [ "$dirOrFile" != "" ]
+then
+  vMsg dirOrFile: $dirOrFile
+  vMsg dirGiven: $dirGiven
+  vMsg filterGiven: $filterGiven
+  vMsg dir: $dir
+  vMsg testFilter: $testFilter
+
+  if [ -d "$dirOrFile" ]
+  then
+    if [ "$dirGiven" == "yes" ]
+    then
+      echo "$0: both '--dir' option and directory parameter given - not allowed"
+      exit 1
+    fi
+    dir="$dirOrFile"
+  else
+    if [ "$filterGiven" == "yes" ]
+    then
+      echo "$0: both '--filter' option and file parameter given - not allowed"
+      exit 1
+    fi
+
+    #
+    # If just a filename is given, keep the directory as is.
+    # If a whole path is given, use the directory-part as directory and the file-part as filter
+    #
+    dirPart=$(dirname $dirOrFile)
+    filePath=$(basename $dirOrFile)
+
+    if [ "$dirPart" != "." ]
+    then
+      dir=$(dirname $dirOrFile)
+      testFilter=$(basename $dirOrFile)
+    else
+      testFilter=$(basename $dirOrFile)
+    fi
+  fi
+fi
+
+vMsg directory: $dir
+vMsg testFilter: $testFilter
 
 # -----------------------------------------------------------------------------
 #
@@ -201,6 +271,7 @@ date >> /tmp/orionFuncTestLog
 #
 # Preparations - number of test cases
 #
+vMsg find in $(pwd), filter: $testFilter
 fileList=$(find . -name "$testFilter" | sort | sed 's/^.\///')
 typeset -i noOfTests
 typeset -i testNo
