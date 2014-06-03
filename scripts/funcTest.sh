@@ -65,7 +65,7 @@ function vMsg()
 {
   if [ "$verbose" = "on" ]
   then
-    echo $YO: $*
+    echo $ME: $*
   fi
 }
 
@@ -87,7 +87,7 @@ function exitFunction()
 
   if [ "$stopOnError" == "on" ] || [ "$forced" == "DIE" ]
   then
-    echo $YO/$NAME: $errorString
+    echo $ME/$NAME: $errorString
     cat $errorFile 2> /dev/null
     exit $exitCode
   fi
@@ -113,9 +113,9 @@ function exitFunction()
 
 # ------------------------------------------------------------------------------
 #
-# YO - name of script, to be used in error and verbose messages 
+# ME - name of script, to be used in error and verbose messages 
 #
-YO=$(basename $0)
+ME=$(basename $0)
 
 
 
@@ -341,7 +341,8 @@ function fileCreation()
   NAME=$(sed -n '/--NAME--/,/^--/p' $path | grep -v "^--")
   if [ "$NAME" == "" ]
   then
-    exitFunction 2 $path "($path): --NAME-- part is missing" "" DIE
+    exitFunction 2 "$path" "($path): --NAME-- part is missing" "" DIE
+    exit 2 # Just in case
   fi
 
   #
