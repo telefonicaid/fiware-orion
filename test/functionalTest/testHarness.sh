@@ -37,7 +37,6 @@ fi
 cd $dirname
 SCRIPT_HOME=$(pwd)
 cd - > /dev/null 2>&1
-echo SCRIPT_HOME: $SCRIPT_HOME
 
 # -----------------------------------------------------------------------------
 #
