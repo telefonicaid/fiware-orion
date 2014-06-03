@@ -23,9 +23,10 @@
 # Author: Ken Zangelin
 
 
+
 # ------------------------------------------------------------------------------
 #
-# Set home directory
+# Find out in which directory this script resides
 #
 dirname=$(dirname $0)
 
@@ -37,6 +38,8 @@ fi
 cd $dirname
 SCRIPT_HOME=$(pwd)
 cd - > /dev/null 2>&1
+
+
 
 # -----------------------------------------------------------------------------
 #
@@ -131,6 +134,7 @@ function exitFunction()
 # ME - name of script, to be used in error and verbose messages 
 #
 ME=$(basename $0)
+vMsg "$ME, in directory $SCRIPT_HOME"
 
 
 
@@ -226,6 +230,9 @@ fi
 
 vMsg directory: $dir
 vMsg testFilter: $testFilter
+vMsg "Script in $SCRIPT_HOME"
+
+
 
 # -----------------------------------------------------------------------------
 #
@@ -247,7 +254,7 @@ then
     # RPM deployment case)
     vMsg Sourcing $SCRIPT_HOME/testEnv.sh
     source $SCRIPT_HOME/testEnv.sh
-  elif [ -f "$SCRIPT_HOME/testEnv.sh" ]
+  elif [ -f "$SCRIPT_HOME/../../scripts/testEnv.sh" ]
   then
     # Second, we try with a testEnv.sh file in the script/testEnv.sh (realtive to git repo home).
     # Note that the script home in this case is test/functionaTest
