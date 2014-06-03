@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK
+Content-Length: 253
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:45 GMT
+
+<?xml version="1.0"?>
+<unsubscribeContextAvailabilityResponse>
+  <subscriptionId>012345678901234567890123</subscriptionId>
+  <statusCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </statusCode>
+</unsubscribeContextAvailabilityResponse>
+2: ***********************************

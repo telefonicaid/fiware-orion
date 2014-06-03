@@ -1,0 +1,78 @@
+url='/NGSI9/registerContext'
+payload='<?xml version="1.0"?>
+<discoverContextAvailabilityRequest/>'
+curlXml ${url} "${payload}"
+echo "1: ++++++++++++++++++++"
+
+url='/NGSI9/discoverContextAvailability'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
+echo "2: ++++++++++++++++++++"
+
+url='/NGSI9/subscribeContextAvailability'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
+echo "3: ++++++++++++++++++++"
+
+url='/NGSI9/updateContextAvailabilitySubscription'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
+echo "4: ++++++++++++++++++++"
+
+url='/NGSI9/unsubscribeContextAvailability'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
+echo "5: ++++++++++++++++++++"
+
+url='/NGSI10/queryContext'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
+echo "6: ++++++++++++++++++++"
+
+url='/NGSI10/updateContext'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
+echo "7: ++++++++++++++++++++"
+
+url='/NGSI10/subscribeContext'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
+echo "8: ++++++++++++++++++++"
+
+url='/NGSI10/updateContextSubscription'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
+echo "9: ++++++++++++++++++++"
+
+url='/NGSI10/unsubscribeContext'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
+echo "10: ++++++++++++++++++++"
+
+url='/NGSI9/notSupportedRequest'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
+echo "11: ++++++++++++++++++++"
+
+url='/NGSI10/notSupportedRequest'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
+echo "12: ++++++++++++++++++++"
+
+url='/notSupportedRequest'
+payload='<?xml version="1.0"?>
+<registerContextRequest/>'
+curlXml ${url} "${payload}"
+echo "13: ++++++++++++++++++++"
+

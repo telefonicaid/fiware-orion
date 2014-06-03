@@ -1,0 +1,175 @@
+HTTP/1.1 200 OK
+Content-Length: 181
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 09:46:04 GMT
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "Empty Context Registration List", 
+        "reasonPhrase": "Bad Request"
+    }, 
+    "registrationId": "000000000000000000000000"
+}
+1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 09:46:04 GMT
+
+{
+    "errorCode": {
+        "code": "404", 
+        "reasonPhrase": "No context element found"
+    }
+}
+2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 161
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 09:46:04 GMT
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "No entities", 
+        "reasonPhrase": "Bad Request"
+    }, 
+    "subscriptionId": "000000000000000000000000"
+}
+3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 161
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 09:46:04 GMT
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "No entities", 
+        "reasonPhrase": "Bad Request"
+    }, 
+    "subscriptionId": "000000000000000000000000"
+}
+4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 144
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 09:46:04 GMT
+
+{
+    "statusCode": {
+        "code": "404", 
+        "reasonPhrase": "No context element found"
+    }, 
+    "subscriptionId": "000000000000000000000000"
+}
+5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 112
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 09:46:04 GMT
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "No entities", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 120
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 09:46:04 GMT
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "No context elements", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+7: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 166
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 09:46:04 GMT
+
+{
+    "subscribeError": {
+        "errorCode": {
+            "code": "400", 
+            "details": "invalid payload: No entities", 
+            "reasonPhrase": "Bad Request"
+        }
+    }
+}
+8: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 180
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 09:46:04 GMT
+
+{
+    "subscribeError": {
+        "errorCode": {
+            "code": "404", 
+            "reasonPhrase": "No context element found"
+        }, 
+        "subscriptionId": "000000000000000000000000"
+    }
+}
+9: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 144
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 09:46:04 GMT
+
+{
+    "statusCode": {
+        "code": "404", 
+        "reasonPhrase": "No context element found"
+    }, 
+    "subscriptionId": "000000000000000000000000"
+}
+10: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 154
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 09:46:04 GMT
+
+{
+    "orionError": {
+        "code": "400", 
+        "details": "ngsi9 service '/NGSI9/notSupportedRequest' not found", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+11: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 156
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 09:46:04 GMT
+
+{
+    "orionError": {
+        "code": "400", 
+        "details": "ngsi10 service '/NGSI10/notSupportedRequest' not found", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+12: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 142
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 09:46:04 GMT
+
+{
+    "orionError": {
+        "code": "400", 
+        "details": "service '/notSupportedRequest' not found", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+13: ++++++++++++++++++++

@@ -1,0 +1,41 @@
+1: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 206
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:20:29 GMT
+
+{
+    "statusCode": {
+        "code": "404", 
+        "details": "subscriptionId: '012345678901234567890123'", 
+        "reasonPhrase": "No context element found"
+    }, 
+    "subscriptionId": "012345678901234567890123"
+}
+2: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 134
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:20:29 GMT
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y", 
+        "subscriptionId": "538c33cd947d6969da9cb6e6", 
+        "throttling": "P5Y"
+    }
+}
+3: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:20:29 GMT
+
+{
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }, 
+    "subscriptionId": "538c33cd947d6969da9cb6e6"
+}
+4: ***********************************

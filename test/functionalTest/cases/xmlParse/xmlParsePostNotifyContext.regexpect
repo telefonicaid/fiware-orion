@@ -1,0 +1,13 @@
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<notifyContextResponse>
+  <responseCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </responseCode>
+</notifyContextResponse>
+++++++++++++++++++++

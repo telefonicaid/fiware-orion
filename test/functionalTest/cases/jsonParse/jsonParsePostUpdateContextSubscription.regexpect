@@ -1,0 +1,42 @@
+1: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeError": {
+        "errorCode": {
+            "code": "404",
+            "reasonPhrase": "No context element found"
+        },
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+2: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 134
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y", 
+        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "throttling": "P5Y"
+    }
+}
+3: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 134
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P4Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "P4Y"
+    }
+}
+4: ***********************************

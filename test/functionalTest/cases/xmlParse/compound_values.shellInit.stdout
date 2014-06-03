@@ -1,0 +1,1345 @@
+{ "dropped" : "testharness", "ok" : 1 }
+T@17:45:21  paConfigActions[727]: setting trace levels to '0-255'
+T@17:45:21  paConfigActions[728]: Leaving function paConfigActions
+E@17:45:21  exitFunc[1009]: unlink(/tmp/orion_9999.pid): No such file or directory
+T@17:45:21  semInit[61]: Initialized 'req' semaphore
+T@17:45:21  semInit[62]: Initialized 'mongo' semaphore
+T@17:45:21  mongoSemTake[90]: mongoConnect taking the 'mongo' semaphore for 'connecting to mongo'
+T@17:45:21  mongoSemTake[92]: mongoConnect has the 'mongo' semaphore
+T@17:45:21  mongoConnect[152]: mongo version server: 2.4.9 (mayor: 2, minor: 4, extra: 9)
+T@17:45:21  mongoSemGive[118]: mongoConnect gives the 'mongo' semaphore for 'connecting to mongo'
+F@17:45:21  ***[1063]: Connected to mongo at localhost:testharness
+T@17:45:21  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant )
+T@17:45:21  recoverOntimeIntervalThreads[398]: query() in 'testharness.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@17:45:21  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:21  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@17:45:21  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+V@17:45:21  restStart[569]: Starting HTTP daemon on IPv4 0.0.0.0 port 9999
+V@17:45:21  restStart[611]: Starting HTTP daemon on IPv6 :: port 9999
+T@17:45:22  connectionTreat[438]: notifyFormat: ''
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Content-Length: 421
+T@17:45:22  connectionTreat[442]: HTTP tenant: ''
+T@17:45:22  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:22  restService[179]: Parsing payload for URL '/ngsi10/updateContext', method 'POST', service vector index: 12
+T@17:45:22  payloadParse[53]: parsing data for service 'UpdateContextRequest'. Method: 'POST'
+T@17:45:22  payloadParse[54]: outFormat: XML
+T@17:45:22  payloadParse[58]: Calling xmlTreat for service request 17, payloadWord 'updateContextRequest'
+2@17:45:22  xmlRequestGet[155]: Found xmlRequest of type 17, method 'POST' - index 12 (/updateContextRequest)
+T@17:45:22  nullTreat[272]: Not treating node 'updateContextRequest'
+T@17:45:22  nullTreat[272]: Not treating node 'contextElementList'
+T@17:45:22  entityId[67]: Got an entityId
+T@17:45:22  entityIdParse[291]: Got a type for an entity: 'Room'
+T@17:45:22  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@17:45:22  entityIdId[88]: Got an entityId:id: 'ConferenceRoom'
+T@17:45:22  nullTreat[272]: Not treating node 'contextAttributeList'
+T@17:45:22  contextAttribute[103]: Creating an attribute
+T@17:45:22  ContextAttribute[42]: Creating a ContextAttribute 1
+T@17:45:22  contextAttributeName[117]: Got an attribute name: 'temperature'
+T@17:45:22  contextAttributeType[130]: Got an attribute type: 'degree'
+T@17:45:22  contextAttributeValue[147]: Set parseDataP->lastContextAttribute (type: '') to: 0xf4c240
+T@17:45:22  contextAttributeValue[149]: Got an attribute value: '1'
+T@17:45:22  updateAction[272]: Got an update action: 'APPEND'
+T@17:45:22  xmlTreat[251]: Calling check for XML parsed tree (updateContextRequest)
+T@17:45:22  ~UpdateContextResponse[58]: destroyed
+T@17:45:22  payloadParse[69]: result: 'OK'
+T@17:45:22  payloadParse[70]: outFormat: XML
+T@17:45:22  restService[182]: payloadParse returns 'OK'
+T@17:45:22  restService[197]: Treating service POST /ngsi10/updateContext
+T@17:45:22  restService[237]: tenant: ''
+T@17:45:22  reqSemTake[75]: mongoUpdateContext taking the 'req' semaphore for 'ngsi10 update request'
+T@17:45:22  reqSemTake[77]: mongoUpdateContext has the 'req' semaphore
+T@17:45:22  processContextElement[1397]: query() in 'testharness.entities' collection: '{ _id.id: "ConferenceRoom", _id.type: "Room" }'
+T@17:45:22  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:22  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:22  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:22  ContextAttribute[86]: Creating a ContextAttribute 'temperature':'degree':'', setting its compound to NULL
+T@17:45:22  createEntity[1201]: Entity not found in 'testharness.entities' collection, creating it
+T@17:45:22  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant )
+T@17:45:22  createEntity[1238]: new attribute: {name: temperature, type: degree, value: 1}
+T@17:45:22  createEntity[1273]: insert() in 'testharness.entities' collection: '{ _id: { id: "ConferenceRoom", type: "Room" }, attrs: [ { name: "temperature", type: "degree", creDate: 1401644722, modDate: 1401644722, value: "1" } ], creDate: 1401644722, modDate: 1401644722 }'
+T@17:45:22  mongoSemTake[90]: createEntity taking the 'mongo' semaphore for 'insert into EntitiesCollection'
+T@17:45:22  mongoSemTake[92]: createEntity has the 'mongo' semaphore
+T@17:45:22  mongoSemGive[118]: createEntity gives the 'mongo' semaphore for 'insert into EntitiesCollection'
+T@17:45:22  addTriggeredSubscriptions[772]: JS function: function(){for (var i=0; i < this.entities.length; i++) {if (this.entities[i].isPattern == "true" && (this.entities[i].type == "Room" || this.entities[i].type == "" || !("type" in this.entities[i])) && "ConferenceRoom".match(this.entities[i].id)) {return true; }}return false; }
+T@17:45:22  addTriggeredSubscriptions[787]: query() in 'testharness.csubs' collection: '{ $or: [ { entities.id: "ConferenceRoom", $or: [ { entities.type: "Room" }, { entities.type: { $exists: false } } ], entities.isPattern: "false", conditions.type: "ONCHANGE", conditions.value: "temperature", expiration: { $gt: 1401644722 } }, { entities.isPattern: "true", conditions.type: "ONCHANGE", conditions.value: "temperature", expiration: { $gt: 1401644722 }, $where: function(){for (var i=0; i < this.entities.length; i++) {if (this.enti... } ] }'
+T@17:45:22  mongoSemTake[90]: addTriggeredSubscriptions taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:22  mongoSemTake[92]: addTriggeredSubscriptions has the 'mongo' semaphore
+T@17:45:22  mongoSemGive[118]: addTriggeredSubscriptions gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:22  reqSemGive[104]: mongoUpdateContext gives the 'req' semaphore for 'ngsi10 update request'
+T@17:45:22  ~UpdateContextResponse[58]: destroyed
+T@17:45:22  restReply[65]: Response 1: responding with 644 bytes, Status Code 200
+T@17:45:22  restReply[66]: Response payload: '<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue></contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+'
+T@17:45:22  ~RegisterContextResponse[56]: destroyed
+T@17:45:22  connectionTreat[438]: notifyFormat: ''
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Content-Length: 454
+T@17:45:22  connectionTreat[442]: HTTP tenant: ''
+T@17:45:22  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:22  restService[179]: Parsing payload for URL '/ngsi10/updateContext', method 'POST', service vector index: 12
+T@17:45:22  payloadParse[53]: parsing data for service 'UpdateContextRequest'. Method: 'POST'
+T@17:45:22  payloadParse[54]: outFormat: XML
+T@17:45:22  payloadParse[58]: Calling xmlTreat for service request 17, payloadWord 'updateContextRequest'
+2@17:45:22  xmlRequestGet[155]: Found xmlRequest of type 17, method 'POST' - index 12 (/updateContextRequest)
+T@17:45:22  nullTreat[272]: Not treating node 'updateContextRequest'
+T@17:45:22  nullTreat[272]: Not treating node 'contextElementList'
+T@17:45:22  entityId[67]: Got an entityId
+T@17:45:22  entityIdParse[291]: Got a type for an entity: 'Room'
+T@17:45:22  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@17:45:22  entityIdId[88]: Got an entityId:id: 'ConferenceRoom'
+T@17:45:22  nullTreat[272]: Not treating node 'contextAttributeList'
+T@17:45:22  contextAttribute[103]: Creating an attribute
+T@17:45:22  ContextAttribute[42]: Creating a ContextAttribute 1
+T@17:45:22  contextAttributeName[117]: Got an attribute name: 'temperature'
+T@17:45:22  contextAttributeType[130]: Got an attribute type: ' '
+W@17:45:22  xmlParse[242]: ERROR: 'Unknown XML field: 'here'', PATH: '/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/type'   
+T@17:45:22  contextAttributeValue[147]: Set parseDataP->lastContextAttribute (type: '') to: 0xf4c3c0
+T@17:45:22  contextAttributeValue[149]: Got an attribute value: '1'
+T@17:45:22  updateAction[272]: Got an update action: 'APPEND'
+T@17:45:22  ~UpdateContextResponse[58]: destroyed
+T@17:45:22  payloadParse[69]: result: '<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>Unknown XML field: 'here'</details>
+  </errorCode>
+</updateContextResponse>
+'
+T@17:45:22  payloadParse[70]: outFormat: XML
+T@17:45:22  restReply[65]: Response 2: responding with 193 bytes, Status Code 200
+T@17:45:22  restReply[66]: Response payload: '<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>Unknown XML field: 'here'</details>
+  </errorCode>
+</updateContextResponse>
+'
+T@17:45:22  restService[182]: payloadParse returns '<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>Unknown XML field: 'here'</details>
+  </errorCode>
+</updateContextResponse>
+'
+T@17:45:22  restReply[65]: Response 3: responding with 193 bytes, Status Code 200
+T@17:45:22  restReply[66]: Response payload: '<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>Unknown XML field: 'here'</details>
+  </errorCode>
+</updateContextResponse>
+'
+T@17:45:22  ~RegisterContextResponse[56]: destroyed
+T@17:45:22  connectionTreat[438]: notifyFormat: ''
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Content-Length: 437
+T@17:45:22  connectionTreat[442]: HTTP tenant: ''
+T@17:45:22  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:22  restService[179]: Parsing payload for URL '/ngsi10/updateContext', method 'POST', service vector index: 12
+T@17:45:22  payloadParse[53]: parsing data for service 'UpdateContextRequest'. Method: 'POST'
+T@17:45:22  payloadParse[54]: outFormat: XML
+T@17:45:22  payloadParse[58]: Calling xmlTreat for service request 17, payloadWord 'updateContextRequest'
+2@17:45:22  xmlRequestGet[155]: Found xmlRequest of type 17, method 'POST' - index 12 (/updateContextRequest)
+T@17:45:22  nullTreat[272]: Not treating node 'updateContextRequest'
+T@17:45:22  nullTreat[272]: Not treating node 'contextElementList'
+T@17:45:22  entityId[67]: Got an entityId
+T@17:45:22  entityIdParse[291]: Got a type for an entity: 'Room'
+T@17:45:22  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@17:45:22  entityIdId[88]: Got an entityId:id: 'ConferenceRoom'
+T@17:45:22  nullTreat[272]: Not treating node 'contextAttributeList'
+T@17:45:22  contextAttribute[103]: Creating an attribute
+T@17:45:22  ContextAttribute[42]: Creating a ContextAttribute 1
+T@17:45:22  contextAttributeName[117]: Got an attribute name: 'temperature'
+T@17:45:22  contextAttributeType[130]: Got an attribute type: 'degree'
+T@17:45:22  contextAttributeValue[147]: Set parseDataP->lastContextAttribute (type: '') to: 0xf4c350
+T@17:45:22  contextAttributeValue[149]: Got an attribute value: ' '
+T@17:45:22  CompoundValueNode[75]: Created TOPLEVEL compound node (a Object)
+T@17:45:22  CompoundValueNode[95]: Created compound node 's1' at level 1, sibling number 0, type String
+T@17:45:22  add[167]: Adding String 's1', with value 'STRING' under '/' (toplevel)
+T@17:45:22  compoundValueEnd[119]: Compound END
+T@17:45:22  finish[143]: Finishing a compound
+F@17:45:22  ***[228]: name:      toplevel
+F@17:45:22  ***[233]: container: toplevel
+F@17:45:22  ***[234]: level:     0
+F@17:45:22  ***[235]: sibling:   0
+F@17:45:22  ***[236]: type:      Object
+F@17:45:22  ***[237]: path:      /
+F@17:45:22  ***[238]: rootP:     toplevel
+F@17:45:22  ***[251]: 1 children (s1)
+F@17:45:22  ***[228]:   name:      s1
+F@17:45:22  ***[231]:   value:     STRING
+F@17:45:22  ***[233]:   container: toplevel
+F@17:45:22  ***[234]:   level:     1
+F@17:45:22  ***[235]:   sibling:   0
+F@17:45:22  ***[236]:   type:      String
+F@17:45:22  ***[237]:   path:      /s1
+F@17:45:22  ***[238]:   rootP:     toplevel
+F@17:45:22  ***[257]: 
+F@17:45:22  ***[257]: 
+T@17:45:22  compoundValueEnd[137]: Set compoundValueP (0xf4c620) for attribute at 0xf4c350
+T@17:45:22  compoundValueEnd[143]: Set current container to NULL
+T@17:45:22  updateAction[272]: Got an update action: 'APPEND'
+T@17:45:22  xmlTreat[251]: Calling check for XML parsed tree (updateContextRequest)
+T@17:45:22  ~UpdateContextResponse[58]: destroyed
+F@17:45:22  ***[228]:     name:      toplevel
+F@17:45:22  ***[233]:     container: toplevel
+F@17:45:22  ***[234]:     level:     0
+F@17:45:22  ***[235]:     sibling:   0
+F@17:45:22  ***[236]:     type:      Object
+F@17:45:22  ***[237]:     path:      /
+F@17:45:22  ***[238]:     rootP:     toplevel
+F@17:45:22  ***[251]:     1 children (s1)
+F@17:45:22  ***[228]:       name:      s1
+F@17:45:22  ***[231]:       value:     STRING
+F@17:45:22  ***[233]:       container: toplevel
+F@17:45:22  ***[234]:       level:     1
+F@17:45:22  ***[235]:       sibling:   0
+F@17:45:22  ***[236]:       type:      String
+F@17:45:22  ***[237]:       path:      /s1
+F@17:45:22  ***[238]:       rootP:     toplevel
+F@17:45:22  ***[257]: 
+F@17:45:22  ***[257]: 
+T@17:45:22  payloadParse[69]: result: 'OK'
+T@17:45:22  payloadParse[70]: outFormat: XML
+T@17:45:22  restService[182]: payloadParse returns 'OK'
+T@17:45:22  restService[197]: Treating service POST /ngsi10/updateContext
+T@17:45:22  restService[237]: tenant: ''
+T@17:45:22  reqSemTake[75]: mongoUpdateContext taking the 'req' semaphore for 'ngsi10 update request'
+T@17:45:22  reqSemTake[77]: mongoUpdateContext has the 'req' semaphore
+T@17:45:22  processContextElement[1397]: query() in 'testharness.entities' collection: '{ _id.id: "ConferenceRoom", _id.type: "Room" }'
+T@17:45:22  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:22  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:22  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:22  processContextElement[1431]: retrieved document: '{ _id: { id: "ConferenceRoom", type: "Room" }, attrs: [ { name: "temperature", type: "degree", creDate: 1401644722, modDate: 1401644722, value: "1" } ], creDate: 1401644722, modDate: 1401644722 }'
+T@17:45:22  ContextAttribute[86]: Creating a ContextAttribute 'temperature':'degree':'', setting its compound to NULL
+T@17:45:22  addTriggeredSubscriptions[772]: JS function: function(){for (var i=0; i < this.entities.length; i++) {if (this.entities[i].isPattern == "true" && (this.entities[i].type == "Room" || this.entities[i].type == "" || !("type" in this.entities[i])) && "ConferenceRoom".match(this.entities[i].id)) {return true; }}return false; }
+T@17:45:22  addTriggeredSubscriptions[787]: query() in 'testharness.csubs' collection: '{ $or: [ { entities.id: "ConferenceRoom", $or: [ { entities.type: "Room" }, { entities.type: { $exists: false } } ], entities.isPattern: "false", conditions.type: "ONCHANGE", conditions.value: "temperature", expiration: { $gt: 1401644722 } }, { entities.isPattern: "true", conditions.type: "ONCHANGE", conditions.value: "temperature", expiration: { $gt: 1401644722 }, $where: function(){for (var i=0; i < this.entities.length; i++) {if (this.enti... } ] }'
+T@17:45:22  mongoSemTake[90]: addTriggeredSubscriptions taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:22  mongoSemTake[92]: addTriggeredSubscriptions has the 'mongo' semaphore
+T@17:45:22  mongoSemGive[118]: addTriggeredSubscriptions gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:22  processContextElement[1516]: update() in 'testharness.entities' collection: {{ _id.id: "ConferenceRoom", _id.type: "Room" }, { $set: { attrs: [ { name: "temperature", type: "degree", creDate: 1401644722, value: { s1: "STRING" }, modDate: 1401644722 } ], modDate: 1401644722 }, $unset: { location: 1 } }}
+T@17:45:22  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'update in EntitiesCollection'
+T@17:45:22  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:22  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'update in EntitiesCollection'
+T@17:45:22  reqSemGive[104]: mongoUpdateContext gives the 'req' semaphore for 'ngsi10 update request'
+T@17:45:22  ~UpdateContextResponse[58]: destroyed
+T@17:45:22  ~CompoundValueNode[106]: Destroying node 'toplevel', path '/'
+T@17:45:22  ~CompoundValueNode[106]: Destroying node 's1', path '/s1'
+T@17:45:22  restReply[65]: Response 4: responding with 644 bytes, Status Code 200
+T@17:45:22  restReply[66]: Response payload: '<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue></contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+'
+T@17:45:22  ~RegisterContextResponse[56]: destroyed
+T@17:45:22  connectionTreat[438]: notifyFormat: ''
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Content-Length: 453
+T@17:45:22  connectionTreat[442]: HTTP tenant: ''
+T@17:45:22  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:22  restService[179]: Parsing payload for URL '/ngsi10/updateContext', method 'POST', service vector index: 12
+T@17:45:22  payloadParse[53]: parsing data for service 'UpdateContextRequest'. Method: 'POST'
+T@17:45:22  payloadParse[54]: outFormat: XML
+T@17:45:22  payloadParse[58]: Calling xmlTreat for service request 17, payloadWord 'updateContextRequest'
+2@17:45:22  xmlRequestGet[155]: Found xmlRequest of type 17, method 'POST' - index 12 (/updateContextRequest)
+T@17:45:22  nullTreat[272]: Not treating node 'updateContextRequest'
+T@17:45:22  nullTreat[272]: Not treating node 'contextElementList'
+T@17:45:22  entityId[67]: Got an entityId
+T@17:45:22  entityIdParse[291]: Got a type for an entity: 'Room'
+T@17:45:22  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@17:45:22  entityIdId[88]: Got an entityId:id: 'ConferenceRoom'
+T@17:45:22  nullTreat[272]: Not treating node 'contextAttributeList'
+T@17:45:22  contextAttribute[103]: Creating an attribute
+T@17:45:22  ContextAttribute[42]: Creating a ContextAttribute 1
+T@17:45:22  contextAttributeName[117]: Got an attribute name: 'temperature'
+T@17:45:22  contextAttributeType[130]: Got an attribute type: 'degree'
+T@17:45:22  contextAttributeValue[147]: Set parseDataP->lastContextAttribute (type: '') to: 0xf4c350
+T@17:45:22  contextAttributeValue[149]: Got an attribute value: ' '
+T@17:45:22  CompoundValueNode[75]: Created TOPLEVEL compound node (a Object)
+T@17:45:22  CompoundValueNode[95]: Created compound node 's1' at level 1, sibling number 0, type String
+T@17:45:22  add[167]: Adding String 's1', with value 'STRING' under '/' (toplevel)
+T@17:45:22  CompoundValueNode[95]: Created compound node 's2' at level 1, sibling number 1, type String
+T@17:45:22  add[167]: Adding String 's2', with value 'STRING' under '/' (toplevel)
+T@17:45:22  compoundValueEnd[119]: Compound END
+T@17:45:22  finish[143]: Finishing a compound
+F@17:45:22  ***[228]: name:      toplevel
+F@17:45:22  ***[233]: container: toplevel
+F@17:45:22  ***[234]: level:     0
+F@17:45:22  ***[235]: sibling:   0
+F@17:45:22  ***[236]: type:      Object
+F@17:45:22  ***[237]: path:      /
+F@17:45:22  ***[238]: rootP:     toplevel
+F@17:45:22  ***[251]: 2 children (s1, s2)
+F@17:45:22  ***[228]:   name:      s1
+F@17:45:22  ***[231]:   value:     STRING
+F@17:45:22  ***[233]:   container: toplevel
+F@17:45:22  ***[234]:   level:     1
+F@17:45:22  ***[235]:   sibling:   0
+F@17:45:22  ***[236]:   type:      String
+F@17:45:22  ***[237]:   path:      /s1
+F@17:45:22  ***[238]:   rootP:     toplevel
+F@17:45:22  ***[257]: 
+F@17:45:22  ***[228]:   name:      s2
+F@17:45:22  ***[231]:   value:     STRING
+F@17:45:22  ***[233]:   container: toplevel
+F@17:45:22  ***[234]:   level:     1
+F@17:45:22  ***[235]:   sibling:   1
+F@17:45:22  ***[236]:   type:      String
+F@17:45:22  ***[237]:   path:      /s2
+F@17:45:22  ***[238]:   rootP:     toplevel
+F@17:45:22  ***[257]: 
+F@17:45:22  ***[257]: 
+T@17:45:22  compoundValueEnd[137]: Set compoundValueP (0xf4c620) for attribute at 0xf4c350
+T@17:45:22  compoundValueEnd[143]: Set current container to NULL
+T@17:45:22  updateAction[272]: Got an update action: 'APPEND'
+T@17:45:22  xmlTreat[251]: Calling check for XML parsed tree (updateContextRequest)
+T@17:45:22  ~UpdateContextResponse[58]: destroyed
+F@17:45:22  ***[228]:     name:      toplevel
+F@17:45:22  ***[233]:     container: toplevel
+F@17:45:22  ***[234]:     level:     0
+F@17:45:22  ***[235]:     sibling:   0
+F@17:45:22  ***[236]:     type:      Object
+F@17:45:22  ***[237]:     path:      /
+F@17:45:22  ***[238]:     rootP:     toplevel
+F@17:45:22  ***[251]:     2 children (s1, s2)
+F@17:45:22  ***[228]:       name:      s1
+F@17:45:22  ***[231]:       value:     STRING
+F@17:45:22  ***[233]:       container: toplevel
+F@17:45:22  ***[234]:       level:     1
+F@17:45:22  ***[235]:       sibling:   0
+F@17:45:22  ***[236]:       type:      String
+F@17:45:22  ***[237]:       path:      /s1
+F@17:45:22  ***[238]:       rootP:     toplevel
+F@17:45:22  ***[257]: 
+F@17:45:22  ***[228]:       name:      s2
+F@17:45:22  ***[231]:       value:     STRING
+F@17:45:22  ***[233]:       container: toplevel
+F@17:45:22  ***[234]:       level:     1
+F@17:45:22  ***[235]:       sibling:   1
+F@17:45:22  ***[236]:       type:      String
+F@17:45:22  ***[237]:       path:      /s2
+F@17:45:22  ***[238]:       rootP:     toplevel
+F@17:45:22  ***[257]: 
+F@17:45:22  ***[257]: 
+T@17:45:22  payloadParse[69]: result: 'OK'
+T@17:45:22  payloadParse[70]: outFormat: XML
+T@17:45:22  restService[182]: payloadParse returns 'OK'
+T@17:45:22  restService[197]: Treating service POST /ngsi10/updateContext
+T@17:45:22  restService[237]: tenant: ''
+T@17:45:22  reqSemTake[75]: mongoUpdateContext taking the 'req' semaphore for 'ngsi10 update request'
+T@17:45:22  reqSemTake[77]: mongoUpdateContext has the 'req' semaphore
+T@17:45:22  processContextElement[1397]: query() in 'testharness.entities' collection: '{ _id.id: "ConferenceRoom", _id.type: "Room" }'
+T@17:45:22  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:22  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:22  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:22  processContextElement[1431]: retrieved document: '{ _id: { id: "ConferenceRoom", type: "Room" }, attrs: [ { name: "temperature", type: "degree", creDate: 1401644722, value: { s1: "STRING" }, modDate: 1401644722 } ], creDate: 1401644722, modDate: 1401644722 }'
+T@17:45:22  ContextAttribute[86]: Creating a ContextAttribute 'temperature':'degree':'', setting its compound to NULL
+T@17:45:22  addTriggeredSubscriptions[772]: JS function: function(){for (var i=0; i < this.entities.length; i++) {if (this.entities[i].isPattern == "true" && (this.entities[i].type == "Room" || this.entities[i].type == "" || !("type" in this.entities[i])) && "ConferenceRoom".match(this.entities[i].id)) {return true; }}return false; }
+T@17:45:22  addTriggeredSubscriptions[787]: query() in 'testharness.csubs' collection: '{ $or: [ { entities.id: "ConferenceRoom", $or: [ { entities.type: "Room" }, { entities.type: { $exists: false } } ], entities.isPattern: "false", conditions.type: "ONCHANGE", conditions.value: "temperature", expiration: { $gt: 1401644722 } }, { entities.isPattern: "true", conditions.type: "ONCHANGE", conditions.value: "temperature", expiration: { $gt: 1401644722 }, $where: function(){for (var i=0; i < this.entities.length; i++) {if (this.enti... } ] }'
+T@17:45:22  mongoSemTake[90]: addTriggeredSubscriptions taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:22  mongoSemTake[92]: addTriggeredSubscriptions has the 'mongo' semaphore
+T@17:45:22  mongoSemGive[118]: addTriggeredSubscriptions gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:22  processContextElement[1516]: update() in 'testharness.entities' collection: {{ _id.id: "ConferenceRoom", _id.type: "Room" }, { $set: { attrs: [ { name: "temperature", type: "degree", creDate: 1401644722, value: { s1: "STRING", s2: "STRING" }, modDate: 1401644722 } ], modDate: 1401644722 }, $unset: { location: 1 } }}
+T@17:45:22  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'update in EntitiesCollection'
+T@17:45:22  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:22  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'update in EntitiesCollection'
+T@17:45:22  reqSemGive[104]: mongoUpdateContext gives the 'req' semaphore for 'ngsi10 update request'
+T@17:45:22  ~UpdateContextResponse[58]: destroyed
+T@17:45:22  ~CompoundValueNode[106]: Destroying node 'toplevel', path '/'
+T@17:45:22  ~CompoundValueNode[106]: Destroying node 's1', path '/s1'
+T@17:45:22  ~CompoundValueNode[106]: Destroying node 's2', path '/s2'
+T@17:45:22  restReply[65]: Response 5: responding with 644 bytes, Status Code 200
+T@17:45:22  restReply[66]: Response payload: '<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue></contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+'
+T@17:45:22  ~RegisterContextResponse[56]: destroyed
+T@17:45:22  connectionTreat[438]: notifyFormat: ''
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:22  httpHeaderGet[137]: HTTP Header:   Content-Length: 469
+T@17:45:22  connectionTreat[442]: HTTP tenant: ''
+T@17:45:22  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:22  restService[179]: Parsing payload for URL '/ngsi10/updateContext', method 'POST', service vector index: 12
+T@17:45:22  payloadParse[53]: parsing data for service 'UpdateContextRequest'. Method: 'POST'
+T@17:45:22  payloadParse[54]: outFormat: XML
+T@17:45:22  payloadParse[58]: Calling xmlTreat for service request 17, payloadWord 'updateContextRequest'
+2@17:45:22  xmlRequestGet[155]: Found xmlRequest of type 17, method 'POST' - index 12 (/updateContextRequest)
+T@17:45:22  nullTreat[272]: Not treating node 'updateContextRequest'
+T@17:45:22  nullTreat[272]: Not treating node 'contextElementList'
+T@17:45:22  entityId[67]: Got an entityId
+T@17:45:22  entityIdParse[291]: Got a type for an entity: 'Room'
+T@17:45:22  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@17:45:22  entityIdId[88]: Got an entityId:id: 'ConferenceRoom'
+T@17:45:22  nullTreat[272]: Not treating node 'contextAttributeList'
+T@17:45:22  contextAttribute[103]: Creating an attribute
+T@17:45:22  ContextAttribute[42]: Creating a ContextAttribute 1
+T@17:45:22  contextAttributeName[117]: Got an attribute name: 'temperature'
+T@17:45:22  contextAttributeType[130]: Got an attribute type: 'degree'
+T@17:45:22  contextAttributeValue[147]: Set parseDataP->lastContextAttribute (type: '') to: 0xf4c350
+T@17:45:22  contextAttributeValue[149]: Got an attribute value: ' '
+T@17:45:22  CompoundValueNode[75]: Created TOPLEVEL compound node (a Object)
+T@17:45:22  CompoundValueNode[95]: Created compound node 's1' at level 1, sibling number 0, type String
+T@17:45:22  add[167]: Adding String 's1', with value 'STRING' under '/' (toplevel)
+T@17:45:22  CompoundValueNode[95]: Created compound node 's2' at level 1, sibling number 1, type String
+T@17:45:22  add[167]: Adding String 's2', with value 'STRING' under '/' (toplevel)
+T@17:45:22  CompoundValueNode[95]: Created compound node 's1' at level 1, sibling number 2, type String
+T@17:45:22  add[167]: Adding String 's1', with value 'STRING' under '/' (toplevel)
+T@17:45:22  compoundValueEnd[119]: Compound END
+T@17:45:22  finish[143]: Finishing a compound
+F@17:45:22  ***[228]: name:      toplevel
+F@17:45:22  ***[233]: container: toplevel
+F@17:45:22  ***[234]: level:     0
+F@17:45:22  ***[235]: sibling:   0
+F@17:45:22  ***[236]: type:      Object
+F@17:45:22  ***[237]: path:      /
+F@17:45:22  ***[238]: rootP:     toplevel
+F@17:45:22  ***[251]: 3 children (s1, s2, s1)
+F@17:45:22  ***[228]:   name:      s1
+F@17:45:22  ***[231]:   value:     STRING
+F@17:45:22  ***[233]:   container: toplevel
+F@17:45:22  ***[234]:   level:     1
+F@17:45:22  ***[235]:   sibling:   0
+F@17:45:22  ***[236]:   type:      String
+F@17:45:22  ***[237]:   path:      /s1
+F@17:45:22  ***[238]:   rootP:     toplevel
+F@17:45:22  ***[257]: 
+F@17:45:22  ***[228]:   name:      s2
+F@17:45:22  ***[231]:   value:     STRING
+F@17:45:22  ***[233]:   container: toplevel
+F@17:45:22  ***[234]:   level:     1
+F@17:45:22  ***[235]:   sibling:   1
+F@17:45:22  ***[236]:   type:      String
+F@17:45:22  ***[237]:   path:      /s2
+F@17:45:22  ***[238]:   rootP:     toplevel
+F@17:45:22  ***[257]: 
+F@17:45:22  ***[228]:   name:      s1
+F@17:45:22  ***[231]:   value:     STRING
+F@17:45:22  ***[233]:   container: toplevel
+F@17:45:22  ***[234]:   level:     1
+F@17:45:22  ***[235]:   sibling:   2
+F@17:45:22  ***[236]:   type:      String
+F@17:45:22  ***[237]:   path:      /s1
+F@17:45:22  ***[238]:   rootP:     toplevel
+F@17:45:22  ***[257]: 
+F@17:45:22  ***[257]: 
+E@17:45:22  check[300]: duplicated tag-name: 's1' in '/'
+W@17:45:22  compoundValueEnd[130]: ERROR: 'compound value error: duplicated tag-name: 's1' in '/''
+T@17:45:22  compoundValueEnd[137]: Set compoundValueP (0xf4c620) for attribute at 0xf4c350
+T@17:45:22  compoundValueEnd[143]: Set current container to NULL
+T@17:45:22  updateAction[272]: Got an update action: 'APPEND'
+T@17:45:22  ~UpdateContextResponse[58]: destroyed
+T@17:45:22  payloadParse[69]: result: '<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>compound value error: duplicated tag-name: 's1' in '/'</details>
+  </errorCode>
+</updateContextResponse>
+'
+T@17:45:22  payloadParse[70]: outFormat: XML
+T@17:45:22  restReply[65]: Response 6: responding with 222 bytes, Status Code 200
+T@17:45:22  restReply[66]: Response payload: '<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>compound value error: duplicated tag-name: 's1' in '/'</details>
+  </errorCode>
+</updateContextResponse>
+'
+T@17:45:22  restService[182]: payloadParse returns '<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>compound value error: duplicated tag-name: 's1' in '/'</details>
+  </errorCode>
+</updateContextResponse>
+'
+T@17:45:22  restReply[65]: Response 7: responding with 222 bytes, Status Code 200
+T@17:45:22  restReply[66]: Response payload: '<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>compound value error: duplicated tag-name: 's1' in '/'</details>
+  </errorCode>
+</updateContextResponse>
+'
+T@17:45:22  ~CompoundValueNode[106]: Destroying node 'toplevel', path '/'
+T@17:45:22  ~CompoundValueNode[106]: Destroying node 's1', path '/s1'
+T@17:45:22  ~CompoundValueNode[106]: Destroying node 's2', path '/s2'
+T@17:45:22  ~CompoundValueNode[106]: Destroying node 's1', path '/s1'
+T@17:45:22  ~RegisterContextResponse[56]: destroyed
+T@17:45:23  connectionTreat[438]: notifyFormat: ''
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   Content-Length: 456
+T@17:45:23  connectionTreat[442]: HTTP tenant: ''
+T@17:45:23  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:23  restService[179]: Parsing payload for URL '/ngsi10/updateContext', method 'POST', service vector index: 12
+T@17:45:23  payloadParse[53]: parsing data for service 'UpdateContextRequest'. Method: 'POST'
+T@17:45:23  payloadParse[54]: outFormat: XML
+T@17:45:23  payloadParse[58]: Calling xmlTreat for service request 17, payloadWord 'updateContextRequest'
+2@17:45:23  xmlRequestGet[155]: Found xmlRequest of type 17, method 'POST' - index 12 (/updateContextRequest)
+T@17:45:23  nullTreat[272]: Not treating node 'updateContextRequest'
+T@17:45:23  nullTreat[272]: Not treating node 'contextElementList'
+T@17:45:23  entityId[67]: Got an entityId
+T@17:45:23  entityIdParse[291]: Got a type for an entity: 'Room'
+T@17:45:23  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@17:45:23  entityIdId[88]: Got an entityId:id: 'ConferenceRoom'
+T@17:45:23  nullTreat[272]: Not treating node 'contextAttributeList'
+T@17:45:23  contextAttribute[103]: Creating an attribute
+T@17:45:23  ContextAttribute[42]: Creating a ContextAttribute 1
+T@17:45:23  contextAttributeName[117]: Got an attribute name: 'temperature'
+T@17:45:23  contextAttributeType[130]: Got an attribute type: 'degree'
+T@17:45:23  contextAttributeValue[147]: Set parseDataP->lastContextAttribute (type: 'vector') to: 0xf4c220
+T@17:45:23  contextAttributeValue[149]: Got an attribute value: ' '
+T@17:45:23  CompoundValueNode[75]: Created TOPLEVEL compound node (a Vector)
+T@17:45:23  CompoundValueNode[95]: Created compound node 'vecitem' at level 1, sibling number 0, type String
+T@17:45:23  add[167]: Adding String 'vecitem', with value '1' under '/' (toplevel)
+T@17:45:23  compoundValueEnd[119]: Compound END
+T@17:45:23  finish[143]: Finishing a compound
+F@17:45:23  ***[228]: name:      toplevel
+F@17:45:23  ***[233]: container: toplevel
+F@17:45:23  ***[234]: level:     0
+F@17:45:23  ***[235]: sibling:   0
+F@17:45:23  ***[236]: type:      Vector
+F@17:45:23  ***[237]: path:      /
+F@17:45:23  ***[238]: rootP:     toplevel
+F@17:45:23  ***[251]: 1 children (vecitem)
+F@17:45:23  ***[228]:   name:      vecitem
+F@17:45:23  ***[231]:   value:     1
+F@17:45:23  ***[233]:   container: toplevel
+F@17:45:23  ***[234]:   level:     1
+F@17:45:23  ***[235]:   sibling:   0
+F@17:45:23  ***[236]:   type:      String
+F@17:45:23  ***[237]:   path:      /vecitem
+F@17:45:23  ***[238]:   rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[257]: 
+T@17:45:23  compoundValueEnd[137]: Set compoundValueP (0xf4c580) for attribute at 0xf4c220
+T@17:45:23  compoundValueEnd[143]: Set current container to NULL
+T@17:45:23  updateAction[272]: Got an update action: 'APPEND'
+T@17:45:23  xmlTreat[251]: Calling check for XML parsed tree (updateContextRequest)
+T@17:45:23  ~UpdateContextResponse[58]: destroyed
+F@17:45:23  ***[228]:     name:      toplevel
+F@17:45:23  ***[233]:     container: toplevel
+F@17:45:23  ***[234]:     level:     0
+F@17:45:23  ***[235]:     sibling:   0
+F@17:45:23  ***[236]:     type:      Vector
+F@17:45:23  ***[237]:     path:      /
+F@17:45:23  ***[238]:     rootP:     toplevel
+F@17:45:23  ***[251]:     1 children (vecitem)
+F@17:45:23  ***[228]:       name:      vecitem
+F@17:45:23  ***[231]:       value:     1
+F@17:45:23  ***[233]:       container: toplevel
+F@17:45:23  ***[234]:       level:     1
+F@17:45:23  ***[235]:       sibling:   0
+F@17:45:23  ***[236]:       type:      String
+F@17:45:23  ***[237]:       path:      /vecitem
+F@17:45:23  ***[238]:       rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[257]: 
+T@17:45:23  payloadParse[69]: result: 'OK'
+T@17:45:23  payloadParse[70]: outFormat: XML
+T@17:45:23  restService[182]: payloadParse returns 'OK'
+T@17:45:23  restService[197]: Treating service POST /ngsi10/updateContext
+T@17:45:23  restService[237]: tenant: ''
+T@17:45:23  reqSemTake[75]: mongoUpdateContext taking the 'req' semaphore for 'ngsi10 update request'
+T@17:45:23  reqSemTake[77]: mongoUpdateContext has the 'req' semaphore
+T@17:45:23  processContextElement[1397]: query() in 'testharness.entities' collection: '{ _id.id: "ConferenceRoom", _id.type: "Room" }'
+T@17:45:23  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:23  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:23  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:23  processContextElement[1431]: retrieved document: '{ _id: { id: "ConferenceRoom", type: "Room" }, attrs: [ { name: "temperature", type: "degree", creDate: 1401644722, value: { s1: "STRING", s2: "STRING" }, modDate: 1401644722 } ], creDate: 1401644722, modDate: 1401644722 }'
+T@17:45:23  ContextAttribute[86]: Creating a ContextAttribute 'temperature':'degree':'', setting its compound to NULL
+T@17:45:23  addTriggeredSubscriptions[772]: JS function: function(){for (var i=0; i < this.entities.length; i++) {if (this.entities[i].isPattern == "true" && (this.entities[i].type == "Room" || this.entities[i].type == "" || !("type" in this.entities[i])) && "ConferenceRoom".match(this.entities[i].id)) {return true; }}return false; }
+T@17:45:23  addTriggeredSubscriptions[787]: query() in 'testharness.csubs' collection: '{ $or: [ { entities.id: "ConferenceRoom", $or: [ { entities.type: "Room" }, { entities.type: { $exists: false } } ], entities.isPattern: "false", conditions.type: "ONCHANGE", conditions.value: "temperature", expiration: { $gt: 1401644723 } }, { entities.isPattern: "true", conditions.type: "ONCHANGE", conditions.value: "temperature", expiration: { $gt: 1401644723 }, $where: function(){for (var i=0; i < this.entities.length; i++) {if (this.enti... } ] }'
+T@17:45:23  mongoSemTake[90]: addTriggeredSubscriptions taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:23  mongoSemTake[92]: addTriggeredSubscriptions has the 'mongo' semaphore
+T@17:45:23  mongoSemGive[118]: addTriggeredSubscriptions gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:23  processContextElement[1516]: update() in 'testharness.entities' collection: {{ _id.id: "ConferenceRoom", _id.type: "Room" }, { $set: { attrs: [ { name: "temperature", type: "degree", creDate: 1401644722, value: [ "1" ], modDate: 1401644723 } ], modDate: 1401644723 }, $unset: { location: 1 } }}
+T@17:45:23  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'update in EntitiesCollection'
+T@17:45:23  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:23  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'update in EntitiesCollection'
+T@17:45:23  reqSemGive[104]: mongoUpdateContext gives the 'req' semaphore for 'ngsi10 update request'
+T@17:45:23  ~UpdateContextResponse[58]: destroyed
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'toplevel', path '/'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'vecitem', path '/vecitem'
+T@17:45:23  restReply[65]: Response 8: responding with 644 bytes, Status Code 200
+T@17:45:23  restReply[66]: Response payload: '<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue></contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+'
+T@17:45:23  ~RegisterContextResponse[56]: destroyed
+T@17:45:23  connectionTreat[438]: notifyFormat: ''
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   Content-Length: 540
+T@17:45:23  connectionTreat[442]: HTTP tenant: ''
+T@17:45:23  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:23  restService[179]: Parsing payload for URL '/ngsi10/updateContext', method 'POST', service vector index: 12
+T@17:45:23  payloadParse[53]: parsing data for service 'UpdateContextRequest'. Method: 'POST'
+T@17:45:23  payloadParse[54]: outFormat: XML
+T@17:45:23  payloadParse[58]: Calling xmlTreat for service request 17, payloadWord 'updateContextRequest'
+2@17:45:23  xmlRequestGet[155]: Found xmlRequest of type 17, method 'POST' - index 12 (/updateContextRequest)
+T@17:45:23  nullTreat[272]: Not treating node 'updateContextRequest'
+T@17:45:23  nullTreat[272]: Not treating node 'contextElementList'
+T@17:45:23  entityId[67]: Got an entityId
+T@17:45:23  entityIdParse[291]: Got a type for an entity: 'Room'
+T@17:45:23  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@17:45:23  entityIdId[88]: Got an entityId:id: 'ConferenceRoom'
+T@17:45:23  nullTreat[272]: Not treating node 'contextAttributeList'
+T@17:45:23  contextAttribute[103]: Creating an attribute
+T@17:45:23  ContextAttribute[42]: Creating a ContextAttribute 1
+T@17:45:23  contextAttributeName[117]: Got an attribute name: 'temperature'
+T@17:45:23  contextAttributeType[130]: Got an attribute type: 'degree'
+T@17:45:23  contextAttributeValue[147]: Set parseDataP->lastContextAttribute (type: 'vector') to: 0xf4c380
+T@17:45:23  contextAttributeValue[149]: Got an attribute value: ' '
+T@17:45:23  CompoundValueNode[75]: Created TOPLEVEL compound node (a Vector)
+T@17:45:23  CompoundValueNode[95]: Created compound node 'vecitem' at level 1, sibling number 0, type String
+T@17:45:23  add[167]: Adding String 'vecitem', with value '1' under '/' (toplevel)
+T@17:45:23  CompoundValueNode[95]: Created compound node 'vecitem' at level 1, sibling number 1, type String
+T@17:45:23  add[167]: Adding String 'vecitem', with value '2' under '/' (toplevel)
+T@17:45:23  CompoundValueNode[95]: Created compound node 'vecitem' at level 1, sibling number 2, type String
+T@17:45:23  add[167]: Adding String 'vecitem', with value '3' under '/' (toplevel)
+T@17:45:23  CompoundValueNode[95]: Created compound node 'vecitem' at level 1, sibling number 3, type String
+T@17:45:23  add[167]: Adding String 'vecitem', with value '4' under '/' (toplevel)
+T@17:45:23  CompoundValueNode[95]: Created compound node 'vecitem' at level 1, sibling number 4, type String
+T@17:45:23  add[167]: Adding String 'vecitem', with value '5' under '/' (toplevel)
+T@17:45:23  compoundValueEnd[119]: Compound END
+T@17:45:23  finish[143]: Finishing a compound
+F@17:45:23  ***[228]: name:      toplevel
+F@17:45:23  ***[233]: container: toplevel
+F@17:45:23  ***[234]: level:     0
+F@17:45:23  ***[235]: sibling:   0
+F@17:45:23  ***[236]: type:      Vector
+F@17:45:23  ***[237]: path:      /
+F@17:45:23  ***[238]: rootP:     toplevel
+F@17:45:23  ***[251]: 5 children (vecitem, vecitem, vecitem, vecitem, vecitem)
+F@17:45:23  ***[228]:   name:      vecitem
+F@17:45:23  ***[231]:   value:     1
+F@17:45:23  ***[233]:   container: toplevel
+F@17:45:23  ***[234]:   level:     1
+F@17:45:23  ***[235]:   sibling:   0
+F@17:45:23  ***[236]:   type:      String
+F@17:45:23  ***[237]:   path:      /vecitem
+F@17:45:23  ***[238]:   rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:   name:      vecitem
+F@17:45:23  ***[231]:   value:     2
+F@17:45:23  ***[233]:   container: toplevel
+F@17:45:23  ***[234]:   level:     1
+F@17:45:23  ***[235]:   sibling:   1
+F@17:45:23  ***[236]:   type:      String
+F@17:45:23  ***[237]:   path:      /vecitem
+F@17:45:23  ***[238]:   rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:   name:      vecitem
+F@17:45:23  ***[231]:   value:     3
+F@17:45:23  ***[233]:   container: toplevel
+F@17:45:23  ***[234]:   level:     1
+F@17:45:23  ***[235]:   sibling:   2
+F@17:45:23  ***[236]:   type:      String
+F@17:45:23  ***[237]:   path:      /vecitem
+F@17:45:23  ***[238]:   rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:   name:      vecitem
+F@17:45:23  ***[231]:   value:     4
+F@17:45:23  ***[233]:   container: toplevel
+F@17:45:23  ***[234]:   level:     1
+F@17:45:23  ***[235]:   sibling:   3
+F@17:45:23  ***[236]:   type:      String
+F@17:45:23  ***[237]:   path:      /vecitem
+F@17:45:23  ***[238]:   rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:   name:      vecitem
+F@17:45:23  ***[231]:   value:     5
+F@17:45:23  ***[233]:   container: toplevel
+F@17:45:23  ***[234]:   level:     1
+F@17:45:23  ***[235]:   sibling:   4
+F@17:45:23  ***[236]:   type:      String
+F@17:45:23  ***[237]:   path:      /vecitem
+F@17:45:23  ***[238]:   rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[257]: 
+T@17:45:23  compoundValueEnd[137]: Set compoundValueP (0xf4c6e0) for attribute at 0xf4c380
+T@17:45:23  compoundValueEnd[143]: Set current container to NULL
+T@17:45:23  updateAction[272]: Got an update action: 'APPEND'
+T@17:45:23  xmlTreat[251]: Calling check for XML parsed tree (updateContextRequest)
+T@17:45:23  ~UpdateContextResponse[58]: destroyed
+F@17:45:23  ***[228]:     name:      toplevel
+F@17:45:23  ***[233]:     container: toplevel
+F@17:45:23  ***[234]:     level:     0
+F@17:45:23  ***[235]:     sibling:   0
+F@17:45:23  ***[236]:     type:      Vector
+F@17:45:23  ***[237]:     path:      /
+F@17:45:23  ***[238]:     rootP:     toplevel
+F@17:45:23  ***[251]:     5 children (vecitem, vecitem, vecitem, vecitem, vecitem)
+F@17:45:23  ***[228]:       name:      vecitem
+F@17:45:23  ***[231]:       value:     1
+F@17:45:23  ***[233]:       container: toplevel
+F@17:45:23  ***[234]:       level:     1
+F@17:45:23  ***[235]:       sibling:   0
+F@17:45:23  ***[236]:       type:      String
+F@17:45:23  ***[237]:       path:      /vecitem
+F@17:45:23  ***[238]:       rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:       name:      vecitem
+F@17:45:23  ***[231]:       value:     2
+F@17:45:23  ***[233]:       container: toplevel
+F@17:45:23  ***[234]:       level:     1
+F@17:45:23  ***[235]:       sibling:   1
+F@17:45:23  ***[236]:       type:      String
+F@17:45:23  ***[237]:       path:      /vecitem
+F@17:45:23  ***[238]:       rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:       name:      vecitem
+F@17:45:23  ***[231]:       value:     3
+F@17:45:23  ***[233]:       container: toplevel
+F@17:45:23  ***[234]:       level:     1
+F@17:45:23  ***[235]:       sibling:   2
+F@17:45:23  ***[236]:       type:      String
+F@17:45:23  ***[237]:       path:      /vecitem
+F@17:45:23  ***[238]:       rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:       name:      vecitem
+F@17:45:23  ***[231]:       value:     4
+F@17:45:23  ***[233]:       container: toplevel
+F@17:45:23  ***[234]:       level:     1
+F@17:45:23  ***[235]:       sibling:   3
+F@17:45:23  ***[236]:       type:      String
+F@17:45:23  ***[237]:       path:      /vecitem
+F@17:45:23  ***[238]:       rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:       name:      vecitem
+F@17:45:23  ***[231]:       value:     5
+F@17:45:23  ***[233]:       container: toplevel
+F@17:45:23  ***[234]:       level:     1
+F@17:45:23  ***[235]:       sibling:   4
+F@17:45:23  ***[236]:       type:      String
+F@17:45:23  ***[237]:       path:      /vecitem
+F@17:45:23  ***[238]:       rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[257]: 
+T@17:45:23  payloadParse[69]: result: 'OK'
+T@17:45:23  payloadParse[70]: outFormat: XML
+T@17:45:23  restService[182]: payloadParse returns 'OK'
+T@17:45:23  restService[197]: Treating service POST /ngsi10/updateContext
+T@17:45:23  restService[237]: tenant: ''
+T@17:45:23  reqSemTake[75]: mongoUpdateContext taking the 'req' semaphore for 'ngsi10 update request'
+T@17:45:23  reqSemTake[77]: mongoUpdateContext has the 'req' semaphore
+T@17:45:23  processContextElement[1397]: query() in 'testharness.entities' collection: '{ _id.id: "ConferenceRoom", _id.type: "Room" }'
+T@17:45:23  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:23  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:23  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:23  processContextElement[1431]: retrieved document: '{ _id: { id: "ConferenceRoom", type: "Room" }, attrs: [ { name: "temperature", type: "degree", creDate: 1401644722, value: [ "1" ], modDate: 1401644723 } ], creDate: 1401644722, modDate: 1401644723 }'
+T@17:45:23  ContextAttribute[86]: Creating a ContextAttribute 'temperature':'degree':'', setting its compound to NULL
+T@17:45:23  addTriggeredSubscriptions[772]: JS function: function(){for (var i=0; i < this.entities.length; i++) {if (this.entities[i].isPattern == "true" && (this.entities[i].type == "Room" || this.entities[i].type == "" || !("type" in this.entities[i])) && "ConferenceRoom".match(this.entities[i].id)) {return true; }}return false; }
+T@17:45:23  addTriggeredSubscriptions[787]: query() in 'testharness.csubs' collection: '{ $or: [ { entities.id: "ConferenceRoom", $or: [ { entities.type: "Room" }, { entities.type: { $exists: false } } ], entities.isPattern: "false", conditions.type: "ONCHANGE", conditions.value: "temperature", expiration: { $gt: 1401644723 } }, { entities.isPattern: "true", conditions.type: "ONCHANGE", conditions.value: "temperature", expiration: { $gt: 1401644723 }, $where: function(){for (var i=0; i < this.entities.length; i++) {if (this.enti... } ] }'
+T@17:45:23  mongoSemTake[90]: addTriggeredSubscriptions taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:23  mongoSemTake[92]: addTriggeredSubscriptions has the 'mongo' semaphore
+T@17:45:23  mongoSemGive[118]: addTriggeredSubscriptions gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:23  processContextElement[1516]: update() in 'testharness.entities' collection: {{ _id.id: "ConferenceRoom", _id.type: "Room" }, { $set: { attrs: [ { name: "temperature", type: "degree", creDate: 1401644722, value: [ "1", "2", "3", "4", "5" ], modDate: 1401644723 } ], modDate: 1401644723 }, $unset: { location: 1 } }}
+T@17:45:23  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'update in EntitiesCollection'
+T@17:45:23  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:23  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'update in EntitiesCollection'
+T@17:45:23  reqSemGive[104]: mongoUpdateContext gives the 'req' semaphore for 'ngsi10 update request'
+T@17:45:23  ~UpdateContextResponse[58]: destroyed
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'toplevel', path '/'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'vecitem', path '/vecitem'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'vecitem', path '/vecitem'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'vecitem', path '/vecitem'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'vecitem', path '/vecitem'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'vecitem', path '/vecitem'
+T@17:45:23  restReply[65]: Response 9: responding with 644 bytes, Status Code 200
+T@17:45:23  restReply[66]: Response payload: '<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue></contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+'
+T@17:45:23  ~RegisterContextResponse[56]: destroyed
+T@17:45:23  connectionTreat[438]: notifyFormat: ''
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   Content-Length: 563
+T@17:45:23  connectionTreat[442]: HTTP tenant: ''
+T@17:45:23  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:23  restService[179]: Parsing payload for URL '/ngsi10/updateContext', method 'POST', service vector index: 12
+T@17:45:23  payloadParse[53]: parsing data for service 'UpdateContextRequest'. Method: 'POST'
+T@17:45:23  payloadParse[54]: outFormat: XML
+T@17:45:23  payloadParse[58]: Calling xmlTreat for service request 17, payloadWord 'updateContextRequest'
+2@17:45:23  xmlRequestGet[155]: Found xmlRequest of type 17, method 'POST' - index 12 (/updateContextRequest)
+T@17:45:23  nullTreat[272]: Not treating node 'updateContextRequest'
+T@17:45:23  nullTreat[272]: Not treating node 'contextElementList'
+T@17:45:23  entityId[67]: Got an entityId
+T@17:45:23  entityIdParse[291]: Got a type for an entity: 'Room'
+T@17:45:23  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@17:45:23  entityIdId[88]: Got an entityId:id: 'ConferenceRoom'
+T@17:45:23  nullTreat[272]: Not treating node 'contextAttributeList'
+T@17:45:23  contextAttribute[103]: Creating an attribute
+T@17:45:23  ContextAttribute[42]: Creating a ContextAttribute 1
+T@17:45:23  contextAttributeName[117]: Got an attribute name: 'temperature'
+T@17:45:23  contextAttributeType[130]: Got an attribute type: 'degree'
+T@17:45:23  contextAttributeValue[147]: Set parseDataP->lastContextAttribute (type: 'vector') to: 0xf4c3c0
+T@17:45:23  contextAttributeValue[149]: Got an attribute value: ' '
+T@17:45:23  CompoundValueNode[75]: Created TOPLEVEL compound node (a Vector)
+T@17:45:23  CompoundValueNode[95]: Created compound node 'vecitem' at level 1, sibling number 0, type String
+T@17:45:23  add[167]: Adding String 'vecitem', with value '1' under '/' (toplevel)
+T@17:45:23  CompoundValueNode[95]: Created compound node 'vecitem' at level 1, sibling number 1, type String
+T@17:45:23  add[167]: Adding String 'vecitem', with value '2' under '/' (toplevel)
+T@17:45:23  CompoundValueNode[95]: Created compound node 'vecitem' at level 1, sibling number 2, type String
+T@17:45:23  add[167]: Adding String 'vecitem', with value '3' under '/' (toplevel)
+T@17:45:23  CompoundValueNode[95]: Created compound node 'vecitem' at level 1, sibling number 3, type String
+T@17:45:23  add[167]: Adding String 'vecitem', with value '4' under '/' (toplevel)
+T@17:45:23  CompoundValueNode[95]: Created compound node 'vecitem' at level 1, sibling number 4, type String
+T@17:45:23  add[167]: Adding String 'vecitem', with value '5' under '/' (toplevel)
+T@17:45:23  CompoundValueNode[95]: Created compound node 'vecitem6' at level 1, sibling number 5, type String
+T@17:45:23  add[167]: Adding String 'vecitem6', with value '6' under '/' (toplevel)
+T@17:45:23  compoundValueEnd[119]: Compound END
+T@17:45:23  finish[143]: Finishing a compound
+F@17:45:23  ***[228]: name:      toplevel
+F@17:45:23  ***[233]: container: toplevel
+F@17:45:23  ***[234]: level:     0
+F@17:45:23  ***[235]: sibling:   0
+F@17:45:23  ***[236]: type:      Vector
+F@17:45:23  ***[237]: path:      /
+F@17:45:23  ***[238]: rootP:     toplevel
+F@17:45:23  ***[251]: 6 children (vecitem, vecitem, vecitem, vecitem, vecitem, vecitem6)
+F@17:45:23  ***[228]:   name:      vecitem
+F@17:45:23  ***[231]:   value:     1
+F@17:45:23  ***[233]:   container: toplevel
+F@17:45:23  ***[234]:   level:     1
+F@17:45:23  ***[235]:   sibling:   0
+F@17:45:23  ***[236]:   type:      String
+F@17:45:23  ***[237]:   path:      /vecitem
+F@17:45:23  ***[238]:   rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:   name:      vecitem
+F@17:45:23  ***[231]:   value:     2
+F@17:45:23  ***[233]:   container: toplevel
+F@17:45:23  ***[234]:   level:     1
+F@17:45:23  ***[235]:   sibling:   1
+F@17:45:23  ***[236]:   type:      String
+F@17:45:23  ***[237]:   path:      /vecitem
+F@17:45:23  ***[238]:   rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:   name:      vecitem
+F@17:45:23  ***[231]:   value:     3
+F@17:45:23  ***[233]:   container: toplevel
+F@17:45:23  ***[234]:   level:     1
+F@17:45:23  ***[235]:   sibling:   2
+F@17:45:23  ***[236]:   type:      String
+F@17:45:23  ***[237]:   path:      /vecitem
+F@17:45:23  ***[238]:   rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:   name:      vecitem
+F@17:45:23  ***[231]:   value:     4
+F@17:45:23  ***[233]:   container: toplevel
+F@17:45:23  ***[234]:   level:     1
+F@17:45:23  ***[235]:   sibling:   3
+F@17:45:23  ***[236]:   type:      String
+F@17:45:23  ***[237]:   path:      /vecitem
+F@17:45:23  ***[238]:   rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:   name:      vecitem
+F@17:45:23  ***[231]:   value:     5
+F@17:45:23  ***[233]:   container: toplevel
+F@17:45:23  ***[234]:   level:     1
+F@17:45:23  ***[235]:   sibling:   4
+F@17:45:23  ***[236]:   type:      String
+F@17:45:23  ***[237]:   path:      /vecitem
+F@17:45:23  ***[238]:   rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:   name:      vecitem6
+F@17:45:23  ***[231]:   value:     6
+F@17:45:23  ***[233]:   container: toplevel
+F@17:45:23  ***[234]:   level:     1
+F@17:45:23  ***[235]:   sibling:   5
+F@17:45:23  ***[236]:   type:      String
+F@17:45:23  ***[237]:   path:      /vecitem6
+F@17:45:23  ***[238]:   rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[257]: 
+E@17:45:23  check[283]: bad tag-name of vector item: 'vecitem6' (should be 'vecitem')
+W@17:45:23  compoundValueEnd[130]: ERROR: 'compound value error: bad tag-name of vector item: 'vecitem6' (should be 'vecitem')'
+T@17:45:23  compoundValueEnd[137]: Set compoundValueP (0xf4c720) for attribute at 0xf4c3c0
+T@17:45:23  compoundValueEnd[143]: Set current container to NULL
+T@17:45:23  updateAction[272]: Got an update action: 'APPEND'
+T@17:45:23  ~UpdateContextResponse[58]: destroyed
+T@17:45:23  payloadParse[69]: result: '<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>compound value error: bad tag-name of vector item: 'vecitem6' (should be 'vecitem')</details>
+  </errorCode>
+</updateContextResponse>
+'
+T@17:45:23  payloadParse[70]: outFormat: XML
+T@17:45:23  restReply[65]: Response 10: responding with 251 bytes, Status Code 200
+T@17:45:23  restReply[66]: Response payload: '<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>compound value error: bad tag-name of vector item: 'vecitem6' (should be 'vecitem')</details>
+  </errorCode>
+</updateContextResponse>
+'
+T@17:45:23  restService[182]: payloadParse returns '<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>compound value error: bad tag-name of vector item: 'vecitem6' (should be 'vecitem')</details>
+  </errorCode>
+</updateContextResponse>
+'
+T@17:45:23  restReply[65]: Response 11: responding with 251 bytes, Status Code 200
+T@17:45:23  restReply[66]: Response payload: '<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>compound value error: bad tag-name of vector item: 'vecitem6' (should be 'vecitem')</details>
+  </errorCode>
+</updateContextResponse>
+'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'toplevel', path '/'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'vecitem', path '/vecitem'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'vecitem', path '/vecitem'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'vecitem', path '/vecitem'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'vecitem', path '/vecitem'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'vecitem', path '/vecitem'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'vecitem6', path '/vecitem6'
+T@17:45:23  ~RegisterContextResponse[56]: destroyed
+T@17:45:23  connectionTreat[438]: notifyFormat: ''
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:23  httpHeaderGet[137]: HTTP Header:   Content-Length: 531
+T@17:45:23  connectionTreat[442]: HTTP tenant: ''
+T@17:45:23  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:23  restService[179]: Parsing payload for URL '/ngsi10/updateContext', method 'POST', service vector index: 12
+T@17:45:23  payloadParse[53]: parsing data for service 'UpdateContextRequest'. Method: 'POST'
+T@17:45:23  payloadParse[54]: outFormat: XML
+T@17:45:23  payloadParse[58]: Calling xmlTreat for service request 17, payloadWord 'updateContextRequest'
+2@17:45:23  xmlRequestGet[155]: Found xmlRequest of type 17, method 'POST' - index 12 (/updateContextRequest)
+T@17:45:23  nullTreat[272]: Not treating node 'updateContextRequest'
+T@17:45:23  nullTreat[272]: Not treating node 'contextElementList'
+T@17:45:23  entityId[67]: Got an entityId
+T@17:45:23  entityIdParse[291]: Got a type for an entity: 'Room'
+T@17:45:23  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@17:45:23  entityIdId[88]: Got an entityId:id: 'ConferenceRoom'
+T@17:45:23  nullTreat[272]: Not treating node 'contextAttributeList'
+T@17:45:23  contextAttribute[103]: Creating an attribute
+T@17:45:23  ContextAttribute[42]: Creating a ContextAttribute 1
+T@17:45:23  contextAttributeName[117]: Got an attribute name: 'temperature'
+T@17:45:23  contextAttributeType[130]: Got an attribute type: 'degree'
+T@17:45:23  contextAttributeValue[147]: Set parseDataP->lastContextAttribute (type: '') to: 0xf4c390
+T@17:45:23  contextAttributeValue[149]: Got an attribute value: ' '
+T@17:45:23  CompoundValueNode[75]: Created TOPLEVEL compound node (a Object)
+T@17:45:23  CompoundValueNode[95]: Created compound node 'struct1' at level 1, sibling number 0, type Object
+T@17:45:23  add[169]: Adding Object 'struct1' under '/' (toplevel)
+T@17:45:23  CompoundValueNode[95]: Created compound node 's1-1' at level 2, sibling number 0, type String
+T@17:45:23  add[167]: Adding String 's1-1', with value '1-1' under '/struct1' (struct1)
+T@17:45:23  CompoundValueNode[95]: Created compound node 's1-2' at level 2, sibling number 1, type String
+T@17:45:23  add[167]: Adding String 's1-2', with value '1-2' under '/struct1' (struct1)
+T@17:45:23  CompoundValueNode[95]: Created compound node 'struct2' at level 1, sibling number 1, type Object
+T@17:45:23  add[169]: Adding Object 'struct2' under '/' (toplevel)
+T@17:45:23  CompoundValueNode[95]: Created compound node 's2-1' at level 2, sibling number 0, type String
+T@17:45:23  add[167]: Adding String 's2-1', with value '2-1' under '/struct2' (struct2)
+T@17:45:23  CompoundValueNode[95]: Created compound node 's2-2' at level 2, sibling number 1, type String
+T@17:45:23  add[167]: Adding String 's2-2', with value '2-2' under '/struct2' (struct2)
+T@17:45:23  compoundValueEnd[119]: Compound END
+T@17:45:23  finish[143]: Finishing a compound
+F@17:45:23  ***[228]: name:      toplevel
+F@17:45:23  ***[233]: container: toplevel
+F@17:45:23  ***[234]: level:     0
+F@17:45:23  ***[235]: sibling:   0
+F@17:45:23  ***[236]: type:      Object
+F@17:45:23  ***[237]: path:      /
+F@17:45:23  ***[238]: rootP:     toplevel
+F@17:45:23  ***[251]: 2 children (struct1, struct2)
+F@17:45:23  ***[228]:   name:      struct1
+F@17:45:23  ***[233]:   container: toplevel
+F@17:45:23  ***[234]:   level:     1
+F@17:45:23  ***[235]:   sibling:   0
+F@17:45:23  ***[236]:   type:      Object
+F@17:45:23  ***[237]:   path:      /struct1
+F@17:45:23  ***[238]:   rootP:     toplevel
+F@17:45:23  ***[251]:   2 children (s1-1, s1-2)
+F@17:45:23  ***[228]:     name:      s1-1
+F@17:45:23  ***[231]:     value:     1-1
+F@17:45:23  ***[233]:     container: struct1
+F@17:45:23  ***[234]:     level:     2
+F@17:45:23  ***[235]:     sibling:   0
+F@17:45:23  ***[236]:     type:      String
+F@17:45:23  ***[237]:     path:      /struct1/s1-1
+F@17:45:23  ***[238]:     rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:     name:      s1-2
+F@17:45:23  ***[231]:     value:     1-2
+F@17:45:23  ***[233]:     container: struct1
+F@17:45:23  ***[234]:     level:     2
+F@17:45:23  ***[235]:     sibling:   1
+F@17:45:23  ***[236]:     type:      String
+F@17:45:23  ***[237]:     path:      /struct1/s1-2
+F@17:45:23  ***[238]:     rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:   name:      struct2
+F@17:45:23  ***[233]:   container: toplevel
+F@17:45:23  ***[234]:   level:     1
+F@17:45:23  ***[235]:   sibling:   1
+F@17:45:23  ***[236]:   type:      Object
+F@17:45:23  ***[237]:   path:      /struct2
+F@17:45:23  ***[238]:   rootP:     toplevel
+F@17:45:23  ***[251]:   2 children (s2-1, s2-2)
+F@17:45:23  ***[228]:     name:      s2-1
+F@17:45:23  ***[231]:     value:     2-1
+F@17:45:23  ***[233]:     container: struct2
+F@17:45:23  ***[234]:     level:     2
+F@17:45:23  ***[235]:     sibling:   0
+F@17:45:23  ***[236]:     type:      String
+F@17:45:23  ***[237]:     path:      /struct2/s2-1
+F@17:45:23  ***[238]:     rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:     name:      s2-2
+F@17:45:23  ***[231]:     value:     2-2
+F@17:45:23  ***[233]:     container: struct2
+F@17:45:23  ***[234]:     level:     2
+F@17:45:23  ***[235]:     sibling:   1
+F@17:45:23  ***[236]:     type:      String
+F@17:45:23  ***[237]:     path:      /struct2/s2-2
+F@17:45:23  ***[238]:     rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[257]: 
+T@17:45:23  compoundValueEnd[137]: Set compoundValueP (0xf4c690) for attribute at 0xf4c390
+T@17:45:23  compoundValueEnd[143]: Set current container to NULL
+T@17:45:23  updateAction[272]: Got an update action: 'APPEND'
+T@17:45:23  xmlTreat[251]: Calling check for XML parsed tree (updateContextRequest)
+T@17:45:23  ~UpdateContextResponse[58]: destroyed
+F@17:45:23  ***[228]:     name:      toplevel
+F@17:45:23  ***[233]:     container: toplevel
+F@17:45:23  ***[234]:     level:     0
+F@17:45:23  ***[235]:     sibling:   0
+F@17:45:23  ***[236]:     type:      Object
+F@17:45:23  ***[237]:     path:      /
+F@17:45:23  ***[238]:     rootP:     toplevel
+F@17:45:23  ***[251]:     2 children (struct1, struct2)
+F@17:45:23  ***[228]:       name:      struct1
+F@17:45:23  ***[233]:       container: toplevel
+F@17:45:23  ***[234]:       level:     1
+F@17:45:23  ***[235]:       sibling:   0
+F@17:45:23  ***[236]:       type:      Object
+F@17:45:23  ***[237]:       path:      /struct1
+F@17:45:23  ***[238]:       rootP:     toplevel
+F@17:45:23  ***[251]:       2 children (s1-1, s1-2)
+F@17:45:23  ***[228]:         name:      s1-1
+F@17:45:23  ***[231]:         value:     1-1
+F@17:45:23  ***[233]:         container: struct1
+F@17:45:23  ***[234]:         level:     2
+F@17:45:23  ***[235]:         sibling:   0
+F@17:45:23  ***[236]:         type:      String
+F@17:45:23  ***[237]:         path:      /struct1/s1-1
+F@17:45:23  ***[238]:         rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:         name:      s1-2
+F@17:45:23  ***[231]:         value:     1-2
+F@17:45:23  ***[233]:         container: struct1
+F@17:45:23  ***[234]:         level:     2
+F@17:45:23  ***[235]:         sibling:   1
+F@17:45:23  ***[236]:         type:      String
+F@17:45:23  ***[237]:         path:      /struct1/s1-2
+F@17:45:23  ***[238]:         rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:       name:      struct2
+F@17:45:23  ***[233]:       container: toplevel
+F@17:45:23  ***[234]:       level:     1
+F@17:45:23  ***[235]:       sibling:   1
+F@17:45:23  ***[236]:       type:      Object
+F@17:45:23  ***[237]:       path:      /struct2
+F@17:45:23  ***[238]:       rootP:     toplevel
+F@17:45:23  ***[251]:       2 children (s2-1, s2-2)
+F@17:45:23  ***[228]:         name:      s2-1
+F@17:45:23  ***[231]:         value:     2-1
+F@17:45:23  ***[233]:         container: struct2
+F@17:45:23  ***[234]:         level:     2
+F@17:45:23  ***[235]:         sibling:   0
+F@17:45:23  ***[236]:         type:      String
+F@17:45:23  ***[237]:         path:      /struct2/s2-1
+F@17:45:23  ***[238]:         rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[228]:         name:      s2-2
+F@17:45:23  ***[231]:         value:     2-2
+F@17:45:23  ***[233]:         container: struct2
+F@17:45:23  ***[234]:         level:     2
+F@17:45:23  ***[235]:         sibling:   1
+F@17:45:23  ***[236]:         type:      String
+F@17:45:23  ***[237]:         path:      /struct2/s2-2
+F@17:45:23  ***[238]:         rootP:     toplevel
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[257]: 
+F@17:45:23  ***[257]: 
+T@17:45:23  payloadParse[69]: result: 'OK'
+T@17:45:23  payloadParse[70]: outFormat: XML
+T@17:45:23  restService[182]: payloadParse returns 'OK'
+T@17:45:23  restService[197]: Treating service POST /ngsi10/updateContext
+T@17:45:23  restService[237]: tenant: ''
+T@17:45:23  reqSemTake[75]: mongoUpdateContext taking the 'req' semaphore for 'ngsi10 update request'
+T@17:45:23  reqSemTake[77]: mongoUpdateContext has the 'req' semaphore
+T@17:45:23  processContextElement[1397]: query() in 'testharness.entities' collection: '{ _id.id: "ConferenceRoom", _id.type: "Room" }'
+T@17:45:23  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:23  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:23  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:23  processContextElement[1431]: retrieved document: '{ _id: { id: "ConferenceRoom", type: "Room" }, attrs: [ { name: "temperature", type: "degree", creDate: 1401644722, value: [ "1", "2", "3", "4", "5" ], modDate: 1401644723 } ], creDate: 1401644722, modDate: 1401644723 }'
+T@17:45:23  ContextAttribute[86]: Creating a ContextAttribute 'temperature':'degree':'', setting its compound to NULL
+T@17:45:23  addTriggeredSubscriptions[772]: JS function: function(){for (var i=0; i < this.entities.length; i++) {if (this.entities[i].isPattern == "true" && (this.entities[i].type == "Room" || this.entities[i].type == "" || !("type" in this.entities[i])) && "ConferenceRoom".match(this.entities[i].id)) {return true; }}return false; }
+T@17:45:23  addTriggeredSubscriptions[787]: query() in 'testharness.csubs' collection: '{ $or: [ { entities.id: "ConferenceRoom", $or: [ { entities.type: "Room" }, { entities.type: { $exists: false } } ], entities.isPattern: "false", conditions.type: "ONCHANGE", conditions.value: "temperature", expiration: { $gt: 1401644723 } }, { entities.isPattern: "true", conditions.type: "ONCHANGE", conditions.value: "temperature", expiration: { $gt: 1401644723 }, $where: function(){for (var i=0; i < this.entities.length; i++) {if (this.enti... } ] }'
+T@17:45:23  mongoSemTake[90]: addTriggeredSubscriptions taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:23  mongoSemTake[92]: addTriggeredSubscriptions has the 'mongo' semaphore
+T@17:45:23  mongoSemGive[118]: addTriggeredSubscriptions gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:23  processContextElement[1516]: update() in 'testharness.entities' collection: {{ _id.id: "ConferenceRoom", _id.type: "Room" }, { $set: { attrs: [ { name: "temperature", type: "degree", creDate: 1401644722, value: { struct1: { s1-1: "1-1", s1-2: "1-2" }, struct2: { s2-1: "2-1", s2-2: "2-2" } }, modDate: 1401644723 } ], modDate: 1401644723 }, $unset: { location: 1 } }}
+T@17:45:23  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'update in EntitiesCollection'
+T@17:45:23  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:23  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'update in EntitiesCollection'
+T@17:45:23  reqSemGive[104]: mongoUpdateContext gives the 'req' semaphore for 'ngsi10 update request'
+T@17:45:23  ~UpdateContextResponse[58]: destroyed
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'toplevel', path '/'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'struct1', path '/struct1'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 's1-1', path '/struct1/s1-1'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 's1-2', path '/struct1/s1-2'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 'struct2', path '/struct2'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 's2-1', path '/struct2/s2-1'
+T@17:45:23  ~CompoundValueNode[106]: Destroying node 's2-2', path '/struct2/s2-2'
+T@17:45:23  restReply[65]: Response 12: responding with 644 bytes, Status Code 200
+T@17:45:23  restReply[66]: Response payload: '<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue></contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+'
+T@17:45:23  ~RegisterContextResponse[56]: destroyed
+F@17:45:23  ***[981]: In sigHandler - caught signal 15
+X@17:45:23  sigHandler[987]: Received signal 15
+
+
+1 ContextElementsContext Element 0:
+  Entity Id:
+    Id:         ConferenceRoom
+    Type:       Room
+    isPattern:  false
+  No AttributeDomainName
+1 ContextAttributes  Attribute 0:
+    Name:       temperature
+    Type:       degree
+    Value:      1
+0 Attribute Metadatas
+0 Domain Metadatas
+UpdateActionType: APPEND
+
+
+1 ContextElementsContext Element 0:
+  Entity Id:
+    Id:         ConferenceRoom
+    Type:       Room
+    isPattern:  false
+  No AttributeDomainName
+1 ContextAttributes  Attribute 0:
+    Name:       temperature
+    Type:       degree
+0 Attribute Metadatas
+0 Domain Metadatas
+UpdateActionType: APPEND
+
+
+1 ContextElementsContext Element 0:
+  Entity Id:
+    Id:         ConferenceRoom
+    Type:       Room
+    isPattern:  false
+  No AttributeDomainName
+1 ContextAttributes  Attribute 0:
+    Name:       temperature
+    Type:       degree
+0 Attribute Metadatas
+0 Domain Metadatas
+UpdateActionType: APPEND
+
+
+1 ContextElementsContext Element 0:
+  Entity Id:
+    Id:         ConferenceRoom
+    Type:       Room
+    isPattern:  false
+  No AttributeDomainName
+1 ContextAttributes  Attribute 0:
+    Name:       temperature
+    Type:       degree
+0 Attribute Metadatas
+0 Domain Metadatas
+UpdateActionType: APPEND
+
+
+1 ContextElementsContext Element 0:
+  Entity Id:
+    Id:         ConferenceRoom
+    Type:       Room
+    isPattern:  false
+  No AttributeDomainName
+1 ContextAttributes  Attribute 0:
+    Name:       temperature
+    Type:       degree
+0 Attribute Metadatas
+0 Domain Metadatas
+UpdateActionType: APPEND
+
+
+1 ContextElementsContext Element 0:
+  Entity Id:
+    Id:         ConferenceRoom
+    Type:       Room
+    isPattern:  false
+  No AttributeDomainName
+1 ContextAttributes  Attribute 0:
+    Name:       temperature
+    Type:       degree
+0 Attribute Metadatas
+0 Domain Metadatas
+UpdateActionType: APPEND

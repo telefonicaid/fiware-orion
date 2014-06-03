@@ -1,0 +1,144 @@
+{ "dropped" : "testharness", "ok" : 1 }
+T@17:45:41  paConfigActions[727]: setting trace levels to '0-255'
+T@17:45:41  paConfigActions[728]: Leaving function paConfigActions
+E@17:45:41  exitFunc[1009]: unlink(/tmp/orion_9999.pid): No such file or directory
+T@17:45:41  semInit[61]: Initialized 'req' semaphore
+T@17:45:41  semInit[62]: Initialized 'mongo' semaphore
+T@17:45:41  mongoSemTake[90]: mongoConnect taking the 'mongo' semaphore for 'connecting to mongo'
+T@17:45:41  mongoSemTake[92]: mongoConnect has the 'mongo' semaphore
+T@17:45:41  mongoConnect[152]: mongo version server: 2.4.9 (mayor: 2, minor: 4, extra: 9)
+T@17:45:41  mongoSemGive[118]: mongoConnect gives the 'mongo' semaphore for 'connecting to mongo'
+F@17:45:41  ***[1063]: Connected to mongo at localhost:testharness
+T@17:45:41  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant )
+T@17:45:41  recoverOntimeIntervalThreads[398]: query() in 'testharness.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@17:45:41  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:41  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@17:45:41  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+V@17:45:41  restStart[569]: Starting HTTP daemon on IPv4 0.0.0.0 port 9999
+V@17:45:41  restStart[611]: Starting HTTP daemon on IPv6 :: port 9999
+T@17:45:42  connectionTreat[438]: notifyFormat: ''
+T@17:45:42  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:42  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:42  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:42  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:42  httpHeaderGet[137]: HTTP Header:   Content-Length: 1155
+T@17:45:42  connectionTreat[442]: HTTP tenant: ''
+T@17:45:42  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:42  restService[179]: Parsing payload for URL '/NGSI9/registerContext', method 'POST', service vector index: 0
+T@17:45:42  payloadParse[53]: parsing data for service 'RegisterContextRequest'. Method: 'POST'
+T@17:45:42  payloadParse[54]: outFormat: XML
+T@17:45:42  payloadParse[58]: Calling xmlTreat for service request 1, payloadWord 'registerContextRequest'
+2@17:45:42  xmlRequestGet[155]: Found xmlRequest of type 1, method 'POST' - index 0 (/registerContextRequest)
+T@17:45:42  nullTreat[272]: Not treating node 'registerContextRequest'
+T@17:45:42  nullTreat[272]: Not treating node 'contextRegistrationList'
+T@17:45:42  entityIdList[409]: got an entityIdList
+T@17:45:42  entityId[63]: Got an entityId
+T@17:45:42  entityIdParse[291]: Got a type for an entity: 'Room'
+T@17:45:42  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@17:45:42  entityIdId[84]: Got an entityId:id: 'ConferenceRoom'
+T@17:45:42  entityId[63]: Got an entityId
+T@17:45:42  entityIdParse[291]: Got a type for an entity: 'Room'
+T@17:45:42  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@17:45:42  entityIdId[84]: Got an entityId:id: 'OfficeRoom'
+T@17:45:42  nullTreat[272]: Not treating node 'contextRegistrationAttributeList'
+T@17:45:42  crAttribute[99]: Creating an attribute
+T@17:45:42  craName[113]: Got an attribute name: 'temperature'
+T@17:45:42  craType[126]: Got an attribute type: 'degree'
+T@17:45:42  craIsDomain[139]: Got a isDomain: 'false'
+T@17:45:42  nullTreat[272]: Not treating node 'metadata'
+T@17:45:42  craMetadata[152]: Creating a metadata
+T@17:45:42  craMetadataName[166]: Got a metadata name: 'ID'
+T@17:45:42  craMetadataType[179]: Got a metadata type: 'string'
+T@17:45:42  craMetadataValue[192]: Got a metadata value: '1110'
+T@17:45:42  craMetadata[152]: Creating a metadata
+T@17:45:42  craMetadataName[166]: Got a metadata name: 'cm2'
+T@17:45:42  craMetadataType[179]: Got a metadata type: 'string'
+T@17:45:42  craMetadataValue[192]: Got a metadata value: 'XXX'
+T@17:45:42  nullTreat[272]: Not treating node 'registrationMetadata'
+T@17:45:42  regMetadata[205]: Creating a reg metadata
+T@17:45:42  regMetadataName[219]: Got a reg metadata name: 'ID'
+T@17:45:42  regMetadataType[232]: Got a reg metadata type: 'string'
+T@17:45:42  regMetadataValue[245]: Got a reg metadata value: '2212'
+T@17:45:42  regMetadata[205]: Creating a reg metadata
+T@17:45:42  regMetadataName[219]: Got a reg metadata name: 'ID2'
+T@17:45:42  regMetadataType[232]: Got a reg metadata type: 'string'
+T@17:45:42  regMetadataValue[245]: Got a reg metadata value: '212'
+T@17:45:42  providingApplication[258]: Got a providing application: 'http://localhost:1028/application'
+T@17:45:42  duration[271]: Got a duration: 'PT1H'
+T@17:45:42  registrationId[284]: Got a registration id: ''
+T@17:45:42  xmlTreat[251]: Calling check for XML parsed tree (registerContextRequest)
+T@17:45:42  ~RegisterContextResponse[56]: destroyed
+T@17:45:42  payloadParse[69]: result: 'OK'
+T@17:45:42  payloadParse[70]: outFormat: XML
+T@17:45:42  restService[182]: payloadParse returns 'OK'
+T@17:45:42  restService[197]: Treating service POST /NGSI9/registerContext
+T@17:45:42  restService[237]: tenant: ''
+T@17:45:42  reqSemTake[75]: mongoRegisterContext taking the 'req' semaphore for 'ngsi9 register request'
+T@17:45:42  reqSemTake[77]: mongoRegisterContext has the 'req' semaphore
+T@17:45:42  mongoRegisterContext[51]: Register Context Request
+T@17:45:42  processRegisterContext[342]: Registration expiration: 1401648342
+T@17:45:42  processRegisterContext[380]: Entity registration: {id: ConferenceRoom, type: Room}
+T@17:45:42  processRegisterContext[380]: Entity registration: {id: OfficeRoom, type: Room}
+T@17:45:42  processRegisterContext[394]: Attribute registration: {name: temperature, type: degree, isDomain: false}
+T@17:45:42  processRegisterContext[406]: providingApplication registration: http://localhost:1028/application
+T@17:45:42  addTriggeredSubscriptions[255]: JS function: function(){enId = [ "ConferenceRoom" ,"OfficeRoom" ];enType = [ "Room" ,"Room" ];for (var i=0; i < this.entities.length; i++) {if (this.entities[i].isPattern == "true") {for (var j=0; j < enId.length; j++) {if (enId[j].match(this.entities[i].id) && this.entities[i].type == enType[j]) {return true; }}}}return false; }
+T@17:45:42  addTriggeredSubscriptions[268]: query() in 'testharness.casubs' collection: '{ $or: [ { entities: { $in: [ { id: "ConferenceRoom", type: "Room", isPattern: "false" }, { id: "OfficeRoom", type: "Room", isPattern: "false" } ] }, $or: [ { attrs: { $in: [ "temperature" ] } }, { attrs: { $size: 0 } } ], expiration: { $gt: 1401644742 } }, { entities.isPattern: "true", expiration: { $gt: 1401644742 }, $where: function(){enId = [ "ConferenceRoom" ,"OfficeRoom" ];enType = [ "Room"... } ] }'
+T@17:45:42  mongoSemTake[90]: addTriggeredSubscriptions taking the 'mongo' semaphore for 'query in SubscribeContextAvailabilityCollection'
+T@17:45:42  mongoSemTake[92]: addTriggeredSubscriptions has the 'mongo' semaphore
+T@17:45:42  mongoSemGive[118]: addTriggeredSubscriptions gives the 'mongo' semaphore for 'query in SubscribeContextAvailabilityCollection'
+T@17:45:42  processRegisterContext[422]: upsert update() in 'testharness.registrations' collection: '{ _id: ObjectId('538b66c66c9f729627688f6a'), expiration: 1401648342, contextRegistration: [ { entities: [ { id: "ConferenceRoom", type: "Room" }, { id: "OfficeRoom", type: "Room" } ], attrs: [ { name: "temperature", type: "degree", isDomain: "false" } ], providingApplication: "http://localhost:1028/application" } ] }'
+T@17:45:42  mongoSemTake[90]: processRegisterContext taking the 'mongo' semaphore for 'update in RegistrationsCollection'
+T@17:45:42  mongoSemTake[92]: processRegisterContext has the 'mongo' semaphore
+T@17:45:42  mongoSemGive[118]: processRegisterContext gives the 'mongo' semaphore for 'update in RegistrationsCollection'
+T@17:45:42  reqSemGive[104]: mongoRegisterContext gives the 'req' semaphore for 'ngsi9 register request'
+T@17:45:42  ~RegisterContextResponse[56]: destroyed
+T@17:45:42  release[153]: Releasing Metadata 0
+T@17:45:42  release[153]: Releasing Metadata 1
+T@17:45:42  release[153]: Releasing Metadata 0
+T@17:45:42  release[153]: Releasing Metadata 1
+T@17:45:42  restReply[65]: Response 1: responding with 141 bytes, Status Code 200
+T@17:45:42  restReply[66]: Response payload: '<registerContextResponse>
+  <duration>PT1H</duration>
+  <registrationId>538b66c66c9f729627688f6a</registrationId>
+</registerContextResponse>
+'
+T@17:45:42  ~RegisterContextResponse[56]: destroyed
+F@17:45:42  ***[981]: In sigHandler - caught signal 15
+X@17:45:42  sigHandler[987]: Received signal 15
+
+
+1 ContextRegistrationsContext Registration 0:
+2 EntityIds:
+  Entity Id 0:
+    Id:         ConferenceRoom
+    Type:       Room
+    isPattern:  false
+  Entity Id 1:
+    Id:         OfficeRoom
+    Type:       Room
+    isPattern:  false
+1 ContextRegistrationAttributes  Attribute 0:
+    Name:       temperature
+    Type:       degree
+    isDomain:   false
+2 Attribute Metadatas
+    Attribute Metadata 0:
+      Name:     ID
+      Type:     string
+      Value:    1110
+    Attribute Metadata 1:
+      Name:     cm2
+      Type:     string
+      Value:    XXX
+2 Registration Metadatas
+  Registration Metadata 0:
+    Name:     ID
+    Type:     string
+    Value:    2212
+  Registration Metadata 1:
+    Name:     ID2
+    Type:     string
+    Value:    212
+  ProvidingApplication: http://localhost:1028/application
+Duration: PT1H
+No RegistrationId

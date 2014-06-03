@@ -1,0 +1,20 @@
+{ "dropped" : "testharness", "ok" : 1 }
+T@08:55:43  paConfigActions[727]: setting trace levels to '0-255'
+T@08:55:43  paConfigActions[728]: Leaving function paConfigActions
+E@08:55:43  exitFunc[1009]: unlink(/tmp/orion_9999.pid): No such file or directory
+T@08:55:43  semInit[61]: Initialized 'req' semaphore
+T@08:55:43  semInit[62]: Initialized 'mongo' semaphore
+T@08:55:43  mongoSemTake[90]: mongoConnect taking the 'mongo' semaphore for 'connecting to mongo'
+T@08:55:43  mongoSemTake[92]: mongoConnect has the 'mongo' semaphore
+T@08:55:43  mongoConnect[152]: mongo version server: 2.4.9 (mayor: 2, minor: 4, extra: 9)
+T@08:55:43  mongoSemGive[118]: mongoConnect gives the 'mongo' semaphore for 'connecting to mongo'
+F@08:55:43  ***[1063]: Connected to mongo at localhost:testharness
+T@08:55:43  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant )
+T@08:55:43  recoverOntimeIntervalThreads[398]: query() in 'testharness.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@08:55:43  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@08:55:43  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@08:55:43  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+V@08:55:43  restStart[569]: Starting HTTP daemon on IPv4 0.0.0.0 port 9999
+V@08:55:43  restStart[611]: Starting HTTP daemon on IPv6 :: port 9999
+F@08:56:04  ***[981]: In sigHandler - caught signal 15
+X@08:56:04  sigHandler[987]: Received signal 15

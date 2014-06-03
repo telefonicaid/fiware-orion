@@ -1,0 +1,443 @@
+{ "dropped" : "testharness", "ok" : 1 }
+T@17:45:35  paConfigActions[727]: setting trace levels to '0-255'
+T@17:45:35  paConfigActions[728]: Leaving function paConfigActions
+E@17:45:35  exitFunc[1009]: unlink(/tmp/orion_9999.pid): No such file or directory
+T@17:45:35  semInit[61]: Initialized 'req' semaphore
+T@17:45:35  semInit[62]: Initialized 'mongo' semaphore
+T@17:45:35  mongoSemTake[90]: mongoConnect taking the 'mongo' semaphore for 'connecting to mongo'
+T@17:45:35  mongoSemTake[92]: mongoConnect has the 'mongo' semaphore
+T@17:45:35  mongoConnect[152]: mongo version server: 2.4.9 (mayor: 2, minor: 4, extra: 9)
+T@17:45:35  mongoSemGive[118]: mongoConnect gives the 'mongo' semaphore for 'connecting to mongo'
+F@17:45:35  ***[1063]: Connected to mongo at localhost:testharness
+T@17:45:35  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant )
+T@17:45:35  recoverOntimeIntervalThreads[398]: query() in 'testharness.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@17:45:35  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:35  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@17:45:36  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+V@17:45:36  restStart[569]: Starting HTTP daemon on IPv4 0.0.0.0 port 9999
+V@17:45:36  restStart[611]: Starting HTTP daemon on IPv6 :: port 9999
+T@17:45:37  connectionTreat[438]: notifyFormat: ''
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:37  connectionTreat[442]: HTTP tenant: ''
+T@17:45:37  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:37  restService[197]: Treating service GET /NGSI10/contextEntities/ENTITY_ID
+T@17:45:37  restService[237]: tenant: ''
+T@17:45:37  getIndividualContextEntity[49]: CONVENIENCE: got 'GET' request with 3 components
+T@17:45:37  reqSemTake[75]: mongoQueryContext taking the 'req' semaphore for 'ngsi10 query request'
+T@17:45:37  reqSemTake[77]: mongoQueryContext has the 'req' semaphore
+T@17:45:37  mongoQueryContext[47]: QueryContext Request
+T@17:45:37  fillQueryEntFalse[535]: Entity query token (isPattern=false): {id: ENTITY_ID}
+T@17:45:37  entitiesQuery[795]: query() in 'testharness.entities' collection: '{ $or: [ { _id.id: { $in: [ "ENTITY_ID" ] } } ] }'
+T@17:45:37  mongoSemTake[90]: entitiesQuery taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:37  mongoSemTake[92]: entitiesQuery has the 'mongo' semaphore
+T@17:45:37  mongoSemGive[118]: entitiesQuery gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:37  reqSemGive[104]: mongoQueryContext gives the 'req' semaphore for 'ngsi10 query request'
+E@17:45:37  mapGetIndividualContextEntity[60]: entityId 'ENTITY_ID' not found
+T@17:45:37  ~QueryContextResponse[64]: destroyed
+T@17:45:37  restReply[65]: Response 1: responding with 328 bytes, Status Code 200
+T@17:45:37  restReply[66]: Response payload: '<contextElementResponse>
+  <contextElement>
+    <entityId type="" isPattern="false">
+      <id>ENTITY_ID</id>
+    </entityId>
+  </contextElement>
+  <statusCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Entity id: 'ENTITY_ID'</details>
+  </statusCode>
+</contextElementResponse>
+'
+T@17:45:37  ~RegisterContextResponse[56]: destroyed
+T@17:45:37  connectionTreat[438]: notifyFormat: ''
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:37  connectionTreat[442]: HTTP tenant: ''
+T@17:45:37  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:37  restService[197]: Treating service DELETE /NGSI10/contextEntities/ENTITY_ID
+T@17:45:37  restService[237]: tenant: ''
+T@17:45:37  deleteIndividualContextEntity[52]: CONVENIENCE: got a 'DELETE' request for entityId 'ENTITY_ID'
+T@17:45:37  reqSemTake[75]: mongoUpdateContext taking the 'req' semaphore for 'ngsi10 update request'
+T@17:45:37  reqSemTake[77]: mongoUpdateContext has the 'req' semaphore
+T@17:45:37  processContextElement[1397]: query() in 'testharness.entities' collection: '{ _id.id: "ENTITY_ID" }'
+T@17:45:37  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:37  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:37  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:37  reqSemGive[104]: mongoUpdateContext gives the 'req' semaphore for 'ngsi10 update request'
+T@17:45:37  ~UpdateContextResponse[58]: destroyed
+T@17:45:37  restReply[65]: Response 2: responding with 133 bytes, Status Code 200
+T@17:45:37  restReply[66]: Response payload: '<statusCode>
+  <code>404</code>
+  <reasonPhrase>No context element found</reasonPhrase>
+  <details>ENTITY_ID</details>
+</statusCode>
+'
+T@17:45:37  ~RegisterContextResponse[56]: destroyed
+T@17:45:37  connectionTreat[438]: notifyFormat: ''
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Content-Length: 303
+T@17:45:37  connectionTreat[442]: HTTP tenant: ''
+T@17:45:37  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:37  restService[179]: Parsing payload for URL '/NGSI10/contextEntities/ENTITY_ID', method 'POST', service vector index: 49
+T@17:45:37  payloadParse[53]: parsing data for service 'IndividualContextEntity'. Method: 'POST'
+T@17:45:37  payloadParse[54]: outFormat: XML
+T@17:45:37  payloadParse[58]: Calling xmlTreat for service request 31, payloadWord 'appendContextElementRequest'
+2@17:45:37  xmlRequestGet[155]: Found xmlRequest of type 31, method 'POST' - index 38 (/appendContextElementRequest)
+T@17:45:37  nullTreat[272]: Not treating node 'appendContextElementRequest'
+T@17:45:37  attributeDomainName[48]: Got an attributeDomainName
+T@17:45:37  nullTreat[272]: Not treating node 'contextAttributeList'
+T@17:45:37  contextAttribute[61]: Got an attribute
+T@17:45:37  ContextAttribute[42]: Creating a ContextAttribute 1
+T@17:45:37  contextAttributeName[75]: Got an attribute name: pressure
+T@17:45:37  contextAttributeType[88]: Got an attribute type: clima
+T@17:45:37  contextAttributeValue[101]: Got an attribute value: p23
+T@17:45:37  xmlTreat[251]: Calling check for XML parsed tree (appendContextElementRequest)
+T@17:45:37  payloadParse[69]: result: 'OK'
+T@17:45:37  payloadParse[70]: outFormat: XML
+T@17:45:37  restService[182]: payloadParse returns 'OK'
+T@17:45:37  restService[197]: Treating service POST /NGSI10/contextEntities/ENTITY_ID
+T@17:45:37  restService[237]: tenant: ''
+T@17:45:37  postIndividualContextEntity[49]: CONVENIENCE: got a 'POST' request for entityId 'ENTITY_ID'
+T@17:45:37  ContextAttribute[67]: Creating a ContextAttribute: compoundValueP at (nil) for attribute 'pressure' at 0x266e050
+T@17:45:37  reqSemTake[75]: mongoUpdateContext taking the 'req' semaphore for 'ngsi10 update request'
+T@17:45:37  reqSemTake[77]: mongoUpdateContext has the 'req' semaphore
+T@17:45:37  processContextElement[1397]: query() in 'testharness.entities' collection: '{ _id.id: "ENTITY_ID" }'
+T@17:45:37  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:37  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:37  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:37  ContextAttribute[86]: Creating a ContextAttribute 'pressure':'clima':'', setting its compound to NULL
+T@17:45:37  createEntity[1201]: Entity not found in 'testharness.entities' collection, creating it
+T@17:45:37  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant )
+T@17:45:37  createEntity[1238]: new attribute: {name: pressure, type: clima, value: p23}
+T@17:45:37  createEntity[1273]: insert() in 'testharness.entities' collection: '{ _id: { id: "ENTITY_ID" }, attrs: [ { name: "pressure", type: "clima", creDate: 1401644737, modDate: 1401644737, value: "p23" } ], creDate: 1401644737, modDate: 1401644737 }'
+T@17:45:37  mongoSemTake[90]: createEntity taking the 'mongo' semaphore for 'insert into EntitiesCollection'
+T@17:45:37  mongoSemTake[92]: createEntity has the 'mongo' semaphore
+T@17:45:37  mongoSemGive[118]: createEntity gives the 'mongo' semaphore for 'insert into EntitiesCollection'
+T@17:45:37  addTriggeredSubscriptions[772]: JS function: function(){for (var i=0; i < this.entities.length; i++) {if (this.entities[i].isPattern == "true" && (this.entities[i].type == "" || this.entities[i].type == "" || !("type" in this.entities[i])) && "ENTITY_ID".match(this.entities[i].id)) {return true; }}return false; }
+T@17:45:37  addTriggeredSubscriptions[787]: query() in 'testharness.csubs' collection: '{ $or: [ { entities.id: "ENTITY_ID", $or: [ { entities.type: "" }, { entities.type: { $exists: false } } ], entities.isPattern: "false", conditions.type: "ONCHANGE", conditions.value: "pressure", expiration: { $gt: 1401644737 } }, { entities.isPattern: "true", conditions.type: "ONCHANGE", conditions.value: "pressure", expiration: { $gt: 1401644737 }, $where: function(){for (var i=0; i < this.entities.length; i++) {if (this.enti... } ] }'
+T@17:45:37  mongoSemTake[90]: addTriggeredSubscriptions taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:37  mongoSemTake[92]: addTriggeredSubscriptions has the 'mongo' semaphore
+T@17:45:37  mongoSemGive[118]: addTriggeredSubscriptions gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:37  reqSemGive[104]: mongoUpdateContext gives the 'req' semaphore for 'ngsi10 update request'
+T@17:45:37  mapPostIndividualContextEntity[69]: Copying ContextAttribute 0
+T@17:45:37  ContextAttribute[67]: Creating a ContextAttribute: compoundValueP at (nil) for attribute 'pressure' at 0x266e3f0
+T@17:45:37  release[114]: In UpdateContextResponse::release
+T@17:45:37  ~UpdateContextResponse[58]: destroyed
+T@17:45:37  release[99]: Releasing AppendContextElementResponse
+T@17:45:37  restReply[65]: Response 3: responding with 494 bytes, Status Code 200
+T@17:45:37  restReply[66]: Response payload: '<appendContextElementResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>pressure</name>
+          <type>clima</type>
+          <contextValue></contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</appendContextElementResponse>
+'
+T@17:45:37  ~RegisterContextResponse[56]: destroyed
+T@17:45:37  connectionTreat[438]: notifyFormat: ''
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Content-Length: 306
+T@17:45:37  connectionTreat[442]: HTTP tenant: ''
+T@17:45:37  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:37  restService[179]: Parsing payload for URL '/NGSI10/contextEntities/ENTITY_ID', method 'PUT', service vector index: 48
+T@17:45:37  payloadParse[53]: parsing data for service 'IndividualContextEntity'. Method: 'PUT'
+T@17:45:37  payloadParse[54]: outFormat: XML
+T@17:45:37  payloadParse[58]: Calling xmlTreat for service request 31, payloadWord 'updateContextElementRequest'
+2@17:45:37  xmlRequestGet[155]: Found xmlRequest of type 31, method 'PUT' - index 37 (/updateContextElementRequest)
+T@17:45:37  nullTreat[272]: Not treating node 'updateContextElementRequest'
+T@17:45:37  attributeDomainName[48]: Got an attributeDomainName
+T@17:45:37  nullTreat[272]: Not treating node 'contextAttributeList'
+T@17:45:37  contextAttribute[61]: Got an attribute
+T@17:45:37  ContextAttribute[42]: Creating a ContextAttribute 1
+T@17:45:37  contextAttributeName[75]: Got an attribute name: temperature
+T@17:45:37  contextAttributeType[88]: Got an attribute type: degree
+T@17:45:37  contextAttributeValue[101]: Got an attribute value: 10
+T@17:45:37  xmlTreat[251]: Calling check for XML parsed tree (updateContextElementRequest)
+T@17:45:37  payloadParse[69]: result: 'OK'
+T@17:45:37  payloadParse[70]: outFormat: XML
+T@17:45:37  restService[182]: payloadParse returns 'OK'
+T@17:45:37  restService[197]: Treating service PUT /NGSI10/contextEntities/ENTITY_ID
+T@17:45:37  restService[237]: tenant: ''
+T@17:45:37  putIndividualContextEntity[49]: CONVENIENCE: got a 'PUT' request for entityId 'ENTITY_ID'
+T@17:45:37  reqSemTake[75]: mongoUpdateContext taking the 'req' semaphore for 'ngsi10 update request'
+T@17:45:37  reqSemTake[77]: mongoUpdateContext has the 'req' semaphore
+T@17:45:37  processContextElement[1397]: query() in 'testharness.entities' collection: '{ _id.id: "ENTITY_ID" }'
+T@17:45:37  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:37  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:37  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:37  processContextElement[1431]: retrieved document: '{ _id: { id: "ENTITY_ID" }, attrs: [ { name: "pressure", type: "clima", creDate: 1401644737, modDate: 1401644737, value: "p23" } ], creDate: 1401644737, modDate: 1401644737 }'
+T@17:45:37  ContextAttribute[86]: Creating a ContextAttribute 'temperature':'degree':'', setting its compound to NULL
+T@17:45:37  reqSemGive[104]: mongoUpdateContext gives the 'req' semaphore for 'ngsi10 update request'
+T@17:45:37  ContextAttribute[67]: Creating a ContextAttribute: compoundValueP at (nil) for attribute 'temperature' at 0x266e2b0
+T@17:45:37  ~UpdateContextResponse[58]: destroyed
+T@17:45:37  restReply[65]: Response 4: responding with 284 bytes, Status Code 200
+T@17:45:37  restReply[66]: Response payload: '<updateContextElementResponse>
+  <errorCode>
+    <code>472</code>
+    <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
+    <details>action: UPDATE - entity: (ENTITY_ID, ) - offending attribute: temperature</details>
+  </errorCode>
+</updateContextElementResponse>
+'
+T@17:45:37  ~RegisterContextResponse[56]: destroyed
+T@17:45:37  connectionTreat[438]: notifyFormat: ''
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Content-Length: 601
+T@17:45:37  connectionTreat[442]: HTTP tenant: ''
+T@17:45:37  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:37  restService[179]: Parsing payload for URL '/NGSI9/registerContext', method 'POST', service vector index: 0
+T@17:45:37  payloadParse[53]: parsing data for service 'RegisterContextRequest'. Method: 'POST'
+T@17:45:37  payloadParse[54]: outFormat: XML
+T@17:45:37  payloadParse[58]: Calling xmlTreat for service request 1, payloadWord 'registerContextRequest'
+2@17:45:37  xmlRequestGet[155]: Found xmlRequest of type 1, method 'POST' - index 0 (/registerContextRequest)
+T@17:45:37  nullTreat[272]: Not treating node 'registerContextRequest'
+T@17:45:37  nullTreat[272]: Not treating node 'contextRegistrationList'
+T@17:45:37  entityIdList[409]: got an entityIdList
+T@17:45:37  entityId[63]: Got an entityId
+T@17:45:37  entityIdParse[291]: Got a type for an entity: 'Room'
+T@17:45:37  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@17:45:37  entityIdId[84]: Got an entityId:id: 'ENTITY_ID'
+T@17:45:37  nullTreat[272]: Not treating node 'contextRegistrationAttributeList'
+T@17:45:37  crAttribute[99]: Creating an attribute
+T@17:45:37  craName[113]: Got an attribute name: 'temperature'
+T@17:45:37  craType[126]: Got an attribute type: 'degree'
+T@17:45:37  craIsDomain[139]: Got a isDomain: 'false'
+T@17:45:37  providingApplication[258]: Got a providing application: 'http://localhost:1028/application'
+T@17:45:37  duration[271]: Got a duration: 'PT1H'
+T@17:45:37  xmlTreat[251]: Calling check for XML parsed tree (registerContextRequest)
+T@17:45:37  ~RegisterContextResponse[56]: destroyed
+T@17:45:37  payloadParse[69]: result: 'OK'
+T@17:45:37  payloadParse[70]: outFormat: XML
+T@17:45:37  restService[182]: payloadParse returns 'OK'
+T@17:45:37  restService[197]: Treating service POST /NGSI9/registerContext
+T@17:45:37  restService[237]: tenant: ''
+T@17:45:37  reqSemTake[75]: mongoRegisterContext taking the 'req' semaphore for 'ngsi9 register request'
+T@17:45:37  reqSemTake[77]: mongoRegisterContext has the 'req' semaphore
+T@17:45:37  mongoRegisterContext[51]: Register Context Request
+T@17:45:37  processRegisterContext[342]: Registration expiration: 1401648337
+T@17:45:37  processRegisterContext[380]: Entity registration: {id: ENTITY_ID, type: Room}
+T@17:45:37  processRegisterContext[394]: Attribute registration: {name: temperature, type: degree, isDomain: false}
+T@17:45:37  processRegisterContext[406]: providingApplication registration: http://localhost:1028/application
+T@17:45:37  addTriggeredSubscriptions[255]: JS function: function(){enId = [ "ENTITY_ID" ];enType = [ "Room" ];for (var i=0; i < this.entities.length; i++) {if (this.entities[i].isPattern == "true") {for (var j=0; j < enId.length; j++) {if (enId[j].match(this.entities[i].id) && this.entities[i].type == enType[j]) {return true; }}}}return false; }
+T@17:45:37  addTriggeredSubscriptions[268]: query() in 'testharness.casubs' collection: '{ $or: [ { entities: { $in: [ { id: "ENTITY_ID", type: "Room", isPattern: "false" } ] }, $or: [ { attrs: { $in: [ "temperature" ] } }, { attrs: { $size: 0 } } ], expiration: { $gt: 1401644737 } }, { entities.isPattern: "true", expiration: { $gt: 1401644737 }, $where: function(){enId = [ "ENTITY_ID" ];enType = [ "Room" ];for (var i=0; i ... } ] }'
+T@17:45:37  mongoSemTake[90]: addTriggeredSubscriptions taking the 'mongo' semaphore for 'query in SubscribeContextAvailabilityCollection'
+T@17:45:37  mongoSemTake[92]: addTriggeredSubscriptions has the 'mongo' semaphore
+T@17:45:37  mongoSemGive[118]: addTriggeredSubscriptions gives the 'mongo' semaphore for 'query in SubscribeContextAvailabilityCollection'
+T@17:45:37  processRegisterContext[422]: upsert update() in 'testharness.registrations' collection: '{ _id: ObjectId('538b66c12ce5ea10dc431fa9'), expiration: 1401648337, contextRegistration: [ { entities: [ { id: "ENTITY_ID", type: "Room" } ], attrs: [ { name: "temperature", type: "degree", isDomain: "false" } ], providingApplication: "http://localhost:1028/application" } ] }'
+T@17:45:37  mongoSemTake[90]: processRegisterContext taking the 'mongo' semaphore for 'update in RegistrationsCollection'
+T@17:45:37  mongoSemTake[92]: processRegisterContext has the 'mongo' semaphore
+T@17:45:37  mongoSemGive[118]: processRegisterContext gives the 'mongo' semaphore for 'update in RegistrationsCollection'
+T@17:45:37  reqSemGive[104]: mongoRegisterContext gives the 'req' semaphore for 'ngsi9 register request'
+T@17:45:37  ~RegisterContextResponse[56]: destroyed
+T@17:45:37  restReply[65]: Response 5: responding with 141 bytes, Status Code 200
+T@17:45:37  restReply[66]: Response payload: '<registerContextResponse>
+  <duration>PT1H</duration>
+  <registrationId>538b66c12ce5ea10dc431fa9</registrationId>
+</registerContextResponse>
+'
+T@17:45:37  ~RegisterContextResponse[56]: destroyed
+T@17:45:37  connectionTreat[438]: notifyFormat: ''
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:37  connectionTreat[442]: HTTP tenant: ''
+T@17:45:37  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:37  restService[197]: Treating service GET /NGSI10/contextEntities/ENTITY_ID
+T@17:45:37  restService[237]: tenant: ''
+T@17:45:37  getIndividualContextEntity[49]: CONVENIENCE: got 'GET' request with 3 components
+T@17:45:37  reqSemTake[75]: mongoQueryContext taking the 'req' semaphore for 'ngsi10 query request'
+T@17:45:37  reqSemTake[77]: mongoQueryContext has the 'req' semaphore
+T@17:45:37  mongoQueryContext[47]: QueryContext Request
+T@17:45:37  fillQueryEntFalse[535]: Entity query token (isPattern=false): {id: ENTITY_ID}
+T@17:45:37  entitiesQuery[795]: query() in 'testharness.entities' collection: '{ $or: [ { _id.id: { $in: [ "ENTITY_ID" ] } } ] }'
+T@17:45:37  mongoSemTake[90]: entitiesQuery taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:37  mongoSemTake[92]: entitiesQuery has the 'mongo' semaphore
+T@17:45:37  mongoSemGive[118]: entitiesQuery gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:37  entitiesQuery[832]: retrieved document: '{ _id: { id: "ENTITY_ID" }, attrs: [ { name: "pressure", type: "clima", creDate: 1401644737, modDate: 1401644737, value: "p23" } ], creDate: 1401644737, modDate: 1401644737 }'
+T@17:45:37  ContextAttribute[42]: Creating a ContextAttribute 1
+T@17:45:37  ContextAttribute[86]: Creating a ContextAttribute 'pressure':'clima':'p23', setting its compound to NULL
+T@17:45:37  reqSemGive[104]: mongoQueryContext gives the 'req' semaphore for 'ngsi10 query request'
+T@17:45:37  ContextAttribute[67]: Creating a ContextAttribute: compoundValueP at (nil) for attribute 'pressure' at 0x266e3b0
+T@17:45:37  ~QueryContextResponse[64]: destroyed
+T@17:45:37  restReply[65]: Response 6: responding with 464 bytes, Status Code 200
+T@17:45:37  restReply[66]: Response payload: '<contextElementResponse>
+  <contextElement>
+    <entityId type="" isPattern="false">
+      <id>ENTITY_ID</id>
+    </entityId>
+    <contextAttributeList>
+      <contextAttribute>
+        <name>pressure</name>
+        <type>clima</type>
+        <contextValue>p23</contextValue>
+      </contextAttribute>
+    </contextAttributeList>
+  </contextElement>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</contextElementResponse>
+'
+T@17:45:37  ~RegisterContextResponse[56]: destroyed
+T@17:45:37  connectionTreat[438]: notifyFormat: ''
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Content-Length: 303
+T@17:45:37  connectionTreat[442]: HTTP tenant: ''
+T@17:45:37  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:37  restService[179]: Parsing payload for URL '/NGSI10/contextEntities/ENTITY_ID', method 'PUT', service vector index: 48
+T@17:45:37  payloadParse[53]: parsing data for service 'IndividualContextEntity'. Method: 'PUT'
+T@17:45:37  payloadParse[54]: outFormat: XML
+T@17:45:37  payloadParse[58]: Calling xmlTreat for service request 31, payloadWord 'updateContextElementRequest'
+2@17:45:37  xmlRequestGet[155]: Found xmlRequest of type 31, method 'PUT' - index 37 (/updateContextElementRequest)
+T@17:45:37  nullTreat[272]: Not treating node 'updateContextElementRequest'
+T@17:45:37  attributeDomainName[48]: Got an attributeDomainName
+T@17:45:37  nullTreat[272]: Not treating node 'contextAttributeList'
+T@17:45:37  contextAttribute[61]: Got an attribute
+T@17:45:37  ContextAttribute[42]: Creating a ContextAttribute 1
+T@17:45:37  contextAttributeName[75]: Got an attribute name: pressure
+T@17:45:37  contextAttributeType[88]: Got an attribute type: clima
+T@17:45:37  contextAttributeValue[101]: Got an attribute value: p50
+T@17:45:37  xmlTreat[251]: Calling check for XML parsed tree (updateContextElementRequest)
+T@17:45:37  payloadParse[69]: result: 'OK'
+T@17:45:37  payloadParse[70]: outFormat: XML
+T@17:45:37  restService[182]: payloadParse returns 'OK'
+T@17:45:37  restService[197]: Treating service PUT /NGSI10/contextEntities/ENTITY_ID
+T@17:45:37  restService[237]: tenant: ''
+T@17:45:37  putIndividualContextEntity[49]: CONVENIENCE: got a 'PUT' request for entityId 'ENTITY_ID'
+T@17:45:37  reqSemTake[75]: mongoUpdateContext taking the 'req' semaphore for 'ngsi10 update request'
+T@17:45:37  reqSemTake[77]: mongoUpdateContext has the 'req' semaphore
+T@17:45:37  processContextElement[1397]: query() in 'testharness.entities' collection: '{ _id.id: "ENTITY_ID" }'
+T@17:45:37  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:37  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:37  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:37  processContextElement[1431]: retrieved document: '{ _id: { id: "ENTITY_ID" }, attrs: [ { name: "pressure", type: "clima", creDate: 1401644737, modDate: 1401644737, value: "p23" } ], creDate: 1401644737, modDate: 1401644737 }'
+T@17:45:37  ContextAttribute[86]: Creating a ContextAttribute 'pressure':'clima':'', setting its compound to NULL
+T@17:45:37  addTriggeredSubscriptions[772]: JS function: function(){for (var i=0; i < this.entities.length; i++) {if (this.entities[i].isPattern == "true" && (this.entities[i].type == "" || this.entities[i].type == "" || !("type" in this.entities[i])) && "ENTITY_ID".match(this.entities[i].id)) {return true; }}return false; }
+T@17:45:37  addTriggeredSubscriptions[787]: query() in 'testharness.csubs' collection: '{ $or: [ { entities.id: "ENTITY_ID", $or: [ { entities.type: "" }, { entities.type: { $exists: false } } ], entities.isPattern: "false", conditions.type: "ONCHANGE", conditions.value: "pressure", expiration: { $gt: 1401644737 } }, { entities.isPattern: "true", conditions.type: "ONCHANGE", conditions.value: "pressure", expiration: { $gt: 1401644737 }, $where: function(){for (var i=0; i < this.entities.length; i++) {if (this.enti... } ] }'
+T@17:45:37  mongoSemTake[90]: addTriggeredSubscriptions taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:37  mongoSemTake[92]: addTriggeredSubscriptions has the 'mongo' semaphore
+T@17:45:37  mongoSemGive[118]: addTriggeredSubscriptions gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:37  processContextElement[1516]: update() in 'testharness.entities' collection: {{ _id.id: "ENTITY_ID", _id.type: { $exists: false } }, { $set: { attrs: [ { name: "pressure", type: "clima", creDate: 1401644737, value: "p50", modDate: 1401644737 } ], modDate: 1401644737 }, $unset: { location: 1 } }}
+T@17:45:37  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'update in EntitiesCollection'
+T@17:45:37  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:37  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'update in EntitiesCollection'
+T@17:45:37  reqSemGive[104]: mongoUpdateContext gives the 'req' semaphore for 'ngsi10 update request'
+T@17:45:37  ContextAttribute[67]: Creating a ContextAttribute: compoundValueP at (nil) for attribute 'pressure' at 0x266e040
+T@17:45:37  ~UpdateContextResponse[58]: destroyed
+T@17:45:37  restReply[65]: Response 7: responding with 494 bytes, Status Code 200
+T@17:45:37  restReply[66]: Response payload: '<updateContextElementResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>pressure</name>
+          <type>clima</type>
+          <contextValue></contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</updateContextElementResponse>
+'
+T@17:45:37  ~RegisterContextResponse[56]: destroyed
+T@17:45:37  connectionTreat[438]: notifyFormat: ''
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:37  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:37  connectionTreat[442]: HTTP tenant: ''
+T@17:45:37  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:37  restService[197]: Treating service DELETE /NGSI10/contextEntities/ENTITY_ID
+T@17:45:37  restService[237]: tenant: ''
+T@17:45:37  deleteIndividualContextEntity[52]: CONVENIENCE: got a 'DELETE' request for entityId 'ENTITY_ID'
+T@17:45:37  reqSemTake[75]: mongoUpdateContext taking the 'req' semaphore for 'ngsi10 update request'
+T@17:45:37  reqSemTake[77]: mongoUpdateContext has the 'req' semaphore
+T@17:45:37  processContextElement[1397]: query() in 'testharness.entities' collection: '{ _id.id: "ENTITY_ID" }'
+T@17:45:37  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:37  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@17:45:37  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:37  processContextElement[1431]: retrieved document: '{ _id: { id: "ENTITY_ID" }, attrs: [ { name: "pressure", type: "clima", creDate: 1401644737, value: "p50", modDate: 1401644737 } ], creDate: 1401644737, modDate: 1401644737 }'
+T@17:45:37  removeEntity[1319]: remove() in 'testharness.entities' collection: {{ _id.id: "ENTITY_ID", _id.type: { $exists: false } }}
+T@17:45:37  mongoSemTake[90]: removeEntity taking the 'mongo' semaphore for 'remove in EntitiesCollection'
+T@17:45:37  mongoSemTake[92]: removeEntity has the 'mongo' semaphore
+T@17:45:37  mongoSemGive[118]: removeEntity gives the 'mongo' semaphore for 'remove in EntitiesCollection'
+T@17:45:37  reqSemGive[104]: mongoUpdateContext gives the 'req' semaphore for 'ngsi10 update request'
+T@17:45:37  ~UpdateContextResponse[58]: destroyed
+T@17:45:37  restReply[65]: Response 8: responding with 80 bytes, Status Code 200
+T@17:45:37  restReply[66]: Response payload: '<statusCode>
+  <code>200</code>
+  <reasonPhrase>OK</reasonPhrase>
+</statusCode>
+'
+T@17:45:37  ~RegisterContextResponse[56]: destroyed
+F@17:45:37  ***[981]: In sigHandler - caught signal 15
+X@17:45:37  sigHandler[987]: Received signal 15
+No AttributeDomainName
+1 ContextAttributesAttribute 0:
+  Name:       pressure
+  Type:       clima
+  Value:      p23
+0 Attribute Metadatas
+0 Domain Metadatas
+No AttributeDomainName
+1 ContextAttributesAttribute 0:
+  Name:       temperature
+  Type:       degree
+  Value:      10
+0 Attribute Metadatas
+
+
+1 ContextRegistrationsContext Registration 0:
+1 EntityIds:
+  Entity Id 0:
+    Id:         ENTITY_ID
+    Type:       Room
+    isPattern:  false
+1 ContextRegistrationAttributes  Attribute 0:
+    Name:       temperature
+    Type:       degree
+    isDomain:   false
+0 Attribute Metadatas
+0 Registration Metadatas
+  ProvidingApplication: http://localhost:1028/application
+Duration: PT1H
+No RegistrationId
+No AttributeDomainName
+1 ContextAttributesAttribute 0:
+  Name:       pressure
+  Type:       clima
+  Value:      p50
+0 Attribute Metadatas

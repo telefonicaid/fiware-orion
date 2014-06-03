@@ -1,0 +1,76 @@
+1: +++++++++++++++++++++++++++++++++++++
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+2: +++++++++++++++++++++++++++++++++++++
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>entity01</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue></contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue></contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+3: +++++++++++++++++++++++++++++++++++++
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>entity01</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>11</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue>L23</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+4: +++++++++++++++++++++++++++++++++++++
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>538b66bf0c18132d6745f4d6</subscriptionId>
+    <duration>P5Y</duration>
+    <throttling>P5Y</throttling>
+  </subscribeResponse>
+</subscribeContextResponse>
+5: +++++++++++++++++++++++++++++++++++++
+circleRadius: Got a circleRadius: 10
+circleRadius: Got a circleRadius: 10
+circleRadius: Got a circleRadius: 11
+6: +++++++++++++++++++++++++++++++++++++

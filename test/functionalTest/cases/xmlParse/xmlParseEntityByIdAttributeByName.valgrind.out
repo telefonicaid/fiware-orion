@@ -1,0 +1,729 @@
+==29634== Memcheck, a memory error detector
+==29634== Copyright (C) 2002-2011, and GNU GPL'd, by Julian Seward et al.
+==29634== Using Valgrind-3.7.0 and LibVEX; rerun with -h for copyright info
+==29634== Command: contextBroker -vvvvv -harakiri -port 9999 -pidpath /tmp/orion_9999.pid -db testharness -t 0-255
+==29634== 
+T@09:30:33  paConfigActions[727]: setting trace levels to '0-255'
+T@09:30:33  paConfigActions[728]: Leaving function paConfigActions
+E@09:30:33  exitFunc[559]: unlink(/tmp/orion_9999.pid): No such file or directory
+T@09:30:33  semInit[61]: Initialized 'req' semaphore
+T@09:30:33  semInit[62]: Initialized 'mongo' semaphore
+T@09:30:33  mongoSemTake[90]: mongoConnect taking the 'mongo' semaphore for 'connecting to mongo'
+T@09:30:33  mongoSemTake[92]: mongoConnect has the 'mongo' semaphore
+==29634== 
+==29634== HEAP SUMMARY:
+==29634==     in use at exit: 17,690 bytes in 104 blocks
+==29634==   total heap usage: 3,269 allocs, 3,165 frees, 313,863 bytes allocated
+==29634== 
+==29634== LEAK SUMMARY:
+==29634==    definitely lost: 0 bytes in 0 blocks
+==29634==    indirectly lost: 0 bytes in 0 blocks
+==29634==      possibly lost: 0 bytes in 0 blocks
+==29634==    still reachable: 17,690 bytes in 104 blocks
+==29634==         suppressed: 0 bytes in 0 blocks
+==29634== Rerun with --leak-check=full to see details of leaked memory
+==29634== 
+==29634== For counts of detected and suppressed errors, rerun with: -v
+==29634== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 7 from 7)
+T@09:30:33  mongoConnect[136]: mongo version server: 2.4.9 (mayor: 2, minor: 4, extra: 9)
+T@09:30:33  mongoSemGive[118]: mongoConnect gives the 'mongo' semaphore for 'connecting to mongo'
+F@09:30:33  ***[600]: Connected to mongo at localhost:testharness
+T@09:30:33  ensureLocationIndex[336]: ensuring 2dsphere index on location.coords
+T@09:30:33  recoverOntimeIntervalThreads[353]: query() in 'testharness.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@09:30:33  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@09:30:33  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@09:30:33  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+==29639== Source and destination overlap in strncpy(0xa4d8a7, 0xa4d8a7, 63)
+==29639==    at 0x4C29782: strncpy (mc_replace_strmem.c:463)
+==29639==    by 0x659678: restInit(RestService*, IpVersion, char const*, unsigned short, char const*, char const*, void (*)(ConnectionInfo*), bool) (rest.cpp:600)
+==29639==    by 0x5DF38D: main (contextBroker.cpp:737)
+==29639== 
+==29639== Source and destination overlap in strncpy(0xa4d8e2, 0xa4d8e2, 63)
+==29639==    at 0x4C29782: strncpy (mc_replace_strmem.c:463)
+==29639==    by 0x65969C: restInit(RestService*, IpVersion, char const*, unsigned short, char const*, char const*, void (*)(ConnectionInfo*), bool) (rest.cpp:603)
+==29639==    by 0x5DF38D: main (contextBroker.cpp:737)
+==29639== 
+V@09:30:33  restStart[499]: Starting HTTP daemon on IPv4 0.0.0.0 port 9999
+V@09:30:33  restStart[541]: Starting HTTP daemon on IPv6 :: port 9999
+==29639== Thread 4:
+==29639== Syscall param mmap(length) contains uninitialised byte(s)
+==29639==    at 0x58B9AFA: mmap (syscall-template.S:82)
+==29639==    by 0x4E398E7: MHD_pool_create (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35F47: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4E39A1F: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35F20: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4E39A24: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35F20: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4E39A52: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35F20: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4E399BC: MHD_pool_allocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E33C62: MHD_set_connection_value (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34033: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E3426D: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34783: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+T@09:30:40  httpHeaderGet[94]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:30:40  httpHeaderGet[94]: HTTP Header:   Host: localhost:9999
+T@09:30:40  httpHeaderGet[94]: HTTP Header:   Content-Type: application/xml
+T@09:30:40  httpHeaderGet[94]: HTTP Header:   Accept: application/xml
+T@09:30:40  httpHeaderGet[94]: HTTP Header:   Content-Length: 392
+T@09:30:41  restService[135]: Parsing payload for URL '/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01', method 'POST', service vector index: 31
+T@09:30:41  payloadParse[53]: parsing data for service 'EntityByIdAttributeByName'. Method: 'POST'
+T@09:30:41  payloadParse[54]: outFormat: XML
+T@09:30:41  payloadParse[58]: Calling xmlTreat for service request 23, payloadWord 'registerProviderRequest'
+2@09:30:41  xmlRequestGet[155]: Found xmlRequest of type 23, method 'POST' - index 26 (/registerProviderRequest)
+T@09:30:41  nullTreat[272]: Not treating node 'registerProviderRequest'
+T@09:30:41  nullTreat[272]: Not treating node 'metadata'
+T@09:30:41  contextMetadata[48]: Got a metadata
+T@09:30:41  contextMetadataName[62]: Got a metadata name 'ID'
+T@09:30:41  contextMetadataType[75]: Got a metadata type 'string'
+T@09:30:41  contextMetadataValue[88]: Got a metadata value '1110'
+T@09:30:41  contextMetadata[48]: Got a metadata
+T@09:30:41  contextMetadataName[62]: Got a metadata name 'cm2'
+T@09:30:41  contextMetadataType[75]: Got a metadata type 'string'
+T@09:30:41  contextMetadataValue[88]: Got a metadata value 'XXX'
+T@09:30:41  duration[101]: Got a duration 'PT1H'
+T@09:30:41  providingApplication[114]: Got a providingApplication 'http://kz.tid.es/abc'
+T@09:30:41  xmlTreat[251]: Calling check for XML parsed tree (registerProviderRequest)
+T@09:30:41  payloadParse[69]: result: 'OK'
+T@09:30:41  payloadParse[70]: outFormat: XML
+T@09:30:41  restService[138]: payloadParse returns 'OK'
+T@09:30:41  restService[153]: Treating service POST /NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01
+T@09:30:41  Metadata[58]: 'cloning' a Metadata
+T@09:30:41  Metadata[58]: 'cloning' a Metadata
+T@09:30:41  reqSemTake[75]: mongoRegisterContext taking the 'req' semaphore for 'ngsi9 register request'
+T@09:30:41  reqSemTake[77]: mongoRegisterContext has the 'req' semaphore
+T@09:30:41  mongoRegisterContext[51]: Register Context Request
+T@09:30:41  processRegisterContext[342]: Registration expiration: 1399458641
+T@09:30:41  processRegisterContext[376]: Entity registration: {id: ENTITY_ID}
+T@09:30:41  processRegisterContext[394]: Attribute registration: {name: ATTRIBUTE_01, type: , isDomain: false}
+T@09:30:41  processRegisterContext[406]: providingApplication registration: http://kz.tid.es/abc
+T@09:30:41  addTriggeredSubscriptions[255]: JS function: function(){enId = [ "ENTITY_ID" ];enType = [ "" ];for (var i=0; i < this.entities.length; i++) {if (this.entities[i].isPattern == "true") {for (var j=0; j < enId.length; j++) {if (enId[j].match(this.entities[i].id) && this.entities[i].type == enType[j]) {return true; }}}}return false; }
+T@09:30:41  addTriggeredSubscriptions[268]: query() in 'testharness.casubs' collection: '{ $or: [ { entities: { $in: [ { id: "ENTITY_ID", type: "", isPattern: "false" } ] }, $or: [ { attrs: { $in: [ "ATTRIBUTE_01" ] } }, { attrs: { $size: 0 } } ], expiration: { $gt: 1399455041 } }, { entities.isPattern: "true", expiration: { $gt: 1399455041 }, $where: function(){enId = [ "ENTITY_ID" ];enType = [ "" ];for (var i=0; i < th... } ] }'
+T@09:30:41  mongoSemTake[90]: addTriggeredSubscriptions taking the 'mongo' semaphore for 'query in SubscribeContextAvailabilityCollection'
+T@09:30:41  mongoSemTake[92]: addTriggeredSubscriptions has the 'mongo' semaphore
+T@09:30:41  mongoSemGive[118]: addTriggeredSubscriptions gives the 'mongo' semaphore for 'query in SubscribeContextAvailabilityCollection'
+T@09:30:41  processRegisterContext[422]: upsert update() in 'testharness.registrations' collection: '{ _id: ObjectId('5369fd410e9decd6b6d14872'), expiration: 1399458641, contextRegistration: [ { entities: [ { id: "ENTITY_ID" } ], attrs: [ { name: "ATTRIBUTE_01", type: "", isDomain: "false" } ], providingApplication: "http://kz.tid.es/abc" } ] }'
+T@09:30:41  mongoSemTake[90]: processRegisterContext taking the 'mongo' semaphore for 'update in RegistrationsCollection'
+T@09:30:41  mongoSemTake[92]: processRegisterContext has the 'mongo' semaphore
+T@09:30:41  mongoSemGive[118]: processRegisterContext gives the 'mongo' semaphore for 'update in RegistrationsCollection'
+T@09:30:41  reqSemGive[104]: mongoRegisterContext gives the 'req' semaphore for 'ngsi9 register request'
+T@09:30:41  ~RegisterContextResponse[56]: destroyed
+T@09:30:41  release[153]: Releasing Metadata 0
+T@09:30:41  release[153]: Releasing Metadata 1
+T@09:30:41  release[153]: Releasing Metadata 0
+T@09:30:41  release[153]: Releasing Metadata 1
+T@09:30:41  restReply[65]: Response 1: responding with 141 bytes, Status Code 200
+T@09:30:41  restReply[66]: Response payload: '<registerContextResponse>
+  <duration>PT1H</duration>
+  <registrationId>5369fd410e9decd6b6d14872</registrationId>
+</registerContextResponse>
+'
+T@09:30:41  ~RegisterContextResponse[56]: destroyed
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4E399BC: MHD_pool_allocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E335B6: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4E335BD: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4C2A639: memcpy (mc_replace_strmem.c:121)
+==29639==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4C2A64E: memcpy (mc_replace_strmem.c:838)
+==29639==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4C2A69B: memcpy (mc_replace_strmem.c:838)
+==29639==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4C2A790: memcpy (mc_replace_strmem.c:838)
+==29639==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Use of uninitialised value of size 8
+==29639==    at 0x4C2A7C8: memcpy (mc_replace_strmem.c:838)
+==29639==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Use of uninitialised value of size 8
+==29639==    at 0x4C2A7ED: memcpy (mc_replace_strmem.c:838)
+==29639==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Use of uninitialised value of size 8
+==29639==    at 0x58CFC9C: __vsprintf_chk (vsprintf_chk.c:79)
+==29639==    by 0x58CFC0E: __sprintf_chk (sprintf_chk.c:33)
+==29639==    by 0x4E33622: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Use of uninitialised value of size 8
+==29639==    at 0x4C2953C: strcpy (mc_replace_strmem.c:429)
+==29639==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4C29569: strcpy (mc_replace_strmem.c:112)
+==29639==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4C2956E: strcpy (mc_replace_strmem.c:121)
+==29639==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4C2957F: strcpy (mc_replace_strmem.c:429)
+==29639==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Use of uninitialised value of size 8
+==29639==    at 0x4E3363E: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Syscall param sendto(msg) contains uninitialised byte(s)
+==29639==    at 0x58BE0AC: send (send.c:32)
+==29639==    by 0x4E36D69: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35963: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35A87: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4E39A1F: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E33BA1: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35A9D: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4E39A24: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E33BA1: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35A9D: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4E39A40: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E33BA1: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35A9D: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4E39A1F: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4E39A24: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4E39A52: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Thread 3:
+==29639== Syscall param munmap(length) contains uninitialised byte(s)
+==29639==    at 0x58B9B27: munmap (syscall-template.S:82)
+==29639==    by 0x4E3996B: MHD_pool_destroy (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37030: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E3881C: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Host: localhost:9999
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Content-Type: application/xml
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Accept: application/xml
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Content-Length: 194
+T@09:30:41  restService[135]: Parsing payload for URL '/NGSI9/discoverContextAvailability', method 'POST', service vector index: 2
+T@09:30:41  payloadParse[53]: parsing data for service 'DiscoverContextAvailabilityRequest'. Method: 'POST'
+T@09:30:41  payloadParse[54]: outFormat: XML
+T@09:30:41  payloadParse[58]: Calling xmlTreat for service request 2, payloadWord 'discoverContextAvailabilityRequest'
+2@09:30:41  xmlRequestGet[155]: Found xmlRequest of type 2, method 'POST' - index 2 (/discoverContextAvailabilityRequest)
+T@09:30:41  nullTreat[272]: Not treating node 'discoverContextAvailabilityRequest'
+T@09:30:41  nullTreat[272]: Not treating node 'entityIdList'
+T@09:30:41  entityId[49]: Got an entityId
+T@09:30:41  entityIdParse[291]: Got a type for an entity: ''
+T@09:30:41  entityIdParse[296]: Got an isPattern for an entity: 'true'
+T@09:30:41  entityIdId[70]: Got an entityId:id: 'ENTITY_ID'
+T@09:30:41  xmlTreat[251]: Calling check for XML parsed tree (discoverContextAvailabilityRequest)
+T@09:30:41  payloadParse[69]: result: 'OK'
+T@09:30:41  payloadParse[70]: outFormat: XML
+T@09:30:41  restService[138]: payloadParse returns 'OK'
+T@09:30:41  restService[153]: Treating service POST /NGSI9/discoverContextAvailability
+T@09:30:41  reqSemTake[75]: mongoDiscoverContextAvailability taking the 'req' semaphore for 'mongo ngsi9 discovery request'
+T@09:30:41  reqSemTake[77]: mongoDiscoverContextAvailability has the 'req' semaphore
+T@09:30:41  mongoDiscoverContextAvailability[248]: DiscoverContextAvailability Request
+T@09:30:41  registrationsQuery[1047]: query() in 'testharness.registrations' collection: '{ $or: [ { contextRegistration.entities.id: /ENTITY_ID/ }, { contextRegistration.entities: { $in: {} } }, { contextRegistration.entities.id: { $in: {} } } ], expiration: { $gt: 1399455041 } }'
+T@09:30:41  mongoSemTake[90]: registrationsQuery taking the 'mongo' semaphore for 'query in RegistrationsCollection'
+T@09:30:41  mongoSemTake[92]: registrationsQuery has the 'mongo' semaphore
+T@09:30:41  mongoSemGive[118]: registrationsQuery gives the 'mongo' semaphore for 'query in RegistrationsCollection'
+T@09:30:41  registrationsQuery[1074]: retrieved document: '{ _id: ObjectId('5369fd410e9decd6b6d14872'), expiration: 1399458641, contextRegistration: [ { entities: [ { id: "ENTITY_ID" } ], attrs: [ { name: "ATTRIBUTE_01", type: "", isDomain: "false" } ], providingApplication: "http://kz.tid.es/abc" } ] }'
+T@09:30:41  reqSemGive[104]: mongoDiscoverContextAvailability gives the 'req' semaphore for 'mongo ngsi9 discovery request'
+T@09:30:41  restReply[65]: Response 2: responding with 770 bytes, Status Code 200
+T@09:30:41  restReply[66]: Response payload: '<discoverContextAvailabilityResponse>
+  <contextRegistrationResponseList>
+    <contextRegistrationResponse>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="" isPattern="false">
+            <id>ENTITY_ID</id>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
+          <contextRegistrationAttribute>
+            <name>ATTRIBUTE_01</name>
+            <type></type>
+            <isDomain>false</isDomain>
+          </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://kz.tid.es/abc</providingApplication>
+      </contextRegistration>
+    </contextRegistrationResponse>
+  </contextRegistrationResponseList>
+</discoverContextAvailabilityResponse>
+'
+T@09:30:41  ~RegisterContextResponse[56]: destroyed
+==29639== Thread 4:
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4C2A63F: memcpy (mc_replace_strmem.c:124)
+==29639==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Use of uninitialised value of size 8
+==29639==    at 0x4C2A6FB: memcpy (mc_replace_strmem.c:838)
+==29639==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Use of uninitialised value of size 8
+==29639==    at 0x4C2A763: memcpy (mc_replace_strmem.c:838)
+==29639==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4C29570: strcpy (mc_replace_strmem.c:124)
+==29639==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+==29639== Conditional jump or move depends on uninitialised value(s)
+==29639==    at 0x4E39AA6: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==29639==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==29639==    by 0x58BD0EC: clone (clone.S:112)
+==29639== 
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Host: localhost:9999
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Content-Type: application/xml
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Accept: application/xml
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Content-Length: 451
+T@09:30:41  restService[135]: Parsing payload for URL '/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01', method 'POST', service vector index: 31
+T@09:30:41  payloadParse[53]: parsing data for service 'EntityByIdAttributeByName'. Method: 'POST'
+T@09:30:41  payloadParse[54]: outFormat: XML
+T@09:30:41  payloadParse[58]: Calling xmlTreat for service request 23, payloadWord 'registerProviderRequest'
+2@09:30:41  xmlRequestGet[155]: Found xmlRequest of type 23, method 'POST' - index 26 (/registerProviderRequest)
+T@09:30:41  nullTreat[272]: Not treating node 'registerProviderRequest'
+T@09:30:41  nullTreat[272]: Not treating node 'metadata'
+T@09:30:41  contextMetadata[48]: Got a metadata
+T@09:30:41  contextMetadataName[62]: Got a metadata name 'ID'
+T@09:30:41  contextMetadataType[75]: Got a metadata type 'string'
+T@09:30:41  contextMetadataValue[88]: Got a metadata value '1111'
+T@09:30:41  contextMetadata[48]: Got a metadata
+T@09:30:41  contextMetadataName[62]: Got a metadata name 'cm2'
+T@09:30:41  contextMetadataType[75]: Got a metadata type 'string'
+T@09:30:41  contextMetadataValue[88]: Got a metadata value 'YYY'
+T@09:30:41  duration[101]: Got a duration 'PT2H'
+T@09:30:41  providingApplication[114]: Got a providingApplication 'http://kz.tid.es/abc2'
+T@09:30:41  registrationId[127]: Got a registrationId '5369fd410e9decd6b6d14872'
+T@09:30:41  xmlTreat[251]: Calling check for XML parsed tree (registerProviderRequest)
+T@09:30:41  payloadParse[69]: result: 'OK'
+T@09:30:41  payloadParse[70]: outFormat: XML
+T@09:30:41  restService[138]: payloadParse returns 'OK'
+T@09:30:41  restService[153]: Treating service POST /NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01
+T@09:30:41  Metadata[58]: 'cloning' a Metadata
+T@09:30:41  Metadata[58]: 'cloning' a Metadata
+T@09:30:41  reqSemTake[75]: mongoRegisterContext taking the 'req' semaphore for 'ngsi9 register request'
+T@09:30:41  reqSemTake[77]: mongoRegisterContext has the 'req' semaphore
+T@09:30:41  mongoRegisterContext[51]: Register Context Request
+T@09:30:41  mongoSemTake[90]: mongoRegisterContext taking the 'mongo' semaphore for 'findOne from RegistrationsCollection'
+T@09:30:41  mongoSemTake[92]: mongoRegisterContext has the 'mongo' semaphore
+T@09:30:41  mongoSemGive[118]: mongoRegisterContext gives the 'mongo' semaphore for 'findOne from RegistrationsCollection'
+T@09:30:41  processRegisterContext[342]: Registration expiration: 1399462241
+T@09:30:41  processRegisterContext[376]: Entity registration: {id: ENTITY_ID}
+T@09:30:41  processRegisterContext[394]: Attribute registration: {name: ATTRIBUTE_01, type: , isDomain: false}
+T@09:30:41  processRegisterContext[406]: providingApplication registration: http://kz.tid.es/abc2
+T@09:30:41  addTriggeredSubscriptions[255]: JS function: function(){enId = [ "ENTITY_ID" ];enType = [ "" ];for (var i=0; i < this.entities.length; i++) {if (this.entities[i].isPattern == "true") {for (var j=0; j < enId.length; j++) {if (enId[j].match(this.entities[i].id) && this.entities[i].type == enType[j]) {return true; }}}}return false; }
+T@09:30:41  addTriggeredSubscriptions[268]: query() in 'testharness.casubs' collection: '{ $or: [ { entities: { $in: [ { id: "ENTITY_ID", type: "", isPattern: "false" } ] }, $or: [ { attrs: { $in: [ "ATTRIBUTE_01" ] } }, { attrs: { $size: 0 } } ], expiration: { $gt: 1399455041 } }, { entities.isPattern: "true", expiration: { $gt: 1399455041 }, $where: function(){enId = [ "ENTITY_ID" ];enType = [ "" ];for (var i=0; i < th... } ] }'
+T@09:30:41  mongoSemTake[90]: addTriggeredSubscriptions taking the 'mongo' semaphore for 'query in SubscribeContextAvailabilityCollection'
+T@09:30:41  mongoSemTake[92]: addTriggeredSubscriptions has the 'mongo' semaphore
+T@09:30:41  mongoSemGive[118]: addTriggeredSubscriptions gives the 'mongo' semaphore for 'query in SubscribeContextAvailabilityCollection'
+T@09:30:41  processRegisterContext[422]: upsert update() in 'testharness.registrations' collection: '{ _id: ObjectId('5369fd410e9decd6b6d14872'), expiration: 1399462241, contextRegistration: [ { entities: [ { id: "ENTITY_ID" } ], attrs: [ { name: "ATTRIBUTE_01", type: "", isDomain: "false" } ], providingApplication: "http://kz.tid.es/abc2" } ] }'
+T@09:30:41  mongoSemTake[90]: processRegisterContext taking the 'mongo' semaphore for 'update in RegistrationsCollection'
+T@09:30:41  mongoSemTake[92]: processRegisterContext has the 'mongo' semaphore
+T@09:30:41  mongoSemGive[118]: processRegisterContext gives the 'mongo' semaphore for 'update in RegistrationsCollection'
+T@09:30:41  reqSemGive[104]: mongoRegisterContext gives the 'req' semaphore for 'ngsi9 register request'
+T@09:30:41  ~RegisterContextResponse[56]: destroyed
+T@09:30:41  release[153]: Releasing Metadata 0
+T@09:30:41  release[153]: Releasing Metadata 1
+T@09:30:41  release[153]: Releasing Metadata 0
+T@09:30:41  release[153]: Releasing Metadata 1
+T@09:30:41  restReply[65]: Response 3: responding with 141 bytes, Status Code 200
+T@09:30:41  restReply[66]: Response payload: '<registerContextResponse>
+  <duration>PT2H</duration>
+  <registrationId>5369fd410e9decd6b6d14872</registrationId>
+</registerContextResponse>
+'
+T@09:30:41  ~RegisterContextResponse[56]: destroyed
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Host: localhost:9999
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Content-Type: application/xml
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Accept: application/xml
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Content-Length: 194
+T@09:30:41  restService[135]: Parsing payload for URL '/NGSI9/discoverContextAvailability', method 'POST', service vector index: 2
+T@09:30:41  payloadParse[53]: parsing data for service 'DiscoverContextAvailabilityRequest'. Method: 'POST'
+T@09:30:41  payloadParse[54]: outFormat: XML
+T@09:30:41  payloadParse[58]: Calling xmlTreat for service request 2, payloadWord 'discoverContextAvailabilityRequest'
+2@09:30:41  xmlRequestGet[155]: Found xmlRequest of type 2, method 'POST' - index 2 (/discoverContextAvailabilityRequest)
+T@09:30:41  nullTreat[272]: Not treating node 'discoverContextAvailabilityRequest'
+T@09:30:41  nullTreat[272]: Not treating node 'entityIdList'
+T@09:30:41  entityId[49]: Got an entityId
+T@09:30:41  entityIdParse[291]: Got a type for an entity: ''
+T@09:30:41  entityIdParse[296]: Got an isPattern for an entity: 'true'
+T@09:30:41  entityIdId[70]: Got an entityId:id: 'ENTITY_ID'
+T@09:30:41  xmlTreat[251]: Calling check for XML parsed tree (discoverContextAvailabilityRequest)
+T@09:30:41  payloadParse[69]: result: 'OK'
+T@09:30:41  payloadParse[70]: outFormat: XML
+T@09:30:41  restService[138]: payloadParse returns 'OK'
+T@09:30:41  restService[153]: Treating service POST /NGSI9/discoverContextAvailability
+T@09:30:41  reqSemTake[75]: mongoDiscoverContextAvailability taking the 'req' semaphore for 'mongo ngsi9 discovery request'
+T@09:30:41  reqSemTake[77]: mongoDiscoverContextAvailability has the 'req' semaphore
+T@09:30:41  mongoDiscoverContextAvailability[248]: DiscoverContextAvailability Request
+T@09:30:41  registrationsQuery[1047]: query() in 'testharness.registrations' collection: '{ $or: [ { contextRegistration.entities.id: /ENTITY_ID/ }, { contextRegistration.entities: { $in: {} } }, { contextRegistration.entities.id: { $in: {} } } ], expiration: { $gt: 1399455041 } }'
+T@09:30:41  mongoSemTake[90]: registrationsQuery taking the 'mongo' semaphore for 'query in RegistrationsCollection'
+T@09:30:41  mongoSemTake[92]: registrationsQuery has the 'mongo' semaphore
+T@09:30:41  mongoSemGive[118]: registrationsQuery gives the 'mongo' semaphore for 'query in RegistrationsCollection'
+T@09:30:41  registrationsQuery[1074]: retrieved document: '{ _id: ObjectId('5369fd410e9decd6b6d14872'), expiration: 1399462241, contextRegistration: [ { entities: [ { id: "ENTITY_ID" } ], attrs: [ { name: "ATTRIBUTE_01", type: "", isDomain: "false" } ], providingApplication: "http://kz.tid.es/abc2" } ] }'
+T@09:30:41  reqSemGive[104]: mongoDiscoverContextAvailability gives the 'req' semaphore for 'mongo ngsi9 discovery request'
+T@09:30:41  restReply[65]: Response 4: responding with 771 bytes, Status Code 200
+T@09:30:41  restReply[66]: Response payload: '<discoverContextAvailabilityResponse>
+  <contextRegistrationResponseList>
+    <contextRegistrationResponse>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="" isPattern="false">
+            <id>ENTITY_ID</id>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
+          <contextRegistrationAttribute>
+            <name>ATTRIBUTE_01</name>
+            <type></type>
+            <isDomain>false</isDomain>
+          </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://kz.tid.es/abc2</providingApplication>
+      </contextRegistration>
+    </contextRegistrationResponse>
+  </contextRegistrationResponseList>
+</discoverContextAvailabilityResponse>
+'
+T@09:30:41  ~RegisterContextResponse[56]: destroyed
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Host: localhost:9999
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Content-Type: application/xml
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Accept: application/xml
+T@09:30:41  restService[153]: Treating service GET /NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01
+T@09:30:41  getEntityByIdAttributeByName[49]: CONVENIENCE: got a  'GET' request for entityId 'ENTITY_ID', attribute 'ATTRIBUTE_01'
+T@09:30:41  reqSemTake[75]: mongoDiscoverContextAvailability taking the 'req' semaphore for 'mongo ngsi9 discovery request'
+T@09:30:41  reqSemTake[77]: mongoDiscoverContextAvailability has the 'req' semaphore
+T@09:30:41  mongoDiscoverContextAvailability[248]: DiscoverContextAvailability Request
+T@09:30:41  registrationsQuery[1009]: Entity discovery without type: id 'ENTITY_ID'
+T@09:30:41  registrationsQuery[1024]: Attribute discovery: 'ATTRIBUTE_01'
+T@09:30:41  registrationsQuery[1047]: query() in 'testharness.registrations' collection: '{ $or: [ { contextRegistration.entities: { $in: {} } }, { contextRegistration.entities.id: { $in: [ "ENTITY_ID" ] } } ], expiration: { $gt: 1399455041 }, contextRegistration.attrs.name: { $in: [ "ATTRIBUTE_01" ] } }'
+T@09:30:41  mongoSemTake[90]: registrationsQuery taking the 'mongo' semaphore for 'query in RegistrationsCollection'
+T@09:30:41  mongoSemTake[92]: registrationsQuery has the 'mongo' semaphore
+T@09:30:41  mongoSemGive[118]: registrationsQuery gives the 'mongo' semaphore for 'query in RegistrationsCollection'
+T@09:30:41  registrationsQuery[1074]: retrieved document: '{ _id: ObjectId('5369fd410e9decd6b6d14872'), expiration: 1399462241, contextRegistration: [ { entities: [ { id: "ENTITY_ID" } ], attrs: [ { name: "ATTRIBUTE_01", type: "", isDomain: "false" } ], providingApplication: "http://kz.tid.es/abc2" } ] }'
+T@09:30:41  reqSemGive[104]: mongoDiscoverContextAvailability gives the 'req' semaphore for 'mongo ngsi9 discovery request'
+T@09:30:41  restReply[65]: Response 5: responding with 771 bytes, Status Code 200
+T@09:30:41  restReply[66]: Response payload: '<discoverContextAvailabilityResponse>
+  <contextRegistrationResponseList>
+    <contextRegistrationResponse>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="" isPattern="false">
+            <id>ENTITY_ID</id>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
+          <contextRegistrationAttribute>
+            <name>ATTRIBUTE_01</name>
+            <type></type>
+            <isDomain>false</isDomain>
+          </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://kz.tid.es/abc2</providingApplication>
+      </contextRegistration>
+    </contextRegistrationResponse>
+  </contextRegistrationResponseList>
+</discoverContextAvailabilityResponse>
+'
+T@09:30:41  ~RegisterContextResponse[56]: destroyed
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Host: localhost:9999
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Content-Type: application/xml
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Accept: application/xml
+T@09:30:41  restService[153]: Treating service GET /NGSI9/contextEntities/ENTITY_ID2/attributes
+T@09:30:41  getContextEntityAttributes[48]: CONVENIENCE: got a 'GET' request for entityId 'ENTITY_ID2'
+T@09:30:41  reqSemTake[75]: mongoDiscoverContextAvailability taking the 'req' semaphore for 'mongo ngsi9 discovery request'
+T@09:30:41  reqSemTake[77]: mongoDiscoverContextAvailability has the 'req' semaphore
+T@09:30:41  mongoDiscoverContextAvailability[248]: DiscoverContextAvailability Request
+T@09:30:41  registrationsQuery[1009]: Entity discovery without type: id 'ENTITY_ID2'
+T@09:30:41  registrationsQuery[1047]: query() in 'testharness.registrations' collection: '{ $or: [ { contextRegistration.entities: { $in: {} } }, { contextRegistration.entities.id: { $in: [ "ENTITY_ID2" ] } } ], expiration: { $gt: 1399455041 } }'
+T@09:30:41  mongoSemTake[90]: registrationsQuery taking the 'mongo' semaphore for 'query in RegistrationsCollection'
+T@09:30:41  mongoSemTake[92]: registrationsQuery has the 'mongo' semaphore
+T@09:30:41  mongoSemGive[118]: registrationsQuery gives the 'mongo' semaphore for 'query in RegistrationsCollection'
+T@09:30:41  reqSemGive[104]: mongoDiscoverContextAvailability gives the 'req' semaphore for 'mongo ngsi9 discovery request'
+T@09:30:41  restReply[65]: Response 6: responding with 185 bytes, Status Code 200
+T@09:30:41  restReply[66]: Response payload: '<discoverContextAvailabilityResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
+</discoverContextAvailabilityResponse>
+'
+T@09:30:41  ~RegisterContextResponse[56]: destroyed
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Host: localhost:9999
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Content-Type: application/xml
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Accept: application/xml
+T@09:30:41  restService[153]: Treating service * /NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01
+W@09:30:41  badVerbGetPostOnly[48]: bad verb for url '/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01', method 'DELETE'
+T@09:30:41  restReply[65]: Response 7: responding with 0 bytes, Status Code 405
+T@09:30:41  restReply[66]: Response payload: ''
+T@09:30:41  ~RegisterContextResponse[56]: destroyed
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Host: localhost:9999
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Content-Type: application/xml
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Accept: application/xml
+T@09:30:41  httpHeaderGet[94]: HTTP Header:   Content-Length: 393
+T@09:30:41  restService[153]: Treating service * /NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01
+W@09:30:41  badVerbGetPostOnly[48]: bad verb for url '/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01', method 'PUT'
+T@09:30:41  restReply[65]: Response 8: responding with 0 bytes, Status Code 405
+T@09:30:41  restReply[66]: Response payload: ''
+T@09:30:41  ~RegisterContextResponse[56]: destroyed
+T@09:30:42  httpHeaderGet[94]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:30:42  httpHeaderGet[94]: HTTP Header:   Host: localhost:9999
+T@09:30:42  httpHeaderGet[94]: HTTP Header:   Accept: */*
+T@09:30:42  restService[153]: Treating service GET /exit/harakiri
+E@09:30:42  orionExit[548]: Received a 'DIE' request
+RegisterProviderRequest:
+2 Registration Metadatas
+  Registration Metadata 0:
+    Name:     ID
+    Type:     string
+    Value:    1110
+  Registration Metadata 1:
+    Name:     cm2
+    Type:     string
+    Value:    XXX
+  Duration: PT1H
+  ProvidingApplication: http://kz.tid.es/abc
+  No RegistrationId
+
+
+
+1 EntityIds:
+Entity Id 0:
+  Id:         ENTITY_ID
+  Type:       
+  isPattern:  true
+Attribute List
+No AttributeExpression
+No scopes
+1 EntityIds:
+Entity Id 0:
+  Id:         ENTITY_ID
+  Type:       
+  isPattern:  true
+Attribute List
+No AttributeExpression
+No scopes
+
+
+1 EntityIds:
+Entity Id 0:
+  Id:         ENTITY_ID
+  Type:       
+  isPattern:  true
+Attribute List
+No AttributeExpression
+No scopes
+RegisterProviderRequest:
+2 Registration Metadatas
+  Registration Metadata 0:
+    Name:     ID
+    Type:     string
+    Value:    1111
+  Registration Metadata 1:
+    Name:     cm2
+    Type:     string
+    Value:    YYY
+  Duration: PT2H
+  ProvidingApplication: http://kz.tid.es/abc2
+  RegistrationId: 5369fd410e9decd6b6d14872
+
+
+
+1 EntityIds:
+Entity Id 0:
+  Id:         ENTITY_ID
+  Type:       
+  isPattern:  true
+Attribute List
+No AttributeExpression
+No scopes
+1 EntityIds:
+Entity Id 0:
+  Id:         ENTITY_ID
+  Type:       
+  isPattern:  true
+Attribute List
+No AttributeExpression
+No scopes
+
+
+1 EntityIds:
+Entity Id 0:
+  Id:         ENTITY_ID
+  Type:       
+  isPattern:  true
+Attribute List
+No AttributeExpression
+No scopes
+==29639== 
+==29639== HEAP SUMMARY:
+==29639==     in use at exit: 23,191 bytes in 148 blocks
+==29639==   total heap usage: 5,844 allocs, 5,696 frees, 8,861,193 bytes allocated
+==29639== 
+==29639== LEAK SUMMARY:
+==29639==    definitely lost: 0 bytes in 0 blocks
+==29639==    indirectly lost: 0 bytes in 0 blocks
+==29639==      possibly lost: 1,394 bytes in 16 blocks
+==29639==    still reachable: 21,797 bytes in 132 blocks
+==29639==         suppressed: 0 bytes in 0 blocks
+==29639== Rerun with --leak-check=full to see details of leaked memory
+==29639== 
+==29639== For counts of detected and suppressed errors, rerun with: -v
+==29639== Use --track-origins=yes to see where uninitialised values come from
+==29639== ERROR SUMMARY: 276 errors from 34 contexts (suppressed: 7 from 7)

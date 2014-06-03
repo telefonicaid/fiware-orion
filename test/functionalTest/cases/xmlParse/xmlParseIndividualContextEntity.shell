@@ -1,0 +1,82 @@
+echo "1: +++++++++++ GET that fails ++++++++++++++++++"
+curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID"
+
+echo "2: ++++++++++++ DELETE that fails +++++++++++++++++"
+curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
+
+echo "3: ++++++++++++ POST that is ok ++++++++++++++++"
+url="/NGSI10/contextEntities/ENTITY_ID"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<appendContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>pressure</name>
+      <type>clima</type>
+      <contextValue>p23</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>'
+curlXml ${url} "${payload}"
+
+echo "4: ++++++++++++++ PUT that fails +++++++++++++++"
+url="/NGSI10/contextEntities/ENTITY_ID"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>temperature</name>
+      <type>degree</type>
+      <contextValue>10</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</updateContextElementRequest>'
+curlXml ${url} "${payload}" "-X PUT"
+
+echo "5: ++++++++++++ Register an entity +++++++++++++++++"
+url="/NGSI9/registerContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+  <registerContextRequest>
+    <contextRegistrationList>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="Room" isPattern="false">
+            <id>ENTITY_ID</id>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
+          <contextRegistrationAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <isDomain>false</isDomain>
+          </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://localhost:1028/application</providingApplication>
+      </contextRegistration>
+    </contextRegistrationList>
+    <duration>PT1H</duration>
+  </registerContextRequest>'
+curlXml ${url} "${payload}"
+
+echo "6: ++++++++++++ GET that is OK +++++++++++++++++"
+curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID"
+
+echo "7: ++++++++++++++ PUT that is OK +++++++++++++++"
+url="/NGSI10/contextEntities/ENTITY_ID"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>pressure</name>
+      <type>clima</type>
+      <contextValue>p50</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</updateContextElementRequest>'
+curlXml ${url} "${payload}" "-X PUT"
+
+echo "8: +++++++++++++ DELETE that is OK ++++++++++++++++"
+curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
+

@@ -1,0 +1,1046 @@
+==28430== Memcheck, a memory error detector
+==28430== Copyright (C) 2002-2011, and GNU GPL'd, by Julian Seward et al.
+==28430== Using Valgrind-3.7.0 and LibVEX; rerun with -h for copyright info
+==28430== Command: contextBroker -vvvvv -harakiri -port 9999 -pidpath /tmp/orion_9999.pid -db testharness -t 0-255
+==28430== 
+==28430== Invalid read of size 4
+==28430==    at 0x5DE5E9: paParse(PaArgument*, int, char**, int, bool, char const*) (paParse.cpp:317)
+==28430==    by 0x4CCC0D: main (contextBroker.cpp:1200)
+==28430==  Address 0x6f9c2bc is 12 bytes inside a block of size 14 alloc'd
+==28430==    at 0x4C28BED: malloc (vg_replace_malloc.c:263)
+==28430==    by 0x5861C41: strdup (strdup.c:43)
+==28430==    by 0x5DE483: paParse(PaArgument*, int, char**, int, bool, char const*) (paParse.cpp:414)
+==28430==    by 0x4CCC0D: main (contextBroker.cpp:1200)
+==28430== 
+T@08:14:04  paConfigActions[727]: setting trace levels to '0-255'
+T@08:14:04  paConfigActions[728]: Leaving function paConfigActions
+E@08:14:04  exitFunc[1009]: unlink(/tmp/orion_9999.pid): No such file or directory
+T@08:14:04  semInit[61]: Initialized 'req' semaphore
+T@08:14:04  semInit[62]: Initialized 'mongo' semaphore
+T@08:14:04  mongoSemTake[90]: mongoConnect taking the 'mongo' semaphore for 'connecting to mongo'
+T@08:14:04  mongoSemTake[92]: mongoConnect has the 'mongo' semaphore
+T@08:14:04  mongoConnect[152]: mongo version server: 2.4.9 (mayor: 2, minor: 4, extra: 9)
+T@08:14:04  mongoSemGive[118]: mongoConnect gives the 'mongo' semaphore for 'connecting to mongo'
+F@08:14:04  ***[1063]: Connected to mongo at localhost:testharness
+==28430== 
+==28430== HEAP SUMMARY:
+==28430==     in use at exit: 17,324 bytes in 100 blocks
+==28430==   total heap usage: 4,626 allocs, 4,526 frees, 359,411 bytes allocated
+==28430== 
+==28430== LEAK SUMMARY:
+==28430==    definitely lost: 0 bytes in 0 blocks
+==28430==    indirectly lost: 0 bytes in 0 blocks
+==28430==      possibly lost: 28 bytes in 1 blocks
+==28430==    still reachable: 17,296 bytes in 99 blocks
+==28430==         suppressed: 0 bytes in 0 blocks
+==28430== Rerun with --leak-check=full to see details of leaked memory
+==28430== 
+==28430== For counts of detected and suppressed errors, rerun with: -v
+==28430== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 7 from 7)
+T@08:14:04  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant )
+T@08:14:04  recoverOntimeIntervalThreads[398]: query() in 'testharness.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@08:14:04  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@08:14:04  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@08:14:04  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+==28434== Source and destination overlap in strncpy(0x8d3ca7, 0x8d3ca7, 63)
+==28434==    at 0x4C29782: strncpy (mc_replace_strmem.c:463)
+==28434==    by 0x55D0E0: restInit(RestService*, IpVersion, char const*, unsigned short, std::string const&, std::string const&, unsigned short, char const*, char const*, void (*)(ConnectionInfo*), bool) (rest.cpp:676)
+==28434==    by 0x4CD74D: main (contextBroker.cpp:1271)
+==28434== 
+==28434== Source and destination overlap in strncpy(0x8d3ce2, 0x8d3ce2, 63)
+==28434==    at 0x4C29782: strncpy (mc_replace_strmem.c:463)
+==28434==    by 0x55D0F9: restInit(RestService*, IpVersion, char const*, unsigned short, std::string const&, std::string const&, unsigned short, char const*, char const*, void (*)(ConnectionInfo*), bool) (rest.cpp:679)
+==28434==    by 0x4CD74D: main (contextBroker.cpp:1271)
+==28434== 
+V@08:14:04  restStart[569]: Starting HTTP daemon on IPv4 0.0.0.0 port 9999
+V@08:14:04  restStart[611]: Starting HTTP daemon on IPv6 :: port 9999
+==28434== Thread 4:
+==28434== Syscall param mmap(length) contains uninitialised byte(s)
+==28434==    at 0x58B9AFA: mmap (syscall-template.S:82)
+==28434==    by 0x4E398E7: MHD_pool_create (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35F47: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4E39A1F: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35F20: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4E39A24: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35F20: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4E39A52: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35F20: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4E399BC: MHD_pool_allocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E33C62: MHD_set_connection_value (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34033: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E3426D: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34783: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+T@08:14:12  connectionTreat[438]: notifyFormat: ''
+T@08:14:12  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@08:14:12  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@08:14:12  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@08:14:12  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@08:14:12  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@08:14:12  connectionTreat[442]: HTTP tenant: ''
+T@08:14:12  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@08:14:12  restService[179]: Parsing payload for URL '/NGSI9/registerContext', method 'POST', service vector index: 0
+T@08:14:12  payloadParse[53]: parsing data for service 'RegisterContextRequest'. Method: 'POST'
+T@08:14:12  payloadParse[54]: outFormat: JSON
+2@08:14:12  jsonRequestGet[121]: Found jsonRequest of type 1, method 'POST' - index 0 (/contextRegistrations)
+T@08:14:12  jsonTreat[140]: Treating a JSON request: '{}'
+T@08:14:12  jsonTreat[155]: Treating 'registerContextRequest' request
+T@08:14:12  jsonTreat[192]: Calling check for JSON parsed tree (registerContextRequest)
+E@08:14:12  check[84]: contextRegistrationVector.size() == 0
+E@08:14:12  check[97]: Not OK - returning rendered error result
+W@08:14:12  render[112]: No registrationId - setting it to all zeroes
+T@08:14:12  ~RegisterContextResponse[56]: destroyed
+T@08:14:12  payloadParse[69]: result: '{
+  "registrationId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "Empty Context Registration List"
+  }
+}
+'
+T@08:14:12  payloadParse[70]: outFormat: JSON
+T@08:14:12  restReply[65]: Response 1: responding with 181 bytes, Status Code 200
+T@08:14:12  restReply[66]: Response payload: '{
+  "registrationId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "Empty Context Registration List"
+  }
+}
+'
+T@08:14:12  restService[182]: payloadParse returns '{
+  "registrationId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "Empty Context Registration List"
+  }
+}
+'
+T@08:14:12  restReply[65]: Response 2: responding with 181 bytes, Status Code 200
+T@08:14:12  restReply[66]: Response payload: '{
+  "registrationId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "Empty Context Registration List"
+  }
+}
+'
+T@08:14:12  ~RegisterContextResponse[56]: destroyed
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4E399BC: MHD_pool_allocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E335B6: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4E335BD: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4C2A639: memcpy (mc_replace_strmem.c:121)
+==28434==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4C2A64E: memcpy (mc_replace_strmem.c:838)
+==28434==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4C2A69B: memcpy (mc_replace_strmem.c:838)
+==28434==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4C2A790: memcpy (mc_replace_strmem.c:838)
+==28434==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Use of uninitialised value of size 8
+==28434==    at 0x4C2A7C8: memcpy (mc_replace_strmem.c:838)
+==28434==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Use of uninitialised value of size 8
+==28434==    at 0x4C2A7ED: memcpy (mc_replace_strmem.c:838)
+==28434==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Use of uninitialised value of size 8
+==28434==    at 0x58CFC9C: __vsprintf_chk (vsprintf_chk.c:79)
+==28434==    by 0x58CFC0E: __sprintf_chk (sprintf_chk.c:33)
+==28434==    by 0x4E33622: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Use of uninitialised value of size 8
+==28434==    at 0x4C2953C: strcpy (mc_replace_strmem.c:429)
+==28434==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4C29569: strcpy (mc_replace_strmem.c:112)
+==28434==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4C2956E: strcpy (mc_replace_strmem.c:121)
+==28434==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4C2957F: strcpy (mc_replace_strmem.c:429)
+==28434==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Use of uninitialised value of size 8
+==28434==    at 0x4E3363E: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Syscall param sendto(msg) contains uninitialised byte(s)
+==28434==    at 0x58BE0AC: send (send.c:32)
+==28434==    by 0x4E36D69: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35963: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35A87: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4E39A1F: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E33BA1: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35A9D: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4E39A24: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E33BA1: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35A9D: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4E39A40: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E33BA1: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35A9D: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4E39A1F: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4E39A24: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4E39A52: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Thread 3:
+==28434== Syscall param munmap(length) contains uninitialised byte(s)
+==28434==    at 0x58B9B27: munmap (syscall-template.S:82)
+==28434==    by 0x4E3996B: MHD_pool_destroy (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37030: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E3881C: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+T@08:14:12  connectionTreat[438]: notifyFormat: ''
+T@08:14:12  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@08:14:12  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@08:14:12  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@08:14:12  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@08:14:12  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@08:14:12  connectionTreat[442]: HTTP tenant: ''
+T@08:14:12  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@08:14:12  restService[179]: Parsing payload for URL '/NGSI9/discoverContextAvailability', method 'POST', service vector index: 2
+T@08:14:12  payloadParse[53]: parsing data for service 'DiscoverContextAvailabilityRequest'. Method: 'POST'
+T@08:14:12  payloadParse[54]: outFormat: JSON
+2@08:14:12  jsonRequestGet[121]: Found jsonRequest of type 2, method 'POST' - index 1 (/entities)
+T@08:14:12  jsonTreat[140]: Treating a JSON request: '{}'
+T@08:14:12  jsonTreat[155]: Treating 'discoverContextAvailabilityRequest' request
+T@08:14:12  jsonTreat[192]: Calling check for JSON parsed tree (discoverContextAvailabilityRequest)
+T@08:14:12  payloadParse[69]: result: '{
+  "errorCode" : {
+    "code" : "404",
+    "reasonPhrase" : "No context element found"
+  }
+}
+'
+T@08:14:12  payloadParse[70]: outFormat: JSON
+T@08:14:12  restReply[65]: Response 3: responding with 94 bytes, Status Code 200
+T@08:14:12  restReply[66]: Response payload: '{
+  "errorCode" : {
+    "code" : "404",
+    "reasonPhrase" : "No context element found"
+  }
+}
+'
+T@08:14:13  restService[182]: payloadParse returns '{
+  "errorCode" : {
+    "code" : "404",
+    "reasonPhrase" : "No context element found"
+  }
+}
+'
+T@08:14:13  restReply[65]: Response 4: responding with 94 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "errorCode" : {
+    "code" : "404",
+    "reasonPhrase" : "No context element found"
+  }
+}
+'
+T@08:14:13  ~RegisterContextResponse[56]: destroyed
+==28434== Thread 4:
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4C2A63F: memcpy (mc_replace_strmem.c:124)
+==28434==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Use of uninitialised value of size 8
+==28434==    at 0x4C2A6FB: memcpy (mc_replace_strmem.c:838)
+==28434==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Use of uninitialised value of size 8
+==28434==    at 0x4C2A763: memcpy (mc_replace_strmem.c:838)
+==28434==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4C29570: strcpy (mc_replace_strmem.c:124)
+==28434==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+==28434== Conditional jump or move depends on uninitialised value(s)
+==28434==    at 0x4E39AA6: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28434==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28434==    by 0x58BD0EC: clone (clone.S:112)
+==28434== 
+T@08:14:13  connectionTreat[438]: notifyFormat: ''
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@08:14:13  connectionTreat[442]: HTTP tenant: ''
+T@08:14:13  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@08:14:13  restService[179]: Parsing payload for URL '/NGSI9/subscribeContextAvailability', method 'POST', service vector index: 4
+T@08:14:13  payloadParse[53]: parsing data for service 'SubscribeContextAvailabilityRequest'. Method: 'POST'
+T@08:14:13  payloadParse[54]: outFormat: JSON
+2@08:14:13  jsonRequestGet[121]: Found jsonRequest of type 3, method 'POST' - index 2 (/entities)
+T@08:14:13  jsonTreat[140]: Treating a JSON request: '{}'
+T@08:14:13  jsonTreat[155]: Treating 'subscribeContextAvailabilityRequest' request
+T@08:14:13  jsonTreat[192]: Calling check for JSON parsed tree (subscribeContextAvailabilityRequest)
+E@08:14:13  check[77]: No entity list when it is mandatory
+T@08:14:13  ~SubscribeContextAvailabilityResponse[52]: destroyed
+T@08:14:13  payloadParse[69]: result: '{
+  "subscriptionId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@08:14:13  payloadParse[70]: outFormat: JSON
+T@08:14:13  restReply[65]: Response 5: responding with 161 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "subscriptionId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@08:14:13  restService[182]: payloadParse returns '{
+  "subscriptionId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@08:14:13  restReply[65]: Response 6: responding with 161 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "subscriptionId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@08:14:13  ~RegisterContextResponse[56]: destroyed
+T@08:14:13  connectionTreat[438]: notifyFormat: ''
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@08:14:13  connectionTreat[442]: HTTP tenant: ''
+T@08:14:13  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@08:14:13  restService[179]: Parsing payload for URL '/NGSI9/updateContextAvailabilitySubscription', method 'POST', service vector index: 8
+T@08:14:13  payloadParse[53]: parsing data for service 'UpdateContextAvailabilitySubscriptionRequest'. Method: 'POST'
+T@08:14:13  payloadParse[54]: outFormat: JSON
+2@08:14:13  jsonRequestGet[121]: Found jsonRequest of type 5, method 'POST' - index 5 (/entities)
+T@08:14:13  jsonTreat[140]: Treating a JSON request: '{}'
+T@08:14:13  jsonTreat[155]: Treating 'updateContextAvailabilitySubscriptionRequest' request
+T@08:14:13  jsonTreat[192]: Calling check for JSON parsed tree (updateContextAvailabilitySubscriptionRequest)
+E@08:14:13  check[77]: No entity list when it is mandatory
+T@08:14:13  ~UpdateContextAvailabilitySubscriptionResponse[67]: destroyed
+T@08:14:13  payloadParse[69]: result: '{
+  "subscriptionId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@08:14:13  payloadParse[70]: outFormat: JSON
+T@08:14:13  restReply[65]: Response 7: responding with 161 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "subscriptionId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@08:14:13  restService[182]: payloadParse returns '{
+  "subscriptionId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@08:14:13  restReply[65]: Response 8: responding with 161 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "subscriptionId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@08:14:13  ~RegisterContextResponse[56]: destroyed
+T@08:14:13  connectionTreat[438]: notifyFormat: ''
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@08:14:13  connectionTreat[442]: HTTP tenant: ''
+T@08:14:13  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@08:14:13  restService[179]: Parsing payload for URL '/NGSI9/unsubscribeContextAvailability', method 'POST', service vector index: 6
+T@08:14:13  payloadParse[53]: parsing data for service 'UnsubscribeContextAvailabilityRequest'. Method: 'POST'
+T@08:14:13  payloadParse[54]: outFormat: JSON
+2@08:14:13  jsonRequestGet[121]: Found jsonRequest of type 7, method 'POST' - index 3 (/subscriptionId)
+T@08:14:13  jsonTreat[140]: Treating a JSON request: '{}'
+T@08:14:13  jsonTreat[155]: Treating 'unsubscribeContextAvailabilityRequest' request
+T@08:14:13  jsonTreat[192]: Calling check for JSON parsed tree (unsubscribeContextAvailabilityRequest)
+T@08:14:13  ~UnsubscribeContextAvailabilityResponse[71]: destroyed
+T@08:14:13  payloadParse[69]: result: 'OK'
+T@08:14:13  payloadParse[70]: outFormat: JSON
+T@08:14:13  restService[182]: payloadParse returns 'OK'
+T@08:14:13  restService[197]: Treating service POST /NGSI9/unsubscribeContextAvailability
+T@08:14:13  restService[237]: tenant: ''
+T@08:14:13  reqSemTake[75]: mongoUnsubscribeContextAvailability taking the 'req' semaphore for 'ngsi9 unsubscribe request'
+T@08:14:13  reqSemTake[77]: mongoUnsubscribeContextAvailability has the 'req' semaphore
+T@08:14:13  mongoUnsubscribeContextAvailability[45]: Unsubscribe Context Availability
+
+
+0 ContextRegistrationsNo Duration
+No RegistrationId
+
+
+0 ContextRegistrationsNo Duration
+No RegistrationId
+
+
+0 EntityIds:
+Attribute List
+No AttributeExpression
+No scopes
+
+
+0 EntityIds:
+Attribute List
+No AttributeExpression
+No scopes
+jsonScarPresent
+0 EntityIds:
+Attribute List
+No Reference
+No Duration
+No AttributeExpression
+No scopes
+jsonScarPresent
+0 EntityIds:
+Attribute List
+No Reference
+No Duration
+No AttributeExpression
+No scopes
+jsonUcasPresent
+0 EntityIds:
+  Attribute List
+  No Duration
+  No AttributeExpression
+No scopes
+  No SubscriptionId
+jsonUcasPresent
+0 EntityIds:
+  Attribute List
+  No Duration
+  No AttributeExpression
+No scopes
+  No SubscriptionId
+
+
+No SubscriptionId
+
+
+No SubscriptionId
+Mon Jun  2 10:14:13   Assertion failure s.size() == 24 src/mongo/bson/oid.cpp 161
+T@08:14:13  mongoSemGive[118]: mongoUnsubscribeContextAvailability gives the 'mongo' semaphore for 'findOne in SubscribeContextAvailabilityCollection (mongo assertion exception)'
+T@08:14:13  reqSemGive[104]: mongoUnsubscribeContextAvailability gives the 'req' semaphore for 'ngsi9 unsubscribe request (mongo assertion exception)'
+T@08:14:13  ~UnsubscribeContextAvailabilityResponse[71]: destroyed
+T@08:14:13  restReply[65]: Response 9: responding with 144 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "subscriptionId" : "000000000000000000000000",
+  "statusCode" : {
+    "code" : "404",
+    "reasonPhrase" : "No context element found"
+  }
+}
+'
+T@08:14:13  ~RegisterContextResponse[56]: destroyed
+T@08:14:13  connectionTreat[438]: notifyFormat: ''
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@08:14:13  connectionTreat[442]: HTTP tenant: ''
+T@08:14:13  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@08:14:13  restService[179]: Parsing payload for URL '/NGSI10/queryContext', method 'POST', service vector index: 14
+T@08:14:13  payloadParse[53]: parsing data for service 'QueryContextRequest'. Method: 'POST'
+T@08:14:13  payloadParse[54]: outFormat: JSON
+2@08:14:13  jsonRequestGet[121]: Found jsonRequest of type 11, method 'POST' - index 6 (/entities)
+T@08:14:13  jsonTreat[140]: Treating a JSON request: '{}'
+T@08:14:13  jsonTreat[155]: Treating 'queryContextRequest' request
+T@08:14:13  jsonTreat[192]: Calling check for JSON parsed tree (queryContextRequest)
+E@08:14:13  check[77]: No entity list when it is mandatory
+T@08:14:13  ~QueryContextResponse[64]: destroyed
+T@08:14:13  payloadParse[69]: result: '{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@08:14:13  payloadParse[70]: outFormat: JSON
+T@08:14:13  restReply[65]: Response 10: responding with 112 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@08:14:13  restService[182]: payloadParse returns '{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@08:14:13  restReply[65]: Response 11: responding with 112 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@08:14:13  ~RegisterContextResponse[56]: destroyed
+T@08:14:13  connectionTreat[438]: notifyFormat: ''
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@08:14:13  connectionTreat[442]: HTTP tenant: ''
+T@08:14:13  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@08:14:13  restService[179]: Parsing payload for URL '/NGSI10/updateContext', method 'POST', service vector index: 12
+T@08:14:13  payloadParse[53]: parsing data for service 'UpdateContextRequest'. Method: 'POST'
+T@08:14:13  payloadParse[54]: outFormat: JSON
+2@08:14:13  jsonRequestGet[121]: Found jsonRequest of type 17, method 'POST' - index 7 (/contextElements)
+T@08:14:13  jsonTreat[140]: Treating a JSON request: '{}'
+T@08:14:13  jsonTreat[155]: Treating 'updateContextRequest' request
+T@08:14:13  jsonTreat[192]: Calling check for JSON parsed tree (updateContextRequest)
+T@08:14:13  ~UpdateContextResponse[58]: destroyed
+T@08:14:13  payloadParse[69]: result: '{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No context elements"
+  }
+}
+'
+T@08:14:13  payloadParse[70]: outFormat: JSON
+T@08:14:13  restReply[65]: Response 12: responding with 120 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No context elements"
+  }
+}
+'
+T@08:14:13  restService[182]: payloadParse returns '{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No context elements"
+  }
+}
+'
+T@08:14:13  restReply[65]: Response 13: responding with 120 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No context elements"
+  }
+}
+'
+T@08:14:13  ~RegisterContextResponse[56]: destroyed
+T@08:14:13  connectionTreat[438]: notifyFormat: ''
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@08:14:13  connectionTreat[442]: HTTP tenant: ''
+T@08:14:13  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@08:14:13  restService[179]: Parsing payload for URL '/NGSI10/subscribeContext', method 'POST', service vector index: 16
+T@08:14:13  payloadParse[53]: parsing data for service 'SubscribeContextRequest'. Method: 'POST'
+T@08:14:13  payloadParse[54]: outFormat: JSON
+2@08:14:13  jsonRequestGet[121]: Found jsonRequest of type 12, method 'POST' - index 8 (/entities)
+T@08:14:13  jsonTreat[140]: Treating a JSON request: '{}'
+T@08:14:13  jsonTreat[155]: Treating 'subscribeContextRequest' request
+T@08:14:13  jsonTreat[192]: Calling check for JSON parsed tree (subscribeContextRequest)
+E@08:14:13  check[77]: No entity list when it is mandatory
+T@08:14:13  ~SubscribeContextResponse[38]: destroyed
+T@08:14:13  payloadParse[69]: result: '{
+  "subscribeError" : {
+    "errorCode" : {
+      "code" : "400",
+      "reasonPhrase" : "Bad Request",
+      "details" : "invalid payload: No entities"
+    }
+  }
+}
+'
+T@08:14:13  payloadParse[70]: outFormat: JSON
+T@08:14:13  restReply[65]: Response 14: responding with 166 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "subscribeError" : {
+    "errorCode" : {
+      "code" : "400",
+      "reasonPhrase" : "Bad Request",
+      "details" : "invalid payload: No entities"
+    }
+  }
+}
+'
+T@08:14:13  restService[182]: payloadParse returns '{
+  "subscribeError" : {
+    "errorCode" : {
+      "code" : "400",
+      "reasonPhrase" : "Bad Request",
+      "details" : "invalid payload: No entities"
+    }
+  }
+}
+'
+T@08:14:13  restReply[65]: Response 15: responding with 166 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "subscribeError" : {
+    "errorCode" : {
+      "code" : "400",
+      "reasonPhrase" : "Bad Request",
+      "details" : "invalid payload: No entities"
+    }
+  }
+}
+'
+T@08:14:13  ~RegisterContextResponse[56]: destroyed
+T@08:14:13  connectionTreat[438]: notifyFormat: ''
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@08:14:13  connectionTreat[442]: HTTP tenant: ''
+T@08:14:13  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@08:14:13  restService[179]: Parsing payload for URL '/NGSI10/updateContextSubscription', method 'POST', service vector index: 18
+T@08:14:13  payloadParse[53]: parsing data for service 'UpdateContextSubscriptionRequest'. Method: 'POST'
+T@08:14:13  payloadParse[54]: outFormat: JSON
+2@08:14:13  jsonRequestGet[121]: Found jsonRequest of type 13, method 'POST' - index 11 (/duration)
+T@08:14:13  jsonTreat[140]: Treating a JSON request: '{}'
+T@08:14:13  jsonTreat[155]: Treating 'updateContextSubscriptionRequest' request
+T@08:14:13  jsonTreat[192]: Calling check for JSON parsed tree (updateContextSubscriptionRequest)
+T@08:14:13  check[45]: In Restriction::check
+T@08:14:13  check[48]: Restriction::check returns OK (counter == 0)
+T@08:14:13  ~UpdateContextSubscriptionResponse[60]: destroyed
+T@08:14:13  payloadParse[69]: result: 'OK'
+T@08:14:13  payloadParse[70]: outFormat: JSON
+T@08:14:13  restService[182]: payloadParse returns 'OK'
+T@08:14:13  restService[197]: Treating service POST /NGSI10/updateContextSubscription
+T@08:14:13  restService[237]: tenant: ''
+T@08:14:13  reqSemTake[75]: mongoUpdateContextSubscription taking the 'req' semaphore for 'ngsi10 update subscription request'
+T@08:14:13  reqSemTake[77]: mongoUpdateContextSubscription has the 'req' semaphore
+T@08:14:13  mongoUpdateContextSubscription[47]: Update Context Subscription
+
+
+0 EntityIds:
+Attribute List
+No AttributeExpression
+No scopes
+
+
+0 EntityIds:
+Attribute List
+No AttributeExpression
+No scopes
+
+
+0 ContextElementsNo UpdateActionType
+
+
+0 ContextElementsNo UpdateActionType
+jsonScrPresent
+0 EntityIds:
+  Attribute List
+  No Reference
+  No Duration
+  No AttributeExpression
+No scopes
+0 NotifyConditions  No Throttling
+jsonScrPresent
+0 EntityIds:
+  Attribute List
+  No Reference
+  No Duration
+  No AttributeExpression
+No scopes
+0 NotifyConditions  No Throttling
+jsonUcsrPresent
+No Duration
+No AttributeExpression
+No scopes
+No SubscriptionId
+0 NotifyConditionsNo Throttling
+jsonUcsrPresent
+No Duration
+No AttributeExpression
+No scopes
+No SubscriptionId
+0 NotifyConditionsNo Throttling
+Mon Jun  2 10:14:13   Assertion failure s.size() == 24 src/mongo/bson/oid.cpp 161
+T@08:14:13  mongoSemGive[118]: mongoUpdateContextSubscription gives the 'mongo' semaphore for 'findOne in SubscribeContextCollection (mongo assertion exception)'
+T@08:14:13  reqSemGive[104]: mongoUpdateContextSubscription gives the 'req' semaphore for 'ngsi10 update subscription request (mongo assertion exception)'
+T@08:14:13  ~UpdateContextSubscriptionResponse[60]: destroyed
+T@08:14:13  restReply[65]: Response 16: responding with 180 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "subscribeError" : {
+    "subscriptionId" : "000000000000000000000000",
+    "errorCode" : {
+      "code" : "404",
+      "reasonPhrase" : "No context element found"
+    }
+  }
+}
+'
+T@08:14:13  ~RegisterContextResponse[56]: destroyed
+T@08:14:13  connectionTreat[438]: notifyFormat: ''
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@08:14:13  connectionTreat[442]: HTTP tenant: ''
+T@08:14:13  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@08:14:13  restService[179]: Parsing payload for URL '/NGSI10/unsubscribeContext', method 'POST', service vector index: 20
+T@08:14:13  payloadParse[53]: parsing data for service 'UnsubscribeContextRequest'. Method: 'POST'
+T@08:14:13  payloadParse[54]: outFormat: JSON
+2@08:14:13  jsonRequestGet[121]: Found jsonRequest of type 14, method 'POST' - index 10 (/subscriptionId)
+T@08:14:13  jsonTreat[140]: Treating a JSON request: '{}'
+T@08:14:13  jsonTreat[155]: Treating 'unsubscribeContextRequest' request
+T@08:14:13  jsonTreat[192]: Calling check for JSON parsed tree (unsubscribeContextRequest)
+T@08:14:13  UnsubscribeContextResponse[40]: created
+T@08:14:13  ~UnsubscribeContextResponse[63]: destroyed
+T@08:14:13  payloadParse[69]: result: 'OK'
+T@08:14:13  payloadParse[70]: outFormat: JSON
+T@08:14:13  restService[182]: payloadParse returns 'OK'
+T@08:14:13  restService[197]: Treating service POST /NGSI10/unsubscribeContext
+T@08:14:13  restService[237]: tenant: ''
+T@08:14:13  UnsubscribeContextResponse[40]: created
+T@08:14:13  reqSemTake[75]: mongoUnsubscribeContext taking the 'req' semaphore for 'ngsi10 unsubscribe request'
+T@08:14:13  reqSemTake[77]: mongoUnsubscribeContext has the 'req' semaphore
+T@08:14:13  mongoUnsubscribeContext[45]: Unsubscribe Context
+
+
+No SubscriptionId
+
+
+No SubscriptionId
+Mon Jun  2 10:14:13   Assertion failure s.size() == 24 src/mongo/bson/oid.cpp 161
+T@08:14:13  mongoSemGive[118]: mongoUnsubscribeContext gives the 'mongo' semaphore for 'findOne in SubscribeContextCollection (mongo assertion exception)'
+T@08:14:13  reqSemGive[104]: mongoUnsubscribeContext gives the 'req' semaphore for 'ngsi10 unsubscribe request (mongo assertion exception)'
+T@08:14:13  ~UnsubscribeContextResponse[63]: destroyed
+T@08:14:13  restReply[65]: Response 17: responding with 144 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "subscriptionId" : "000000000000000000000000",
+  "statusCode" : {
+    "code" : "404",
+    "reasonPhrase" : "No context element found"
+  }
+}
+'
+T@08:14:13  ~RegisterContextResponse[56]: destroyed
+T@08:14:13  connectionTreat[438]: notifyFormat: ''
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@08:14:13  connectionTreat[442]: HTTP tenant: ''
+T@08:14:13  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@08:14:13  restService[197]: Treating service * /NGSI9/notSupportedRequest
+T@08:14:13  restService[237]: tenant: ''
+E@08:14:13  restErrorReplyGet[227]: Unknown tag: 'UnknownTag', request == ''
+T@08:14:13  restReply[65]: Response 18: responding with 154 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "orionError" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "ngsi9 service '/NGSI9/notSupportedRequest' not found"
+  }
+}
+'
+T@08:14:13  ~RegisterContextResponse[56]: destroyed
+T@08:14:13  connectionTreat[438]: notifyFormat: ''
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@08:14:13  connectionTreat[442]: HTTP tenant: ''
+T@08:14:13  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@08:14:13  restService[197]: Treating service * /NGSI10/notSupportedRequest
+T@08:14:13  restService[237]: tenant: ''
+E@08:14:13  restErrorReplyGet[227]: Unknown tag: 'UnknownTag', request == ''
+T@08:14:13  restReply[65]: Response 19: responding with 156 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "orionError" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "ngsi10 service '/NGSI10/notSupportedRequest' not found"
+  }
+}
+'
+T@08:14:13  ~RegisterContextResponse[56]: destroyed
+T@08:14:13  connectionTreat[438]: notifyFormat: ''
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@08:14:13  connectionTreat[442]: HTTP tenant: ''
+T@08:14:13  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@08:14:13  restService[197]: Treating service * /notSupportedRequest
+T@08:14:13  restService[203]: URL tenant: 'notSupportedRequest'
+T@08:14:13  restService[237]: tenant: ''
+E@08:14:13  restErrorReplyGet[227]: Unknown tag: 'UnknownTag', request == ''
+T@08:14:13  restReply[65]: Response 20: responding with 142 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '{
+  "orionError" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "service '/notSupportedRequest' not found"
+  }
+}
+'
+T@08:14:13  ~RegisterContextResponse[56]: destroyed
+T@08:14:13  connectionTreat[438]: notifyFormat: ''
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@08:14:13  httpHeaderGet[137]: HTTP Header:   Accept: */*
+T@08:14:13  connectionTreat[442]: HTTP tenant: ''
+T@08:14:13  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@08:14:13  restService[197]: Treating service * /exit/harakiri
+T@08:14:13  restService[203]: URL tenant: 'exit'
+T@08:14:13  restService[237]: tenant: ''
+E@08:14:13  restErrorReplyGet[227]: Unknown tag: 'UnknownTag', request == ''
+T@08:14:13  restReply[65]: Response 21: responding with 145 bytes, Status Code 200
+T@08:14:13  restReply[66]: Response payload: '<orionError>
+  <code>400</code>
+  <reasonPhrase>Bad Request</reasonPhrase>
+  <details>service '/exit/harakiri' not found</details>
+</orionError>
+'
+T@08:14:13  ~RegisterContextResponse[56]: destroyed
+F@08:14:24  ***[981]: In sigHandler - caught signal 15
+X@08:14:24  sigHandler[987]: Received signal 15
+==28434== 
+==28434== Process terminating with default action of signal 11 (SIGSEGV)
+==28434==  General Protection Fault
+==28434==    at 0x404DB43: boost::detail::set_tss_data(void const*, boost::shared_ptr<boost::detail::tss_cleanup_function>, void*, bool) (in /usr/lib/libboost_thread.so.1.49.0)
+==28434==    by 0x5718F8: boost::thread_specific_ptr<boost::weak_ptr<boost::spirit::classic::impl::grammar_helper<boost::spirit::classic::grammar<boost::property_tree::json_parser::json_grammar<boost::property_tree::basic_ptree<std::string, std::string, std::less<std::string> > >, boost::spirit::classic::parser_context<boost::spirit::classic::nil_t> >, boost::property_tree::json_parser::json_grammar<boost::property_tree::basic_ptree<std::string, std::string, std::less<std::string> > >, boost::spirit::classic::scanner<__gnu_cxx::__normal_iterator<char*, std::vector<char, std::allocator<char> > >, boost::spirit::classic::scanner_policies<boost::spirit::classic::skip_parser_iteration_policy<boost::spirit::classic::alternative<boost::spirit::classic::alternative<boost::spirit::classic::space_parser, boost::spirit::classic::confix_parser<boost::spirit::classic::strlit<char const*>, boost::spirit::classic::kleene_star<boost::spirit::classic::anychar_parser>, boost::spirit::classic::alternative<boost::spirit::classic::eol_parser, boost::spirit::classic::end_parser>, boost::spirit::classic::unary_parser_category, boost::spirit::classic::non_nested, boost::spirit::classic::is_lexeme> >, boost::spirit::classic::confix_parser<boost::spirit::classic::strlit<char const*>, boost::spirit::classic::kleene_star<boost::spirit::classic::anychar_parser>, boost::spirit::classic::strlit<char const*>, boost::spirit::classic::unary_parser_category, boost::spirit::classic::non_nested, boost::spirit::classic::is_lexeme> >, boost::spirit::classic::iteration_policy>, boost::spirit::classic::match_policy, boost::spirit::classic::action_policy> > > > >::~thread_specific_ptr() (tss.hpp:79)
+==28434==    by 0x5817DF1: __run_exit_handlers (exit.c:78)
+==28434==    by 0x5817E44: exit (exit.c:100)
+==28434==    by 0x5DB2E0: lmOut(char*, char, char const*, int, char const*, int, char const*, bool) (logMsg.cpp:1844)
+==28434==    by 0x4DC14D: sigHandler(int) (contextBroker.cpp:987)
+==28434==    by 0x58134EF: ??? (in /lib/x86_64-linux-gnu/libc-2.13.so)
+==28434==    by 0x588D60C: ??? (syscall-template.S:82)
+==28434==    by 0x588D47F: sleep (sleep.c:138)
+==28434==    by 0x4CD2C9: main (contextBroker.cpp:1274)
+==28434== 
+==28434== HEAP SUMMARY:
+==28434==     in use at exit: 218,835 bytes in 3,970 blocks
+==28434==   total heap usage: 7,803 allocs, 3,833 frees, 11,611,429 bytes allocated
+==28434== 
+==28434== LEAK SUMMARY:
+==28434==    definitely lost: 0 bytes in 0 blocks
+==28434==    indirectly lost: 0 bytes in 0 blocks
+==28434==      possibly lost: 128,462 bytes in 2,899 blocks
+==28434==    still reachable: 90,373 bytes in 1,071 blocks
+==28434==         suppressed: 0 bytes in 0 blocks
+==28434== Rerun with --leak-check=full to see details of leaked memory
+==28434== 
+==28434== For counts of detected and suppressed errors, rerun with: -v
+==28434== Use --track-origins=yes to see where uninitialised values come from
+==28434== ERROR SUMMARY: 469 errors from 35 contexts (suppressed: 7 from 7)

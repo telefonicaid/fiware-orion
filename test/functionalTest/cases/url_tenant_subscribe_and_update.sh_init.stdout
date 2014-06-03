@@ -1,0 +1,532 @@
+{ "dropped" : "testharness", "ok" : 1 }
+{ "dropped" : "testharness-t_01", "ok" : 1 }
+{ "dropped" : "testharness-t_02", "ok" : 1 }
+T@14:51:19  paConfigActions[727]: setting trace levels to '0-255'
+T@14:51:19  paConfigActions[728]: Leaving function paConfigActions
+E@14:51:19  exitFunc[976]: unlink(/tmp/orion_9999.pid): No such file or directory
+T@14:51:19  semInit[61]: Initialized 'req' semaphore
+T@14:51:19  semInit[62]: Initialized 'mongo' semaphore
+T@14:51:19  mongoSemTake[90]: mongoConnect taking the 'mongo' semaphore for 'connecting to mongo'
+T@14:51:19  mongoSemTake[92]: mongoConnect has the 'mongo' semaphore
+T@14:51:19  mongoConnect[152]: mongo version server: 2.4.9 (mayor: 2, minor: 4, extra: 9)
+T@14:51:19  mongoSemGive[118]: mongoConnect gives the 'mongo' semaphore for 'connecting to mongo'
+F@14:51:19  ***[1030]: Connected to mongo at localhost:testharness
+T@14:51:19  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant )
+T@14:51:19  mongoSemTake[90]: getOrionDatabases taking the 'mongo' semaphore for 'get Orion databases'
+T@14:51:19  mongoSemTake[92]: getOrionDatabases has the 'mongo' semaphore
+T@14:51:19  mongoSemGive[118]: getOrionDatabases gives the 'mongo' semaphore for 'get Orion databases'
+T@14:51:19  getOrionDatabases[257]: Orion database found: testharness-t_03
+T@14:51:19  getOrionDatabases[257]: Orion database found: testharness-kz
+T@14:51:19  getOrionDatabases[257]: Orion database found: testharness-_kzg0123456789012345
+T@14:51:19  getOrionDatabases[257]: Orion database found: testharness-t_04
+T@14:51:19  getOrionDatabases[257]: Orion database found: testharness-_kgz0123456789012345
+T@14:51:19  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant t_03)
+T@14:51:19  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant kz)
+T@14:51:19  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant _kzg0123456789012345)
+T@14:51:19  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant t_04)
+T@14:51:19  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant _kgz0123456789012345)
+T@14:51:19  recoverOntimeIntervalThreads[398]: query() in 'testharness.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@14:51:19  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@14:51:19  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@14:51:19  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@14:51:19  mongoSemTake[90]: getOrionDatabases taking the 'mongo' semaphore for 'get Orion databases'
+T@14:51:19  mongoSemTake[92]: getOrionDatabases has the 'mongo' semaphore
+T@14:51:19  mongoSemGive[118]: getOrionDatabases gives the 'mongo' semaphore for 'get Orion databases'
+T@14:51:19  getOrionDatabases[257]: Orion database found: testharness-t_03
+T@14:51:19  getOrionDatabases[257]: Orion database found: testharness-kz
+T@14:51:19  getOrionDatabases[257]: Orion database found: testharness-_kzg0123456789012345
+T@14:51:19  getOrionDatabases[257]: Orion database found: testharness-t_04
+T@14:51:19  getOrionDatabases[257]: Orion database found: testharness-_kgz0123456789012345
+T@14:51:19  recoverOntimeIntervalThreads[398]: query() in 'testharness-t_03.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@14:51:19  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@14:51:19  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@14:51:19  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@14:51:19  recoverOntimeIntervalThreads[398]: query() in 'testharness-kz.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@14:51:19  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@14:51:19  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@14:51:19  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@14:51:19  recoverOntimeIntervalThreads[398]: query() in 'testharness-_kzg0123456789012345.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@14:51:19  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@14:51:19  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@14:51:19  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@14:51:19  recoverOntimeIntervalThreads[398]: query() in 'testharness-t_04.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@14:51:19  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@14:51:19  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@14:51:19  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@14:51:19  recoverOntimeIntervalThreads[398]: query() in 'testharness-_kgz0123456789012345.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@14:51:19  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@14:51:19  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@14:51:19  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+V@14:51:19  restStart[503]: Starting HTTP daemon on IPv4 0.0.0.0 port 9999
+accumulator running as PID 25956
+accumulator running as PID 25956
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   User-Agent: curl/7.26.0
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   Host: localhost:9999
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   Content-Type: application/xml
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   Accept: application/xml
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   Content-Length: 439
+T@14:51:24  connectionTreat[390]: HTTP tenant: ''
+T@14:51:24  restService[179]: Parsing payload for URL '/t_01/NGSI10/subscribeContext', method 'POST', service vector index: 40
+T@14:51:24  payloadParse[53]: parsing data for service 'SubscribeContextRequest'. Method: 'POST'
+T@14:51:24  payloadParse[54]: outFormat: XML
+T@14:51:24  payloadParse[58]: Calling xmlTreat for service request 12, payloadWord 'subscribeContextRequest'
+2@14:51:24  xmlRequestGet[155]: Found xmlRequest of type 12, method 'POST' - index 16 (/subscribeContextRequest)
+T@14:51:24  nullTreat[272]: Not treating node 'subscribeContextRequest'
+T@14:51:24  nullTreat[272]: Not treating node 'entityIdList'
+T@14:51:24  entityId[53]: Got an entityId
+T@14:51:24  entityIdParse[291]: Got a type for an entity: 'Test'
+T@14:51:24  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@14:51:24  entityIdId[77]: Got an entityId:id: 'E'
+T@14:51:24  nullTreat[272]: Not treating node 'attributeList'
+T@14:51:24  reference[351]: Got a reference: 'http://127.0.0.1:9997/notify'
+T@14:51:24  duration[364]: Got a duration: 'PT1H'
+T@14:51:24  nullTreat[272]: Not treating node 'notifyConditions'
+T@14:51:24  notifyCondition[376]: Got a Notify Condition
+T@14:51:24  notifyConditionType[404]: Got a Notify Condition Type: 'ONCHANGE'
+T@14:51:24  nullTreat[272]: Not treating node 'condValueList'
+T@14:51:24  condValue[417]: Got a Cond Value: 'att'
+T@14:51:24  xmlTreat[251]: Calling check for XML parsed tree (subscribeContextRequest)
+T@14:51:24  check[45]: In Restriction::check
+T@14:51:24  check[48]: Restriction::check returns OK (counter == 0)
+T@14:51:24  ~SubscribeContextResponse[38]: destroyed
+T@14:51:24  payloadParse[69]: result: 'OK'
+T@14:51:24  payloadParse[70]: outFormat: XML
+T@14:51:24  restService[182]: payloadParse returns 'OK'
+T@14:51:24  restService[197]: Treating service POST /t_01/NGSI10/subscribeContext
+T@14:51:24  restService[203]: URL tenant: 't_01'
+T@14:51:24  restService[229]: tenant: 't_01'
+T@14:51:24  reqSemTake[75]: mongoSubscribeContext taking the 'req' semaphore for 'ngsi10 subscribe request'
+T@14:51:24  reqSemTake[77]: mongoSubscribeContext has the 'req' semaphore
+T@14:51:24  mongoSubscribeContext[46]: Subscribe Context Request
+T@14:51:24  mongoSubscribeContext[57]: Subscription expiration: 1399650684
+T@14:51:24  processEntitityPatternFalse[531]: Entity query token (isPattern=false): {id: E, type: Test}
+T@14:51:24  entitiesQuery[788]: query() in 'testharness-t_01.entities' collection: '{ $or: [ { _id: { $in: [ { id: "E", type: "Test" } ] } } ] }'
+T@14:51:24  mongoSemTake[90]: entitiesQuery taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@14:51:24  mongoSemTake[92]: entitiesQuery has the 'mongo' semaphore
+T@14:51:24  mongoSemGive[118]: entitiesQuery gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@14:51:24  mongoSubscribeContext[109]: insert() in 'testharness-t_01.csubs' collection: '{ _id: ObjectId('536ceb6c17365a7b96d9d9d1'), expiration: 1399650684, reference: "http://127.0.0.1:9997/notify", entities: [ { id: "E", type: "Test", isPattern: "false" } ], attrs: {}, conditions: [ { type: "ONCHANGE", value: [ "att" ] } ], format: "XML" }'
+T@14:51:24  mongoSemTake[90]: mongoSubscribeContext taking the 'mongo' semaphore for 'insert into SubscribeContextCollection'
+T@14:51:24  mongoSemTake[92]: mongoSubscribeContext has the 'mongo' semaphore
+T@14:51:24  mongoSemGive[118]: mongoSubscribeContext gives the 'mongo' semaphore for 'insert into SubscribeContextCollection'
+T@14:51:24  reqSemGive[104]: mongoSubscribeContext gives the 'req' semaphore for 'ngsi10 subscribe request'
+T@14:51:24  ~SubscribeContextResponse[38]: destroyed
+T@14:51:24  restReply[65]: Response 1: responding with 192 bytes, Status Code 200
+T@14:51:24  restReply[66]: Response payload: '<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>536ceb6c17365a7b96d9d9d1</subscriptionId>
+    <duration>PT1H</duration>
+  </subscribeResponse>
+</subscribeContextResponse>
+'
+T@14:51:24  ~RegisterContextResponse[56]: destroyed
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   User-Agent: curl/7.26.0
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   Host: localhost:9999
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   Content-Type: application/xml
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   Accept: application/xml
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   Content-Length: 439
+T@14:51:24  connectionTreat[390]: HTTP tenant: ''
+T@14:51:24  restService[179]: Parsing payload for URL '/t_02/NGSI10/subscribeContext', method 'POST', service vector index: 40
+T@14:51:24  payloadParse[53]: parsing data for service 'SubscribeContextRequest'. Method: 'POST'
+T@14:51:24  payloadParse[54]: outFormat: XML
+T@14:51:24  payloadParse[58]: Calling xmlTreat for service request 12, payloadWord 'subscribeContextRequest'
+2@14:51:24  xmlRequestGet[155]: Found xmlRequest of type 12, method 'POST' - index 16 (/subscribeContextRequest)
+T@14:51:24  nullTreat[272]: Not treating node 'subscribeContextRequest'
+T@14:51:24  nullTreat[272]: Not treating node 'entityIdList'
+T@14:51:24  entityId[53]: Got an entityId
+T@14:51:24  entityIdParse[291]: Got a type for an entity: 'Test'
+T@14:51:24  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@14:51:24  entityIdId[77]: Got an entityId:id: 'E'
+T@14:51:24  nullTreat[272]: Not treating node 'attributeList'
+T@14:51:24  reference[351]: Got a reference: 'http://127.0.0.1:9977/notify'
+T@14:51:24  duration[364]: Got a duration: 'PT1H'
+T@14:51:24  nullTreat[272]: Not treating node 'notifyConditions'
+T@14:51:24  notifyCondition[376]: Got a Notify Condition
+T@14:51:24  notifyConditionType[404]: Got a Notify Condition Type: 'ONCHANGE'
+T@14:51:24  nullTreat[272]: Not treating node 'condValueList'
+T@14:51:24  condValue[417]: Got a Cond Value: 'att'
+T@14:51:24  xmlTreat[251]: Calling check for XML parsed tree (subscribeContextRequest)
+T@14:51:24  check[45]: In Restriction::check
+T@14:51:24  check[48]: Restriction::check returns OK (counter == 0)
+T@14:51:24  ~SubscribeContextResponse[38]: destroyed
+T@14:51:24  payloadParse[69]: result: 'OK'
+T@14:51:24  payloadParse[70]: outFormat: XML
+T@14:51:24  restService[182]: payloadParse returns 'OK'
+T@14:51:24  restService[197]: Treating service POST /t_02/NGSI10/subscribeContext
+T@14:51:24  restService[203]: URL tenant: 't_02'
+T@14:51:24  restService[229]: tenant: 't_02'
+T@14:51:24  reqSemTake[75]: mongoSubscribeContext taking the 'req' semaphore for 'ngsi10 subscribe request'
+T@14:51:24  reqSemTake[77]: mongoSubscribeContext has the 'req' semaphore
+T@14:51:24  mongoSubscribeContext[46]: Subscribe Context Request
+T@14:51:24  mongoSubscribeContext[57]: Subscription expiration: 1399650684
+T@14:51:24  processEntitityPatternFalse[531]: Entity query token (isPattern=false): {id: E, type: Test}
+T@14:51:24  entitiesQuery[788]: query() in 'testharness-t_02.entities' collection: '{ $or: [ { _id: { $in: [ { id: "E", type: "Test" } ] } } ] }'
+T@14:51:24  mongoSemTake[90]: entitiesQuery taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@14:51:24  mongoSemTake[92]: entitiesQuery has the 'mongo' semaphore
+T@14:51:24  mongoSemGive[118]: entitiesQuery gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@14:51:24  mongoSubscribeContext[109]: insert() in 'testharness-t_02.csubs' collection: '{ _id: ObjectId('536ceb6c17365a7b96d9d9d2'), expiration: 1399650684, reference: "http://127.0.0.1:9977/notify", entities: [ { id: "E", type: "Test", isPattern: "false" } ], attrs: {}, conditions: [ { type: "ONCHANGE", value: [ "att" ] } ], format: "XML" }'
+T@14:51:24  mongoSemTake[90]: mongoSubscribeContext taking the 'mongo' semaphore for 'insert into SubscribeContextCollection'
+T@14:51:24  mongoSemTake[92]: mongoSubscribeContext has the 'mongo' semaphore
+T@14:51:24  mongoSemGive[118]: mongoSubscribeContext gives the 'mongo' semaphore for 'insert into SubscribeContextCollection'
+T@14:51:24  reqSemGive[104]: mongoSubscribeContext gives the 'req' semaphore for 'ngsi10 subscribe request'
+T@14:51:24  ~SubscribeContextResponse[38]: destroyed
+T@14:51:24  restReply[65]: Response 2: responding with 192 bytes, Status Code 200
+T@14:51:24  restReply[66]: Response payload: '<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>536ceb6c17365a7b96d9d9d2</subscriptionId>
+    <duration>PT1H</duration>
+  </subscribeResponse>
+</subscribeContextResponse>
+'
+T@14:51:24  ~RegisterContextResponse[56]: destroyed
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   User-Agent: curl/7.26.0
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   Host: localhost:9999
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   Content-Type: application/xml
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   Accept: application/xml
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   Content-Length: 422
+T@14:51:24  connectionTreat[390]: HTTP tenant: ''
+T@14:51:24  restService[179]: Parsing payload for URL '/t_01/NGSI10/updateContext', method 'POST', service vector index: 36
+T@14:51:24  payloadParse[53]: parsing data for service 'UpdateContextRequest'. Method: 'POST'
+T@14:51:24  payloadParse[54]: outFormat: XML
+T@14:51:24  payloadParse[58]: Calling xmlTreat for service request 17, payloadWord 'updateContextRequest'
+2@14:51:24  xmlRequestGet[155]: Found xmlRequest of type 17, method 'POST' - index 12 (/updateContextRequest)
+T@14:51:24  nullTreat[272]: Not treating node 'updateContextRequest'
+T@14:51:24  nullTreat[272]: Not treating node 'contextElementList'
+T@14:51:24  entityId[67]: Got an entityId
+T@14:51:24  entityIdParse[291]: Got a type for an entity: 'Test'
+T@14:51:24  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@14:51:24  entityIdId[88]: Got an entityId:id: 'E'
+T@14:51:24  nullTreat[272]: Not treating node 'contextAttributeList'
+T@14:51:24  contextAttribute[103]: Creating an attribute
+T@14:51:24  ContextAttribute[42]: Creating a ContextAttribute 1
+T@14:51:24  contextAttributeName[117]: Got an attribute name: 'att'
+T@14:51:24  contextAttributeType[130]: Got an attribute type: 'test'
+T@14:51:24  contextAttributeValue[147]: Set parseDataP->lastContextAttribute (type: '') to: 0x29d0670
+T@14:51:24  contextAttributeValue[149]: Got an attribute value: 'accu_t01'
+T@14:51:24  updateAction[272]: Got an update action: 'APPEND'
+T@14:51:24  xmlTreat[251]: Calling check for XML parsed tree (updateContextRequest)
+T@14:51:24  ~UpdateContextResponse[58]: destroyed
+T@14:51:24  payloadParse[69]: result: 'OK'
+T@14:51:24  payloadParse[70]: outFormat: XML
+T@14:51:24  restService[182]: payloadParse returns 'OK'
+T@14:51:24  restService[197]: Treating service POST /t_01/NGSI10/updateContext
+T@14:51:24  restService[203]: URL tenant: 't_01'
+T@14:51:24  restService[229]: tenant: 't_01'
+T@14:51:24  reqSemTake[75]: mongoUpdateContext taking the 'req' semaphore for 'ngsi10 update request'
+T@14:51:24  reqSemTake[77]: mongoUpdateContext has the 'req' semaphore
+T@14:51:24  processContextElement[1400]: query() in 'testharness-t_01.entities' collection: '{ _id.id: "E", _id.type: "Test" }'
+T@14:51:24  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@14:51:24  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@14:51:24  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@14:51:24  ContextAttribute[86]: Creating a ContextAttribute 'att':'test':'', setting its compound to NULL
+T@14:51:24  createEntity[1205]: Entity not found in 'testharness-t_01.entities' collection, creating it
+T@14:51:24  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant t_01)
+T@14:51:24  createEntity[1242]: new attribute: {name: att, type: test, value: accu_t01}
+T@14:51:24  createEntity[1277]: insert() in 'testharness-t_01.entities' collection: '{ _id: { id: "E", type: "Test" }, attrs: [ { name: "att", type: "test", creDate: 1399647084, modDate: 1399647084, value: "accu_t01", md: {} } ], creDate: 1399647084, modDate: 1399647084 }'
+T@14:51:24  mongoSemTake[90]: createEntity taking the 'mongo' semaphore for 'insert into EntitiesCollection'
+T@14:51:24  mongoSemTake[92]: createEntity has the 'mongo' semaphore
+T@14:51:24  mongoSemGive[118]: createEntity gives the 'mongo' semaphore for 'insert into EntitiesCollection'
+T@14:51:24  addTriggeredSubscriptions[776]: JS function: function(){for (var i=0; i < this.entities.length; i++) {if (this.entities[i].isPattern == "true" && (this.entities[i].type == "Test" || this.entities[i].type == "" || !("type" in this.entities[i])) && "E".match(this.entities[i].id)) {return true; }}return false; }
+T@14:51:24  addTriggeredSubscriptions[791]: query() in 'testharness-t_01.csubs' collection: '{ $or: [ { entities.id: "E", $or: [ { entities.type: "Test" }, { entities.type: { $exists: false } } ], entities.isPattern: "false", conditions.type: "ONCHANGE", conditions.value: "att", expiration: { $gt: 1399647084 } }, { entities.isPattern: "true", conditions.type: "ONCHANGE", conditions.value: "att", expiration: { $gt: 1399647084 }, $where: function(){for (var i=0; i < this.entities.length; i++) {if (this.enti... } ] }'
+T@14:51:24  mongoSemTake[90]: addTriggeredSubscriptions taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@14:51:24  mongoSemTake[92]: addTriggeredSubscriptions has the 'mongo' semaphore
+T@14:51:24  mongoSemGive[118]: addTriggeredSubscriptions gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@14:51:24  addTriggeredSubscriptions[828]: adding subscription: '{ _id: ObjectId('536ceb6c17365a7b96d9d9d1'), expiration: 1399650684, reference: "http://127.0.0.1:9997/notify", entities: [ { id: "E", type: "Test", isPattern: "false" } ], attrs: {}, conditions: [ { type: "ONCHANGE", value: [ "att" ] } ], format: "XML" }'
+T@14:51:24  mongoSemTake[90]: processSubscriptions taking the 'mongo' semaphore for 'findOne in SubscribeContextCollection'
+T@14:51:24  mongoSemTake[92]: processSubscriptions has the 'mongo' semaphore
+T@14:51:24  mongoSemGive[118]: processSubscriptions gives the 'mongo' semaphore for 'findOne in SubscribeContextCollection'
+T@14:51:24  processSubscriptions[873]: retrieved document: '{ _id: ObjectId('536ceb6c17365a7b96d9d9d1'), expiration: 1399650684, reference: "http://127.0.0.1:9997/notify", entities: [ { id: "E", type: "Test", isPattern: "false" } ], attrs: {}, conditions: [ { type: "ONCHANGE", value: [ "att" ] } ], format: "XML" }'
+T@14:51:24  processEntitityPatternFalse[531]: Entity query token (isPattern=false): {id: E, type: Test}
+T@14:51:24  entitiesQuery[788]: query() in 'testharness-t_01.entities' collection: '{ $or: [ { _id: { $in: [ { id: "E", type: "Test" } ] } } ] }'
+T@14:51:24  mongoSemTake[90]: entitiesQuery taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@14:51:24  mongoSemTake[92]: entitiesQuery has the 'mongo' semaphore
+T@14:51:24  mongoSemGive[118]: entitiesQuery gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@14:51:24  entitiesQuery[825]: retrieved document: '{ _id: { id: "E", type: "Test" }, attrs: [ { name: "att", type: "test", creDate: 1399647084, modDate: 1399647084, value: "accu_t01", md: {} } ], creDate: 1399647084, modDate: 1399647084 }'
+T@14:51:24  ContextAttribute[42]: Creating a ContextAttribute 1
+T@14:51:24  ContextAttribute[86]: Creating a ContextAttribute 'att':'test':'accu_t01', setting its compound to NULL
+T@14:51:24  startSenderThread[43]: sending to: host='127.0.0.1', port=9997, verb=POST, tenant='t_01', path='/notify', content-type: application/xml
+T@14:51:24  processSubscriptions[908]: update() in 'testharness-t_01.csubs' collection: {{ _id: ObjectId('536ceb6c17365a7b96d9d9d1') }, { $set: { lastNotification: 1399647084 }, $inc: { count: 1 } }}
+T@14:51:24  sendHttpSocket[204]: 'PRE' HTTP headers:
+--------------
+POST /notify HTTP/1.1
+User-Agent: orion/0.12.0-next
+Host: 127.0.0.1:9997
+Accept: application/xml, application/json
+
+-------------
+T@14:51:24  mongoSemTake[90]: processSubscriptions taking the 'mongo' semaphore for 'update in SubscribeContextCollection'
+T@14:51:24  mongoSemTake[92]: processSubscriptions has the 'mongo' semaphore
+3@14:51:24  socketHttpConnect[62]: Generic Connect to: '127.0.0.1'  port: '9997'
+3@14:51:24  socketHttpConnect[71]: Allow IPv4 only
+T@14:51:24  mongoSemGive[118]: processSubscriptions gives the 'mongo' semaphore for 'update in SubscribeContextCollection'
+T@14:51:24  reqSemGive[104]: mongoUpdateContext gives the 'req' semaphore for 'ngsi10 update request'
+T@14:51:24  ~UpdateContextResponse[58]: destroyed
+T@14:51:24  restReply[65]: Response 3: responding with 621 bytes, Status Code 200
+T@14:51:24  restReply[66]: Response payload: '<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Test" isPattern="false">
+          <id>E</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>att</name>
+            <type>test</type>
+            <contextValue></contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+'
+T@14:51:24  sendHttpSocket[264]: Sending message 1 to HTTP server: sending static message of 912 bytes to HTTP server
+T@14:51:24  ~RegisterContextResponse[56]: destroyed
+T@14:51:24  sendHttpSocket[265]: Sending to HTTP server payload:
+POST /notify HTTP/1.1
+User-Agent: orion/0.12.0-next
+Host: 127.0.0.1:9997
+Accept: application/xml, application/json
+fiware-service: t_01
+Content-Type: application/xml
+Content-Length: 725
+
+<notifyContextRequest>
+  <subscriptionId>536ceb6c17365a7b96d9d9d1</subscriptionId>
+  <originator>localhost</originator>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Test" isPattern="false">
+          <id>E</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>att</name>
+            <type>test</type>
+            <contextValue>accu_t01</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</notifyContextRequest>
+
+
+T@14:51:24  sendHttpSocket[293]: not waiting for response
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   User-Agent: curl/7.26.0
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   Host: localhost:9999
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   Content-Type: application/xml
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   Accept: application/xml
+T@14:51:24  httpHeaderGet[96]: HTTP Header:   Content-Length: 422
+T@14:51:24  connectionTreat[390]: HTTP tenant: ''
+T@14:51:24  restService[179]: Parsing payload for URL '/t_02/NGSI10/updateContext', method 'POST', service vector index: 36
+T@14:51:24  payloadParse[53]: parsing data for service 'UpdateContextRequest'. Method: 'POST'
+T@14:51:24  payloadParse[54]: outFormat: XML
+T@14:51:24  payloadParse[58]: Calling xmlTreat for service request 17, payloadWord 'updateContextRequest'
+2@14:51:24  xmlRequestGet[155]: Found xmlRequest of type 17, method 'POST' - index 12 (/updateContextRequest)
+T@14:51:24  nullTreat[272]: Not treating node 'updateContextRequest'
+T@14:51:24  nullTreat[272]: Not treating node 'contextElementList'
+T@14:51:24  entityId[67]: Got an entityId
+T@14:51:24  entityIdParse[291]: Got a type for an entity: 'Test'
+T@14:51:24  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@14:51:24  entityIdId[88]: Got an entityId:id: 'E'
+T@14:51:24  nullTreat[272]: Not treating node 'contextAttributeList'
+T@14:51:24  contextAttribute[103]: Creating an attribute
+T@14:51:24  ContextAttribute[42]: Creating a ContextAttribute 1
+T@14:51:24  contextAttributeName[117]: Got an attribute name: 'att'
+T@14:51:24  contextAttributeType[130]: Got an attribute type: 'test'
+T@14:51:24  contextAttributeValue[147]: Set parseDataP->lastContextAttribute (type: '') to: 0x29d03b0
+T@14:51:24  contextAttributeValue[149]: Got an attribute value: 'accu_t02'
+T@14:51:24  updateAction[272]: Got an update action: 'APPEND'
+T@14:51:24  xmlTreat[251]: Calling check for XML parsed tree (updateContextRequest)
+T@14:51:24  ~UpdateContextResponse[58]: destroyed
+T@14:51:24  payloadParse[69]: result: 'OK'
+T@14:51:24  payloadParse[70]: outFormat: XML
+T@14:51:24  restService[182]: payloadParse returns 'OK'
+T@14:51:24  restService[197]: Treating service POST /t_02/NGSI10/updateContext
+T@14:51:24  restService[203]: URL tenant: 't_02'
+T@14:51:24  restService[229]: tenant: 't_02'
+T@14:51:24  reqSemTake[75]: mongoUpdateContext taking the 'req' semaphore for 'ngsi10 update request'
+T@14:51:24  reqSemTake[77]: mongoUpdateContext has the 'req' semaphore
+T@14:51:24  processContextElement[1400]: query() in 'testharness-t_02.entities' collection: '{ _id.id: "E", _id.type: "Test" }'
+T@14:51:24  mongoSemTake[90]: processContextElement taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@14:51:24  mongoSemTake[92]: processContextElement has the 'mongo' semaphore
+T@14:51:24  mongoSemGive[118]: processContextElement gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@14:51:24  ContextAttribute[86]: Creating a ContextAttribute 'att':'test':'', setting its compound to NULL
+T@14:51:24  createEntity[1205]: Entity not found in 'testharness-t_02.entities' collection, creating it
+T@14:51:24  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant t_02)
+T@14:51:24  createEntity[1242]: new attribute: {name: att, type: test, value: accu_t02}
+T@14:51:24  createEntity[1277]: insert() in 'testharness-t_02.entities' collection: '{ _id: { id: "E", type: "Test" }, attrs: [ { name: "att", type: "test", creDate: 1399647084, modDate: 1399647084, value: "accu_t02", md: {} } ], creDate: 1399647084, modDate: 1399647084 }'
+T@14:51:24  mongoSemTake[90]: createEntity taking the 'mongo' semaphore for 'insert into EntitiesCollection'
+T@14:51:24  mongoSemTake[92]: createEntity has the 'mongo' semaphore
+T@14:51:24  mongoSemGive[118]: createEntity gives the 'mongo' semaphore for 'insert into EntitiesCollection'
+T@14:51:24  addTriggeredSubscriptions[776]: JS function: function(){for (var i=0; i < this.entities.length; i++) {if (this.entities[i].isPattern == "true" && (this.entities[i].type == "Test" || this.entities[i].type == "" || !("type" in this.entities[i])) && "E".match(this.entities[i].id)) {return true; }}return false; }
+T@14:51:24  addTriggeredSubscriptions[791]: query() in 'testharness-t_02.csubs' collection: '{ $or: [ { entities.id: "E", $or: [ { entities.type: "Test" }, { entities.type: { $exists: false } } ], entities.isPattern: "false", conditions.type: "ONCHANGE", conditions.value: "att", expiration: { $gt: 1399647084 } }, { entities.isPattern: "true", conditions.type: "ONCHANGE", conditions.value: "att", expiration: { $gt: 1399647084 }, $where: function(){for (var i=0; i < this.entities.length; i++) {if (this.enti... } ] }'
+T@14:51:24  mongoSemTake[90]: addTriggeredSubscriptions taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@14:51:24  mongoSemTake[92]: addTriggeredSubscriptions has the 'mongo' semaphore
+T@14:51:24  mongoSemGive[118]: addTriggeredSubscriptions gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@14:51:24  addTriggeredSubscriptions[828]: adding subscription: '{ _id: ObjectId('536ceb6c17365a7b96d9d9d2'), expiration: 1399650684, reference: "http://127.0.0.1:9977/notify", entities: [ { id: "E", type: "Test", isPattern: "false" } ], attrs: {}, conditions: [ { type: "ONCHANGE", value: [ "att" ] } ], format: "XML" }'
+T@14:51:24  mongoSemTake[90]: processSubscriptions taking the 'mongo' semaphore for 'findOne in SubscribeContextCollection'
+T@14:51:24  mongoSemTake[92]: processSubscriptions has the 'mongo' semaphore
+T@14:51:24  mongoSemGive[118]: processSubscriptions gives the 'mongo' semaphore for 'findOne in SubscribeContextCollection'
+T@14:51:24  processSubscriptions[873]: retrieved document: '{ _id: ObjectId('536ceb6c17365a7b96d9d9d2'), expiration: 1399650684, reference: "http://127.0.0.1:9977/notify", entities: [ { id: "E", type: "Test", isPattern: "false" } ], attrs: {}, conditions: [ { type: "ONCHANGE", value: [ "att" ] } ], format: "XML" }'
+T@14:51:24  processEntitityPatternFalse[531]: Entity query token (isPattern=false): {id: E, type: Test}
+T@14:51:24  entitiesQuery[788]: query() in 'testharness-t_02.entities' collection: '{ $or: [ { _id: { $in: [ { id: "E", type: "Test" } ] } } ] }'
+T@14:51:24  mongoSemTake[90]: entitiesQuery taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@14:51:24  mongoSemTake[92]: entitiesQuery has the 'mongo' semaphore
+T@14:51:24  mongoSemGive[118]: entitiesQuery gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@14:51:24  entitiesQuery[825]: retrieved document: '{ _id: { id: "E", type: "Test" }, attrs: [ { name: "att", type: "test", creDate: 1399647084, modDate: 1399647084, value: "accu_t02", md: {} } ], creDate: 1399647084, modDate: 1399647084 }'
+T@14:51:24  ContextAttribute[42]: Creating a ContextAttribute 1
+T@14:51:24  ContextAttribute[86]: Creating a ContextAttribute 'att':'test':'accu_t02', setting its compound to NULL
+T@14:51:24  startSenderThread[43]: sending to: host='127.0.0.1', port=9977, verb=POST, tenant='t_02', path='/notify', content-type: application/xml
+T@14:51:24  processSubscriptions[908]: update() in 'testharness-t_02.csubs' collection: {{ _id: ObjectId('536ceb6c17365a7b96d9d9d2') }, { $set: { lastNotification: 1399647084 }, $inc: { count: 1 } }}
+T@14:51:24  sendHttpSocket[204]: 'PRE' HTTP headers:
+--------------
+POST /notify HTTP/1.1
+User-Agent: orion/0.12.0-next
+Host: 127.0.0.1:9977
+Accept: application/xml, application/json
+
+-------------
+T@14:51:24  mongoSemTake[90]: processSubscriptions taking the 'mongo' semaphore for 'update in SubscribeContextCollection'
+T@14:51:24  mongoSemTake[92]: processSubscriptions has the 'mongo' semaphore
+3@14:51:24  socketHttpConnect[62]: Generic Connect to: '127.0.0.1'  port: '9977'
+3@14:51:24  socketHttpConnect[71]: Allow IPv4 only
+T@14:51:24  mongoSemGive[118]: processSubscriptions gives the 'mongo' semaphore for 'update in SubscribeContextCollection'
+T@14:51:24  reqSemGive[104]: mongoUpdateContext gives the 'req' semaphore for 'ngsi10 update request'
+T@14:51:24  ~UpdateContextResponse[58]: destroyed
+T@14:51:24  sendHttpSocket[264]: Sending message 2 to HTTP server: sending static message of 912 bytes to HTTP server
+T@14:51:24  restReply[65]: Response 4: responding with 621 bytes, Status Code 200
+T@14:51:24  sendHttpSocket[265]: Sending to HTTP server payload:
+POST /notify HTTP/1.1
+User-Agent: orion/0.12.0-next
+Host: 127.0.0.1:9977
+Accept: application/xml, application/json
+fiware-service: t_02
+Content-Type: application/xml
+Content-Length: 725
+
+<notifyContextRequest>
+  <subscriptionId>536ceb6c17365a7b96d9d9d2</subscriptionId>
+  <originator>localhost</originator>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Test" isPattern="false">
+          <id>E</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>att</name>
+            <type>test</type>
+            <contextValue>accu_t02</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</notifyContextRequest>
+
+
+T@14:51:24  restReply[66]: Response payload: '<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Test" isPattern="false">
+          <id>E</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>att</name>
+            <type>test</type>
+            <contextValue></contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+'
+T@14:51:24  ~RegisterContextResponse[56]: destroyed
+T@14:51:24  sendHttpSocket[293]: not waiting for response
+F@14:51:24  ***[948]: In sigHandler - caught signal 15
+X@14:51:24  sigHandler[954]: Received signal 15
+1 EntityIds:
+  Entity Id 0:
+    Id:         E
+    Type:       Test
+    isPattern:  false
+  Attribute List
+  Reference: http://127.0.0.1:9997/notify
+  Duration: PT1H
+  No AttributeExpression
+No scopes
+1 NotifyConditions    Notify Condition 0:
+    type: ONCHANGE
+    ConditionValue List
+      att
+    No RestrictionString
+  No Throttling
+1 EntityIds:
+  Entity Id 0:
+    Id:         E
+    Type:       Test
+    isPattern:  false
+  Attribute List
+  Reference: http://127.0.0.1:9977/notify
+  Duration: PT1H
+  No AttributeExpression
+No scopes
+1 NotifyConditions    Notify Condition 0:
+    type: ONCHANGE
+    ConditionValue List
+      att
+    No RestrictionString
+  No Throttling
+
+
+1 ContextElementsContext Element 0:
+  Entity Id:
+    Id:         E
+    Type:       Test
+    isPattern:  false
+  No AttributeDomainName
+1 ContextAttributes  Attribute 0:
+    Name:       att
+    Type:       test
+    Value:      accu_t01
+0 Attribute Metadatas
+0 Domain Metadatas
+UpdateActionType: APPEND
+
+
+1 ContextElementsContext Element 0:
+  Entity Id:
+    Id:         E
+    Type:       Test
+    isPattern:  false
+  No AttributeDomainName
+1 ContextAttributes  Attribute 0:
+    Name:       att
+    Type:       test
+    Value:      accu_t02
+0 Attribute Metadatas
+0 Domain Metadatas
+UpdateActionType: APPEND

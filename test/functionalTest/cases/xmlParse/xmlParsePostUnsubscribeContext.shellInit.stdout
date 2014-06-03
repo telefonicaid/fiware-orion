@@ -1,0 +1,241 @@
+{ "dropped" : "testharness", "ok" : 1 }
+T@17:45:42  paConfigActions[727]: setting trace levels to '0-255'
+T@17:45:42  paConfigActions[728]: Leaving function paConfigActions
+E@17:45:42  exitFunc[1009]: unlink(/tmp/orion_9999.pid): No such file or directory
+T@17:45:42  semInit[61]: Initialized 'req' semaphore
+T@17:45:42  semInit[62]: Initialized 'mongo' semaphore
+T@17:45:42  mongoSemTake[90]: mongoConnect taking the 'mongo' semaphore for 'connecting to mongo'
+T@17:45:42  mongoSemTake[92]: mongoConnect has the 'mongo' semaphore
+T@17:45:42  mongoConnect[152]: mongo version server: 2.4.9 (mayor: 2, minor: 4, extra: 9)
+T@17:45:42  mongoSemGive[118]: mongoConnect gives the 'mongo' semaphore for 'connecting to mongo'
+F@17:45:42  ***[1063]: Connected to mongo at localhost:testharness
+T@17:45:42  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant )
+T@17:45:42  recoverOntimeIntervalThreads[398]: query() in 'testharness.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@17:45:42  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:42  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@17:45:42  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+V@17:45:42  restStart[569]: Starting HTTP daemon on IPv4 0.0.0.0 port 9999
+V@17:45:42  restStart[611]: Starting HTTP daemon on IPv6 :: port 9999
+T@17:45:43  connectionTreat[438]: notifyFormat: ''
+T@17:45:43  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:43  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:43  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:43  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:43  httpHeaderGet[137]: HTTP Header:   Content-Length: 153
+T@17:45:43  connectionTreat[442]: HTTP tenant: ''
+T@17:45:43  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:43  restService[179]: Parsing payload for URL '/NGSI10/unsubscribeContext', method 'POST', service vector index: 20
+T@17:45:43  payloadParse[53]: parsing data for service 'UnsubscribeContextRequest'. Method: 'POST'
+T@17:45:43  payloadParse[54]: outFormat: XML
+T@17:45:43  payloadParse[58]: Calling xmlTreat for service request 14, payloadWord 'unsubscribeContextRequest'
+2@17:45:43  xmlRequestGet[155]: Found xmlRequest of type 14, method 'POST' - index 20 (/unsubscribeContextRequest)
+T@17:45:43  nullTreat[272]: Not treating node 'unsubscribeContextRequest'
+T@17:45:43  xmlTreat[251]: Calling check for XML parsed tree (unsubscribeContextRequest)
+T@17:45:43  UnsubscribeContextResponse[40]: created
+T@17:45:43  ~UnsubscribeContextResponse[63]: destroyed
+T@17:45:43  payloadParse[69]: result: 'OK'
+T@17:45:43  payloadParse[70]: outFormat: XML
+T@17:45:43  restService[182]: payloadParse returns 'OK'
+T@17:45:43  restService[197]: Treating service POST /NGSI10/unsubscribeContext
+T@17:45:43  restService[237]: tenant: ''
+T@17:45:43  UnsubscribeContextResponse[40]: created
+T@17:45:43  reqSemTake[75]: mongoUnsubscribeContext taking the 'req' semaphore for 'ngsi10 unsubscribe request'
+T@17:45:43  reqSemTake[77]: mongoUnsubscribeContext has the 'req' semaphore
+T@17:45:43  mongoUnsubscribeContext[45]: Unsubscribe Context
+T@17:45:43  mongoUnsubscribeContext[58]: findOne() in 'testharness.csubs' collection _id '012345678901234567890123'}
+T@17:45:43  mongoSemTake[90]: mongoUnsubscribeContext taking the 'mongo' semaphore for 'findOne in SubscribeContextCollection'
+T@17:45:43  mongoSemTake[92]: mongoUnsubscribeContext has the 'mongo' semaphore
+T@17:45:43  mongoSemGive[118]: mongoUnsubscribeContext gives the 'mongo' semaphore for 'findOne in SubscribeContextCollection'
+T@17:45:43  reqSemGive[104]: mongoUnsubscribeContext gives the 'req' semaphore for 'ngsi10 unsubscribe request (no subscriptions found)'
+T@17:45:43  ~UnsubscribeContextResponse[63]: destroyed
+T@17:45:43  restReply[65]: Response 1: responding with 295 bytes, Status Code 200
+T@17:45:43  restReply[66]: Response payload: '<unsubscribeContextResponse>
+  <subscriptionId>012345678901234567890123</subscriptionId>
+  <statusCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>subscriptionId: '012345678901234567890123'</details>
+  </statusCode>
+</unsubscribeContextResponse>
+'
+T@17:45:43  ~RegisterContextResponse[56]: destroyed
+T@17:45:43  connectionTreat[438]: notifyFormat: ''
+T@17:45:43  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:43  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:43  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:43  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:43  httpHeaderGet[137]: HTTP Header:   Content-Length: 976
+T@17:45:43  connectionTreat[442]: HTTP tenant: ''
+T@17:45:43  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:43  restService[179]: Parsing payload for URL '/NGSI10/subscribeContext', method 'POST', service vector index: 16
+T@17:45:43  payloadParse[53]: parsing data for service 'SubscribeContextRequest'. Method: 'POST'
+T@17:45:43  payloadParse[54]: outFormat: XML
+T@17:45:43  payloadParse[58]: Calling xmlTreat for service request 12, payloadWord 'subscribeContextRequest'
+2@17:45:43  xmlRequestGet[155]: Found xmlRequest of type 12, method 'POST' - index 16 (/subscribeContextRequest)
+T@17:45:43  nullTreat[272]: Not treating node 'subscribeContextRequest'
+T@17:45:43  nullTreat[272]: Not treating node 'entityIdList'
+T@17:45:43  entityId[53]: Got an entityId
+T@17:45:43  entityIdParse[291]: Got a type for an entity: 'Room'
+T@17:45:43  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@17:45:43  entityIdId[77]: Got an entityId:id: 'ConferenceRoom'
+T@17:45:43  entityId[53]: Got an entityId
+T@17:45:43  entityIdParse[291]: Got a type for an entity: 'Room'
+T@17:45:43  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@17:45:43  entityIdId[77]: Got an entityId:id: 'OfficeRoom'
+T@17:45:43  nullTreat[272]: Not treating node 'attributeList'
+T@17:45:43  attribute[90]: Got an attribute
+T@17:45:43  attribute[90]: Got an attribute
+T@17:45:43  reference[351]: Got a reference: 'http://127.0.0.1:1028'
+T@17:45:43  duration[364]: Got a duration: 'P5Y'
+T@17:45:43  restriction[104]: Got a restriction
+T@17:45:43  attributeExpression[118]: Got an attributeExpression: 'testRestriction'
+T@17:45:43  nullTreat[272]: Not treating node 'scope'
+T@17:45:43  operationScope[134]: Got an operationScope
+T@17:45:43  scopeType[149]: Got a scopeType: 'scope1'
+T@17:45:43  scopeValue[176]: Got a scopeValue: 'sval1' for scopeType 'scope1'
+T@17:45:43  operationScope[134]: Got an operationScope
+T@17:45:43  scopeType[149]: Got a scopeType: 'scope2'
+T@17:45:43  scopeValue[176]: Got a scopeValue: 'sval2' for scopeType 'scope2'
+T@17:45:43  nullTreat[272]: Not treating node 'notifyConditions'
+T@17:45:43  notifyCondition[376]: Got a Notify Condition
+T@17:45:43  notifyConditionType[404]: Got a Notify Condition Type: 'ONTIMEINTERVAL'
+T@17:45:43  nullTreat[272]: Not treating node 'condValueList'
+T@17:45:43  condValue[417]: Got a Cond Value: 'PT10S'
+T@17:45:43  notifyConditionRestriction[390]: Got a Notify Condition restriction
+T@17:45:43  throttling[430]: Got a throttling: 'P5Y'
+T@17:45:43  xmlTreat[251]: Calling check for XML parsed tree (subscribeContextRequest)
+T@17:45:43  check[45]: In Restriction::check
+T@17:45:43  check[59]: Restriction::check returns OK (2)
+T@17:45:43  ~SubscribeContextResponse[38]: destroyed
+T@17:45:43  payloadParse[69]: result: 'OK'
+T@17:45:43  payloadParse[70]: outFormat: XML
+T@17:45:43  restService[182]: payloadParse returns 'OK'
+T@17:45:43  restService[197]: Treating service POST /NGSI10/subscribeContext
+T@17:45:43  restService[237]: tenant: ''
+T@17:45:43  mongoSubscribeContext[53]: Subscribe Context Request: notifications sent in 'XML' format
+T@17:45:43  reqSemTake[75]: mongoSubscribeContext taking the 'req' semaphore for 'ngsi10 subscribe request'
+T@17:45:43  reqSemTake[77]: mongoSubscribeContext has the 'req' semaphore
+T@17:45:43  mongoSubscribeContext[66]: Subscription expiration: 1559324743
+T@17:45:43  createIntervalThread[179]: created thread: 47847755867904
+T@17:45:43  startOnIntervalThread[114]: ONTIMEINTERVAL thread wakes up (538b66c755f7c477cd5a9eab)
+T@17:45:43  mongoSubscribeContext[118]: insert() in 'testharness.csubs' collection: '{ _id: ObjectId('538b66c755f7c477cd5a9eab'), expiration: 1559324743, reference: "http://127.0.0.1:1028", throttling: 157680000, entities: [ { id: "ConferenceRoom", type: "Room", isPattern: "false" }, { id: "OfficeRoom", type: "Room", isPattern: "false" } ], attrs: [ "temperature", "lightstatus" ], conditions: [ { type: "ONTIMEINTERVAL", value: 10 } ], format: "XML" }'
+T@17:45:43  reqSemTake[75]: mongoGetContextSubscriptionInfo taking the 'req' semaphore for 'get info on subscriptions'
+T@17:45:43  mongoSemTake[90]: mongoSubscribeContext taking the 'mongo' semaphore for 'insert into SubscribeContextCollection'
+T@17:45:43  mongoSemTake[92]: mongoSubscribeContext has the 'mongo' semaphore
+T@17:45:43  mongoSemGive[118]: mongoSubscribeContext gives the 'mongo' semaphore for 'insert into SubscribeContextCollection'
+T@17:45:43  reqSemGive[104]: mongoSubscribeContext gives the 'req' semaphore for 'ngsi10 subscribe request'
+T@17:45:43  ~SubscribeContextResponse[38]: destroyed
+T@17:45:43  restReply[65]: Response 2: responding with 224 bytes, Status Code 200
+T@17:45:43  restReply[66]: Response payload: '<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>538b66c755f7c477cd5a9eab</subscriptionId>
+    <duration>P5Y</duration>
+    <throttling>P5Y</throttling>
+  </subscribeResponse>
+</subscribeContextResponse>
+'
+T@17:45:43  ~RegisterContextResponse[56]: destroyed
+T@17:45:43  reqSemTake[77]: mongoGetContextSubscriptionInfo has the 'req' semaphore
+T@17:45:43  mongoGetContextSubscriptionInfo[46]: Get Subscription Info operation
+T@17:45:43  mongoGetContextSubscriptionInfo[51]: findOne() in 'testharness.csubs' collection by _id '538b66c755f7c477cd5a9eab'
+T@17:45:43  mongoSemTake[90]: mongoGetContextSubscriptionInfo taking the 'mongo' semaphore for 'findOne in SubscribeContextCollection'
+T@17:45:43  mongoSemTake[92]: mongoGetContextSubscriptionInfo has the 'mongo' semaphore
+T@17:45:43  mongoSemGive[118]: mongoGetContextSubscriptionInfo gives the 'mongo' semaphore for 'findOne in SubscribeContextCollection'
+T@17:45:43  mongoGetContextSubscriptionInfo[71]: retrieved subscription: { _id: ObjectId('538b66c755f7c477cd5a9eab'), expiration: 1559324743, reference: "http://127.0.0.1:1028", throttling: 157680000, entities: [ { id: "ConferenceRoom", type: "Room", isPattern: "false" }, { id: "OfficeRoom", type: "Room", isPattern: "false" } ], attrs: [ "temperature", "lightstatus" ], conditions: [ { type: "ONTIMEINTERVAL", value: 10 } ], format: "XML" }
+T@17:45:43  reqSemGive[104]: mongoGetContextSubscriptionInfo gives the 'req' semaphore for 'get info on subscriptions'
+T@17:45:43  reqSemTake[75]: mongoGetContextElementResponses taking the 'req' semaphore for 'get context-element responses'
+T@17:45:43  reqSemTake[77]: mongoGetContextElementResponses has the 'req' semaphore
+T@17:45:43  mongoGetContextElementResponses[125]: Get Notify Context Request operation
+T@17:45:43  fillQueryEntFalse[531]: Entity query token (isPattern=false): {id: ConferenceRoom, type: Room}
+T@17:45:43  fillQueryEntFalse[531]: Entity query token (isPattern=false): {id: OfficeRoom, type: Room}
+T@17:45:43  entitiesQuery[775]: Attribute query token: 'temperature'
+T@17:45:43  entitiesQuery[775]: Attribute query token: 'lightstatus'
+T@17:45:43  entitiesQuery[795]: query() in 'testharness.entities' collection: '{ $or: [ { _id: { $in: [ { id: "ConferenceRoom", type: "Room" }, { id: "OfficeRoom", type: "Room" } ] } } ], attrs.name: { $in: [ "temperature", "lightstatus" ] } }'
+T@17:45:43  mongoSemTake[90]: entitiesQuery taking the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:43  mongoSemTake[92]: entitiesQuery has the 'mongo' semaphore
+T@17:45:43  mongoSemGive[118]: entitiesQuery gives the 'mongo' semaphore for 'query in EntitiesCollection'
+T@17:45:43  reqSemGive[104]: mongoGetContextElementResponses gives the 'req' semaphore for 'get context-element responses'
+T@17:45:43  doNotification[92]: notification not sent due to empty context elements response vector)
+T@17:45:43  connectionTreat[438]: notifyFormat: ''
+T@17:45:43  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:43  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:43  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:43  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:43  httpHeaderGet[137]: HTTP Header:   Content-Length: 153
+T@17:45:43  connectionTreat[442]: HTTP tenant: ''
+T@17:45:43  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:43  restService[179]: Parsing payload for URL '/NGSI10/unsubscribeContext', method 'POST', service vector index: 20
+T@17:45:43  payloadParse[53]: parsing data for service 'UnsubscribeContextRequest'. Method: 'POST'
+T@17:45:43  payloadParse[54]: outFormat: XML
+T@17:45:43  payloadParse[58]: Calling xmlTreat for service request 14, payloadWord 'unsubscribeContextRequest'
+2@17:45:43  xmlRequestGet[155]: Found xmlRequest of type 14, method 'POST' - index 20 (/unsubscribeContextRequest)
+T@17:45:43  nullTreat[272]: Not treating node 'unsubscribeContextRequest'
+T@17:45:43  xmlTreat[251]: Calling check for XML parsed tree (unsubscribeContextRequest)
+T@17:45:43  UnsubscribeContextResponse[40]: created
+T@17:45:43  ~UnsubscribeContextResponse[63]: destroyed
+T@17:45:43  payloadParse[69]: result: 'OK'
+T@17:45:43  payloadParse[70]: outFormat: XML
+T@17:45:43  restService[182]: payloadParse returns 'OK'
+T@17:45:43  restService[197]: Treating service POST /NGSI10/unsubscribeContext
+T@17:45:43  restService[237]: tenant: ''
+T@17:45:43  UnsubscribeContextResponse[40]: created
+T@17:45:43  reqSemTake[75]: mongoUnsubscribeContext taking the 'req' semaphore for 'ngsi10 unsubscribe request'
+T@17:45:43  reqSemTake[77]: mongoUnsubscribeContext has the 'req' semaphore
+T@17:45:43  mongoUnsubscribeContext[45]: Unsubscribe Context
+T@17:45:43  mongoUnsubscribeContext[58]: findOne() in 'testharness.csubs' collection _id '538b66c755f7c477cd5a9eab'}
+T@17:45:43  mongoSemTake[90]: mongoUnsubscribeContext taking the 'mongo' semaphore for 'findOne in SubscribeContextCollection'
+T@17:45:43  mongoSemTake[92]: mongoUnsubscribeContext has the 'mongo' semaphore
+T@17:45:43  mongoSemGive[118]: mongoUnsubscribeContext gives the 'mongo' semaphore for 'findOne in SubscribeContextCollection'
+T@17:45:43  mongoUnsubscribeContext[103]: remove() in 'testharness.csubs' collection _id '538b66c755f7c477cd5a9eab'}
+T@17:45:43  mongoSemTake[90]: mongoUnsubscribeContext taking the 'mongo' semaphore for 'remove from SubscribeContextCollection'
+T@17:45:43  mongoSemTake[92]: mongoUnsubscribeContext has the 'mongo' semaphore
+T@17:45:43  mongoSemGive[118]: mongoUnsubscribeContext gives the 'mongo' semaphore for 'remove from SubscribeContextCollection'
+E@17:45:43  destroyOntimeIntervalThreads[226]: error joining thread 47847755867904: 22
+T@17:45:43  reqSemGive[104]: mongoUnsubscribeContext gives the 'req' semaphore for 'ngsi10 unsubscribe request'
+T@17:45:43  ~UnsubscribeContextResponse[63]: destroyed
+T@17:45:43  restReply[65]: Response 3: responding with 207 bytes, Status Code 200
+T@17:45:43  restReply[66]: Response payload: '<unsubscribeContextResponse>
+  <subscriptionId>538b66c755f7c477cd5a9eab</subscriptionId>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</unsubscribeContextResponse>
+'
+T@17:45:43  ~RegisterContextResponse[56]: destroyed
+F@17:45:43  ***[981]: In sigHandler - caught signal 15
+X@17:45:43  sigHandler[987]: Received signal 15
+
+
+SubscriptionId: 012345678901234567890123
+2 EntityIds:
+  Entity Id 0:
+    Id:         ConferenceRoom
+    Type:       Room
+    isPattern:  false
+  Entity Id 1:
+    Id:         OfficeRoom
+    Type:       Room
+    isPattern:  false
+  Attribute List
+    temperature
+    lightstatus
+  Reference: http://127.0.0.1:1028
+  Duration: P5Y
+  AttributeExpression: testRestriction
+2 Scopes:
+  Scope 0:
+    Type:     scope1
+    Value:    sval1
+  Scope 1:
+    Type:     scope2
+    Value:    sval2
+1 NotifyConditions    Notify Condition 0:
+    type: ONTIMEINTERVAL
+    ConditionValue List
+      PT10S
+    RestrictionString: restriction
+  Throttling: P5Y
+
+
+SubscriptionId: 538b66c755f7c477cd5a9eab

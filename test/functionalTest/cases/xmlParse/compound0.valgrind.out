@@ -1,0 +1,291 @@
+==26484== Memcheck, a memory error detector
+==26484== Copyright (C) 2002-2011, and GNU GPL'd, by Julian Seward et al.
+==26484== Using Valgrind-3.7.0 and LibVEX; rerun with -h for copyright info
+==26484== Command: contextBroker -vvvvv -harakiri -port 9999 -pidpath /tmp/orion_9999.pid -db testharness -t 0-1
+==26484== 
+T@09:24:14  paConfigActions[727]: setting trace levels to '0-1'
+E@09:24:14  exitFunc[559]: unlink(/tmp/orion_9999.pid): No such file or directory
+==26484== 
+==26484== HEAP SUMMARY:
+==26484==     in use at exit: 17,690 bytes in 104 blocks
+==26484==   total heap usage: 3,267 allocs, 3,163 frees, 281,093 bytes allocated
+==26484== 
+==26484== LEAK SUMMARY:
+==26484==    definitely lost: 0 bytes in 0 blocks
+==26484==    indirectly lost: 0 bytes in 0 blocks
+==26484==      possibly lost: 0 bytes in 0 blocks
+==26484==    still reachable: 17,690 bytes in 104 blocks
+==26484==         suppressed: 0 bytes in 0 blocks
+==26484== Rerun with --leak-check=full to see details of leaked memory
+==26484== 
+==26484== For counts of detected and suppressed errors, rerun with: -v
+==26484== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 7 from 7)
+F@09:24:14  ***[600]: Connected to mongo at localhost:testharness
+==26489== Source and destination overlap in strncpy(0xa4d8a7, 0xa4d8a7, 63)
+==26489==    at 0x4C29782: strncpy (mc_replace_strmem.c:463)
+==26489==    by 0x659678: restInit(RestService*, IpVersion, char const*, unsigned short, char const*, char const*, void (*)(ConnectionInfo*), bool) (rest.cpp:600)
+==26489==    by 0x5DF38D: main (contextBroker.cpp:737)
+==26489== 
+==26489== Source and destination overlap in strncpy(0xa4d8e2, 0xa4d8e2, 63)
+==26489==    at 0x4C29782: strncpy (mc_replace_strmem.c:463)
+==26489==    by 0x65969C: restInit(RestService*, IpVersion, char const*, unsigned short, char const*, char const*, void (*)(ConnectionInfo*), bool) (rest.cpp:603)
+==26489==    by 0x5DF38D: main (contextBroker.cpp:737)
+==26489== 
+V@09:24:14  restStart[499]: Starting HTTP daemon on IPv4 0.0.0.0 port 9999
+V@09:24:14  restStart[541]: Starting HTTP daemon on IPv6 :: port 9999
+==26489== Thread 4:
+==26489== Syscall param mmap(length) contains uninitialised byte(s)
+==26489==    at 0x58B9AFA: mmap (syscall-template.S:82)
+==26489==    by 0x4E398E7: MHD_pool_create (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E35F47: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4E39A1F: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E35F20: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4E39A24: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E35F20: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4E39A52: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E35F20: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4E399BC: MHD_pool_allocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E33C62: MHD_set_connection_value (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34033: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E3426D: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34783: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+2@09:24:22  xmlRequestGet[155]: Found xmlRequest of type 17, method 'POST' - index 12 (/updateContextRequest)
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x63FD37: contextAttributeCustomMetadataToBson(mongo::BSONObj&, ContextAttribute*) (MongoCommonUpdate.cpp:536)
+==26489==    by 0x649675: createEntity(EntityId, ContextAttributeVector, std::string*) (MongoCommonUpdate.cpp:1254)
+==26489==    by 0x64D4B3: processContextElement(ContextElement*, UpdateContextResponse*, std::string) (MongoCommonUpdate.cpp:1594)
+==26489==    by 0x633A5B: mongoUpdateContext(UpdateContextRequest*, UpdateContextResponse*) (mongoUpdateContext.cpp:51)
+==26489==    by 0x615FBC: postUpdateContext(ConnectionInfo*, int, std::vector<std::string, std::allocator<std::string> >, ParseData*) (postUpdateContext.cpp:44)
+==26489==    by 0x65D126: restService(ConnectionInfo*, RestService*) (RestService.cpp:155)
+==26489==    by 0x6577FC: serve(ConnectionInfo*) (rest.cpp:234)
+==26489==    by 0x658AA1: connectionTreat(void*, MHD_Connection*, char const*, char const*, char const*, char const*, unsigned long*, void**) (rest.cpp:458)
+==26489==    by 0x4E34328: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34DBF: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4E399BC: MHD_pool_allocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E335B6: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4E335BD: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4C2A639: memcpy (mc_replace_strmem.c:121)
+==26489==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4C2A64E: memcpy (mc_replace_strmem.c:838)
+==26489==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4C2A69B: memcpy (mc_replace_strmem.c:838)
+==26489==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4C2A790: memcpy (mc_replace_strmem.c:838)
+==26489==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Use of uninitialised value of size 8
+==26489==    at 0x4C2A7C8: memcpy (mc_replace_strmem.c:838)
+==26489==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Use of uninitialised value of size 8
+==26489==    at 0x4C2A7ED: memcpy (mc_replace_strmem.c:838)
+==26489==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Use of uninitialised value of size 8
+==26489==    at 0x58CFC9C: __vsprintf_chk (vsprintf_chk.c:79)
+==26489==    by 0x58CFC0E: __sprintf_chk (sprintf_chk.c:33)
+==26489==    by 0x4E33622: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Use of uninitialised value of size 8
+==26489==    at 0x4C2953C: strcpy (mc_replace_strmem.c:429)
+==26489==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4C29569: strcpy (mc_replace_strmem.c:112)
+==26489==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4C2956E: strcpy (mc_replace_strmem.c:121)
+==26489==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4C2957F: strcpy (mc_replace_strmem.c:429)
+==26489==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Use of uninitialised value of size 8
+==26489==    at 0x4E3363E: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Syscall param sendto(msg) contains uninitialised byte(s)
+==26489==    at 0x58BE0AC: send (send.c:32)
+==26489==    by 0x4E36D69: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E35963: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E35A87: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4E39A1F: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E33BA1: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E35A9D: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4E39A24: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E33BA1: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E35A9D: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4E39A40: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E33BA1: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E35A9D: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4E39A1F: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4E39A24: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Conditional jump or move depends on uninitialised value(s)
+==26489==    at 0x4E39A52: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+==26489== Thread 3:
+==26489== Syscall param munmap(length) contains uninitialised byte(s)
+==26489==    at 0x58B9B27: munmap (syscall-template.S:82)
+==26489==    by 0x4E3996B: MHD_pool_destroy (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E37030: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x4E3881C: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==26489==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==26489==    by 0x58BD0EC: clone (clone.S:112)
+==26489== 
+E@09:24:22  orionExit[548]: Received a 'DIE' request
+==26489== 
+==26489== HEAP SUMMARY:
+==26489==     in use at exit: 23,191 bytes in 148 blocks
+==26489==   total heap usage: 3,827 allocs, 3,679 frees, 483,310 bytes allocated
+==26489== 
+==26489== LEAK SUMMARY:
+==26489==    definitely lost: 0 bytes in 0 blocks
+==26489==    indirectly lost: 0 bytes in 0 blocks
+==26489==      possibly lost: 1,394 bytes in 16 blocks
+==26489==    still reachable: 21,797 bytes in 132 blocks
+==26489==         suppressed: 0 bytes in 0 blocks
+==26489== Rerun with --leak-check=full to see details of leaked memory
+==26489== 
+==26489== For counts of detected and suppressed errors, rerun with: -v
+==26489== Use --track-origins=yes to see where uninitialised values come from
+==26489== ERROR SUMMARY: 43 errors from 30 contexts (suppressed: 7 from 7)

@@ -1,0 +1,331 @@
+==30918== Memcheck, a memory error detector
+==30918== Copyright (C) 2002-2011, and GNU GPL'd, by Julian Seward et al.
+==30918== Using Valgrind-3.7.0 and LibVEX; rerun with -h for copyright info
+==30918== Command: contextBroker -vvvvv -harakiri -port 9999 -pidpath /tmp/orion_9999.pid -db testharness -t 0-255
+==30918== 
+T@09:32:59  paConfigActions[727]: setting trace levels to '0-255'
+T@09:32:59  paConfigActions[728]: Leaving function paConfigActions
+E@09:32:59  exitFunc[559]: unlink(/tmp/orion_9999.pid): No such file or directory
+T@09:32:59  semInit[61]: Initialized 'req' semaphore
+T@09:32:59  semInit[62]: Initialized 'mongo' semaphore
+T@09:32:59  mongoSemTake[90]: mongoConnect taking the 'mongo' semaphore for 'connecting to mongo'
+T@09:32:59  mongoSemTake[92]: mongoConnect has the 'mongo' semaphore
+==30918== 
+==30918== HEAP SUMMARY:
+==30918==     in use at exit: 17,690 bytes in 104 blocks
+==30918==   total heap usage: 3,269 allocs, 3,165 frees, 313,863 bytes allocated
+==30918== 
+==30918== LEAK SUMMARY:
+==30918==    definitely lost: 0 bytes in 0 blocks
+==30918==    indirectly lost: 0 bytes in 0 blocks
+==30918==      possibly lost: 0 bytes in 0 blocks
+==30918==    still reachable: 17,690 bytes in 104 blocks
+==30918==         suppressed: 0 bytes in 0 blocks
+==30918== Rerun with --leak-check=full to see details of leaked memory
+==30918== 
+==30918== For counts of detected and suppressed errors, rerun with: -v
+==30918== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 7 from 7)
+T@09:33:00  mongoConnect[136]: mongo version server: 2.4.9 (mayor: 2, minor: 4, extra: 9)
+T@09:33:00  mongoSemGive[118]: mongoConnect gives the 'mongo' semaphore for 'connecting to mongo'
+F@09:33:00  ***[600]: Connected to mongo at localhost:testharness
+T@09:33:00  ensureLocationIndex[336]: ensuring 2dsphere index on location.coords
+T@09:33:00  recoverOntimeIntervalThreads[353]: query() in 'testharness.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@09:33:00  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@09:33:00  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@09:33:00  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+==30923== Source and destination overlap in strncpy(0xa4d8a7, 0xa4d8a7, 63)
+==30923==    at 0x4C29782: strncpy (mc_replace_strmem.c:463)
+==30923==    by 0x659678: restInit(RestService*, IpVersion, char const*, unsigned short, char const*, char const*, void (*)(ConnectionInfo*), bool) (rest.cpp:600)
+==30923==    by 0x5DF38D: main (contextBroker.cpp:737)
+==30923== 
+==30923== Source and destination overlap in strncpy(0xa4d8e2, 0xa4d8e2, 63)
+==30923==    at 0x4C29782: strncpy (mc_replace_strmem.c:463)
+==30923==    by 0x65969C: restInit(RestService*, IpVersion, char const*, unsigned short, char const*, char const*, void (*)(ConnectionInfo*), bool) (rest.cpp:603)
+==30923==    by 0x5DF38D: main (contextBroker.cpp:737)
+==30923== 
+V@09:33:00  restStart[499]: Starting HTTP daemon on IPv4 0.0.0.0 port 9999
+V@09:33:00  restStart[541]: Starting HTTP daemon on IPv6 :: port 9999
+==30923== Thread 4:
+==30923== Syscall param mmap(length) contains uninitialised byte(s)
+==30923==    at 0x58B9AFA: mmap (syscall-template.S:82)
+==30923==    by 0x4E398E7: MHD_pool_create (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E35F47: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4E39A1F: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E35F20: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4E39A24: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E35F20: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4E39A52: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E35F20: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4E399BC: MHD_pool_allocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E33C62: MHD_set_connection_value (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E34033: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E3426D: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E34783: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+T@09:33:07  httpHeaderGet[94]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:33:07  httpHeaderGet[94]: HTTP Header:   Host: localhost:9999
+T@09:33:07  httpHeaderGet[94]: HTTP Header:   Content-Type: application/xml
+T@09:33:07  httpHeaderGet[94]: HTTP Header:   Accept: application/xml
+T@09:33:07  httpHeaderGet[94]: HTTP Header:   Content-Length: 177
+T@09:33:07  restService[135]: Parsing payload for URL '/NGSI9/unsubscribeContextAvailability', method 'POST', service vector index: 6
+T@09:33:07  payloadParse[53]: parsing data for service 'UnsubscribeContextAvailabilityRequest'. Method: 'POST'
+T@09:33:07  payloadParse[54]: outFormat: XML
+T@09:33:07  payloadParse[58]: Calling xmlTreat for service request 7, payloadWord 'unsubscribeContextAvailabilityRequest'
+2@09:33:07  xmlRequestGet[155]: Found xmlRequest of type 7, method 'POST' - index 6 (/unsubscribeContextAvailabilityRequest)
+T@09:33:07  nullTreat[272]: Not treating node 'unsubscribeContextAvailabilityRequest'
+T@09:33:07  xmlTreat[251]: Calling check for XML parsed tree (unsubscribeContextAvailabilityRequest)
+T@09:33:07  ~UnsubscribeContextAvailabilityResponse[71]: destroyed
+T@09:33:07  payloadParse[69]: result: 'OK'
+T@09:33:07  payloadParse[70]: outFormat: XML
+T@09:33:07  restService[138]: payloadParse returns 'OK'
+T@09:33:07  restService[153]: Treating service POST /NGSI9/unsubscribeContextAvailability
+T@09:33:07  reqSemTake[75]: mongoUnsubscribeContextAvailability taking the 'req' semaphore for 'ngsi9 unsubscribe request'
+T@09:33:07  reqSemTake[77]: mongoUnsubscribeContextAvailability has the 'req' semaphore
+T@09:33:07  mongoUnsubscribeContextAvailability[45]: Unsubscribe Context Availability
+T@09:33:07  mongoUnsubscribeContextAvailability[58]: findOne() in 'testharness.casubs' collection _id '012345678901234567890123'}
+T@09:33:07  mongoSemTake[90]: mongoUnsubscribeContextAvailability taking the 'mongo' semaphore for 'findOne in SubscribeContextAvailabilityCollection'
+T@09:33:07  mongoSemTake[92]: mongoUnsubscribeContextAvailability has the 'mongo' semaphore
+T@09:33:07  mongoSemGive[118]: mongoUnsubscribeContextAvailability gives the 'mongo' semaphore for 'findOne in SubscribeContextAvailabilityCollection'
+T@09:33:07  reqSemGive[104]: mongoUnsubscribeContextAvailability gives the 'req' semaphore for 'ngsi9 unsubscribe request (no subscriptions)'
+T@09:33:07  ~UnsubscribeContextAvailabilityResponse[71]: destroyed
+T@09:33:07  restReply[65]: Response 1: responding with 253 bytes, Status Code 200
+T@09:33:07  restReply[66]: Response payload: '<unsubscribeContextAvailabilityResponse>
+  <subscriptionId>012345678901234567890123</subscriptionId>
+  <statusCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </statusCode>
+</unsubscribeContextAvailabilityResponse>
+'
+T@09:33:07  ~RegisterContextResponse[56]: destroyed
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4E399BC: MHD_pool_allocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E335B6: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4E335BD: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4C2A639: memcpy (mc_replace_strmem.c:121)
+==30923==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4C2A64E: memcpy (mc_replace_strmem.c:838)
+==30923==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4C2A69B: memcpy (mc_replace_strmem.c:838)
+==30923==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4C2A790: memcpy (mc_replace_strmem.c:838)
+==30923==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Use of uninitialised value of size 8
+==30923==    at 0x4C2A7C8: memcpy (mc_replace_strmem.c:838)
+==30923==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Use of uninitialised value of size 8
+==30923==    at 0x4C2A7ED: memcpy (mc_replace_strmem.c:838)
+==30923==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Use of uninitialised value of size 8
+==30923==    at 0x58CFC9C: __vsprintf_chk (vsprintf_chk.c:79)
+==30923==    by 0x58CFC0E: __sprintf_chk (sprintf_chk.c:33)
+==30923==    by 0x4E33622: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Use of uninitialised value of size 8
+==30923==    at 0x4C2953C: strcpy (mc_replace_strmem.c:429)
+==30923==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4C29569: strcpy (mc_replace_strmem.c:112)
+==30923==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4C2956E: strcpy (mc_replace_strmem.c:121)
+==30923==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4C2957F: strcpy (mc_replace_strmem.c:429)
+==30923==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Use of uninitialised value of size 8
+==30923==    at 0x4E3363E: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Syscall param sendto(msg) contains uninitialised byte(s)
+==30923==    at 0x58BE0AC: send (send.c:32)
+==30923==    by 0x4E36D69: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E35963: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E35A87: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4E39A1F: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E33BA1: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E35A9D: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4E39A24: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E33BA1: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E35A9D: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4E39A40: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E33BA1: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E35A9D: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4E39A1F: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4E39A24: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Conditional jump or move depends on uninitialised value(s)
+==30923==    at 0x4E39A52: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+==30923== Thread 3:
+==30923== Syscall param munmap(length) contains uninitialised byte(s)
+==30923==    at 0x58B9B27: munmap (syscall-template.S:82)
+==30923==    by 0x4E3996B: MHD_pool_destroy (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E37030: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x4E3881C: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==30923==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==30923==    by 0x58BD0EC: clone (clone.S:112)
+==30923== 
+T@09:33:08  httpHeaderGet[94]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:33:08  httpHeaderGet[94]: HTTP Header:   Host: localhost:9999
+T@09:33:08  httpHeaderGet[94]: HTTP Header:   Accept: */*
+T@09:33:08  restService[153]: Treating service GET /exit/harakiri
+E@09:33:08  orionExit[548]: Received a 'DIE' request
+
+
+SubscriptionId: 012345678901234567890123
+==30923== 
+==30923== HEAP SUMMARY:
+==30923==     in use at exit: 23,191 bytes in 148 blocks
+==30923==   total heap usage: 3,643 allocs, 3,495 frees, 1,886,800 bytes allocated
+==30923== 
+==30923== LEAK SUMMARY:
+==30923==    definitely lost: 0 bytes in 0 blocks
+==30923==    indirectly lost: 0 bytes in 0 blocks
+==30923==      possibly lost: 1,394 bytes in 16 blocks
+==30923==    still reachable: 21,797 bytes in 132 blocks
+==30923==         suppressed: 0 bytes in 0 blocks
+==30923== Rerun with --leak-check=full to see details of leaked memory
+==30923== 
+==30923== For counts of detected and suppressed errors, rerun with: -v
+==30923== Use --track-origins=yes to see where uninitialised values come from
+==30923== ERROR SUMMARY: 42 errors from 29 contexts (suppressed: 7 from 7)

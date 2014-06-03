@@ -1,0 +1,249 @@
+# 0. ok:  No compound value
+echo "0: +++++++++++++++++++++++++++++++++"
+url='/ngsi10/updateContext'
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue>1</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+curlXml ${url} "${payload}"
+
+#   1. err: unknown path
+#INVALID_XML
+echo "1: +++++++++++++++++++++++++++++++++"
+url='/ngsi10/updateContext'
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>
+            <here>No compounds are allowed</here>
+          </type>
+          <contextValue>1</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+curlXml ${url} "${payload}"
+
+
+#   2. ok:  One string 's1' == 'STRING' as compound value (contextValue is a struct)
+echo "2: +++++++++++++++++++++++++++++++++"
+url='/ngsi10/updateContext'
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue>
+            <s1>STRING</s1>
+          </contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+curlXml ${url} "${payload}"
+
+
+#   3. ok:  's1' and 's2' (== 'STRING2')
+echo "3: +++++++++++++++++++++++++++++++++"
+url='/ngsi10/updateContext'
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue>
+            <s1>STRING</s1>
+            <s2>STRING</s2>
+          </contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+curlXml ${url} "${payload}"
+
+
+#   4. err: Two items with same name in struct 's1' + 's2' + 's1'
+echo "4: +++++++++++++++++++++++++++++++++"
+url='/ngsi10/updateContext'
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue>
+            <s1>STRING</s1>
+            <s2>STRING</s2>
+            <s1>STRING</s1>
+          </contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+curlXml ${url} "${payload}"
+
+
+#   5. ok:  contextValue is a vector with one item
+echo "5: +++++++++++++++++++++++++++++++++"
+url='/ngsi10/updateContext'
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue type="vector">
+            <vecitem>1</vecitem>
+          </contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+curlXml ${url} "${payload}"
+
+
+#   6. ok:  contextValue is a vector with five items
+echo "6: +++++++++++++++++++++++++++++++++"
+url='/ngsi10/updateContext'
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue type="vector">
+            <vecitem>1</vecitem>
+            <vecitem>2</vecitem>
+            <vecitem>3</vecitem>
+            <vecitem>4</vecitem>
+            <vecitem>5</vecitem>
+          </contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+curlXml ${url} "${payload}"
+
+
+#   7. err: contextValue is a vector with five items + one item with a bad name
+echo "7: +++++++++++++++++++++++++++++++++"
+url='/ngsi10/updateContext'
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue type="vector">
+            <vecitem>1</vecitem>
+            <vecitem>2</vecitem>
+            <vecitem>3</vecitem>
+            <vecitem>4</vecitem>
+            <vecitem>5</vecitem>
+            <vecitem6>6</vecitem6>
+          </contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+curlXml ${url} "${payload}"
+
+
+#   8. ok: two structs with two values each
+echo "8: +++++++++++++++++++++++++++++++++"
+url='/ngsi10/updateContext'
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue>
+            <struct1>
+              <s1-1>1-1</s1-1>
+              <s1-2>1-2</s1-2>
+            </struct1>
+            <struct2>
+              <s2-1>2-1</s2-1>
+              <s2-2>2-2</s2-2>
+            </struct2>
+          </contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+curlXml ${url} "${payload}"

@@ -1,0 +1,32 @@
+1: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 227
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+    <duration>PT24H</duration>
+    <throttling>PT5H</throttling>
+  </subscribeResponse>
+</subscribeContextResponse>
+
+2: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 273
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeError>
+    <errorCode>
+      <code>400</code>
+      <reasonPhrase>Bad Request</reasonPhrase>
+      <details>invalid payload: syntax error in throttling string</details>
+    </errorCode>
+  </subscribeError>
+</subscribeContextResponse>
+

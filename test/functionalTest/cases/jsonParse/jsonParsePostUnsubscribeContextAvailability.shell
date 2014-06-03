@@ -1,0 +1,10 @@
+echo "1: ***********************************"
+
+url="/NGSI9/unsubscribeContextAvailability"
+payload='{
+  "subscriptionId": "012345678901234567890123"
+}'
+curlJson ${url} "${payload}"
+
+
+echo "2: ***********************************"

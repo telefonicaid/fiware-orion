@@ -1,0 +1,29 @@
+5: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 644
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:17 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>

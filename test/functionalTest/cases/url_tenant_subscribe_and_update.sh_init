@@ -1,0 +1,9 @@
+source harnessFunctions.sh
+
+dbInit CB
+dbTenantInit ${BROKER_DATABASE_NAME}-t_01
+dbTenantInit ${BROKER_DATABASE_NAME}-t_02
+brokerStart CB 0-255 IPV4 -multiservice url
+accumulatorStart localhost ${LISTENER_PORT}
+accumulatorStart localhost ${LISTENER2_PORT}
+

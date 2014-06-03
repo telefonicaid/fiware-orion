@@ -1,0 +1,132 @@
+1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 08:55:41 GMT
+
+{
+    "duration": "PT1H", 
+    "registrationId": "538d8d8dcfe8966eac0c210f"
+}
+2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 457
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 08:55:41 GMT
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "ATTRIBUTE_01", 
+                        "type": ""
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "ENTITY_ID", 
+                        "isPattern": "false", 
+                        "type": ""
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }
+    ]
+}
+3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 08:55:41 GMT
+
+{
+    "duration": "PT2H", 
+    "registrationId": "538d8d8dcfe8966eac0c210f"
+}
+4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 458
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 08:55:41 GMT
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "ATTRIBUTE_01", 
+                        "type": ""
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "ENTITY_ID", 
+                        "isPattern": "false", 
+                        "type": ""
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc2"
+            }
+        }
+    ]
+}
+5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 458
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 08:55:42 GMT
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "ATTRIBUTE_01", 
+                        "type": ""
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "ENTITY_ID", 
+                        "isPattern": "false", 
+                        "type": ""
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc2"
+            }
+        }
+    ]
+}
+6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: Tue, 03 Jun 2014 08:55:42 GMT
+
+{
+    "errorCode": {
+        "code": "404", 
+        "reasonPhrase": "No context element found"
+    }
+}
+7: ++++++++++++++++++++
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST, GET
+Date: Tue, 03 Jun 2014 08:55:42 GMT
+
+8: ++++++++++++++++++++
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST, GET
+Date: Tue, 03 Jun 2014 08:55:42 GMT
+
+9: ++++++++++++++++++++

@@ -1,0 +1,216 @@
+0: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 644
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:22 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+1: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 193
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:22 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>Unknown XML field: 'here'</details>
+  </errorCode>
+</updateContextResponse>
+2: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 644
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:22 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+3: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 644
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:22 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+4: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 222
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:22 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>compound value error: duplicated tag-name: 's1' in '/'</details>
+  </errorCode>
+</updateContextResponse>
+5: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 644
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:23 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+6: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 644
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:23 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+7: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 251
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:23 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>compound value error: bad tag-name of vector item: 'vecitem6' (should be 'vecitem')</details>
+  </errorCode>
+</updateContextResponse>
+8: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 644
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:23 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>

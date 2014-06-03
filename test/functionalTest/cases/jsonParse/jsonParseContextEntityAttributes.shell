@@ -1,0 +1,107 @@
+# Make a registration using conv op /NGSI9/contextEntities/ENTITY_ID/attributes
+echo "1: ++++++++++++++++++++"
+url="/NGSI9/contextEntities/ENTITY_ID/attributes"
+payload='{
+  "metadatas" : [
+    {
+      "name" : "ID",
+      "type" : "string",
+      "value" : "1110"
+    },
+    {
+      "name" : "cm2",
+      "type" : "string",
+      "value" : "XXX"
+    }
+  ],
+  "duration" : "PT1H",
+  "providingApplication" : "http://kz.tid.es/abc"
+}'
+curlJson ${url} "${payload}"
+
+REG_ID=$(echo "$response" | grep -Po '(?<="registrationId" : ")[^"]*')
+
+# Make a discovery to see that the registration went OK
+echo "2: ++++++++++++++++++++"
+url="/NGSI9/discoverContextAvailability"
+payload='{
+    "entities": [
+        {
+            "type": "",
+            "isPattern": "false",
+            "id": "ENTITY_ID"
+        }
+    ]
+}'
+curlJson ${url} "${payload}"
+
+# Modify the first registration
+echo "3: ++++++++++++++++++++"
+url="/NGSI9/contextEntities/ENTITY_ID/attributes"
+payload='{
+  "metadatas" : [
+    {
+      "name" : "ID",
+      "type" : "string",
+      "value" : "1111"
+    },
+    {
+      "name" : "cm2",
+      "type" : "string",
+      "value" : "YYY"
+    }
+  ],
+  "duration" : "PT2H",
+  "providingApplication" : "http://kz.tid.es/abc2",
+  "registrationId" : "'$REG_ID'"
+}'
+curlJson ${url} "${payload}"
+
+# Now discover that very registration again to see the change
+echo "4: ++++++++++++++++++++"
+url="/NGSI9/discoverContextAvailability"
+payload='{
+    "entities": [
+        {
+            "type": "",
+            "isPattern": "false",
+            "id": "ENTITY_ID"
+        }
+    ]
+}'
+curlJson ${url} "${payload}"
+
+# Now try the GET method
+echo "5: ++++++++++++++++++++"
+curlJsonNoPayload "/NGSI9/contextEntities/ENTITY_ID/attributes"
+
+# And a GET that fails
+echo "6: ++++++++++++++++++++"
+curlJsonNoPayload "/NGSI9/contextEntities/ENTITY_ID2/attributes"
+
+# DELETE and PUT should give errors
+echo "7: ++++++++++++++++++++"
+curlJsonNoPayload "/NGSI9/contextEntities/ENTITY_ID/attributes" "-X DELETE"
+
+echo "8: ++++++++++++++++++++"
+url="/NGSI9/contextEntities/ENTITY_ID/attributes"
+payload='{
+  "metadatas" : [
+    {
+      "name" : "ID",
+      "type" : "string",
+      "value" : "1111"
+    },
+    {
+      "name" : "cm2",
+      "type" : "string",
+      "value" : "YYY"
+    }
+  ],
+  "duration" : "PT2H",
+  "providingApplication" : "http://kz.tid.es/abc2"
+}'
+curlJson ${url} "${payload}" "-X PUT"
+
+echo "9: ++++++++++++++++++++"
+

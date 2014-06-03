@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK
+Content-Length: 211
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:19:23 GMT
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "JSON Parse Error: <unspecified file>(1): expected object name", 
+        "reasonPhrase": "Bad Request"
+    }, 
+    "registrationId": "000000000000000000000000"
+}
+++++++++++++++++++++

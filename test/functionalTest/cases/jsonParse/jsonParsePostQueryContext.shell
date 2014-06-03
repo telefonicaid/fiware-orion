@@ -1,0 +1,118 @@
+echo "1: ***********************************"
+url="/NGSI10/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "occupancy",
+    "lightstatus"
+  ],
+  "restriction": {
+    "attributeExpression" : "Attribute Expression",
+    "scopes": [
+      {
+        "type" : "st1",
+        "value" : "sv1"
+      },
+      {
+        "type" : "st2",
+        "value" : "sv2"
+      }
+    ]
+  }
+}'
+curlJson ${url} "${payload}"
+
+echo "2: ***********************************"
+url="/NGSI9/registerContext"
+payload='{
+  "contextRegistrations": [
+    {
+      "entities": [
+        {
+          "type": "Room",
+          "isPattern": "false",
+          "id": "ConferenceRoom"
+        },
+        {
+          "type": "Room",
+          "isPattern": "false",
+          "id": "OfficeRoom"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "isDomain": "false",
+          "metadatas": [
+            {
+              "name": "ID",
+              "type": "string",
+              "value": "1110"
+            }
+          ]
+        }
+      ],
+      "metadatas": [
+        {
+          "name": "ID",
+          "type": "string",
+          "value": "2212"
+        }
+      ],
+      "providingApplication": "http://192.168.100.1:70/application"
+    }
+  ],
+  "duration": "PT1M"
+}'
+curlJson ${url} "${payload}"
+
+echo "3: ***********************************"
+url="/NGSI10/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "occupancy",
+    "lightstatus"
+  ],
+  "restriction": {
+    "attributeExpression" : "Attribute Expression",
+    "scopes": [
+      {
+        "type" : "st1",
+        "value" : "sv1"
+      },
+      {
+        "type" : "st2",
+        "value" : "sv2"
+      }
+    ]
+  }
+}'
+curlJson ${url} "${payload}"
+
+echo "4: ***********************************"

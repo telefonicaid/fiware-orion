@@ -1,0 +1,10 @@
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:19:01 GMT
+
+{
+    "duration": "PT1M", 
+    "registrationId": "538c3375430e96077860141d"
+}
+++++++++++++++++++++

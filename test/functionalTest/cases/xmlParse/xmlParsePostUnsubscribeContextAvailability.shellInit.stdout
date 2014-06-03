@@ -1,0 +1,63 @@
+{ "dropped" : "testharness", "ok" : 1 }
+T@17:45:44  paConfigActions[727]: setting trace levels to '0-255'
+T@17:45:44  paConfigActions[728]: Leaving function paConfigActions
+E@17:45:44  exitFunc[1009]: unlink(/tmp/orion_9999.pid): No such file or directory
+T@17:45:44  semInit[61]: Initialized 'req' semaphore
+T@17:45:44  semInit[62]: Initialized 'mongo' semaphore
+T@17:45:44  mongoSemTake[90]: mongoConnect taking the 'mongo' semaphore for 'connecting to mongo'
+T@17:45:44  mongoSemTake[92]: mongoConnect has the 'mongo' semaphore
+T@17:45:44  mongoConnect[152]: mongo version server: 2.4.9 (mayor: 2, minor: 4, extra: 9)
+T@17:45:44  mongoSemGive[118]: mongoConnect gives the 'mongo' semaphore for 'connecting to mongo'
+F@17:45:44  ***[1063]: Connected to mongo at localhost:testharness
+T@17:45:44  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant )
+T@17:45:44  recoverOntimeIntervalThreads[398]: query() in 'testharness.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@17:45:44  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@17:45:44  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@17:45:44  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+V@17:45:44  restStart[569]: Starting HTTP daemon on IPv4 0.0.0.0 port 9999
+V@17:45:44  restStart[611]: Starting HTTP daemon on IPv6 :: port 9999
+T@17:45:45  connectionTreat[438]: notifyFormat: ''
+T@17:45:45  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@17:45:45  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@17:45:45  httpHeaderGet[137]: HTTP Header:   Content-Type: application/xml
+T@17:45:45  httpHeaderGet[137]: HTTP Header:   Accept: application/xml
+T@17:45:45  httpHeaderGet[137]: HTTP Header:   Content-Length: 177
+T@17:45:45  connectionTreat[442]: HTTP tenant: ''
+T@17:45:45  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 1)): 'XML'
+T@17:45:45  restService[179]: Parsing payload for URL '/NGSI9/unsubscribeContextAvailability', method 'POST', service vector index: 6
+T@17:45:45  payloadParse[53]: parsing data for service 'UnsubscribeContextAvailabilityRequest'. Method: 'POST'
+T@17:45:45  payloadParse[54]: outFormat: XML
+T@17:45:45  payloadParse[58]: Calling xmlTreat for service request 7, payloadWord 'unsubscribeContextAvailabilityRequest'
+2@17:45:45  xmlRequestGet[155]: Found xmlRequest of type 7, method 'POST' - index 6 (/unsubscribeContextAvailabilityRequest)
+T@17:45:45  nullTreat[272]: Not treating node 'unsubscribeContextAvailabilityRequest'
+T@17:45:45  xmlTreat[251]: Calling check for XML parsed tree (unsubscribeContextAvailabilityRequest)
+T@17:45:45  ~UnsubscribeContextAvailabilityResponse[71]: destroyed
+T@17:45:45  payloadParse[69]: result: 'OK'
+T@17:45:45  payloadParse[70]: outFormat: XML
+T@17:45:45  restService[182]: payloadParse returns 'OK'
+T@17:45:45  restService[197]: Treating service POST /NGSI9/unsubscribeContextAvailability
+T@17:45:45  restService[237]: tenant: ''
+T@17:45:45  reqSemTake[75]: mongoUnsubscribeContextAvailability taking the 'req' semaphore for 'ngsi9 unsubscribe request'
+T@17:45:45  reqSemTake[77]: mongoUnsubscribeContextAvailability has the 'req' semaphore
+T@17:45:45  mongoUnsubscribeContextAvailability[45]: Unsubscribe Context Availability
+T@17:45:45  mongoUnsubscribeContextAvailability[58]: findOne() in 'testharness.casubs' collection _id '012345678901234567890123'}
+T@17:45:45  mongoSemTake[90]: mongoUnsubscribeContextAvailability taking the 'mongo' semaphore for 'findOne in SubscribeContextAvailabilityCollection'
+T@17:45:45  mongoSemTake[92]: mongoUnsubscribeContextAvailability has the 'mongo' semaphore
+T@17:45:45  mongoSemGive[118]: mongoUnsubscribeContextAvailability gives the 'mongo' semaphore for 'findOne in SubscribeContextAvailabilityCollection'
+T@17:45:45  reqSemGive[104]: mongoUnsubscribeContextAvailability gives the 'req' semaphore for 'ngsi9 unsubscribe request (no subscriptions)'
+T@17:45:45  ~UnsubscribeContextAvailabilityResponse[71]: destroyed
+T@17:45:45  restReply[65]: Response 1: responding with 253 bytes, Status Code 200
+T@17:45:45  restReply[66]: Response payload: '<unsubscribeContextAvailabilityResponse>
+  <subscriptionId>012345678901234567890123</subscriptionId>
+  <statusCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </statusCode>
+</unsubscribeContextAvailabilityResponse>
+'
+T@17:45:45  ~RegisterContextResponse[56]: destroyed
+F@17:45:45  ***[981]: In sigHandler - caught signal 15
+X@17:45:45  sigHandler[987]: Received signal 15
+
+
+SubscriptionId: 012345678901234567890123

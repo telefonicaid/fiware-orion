@@ -1,0 +1,11 @@
+{ "dropped" : "testharness", "ok" : 1 }
+T@17:45:15  paConfigActions[727]: setting trace levels to '0-1'
+E@17:45:15  exitFunc[1009]: unlink(/tmp/orion_9999.pid): No such file or directory
+F@17:45:15  ***[1063]: Connected to mongo at localhost:testharness
+V@17:45:15  restStart[569]: Starting HTTP daemon on IPv4 0.0.0.0 port 9999
+V@17:45:15  restStart[611]: Starting HTTP daemon on IPv6 :: port 9999
+2@17:45:16  xmlRequestGet[155]: Found xmlRequest of type 17, method 'POST' - index 12 (/updateContextRequest)
+E@17:45:16  check[300]: duplicated tag-name: 's1' in '/'
+W@17:45:16  compoundValueEnd[130]: ERROR: 'compound value error: duplicated tag-name: 's1' in '/''
+F@17:45:16  ***[981]: In sigHandler - caught signal 15
+X@17:45:16  sigHandler[987]: Received signal 15

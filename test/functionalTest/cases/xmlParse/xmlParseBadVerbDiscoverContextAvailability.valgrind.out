@@ -1,0 +1,455 @@
+==28626== Memcheck, a memory error detector
+==28626== Copyright (C) 2002-2011, and GNU GPL'd, by Julian Seward et al.
+==28626== Using Valgrind-3.7.0 and LibVEX; rerun with -h for copyright info
+==28626== Command: contextBroker -vvvvv -harakiri -port 9999 -pidpath /tmp/orion_9999.pid -db testharness -t 0-255
+==28626== 
+T@09:28:41  paConfigActions[727]: setting trace levels to '0-255'
+T@09:28:41  paConfigActions[728]: Leaving function paConfigActions
+E@09:28:41  exitFunc[559]: unlink(/tmp/orion_9999.pid): No such file or directory
+T@09:28:41  semInit[61]: Initialized 'req' semaphore
+T@09:28:41  semInit[62]: Initialized 'mongo' semaphore
+T@09:28:41  mongoSemTake[90]: mongoConnect taking the 'mongo' semaphore for 'connecting to mongo'
+T@09:28:41  mongoSemTake[92]: mongoConnect has the 'mongo' semaphore
+==28626== 
+==28626== HEAP SUMMARY:
+==28626==     in use at exit: 17,690 bytes in 104 blocks
+==28626==   total heap usage: 3,269 allocs, 3,165 frees, 313,863 bytes allocated
+==28626== 
+==28626== LEAK SUMMARY:
+==28626==    definitely lost: 0 bytes in 0 blocks
+==28626==    indirectly lost: 0 bytes in 0 blocks
+==28626==      possibly lost: 0 bytes in 0 blocks
+==28626==    still reachable: 17,690 bytes in 104 blocks
+==28626==         suppressed: 0 bytes in 0 blocks
+==28626== Rerun with --leak-check=full to see details of leaked memory
+==28626== 
+==28626== For counts of detected and suppressed errors, rerun with: -v
+==28626== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 7 from 7)
+T@09:28:41  mongoConnect[136]: mongo version server: 2.4.9 (mayor: 2, minor: 4, extra: 9)
+T@09:28:41  mongoSemGive[118]: mongoConnect gives the 'mongo' semaphore for 'connecting to mongo'
+F@09:28:41  ***[600]: Connected to mongo at localhost:testharness
+T@09:28:41  ensureLocationIndex[336]: ensuring 2dsphere index on location.coords
+T@09:28:41  recoverOntimeIntervalThreads[353]: query() in 'testharness.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@09:28:41  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@09:28:41  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@09:28:41  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+==28631== Source and destination overlap in strncpy(0xa4d8a7, 0xa4d8a7, 63)
+==28631==    at 0x4C29782: strncpy (mc_replace_strmem.c:463)
+==28631==    by 0x659678: restInit(RestService*, IpVersion, char const*, unsigned short, char const*, char const*, void (*)(ConnectionInfo*), bool) (rest.cpp:600)
+==28631==    by 0x5DF38D: main (contextBroker.cpp:737)
+==28631== 
+==28631== Source and destination overlap in strncpy(0xa4d8e2, 0xa4d8e2, 63)
+==28631==    at 0x4C29782: strncpy (mc_replace_strmem.c:463)
+==28631==    by 0x65969C: restInit(RestService*, IpVersion, char const*, unsigned short, char const*, char const*, void (*)(ConnectionInfo*), bool) (rest.cpp:603)
+==28631==    by 0x5DF38D: main (contextBroker.cpp:737)
+==28631== 
+V@09:28:41  restStart[499]: Starting HTTP daemon on IPv4 0.0.0.0 port 9999
+V@09:28:41  restStart[541]: Starting HTTP daemon on IPv6 :: port 9999
+==28631== Thread 4:
+==28631== Syscall param mmap(length) contains uninitialised byte(s)
+==28631==    at 0x58B9AFA: mmap (syscall-template.S:82)
+==28631==    by 0x4E398E7: MHD_pool_create (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E35F47: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4E39A1F: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E35F20: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4E39A24: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E35F20: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4E39A52: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E35F20: MHD_connection_get_pollfd (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E35FFB: MHD_connection_get_fdset (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E373B0: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4E399BC: MHD_pool_allocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E33C62: MHD_set_connection_value (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34033: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E3426D: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34783: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+T@09:28:49  httpHeaderGet[94]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:28:49  httpHeaderGet[94]: HTTP Header:   Host: localhost:9999
+T@09:28:49  httpHeaderGet[94]: HTTP Header:   Content-Type: application/xml
+T@09:28:49  httpHeaderGet[94]: HTTP Header:   Accept: application/xml
+T@09:28:49  httpHeaderGet[94]: HTTP Header:   Content-Length: 1157
+T@09:28:49  restService[135]: Parsing payload for URL '/NGSI9/registerContext', method 'POST', service vector index: 0
+T@09:28:49  payloadParse[53]: parsing data for service 'RegisterContextRequest'. Method: 'POST'
+T@09:28:49  payloadParse[54]: outFormat: XML
+T@09:28:49  payloadParse[58]: Calling xmlTreat for service request 1, payloadWord 'registerContextRequest'
+2@09:28:49  xmlRequestGet[155]: Found xmlRequest of type 1, method 'POST' - index 0 (/registerContextRequest)
+T@09:28:49  nullTreat[272]: Not treating node 'registerContextRequest'
+T@09:28:49  nullTreat[272]: Not treating node 'contextRegistrationList'
+T@09:28:49  entityIdList[409]: got an entityIdList
+T@09:28:49  entityId[63]: Got an entityId
+T@09:28:49  entityIdParse[291]: Got a type for an entity: 'Room'
+T@09:28:49  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@09:28:49  entityIdId[84]: Got an entityId:id: 'ConferenceRoom2'
+T@09:28:49  entityId[63]: Got an entityId
+T@09:28:49  entityIdParse[291]: Got a type for an entity: 'Room'
+T@09:28:49  entityIdParse[296]: Got an isPattern for an entity: 'false'
+T@09:28:49  entityIdId[84]: Got an entityId:id: 'OfficeRoom2'
+T@09:28:49  nullTreat[272]: Not treating node 'contextRegistrationAttributeList'
+T@09:28:49  crAttribute[99]: Creating an attribute
+T@09:28:49  craName[113]: Got an attribute name: 'temperature'
+T@09:28:49  craType[126]: Got an attribute type: 'degree'
+T@09:28:49  craIsDomain[139]: Got a isDomain: 'false'
+T@09:28:49  nullTreat[272]: Not treating node 'metadata'
+T@09:28:49  craMetadata[152]: Creating a metadata
+T@09:28:49  craMetadataName[166]: Got a metadata name: 'ID'
+T@09:28:49  craMetadataType[179]: Got a metadata type: 'string'
+T@09:28:49  craMetadataValue[192]: Got a metadata value: '1110'
+T@09:28:49  craMetadata[152]: Creating a metadata
+T@09:28:49  craMetadataName[166]: Got a metadata name: 'cm2'
+T@09:28:49  craMetadataType[179]: Got a metadata type: 'string'
+T@09:28:49  craMetadataValue[192]: Got a metadata value: 'XXX'
+T@09:28:49  nullTreat[272]: Not treating node 'registrationMetadata'
+T@09:28:49  regMetadata[205]: Creating a reg metadata
+T@09:28:49  regMetadataName[219]: Got a reg metadata name: 'ID'
+T@09:28:49  regMetadataType[232]: Got a reg metadata type: 'string'
+T@09:28:49  regMetadataValue[245]: Got a reg metadata value: '2212'
+T@09:28:49  regMetadata[205]: Creating a reg metadata
+T@09:28:49  regMetadataName[219]: Got a reg metadata name: 'ID2'
+T@09:28:49  regMetadataType[232]: Got a reg metadata type: 'string'
+T@09:28:49  regMetadataValue[245]: Got a reg metadata value: '212'
+T@09:28:49  providingApplication[258]: Got a providing application: 'http://localhost:1028/application'
+T@09:28:49  duration[271]: Got a duration: 'PT1H'
+T@09:28:49  registrationId[284]: Got a registration id: ''
+T@09:28:49  xmlTreat[251]: Calling check for XML parsed tree (registerContextRequest)
+T@09:28:49  ~RegisterContextResponse[56]: destroyed
+T@09:28:49  payloadParse[69]: result: 'OK'
+T@09:28:49  payloadParse[70]: outFormat: XML
+T@09:28:49  restService[138]: payloadParse returns 'OK'
+T@09:28:49  restService[153]: Treating service POST /NGSI9/registerContext
+T@09:28:49  reqSemTake[75]: mongoRegisterContext taking the 'req' semaphore for 'ngsi9 register request'
+T@09:28:49  reqSemTake[77]: mongoRegisterContext has the 'req' semaphore
+T@09:28:49  mongoRegisterContext[51]: Register Context Request
+T@09:28:49  processRegisterContext[342]: Registration expiration: 1399458529
+T@09:28:49  processRegisterContext[380]: Entity registration: {id: ConferenceRoom2, type: Room}
+T@09:28:49  processRegisterContext[380]: Entity registration: {id: OfficeRoom2, type: Room}
+T@09:28:49  processRegisterContext[394]: Attribute registration: {name: temperature, type: degree, isDomain: false}
+T@09:28:49  processRegisterContext[406]: providingApplication registration: http://localhost:1028/application
+T@09:28:49  addTriggeredSubscriptions[255]: JS function: function(){enId = [ "ConferenceRoom2" ,"OfficeRoom2" ];enType = [ "Room" ,"Room" ];for (var i=0; i < this.entities.length; i++) {if (this.entities[i].isPattern == "true") {for (var j=0; j < enId.length; j++) {if (enId[j].match(this.entities[i].id) && this.entities[i].type == enType[j]) {return true; }}}}return false; }
+T@09:28:49  addTriggeredSubscriptions[268]: query() in 'testharness.casubs' collection: '{ $or: [ { entities: { $in: [ { id: "ConferenceRoom2", type: "Room", isPattern: "false" }, { id: "OfficeRoom2", type: "Room", isPattern: "false" } ] }, $or: [ { attrs: { $in: [ "temperature" ] } }, { attrs: { $size: 0 } } ], expiration: { $gt: 1399454929 } }, { entities.isPattern: "true", expiration: { $gt: 1399454929 }, $where: function(){enId = [ "ConferenceRoom2" ,"OfficeRoom2" ];enType = [ "Roo... } ] }'
+T@09:28:49  mongoSemTake[90]: addTriggeredSubscriptions taking the 'mongo' semaphore for 'query in SubscribeContextAvailabilityCollection'
+T@09:28:49  mongoSemTake[92]: addTriggeredSubscriptions has the 'mongo' semaphore
+T@09:28:49  mongoSemGive[118]: addTriggeredSubscriptions gives the 'mongo' semaphore for 'query in SubscribeContextAvailabilityCollection'
+T@09:28:49  processRegisterContext[422]: upsert update() in 'testharness.registrations' collection: '{ _id: ObjectId('5369fcd19fc7176d098aa7fd'), expiration: 1399458529, contextRegistration: [ { entities: [ { id: "ConferenceRoom2", type: "Room" }, { id: "OfficeRoom2", type: "Room" } ], attrs: [ { name: "temperature", type: "degree", isDomain: "false" } ], providingApplication: "http://localhost:1028/application" } ] }'
+T@09:28:49  mongoSemTake[90]: processRegisterContext taking the 'mongo' semaphore for 'update in RegistrationsCollection'
+T@09:28:49  mongoSemTake[92]: processRegisterContext has the 'mongo' semaphore
+T@09:28:49  mongoSemGive[118]: processRegisterContext gives the 'mongo' semaphore for 'update in RegistrationsCollection'
+T@09:28:49  reqSemGive[104]: mongoRegisterContext gives the 'req' semaphore for 'ngsi9 register request'
+T@09:28:49  ~RegisterContextResponse[56]: destroyed
+T@09:28:49  release[153]: Releasing Metadata 0
+T@09:28:49  release[153]: Releasing Metadata 1
+T@09:28:49  release[153]: Releasing Metadata 0
+T@09:28:49  release[153]: Releasing Metadata 1
+T@09:28:49  restReply[65]: Response 1: responding with 141 bytes, Status Code 200
+T@09:28:49  restReply[66]: Response payload: '<registerContextResponse>
+  <duration>PT1H</duration>
+  <registrationId>5369fcd19fc7176d098aa7fd</registrationId>
+</registerContextResponse>
+'
+T@09:28:49  ~RegisterContextResponse[56]: destroyed
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4E399BC: MHD_pool_allocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E335B6: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4E335BD: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4C2A639: memcpy (mc_replace_strmem.c:121)
+==28631==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4C2A64E: memcpy (mc_replace_strmem.c:838)
+==28631==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4C2A69B: memcpy (mc_replace_strmem.c:838)
+==28631==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4C2A790: memcpy (mc_replace_strmem.c:838)
+==28631==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Use of uninitialised value of size 8
+==28631==    at 0x4C2A7C8: memcpy (mc_replace_strmem.c:838)
+==28631==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Use of uninitialised value of size 8
+==28631==    at 0x4C2A7ED: memcpy (mc_replace_strmem.c:838)
+==28631==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Use of uninitialised value of size 8
+==28631==    at 0x58CFC9C: __vsprintf_chk (vsprintf_chk.c:79)
+==28631==    by 0x58CFC0E: __sprintf_chk (sprintf_chk.c:33)
+==28631==    by 0x4E33622: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Use of uninitialised value of size 8
+==28631==    at 0x4C2953C: strcpy (mc_replace_strmem.c:429)
+==28631==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4C29569: strcpy (mc_replace_strmem.c:112)
+==28631==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4C2956E: strcpy (mc_replace_strmem.c:121)
+==28631==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4C2957F: strcpy (mc_replace_strmem.c:429)
+==28631==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Use of uninitialised value of size 8
+==28631==    at 0x4E3363E: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Syscall param sendto(msg) contains uninitialised byte(s)
+==28631==    at 0x58BE0AC: send (send.c:32)
+==28631==    by 0x4E36D69: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E35963: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E35A87: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4E39A1F: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E33BA1: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E35A9D: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4E39A24: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E33BA1: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E35A9D: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4E39A40: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E33BA1: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E35A9D: MHD_connection_handle_write (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37638: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4E39A1F: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4E39A24: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4E39A52: MHD_pool_reallocate (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E334BF: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E35D17: MHD_connection_handle_read (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37648: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Thread 3:
+==28631== Syscall param munmap(length) contains uninitialised byte(s)
+==28631==    at 0x58B9B27: munmap (syscall-template.S:82)
+==28631==    by 0x4E3996B: MHD_pool_destroy (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37030: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E3881C: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+T@09:28:49  httpHeaderGet[94]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:28:49  httpHeaderGet[94]: HTTP Header:   Host: localhost:9999
+T@09:28:49  httpHeaderGet[94]: HTTP Header:   Content-Type: application/xml
+T@09:28:49  httpHeaderGet[94]: HTTP Header:   Accept: application/xml
+T@09:28:49  httpHeaderGet[94]: HTTP Header:   Content-Length: 379
+T@09:28:49  restService[153]: Treating service * /NGSI9/discoverContextAvailability
+W@09:28:49  badVerbPostOnly[48]: bad verb for url '/NGSI9/discoverContextAvailability', method 'BAD_VERB'
+T@09:28:49  restReply[65]: Response 2: responding with 0 bytes, Status Code 405
+T@09:28:49  restReply[66]: Response payload: ''
+T@09:28:49  ~RegisterContextResponse[56]: destroyed
+==28631== Thread 4:
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4C2A63F: memcpy (mc_replace_strmem.c:124)
+==28631==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Use of uninitialised value of size 8
+==28631==    at 0x4C2A6FB: memcpy (mc_replace_strmem.c:838)
+==28631==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Use of uninitialised value of size 8
+==28631==    at 0x4C2A763: memcpy (mc_replace_strmem.c:838)
+==28631==    by 0x4E338FA: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+==28631== Conditional jump or move depends on uninitialised value(s)
+==28631==    at 0x4C29570: strcpy (mc_replace_strmem.c:124)
+==28631==    by 0x4E33913: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E34DE0: MHD_connection_handle_idle (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x4E37420: ??? (in /usr/lib/x86_64-linux-gnu/libmicrohttpd.so.10.15.0)
+==28631==    by 0x5B72B4F: start_thread (pthread_create.c:304)
+==28631==    by 0x58BD0EC: clone (clone.S:112)
+==28631== 
+T@09:28:49  httpHeaderGet[94]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:28:49  httpHeaderGet[94]: HTTP Header:   Host: localhost:9999
+T@09:28:49  httpHeaderGet[94]: HTTP Header:   Accept: */*
+T@09:28:49  restService[153]: Treating service GET /exit/harakiri
+E@09:28:49  orionExit[548]: Received a 'DIE' request
+
+
+1 ContextRegistrationsContext Registration 0:
+2 EntityIds:
+  Entity Id 0:
+    Id:         ConferenceRoom2
+    Type:       Room
+    isPattern:  false
+  Entity Id 1:
+    Id:         OfficeRoom2
+    Type:       Room
+    isPattern:  false
+1 ContextRegistrationAttributes  Attribute 0:
+    Name:       temperature
+    Type:       degree
+    isDomain:   false
+2 Attribute Metadatas
+    Attribute Metadata 0:
+      Name:     ID
+      Type:     string
+      Value:    1110
+    Attribute Metadata 1:
+      Name:     cm2
+      Type:     string
+      Value:    XXX
+2 Registration Metadatas
+  Registration Metadata 0:
+    Name:     ID
+    Type:     string
+    Value:    2212
+  Registration Metadata 1:
+    Name:     ID2
+    Type:     string
+    Value:    212
+  ProvidingApplication: http://localhost:1028/application
+Duration: PT1H
+No RegistrationId
+==28631== 
+==28631== HEAP SUMMARY:
+==28631==     in use at exit: 23,191 bytes in 148 blocks
+==28631==   total heap usage: 4,124 allocs, 3,976 frees, 3,895,562 bytes allocated
+==28631== 
+==28631== LEAK SUMMARY:
+==28631==    definitely lost: 0 bytes in 0 blocks
+==28631==    indirectly lost: 0 bytes in 0 blocks
+==28631==      possibly lost: 1,394 bytes in 16 blocks
+==28631==    still reachable: 21,797 bytes in 132 blocks
+==28631==         suppressed: 0 bytes in 0 blocks
+==28631== Rerun with --leak-check=full to see details of leaked memory
+==28631== 
+==28631== For counts of detected and suppressed errors, rerun with: -v
+==28631== Use --track-origins=yes to see where uninitialised values come from
+==28631== ERROR SUMMARY: 76 errors from 33 contexts (suppressed: 7 from 7)

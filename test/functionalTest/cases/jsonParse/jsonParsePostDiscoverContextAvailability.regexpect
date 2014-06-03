@@ -1,0 +1,90 @@
++++++ Starting +++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "PT1M",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
++++++ Registration 1 Done +++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 607
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "temperature", 
+                        "type": "degree"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "ConferenceRoom", 
+                        "isPattern": "false", 
+                        "type": "Room"
+                    }, 
+                    {
+                        "id": "OfficeRoom", 
+                        "isPattern": "false", 
+                        "type": "Room"
+                    }
+                ], 
+                "providingApplication": "http://192.168.100.1:70/application"
+            }
+        }
+    ]
+}
++++++ Discovery 1 Done +++++++++++++++
++++++ Register 2: two attributes in vector +++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "PT1M",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
++++++ Registration 2 Done +++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 599
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "temperature", 
+                        "type": "degree"
+                    }, 
+                    {
+                        "isDomain": "false", 
+                        "name": "pressure", 
+                        "type": "bar"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "BathRoom", 
+                        "isPattern": "false", 
+                        "type": "Room"
+                    }
+                ], 
+                "providingApplication": "http://192.168.100.1:70/application"
+            }
+        }
+    ]
+}
++++++ Discovery 2 Done +++++++++++++++

@@ -1,0 +1,696 @@
+{ "dropped" : "testharness", "ok" : 1 }
+T@09:46:03  paConfigActions[727]: setting trace levels to '0-255'
+T@09:46:03  paConfigActions[728]: Leaving function paConfigActions
+E@09:46:03  exitFunc[1009]: unlink(/tmp/orion_9999.pid): No such file or directory
+T@09:46:03  semInit[61]: Initialized 'req' semaphore
+T@09:46:03  semInit[62]: Initialized 'mongo' semaphore
+T@09:46:03  mongoSemTake[90]: mongoConnect taking the 'mongo' semaphore for 'connecting to mongo'
+T@09:46:03  mongoSemTake[92]: mongoConnect has the 'mongo' semaphore
+T@09:46:03  mongoConnect[152]: mongo version server: 2.4.9 (mayor: 2, minor: 4, extra: 9)
+T@09:46:03  mongoSemGive[118]: mongoConnect gives the 'mongo' semaphore for 'connecting to mongo'
+F@09:46:03  ***[1063]: Connected to mongo at localhost:testharness
+T@09:46:03  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant )
+T@09:46:03  recoverOntimeIntervalThreads[398]: query() in 'testharness.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@09:46:03  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@09:46:03  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@09:46:03  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+V@09:46:03  restStart[569]: Starting HTTP daemon on IPv4 0.0.0.0 port 9999
+V@09:46:03  restStart[611]: Starting HTTP daemon on IPv6 :: port 9999
+T@09:46:04  connectionTreat[438]: notifyFormat: ''
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@09:46:04  connectionTreat[442]: HTTP tenant: ''
+T@09:46:04  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@09:46:04  restService[179]: Parsing payload for URL '/NGSI9/registerContext', method 'POST', service vector index: 0
+T@09:46:04  payloadParse[53]: parsing data for service 'RegisterContextRequest'. Method: 'POST'
+T@09:46:04  payloadParse[54]: outFormat: JSON
+2@09:46:04  jsonRequestGet[121]: Found jsonRequest of type 1, method 'POST' - index 0 (/contextRegistrations)
+T@09:46:04  jsonTreat[140]: Treating a JSON request: '{}'
+T@09:46:04  jsonTreat[155]: Treating 'registerContextRequest' request
+T@09:46:04  jsonTreat[192]: Calling check for JSON parsed tree (registerContextRequest)
+E@09:46:04  check[84]: contextRegistrationVector.size() == 0
+E@09:46:04  check[97]: Not OK - returning rendered error result
+W@09:46:04  render[112]: No registrationId - setting it to all zeroes
+T@09:46:04  ~RegisterContextResponse[56]: destroyed
+T@09:46:04  payloadParse[69]: result: '{
+  "registrationId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "Empty Context Registration List"
+  }
+}
+'
+T@09:46:04  payloadParse[70]: outFormat: JSON
+T@09:46:04  restReply[65]: Response 1: responding with 181 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "registrationId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "Empty Context Registration List"
+  }
+}
+'
+T@09:46:04  restService[182]: payloadParse returns '{
+  "registrationId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "Empty Context Registration List"
+  }
+}
+'
+T@09:46:04  restReply[65]: Response 2: responding with 181 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "registrationId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "Empty Context Registration List"
+  }
+}
+'
+T@09:46:04  ~RegisterContextResponse[56]: destroyed
+T@09:46:04  connectionTreat[438]: notifyFormat: ''
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@09:46:04  connectionTreat[442]: HTTP tenant: ''
+T@09:46:04  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@09:46:04  restService[179]: Parsing payload for URL '/NGSI9/discoverContextAvailability', method 'POST', service vector index: 2
+T@09:46:04  payloadParse[53]: parsing data for service 'DiscoverContextAvailabilityRequest'. Method: 'POST'
+T@09:46:04  payloadParse[54]: outFormat: JSON
+2@09:46:04  jsonRequestGet[121]: Found jsonRequest of type 2, method 'POST' - index 1 (/entities)
+T@09:46:04  jsonTreat[140]: Treating a JSON request: '{}'
+T@09:46:04  jsonTreat[155]: Treating 'discoverContextAvailabilityRequest' request
+T@09:46:04  jsonTreat[192]: Calling check for JSON parsed tree (discoverContextAvailabilityRequest)
+T@09:46:04  payloadParse[69]: result: '{
+  "errorCode" : {
+    "code" : "404",
+    "reasonPhrase" : "No context element found"
+  }
+}
+'
+T@09:46:04  payloadParse[70]: outFormat: JSON
+T@09:46:04  restReply[65]: Response 3: responding with 94 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "errorCode" : {
+    "code" : "404",
+    "reasonPhrase" : "No context element found"
+  }
+}
+'
+T@09:46:04  restService[182]: payloadParse returns '{
+  "errorCode" : {
+    "code" : "404",
+    "reasonPhrase" : "No context element found"
+  }
+}
+'
+T@09:46:04  restReply[65]: Response 4: responding with 94 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "errorCode" : {
+    "code" : "404",
+    "reasonPhrase" : "No context element found"
+  }
+}
+'
+T@09:46:04  ~RegisterContextResponse[56]: destroyed
+T@09:46:04  connectionTreat[438]: notifyFormat: ''
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@09:46:04  connectionTreat[442]: HTTP tenant: ''
+T@09:46:04  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@09:46:04  restService[179]: Parsing payload for URL '/NGSI9/subscribeContextAvailability', method 'POST', service vector index: 4
+T@09:46:04  payloadParse[53]: parsing data for service 'SubscribeContextAvailabilityRequest'. Method: 'POST'
+T@09:46:04  payloadParse[54]: outFormat: JSON
+2@09:46:04  jsonRequestGet[121]: Found jsonRequest of type 3, method 'POST' - index 2 (/entities)
+T@09:46:04  jsonTreat[140]: Treating a JSON request: '{}'
+T@09:46:04  jsonTreat[155]: Treating 'subscribeContextAvailabilityRequest' request
+T@09:46:04  jsonTreat[192]: Calling check for JSON parsed tree (subscribeContextAvailabilityRequest)
+E@09:46:04  check[77]: No entity list when it is mandatory
+T@09:46:04  ~SubscribeContextAvailabilityResponse[52]: destroyed
+T@09:46:04  payloadParse[69]: result: '{
+  "subscriptionId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@09:46:04  payloadParse[70]: outFormat: JSON
+T@09:46:04  restReply[65]: Response 5: responding with 161 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "subscriptionId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@09:46:04  restService[182]: payloadParse returns '{
+  "subscriptionId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@09:46:04  restReply[65]: Response 6: responding with 161 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "subscriptionId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@09:46:04  ~RegisterContextResponse[56]: destroyed
+T@09:46:04  connectionTreat[438]: notifyFormat: ''
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@09:46:04  connectionTreat[442]: HTTP tenant: ''
+T@09:46:04  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@09:46:04  restService[179]: Parsing payload for URL '/NGSI9/updateContextAvailabilitySubscription', method 'POST', service vector index: 8
+T@09:46:04  payloadParse[53]: parsing data for service 'UpdateContextAvailabilitySubscriptionRequest'. Method: 'POST'
+T@09:46:04  payloadParse[54]: outFormat: JSON
+2@09:46:04  jsonRequestGet[121]: Found jsonRequest of type 5, method 'POST' - index 5 (/entities)
+T@09:46:04  jsonTreat[140]: Treating a JSON request: '{}'
+T@09:46:04  jsonTreat[155]: Treating 'updateContextAvailabilitySubscriptionRequest' request
+T@09:46:04  jsonTreat[192]: Calling check for JSON parsed tree (updateContextAvailabilitySubscriptionRequest)
+E@09:46:04  check[77]: No entity list when it is mandatory
+T@09:46:04  ~UpdateContextAvailabilitySubscriptionResponse[67]: destroyed
+T@09:46:04  payloadParse[69]: result: '{
+  "subscriptionId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@09:46:04  payloadParse[70]: outFormat: JSON
+T@09:46:04  restReply[65]: Response 7: responding with 161 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "subscriptionId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@09:46:04  restService[182]: payloadParse returns '{
+  "subscriptionId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@09:46:04  restReply[65]: Response 8: responding with 161 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "subscriptionId" : "000000000000000000000000",
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@09:46:04  ~RegisterContextResponse[56]: destroyed
+T@09:46:04  connectionTreat[438]: notifyFormat: ''
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@09:46:04  connectionTreat[442]: HTTP tenant: ''
+T@09:46:04  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@09:46:04  restService[179]: Parsing payload for URL '/NGSI9/unsubscribeContextAvailability', method 'POST', service vector index: 6
+T@09:46:04  payloadParse[53]: parsing data for service 'UnsubscribeContextAvailabilityRequest'. Method: 'POST'
+T@09:46:04  payloadParse[54]: outFormat: JSON
+2@09:46:04  jsonRequestGet[121]: Found jsonRequest of type 7, method 'POST' - index 3 (/subscriptionId)
+T@09:46:04  jsonTreat[140]: Treating a JSON request: '{}'
+T@09:46:04  jsonTreat[155]: Treating 'unsubscribeContextAvailabilityRequest' request
+T@09:46:04  jsonTreat[192]: Calling check for JSON parsed tree (unsubscribeContextAvailabilityRequest)
+T@09:46:04  ~UnsubscribeContextAvailabilityResponse[71]: destroyed
+T@09:46:04  payloadParse[69]: result: 'OK'
+T@09:46:04  payloadParse[70]: outFormat: JSON
+T@09:46:04  restService[182]: payloadParse returns 'OK'
+T@09:46:04  restService[197]: Treating service POST /NGSI9/unsubscribeContextAvailability
+T@09:46:04  restService[237]: tenant: ''
+T@09:46:04  reqSemTake[75]: mongoUnsubscribeContextAvailability taking the 'req' semaphore for 'ngsi9 unsubscribe request'
+T@09:46:04  reqSemTake[77]: mongoUnsubscribeContextAvailability has the 'req' semaphore
+T@09:46:04  mongoUnsubscribeContextAvailability[45]: Unsubscribe Context Availability
+
+
+0 ContextRegistrationsNo Duration
+No RegistrationId
+
+
+0 ContextRegistrationsNo Duration
+No RegistrationId
+
+
+0 EntityIds:
+Attribute List
+No AttributeExpression
+No scopes
+
+
+0 EntityIds:
+Attribute List
+No AttributeExpression
+No scopes
+jsonScarPresent
+0 EntityIds:
+Attribute List
+No Reference
+No Duration
+No AttributeExpression
+No scopes
+jsonScarPresent
+0 EntityIds:
+Attribute List
+No Reference
+No Duration
+No AttributeExpression
+No scopes
+jsonUcasPresent
+0 EntityIds:
+  Attribute List
+  No Duration
+  No AttributeExpression
+No scopes
+  No SubscriptionId
+jsonUcasPresent
+0 EntityIds:
+  Attribute List
+  No Duration
+  No AttributeExpression
+No scopes
+  No SubscriptionId
+
+
+No SubscriptionId
+
+
+No SubscriptionId
+Tue Jun  3 11:46:04   Assertion failure s.size() == 24 src/mongo/bson/oid.cpp 161
+T@09:46:04  mongoSemGive[118]: mongoUnsubscribeContextAvailability gives the 'mongo' semaphore for 'findOne in SubscribeContextAvailabilityCollection (mongo assertion exception)'
+T@09:46:04  reqSemGive[104]: mongoUnsubscribeContextAvailability gives the 'req' semaphore for 'ngsi9 unsubscribe request (mongo assertion exception)'
+T@09:46:04  ~UnsubscribeContextAvailabilityResponse[71]: destroyed
+T@09:46:04  restReply[65]: Response 9: responding with 144 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "subscriptionId" : "000000000000000000000000",
+  "statusCode" : {
+    "code" : "404",
+    "reasonPhrase" : "No context element found"
+  }
+}
+'
+T@09:46:04  ~RegisterContextResponse[56]: destroyed
+T@09:46:04  connectionTreat[438]: notifyFormat: ''
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@09:46:04  connectionTreat[442]: HTTP tenant: ''
+T@09:46:04  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@09:46:04  restService[179]: Parsing payload for URL '/NGSI10/queryContext', method 'POST', service vector index: 14
+T@09:46:04  payloadParse[53]: parsing data for service 'QueryContextRequest'. Method: 'POST'
+T@09:46:04  payloadParse[54]: outFormat: JSON
+2@09:46:04  jsonRequestGet[121]: Found jsonRequest of type 11, method 'POST' - index 6 (/entities)
+T@09:46:04  jsonTreat[140]: Treating a JSON request: '{}'
+T@09:46:04  jsonTreat[155]: Treating 'queryContextRequest' request
+T@09:46:04  jsonTreat[192]: Calling check for JSON parsed tree (queryContextRequest)
+E@09:46:04  check[77]: No entity list when it is mandatory
+T@09:46:04  ~QueryContextResponse[64]: destroyed
+T@09:46:04  payloadParse[69]: result: '{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@09:46:04  payloadParse[70]: outFormat: JSON
+T@09:46:04  restReply[65]: Response 10: responding with 112 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@09:46:04  restService[182]: payloadParse returns '{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@09:46:04  restReply[65]: Response 11: responding with 112 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No entities"
+  }
+}
+'
+T@09:46:04  ~RegisterContextResponse[56]: destroyed
+T@09:46:04  connectionTreat[438]: notifyFormat: ''
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@09:46:04  connectionTreat[442]: HTTP tenant: ''
+T@09:46:04  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@09:46:04  restService[179]: Parsing payload for URL '/NGSI10/updateContext', method 'POST', service vector index: 12
+T@09:46:04  payloadParse[53]: parsing data for service 'UpdateContextRequest'. Method: 'POST'
+T@09:46:04  payloadParse[54]: outFormat: JSON
+2@09:46:04  jsonRequestGet[121]: Found jsonRequest of type 17, method 'POST' - index 7 (/contextElements)
+T@09:46:04  jsonTreat[140]: Treating a JSON request: '{}'
+T@09:46:04  jsonTreat[155]: Treating 'updateContextRequest' request
+T@09:46:04  jsonTreat[192]: Calling check for JSON parsed tree (updateContextRequest)
+T@09:46:04  ~UpdateContextResponse[58]: destroyed
+T@09:46:04  payloadParse[69]: result: '{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No context elements"
+  }
+}
+'
+T@09:46:04  payloadParse[70]: outFormat: JSON
+T@09:46:04  restReply[65]: Response 12: responding with 120 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No context elements"
+  }
+}
+'
+T@09:46:04  restService[182]: payloadParse returns '{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No context elements"
+  }
+}
+'
+T@09:46:04  restReply[65]: Response 13: responding with 120 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "errorCode" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "No context elements"
+  }
+}
+'
+T@09:46:04  ~RegisterContextResponse[56]: destroyed
+T@09:46:04  connectionTreat[438]: notifyFormat: ''
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@09:46:04  connectionTreat[442]: HTTP tenant: ''
+T@09:46:04  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@09:46:04  restService[179]: Parsing payload for URL '/NGSI10/subscribeContext', method 'POST', service vector index: 16
+T@09:46:04  payloadParse[53]: parsing data for service 'SubscribeContextRequest'. Method: 'POST'
+T@09:46:04  payloadParse[54]: outFormat: JSON
+2@09:46:04  jsonRequestGet[121]: Found jsonRequest of type 12, method 'POST' - index 8 (/entities)
+T@09:46:04  jsonTreat[140]: Treating a JSON request: '{}'
+T@09:46:04  jsonTreat[155]: Treating 'subscribeContextRequest' request
+T@09:46:04  jsonTreat[192]: Calling check for JSON parsed tree (subscribeContextRequest)
+E@09:46:04  check[77]: No entity list when it is mandatory
+T@09:46:04  ~SubscribeContextResponse[38]: destroyed
+T@09:46:04  payloadParse[69]: result: '{
+  "subscribeError" : {
+    "errorCode" : {
+      "code" : "400",
+      "reasonPhrase" : "Bad Request",
+      "details" : "invalid payload: No entities"
+    }
+  }
+}
+'
+T@09:46:04  payloadParse[70]: outFormat: JSON
+T@09:46:04  restReply[65]: Response 14: responding with 166 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "subscribeError" : {
+    "errorCode" : {
+      "code" : "400",
+      "reasonPhrase" : "Bad Request",
+      "details" : "invalid payload: No entities"
+    }
+  }
+}
+'
+T@09:46:04  restService[182]: payloadParse returns '{
+  "subscribeError" : {
+    "errorCode" : {
+      "code" : "400",
+      "reasonPhrase" : "Bad Request",
+      "details" : "invalid payload: No entities"
+    }
+  }
+}
+'
+T@09:46:04  restReply[65]: Response 15: responding with 166 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "subscribeError" : {
+    "errorCode" : {
+      "code" : "400",
+      "reasonPhrase" : "Bad Request",
+      "details" : "invalid payload: No entities"
+    }
+  }
+}
+'
+T@09:46:04  ~RegisterContextResponse[56]: destroyed
+T@09:46:04  connectionTreat[438]: notifyFormat: ''
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@09:46:04  connectionTreat[442]: HTTP tenant: ''
+T@09:46:04  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@09:46:04  restService[179]: Parsing payload for URL '/NGSI10/updateContextSubscription', method 'POST', service vector index: 18
+T@09:46:04  payloadParse[53]: parsing data for service 'UpdateContextSubscriptionRequest'. Method: 'POST'
+T@09:46:04  payloadParse[54]: outFormat: JSON
+2@09:46:04  jsonRequestGet[121]: Found jsonRequest of type 13, method 'POST' - index 11 (/duration)
+T@09:46:04  jsonTreat[140]: Treating a JSON request: '{}'
+T@09:46:04  jsonTreat[155]: Treating 'updateContextSubscriptionRequest' request
+T@09:46:04  jsonTreat[192]: Calling check for JSON parsed tree (updateContextSubscriptionRequest)
+T@09:46:04  check[45]: In Restriction::check
+T@09:46:04  check[48]: Restriction::check returns OK (counter == 0)
+T@09:46:04  ~UpdateContextSubscriptionResponse[60]: destroyed
+T@09:46:04  payloadParse[69]: result: 'OK'
+T@09:46:04  payloadParse[70]: outFormat: JSON
+T@09:46:04  restService[182]: payloadParse returns 'OK'
+T@09:46:04  restService[197]: Treating service POST /NGSI10/updateContextSubscription
+T@09:46:04  restService[237]: tenant: ''
+T@09:46:04  reqSemTake[75]: mongoUpdateContextSubscription taking the 'req' semaphore for 'ngsi10 update subscription request'
+T@09:46:04  reqSemTake[77]: mongoUpdateContextSubscription has the 'req' semaphore
+T@09:46:04  mongoUpdateContextSubscription[47]: Update Context Subscription
+
+
+0 EntityIds:
+Attribute List
+No AttributeExpression
+No scopes
+
+
+0 EntityIds:
+Attribute List
+No AttributeExpression
+No scopes
+
+
+0 ContextElementsNo UpdateActionType
+
+
+0 ContextElementsNo UpdateActionType
+jsonScrPresent
+0 EntityIds:
+  Attribute List
+  No Reference
+  No Duration
+  No AttributeExpression
+No scopes
+0 NotifyConditions  No Throttling
+jsonScrPresent
+0 EntityIds:
+  Attribute List
+  No Reference
+  No Duration
+  No AttributeExpression
+No scopes
+0 NotifyConditions  No Throttling
+jsonUcsrPresent
+No Duration
+No AttributeExpression
+No scopes
+No SubscriptionId
+0 NotifyConditionsNo Throttling
+jsonUcsrPresent
+No Duration
+No AttributeExpression
+No scopes
+No SubscriptionId
+0 NotifyConditionsNo Throttling
+Tue Jun  3 11:46:04   Assertion failure s.size() == 24 src/mongo/bson/oid.cpp 161
+T@09:46:04  mongoSemGive[118]: mongoUpdateContextSubscription gives the 'mongo' semaphore for 'findOne in SubscribeContextCollection (mongo assertion exception)'
+T@09:46:04  reqSemGive[104]: mongoUpdateContextSubscription gives the 'req' semaphore for 'ngsi10 update subscription request (mongo assertion exception)'
+T@09:46:04  ~UpdateContextSubscriptionResponse[60]: destroyed
+T@09:46:04  restReply[65]: Response 16: responding with 180 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "subscribeError" : {
+    "subscriptionId" : "000000000000000000000000",
+    "errorCode" : {
+      "code" : "404",
+      "reasonPhrase" : "No context element found"
+    }
+  }
+}
+'
+T@09:46:04  ~RegisterContextResponse[56]: destroyed
+T@09:46:04  connectionTreat[438]: notifyFormat: ''
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@09:46:04  connectionTreat[442]: HTTP tenant: ''
+T@09:46:04  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@09:46:04  restService[179]: Parsing payload for URL '/NGSI10/unsubscribeContext', method 'POST', service vector index: 20
+T@09:46:04  payloadParse[53]: parsing data for service 'UnsubscribeContextRequest'. Method: 'POST'
+T@09:46:04  payloadParse[54]: outFormat: JSON
+2@09:46:04  jsonRequestGet[121]: Found jsonRequest of type 14, method 'POST' - index 10 (/subscriptionId)
+T@09:46:04  jsonTreat[140]: Treating a JSON request: '{}'
+T@09:46:04  jsonTreat[155]: Treating 'unsubscribeContextRequest' request
+T@09:46:04  jsonTreat[192]: Calling check for JSON parsed tree (unsubscribeContextRequest)
+T@09:46:04  UnsubscribeContextResponse[40]: created
+T@09:46:04  ~UnsubscribeContextResponse[63]: destroyed
+T@09:46:04  payloadParse[69]: result: 'OK'
+T@09:46:04  payloadParse[70]: outFormat: JSON
+T@09:46:04  restService[182]: payloadParse returns 'OK'
+T@09:46:04  restService[197]: Treating service POST /NGSI10/unsubscribeContext
+T@09:46:04  restService[237]: tenant: ''
+T@09:46:04  UnsubscribeContextResponse[40]: created
+T@09:46:04  reqSemTake[75]: mongoUnsubscribeContext taking the 'req' semaphore for 'ngsi10 unsubscribe request'
+T@09:46:04  reqSemTake[77]: mongoUnsubscribeContext has the 'req' semaphore
+T@09:46:04  mongoUnsubscribeContext[45]: Unsubscribe Context
+
+
+No SubscriptionId
+
+
+No SubscriptionId
+Tue Jun  3 11:46:04   Assertion failure s.size() == 24 src/mongo/bson/oid.cpp 161
+T@09:46:04  mongoSemGive[118]: mongoUnsubscribeContext gives the 'mongo' semaphore for 'findOne in SubscribeContextCollection (mongo assertion exception)'
+T@09:46:04  reqSemGive[104]: mongoUnsubscribeContext gives the 'req' semaphore for 'ngsi10 unsubscribe request (mongo assertion exception)'
+T@09:46:04  ~UnsubscribeContextResponse[63]: destroyed
+T@09:46:04  restReply[65]: Response 17: responding with 144 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "subscriptionId" : "000000000000000000000000",
+  "statusCode" : {
+    "code" : "404",
+    "reasonPhrase" : "No context element found"
+  }
+}
+'
+T@09:46:04  ~RegisterContextResponse[56]: destroyed
+T@09:46:04  connectionTreat[438]: notifyFormat: ''
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@09:46:04  connectionTreat[442]: HTTP tenant: ''
+T@09:46:04  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@09:46:04  restService[197]: Treating service * /NGSI9/notSupportedRequest
+T@09:46:04  restService[237]: tenant: ''
+E@09:46:04  restErrorReplyGet[227]: Unknown tag: 'UnknownTag', request == ''
+T@09:46:04  restReply[65]: Response 18: responding with 154 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "orionError" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "ngsi9 service '/NGSI9/notSupportedRequest' not found"
+  }
+}
+'
+T@09:46:04  ~RegisterContextResponse[56]: destroyed
+T@09:46:04  connectionTreat[438]: notifyFormat: ''
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@09:46:04  connectionTreat[442]: HTTP tenant: ''
+T@09:46:04  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@09:46:04  restService[197]: Treating service * /NGSI10/notSupportedRequest
+T@09:46:04  restService[237]: tenant: ''
+E@09:46:04  restErrorReplyGet[227]: Unknown tag: 'UnknownTag', request == ''
+T@09:46:04  restReply[65]: Response 19: responding with 156 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "orionError" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "ngsi10 service '/NGSI10/notSupportedRequest' not found"
+  }
+}
+'
+T@09:46:04  ~RegisterContextResponse[56]: destroyed
+T@09:46:04  connectionTreat[438]: notifyFormat: ''
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@09:46:04  httpHeaderGet[137]: HTTP Header:   Content-Length: 2
+T@09:46:04  connectionTreat[442]: HTTP tenant: ''
+T@09:46:04  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@09:46:04  restService[197]: Treating service * /notSupportedRequest
+T@09:46:04  restService[203]: URL tenant: 'notSupportedRequest'
+T@09:46:04  restService[237]: tenant: ''
+E@09:46:04  restErrorReplyGet[227]: Unknown tag: 'UnknownTag', request == ''
+T@09:46:04  restReply[65]: Response 20: responding with 142 bytes, Status Code 200
+T@09:46:04  restReply[66]: Response payload: '{
+  "orionError" : {
+    "code" : "400",
+    "reasonPhrase" : "Bad Request",
+    "details" : "service '/notSupportedRequest' not found"
+  }
+}
+'
+T@09:46:04  ~RegisterContextResponse[56]: destroyed
+F@09:46:04  ***[981]: In sigHandler - caught signal 15
+X@09:46:04  sigHandler[987]: Received signal 15

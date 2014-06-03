@@ -1,0 +1,132 @@
+1: ++++++++ GET that fails +++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 232
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:16:47 GMT
+
+{
+    "contextElement": {
+        "id": "ENTITY_ID", 
+        "isPattern": "false", 
+        "type": ""
+    }, 
+    "statusCode": {
+        "code": "404", 
+        "details": "Entity id: 'ENTITY_ID'", 
+        "reasonPhrase": "No context element found"
+    }
+}
+2: ++++++++ DELETE that fails +++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 95
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:16:47 GMT
+
+{
+    "code": "404", 
+    "details": "ENTITY_ID", 
+    "reasonPhrase": "No context element found"
+}
+3: ++++++++ POST that is OK ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 264
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:16:48 GMT
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "pressure", 
+                    "type": "clima", 
+                    "value": ""
+                }
+            ], 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+4: +++++++++ PUT that fails +++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 203
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:16:48 GMT
+
+{
+    "errorCode": {
+        "code": "472", 
+        "details": "action: UPDATE - entity: (ENTITY_ID, ) - offending attribute: temperature", 
+        "reasonPhrase": "request parameter is invalid/not allowed"
+    }
+}
+5: +++++++++ Register an entity +++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:16:48 GMT
+
+{
+    "duration": "PT1H", 
+    "registrationId": "538c32f09c81b82d0af5ffc9"
+}
+6: ++++++++++++ GET that is OK +++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 291
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:16:48 GMT
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "pressure", 
+                "type": "clima", 
+                "value": "p23"
+            }
+        ], 
+        "id": "ENTITY_ID", 
+        "isPattern": "false", 
+        "type": ""
+    }, 
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+7: +++++++++++++ PUT that is OK ++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 264
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:16:48 GMT
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "pressure", 
+                    "type": "clima", 
+                    "value": ""
+                }
+            ], 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+8: ++++++++++++++ DELETE that is OK +++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:16:48 GMT
+
+{
+    "code": "200", 
+    "reasonPhrase": "OK"
+}

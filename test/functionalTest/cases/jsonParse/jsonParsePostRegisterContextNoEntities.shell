@@ -1,0 +1,33 @@
+url="/NGSI9/registerContext"
+payload='{
+  "contextRegistrations": [
+    {
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "isDomain": "false",
+          "metadatas": [
+            {
+              "name": "ID",
+              "type": "string",
+              "value": "1110"
+            }
+          ]
+        }
+      ],
+      "metadatas": [
+        {
+          "name": "ID",
+          "type": "string",
+          "value": "2212"
+        }
+      ],
+      "providingApplication": "http://192.168.100.1:70/application"
+    }
+  ],
+  "duration": "PT1M"
+}'
+curlJson ${url} "${payload}"
+
+echo "++++++++++++++++++++"

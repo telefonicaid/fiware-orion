@@ -1,0 +1,11 @@
+{ "dropped" : "testharness", "ok" : 1 }
+T@17:45:19  paConfigActions[727]: setting trace levels to '0-1'
+E@17:45:19  exitFunc[1009]: unlink(/tmp/orion_9999.pid): No such file or directory
+F@17:45:19  ***[1063]: Connected to mongo at localhost:testharness
+V@17:45:19  restStart[569]: Starting HTTP daemon on IPv4 0.0.0.0 port 9999
+V@17:45:19  restStart[611]: Starting HTTP daemon on IPv6 :: port 9999
+2@17:45:20  xmlRequestGet[155]: Found xmlRequest of type 17, method 'POST' - index 12 (/updateContextRequest)
+E@17:45:20  check[283]: bad tag-name of vector item: 'vecitem6' (should be 'vecitem')
+W@17:45:20  compoundValueEnd[130]: ERROR: 'compound value error: bad tag-name of vector item: 'vecitem6' (should be 'vecitem')'
+F@17:45:20  ***[981]: In sigHandler - caught signal 15
+X@17:45:20  sigHandler[987]: Received signal 15

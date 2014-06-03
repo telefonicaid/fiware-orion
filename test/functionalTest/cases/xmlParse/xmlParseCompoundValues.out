@@ -1,0 +1,157 @@
+1: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 644
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:29 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+2: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 644
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:29 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+3: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 247
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:29 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>compound value error: bad tag-name of vector item: 'value3' (should be 'value')</details>
+  </errorCode>
+</updateContextResponse>
+4: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 249
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:29 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>Bad value for XML attribute 'type' for 'level3': 'more than one 'type' attribute'</details>
+  </errorCode>
+</updateContextResponse>
+5: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 226
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:29 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>Bad value for XML attribute 'type' for 'level3': 'badType'</details>
+  </errorCode>
+</updateContextResponse>
+6: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 244
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:30 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>Bad value for XML attribute 'type' for 'level3': 'unknown attribute 'happy''</details>
+  </errorCode>
+</updateContextResponse>
+7: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 644
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:30 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+8: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 229
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:30 GMT
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>compound value error: duplicated tag-name: 'int' in '/struct'</details>
+  </errorCode>
+</updateContextResponse>

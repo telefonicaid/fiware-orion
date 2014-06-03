@@ -1,0 +1,164 @@
+1: ++++++++++++++++++++
+<?xml version="1.0"?>
+<orion>
+  <version>REGEX(.*)</version>
+  <uptime>REGEX(.*)</uptime>
+  <git_hash>REGEX(([0-9a-f]{40}|nogitversion))</git_hash>
+  <compile_time>REGEX(.*)</compile_time>
+  <compiled_by>REGEX(.*)</compiled_by>
+  <compiled_in>REGEX(.*)</compiled_in>
+</orion>
+2: ++++++++++++++++++++
+<?xml version="1.0"?>
+<orion>
+  <version>REGEX(.*)</version>
+  <uptime>REGEX(.*)</uptime>
+  <git_hash>REGEX(([0-9a-f]{40}|nogitversion))</git_hash>
+  <compile_time>REGEX(.*)</compile_time>
+  <compiled_by>REGEX(.*)</compiled_by>
+  <compiled_in>REGEX(.*)</compiled_in>
+</orion>
+3: ++++++++++++++++++++
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+    <duration>PT1H</duration>
+  </subscribeResponse>
+</subscribeContextResponse>
+4: ++++++++++++++++++++
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+    <duration>PT1H</duration>
+  </subscribeResponse>
+</subscribeContextResponse>
+5: ++++++++++++++++++++
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom6</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue/>
+          </contextAttribute>
+          <contextAttribute>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+{ "count" : 1 }
+6: ++++++++++++++++++++
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom4</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue/>
+          </contextAttribute>
+          <contextAttribute>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+{ "count" : 1 }
+7: ++++++++++++++++++++
+POST http://REGEX(*/)notify
+Content-Length: 739
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: :::REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/xml
+
+<notifyContextRequest>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <originator>localhost</originator>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom6</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue>L23</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</notifyContextRequest>
+
+=======================================
+8: ++++++++++++++++++++
+POST http://localhost:REGEX([0-9]{4}|[0-9]{5})/notify
+Content-Length: 739
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/xml
+
+<notifyContextRequest>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <originator>localhost</originator>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom4</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue>L23</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</notifyContextRequest>
+
+=======================================

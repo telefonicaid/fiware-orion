@@ -1,0 +1,14 @@
+1: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 137
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT24H", 
+        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "throttling": "PT5H"
+    }
+}
+2: +++++++++++++++++++++++++++++

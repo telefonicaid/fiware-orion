@@ -1,0 +1,43 @@
+HTTP/1.1 200 OK
+Content-Length: 295
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<unsubscribeContextResponse>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <statusCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>subscriptionId: '012345678901234567890123'</details>
+  </statusCode>
+</unsubscribeContextResponse>
+2: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 224
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+    <duration>P5Y</duration>
+    <throttling>P5Y</throttling>
+  </subscribeResponse>
+</subscribeContextResponse>
+3: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 207
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<unsubscribeContextResponse>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</unsubscribeContextResponse>
+4: ***********************************

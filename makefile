@@ -281,10 +281,10 @@ unit_test: build_unit_test
 	@echo '------------------------------- unit_test ended ---------------------------------'
 
 functional_test: install
-	./scripts/funcTest.sh
+	./test/functionalTest/testHarness.sh
 
 functional_test_debug: install_debug
-	./scripts/funcTest.sh
+	./test/functionalTest/testHarness.sh
 
 ft:  functional_test
 ftd: functional_test_debug

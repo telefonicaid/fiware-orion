@@ -1,0 +1,24 @@
+echo "1: ***********************************"
+url="/ngsi9/contextEntities/Room1"
+payload='{
+  "duration" : "P1M",
+  "providingApplication" : "http://mysensors.com/Rooms"
+}'
+curlJson "${url}" "${payload}"
+
+echo "2: ***********************************"
+url="/ngsi9/contextEntities/Room1/attributes/temperature"
+payload='{
+  "duration" : "P1M",
+  "providingApplication" : "http://mysensors.com/Rooms"
+}'
+curlJson "${url}" "${payload}"
+
+echo "3: ***********************************"
+url="/ngsi9/contextEntities/Room1/attributes/pressure"
+payload='{
+  "duration" : "P1M",
+  "providingApplication" : "http://mysensors.com/Rooms"
+}'
+curlJson "${url}" "${payload}"
+

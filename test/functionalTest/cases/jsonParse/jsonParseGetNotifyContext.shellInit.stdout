@@ -1,0 +1,33 @@
+T@08:55:42  paConfigActions[727]: setting trace levels to '0-255'
+T@08:55:42  paConfigActions[728]: Leaving function paConfigActions
+E@08:55:42  exitFunc[1009]: unlink(/tmp/orion_9999.pid): No such file or directory
+T@08:55:42  semInit[61]: Initialized 'req' semaphore
+T@08:55:42  semInit[62]: Initialized 'mongo' semaphore
+T@08:55:42  mongoSemTake[90]: mongoConnect taking the 'mongo' semaphore for 'connecting to mongo'
+T@08:55:42  mongoSemTake[92]: mongoConnect has the 'mongo' semaphore
+T@08:55:42  mongoConnect[152]: mongo version server: 2.4.9 (mayor: 2, minor: 4, extra: 9)
+T@08:55:42  mongoSemGive[118]: mongoConnect gives the 'mongo' semaphore for 'connecting to mongo'
+F@08:55:42  ***[1063]: Connected to mongo at localhost:testharness
+T@08:55:42  ensureLocationIndex[381]: ensuring 2dsphere index on location.coords (tenant )
+T@08:55:42  recoverOntimeIntervalThreads[398]: query() in 'testharness.csubs' collection: '{ conditions.type: "ONTIMEINTERVAL" }'
+T@08:55:42  mongoSemTake[90]: recoverOntimeIntervalThreads taking the 'mongo' semaphore for 'query in SubscribeContextCollection'
+T@08:55:42  mongoSemTake[92]: recoverOntimeIntervalThreads has the 'mongo' semaphore
+T@08:55:42  mongoSemGive[118]: recoverOntimeIntervalThreads gives the 'mongo' semaphore for 'query in SubscribeContextCollection'
+V@08:55:42  restStart[569]: Starting HTTP daemon on IPv4 0.0.0.0 port 9999
+V@08:55:42  restStart[611]: Starting HTTP daemon on IPv6 :: port 9999
+T@08:55:43  connectionTreat[438]: notifyFormat: ''
+T@08:55:43  httpHeaderGet[137]: HTTP Header:   User-Agent: curl/7.26.0
+T@08:55:43  httpHeaderGet[137]: HTTP Header:   Host: localhost:9999
+T@08:55:43  httpHeaderGet[137]: HTTP Header:   Content-Type: application/json
+T@08:55:43  httpHeaderGet[137]: HTTP Header:   Accept: application/json
+T@08:55:43  httpHeaderGet[137]: HTTP Header:   Content-Length: 790
+T@08:55:43  connectionTreat[442]: HTTP tenant: ''
+T@08:55:43  connectionTreat[470]: 'default' value for notifyFormat (ciP->outFormat == 2)): 'JSON'
+T@08:55:43  restService[197]: Treating service * /NGSI10/notifyContext
+T@08:55:43  restService[237]: tenant: ''
+W@08:55:43  badVerbPostOnly[48]: bad verb for url '/NGSI10/notifyContext', method 'GET'
+T@08:55:43  restReply[65]: Response 1: responding with 0 bytes, Status Code 405
+T@08:55:43  restReply[66]: Response payload: ''
+T@08:55:43  ~RegisterContextResponse[56]: destroyed
+F@08:55:43  ***[981]: In sigHandler - caught signal 15
+X@08:55:43  sigHandler[987]: Received signal 15

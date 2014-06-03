@@ -1,0 +1,14 @@
+4: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 222
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>compound value error: duplicated tag-name: 's1' in '/'</details>
+  </errorCode>
+</updateContextResponse>

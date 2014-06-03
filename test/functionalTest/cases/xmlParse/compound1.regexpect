@@ -1,0 +1,14 @@
+1: +++++++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 193
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>Unknown XML field: 'here'</details>
+  </errorCode>
+</updateContextResponse>

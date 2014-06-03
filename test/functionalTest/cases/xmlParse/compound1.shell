@@ -1,0 +1,26 @@
+#   1. err: unknown path
+#INVALID_XML
+echo "1: +++++++++++++++++++++++++++++++++"
+url='/ngsi10/updateContext'
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>
+            <here>No compounds are allowed</here>
+          </type>
+          <contextValue>1</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+curlXml ${url} "${payload}"
+

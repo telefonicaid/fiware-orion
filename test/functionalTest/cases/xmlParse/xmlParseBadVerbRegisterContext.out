@@ -1,0 +1,6 @@
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST
+Date: Sun, 01 Jun 2014 17:45:28 GMT
+
+++++++++++++++++++++

@@ -1,0 +1,14 @@
+1: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 137
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 10:01:38 GMT
+
+{
+    "subscribeResponse": {
+        "duration": "PT24H", 
+        "subscriptionId": "538c4b82c0fc487480492f7e", 
+        "throttling": "PT5H"
+    }
+}
+2: +++++++++++++++++++++++++++++

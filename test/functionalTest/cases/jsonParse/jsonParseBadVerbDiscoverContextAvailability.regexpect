@@ -1,0 +1,17 @@
++++++ Starting +++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "PT1M",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
++++++ Registration Done +++++++++++++++
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST
+Date: REGEX(.*)
+
++++++ Discovery Done +++++++++++++++

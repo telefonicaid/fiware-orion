@@ -1,0 +1,9 @@
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:20:07 GMT
+
+{
+    "duration": "PT1M", 
+    "subscriptionId": "538c33b775a21ba48a07e375"
+}

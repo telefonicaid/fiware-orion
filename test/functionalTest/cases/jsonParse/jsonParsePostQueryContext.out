@@ -1,0 +1,35 @@
+1: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:18:17 GMT
+
+{
+    "errorCode": {
+        "code": "404", 
+        "reasonPhrase": "No context element found"
+    }
+}
+2: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:18:17 GMT
+
+{
+    "duration": "PT1M", 
+    "registrationId": "538c3349631c6e0b37d1b1ef"
+}
+3: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:18:17 GMT
+
+{
+    "errorCode": {
+        "code": "404", 
+        "reasonPhrase": "No context element found"
+    }
+}
+4: ***********************************

@@ -1,0 +1,30 @@
+1: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:19:45 GMT
+
+{
+    "duration": "P1M", 
+    "registrationId": "538c33a1ef6230337359c2b8"
+}
+2: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:19:45 GMT
+
+{
+    "duration": "P1M", 
+    "registrationId": "538c33a1ef6230337359c2b9"
+}
+3: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:19:45 GMT
+
+{
+    "duration": "P1M", 
+    "registrationId": "538c33a1ef6230337359c2ba"
+}

@@ -1,0 +1,34 @@
+1: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 143
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:21:35 GMT
+
+{
+    "errorCode": {
+        "code": "404", 
+        "reasonPhrase": "No context element found"
+    }, 
+    "subscriptionId": "012345678901234567890123"
+}
+2: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:21:35 GMT
+
+{
+    "duration": "PT1M", 
+    "subscriptionId": "538c340f9844f26710fdded3"
+}
+3: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:21:36 GMT
+
+{
+    "duration": "PT1S", 
+    "subscriptionId": "538c340f9844f26710fdded3"
+}
+4: ***********************************

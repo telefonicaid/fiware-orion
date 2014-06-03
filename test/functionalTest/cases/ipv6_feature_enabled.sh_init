@@ -1,0 +1,7 @@
+source harnessFunctions.sh
+
+dbInit CB
+brokerStart CB 0-255 IPV6
+accumulatorStart
+accumulatorStart IPV6
+

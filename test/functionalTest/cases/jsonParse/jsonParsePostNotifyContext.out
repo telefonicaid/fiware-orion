@@ -1,0 +1,13 @@
+1: ***********************************
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/json
+Date: Mon, 02 Jun 2014 08:17:33 GMT
+
+{
+    "responseCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+2: ***********************************

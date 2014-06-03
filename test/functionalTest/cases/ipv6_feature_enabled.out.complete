@@ -1,0 +1,131 @@
+1: ++++++++++++++++++++
+<?xml version="1.0"?>
+<orion>
+  <version>0.9.1-next</version>
+  <uptime>0 d, 0 h, 0 m, 5 s</uptime>
+  <git_hash>6a69cd0d46c0694d3c8d75fa14ac9837ea01c6ba</git_hash>
+  <compile_time>nodate</compile_time>
+  <compiled_by>fermin</compiled_by>
+  <compiled_in>oriondeb</compiled_in>
+</orion>
+2: ++++++++++++++++++++
+<?xml version="1.0"?>
+<orion>
+  <version>0.9.1-next</version>
+  <uptime>0 d, 0 h, 0 m, 5 s</uptime>
+  <git_hash>6a69cd0d46c0694d3c8d75fa14ac9837ea01c6ba</git_hash>
+  <compile_time>nodate</compile_time>
+  <compiled_by>fermin</compiled_by>
+  <compiled_in>oriondeb</compiled_in>
+</orion>
+3: ++++++++++++++++++++
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>52f4a9544ab2dfa2ff342f87</subscriptionId>
+    <duration>PT1H</duration>
+  </subscribeResponse>
+</subscribeContextResponse>
+4: ++++++++++++++++++++
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>52f4a9544ab2dfa2ff342f88</subscriptionId>
+    <duration>PT1H</duration>
+  </subscribeResponse>
+</subscribeContextResponse>
+5: ++++++++++++++++++++
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom6</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue/>
+          </contextAttribute>
+          <contextAttribute>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+{ "count" : 1 }
+6: ++++++++++++++++++++
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom4</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue/>
+          </contextAttribute>
+          <contextAttribute>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+{ "count" : 1 }
+7: ++++++++++++++++++++
+POST http://:::9977/notify
+Content-Length: 739
+User-Agent: orion/0.9.1-next
+Host: :::9977
+Accept: application/xml, application/json
+Content-Type: application/xml
+
+<notifyContextRequest>
+  <subscriptionId>52f4a9544ab2dfa2ff342f87</subscriptionId>
+  <originator>localhost</originator>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom6</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue>L23</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</notifyContextRequest>
+
+=======================================
+8: ++++++++++++++++++++

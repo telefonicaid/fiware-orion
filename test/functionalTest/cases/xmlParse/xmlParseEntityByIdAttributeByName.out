@@ -1,0 +1,132 @@
+1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:34 GMT
+
+<?xml version="1.0"?>
+<registerContextResponse>
+  <duration>PT1H</duration>
+  <registrationId>538b66be0d4f0cdede01f069</registrationId>
+</registerContextResponse>
+2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 770
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:34 GMT
+
+<?xml version="1.0"?>
+<discoverContextAvailabilityResponse>
+  <contextRegistrationResponseList>
+    <contextRegistrationResponse>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="" isPattern="false">
+            <id>ENTITY_ID</id>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
+          <contextRegistrationAttribute>
+            <name>ATTRIBUTE_01</name>
+            <type/>
+            <isDomain>false</isDomain>
+          </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://kz.tid.es/abc</providingApplication>
+      </contextRegistration>
+    </contextRegistrationResponse>
+  </contextRegistrationResponseList>
+</discoverContextAvailabilityResponse>
+3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:34 GMT
+
+<?xml version="1.0"?>
+<registerContextResponse>
+  <duration>PT2H</duration>
+  <registrationId>538b66be0d4f0cdede01f069</registrationId>
+</registerContextResponse>
+4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 771
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:34 GMT
+
+<?xml version="1.0"?>
+<discoverContextAvailabilityResponse>
+  <contextRegistrationResponseList>
+    <contextRegistrationResponse>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="" isPattern="false">
+            <id>ENTITY_ID</id>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
+          <contextRegistrationAttribute>
+            <name>ATTRIBUTE_01</name>
+            <type/>
+            <isDomain>false</isDomain>
+          </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://kz.tid.es/abc2</providingApplication>
+      </contextRegistration>
+    </contextRegistrationResponse>
+  </contextRegistrationResponseList>
+</discoverContextAvailabilityResponse>
+5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 771
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:34 GMT
+
+<?xml version="1.0"?>
+<discoverContextAvailabilityResponse>
+  <contextRegistrationResponseList>
+    <contextRegistrationResponse>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="" isPattern="false">
+            <id>ENTITY_ID</id>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
+          <contextRegistrationAttribute>
+            <name>ATTRIBUTE_01</name>
+            <type/>
+            <isDomain>false</isDomain>
+          </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://kz.tid.es/abc2</providingApplication>
+      </contextRegistration>
+    </contextRegistrationResponse>
+  </contextRegistrationResponseList>
+</discoverContextAvailabilityResponse>
+6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 185
+Content-Type: application/xml
+Date: Sun, 01 Jun 2014 17:45:34 GMT
+
+<?xml version="1.0"?>
+<discoverContextAvailabilityResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
+</discoverContextAvailabilityResponse>
+7: ++++++++++++++++++++
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST, GET
+Date: Sun, 01 Jun 2014 17:45:34 GMT
+
+8: ++++++++++++++++++++
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST, GET
+Date: Sun, 01 Jun 2014 17:45:34 GMT
+
+9: ++++++++++++++++++++
