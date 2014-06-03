@@ -66,6 +66,7 @@ function usage()
   echo "$empty [--dryrun (don't execute any tests)]"
   echo "$empty [--dir <directory>]"
   echo "$empty [--stopOnError (stop at first error encountered)]"
+  echo "$empty [--no-duration (removes duration mark on successful tests)]"
   echo "$empty [ <directory or file> ]"
   exit $1
 }
@@ -134,7 +135,7 @@ ME=$(basename $0)
 
 
 
-# ------------------------------------------------------------------------------
+# ------------------------------------https://github.com/telefonicaid/fiware-orion/pull/394#discussion_r13321709------------------------------------------
 #
 # Argument parsing
 #
@@ -147,6 +148,7 @@ dir=$SCRIPT_HOME/cases
 dirOrFile=""
 dirGiven=no
 filterGiven=no
+showDuration=on
 
 vMsg "parsing options"
 while [ "$#" != 0 ]
@@ -158,6 +160,7 @@ do
   elif [ "$1" == "--stopOnError" ]; then stopOnError=on;
   elif [ "$1" == "--filter" ];      then testFilter="$2"; filterGiven=yes; shift;
   elif [ "$1" == "--dir" ];         then dir="$2"; dirGiven=yes; shift;
+  elif [ "$1" == "--no-duration" ]; then showDuration=off;
   else
     if [ "$dirOrFile" == "" ]
     then
@@ -600,7 +603,12 @@ do
   end=$(date --date="$endDate" +%s)
   typeset -i secs
   secs=$end-$start
-  echo $secs seconds
+  if [ "$showDuration" == "on" ]
+  then
+    echo $secs seconds
+  else
+    echo "SUCCESS"
+  fi
 done
 
 
