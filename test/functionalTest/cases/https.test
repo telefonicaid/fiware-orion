@@ -25,7 +25,7 @@ HTTPS simple test
 
 --SHELL-INIT--
 dbInit CB
-${PWD}/../../scripts/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
+${PWD}/../../../scripts/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
 extraParams="-https -key /tmp/harnessTest.key -cert /tmp/harnessTest.pem"
 brokerStart CB 0-255 IPV4 "$extraParams"
 --SHELL--
