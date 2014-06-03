@@ -674,7 +674,7 @@ function ftCurl()
   #
   # Print and beautify response body
   #
-  if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == " " ] || [ "$_outFormat" == "" ]
+  if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == "" ]
   then
     echo $_response | xmllint --format -
   elif [ "$_outFormat" == application/json ]
