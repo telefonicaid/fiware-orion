@@ -112,9 +112,10 @@ mkdir -p $RPM_BUILD_ROOT/etc/init.d
 mkdir -p $RPM_BUILD_ROOT/etc/profile.d
 mkdir -p $RPM_BUILD_ROOT/usr/share/contextBroker/tests
 mkdir -p $RPM_BUILD_ROOT/usr/share/doc/contextBroker
-cp -r test/testharness/* $RPM_BUILD_ROOT/usr/share/contextBroker/tests
+cp -r test/functionalTest/cases $RPM_BUILD_ROOT/usr/share/contextBroker/tests
+rm $RPM_BUILD_ROOT/usr/share/contextBroker/tests/cases/*.DISABLED $RPM_BUILD_ROOT/usr/share/contextBroker/tests/cases/CMakeLists.txt
 cp LICENSE $RPM_BUILD_ROOT/usr/share/doc/contextBroker
-cp scripts/testEnv.sh scripts/testHarness.sh scripts/testDiff.py $RPM_BUILD_ROOT/usr/share/contextBroker/tests 
+cp scripts/testEnv.sh test/functionalTest/testHarness.sh test/functionalTest/testDiff.py test/functionalTest/harnessFunctions.sh $RPM_BUILD_ROOT/usr/share/contextBroker/tests
 cp scripts/accumulator-server.py $RPM_BUILD_ROOT/usr/share/contextBroker/tests 
 cp scripts/managedb/garbage-collector.py $RPM_BUILD_ROOT/usr/share/contextBroker
 cp scripts/managedb/lastest-updates.py $RPM_BUILD_ROOT/usr/share/contextBroker
