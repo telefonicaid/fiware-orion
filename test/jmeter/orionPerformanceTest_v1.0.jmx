@@ -1,27 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
- Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
-
- This file is part of Orion Context Broker.
-
- Orion Context Broker is free software: you can redistribute it and/or
- modify it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation, either version 3 of the
- License, or (at your option) any later version.
-
- Orion Context Broker is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
- General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
-
- For those usages not covered by this license please contact with
- fermin at tid dot es
- 
- Author: Ivan Arias 
--->
 <jmeterTestPlan version="1.2" properties="2.6" jmeter="2.11 r1554548">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Orion Performance Test" enabled="true">
@@ -126,16 +103,17 @@
             <stringProp name="Argument.desc">[3450-4444] Monitor Perf Port</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
-          <elementProp name="now" elementType="Argument">
-            <stringProp name="Argument.name">now</stringProp>
+          <elementProp name="current_time" elementType="Argument">
+            <stringProp name="Argument.name">current_time</stringProp>
             <stringProp name="Argument.value">${__time(YMDHMS,)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">current time</stringProp>
           </elementProp>
           <elementProp name="MAX_NODES" elementType="Argument">
             <stringProp name="Argument.name">MAX_NODES</stringProp>
             <stringProp name="Argument.value">4</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
-            <stringProp name="Argument.desc"> nodes number maximum</stringProp>
+            <stringProp name="Argument.desc">Maximum amount of nodes</stringProp>
           </elementProp>
         </collectionProp>
       </Arguments>
@@ -248,6 +226,7 @@
             <stringProp name="Argument.name">LOADOSOPHIA</stringProp>
             <stringProp name="Argument.value">loadosophia_upload_token</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">loadosophia upload token</stringProp>
           </elementProp>
         </collectionProp>
       </Arguments>
@@ -899,7 +878,7 @@
         </objProp>
         <stringProp name="filename"></stringProp>
         <stringProp name="project">${PROJECT}</stringProp>
-        <stringProp name="uploadToken">${LOADOSOPHIA}rtrtr</stringProp>
+        <stringProp name="uploadToken">${LOADOSOPHIA}</stringProp>
         <stringProp name="storeDir">${outputDir}</stringProp>
         <stringProp name="color">green</stringProp>
         <stringProp name="title">${__time(YMD)}_${TEST_NAME}_${THREADS}_x${RUNTIME}Secs_IP-${HOST}</stringProp>
