@@ -1,0 +1,142 @@
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# fermin at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Missing Content-Type header
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+echo "1: ++++++++++++++++++++"
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
+  </entityIdList>
+  <attributeList/>
+</queryContextRequest>'
+curlIt "xml" "$url" "$payload" "Content-Type:"
+
+echo "2: ++++++++++++++++++++"
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
+  </entityIdList>
+  <attributeList/>
+</queryContextRequest>'
+curlIt "xml" "$url" "$payload" "Content-Type: application/x-www-form-encoded"
+
+
+echo "3: ++++++++++++++++++++"
+# Check that the ending "; charset=..." works (for XML)
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
+  </entityIdList>
+  <attributeList/>
+</queryContextRequest>'
+curlIt "XML" "$url" "$payload" "Content-Type: application/xml; charset=UTF-8"
+
+
+echo "4: ++++++++++++++++++++"
+# Check that the ending "; charset=..." works (for JSON)
+url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [ ]
+}'
+curlIt "XML" "$url" "$payload" 'Content-Type: application/json; charset=UTF-8'
+
+--REGEXPECT--
+1: ++++++++++++++++++++
+HTTP/1.1 415 Unsupported Media Type
+Connection: close
+Content-Length: 201
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<orionError>
+  <code>415</code>
+  <reasonPhrase>Unsupported Media Type</reasonPhrase>
+  <details>Content-Type header not used, default application/octet-stream is not supported</details>
+</orionError>
+2: ++++++++++++++++++++
+HTTP/1.1 415 Unsupported Media Type
+Connection: close
+Content-Length: 180
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<orionError>
+  <code>415</code>
+  <reasonPhrase>Unsupported Media Type</reasonPhrase>
+  <details>not supported content type: application/x-www-form-encoded</details>
+</orionError>
+3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+--TEARDOWN--
+brokerStop CB
+
