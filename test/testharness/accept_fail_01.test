@@ -32,8 +32,7 @@ brokerStart CB
 # "Accept: */*" according to HTTP RFC
 source harnessFunctions.sh
 url="/NGSI10/queryContext"
-payload='<?xml version="1.0"?>
-<queryContextRequest>
+payload='<queryContextRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">
       <id>OfficeRoom</id>
@@ -41,7 +40,12 @@ payload='<?xml version="1.0"?>
   </entityIdList>
   <attributeList/>
 </queryContextRequest>'
-ftCurl --url "$url" --payload "$payload" --out " "
+
+ftCurl --url "$url" --payload "${payload}" --out " "
+
+# Example of payload from file:
+# echo $payload > payload_file
+# ftCurl --url "$url" --payload payload_file --out " "
 --REGEXPECT--
 HTTP/1.1 200 OK
 Content-Length: 155
