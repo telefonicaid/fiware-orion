@@ -23,7 +23,7 @@ nohup sh startAgent.sh --udp-port 0 --tcp-port 3450 > monitor.log &
 ./jmeter.sh -n -t orionPerformanceTest.jmx -JPROJECT="XXX" -JTEST_NAME="XXXX" -JHOST=X.X.X.X 
 -JNODE_1=X.X.X.X -JPORT=1026 -JTHREADS=XXXX -JRAMPUP=XXX -JRUNTIME=XXXX >> /<path>/jmeter_report_YYYYMMDD.log
 ```
-* Move /tmp/Loadosophia_xxxxxxxxxxxxxxxxxxxxx.jtl.gz file (where "xxxxxxxxxxxxxxxxxxx" is a hash value) into /tmp/JMeter_result/result_<today>-<now> folder.
+* Move /tmp/Loadosophia_xxxxxxxxxxxxxxxxxxxxx.jtl.gz file (where "xxxxxxxxxxxxxxxxxxx" is a hash value) into /tmp/JMeter_result/result_[today]-[now] folder.
 * Copy folder in local
 * Upload in Loadosophia Loadosophia_xxxxxxxxxxxxxxxxxxxxx.jtl.gz and perfmon_xxxxxxxxxxxxxxxxxxxx.jtl.gz. 
 * Fill the report in Google doc
