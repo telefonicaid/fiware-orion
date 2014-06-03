@@ -568,7 +568,7 @@ function dbInsertEntity()
 #   --host        <host>           (default: localhost)
 #   --port        <port>           (default: $BROKER_PORT)
 #   --url         <URL>            (default: empty string)
-#   --payload     <payload>        (default: NO PAYLOAD)
+#   --payload     <payload>        (default: NO PAYLOAD. Possible values: [filename | "${string}"])
 #   --in          (input payload)  (default: xml => application/xml, If 'json': application/json)
 #   --out         (output payload  (default: xml => application/xml, If 'json': application/json)
 #   --json        (in/out JSON)    (if --in/out is used AFTER --json, it overrides) 
@@ -647,8 +647,12 @@ function ftCurl()
   #
   if [ "$_payload" != "" ]
   then
-     echo $_payload > payload
-    _PAYLOAD='-d @payload'
+    if [ -f "$_payload" ]
+    then
+      _PAYLOAD="-d @$_payload"
+    else
+      _PAYLOAD="-d @-"
+    fi
   fi
 
   if [ "$_method" != "" ];     then    _METHOD=' -X "'$_method'"';   fi
@@ -660,11 +664,27 @@ function ftCurl()
   else
     _URL=$_host:$_port$_url
   fi
+  
+  _BUILTINS='-s -S -H "Connection: Close" --dump-header /tmp/httpHeaders.out'
+#   echo '==============================================================================================================================================================='
+#   echo "echo $_payload | curl $_URL $_PAYLOAD $_METHOD --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\" $HTTP_TENANT $_BUILTINS $_xtra"
+#   echo '==============================================================================================================================================================='
 
-  _BUILTINS='-s -S --dump-header /tmp/httpHeaders.out'
-  echo '==============================================================================================================================================================='
-  echo curl $_URL "$_PAYLOAD" $_METHOD --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $HTTP_TENANT $_BUILTINS $_xtra
-  echo '==============================================================================================================================================================='
-
-  curl $_URL "$_PAYLOAD" $_METHOD --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $HTTP_TENANT $_BUILTINS $_xtra
+  _response=$(echo $_payload | curl $_URL $_PAYLOAD $_METHOD --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $HTTP_TENANT $_BUILTINS $_xtra)
+  
+  #
+  # Remove "Connection: Keep-Alive" header and print headers out
+  #
+  sed '/Connection: Keep-Alive/d' /tmp/httpHeaders.out
+  
+  #
+  # Print and beautify response body
+  #
+  if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == " " ] || [ "$_outFormat" == "" ]
+  then
+    echo $_response | xmllint --format -
+  elif [ "$_outFormat" == application/json ]
+  then
+    echo $_response | python -mjson.tool
+  fi
 }
