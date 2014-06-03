@@ -22,8 +22,7 @@
 *
 * Author: Fermin Galan
 */
-#include "gtest/gtest.h"
-#include "testInit.h"
+#include "unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -36,11 +35,6 @@
 #include "ngsi10/QueryContextResponse.h"
 
 #include "mongo/client/dbclient.h"
-
-#include "commonMocks.h"
-
-using ::testing::_;
-using ::testing::Throw;
 
 /* ****************************************************************************
 *
@@ -333,6 +327,107 @@ static void prepareDatabaseWithCustomMetadata(void) {
     connection->insert(ENTITIES_COLL, en1);
     connection->insert(ENTITIES_COLL, en2);
 
+}
+
+/* ****************************************************************************
+*
+* prepareDatabaseWithServicePath -
+*
+*/
+static void prepareDatabaseWithServicePath(void)
+{
+  /* Set database */
+  setupDatabase();
+
+  DBClientConnection* connection = getMongoConnection();
+
+  /* We create the following entities:
+   *
+   * - E1:
+   *     Type:         T
+   *     ServicePath:  /home
+   *     Attribute:    A1, a1
+   *
+   * - E2:
+   *     Type:         T
+   *     ServicePath:  /home/kz
+   *     Attribute:    A1, a1
+   *
+   * - E3:
+   *     Type:         T
+   *     ServicePath:  /home/fg
+   *     Attribute:    A1, a1
+   *
+   * - E4:
+   *     Type:         T
+   *     ServicePath:  /home/kz/e4
+   *     Attribute:    A1, a1
+   *
+   * - E5:
+   *     Type:         T
+   *     ServicePath:  /home/kz/e5
+   *     Attribute:    A1, a1
+   *
+   * - E6:
+   *     Type:         T
+   *     ServicePath:  /home/fg/e6
+   *     Attribute:    A1, a1
+   *
+   */
+
+  BSONObj e1 = BSON("_id" << BSON("id" << "E1" << "type" << "T" << "servicePath" << "/home")       << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a1")));
+  BSONObj e2 = BSON("_id" << BSON("id" << "E2" << "type" << "T" << "servicePath" << "/home/kz")    << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a2")));
+  BSONObj e3 = BSON("_id" << BSON("id" << "E3" << "type" << "T" << "servicePath" << "/home/fg")    << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a3")));
+  BSONObj e4 = BSON("_id" << BSON("id" << "E4" << "type" << "T" << "servicePath" << "/home/kz/e4") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a4")));
+  BSONObj e5 = BSON("_id" << BSON("id" << "E5" << "type" << "T" << "servicePath" << "/home/kz/e5") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a5")));
+  BSONObj e6 = BSON("_id" << BSON("id" << "E5" << "type" << "T" << "servicePath" << "/home/fg/e6") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a6")));
+
+  connection->insert(ENTITIES_COLL, e1);
+  connection->insert(ENTITIES_COLL, e2);
+  connection->insert(ENTITIES_COLL, e3);
+  connection->insert(ENTITIES_COLL, e4);
+  connection->insert(ENTITIES_COLL, e5);
+  connection->insert(ENTITIES_COLL, e6);
+}
+
+/* ****************************************************************************
+*
+* queryWithServicePath -
+*/
+TEST(mongoQueryContextRequest, queryWithServicePath)
+{
+  HttpStatusCode         ms;
+  QueryContextRequest    qcReq;
+  QueryContextResponse   qcResponse;
+  QueryContextResponse   qcResponse2;
+
+  utInit();
+  prepareDatabaseWithServicePath();
+
+  EntityId en("E.*", "T", "true");
+  qcReq.entityIdVector.push_back(&en);
+
+  ms = mongoQueryContext(&qcReq, &qcResponse, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(3,        qcResponse.contextElementResponseVector.size());
+  EXPECT_STREQ("a2",  qcResponse.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a4",  qcResponse.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a5",  qcResponse.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->value.c_str());
+
+
+  ms = mongoQueryContext(&qcReq, &qcResponse2, "", "/home");
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(6,        qcResponse2.contextElementResponseVector.size());
+  EXPECT_STREQ("a1",  qcResponse2.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a2",  qcResponse2.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a3",  qcResponse2.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a4",  qcResponse2.contextElementResponseVector[3]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a5",  qcResponse2.contextElementResponseVector[4]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a6",  qcResponse2.contextElementResponseVector[5]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  utExit();
 }
 
 /* ****************************************************************************

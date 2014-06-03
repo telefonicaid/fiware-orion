@@ -524,7 +524,7 @@ bool includedAttribute(ContextAttribute attr, AttributeList* attrsV) {
 *
 * fillQueryEntFalse -
 */
-static void fillQueryEntFalse(BSONArrayBuilder& ba, EntityId* enP, bool withType = true) {
+static void fillQueryEntFalse(BSONArrayBuilder& ba, EntityId* enP, bool withType) {
 
     if (withType) {
         ba.append(BSON(ENT_ENTITY_ID << enP->id << ENT_ENTITY_TYPE << enP->type));
@@ -540,8 +540,8 @@ static void fillQueryEntFalse(BSONArrayBuilder& ba, EntityId* enP, bool withType
 *
 * fillQueryEntTrue -
 */
-static void fillQueryEntTrue(BSONArrayBuilder& ba, EntityId* enP) {
-
+static void fillQueryEntTrue(BSONArrayBuilder& ba, EntityId* enP, const std::string& servicePath)
+{
     BSONObjBuilder     ent;
     const std::string  idString   = "_id." ENT_ENTITY_ID;
     const std::string  typeString = "_id." ENT_ENTITY_TYPE;
@@ -549,6 +549,14 @@ static void fillQueryEntTrue(BSONArrayBuilder& ba, EntityId* enP) {
     ent.appendRegex(idString, enP->id);
     if (enP->type != "") {
         ent.append(typeString, enP->type);
+    }
+
+    if (servicePath != "")
+    {
+      const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
+      const std::string  servicePathValue  = servicePath + ".*";
+
+      ent.appendRegex(servicePathString, servicePathValue);
     }
 
     BSONObj entObj = ent.obj();
@@ -731,7 +739,7 @@ bool entitiesQuery
      * {
      *    "$or": [ ... ],            (always)
      *    "attrs.name": { ... },     (only if attributes are used in the query)
-     *    "location.coords": { ... } (only in the case of geo queries)
+     *    "location.coords": { ... } (only in the case of geo-queries)
      *  }
      *
      */
@@ -743,14 +751,16 @@ bool entitiesQuery
 
     BSONArrayBuilder entFalseWType;
     BSONArrayBuilder entFalseWOType;
-    for (unsigned int ix = 0; ix < enV.size(); ++ix) {
-        if (isTrue(enV.get(ix)->isPattern)) {
+    for (unsigned int ix = 0; ix < enV.size(); ++ix)
+    {
+        if (isTrue(enV.get(ix)->isPattern))
+        {
             /* Part 1.1: add from 0 to N objects (in entTrue) to the $or array for entities
              * with isPatter=true. Note we are using the builder for the $or vector itself,
              * as in this case entities can be "directly" inserted. For the other two parts, we
              * just accumulate in this loop, as they need additional BSON composition before be
              * inserted in the $or array */
-            fillQueryEntTrue(orEnt, enV.get(ix));
+            fillQueryEntTrue(orEnt, enV.get(ix), servicePath);
         }
         else {
             /* Accumulating for later BSON composition (Part 1.2 and Part 1.3 below)*/

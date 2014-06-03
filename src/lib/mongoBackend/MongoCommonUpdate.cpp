@@ -1348,6 +1348,9 @@ static bool removeEntity(std::string entityId, std::string entityType, ContextEl
 *
 * processContextElement -
 *
+* 0. Preparations
+* 1. Preconditions
+* 2. Get the complete list of entities from mongo
 */
 void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, const std::string& action, const std::string& tenant, const std::string& servicePath) {
 
@@ -1382,17 +1385,30 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         }
     }
 
-    /* Find entities (could be several ones in the case of no type or isPattern=true) */
-    const std::string  idString   = "_id." ENT_ENTITY_ID;
-    const std::string  typeString = "_id." ENT_ENTITY_TYPE;
+    /* Find entities (could be several, in the case of no type or isPattern=true) */
+    const std::string  idString          = "_id." ENT_ENTITY_ID;
+    const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
+    const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
+    const std::string  servicePathValue  = servicePath +  ".*"; // Entity Service Path => Query Service Path
     BSONObj            query;
 
-    if (en.type == "") {
+
+    //
+    // 4 possibilities:
+    // 1. type empty     and servicePath empty
+    // 2. type empty     and servicePath non-empty
+    // 3. type non-empty and servicePath empty
+    // 4. type non-empty and servicePath non-empty
+    //
+    if ((en.type == "") && (servicePath == ""))
         query = BSON(idString << en.id);
-    }
-    else {
+    else if ((en.type == "") && (servicePath != ""))
+        query = BSON(idString << en.id << servicePathString << servicePathValue);
+    else if ((en.type != "") && (servicePath == ""))
         query = BSON(idString << en.id << typeString << en.type);
-    }
+    else
+        query = BSON(idString << en.id << typeString << en.type << servicePathString << servicePathValue);
+
     auto_ptr<DBClientCursor> cursor;
 
     try {
@@ -1427,6 +1443,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         return;
     }
 
+
     bool atLeastOneResult = false;
     while (cursor->more()) {
         BSONObj r = cursor->next();
@@ -1450,9 +1467,9 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         /* We start with the attrs array in the entity document, which is manipulated by the
          * {update|delete|append}Attrsr() function for each one of the attributes in the
          * contextElement being processed. Then, we replace the resulting attrs array in the
-         * BSON document and update the entity document. It would be more efficient to map the
-         * entiry attrs to something like and hash map and manipulate there, but it is not seems
-         * easy using the Mongod driver BSON API. Note that we need to use newAttrs given that attrs is
+         * BSON document and the entity document is updated. It would be more efficient to map the
+         * entity attrs to something like a hash map and manipulate it there, but it does not seem
+         * easy, using the mongo driver BSON API. Note that we need to use newAttrs, given that attrs is
          * BSONObj, which is an inmutable type. FIXME P6: try to improve this */
         BSONObj attrs = r.getField(ENT_ATTRS).embeddedObject();
 
@@ -1467,7 +1484,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         double coordLat, coordLong;
         if (r.hasField(ENT_LOCATION)) {
             // FIXME P2: potentially, assertion error will happen if the field is not as expected. Although this shouldn't happen
-            // (if happens, it means that somebody has manipulated the DB out-of-band contex broker) a safer way of parsing BSON object
+            // (if it happens, it means that somebody has manipulated the DB out-of-band of the context broker), a safer way of parsing BSON object
             // will be needed. This is a general comment, applicable to many places in the mongoBackend code
             BSONObj loc = r.getObjectField(ENT_LOCATION);
             locAttr  = loc.getStringField(ENT_LOCATION_ATTRNAME);
@@ -1567,7 +1584,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
          * the global response */
         cerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(cerP);
-
     }
 
     /* If the entity didn't already exist, we create it. Note that alternatively, we could do a count()
@@ -1611,7 +1627,5 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             }
             responseP->contextElementResponseVector.push_back(cerP);
         }
-
     }
-
 }

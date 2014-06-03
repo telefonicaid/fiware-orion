@@ -66,6 +66,7 @@ using namespace mongo;
 #define ENT_ATTRS                    "attrs"
 #define ENT_ENTITY_ID                "id"
 #define ENT_ENTITY_TYPE              "type"
+#define ENT_SERVICE_PATH             "servicePath"
 #define ENT_ATTRS_NAME               "name"
 #define ENT_ATTRS_TYPE               "type"
 #define ENT_ATTRS_VALUE              "value"
