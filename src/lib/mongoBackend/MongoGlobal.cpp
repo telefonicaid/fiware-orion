@@ -710,9 +710,21 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
 * empty value causes an error)
 *
 */
-bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty, std::string tenant) {
-
+bool entitiesQuery
+(
+  EntityIdVector                enV,
+  AttributeList                 attrL,
+  Restriction                   res,
+  ContextElementResponseVector* cerV,
+  std::string*                  err,
+  bool                          includeEmpty,
+  std::string                   tenant,
+  std::string                   servicePath
+)
+{
     DBClientConnection* connection = getMongoConnection();
+
+    LM_T(LmtServicePath, ("Service Path: '%s'", servicePath.c_str()));
 
     /* Query structure is as follows
      *
@@ -1229,7 +1241,7 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
 
     // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
     Restriction res;
-    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant)) {
+    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant, "")) {
         ncr.contextElementResponseVector.release();
         LM_RE(false, (err.c_str()));
     }
@@ -1247,7 +1259,7 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
             ContextElementResponseVector allCerV;
             AttributeList emptyList;
             // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
-            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false, tenant)) {
+            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false, tenant, "")) {
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
                 LM_RE(false, (err.c_str()));

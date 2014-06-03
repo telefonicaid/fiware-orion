@@ -52,7 +52,7 @@ HttpStatusCode mapPostIndividualContextEntityAttribute(const std::string& entity
    ucRequest.contextElementVector.push_back(&ce);
    ucRequest.updateActionType.set("Append");
 
-   ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant);
+   ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePath);
 
    response->fill(SccOk);
    

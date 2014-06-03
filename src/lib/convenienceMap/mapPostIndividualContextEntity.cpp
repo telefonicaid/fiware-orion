@@ -57,7 +57,7 @@ HttpStatusCode mapPostIndividualContextEntity(const std::string& entityId, Appen
   ucRequest.contextElementVector.push_back(ceP);
   ucRequest.updateActionType.set("Append");
 
-  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePath);
 
   ContextAttributeResponse* car                      = new ContextAttributeResponse();
   ContextElementResponse*   ucContextElementResponse = ucResponse.contextElementResponseVector.get(0);

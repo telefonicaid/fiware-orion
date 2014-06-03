@@ -1353,6 +1353,8 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
     DBClientConnection* connection = getMongoConnection();
 
+    LM_T(LmtServicePath, ("Service Path: '%s'", servicePath.c_str()));
+
     /* Getting the entity in the request (helpful in other places) */
     EntityId en = ceP->entityId;
 
