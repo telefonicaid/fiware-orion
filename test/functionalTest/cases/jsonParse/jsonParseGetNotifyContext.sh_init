@@ -1,5 +1,0 @@
-source ../harnessFunctions.sh
-
-dbInit CB
-brokerStart CB
-

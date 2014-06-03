@@ -1,8 +1,0 @@
-url="/NGSI9/unsubscribeContextAvailability"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<unsubscribeContextAvailabilityRequest>
-  <subscriptionId>012345678901234567890123</subscriptionId>
-</unsubscribeContextAvailabilityRequest>'
-curlXml "$url" "$payload"
-
-echo "2: ***********************************"
