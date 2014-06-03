@@ -32,7 +32,8 @@ brokerStart CB
 # "Accept: */*" according to HTTP RFC
 source harnessFunctions.sh
 url="/NGSI10/queryContext"
-payload='<queryContextRequest>
+payload='<?xml version="1.0"?>
+<queryContextRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">
       <id>OfficeRoom</id>
