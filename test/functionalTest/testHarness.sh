@@ -238,15 +238,23 @@ toBeStopped=false
 # Init files already sourced?
 #
 if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
-then
-  if [ -f scripts/testEnv.sh ]
+then  
+  if [ -f "$SCRIPT_HOME/testEnv.sh" ]
   then
-    vMsg Sourcing scripts/testEnv.sh
-    source scripts/testEnv.sh
+    # First, we try with a testEnv.sh file in the script home (usual situation in the
+    # RPM deployment case)
+    vMsg Sourcing $SCRIPT_HOME/testEnv.sh
+    source $SCRIPT_HOME/testEnv.sh
+  elif [ -f "$SCRIPT_HOME/testEnv.sh" ]
+  then
+    # Second, we try with a testEnv.sh file in the script/testEnv.sh (realtive to git repo home).
+    # Note that the script home in this case is test/functionaTest
+    vMsg Sourcing $SCRIPT_HOME/../../scripts/testEnv.sh
+    source $SCRIPT_HOME/../../scripts/testEnv.sh
   else
-    echo "--------------------------------------------------------------------------"
-    echo "Please source scripts/testEnv.sh before running the functional test suite."
-    echo "--------------------------------------------------------------------------"
+    echo "------------------------------------------------------------------"
+    echo "Please source testEnv.sh before running the functional test suite."
+    echo "------------------------------------------------------------------"
     exit 1
   fi
 fi
