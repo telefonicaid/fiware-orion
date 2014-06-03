@@ -26,7 +26,6 @@ nohup sh startAgent.sh --udp-port 0 --tcp-port 3450 > monitor.log &
 * Move /tmp/Loadosophia_xxxxxxxxxxxxxxxxxxxxx.jtl.gz file (where "xxxxxxxxxxxxxxxxxxx" is a hash value) into /tmp/JMeter_result/result_[today]-[now] folder.
 * Copy folder in local
 * Upload in Loadosophia Loadosophia_xxxxxxxxxxxxxxxxxxxxx.jtl.gz and perfmon_xxxxxxxxxxxxxxxxxxxx.jtl.gz. 
-* Fill the report in Google doc
 
 #### Scripts:
 1. **orionPerformanceTest.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It can used for one standalone VM or a balanced cluster of VM with 4 nodes maximum.
