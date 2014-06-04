@@ -1386,12 +1386,15 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     }
 
     /* Find entities (could be several, in the case of no type or isPattern=true) */
+    char               path[64];
+    slashEscape(servicePath.c_str(), path, sizeof(path));
+
     const std::string  idString          = "_id." ENT_ENTITY_ID;
     const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
     const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
-    const std::string  servicePathValue  = servicePath +  ".*"; // Entity Service Path => Query Service Path
-    BSONObj            query;
-
+    const std::string  servicePathValue  = std::string("^") + path + "$|" + "^" + path + "\\/.*";
+    BSONObj            doesntExist       = BSON("$exists" << false);
+    BSONObjBuilder     bob;
 
     //
     // 4 possibilities:
@@ -1401,13 +1404,29 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     // 4. type non-empty and servicePath non-empty
     //
     if ((en.type == "") && (servicePath == ""))
-        query = BSON(idString << en.id);
+    {
+      bob.append(idString, en.id);
+      bob.append(servicePathString, doesntExist);
+    }
     else if ((en.type == "") && (servicePath != ""))
-        query = BSON(idString << en.id << servicePathString << servicePathValue);
+    {
+      bob.append(idString, en.id);
+      bob.appendRegex(servicePathString, servicePathValue);
+    }
     else if ((en.type != "") && (servicePath == ""))
-        query = BSON(idString << en.id << typeString << en.type);
+    {
+      bob.append(idString, en.id);
+      bob.append(typeString, en.type);
+      bob.append(servicePathString, doesntExist);
+    }
     else
-        query = BSON(idString << en.id << typeString << en.type << servicePathString << servicePathValue);
+    {
+      bob.append(idString, en.id);
+      bob.append(typeString, en.type);
+      bob.appendRegex(servicePathString, servicePathValue);
+    }
+    
+    BSONObj query = bob.obj();
 
     auto_ptr<DBClientCursor> cursor;
 

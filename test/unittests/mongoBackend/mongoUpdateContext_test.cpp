@@ -9350,7 +9350,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
     EXPECT_EQ(SccReceiverInternalError, RES_CER_STATUS(0).code);
     EXPECT_EQ("Internal Server Error", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("collection: unittest.entities "
-              "- query(): { _id.id: \"E1\", _id.type: \"T1\" } "
+              "- query(): { _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $exists: false } } "
               "- exception: boom!!", RES_CER_STATUS(0).details);
 
     /* Release mock */

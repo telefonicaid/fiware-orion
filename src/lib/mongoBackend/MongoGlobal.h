@@ -351,4 +351,14 @@ extern BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVec
 */
 extern bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl, Format format, std::string tenant);
 
+/* ****************************************************************************
+*
+* slashEscape - 
+*
+* When the 'to' buffer is full, slashEscape returns.
+* No warnings, no nothing.
+* Make sure 'to' is buig enough!
+*/
+extern void slashEscape(const char* from, char* to, int toLen);
+
 #endif

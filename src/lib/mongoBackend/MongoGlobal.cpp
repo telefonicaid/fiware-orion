@@ -536,6 +536,8 @@ static void fillQueryEntFalse(BSONArrayBuilder& ba, EntityId* enP, bool withType
     }
 }
 
+
+
 /* ****************************************************************************
 *
 * fillQueryEntTrue -
@@ -543,8 +545,9 @@ static void fillQueryEntFalse(BSONArrayBuilder& ba, EntityId* enP, bool withType
 static void fillQueryEntTrue(BSONArrayBuilder& ba, EntityId* enP, const std::string& servicePath)
 {
     BSONObjBuilder     ent;
-    const std::string  idString   = "_id." ENT_ENTITY_ID;
-    const std::string  typeString = "_id." ENT_ENTITY_TYPE;
+    const std::string  idString          = "_id." ENT_ENTITY_ID;
+    const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
+    const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
     ent.appendRegex(idString, enP->id);
     if (enP->type != "") {
@@ -553,10 +556,15 @@ static void fillQueryEntTrue(BSONArrayBuilder& ba, EntityId* enP, const std::str
 
     if (servicePath != "")
     {
-      const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
-      const std::string  servicePathValue  = servicePath + ".*";
-
+      char path[64];
+      slashEscape(servicePath.c_str(), path, sizeof(path));
+      const std::string  servicePathValue = std::string("^") + path + "$|" + "^" + path + "\\/.*";
       ent.appendRegex(servicePathString, servicePathValue);
+    }
+    else
+    {
+      BSONObj doesntExist = BSON("$exists" << false);
+      ent.append(servicePathString, doesntExist);
     }
 
     BSONObj entObj = ent.obj();
@@ -1444,4 +1452,31 @@ bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, st
 
     ncar.contextRegistrationResponseVector.release();
     return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* slashEscape - 
+*
+* When the 'to' buffer is full, slashEscape returns.
+* No warnings, no nothing.
+* Make sure 'to' is buig enough!
+*/
+void slashEscape(const char* from, char* to, int toLen)
+{
+  int ix = 0;
+
+  while (*from != 0)
+  {
+    if (ix >= toLen - 2)
+      return;
+
+    if (*from == '/')
+      to[ix++] = '\\';
+    to[ix++] = *from;
+    ++from;
+    to[ix] = 0;
+  }
 }
