@@ -330,7 +330,7 @@ function setNumberOfTests()
 
   if [ "$runHarness" -eq "1" ]
   then
-    for file in $(find ../testharness -name "$TEST_FILTER")
+    for file in $(find ../functionalTest/cases -name "$TEST_FILTER")
     do
       noOfTests=$noOfTests+1
     done
@@ -484,7 +484,7 @@ then
 fi
 
 #
-# No diff tool for funcTest when running from valgrind test suite
+# No diff tool for harnessTest when running from valgrind test suite
 #
 unset CB_DIFF_TOOL
 
@@ -496,7 +496,7 @@ then
     exit 1
   fi
 
-  cd $SRC_TOP/test/testharness
+  cd $SRC_TOP/test/functionalTest/cases
   vMsg TEST_FILTER: $TEST_FILTER
   for file in $(find . -name "$TEST_FILTER" | sort)
   do
@@ -513,7 +513,7 @@ then
 
     # In the case of harness test, we check that the test is implemented checking
     # that the word VALGRIND_READY apears in the .test file (usually, in a commented line)
-    grep VALGRIND_READY $SRC_TOP/test/testharness/$directory/$file > /dev/null 2>&1
+    grep VALGRIND_READY $SRC_TOP/test/functionalTest/cases/$directory/$file > /dev/null 2>&1
     if [ "$?" -ne "0" ]
     then
       printNotImplementedString $htest
@@ -528,13 +528,13 @@ then
     if [ "$dryrun" == "off" ]
     then
       vMsg "------------------------------------------------"
-      vMsg running funcTest.sh with $file in $(pwd)
+      vMsg running harnessTest.sh with $file in $(pwd)
       vMsg "------------------------------------------------"
-      VALGRIND=1 scripts/funcTest.sh --filter $file > /tmp/funcTest 2>&1
+      VALGRIND=1 test/functionalTest/testHarness.sh --filter $file > /tmp/testHarness 2>&1
       status=$?
       if [ "$status" != "0" ]
       then
-        mv /tmp/funcTest /tmp/funcTest.$file
+        mv /tmp/testHarness /tmp/testHarness.$file
         echo -n " FAILURE! functional test ended with error code $status. "
         # FIXME P4: NO EXIT here - sometimes harness tests fail under valgrind ...
       fi
@@ -545,20 +545,20 @@ then
         exit 3
       fi
 
-      mv /tmp/valgrind.out test/testharness/$directory/$htest.valgrind.out
+      mv /tmp/valgrind.out test/functionalTest/cases/$directory/$htest.valgrind.out
       
       typeset -i headEndLine1
       typeset -i headEndLine2
       vMsg processing $directory/$htest.valgrind.out in $(pwd)
       vMsg "calling processResult"
-      processResult test/testharness/$directory/$htest.valgrind.out
+      processResult test/functionalTest/cases/$directory/$htest.valgrind.out
       vMsg "called processResult"
     fi
     cd - > /dev/null
 
     if [ "$lost" != "0" ]
     then
-      failedTest "test/testharness/$htest.valgrind.*" $htest $lost
+      failedTest "test/functionalTest/cases/$htest.valgrind.*" $htest $lost
     else
       echo " " $okString
     fi
