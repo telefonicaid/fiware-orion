@@ -838,7 +838,7 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
 * processSubscriptions
 *
 */
-static bool processSubscriptions(const EntityId& en, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
+static bool processSubscriptions(const EntityId* enP, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -881,7 +881,7 @@ static bool processSubscriptions(const EntityId& en, map<string, BSONObj*>* subs
 
         /* Build entities vector */
         EntityIdVector enV;
-        enV.push_back(new EntityId(en.id, en.type, en.isPattern));
+        enV.push_back(new EntityId(enP->id, enP->type, enP->isPattern));
 
         /* Build attribute list vector */
         AttributeList attrL = subToAttributeList(sub);
@@ -1194,7 +1194,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
 * createEntity -
 *
 */
-static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string* errDetail, std::string tenant) {
+static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::string* errDetail, std::string tenant) {
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -1206,7 +1206,7 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
     ensureLocationIndex(tenant);
 
     if (!legalIdUsage(attrsV)) {
-        *errDetail = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: (" + e.toString() + ")";
+        *errDetail = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: (" + eP->toString() + ")";
         return false;
     }
 
@@ -1255,7 +1255,7 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
 
     }
 
-    BSONObj bsonId = e.type == "" ? BSON(ENT_ENTITY_ID << e.id) : BSON(ENT_ENTITY_ID << e.id << ENT_ENTITY_TYPE << e.type);
+    BSONObj bsonId = eP->type == "" ? BSON(ENT_ENTITY_ID << eP->id) : BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type);
     BSONObjBuilder insertedDocB;
     insertedDocB.append("_id", bsonId);
     insertedDocB.append(ENT_ATTRS, attrsToAdd.arr());
@@ -1359,10 +1359,10 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     LM_T(LmtServicePath, ("Service Path: '%s'", servicePath.c_str()));
 
     /* Getting the entity in the request (helpful in other places) */
-    EntityId en = ceP->entityId;
+    EntityId* enP = &ceP->entityId;
 
     /* Not supporting isPattern = true currently */
-    if (isTrue(en.isPattern)) {
+    if (isTrue(enP->isPattern)) {
         buildGeneralErrorReponse(ceP, NULL, responseP, SccNotImplemented);
         return;
     }
@@ -1377,7 +1377,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
                 buildGeneralErrorReponse(ceP, ca, responseP, SccInvalidParameter,                                   
                                    std::string("action: ") + action +
-                                      " - entity: (" + en.toString(true) + ")" +
+                                      " - entity: (" + enP->toString(true) + ")" +
                                       " - offending attribute: " + aP->toString() +
                                       " - empty attribute not allowed in APPEND or UPDATE");
                 return;
@@ -1396,35 +1396,15 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     BSONObj            doesntExist       = BSON("$exists" << false);
     BSONObjBuilder     bob;
 
-    //
-    // 4 possibilities:
-    // 1. type empty     and servicePath empty
-    // 2. type empty     and servicePath non-empty
-    // 3. type non-empty and servicePath empty
-    // 4. type non-empty and servicePath non-empty
-    //
-    if ((en.type == "") && (servicePath == ""))
-    {
-      bob.append(idString, en.id);
+    bob.append(idString, enP->id);
+
+    if (enP->type != "")
+      bob.append(typeString, enP->type);
+    
+    if (servicePath == "")
       bob.append(servicePathString, doesntExist);
-    }
-    else if ((en.type == "") && (servicePath != ""))
-    {
-      bob.append(idString, en.id);
-      bob.appendRegex(servicePathString, servicePathValue);
-    }
-    else if ((en.type != "") && (servicePath == ""))
-    {
-      bob.append(idString, en.id);
-      bob.append(typeString, en.type);
-      bob.append(servicePathString, doesntExist);
-    }
     else
-    {
-      bob.append(idString, en.id);
-      bob.append(typeString, en.type);
       bob.appendRegex(servicePathString, servicePathValue);
-    }
     
     BSONObj query = bob.obj();
 
@@ -1597,7 +1577,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
          * previous addTriggeredSubscriptions() invocations */
         std::string err;
-        processSubscriptions(en, &subsToNotify, &err, tenant);
+        processSubscriptions(enP, &subsToNotify, &err, tenant);
 
         /* To finish with this entity processing, add the corresponding ContextElementResponse to
          * the global response */
@@ -1611,13 +1591,13 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
         if (strcasecmp(action.c_str(), "append") != 0) {
             /* Only APPEND can create entities, thus error is returned in UPDATE or DELETE cases */
-            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, en.id);
+            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
         }
         else {            
 
             /* Creating the part of the response that doesn't depend on success or failure */
             ContextElementResponse* cerP = new ContextElementResponse();
-            cerP->contextElement.entityId.fill(en.id, en.type, "false");
+            cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
             for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                 ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
                 ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);                
@@ -1626,7 +1606,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             }
 
             std::string errReason, errDetail;
-            if (!createEntity(en, ceP->contextAttributeVector, &errDetail, tenant)) {
+            if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant)) {
                cerP->statusCode.fill(SccInvalidParameter, errDetail);
             }
             else {
@@ -1636,13 +1616,13 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 std::map<string, BSONObj*> subsToNotify;
                 for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                     std::string err;
-                    if (!addTriggeredSubscriptions(en.id, en.type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err, tenant)) {
+                    if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err, tenant)) {
                         cerP->statusCode.fill(SccReceiverInternalError, err);
                         responseP->contextElementResponseVector.push_back(cerP);
                         LM_RVE((err.c_str()));
                     }
                 }
-                processSubscriptions(en, &subsToNotify, &errReason, tenant);
+                processSubscriptions(enP, &subsToNotify, &errReason, tenant);
             }
             responseP->contextElementResponseVector.push_back(cerP);
         }
