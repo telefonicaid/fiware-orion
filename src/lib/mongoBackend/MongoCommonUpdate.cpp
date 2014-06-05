@@ -1386,7 +1386,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     }
 
     /* Find entities (could be several, in the case of no type or isPattern=true) */
-    char               path[64];
+    char               path[MAX_SERVICE_NAME_LEN];
     slashEscape(servicePath.c_str(), path, sizeof(path));
 
     const std::string  idString          = "_id." ENT_ENTITY_ID;

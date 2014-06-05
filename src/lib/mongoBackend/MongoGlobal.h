@@ -123,11 +123,16 @@ using namespace mongo;
 
 /*****************************************************************************
 *
+* MAX_SERVICE_NAME_LEN
+*/
+#define MAX_SERVICE_NAME_LEN 1024
+
+/*****************************************************************************
+*
 * Macro to ease extracting fields from BSON objects
 */
 #define STR_FIELD(i, sf) std::string(i.getStringField(sf))
 #define C_STR_FIELD(i, sf) i.getStringField(sf)
-
 
 /*****************************************************************************
 *
@@ -357,8 +362,8 @@ extern bool processAvailabilitySubscription(EntityIdVector enV, AttributeList at
 *
 * When the 'to' buffer is full, slashEscape returns.
 * No warnings, no nothing.
-* Make sure 'to' is buig enough!
+* Make sure 'to' is big enough!
 */
-extern void slashEscape(const char* from, char* to, int toLen);
+extern void slashEscape(const char* from, char* to, unsigned int toLen);
 
 #endif

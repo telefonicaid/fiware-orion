@@ -525,6 +525,12 @@ bool includedAttribute(ContextAttribute attr, AttributeList* attrsV) {
 /* ****************************************************************************
 *
 * fillQueryEntity -
+*
+* The regular expression for servicePath is an OR between the exact path and
+* the exact path followed by a slash ('/') and after that, any text (including slashes)
+*
+* If the servicePath is empty, then we only look for entities that have no service path 
+* associated ("$exists: false").
 */
 static void fillQueryEntity(BSONArrayBuilder& ba, EntityId* enP, const std::string& servicePath)
 {
@@ -543,7 +549,7 @@ static void fillQueryEntity(BSONArrayBuilder& ba, EntityId* enP, const std::stri
 
   if (servicePath != "")
   {
-    char path[64];
+    char path[MAX_SERVICE_NAME_LEN];
     slashEscape(servicePath.c_str(), path, sizeof(path));
     const std::string  servicePathValue = std::string("^") + path + "$|" + "^" + path + "\\/.*";
     ent.appendRegex(servicePathString, servicePathValue);
@@ -1413,16 +1419,34 @@ bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, st
 
 /* ****************************************************************************
 *
-* slashEscape - 
+* slashEscape - escape all slashes in 'from' into 'to'
 *
-* When the 'to' buffer is full, slashEscape returns.
-* No warnings, no nothing.
-* Make sure 'to' is buig enough!
+* If the 'to' buffer is not big enough, slashEscape returns with to's content set to 'ERROR'.
 */
-void slashEscape(const char* from, char* to, int toLen)
+void slashEscape(const char* from, char* to, unsigned int toLen)
 {
-  int ix = 0;
+  unsigned int ix      = 0;
+  unsigned int slashes = 0;
 
+  // 1. count number of slashes, to help to decide whether to return ERROR or not
+  while (from[ix] != 0)
+  {
+    if (from[ix] == '/')
+      ++slashes;
+
+    ++ix;
+  }
+  
+  // 2. If the escaped version of 'from' doesn't fit inside 'to', return ERROR as string
+  if ((strlen(from) + slashes + 1) > toLen)
+  {
+    strncpy(to, "ERROR", toLen);
+    return;
+  } 
+
+
+  // 3. Copy 'in' to 'from', including escapes for '/'
+  ix = 0;
   while (*from != 0)
   {
     if (ix >= toLen - 2)
