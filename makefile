@@ -414,6 +414,5 @@ sonar_metrics: coverage
 	scripts/build/sonarProperties.sh $(BROKER_VERSION) > sonar-project.properties 
 	cd BUILD_COVERAGE/src && gcovr --gcov-exclude='.*parseArgs.*' --gcov-exclude='.*logMsg.*' -x -o ../../coverage_sonar.xml && cd ../../
 	cppcheck --xml -j 8 --enable=all -I src/lib/ -i src/lib/parseArgs -i src/lib/logMsg src/ 2>cppcheck-result.xml
-	rm sonar-project.properties
 
 .PHONY: rpm mock mock32 mock64 valgrind
