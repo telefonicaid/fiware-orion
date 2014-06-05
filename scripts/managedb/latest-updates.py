@@ -52,9 +52,9 @@ if 4 <= len(argv) <= 5:
     max = int(argv[3])
 else:
     print 'Wrong number of arguments'
-    print '   Usage:   ./lastest-updates.py <entities|attributes> <db> <limit> [entity_filter] '
-    print '   Example  ./lastest-updates.py entities orion 10'
-    print '   Example  ./lastest-updates.py entities orion 10 TEST_SENSOR'
+    print '   Usage:   ./latest-updates.py <entities|attributes> <db> <limit> [entity_filter] '
+    print '   Example  ./latest-updates.py entities orion 10'
+    print '   Example  ./latest-updates.py entities orion 10 TEST_SENSOR'
     exit(1)
 
 # Optional argument: filter

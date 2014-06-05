@@ -117,7 +117,7 @@ cp LICENSE $RPM_BUILD_ROOT/usr/share/doc/contextBroker
 cp scripts/testEnv.sh scripts/testHarness.sh scripts/testDiff.py $RPM_BUILD_ROOT/usr/share/contextBroker/tests 
 cp scripts/accumulator-server.py $RPM_BUILD_ROOT/usr/share/contextBroker/tests 
 cp scripts/managedb/garbage-collector.py $RPM_BUILD_ROOT/usr/share/contextBroker
-cp scripts/managedb/lastest-updates.py $RPM_BUILD_ROOT/usr/share/contextBroker
+cp scripts/managedb/latest-updates.py $RPM_BUILD_ROOT/usr/share/contextBroker
 cp etc/init.d/contextBroker.centos $RPM_BUILD_ROOT/etc/init.d/%{name}
 chmod 755 $RPM_BUILD_ROOT/etc/init.d/%{name}
 mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
