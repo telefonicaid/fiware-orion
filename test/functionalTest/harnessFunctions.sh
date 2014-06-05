@@ -694,6 +694,7 @@ export -f accumulatorStop
 export -f curlXml
 export -f curlIt
 export -f curlJson
+export -f orionCurl
 export -f printXmlWithHeaders
 export -f printJsonWithHeaders
 export -f curlXmlNoPayload
