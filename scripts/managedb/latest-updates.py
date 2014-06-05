@@ -28,6 +28,12 @@ from sys import argv
 # just changing the following variable to 'creDate'
 refDate = 'modDate'
 
+def entityString(entity):
+    s = entity['id']
+    if (entity.has_key('type')):
+        s += ' (' + entity['type'] + ')'
+    return s
+
 def printAttrs(attrHash, max):
     # Given that each entity can have N attributes where N can be greater than 1, we need to add a second level
     # of limit control (beyong the ".limit(max)" in the mongo query)
@@ -46,9 +52,9 @@ if 4 <= len(argv) <= 5:
     max = int(argv[3])
 else:
     print 'Wrong number of arguments'
-    print '   Usage:   ./lastest-updates.py <entities|attributes> <db> <limit> [entity_filter] '
-    print '   Example  ./lastest-updates.py entities orion 10'
-    print '   Example  ./lastest-updates.py entities orion 10 TEST_SENSOR'
+    print '   Usage:   ./latest-updates.py <entities|attributes> <db> <limit> [entity_filter] '
+    print '   Example  ./latest-updates.py entities orion 10'
+    print '   Example  ./latest-updates.py entities orion 10 TEST_SENSOR'
     exit(1)
 
 # Optional argument: filter
@@ -64,19 +70,17 @@ if type == 'entities':
     for doc in col.find(query).sort(refDate, direction=DESCENDING).limit(max):
         date = int(doc[refDate])
         dateString = datetime.fromtimestamp(date).strftime('%Y-%m-%d %H:%M:%S')
-        entityString = doc['_id']['id'] + ' (' + doc['_id']['type'] + ')'
-        print '-- ' + dateString + ': ' + entityString
+        print '-- ' + dateString + ': ' + entityString(doc['_id'])
 elif type == 'attributes':
     # Attributes are stored in a hash. The key of the hash is the modification date, so it is actually a 
     # hash of lists (due to several attributes could have the same modification date)
     attrHash = { } 
     query['attrs.' + refDate] = {'$exists': True}
     for doc in col.find(query).sort(refDate, direction=DESCENDING).limit(max):
-        entityString = doc['_id']['id'] + ' (' + doc['_id']['type'] + ')'
         for attr in doc['attrs']:
            if attr.has_key(refDate):
               date = int(attr[refDate])
-              attrString = attr['name'] + ' - ' + entityString
+              attrString = attr['name'] + ' - ' + entityString(doc['_id'])
               if attrHash.has_key(date):
                   attrHash[date].append(attrString)
               else:
