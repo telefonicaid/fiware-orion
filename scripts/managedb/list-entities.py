@@ -39,6 +39,10 @@ def entityString(entity):
 # just changing the following variable to 'creDate'
 refDate = 'modDate'
 
+if argv[1] == "-u": 
+    usage()
+    exit(0)
+
 if 3 <= len(argv) <= 4:
     db = argv[1]
     range = argv[2]
