@@ -659,7 +659,7 @@ function orionCurl()
     _URL=$_host:$_port$_url
   fi
   
-  _BUILTINS='-s -S -H "Connection: Close" --dump-header /tmp/httpHeaders.out'
+  _BUILTINS='-s -S --dump-header /tmp/httpHeaders.out'
 #   echo '==============================================================================================================================================================='
 #   echo "echo $_payload | curl $_URL $_PAYLOAD $_METHOD --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\" $HTTP_TENANT $_BUILTINS $_xtra"
 #   echo '==============================================================================================================================================================='
@@ -680,7 +680,10 @@ function orionCurl()
   elif [ "$_outFormat" == application/json ]
   then
     echo $_response | python -mjson.tool
+  else
+    echo $_response | xmllint --format -
   fi
+  
 }
 
 export -f dbInit
