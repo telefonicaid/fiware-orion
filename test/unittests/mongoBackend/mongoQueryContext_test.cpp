@@ -353,6 +353,9 @@ static void prepareDatabaseWithServicePath(void)
    * - E8:  { Type: T, ServicePath: /home2/kz,    Attribute: { A1, a8  } }
    * - E9:  { Type: T, ServicePath: "",           Attribute: { A1, a9  } }
    * - E10: { Type: T, ServicePath: NO,           Attribute: { A1, a10 } }
+   * - E11: { Type: T, ServicePath: /home3/e11,   Attribute: { A1, a11 } }
+   * - E12: { Type: T, ServicePath: /home3/e12,   Attribute: { A1, a12 } }
+   * - E13: { Type: T, ServicePath: /home3/e13,   Attribute: { A1, a13 } }
    *
    */
 
@@ -468,10 +471,20 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType)
 
 /* ****************************************************************************
 *
+* queryWithIdenticalEntitiesButDifferentServicePaths -
+*/
+TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePaths)
+{
+  EXPECT_STREQ("To implement", "In feature/392");
+}
+
+/* ****************************************************************************
+*
 * queryWithServicePathEntPatternNoType -
 */
 TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType)
 {
+  EXPECT_STREQ("To implement", "In feature/392");
 }
 
 /* ****************************************************************************
@@ -480,6 +493,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType)
 */
 TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternType)
 {
+  EXPECT_STREQ("To implement", "In feature/392");
 }
 
 /* ****************************************************************************
@@ -488,6 +502,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternType)
 */
 TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternNoType)
 {
+  EXPECT_STREQ("To implement", "In feature/392");
 }
 
 /* ****************************************************************************

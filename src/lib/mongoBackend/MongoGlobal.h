@@ -364,6 +364,6 @@ extern bool processAvailabilitySubscription(EntityIdVector enV, AttributeList at
 * No warnings, no nothing.
 * Make sure 'to' is big enough!
 */
-extern void slashEscape(const char* from, char* to, int toLen);
+extern void slashEscape(const char* from, char* to, unsigned int toLen);
 
 #endif
