@@ -541,6 +541,12 @@ static void fillQueryEntFalse(BSONArrayBuilder& ba, EntityId* enP, bool withType
 /* ****************************************************************************
 *
 * fillQueryEntTrue -
+*
+* The regular expression for servicePath is an OR between the exact path and
+* the exact path followed by a slash ('/') and after that, any text (including slashes)
+*
+* If the servicePath is empty, then we only look for entities that have no service path 
+* associated ("$exists: false").
 */
 static void fillQueryEntTrue(BSONArrayBuilder& ba, EntityId* enP, const std::string& servicePath)
 {
@@ -556,7 +562,7 @@ static void fillQueryEntTrue(BSONArrayBuilder& ba, EntityId* enP, const std::str
 
     if (servicePath != "")
     {
-      char path[64];
+      char path[MAX_SERVICE_NAME_LEN];
       slashEscape(servicePath.c_str(), path, sizeof(path));
       const std::string  servicePathValue = std::string("^") + path + "$|" + "^" + path + "\\/.*";
       ent.appendRegex(servicePathString, servicePathValue);
@@ -1462,7 +1468,7 @@ bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, st
 *
 * When the 'to' buffer is full, slashEscape returns.
 * No warnings, no nothing.
-* Make sure 'to' is buig enough!
+* Make sure 'to' is big enough!
 */
 void slashEscape(const char* from, char* to, int toLen)
 {
