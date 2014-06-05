@@ -2018,8 +2018,9 @@ TEST(mongoQueryContextRequest, mongoDbQueryFail)
 
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
+
     EXPECT_EQ("collection: unittest.entities - "
-              "query(): { $or: [ { _id: { $in: [ { id: \"E1\", type: \"T1\" } ] } } ] } - "
+              "query(): { $or: [ { _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $exists: false } } ] } - "
               "exception: boom!!", res.errorCode.details);
     EXPECT_EQ(0,res.contextElementResponseVector.size());
 

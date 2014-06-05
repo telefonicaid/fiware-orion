@@ -520,57 +520,44 @@ bool includedAttribute(ContextAttribute attr, AttributeList* attrsV) {
     return false;
 }
 
-/* ****************************************************************************
-*
-* fillQueryEntFalse -
-*/
-static void fillQueryEntFalse(BSONArrayBuilder& ba, EntityId* enP, bool withType) {
-
-    if (withType) {
-        ba.append(BSON(ENT_ENTITY_ID << enP->id << ENT_ENTITY_TYPE << enP->type));
-        LM_T(LmtMongo, ("Entity query token (isPattern=false): {id: %s, type: %s}", enP->id.c_str(), enP->type.c_str()));
-    }
-    else {
-        ba.append(enP->id);
-        LM_T(LmtMongo, ("Entity query token (isPattern=false): {id: %s}", enP->id.c_str()));
-    }
-}
-
 
 
 /* ****************************************************************************
 *
-* fillQueryEntTrue -
+* fillQueryEntity -
 */
-static void fillQueryEntTrue(BSONArrayBuilder& ba, EntityId* enP, const std::string& servicePath)
+static void fillQueryEntity(BSONArrayBuilder& ba, EntityId* enP, const std::string& servicePath)
 {
-    BSONObjBuilder     ent;
-    const std::string  idString          = "_id." ENT_ENTITY_ID;
-    const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
-    const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
+  BSONObjBuilder     ent;
+  const std::string  idString          = "_id." ENT_ENTITY_ID;
+  const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
+  const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
+  if (enP->isPattern == "true")
     ent.appendRegex(idString, enP->id);
-    if (enP->type != "") {
-        ent.append(typeString, enP->type);
-    }
+  else
+    ent.append(idString, enP->id);
 
-    if (servicePath != "")
-    {
-      char path[64];
-      slashEscape(servicePath.c_str(), path, sizeof(path));
-      const std::string  servicePathValue = std::string("^") + path + "$|" + "^" + path + "\\/.*";
-      ent.appendRegex(servicePathString, servicePathValue);
-    }
-    else
-    {
-      BSONObj doesntExist = BSON("$exists" << false);
-      ent.append(servicePathString, doesntExist);
-    }
+  if (enP->type != "")
+    ent.append(typeString, enP->type);
 
-    BSONObj entObj = ent.obj();
-    ba.append(entObj);
+  if (servicePath != "")
+  {
+    char path[64];
+    slashEscape(servicePath.c_str(), path, sizeof(path));
+    const std::string  servicePathValue = std::string("^") + path + "$|" + "^" + path + "\\/.*";
+    ent.appendRegex(servicePathString, servicePathValue);
+  }
+  else
+  {
+    BSONObj doesntExist = BSON("$exists" << false);
+    ent.append(servicePathString, doesntExist);
+  }
 
-    LM_T(LmtMongo, ("Entity query token (isPattern=true): '%s'", entObj.toString().c_str()));
+  BSONObj entObj = ent.obj();
+  ba.append(entObj);
+
+  LM_T(LmtMongo, ("Entity query token: '%s'", entObj.toString().c_str()));
 }
 
 /* ****************************************************************************
@@ -760,41 +747,9 @@ bool entitiesQuery
     BSONArrayBuilder entFalseWType;
     BSONArrayBuilder entFalseWOType;
     for (unsigned int ix = 0; ix < enV.size(); ++ix)
-    {
-        if (isTrue(enV.get(ix)->isPattern))
-        {
-            /* Part 1.1: add from 0 to N objects (in entTrue) to the $or array for entities
-             * with isPatter=true. Note we are using the builder for the $or vector itself,
-             * as in this case entities can be "directly" inserted. For the other two parts, we
-             * just accumulate in this loop, as they need additional BSON composition before be
-             * inserted in the $or array */
-            fillQueryEntTrue(orEnt, enV.get(ix), servicePath);
-        }
-        else {
-            /* Accumulating for later BSON composition (Part 1.2 and Part 1.3 below)*/
-            if (enV.get(ix)->type == "") {
-                fillQueryEntFalse(entFalseWOType, enV.get(ix), false);
-            }
-            else {
-                fillQueryEntFalse(entFalseWType, enV.get(ix), true);
-            }
-        }
-    }
+      fillQueryEntity(orEnt, enV.get(ix), servicePath);
 
-    /* Part 1.2: add up to one object in the $or array for entities isPattern=false with type
-     * (check size to avoid "{ _id: { $in: {} } }" that would make the query fail) */
-    if (entFalseWType.arrSize() > 0) {
-        orEnt.append(BSON("_id" << BSON("$in" << entFalseWType.arr())));
-    }
-
-    /* Part 1.3: add up to one object to the $or array for entities isPattern=false without type
-     * (check size to avoid "{ _id: { $in: {} } }" that would make the query fail) */
-    if (entFalseWOType.arrSize() > 0) {
-        std::string idId = "_id." ENT_ENTITY_ID;
-        orEnt.append(BSON(idId << BSON("$in" << entFalseWOType.arr())));
-    }
-
-    /* Finally the result of the 3 parts is appended to the final query */
+    /* The result of orEnt is appended to the final query */
     finalQuery.append("$or", orEnt.arr());
 
     /* Part 2: attributes */
