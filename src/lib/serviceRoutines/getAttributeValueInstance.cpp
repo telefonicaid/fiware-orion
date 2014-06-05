@@ -41,7 +41,7 @@
 *
 * GET /ngsi10/contextEntities/{entityID}/attributes/{attributeName}/{valueID}
 */
-std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   QueryContextRequest      request;
   QueryContextResponse     response;
@@ -55,7 +55,7 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   request.entityIdVector.push_back(eP);
   request.attributeList.push_back(attributeName);
 
-  ciP->httpStatusCode = mongoQueryContext(&request, &response);
+  ciP->httpStatusCode = mongoQueryContext(&request, &response, ciP->tenant);
 
   if (response.contextElementResponseVector.size() == 0)
   {

@@ -36,18 +36,18 @@
 *
 * mongoGetContextSubscriptionInfo -
 */
-extern HttpStatusCode mongoGetContextSubscriptionInfo(std::string subId, ContextSubscriptionInfo* csiP, std::string* err);
+extern HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, ContextSubscriptionInfo* csiP, std::string* err, const std::string& tenant = "");
 
 /* ****************************************************************************
 *
 * mongoGetContextElementResponses -
 */
-extern HttpStatusCode mongoGetContextElementResponses(EntityIdVector enV, AttributeList attrL, ContextElementResponseVector* cerV, std::string* err);
+extern HttpStatusCode mongoGetContextElementResponses(const EntityIdVector& enV, const AttributeList& attrL, ContextElementResponseVector* cerV, std::string* err, const std::string& tenant = "");
 
 /* ****************************************************************************
 *
 * mongoUpdateCsubNewNotification -
 */
-extern HttpStatusCode mongoUpdateCsubNewNotification(std::string subId, std::string* err);
+extern HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::string* err, const std::string& tenant = "");
 
 #endif

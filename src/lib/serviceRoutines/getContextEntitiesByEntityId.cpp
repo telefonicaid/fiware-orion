@@ -41,7 +41,7 @@
 *
 * getContextEntitiesByEntityId - 
 */
-std::string getContextEntitiesByEntityId(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string getContextEntitiesByEntityId(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string                          entityId = compV[2];
   std::string                          answer;
@@ -49,7 +49,7 @@ std::string getContextEntitiesByEntityId(ConnectionInfo* ciP, int components, st
 
   LM_T(LmtConvenience, ("CONVENIENCE: got a 'GET' request for entityId '%s'", entityId.c_str()));
 
-  ciP->httpStatusCode = mapGetContextEntitiesByEntityId(entityId, &response);
+  ciP->httpStatusCode = mapGetContextEntitiesByEntityId(entityId, &response, ciP);
   answer = response.render(DiscoverContextAvailability, ciP->outFormat, "");
   response.release();
 

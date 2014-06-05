@@ -37,7 +37,7 @@ using namespace mongo;
 *
 * mongoSetFwdRegId -
 */
-void mongoSetFwdRegId(std::string regId, std::string fwdRegId)
+void mongoSetFwdRegId(const std::string& regId, const std::string& fwdRegId, const std::string& tenant)
 {
     reqSemTake(__FUNCTION__, "Mongo Set Forward RegId");
 
@@ -48,11 +48,11 @@ void mongoSetFwdRegId(std::string regId, std::string fwdRegId)
     try {
         BSONObj updateQuery = BSON("$set" << BSON(REG_FWS_REGID << fwdRegId));
         LM_T(LmtMongo, ("update() in '%s' collection doc _id '%s': %s",
-                        getRegistrationsCollectionName(),
+                        getRegistrationsCollectionName(tenant).c_str(),
                         regId.c_str(), updateQuery.toString().c_str()));
 
         mongoSemTake(__FUNCTION__, "update in RegistrationsCollection");
-        connection->update(getRegistrationsCollectionName(), BSON("_id" << OID(regId)), updateQuery);
+        connection->update(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << OID(regId)), updateQuery);
         mongoSemGive(__FUNCTION__, "update in RegistrationsCollection");
     }
     catch( const DBException &e ) {
@@ -75,7 +75,7 @@ void mongoSetFwdRegId(std::string regId, std::string fwdRegId)
 *
 * mongoGetFwdRegId -
 */
-std::string mongoGetFwdRegId(std::string regId)
+std::string mongoGetFwdRegId(const std::string& regId, const std::string& tenant)
 {
     std::string retVal = "";
 
@@ -86,11 +86,11 @@ std::string mongoGetFwdRegId(std::string regId)
     DBClientConnection* connection = getMongoConnection();
 
     try {
-        LM_T(LmtMongo, ("findOne() in '%s' collection doc _id '%s'", getRegistrationsCollectionName(), regId.c_str()));
+        LM_T(LmtMongo, ("findOne() in '%s' collection doc _id '%s'", getRegistrationsCollectionName(tenant).c_str(), regId.c_str()));
         BSONObj doc;
 
         mongoSemTake(__FUNCTION__, "findOne in RegistrationsCollection");
-        doc = connection->findOne(getRegistrationsCollectionName(), BSON("_id" << OID(regId)));
+        doc = connection->findOne(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << OID(regId)));
         mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection");
 
         LM_T(LmtMongo, ("reg doc: '%s'", doc.toString().c_str()));
@@ -113,4 +113,3 @@ std::string mongoGetFwdRegId(std::string regId)
 
     return retVal;
 }
-

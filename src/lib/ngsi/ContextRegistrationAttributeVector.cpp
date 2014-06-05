@@ -36,7 +36,7 @@
 *
 * ContextRegistrationAttributeVector::render - 
 */
-std::string ContextRegistrationAttributeVector::render(Format format, std::string indent, bool comma)
+std::string ContextRegistrationAttributeVector::render(Format format, const std::string& indent, bool comma)
 {
   std::string xmlTag   = "contextRegistrationAttributeList";
   std::string jsonTag  = "attributes";
@@ -59,7 +59,7 @@ std::string ContextRegistrationAttributeVector::render(Format format, std::strin
 *
 * ContextRegistrationAttributeVector::check - 
 */
-std::string ContextRegistrationAttributeVector::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ContextRegistrationAttributeVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -78,7 +78,7 @@ std::string ContextRegistrationAttributeVector::check(RequestType requestType, F
 *
 * ContextRegistrationAttributeVector::present - 
 */
-void ContextRegistrationAttributeVector::present(std::string indent)
+void ContextRegistrationAttributeVector::present(const std::string& indent)
 {
    PRINTF("%lu ContextRegistrationAttributes", (unsigned long) vec.size());
 

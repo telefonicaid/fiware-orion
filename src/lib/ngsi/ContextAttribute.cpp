@@ -81,7 +81,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
 *
 * ContextAttribute::ContextAttribute - 
 */
-ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::string _value)
+ContextAttribute::ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value)
 {
    LM_T(LmtClone, ("Creating a ContextAttribute '%s':'%s':'%s', setting its compound to NULL", _name.c_str(), _type.c_str(), _value.c_str()));
    name                  = _name;
@@ -95,7 +95,7 @@ ContextAttribute::ContextAttribute(std::string _name, std::string _type, std::st
 *
 * ContextAttribute::ContextAttribute -
 */
-ContextAttribute::ContextAttribute(std::string _name, std::string _type, orion::CompoundValueNode* _compoundValueP)
+ContextAttribute::ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP)
 {
   LM_T(LmtClone, ("Creating a ContextAttribute, maintaing a pointer to compound value (at %p)", _compoundValueP));
 
@@ -137,7 +137,7 @@ std::string ContextAttribute::getLocation()
 *
 * render - 
 */
-std::string ContextAttribute::render(Format format, std::string indent, bool comma)
+std::string ContextAttribute::render(Format format, const std::string& indent, bool comma)
 {
   std::string  out                    = "";
   std::string  xmlTag                 = "contextAttribute";
@@ -166,7 +166,7 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
 
     out += startTag(indent + "  ", "contextValue", "value", format, isCompoundVector, true, isCompoundVector);
     out += compoundValueP->render(format, indent + "    ");
-    out += endTag(indent + "  ", "contextValue", format, comma, isCompoundVector);
+    out += endTag(indent + "  ", "contextValue", format, commaAfterContextValue, isCompoundVector);
   }
 
   out += metadataVector.render(format, indent + "  ", false);
@@ -181,23 +181,27 @@ std::string ContextAttribute::render(Format format, std::string indent, bool com
 *
 * ContextAttribute::check - 
 */
-std::string ContextAttribute::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ContextAttribute::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
-  if ((name == "") || (name == "not in use"))
+  if (name == "")
     return "missing attribute name";
 
-  if (compoundValueP != NULL)
+  if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0))
   {
     // FIXME P9: Use CompoundValueNode::check here and stop calling it from where it is called right now.
     //           Also, change CompoundValueNode::check to return std::string
     return "OK";
   }
 
-  if (requestType != UpdateContext) // FIXME P9: this is just to make harness test work - what is this?
+  // For ngsi10 updateContextRequest, the check of empty context attribute values is made by
+  // the mongoBackend layer, thus is skipped here.
+  // The reason is that in a later stage we have more info to return to the caller in case of errors
+  if (requestType != UpdateContext) // FIXME P9: Issue "old95" about moving checkings from mongoBackend to "external layers" in general
   {
-    if ((value == "") || (value == "not in use"))
+    if (value == "")
       return "missing attribute value";
   }
+  
 
   return "OK";
 }
@@ -208,7 +212,7 @@ std::string ContextAttribute::check(RequestType requestType, Format format, std:
 *
 * ContextAttribute::present - 
 */
-void ContextAttribute::present(std::string indent, int ix)
+void ContextAttribute::present(const std::string& indent, int ix)
 {
   PRINTF("%sAttribute %d:\n",    indent.c_str(), ix);
   PRINTF("%s  Name:       %s\n", indent.c_str(), name.c_str());

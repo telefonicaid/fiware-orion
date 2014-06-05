@@ -44,7 +44,7 @@
 *
 * Payload: UpdateContextAttributeRequest
 */
-std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   UpdateContextRequest            request;
   UpdateContextResponse           response;
@@ -100,7 +100,7 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   request.updateActionType.set("UPDATE");
 
   response.errorCode.code = SccNone;
-  ciP->httpStatusCode = mongoUpdateContext(&request, &response);
+  ciP->httpStatusCode = mongoUpdateContext(&request, &response, ciP->tenant);
   
   StatusCode statusCode;
   if (response.contextElementResponseVector.size() == 0)

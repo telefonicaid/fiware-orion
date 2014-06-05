@@ -109,6 +109,8 @@ extern bool       paBug;
 extern bool       paBuf;
 extern bool       paDoubt;
 
+extern bool       paSilent;
+
 extern bool       paMsgsToStdout;
 extern bool       paMsgsToStderr;
 

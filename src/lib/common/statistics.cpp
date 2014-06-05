@@ -106,59 +106,59 @@ int noOfRtSubscribeError                                 = -1;
 */
 void statisticsUpdate(RequestType request, Format inFormat)
 {
-   if (inFormat == XML)     ++noOfXmlRequests;
-   if (inFormat == JSON)    ++noOfJsonRequests;
+  if (inFormat == XML)     ++noOfXmlRequests;
+  if (inFormat == JSON)    ++noOfJsonRequests;
 
-   switch (request)
-   {
-   case RegisterContext:                            ++noOfRegistrations; break;
-   case DiscoverContextAvailability:                ++noOfDiscoveries; break;
-   case SubscribeContextAvailability:               ++noOfAvailabilitySubscriptions; break;
-   case UpdateContextAvailabilitySubscription:      ++noOfAvailabilitySubscriptionUpdates; break;
-   case UnsubscribeContextAvailability:             ++noOfAvailabilityUnsubscriptions; break;
-   case NotifyContextAvailability:                  ++noOfAvailabilityNotificationsReceived; break;
+  switch (request)
+  {
+  case RegisterContext:                            ++noOfRegistrations; break;
+  case DiscoverContextAvailability:                ++noOfDiscoveries; break;
+  case SubscribeContextAvailability:               ++noOfAvailabilitySubscriptions; break;
+  case UpdateContextAvailabilitySubscription:      ++noOfAvailabilitySubscriptionUpdates; break;
+  case UnsubscribeContextAvailability:             ++noOfAvailabilityUnsubscriptions; break;
+  case NotifyContextAvailability:                  ++noOfAvailabilityNotificationsReceived; break;
 
-   case QueryContext:                               ++noOfQueries; break;
-   case SubscribeContext:                           ++noOfSubscriptions; break;
-   case UpdateContextSubscription:                  ++noOfSubscriptionUpdates; break;
-   case UnsubscribeContext:                         ++noOfUnsubscriptions; break;
-   case NotifyContext:                              ++noOfNotificationsReceived; break;
-   case UpdateContext:                              ++noOfUpdates; break;
+  case QueryContext:                               ++noOfQueries; break;
+  case SubscribeContext:                           ++noOfSubscriptions; break;
+  case UpdateContextSubscription:                  ++noOfSubscriptionUpdates; break;
+  case UnsubscribeContext:                         ++noOfUnsubscriptions; break;
+  case NotifyContext:                              ++noOfNotificationsReceived; break;
+  case UpdateContext:                              ++noOfUpdates; break;
 
-   case ContextEntitiesByEntityId:                  ++noOfContextEntitiesByEntityId; break;
-   case ContextEntityAttributes:                    ++noOfContextEntityAttributes; break;
-   case EntityByIdAttributeByName:                  ++noOfEntityByIdAttributeByName; break;
-   case ContextEntityTypes:                         ++noOfContextEntityTypes; break;
-   case ContextEntityTypeAttributeContainer:        ++noOfContextEntityTypeAttributeContainer; break;
-   case ContextEntityTypeAttribute:                 ++noOfContextEntityTypeAttribute; break;
-   case IndividualContextEntity:                    ++noOfIndividualContextEntity; break;
-   case IndividualContextEntityAttributes:          ++noOfIndividualContextEntityAttributes; break;
-   case AttributeValueInstance:                     ++noOfAttributeValueInstance; break;
-   case IndividualContextEntityAttribute:           ++noOfIndividualContextEntityAttribute; break;
-   case Ngsi9SubscriptionsConvOp:                   ++noOfNgsi9SubscriptionsConvOp; break;
+  case ContextEntitiesByEntityId:                  ++noOfContextEntitiesByEntityId; break;
+  case ContextEntityAttributes:                    ++noOfContextEntityAttributes; break;
+  case EntityByIdAttributeByName:                  ++noOfEntityByIdAttributeByName; break;
+  case ContextEntityTypes:                         ++noOfContextEntityTypes; break;
+  case ContextEntityTypeAttributeContainer:        ++noOfContextEntityTypeAttributeContainer; break;
+  case ContextEntityTypeAttribute:                 ++noOfContextEntityTypeAttribute; break;
+  case IndividualContextEntity:                    ++noOfIndividualContextEntity; break;
+  case IndividualContextEntityAttributes:          ++noOfIndividualContextEntityAttributes; break;
+  case AttributeValueInstance:                     ++noOfAttributeValueInstance; break;
+  case IndividualContextEntityAttribute:           ++noOfIndividualContextEntityAttribute; break;
+  case Ngsi9SubscriptionsConvOp:                   ++noOfNgsi9SubscriptionsConvOp; break;
 
-   case UpdateContextElement:                       ++noOfUpdateContextElement; break;
-   case AppendContextElement:                       ++noOfAppendContextElement; break;
-   case UpdateContextAttribute:                     ++noOfUpdateContextAttribute; break;
-   case Ngsi10ContextEntityTypes:                   ++noOfNgsi10ContextEntityTypes; break;
-   case Ngsi10ContextEntityTypesAttributeContainer: ++noOfNgsi10ContextEntityTypesAttributeContainer; break;
-   case Ngsi10ContextEntityTypesAttribute:          ++noOfNgsi10ContextEntityTypesAttribute; break;
-   case Ngsi10SubscriptionsConvOp:                  ++noOfNgsi10SubscriptionsConvOp; break;
+  case UpdateContextElement:                       ++noOfUpdateContextElement; break;
+  case AppendContextElement:                       ++noOfAppendContextElement; break;
+  case UpdateContextAttribute:                     ++noOfUpdateContextAttribute; break;
+  case Ngsi10ContextEntityTypes:                   ++noOfNgsi10ContextEntityTypes; break;
+  case Ngsi10ContextEntityTypesAttributeContainer: ++noOfNgsi10ContextEntityTypesAttributeContainer; break;
+  case Ngsi10ContextEntityTypesAttribute:          ++noOfNgsi10ContextEntityTypesAttribute; break;
+  case Ngsi10SubscriptionsConvOp:                  ++noOfNgsi10SubscriptionsConvOp; break;
 
-   case LogRequest:                                 ++noOfLogRequests; break;
-   case VersionRequest:                             ++noOfVersionRequests; break;
-   case ExitRequest:                                ++noOfExitRequests; break;
-   case LeakRequest:                                ++noOfLeakRequests; break;
-   case StatisticsRequest:                          ++noOfStatisticsRequests; break;
+  case LogRequest:                                 ++noOfLogRequests; break;
+  case VersionRequest:                             ++noOfVersionRequests; break;
+  case ExitRequest:                                ++noOfExitRequests; break;
+  case LeakRequest:                                ++noOfLeakRequests; break;
+  case StatisticsRequest:                          ++noOfStatisticsRequests; break;
 
-   case InvalidRequest:                             ++noOfInvalidRequests; break;
-   case RegisterResponse:                           ++noOfRegisterResponses; break;
+  case InvalidRequest:                             ++noOfInvalidRequests; break;
+  case RegisterResponse:                           ++noOfRegisterResponses; break;
 
-   case RtSubscribeContextAvailabilityResponse:           ++noOfRtSubscribeContextAvailabilityResponse; break;
-   case RtUpdateContextAvailabilitySubscriptionResponse:  ++noOfRtUpdateContextAvailabilitySubscriptionResponse; break;
-   case RtUnsubscribeContextAvailabilityResponse:         ++noOfRtUnsubscribeContextAvailabilityResponse; break;
-   case RtUnsubscribeContextResponse:                     ++noOfRtUnsubscribeContextResponse; break;
-   case RtSubscribeResponse:                              ++noOfRtSubscribeResponse; break;
-   case RtSubscribeError:                                 ++noOfRtSubscribeError; break;
-   }
+  case RtSubscribeContextAvailabilityResponse:           ++noOfRtSubscribeContextAvailabilityResponse; break;
+  case RtUpdateContextAvailabilitySubscriptionResponse:  ++noOfRtUpdateContextAvailabilitySubscriptionResponse; break;
+  case RtUnsubscribeContextAvailabilityResponse:         ++noOfRtUnsubscribeContextAvailabilityResponse; break;
+  case RtUnsubscribeContextResponse:                     ++noOfRtUnsubscribeContextResponse; break;
+  case RtSubscribeResponse:                              ++noOfRtSubscribeResponse; break;
+  case RtSubscribeError:                                 ++noOfRtSubscribeError; break;
+  }
 }

@@ -46,10 +46,10 @@ typedef struct ContextRegistrationAttribute
   MetadataVector  metadataVector;  // Optional
 
   ContextRegistrationAttribute();
-  ContextRegistrationAttribute(std::string _name, std::string _type, std::string _isDomain = "");
-  std::string     render(Format format, std::string indent, bool comma = false);
-  std::string     check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void            present(int ix, std::string indent);
+  ContextRegistrationAttribute(const std::string& _name, const std::string& _type, const std::string& _isDomain = "");
+  std::string     render(Format format, const std::string& indent, bool comma = false);
+  std::string     check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  void            present(int ix, const std::string& indent);
   void            release(void);
 } ContextRegistrationAttribute;
 

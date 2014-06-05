@@ -42,10 +42,10 @@ namespace orion
 extern void compoundValueStart
 (
    ConnectionInfo*          ciP,
-   std::string              path,
-   std::string              name,
-   std::string              value,
-   std::string              rest,
+   const std::string&       path,
+   const std::string&       name,
+   const std::string&       value,
+   const std::string&       rest,
    CompoundValueNode::Type  type,
    bool                     fatherIsVector
 );
@@ -59,9 +59,9 @@ extern void compoundValueStart
 extern void compoundValueMiddle
 (
    ConnectionInfo*          ciP,
-   std::string              relPath,
-   std::string              name,
-   std::string              value,
+   const std::string&       relPath,
+   const std::string&       name,
+   const std::string&       value,
    CompoundValueNode::Type  type
 );
 

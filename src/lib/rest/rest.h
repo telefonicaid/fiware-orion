@@ -49,7 +49,10 @@ typedef enum IpVersion
 *
 * ipVersionUsed - 
 */
-extern IpVersion  ipVersionUsed;  
+extern IpVersion       ipVersionUsed;  
+extern std::string     rushHost;
+extern unsigned short  rushPort;
+extern std::string     multitenant;
 
 
 
@@ -67,12 +70,17 @@ typedef void (*RestServeFunction)(ConnectionInfo* ciP);
 */
 extern void restInit
 (
-   RestService*      _restServiceV,
-   IpVersion         _ipVersion,
-   const char*       _bindAddress,
-   unsigned short    _port,
-   RestServeFunction _serveFunction = NULL,
-   bool              _acceptTextXml = false
+   RestService*        _restServiceV,
+   IpVersion           _ipVersion,
+   const char*         _bindAddress,
+   unsigned short      _port,
+   const std::string&  _multitenant   = "off",
+   const std::string&  _rushHost      = "",
+   unsigned short      _rushPort      = 0,
+   const char*         _httpsKey      = NULL,
+   const char*         _httpsCert     = NULL,
+   RestServeFunction   _serveFunction = NULL,
+   bool                _acceptTextXml = false
 );
 
 #endif

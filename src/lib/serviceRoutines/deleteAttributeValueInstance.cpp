@@ -42,7 +42,7 @@
 *
 * DELETE /ngsi10/contextEntities/{entityID}/attributes/{attributeName}/{valueID}
 */
-std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   UpdateContextRequest            request;
   UpdateContextResponse           response;
@@ -63,7 +63,7 @@ std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, st
   request.updateActionType.set("DELETE");
 
   response.errorCode.code = SccNone;
-  ciP->httpStatusCode = mongoUpdateContext(&request, &response);
+  ciP->httpStatusCode = mongoUpdateContext(&request, &response, ciP->tenant);
   
   StatusCode statusCode;
   if (response.contextElementResponseVector.size() == 0)

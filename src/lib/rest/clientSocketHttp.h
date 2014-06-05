@@ -38,20 +38,25 @@
 *
 * socketHttpConnect -
 */
-extern int socketHttpConnect(std::string host, unsigned short port);
+extern int socketHttpConnect(const std::string& host, unsigned short port);
 
 
 /* ****************************************************************************
 *
 * sendHttpSocket - 
 */
-extern std::string sendHttpSocket( std::string ip,
-                                   unsigned short port, 
-                                   std::string verb,
-                                   std::string resource, 
-                                   std::string content_type, 
-                                   std::string content,
-                                   bool waitForResponse = true
-                                   );
+extern std::string sendHttpSocket
+(
+  const std::string&     ip,
+  unsigned short         port, 
+  const std::string&     protocol,
+  const std::string&     verb,
+  const std::string&     tenant,
+  const std::string&     resource, 
+  const std::string&     content_type, 
+  const std::string&     content,
+  bool                   useRush,
+  bool                   waitForResponse = true
+);
 
 #endif

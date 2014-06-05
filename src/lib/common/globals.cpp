@@ -23,6 +23,8 @@
 * Author: Ken Zangelin
 */
 #include <time.h>
+#include <stdint.h>
+
 #include <string>
 
 #include "logMsg/logMsg.h"
@@ -101,7 +103,7 @@ bool isFalse(const std::string& s)
 *
 * getTimer -
 */
-Timer* getTimer() {
+Timer* getTimer(void) {
     return timer;
 }
 
@@ -133,9 +135,9 @@ int getCurrentTime(void)
 *
 * toSeconds -
 */
-long long toSeconds(int value, char what, bool dayPart)
+int64_t toSeconds(int value, char what, bool dayPart)
 {
-  long long result = -1;
+  int64_t result = -1;
 
   if (dayPart == true)
   {
@@ -171,72 +173,91 @@ long long toSeconds(int value, char what, bool dayPart)
 * This is common code for Duration and Throttling (at least)
 *
 */
-long long parse8601(std::string s)
+int64_t parse8601(const std::string& s)
 {
-    if (s == "")
-        return 0;
+  if (s == "")
+    return -1;
 
-    char*      duration    = strdup(s.c_str());
-    char*      toFree      = duration;
-    bool       dayPart     = true;
-    long long  accumulated = 0;
-    char*      start;
+  char*      duration    = strdup(s.c_str());
+  char*      toFree      = duration;
+  bool       dayPart     = true;
+  int64_t    accumulated = 0;
+  char*      start;
 
-    if (*duration != 'P')
+  if (*duration != 'P')
+  {
+    free(toFree);
+    return -1;
+  }
+
+  ++duration;
+  start = duration;
+
+  if (*duration == 0)
+  {
+    free(toFree);
+    return -1;
+  }
+
+  bool digitsPending = false;
+
+  while (*duration != 0)
+  {
+    if (isdigit(*duration))
+    {
+      ++duration;
+      digitsPending = true;
+    }
+    else if ((dayPart == true) &&
+             ((*duration == 'Y') || (*duration == 'M') || (*duration == 'D') || (*duration == 'W')))
+    {
+      char what = *duration;
+
+      *duration = 0;
+      int value = atoi(start);
+
+      if ((value == 0) && (*start != '0'))
+      {
+        free(toFree);
+        LM_RE(-1, ("parse error for '%s'", start));
+      }
+
+      accumulated += toSeconds(value, what, dayPart);
+      digitsPending = false;
+      ++duration;
+      start = duration;
+    }
+    else if ((dayPart == true) && (*duration == 'T'))
+    {
+      dayPart = false;
+      ++duration;
+      start = duration;
+      digitsPending = false;
+    }
+    else if ((dayPart == false) &&
+             ((*duration == 'H') || (*duration == 'M') || (*duration == 'S')))
+    {
+      char what = *duration;
+
+      *duration = 0;
+      int value = atoi(start);
+
+      accumulated += toSeconds(value, what, dayPart);
+      digitsPending = false;
+      ++duration;
+      start = duration;
+    }
+    else
     {
       free(toFree);
-      return -1;
+      return -1;  // ParseError
     }
+  }
 
-    ++duration;
-    start = duration;
+  free(toFree);
 
-    while (*duration != 0)
-    {
-      if (isdigit(*duration))
-        ++duration;
-      else if ((dayPart == true) && ((*duration == 'Y') || (*duration == 'M') || (*duration == 'D') || (*duration == 'W')))
-      {
-        char what = *duration;
+  if (digitsPending == true)
+    return -1;
 
-        *duration = 0;
-        int value = atoi(start);
-
-        if ((value == 0) && (*start != '0'))
-        {
-           free(toFree);
-           LM_RE(-1, ("parse error for '%s'", start));
-        }
-
-        accumulated += toSeconds(value, what, dayPart);
-        ++duration;
-        start = duration;
-      }
-      else if ((dayPart == true) && (*duration == 'T'))
-      {
-        dayPart = false;
-        ++duration;
-        start = duration;
-      }
-      else if ((dayPart == false) && ((*duration == 'H') || (*duration == 'M') || (*duration == 'S')))
-      {
-        char what = *duration;
-
-        *duration = 0;
-        int value = atoi(start);
-
-        accumulated += toSeconds(value, what, dayPart);
-        ++duration;
-        start = duration;
-      }
-      else
-      {
-         free(toFree);
-         return -1; // ParseError
-      }
-    }
-
-    free(toFree);
-
-    return accumulated;
+  return accumulated;
 }

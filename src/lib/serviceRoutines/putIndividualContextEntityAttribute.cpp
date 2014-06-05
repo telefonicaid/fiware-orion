@@ -40,7 +40,7 @@
 *
 * putIndividualContextEntityAttribute -
 */
-std::string putIndividualContextEntityAttribute(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string putIndividualContextEntityAttribute(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string  answer;
   std::string  entityId      = compV[2];
@@ -48,7 +48,7 @@ std::string putIndividualContextEntityAttribute(ConnectionInfo* ciP, int compone
   StatusCode   response;
 
   LM_T(LmtConvenience, ("CONVENIENCE: got a 'PUT' request for entityId '%s'", entityId.c_str()));
-  ciP->httpStatusCode = mapPutIndividualContextEntityAttribute(entityId, attributeName, &parseDataP->upcar.res, &response);
+  ciP->httpStatusCode = mapPutIndividualContextEntityAttribute(entityId, attributeName, &parseDataP->upcar.res, &response, ciP);
   answer = response.render(ciP->outFormat, "", false, false);
   response.release();
 

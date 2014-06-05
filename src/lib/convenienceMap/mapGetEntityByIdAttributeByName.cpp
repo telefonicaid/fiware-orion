@@ -29,6 +29,7 @@
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 #include "rest/HttpStatusCode.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -36,7 +37,7 @@
 *
 * mapGetEntityByIdAttributeByName - 
 */
-HttpStatusCode mapGetEntityByIdAttributeByName(std::string id, std::string attributeName, DiscoverContextAvailabilityResponse* response)
+HttpStatusCode mapGetEntityByIdAttributeByName(const std::string& id, const std::string& attributeName, DiscoverContextAvailabilityResponse* response, ConnectionInfo* ciP)
 {
   DiscoverContextAvailabilityRequest  request;
   EntityId                            entityId(id, "", "false");
@@ -44,5 +45,5 @@ HttpStatusCode mapGetEntityByIdAttributeByName(std::string id, std::string attri
   request.entityIdVector.push_back(&entityId);
   request.attributeList.push_back(attributeName);
 
-  return mongoDiscoverContextAvailability(&request, response);
+  return mongoDiscoverContextAvailability(&request, response, ciP->tenant);
 }

@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "logMsg/logMsg.h"
 
@@ -48,6 +49,25 @@
 class ConnectionInfo
 {
 public:
+  ConnectionInfo()
+  {
+    connection             = NULL;
+    payload                = NULL;
+    payloadSize            = 0;
+    inFormat               = XML;
+    outFormat              = XML;
+    httpStatusCode         = SccOk;
+    callNo                 = 1;
+    inCompoundValue        = false;
+    compoundValueRoot      = NULL;
+    compoundValueP         = NULL;
+    parseDataP             = NULL;
+    verb                   = NOVERB;
+    tenant                 = "";
+
+    memset(payloadWord, 0, sizeof(payloadWord));
+  }
+
   ConnectionInfo(std::string _url, std::string _method, std::string _version, MHD_Connection* _connection = NULL) : url(_url), method(_method), version(_version)
   {
     connection             = _connection;
@@ -61,6 +81,7 @@ public:
     compoundValueRoot      = NULL;
     compoundValueP         = NULL;
     parseDataP             = NULL;
+    tenant                 = "";
 
     memset(payloadWord, 0, sizeof(payloadWord));
 
@@ -79,6 +100,9 @@ public:
   std::string                method;
   std::string                version;
   std::string                charset;
+  std::string                tenantFromUrl;
+  std::string                tenantFromHttpHeader;
+  std::string                tenant;
   HttpHeaders                httpHeaders;
   char*                      payload;
   int                        payloadSize;
@@ -86,6 +110,9 @@ public:
   std::string                answer;
   int                        callNo;
   ParseData*                 parseDataP;
+
+  std::map<std::string, std::string>   uriParam;
+
   bool                       inCompoundValue;
   orion::CompoundValueNode*  compoundValueP;    // Points to current node in the tree
   orion::CompoundValueNode*  compoundValueRoot; // Points to the root of the tree

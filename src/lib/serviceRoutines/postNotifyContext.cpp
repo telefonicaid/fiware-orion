@@ -41,11 +41,11 @@
 *
 * postNotifyContext - 
 */
-std::string postNotifyContext(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string postNotifyContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   NotifyContextResponse  ncr;
 
-  ciP->httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res, &ncr);
+  ciP->httpStatusCode = mongoNotifyContext(&parseDataP->ncr.res, &ncr, ciP->tenant);
 
   std::string answer = ncr.render(NotifyContext, ciP->outFormat, "");
 

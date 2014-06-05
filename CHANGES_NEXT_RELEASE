@@ -1,4 +1,0 @@
-- Fix:  All responses with StatusCode now have the 'reasonPhrase' in accordance with the 'code' (Issue 242)
-- Fix:  Every Context Element gets its corresponding Context Element Response when processing updateContext operations
-        (previous version was interrupted in the middle if the processing if one Context Element resulted in error)
-

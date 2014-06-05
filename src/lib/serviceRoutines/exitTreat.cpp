@@ -43,7 +43,7 @@
 *
 * exitTreat - 
 */
-std::string exitTreat(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string exitTreat(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
    std::string password = "XXX";
    std::string out;

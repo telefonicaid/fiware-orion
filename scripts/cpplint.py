@@ -2002,24 +2002,33 @@ def CheckBraces(filename, clean_lines, linenum, error):
 
   line = clean_lines.elided[linenum]        # get rid of comments and strings
 
-  if Match(r'\s*{\s*$', line):
+
+  #
+  # Removed by KZ - this is the 'a start bracket must not be on a new line'
+  #                 IMHO this is crazy. Something invented by authors of books to save
+  #                 paper. No need for this in a file.
+  #
+  # if Match(r'\s*{\s*$', line):
     # We allow an open brace to start a line in the case where someone
     # is using braces in a block to explicitly create a new scope,
     # which is commonly used to control the lifetime of
     # stack-allocated variables.  We don't detect this perfectly: we
     # just don't complain if the last non-whitespace character on the
     # previous non-blank line is ';', ':', '{', or '}'.
-    prevline = GetPreviousNonBlankLine(clean_lines, linenum)[0]
-    if not Search(r'[;:}{]\s*$', prevline):
-      error(filename, linenum, 'whitespace/braces', 4,
-            '{ should almost always be at the end of the previous line')
+      # prevline = GetPreviousNonBlankLine(clean_lines, linenum)[0]
+      # if not Search(r'[;:}{]\s*$', prevline):
+      #  error(filename, linenum, 'whitespace/braces', 4,
+         #   '{ should almost always be at the end of the previous line')
 
   # An else clause should be on the same line as the preceding closing brace.
-  if Match(r'\s*else\s*', line):
-    prevline = GetPreviousNonBlankLine(clean_lines, linenum)[0]
-    if Match(r'\s*}\s*$', prevline):
-      error(filename, linenum, 'whitespace/newline', 4,
-            'An else should appear on the same line as the preceding }')
+  #
+  # Removed by KZ - '} else {'  is just TOO UGLY. My eyes bleed
+  #
+  #if Match(r'\s*else\s*', line):
+  #  prevline = GetPreviousNonBlankLine(clean_lines, linenum)[0]
+  #  if Match(r'\s*}\s*$', prevline):
+  #    error(filename, linenum, 'whitespace/newline', 4,
+  #          'An else should appear on the same line as the preceding }')
 
   # If braces come on one side of an else, they should be on both.
   # However, we have to worry about "else if" that spans multiple lines!
@@ -2228,16 +2237,24 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, class_state,
   #
   # The "$Id:...$" comment may also get very long without it being the
   # developers fault.
+  #
+  # Changed by KZ from 100/80 to 150/120 - A long long time ago when we were
+  #               working with monochrome monitors and without X-Windows, this
+  #               rule with 80 chars was good. Today ... we have Full HD displays 
+  #               and scrollbars.
+  #               Splitting lines in various lines sometimes make the code hard to read.
+  #               
+  #
   if (not line.startswith('#include') and not is_header_guard and
       not Match(r'^\s*//.*http(s?)://\S*$', line) and
       not Match(r'^// \$Id:.*#[0-9]+ \$$', line)):
     line_width = GetLineWidth(line)
-    if line_width > 100:
+    if line_width > 150:
       error(filename, linenum, 'whitespace/line_length', 4,
-            'Lines should very rarely be longer than 100 characters')
-    elif line_width > 80:
+            'Lines should very rarely be longer than 150 characters')
+    elif line_width > 120:
       error(filename, linenum, 'whitespace/line_length', 2,
-            'Lines should be <= 80 characters long')
+            'Lines should be <= 120 characters long')
 
   if (cleansed_line.count(';') > 1 and
       # for loops are allowed two ;'s (and may run over two lines).
@@ -2849,9 +2866,13 @@ def CheckCStyleCast(filename, linenum, line, raw_line, cast_type, pattern,
     return True
 
   # At this point, all that should be left is actual casts.
-  error(filename, linenum, 'readability/casting', 4,
-        'Using C-style cast.  Use %s<%s>(...) instead' %
-        (cast_type, match.group(1)))
+  #
+  # Removed by KZ - I have nothing against these C++ typecasts
+  #                 but the compiler gave me problems.
+  #
+  # error(filename, linenum, 'readability/casting', 4,
+  #       'Using C-style cast.  Use %s<%s>(...) instead' %
+  #      (cast_type, match.group(1)))
 
   return True
 

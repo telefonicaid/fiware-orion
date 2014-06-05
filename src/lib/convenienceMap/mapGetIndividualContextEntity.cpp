@@ -32,6 +32,7 @@
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "rest/HttpStatusCode.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -39,7 +40,7 @@
 *
 * mapGetIndividualContextEntity - 
 */
-HttpStatusCode mapGetIndividualContextEntity(std::string entityId, ContextElementResponse* response)
+HttpStatusCode mapGetIndividualContextEntity(const std::string& entityId, ContextElementResponse* response, ConnectionInfo* ciP)
 {
    HttpStatusCode        ms;
    QueryContextRequest   qcRequest;
@@ -50,7 +51,7 @@ HttpStatusCode mapGetIndividualContextEntity(std::string entityId, ContextElemen
    response->contextElement.entityId.fill(entityId, "", "false");
 
    qcRequest.entityIdVector.push_back(&entity);
-   ms = mongoQueryContext(&qcRequest, &qcResponse);
+   ms = mongoQueryContext(&qcRequest, &qcResponse, ciP->tenant);
 
    if ((ms != SccOk) || (qcResponse.contextElementResponseVector.size() == 0))
    {

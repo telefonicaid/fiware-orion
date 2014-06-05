@@ -34,7 +34,7 @@
 *
 * mongoNofityContext -
 */
-HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextResponse* responseP) {
+HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextResponse* responseP, const std::string& tenant) {
 
     reqSemTake(__FUNCTION__, "ngsi10 notification");
 
@@ -45,7 +45,7 @@ HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextR
     for (unsigned int ix= 0; ix < requestP->contextElementResponseVector.size(); ++ix) {
         /* We use 'ucr' to conform processContextElement signature but we are not doing anything with that */
         UpdateContextResponse ucr;
-        processContextElement(&requestP->contextElementResponseVector.get(ix)->contextElement, &ucr, "append");
+        processContextElement(&requestP->contextElementResponseVector.get(ix)->contextElement, &ucr, "append", tenant);
     }
 
     reqSemGive(__FUNCTION__, "ngsi10 notification");

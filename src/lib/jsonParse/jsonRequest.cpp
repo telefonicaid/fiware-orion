@@ -132,7 +132,7 @@ static JsonRequest* jsonRequestGet(RequestType request, std::string method)
 *
 * jsonTreat - 
 */
-std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parseDataP, RequestType request, std::string payloadWord, JsonRequest** reqPP)
+std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parseDataP, RequestType request, const std::string& payloadWord, JsonRequest** reqPP)
 {
   std::string   res   = "OK";
   JsonRequest*  reqP  = jsonRequestGet(request, ciP->method);
@@ -159,15 +159,17 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
   try
   {
     res = jsonParse(ciP, content, reqP->keyword, reqP->parseVector, parseDataP);
-    if (ciP->inCompoundValue == true)
-      orion::compoundValueEnd(ciP, parseDataP);
-    if ((lmTraceIsSet(LmtCompoundValueShow)) && (ciP->compoundValueP != NULL))
-      ciP->compoundValueP->shortShow("after parse: ");
   }
   catch (std::exception &e)
   {
     std::string errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, std::string("JSON Parse Error: ") + e.what());
     LM_E(("JSON Parse Error: '%s'", e.what()));
+    LM_RE(errorReply, (res.c_str()));
+  }
+  catch (...)
+  {
+    std::string errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, std::string("JSON Generic Error"));
+    LM_E(("JSON Generic Error during jsonParse"));
     LM_RE(errorReply, (res.c_str()));
   }
 
@@ -179,6 +181,11 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
     std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", payloadWord, ciP->httpStatusCode, res);
     return answer; 
   }
+
+  if (ciP->inCompoundValue == true)
+    orion::compoundValueEnd(ciP, parseDataP);
+  if ((lmTraceIsSet(LmtCompoundValueShow)) && (ciP->compoundValueP != NULL))
+    ciP->compoundValueP->shortShow("after parse: ");
 
   reqP->present(parseDataP);
 

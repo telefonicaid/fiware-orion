@@ -37,6 +37,6 @@
 *
 * mongoDiscoverContextAvailability - 
 */
-extern HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP);
+extern HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, const std::string& tenant = "");
 
 #endif

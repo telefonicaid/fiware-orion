@@ -35,6 +35,6 @@
 *
 * orionReply - 
 */
-extern std::string orionReply(ConnectionInfo* ciP, std::string what, std::string value);
+extern std::string orionReply(ConnectionInfo* ciP, const std::string& what, const std::string& value);
 
 #endif

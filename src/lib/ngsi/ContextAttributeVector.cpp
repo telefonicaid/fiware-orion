@@ -50,7 +50,7 @@ ContextAttributeVector::ContextAttributeVector()
 *
 * ContextAttributeVector::render - 
 */
-std::string ContextAttributeVector::render(RequestType request, Format format, std::string indent, bool comma)
+std::string ContextAttributeVector::render(RequestType request, Format format, const std::string& indent, bool comma)
 {
   std::string out      = "";
   std::string xmlTag   = "contextAttributeList";
@@ -80,7 +80,7 @@ std::string ContextAttributeVector::render(RequestType request, Format format, s
 *
 * ContextAttributeVector::check - 
 */
-std::string ContextAttributeVector::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ContextAttributeVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -99,7 +99,7 @@ std::string ContextAttributeVector::check(RequestType requestType, Format format
 *
 * ContextAttributeVector::present - 
 */
-void ContextAttributeVector::present(std::string indent)
+void ContextAttributeVector::present(const std::string& indent)
 {
    PRINTF("%lu ContextAttributes", (unsigned long) vec.size());
 

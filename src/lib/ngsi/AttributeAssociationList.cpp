@@ -48,10 +48,10 @@ void AttributeAssociationList::push_back(AttributeAssociation* aaP)
 *
 * render - 
 */
-std::string AttributeAssociationList::render(Format format, std::string indent, bool comma)
+std::string AttributeAssociationList::render(Format format, const std::string& indent, bool comma)
 {
   std::string out     = "";
-  std::string xmlTag  = "AttributeAssociationList";
+  std::string xmlTag  = "attributeAssociationList";
   std::string jsonTag = "associations";
 
   if (vec.size() == 0)
@@ -73,7 +73,7 @@ std::string AttributeAssociationList::render(Format format, std::string indent, 
 *
 * check - 
 */
-std::string AttributeAssociationList::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string AttributeAssociationList::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -92,7 +92,7 @@ std::string AttributeAssociationList::check(RequestType requestType, Format form
 *
 * present - 
 */
-void AttributeAssociationList::present(std::string indent)
+void AttributeAssociationList::present(const std::string& indent)
 {
   PRINTF("%lu Attribute Associations", (unsigned long) vec.size());
 

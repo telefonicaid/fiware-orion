@@ -29,6 +29,7 @@
 #include "common/globals.h"
 
 #include "convenienceMap/mapGetIndividualContextEntity.h"
+#include "rest/ConnectionInfo.h"
 #include "testInit.h"
 
 
@@ -74,13 +75,14 @@ TEST(mapGetIndividualContextEntity, notFoundThenFound)
 {
   HttpStatusCode          ms;
   ContextElementResponse  response;
+  ConnectionInfo          ci;
 
   prepareDatabase("E1", "Room");
 
-  ms = mapGetIndividualContextEntity("NotFound", &response);
+  ms = mapGetIndividualContextEntity("NotFound", &response, &ci);
   EXPECT_EQ(ms, SccOk);
 
-  ms = mapGetIndividualContextEntity("E1", &response);
+  ms = mapGetIndividualContextEntity("E1", &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_STREQ("E1", response.contextElement.entityId.id.c_str());
 

@@ -34,16 +34,25 @@
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi/StatusCode.h"
+#include "rest/uriParamNames.h"
 
 /* ****************************************************************************
 *
 * mongoSubscribeContext - 
 */
-HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, SubscribeContextResponse* responseP, Format inFormat)
+HttpStatusCode mongoSubscribeContext
+(
+  SubscribeContextRequest*             requestP,
+  SubscribeContextResponse*            responseP,
+  const std::string&                   tenant,
+  std::map<std::string, std::string>&  uriParam
+)
 {
-    reqSemTake(__FUNCTION__, "ngsi10 subscribe request");
+    std::string notifyFormat = uriParam[URI_PARAM_NOTIFY_FORMAT];
 
-    LM_T(LmtMongo, ("Subscribe Context Request"));
+    LM_T(LmtMongo, ("Subscribe Context Request: notifications sent in '%s' format", notifyFormat.c_str()));
+
+    reqSemTake(__FUNCTION__, "ngsi10 subscribe request");
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -93,7 +102,8 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
                                              requestP->attributeList, oid.str(),
                                              requestP->reference.get(),
                                              &notificationDone,
-                                             inFormat);
+                                             (notifyFormat == "XML")? XML : JSON,
+                                             tenant);
     sub.append(CSUB_CONDITIONS, conds);
     if (notificationDone) {
         sub.append(CSUB_LASTNOTIFICATION, getCurrentTime());
@@ -101,21 +111,21 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
     }
 
     /* Adding format to use in notifications */
-    sub.append(CSUB_FORMAT, std::string(formatToString(inFormat)));
+    sub.append(CSUB_FORMAT, notifyFormat);
 
     /* Insert document in database */
     BSONObj subDoc = sub.obj();
-    LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextCollectionName(), subDoc.toString().c_str()));
+    LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), subDoc.toString().c_str()));
     try {
         mongoSemTake(__FUNCTION__, "insert into SubscribeContextCollection");
-        connection->insert(getSubscribeContextCollectionName(), subDoc);
+        connection->insert(getSubscribeContextCollectionName(tenant).c_str(), subDoc);
         mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection");
     }
     catch( const DBException &e ) {
         mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection (mongo db exception)");
         reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo db exception)");
         responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
-                                                 std::string("collection: ") + getSubscribeContextCollectionName() +
+                                                 std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                                                  " - insert(): " + subDoc.toString() +
                                                  " - exception: " + e.what());
 
@@ -125,7 +135,7 @@ HttpStatusCode mongoSubscribeContext(SubscribeContextRequest* requestP, Subscrib
         mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection (mongo generic exception)");
         reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo generic exception)");
         responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
-                                                 std::string("collection: ") + getSubscribeContextCollectionName() +
+                                                 std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                                                  " - insert(): " + subDoc.toString() +
                                                  " - exception: " + "generic");
 

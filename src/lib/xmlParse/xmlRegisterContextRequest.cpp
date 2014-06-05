@@ -514,10 +514,10 @@ XmlNode rcrParseVector[] =
   { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/entityAssociation/targetEntityId",    targetEntityId    },
   { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/entityAssociation/targetEntityId/id", targetEntityIdId  },
 
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/AttributeAssociationList",                                      nullTreat },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/AttributeAssociationList/AttributeAssociation",                 attributeAssociation},
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/AttributeAssociationList/AttributeAssociation/sourceAttribute", sourceAttribute },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/AttributeAssociationList/AttributeAssociation/targetAttribute", targetAttribute },
+  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/attributeAssociationList",                                      nullTreat },
+  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/attributeAssociationList/attributeAssociation",                 attributeAssociation},
+  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/attributeAssociationList/attributeAssociation/sourceAttribute", sourceAttribute },
+  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/attributeAssociationList/attributeAssociation/targetAttribute", targetAttribute },
 
   { "/registerContextRequest/contextRegistrationList/contextRegistration/providingApplication",                       providingApplication },
 

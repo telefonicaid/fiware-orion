@@ -36,6 +36,6 @@
 *
 * mongoRegisterContext - 
 */
-extern HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterContextResponse* responseP);
+extern HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterContextResponse* responseP, const std::string& tenant = "");
 
 #endif

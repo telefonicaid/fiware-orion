@@ -38,7 +38,7 @@
 *
 * ScopeVector::render - 
 */
-std::string ScopeVector::render(Format format, std::string indent, bool comma)
+std::string ScopeVector::render(Format format, const std::string& indent, bool comma)
 {
   std::string out = "";
   std::string tag = "scope";
@@ -60,7 +60,7 @@ std::string ScopeVector::render(Format format, std::string indent, bool comma)
 *
 * ScopeVector::check - 
 */
-std::string ScopeVector::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ScopeVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -82,7 +82,7 @@ std::string ScopeVector::check(RequestType requestType, Format format, std::stri
 *
 * ScopeVector::present - 
 */
-void ScopeVector::present(std::string indent)
+void ScopeVector::present(const std::string& indent)
 {
   if (vec.size() == 0)
     PRINTF("No scopes\n");

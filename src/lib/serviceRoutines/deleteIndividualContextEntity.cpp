@@ -40,7 +40,7 @@
 *
 * deleteIndividualContextEntity - 
 */
-std::string deleteIndividualContextEntity(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP)
+std::string deleteIndividualContextEntity(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
   std::string  answer;
   std::string  entityId = "unknown entityId";
@@ -50,7 +50,7 @@ std::string deleteIndividualContextEntity(ConnectionInfo* ciP, int components, s
      entityId = compV[2];
 
   LM_T(LmtConvenience, ("CONVENIENCE: got a 'DELETE' request for entityId '%s'", entityId.c_str()));
-  ciP->httpStatusCode = mapDeleteIndividualContextEntity(entityId, &response);
+  ciP->httpStatusCode = mapDeleteIndividualContextEntity(entityId, &response, ciP);
   answer = response.render(ciP->outFormat, "", false, false);
   response.release();
 

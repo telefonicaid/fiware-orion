@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include "rest/uriParamNames.h"
+
 #include "unittest.h"
 #include "testInit.h"
 
@@ -53,6 +55,14 @@ static NotifierMock* notifierMock = NULL;
 static TimerMock*    timerMock    = NULL;
 
 
+
+
+
+/* ****************************************************************************
+*
+* uriParams - 
+*/
+std::map<std::string, std::string> uriParams;
 
 
 
@@ -90,6 +100,11 @@ void utInit(void)
 #ifdef UT_DEBUG
   printf("**************** FROM utInit (%d inits, %d exits)\n", noOfInits, noOfExits);
 #endif
+
+  //
+  // Default mime type for notifications: application/xml
+  //
+  uriParams[URI_PARAM_NOTIFY_FORMAT] = "XML";
 }
 
 

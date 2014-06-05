@@ -49,10 +49,10 @@ typedef struct QueryContextResponse
   StatusCode                    errorCode;                     // Optional
 
   QueryContextResponse();
-  QueryContextResponse(StatusCode _errorCode);
+  QueryContextResponse(StatusCode& _errorCode);
   ~QueryContextResponse();
 
-  std::string render(RequestType requestType, Format format, std::string indent);  
+  std::string render(RequestType requestType, Format format, const std::string& indent);  
 } QueryContextResponse;
 
 #endif

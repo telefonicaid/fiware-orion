@@ -53,9 +53,9 @@ static sem_t mongoSem;
 */
 int semInit(int shared, int takenInitially)
 {
-  if (sem_init(&reqSem, shared, takenInitially) == -1) 
+  if (sem_init(&reqSem, shared, takenInitially) == -1)
     LM_RE(1, ("Error initializing 'req' semaphore: %s\n", strerror(errno)));
-  if (sem_init(&mongoSem, shared, takenInitially) == -1) 
+  if (sem_init(&mongoSem, shared, takenInitially) == -1)
     LM_RE(2, ("Error initializing 'mongo' semaphore: %s\n", strerror(errno)));
 
   LM_T(LmtReqSem,   ("Initialized 'req' semaphore"));

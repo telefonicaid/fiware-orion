@@ -102,7 +102,7 @@ static bool isCompoundPath(const char* path)
 *
 * treat - 
 */
-static bool treat(ConnectionInfo* ciP, std::string path, std::string value, JsonNode* parseVector, ParseData* parseDataP)
+static bool treat(ConnectionInfo* ciP, const std::string& path, const std::string& value, JsonNode* parseVector, ParseData* parseDataP)
 {
   LM_T(LmtTreat, ("Treating path '%s', value '%s'", path.c_str(), value.c_str()));
 
@@ -126,7 +126,7 @@ static bool treat(ConnectionInfo* ciP, std::string path, std::string value, Json
 *
 * getArrayElementName -
 */
-static std::string getArrayElementName(std::string arrayName)
+static std::string getArrayElementName(const std::string& arrayName)
 {
   // Get the name of the array
   int pos = arrayName.find_last_of("/");
@@ -149,7 +149,7 @@ static std::string getArrayElementName(std::string arrayName)
 *
 * nodeType - 
 */
-std::string nodeType(std::string nodeName, std::string value, orion::CompoundValueNode::Type* typeP)
+std::string nodeType(const std::string& nodeName, const std::string& value, orion::CompoundValueNode::Type* typeP)
 {
   bool        isObject         = (nodeName == "") && (value == "");
   bool        isString           = (nodeName != "") && (value != "");
@@ -183,7 +183,7 @@ std::string nodeType(std::string nodeName, std::string value, orion::CompoundVal
 *
 * eatCompound - 
 */
-void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, boost::property_tree::ptree::value_type& v, std::string indent)
+void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, boost::property_tree::ptree::value_type& v, const std::string& indent)
 {
   std::string                  nodeName     = v.first.data();
   std::string                  nodeValue    = v.second.data();
@@ -247,14 +247,15 @@ static std::string jsonParse
 (
    ConnectionInfo*                           ciP,
    boost::property_tree::ptree::value_type&  v,
-   std::string                               path,
+   const std::string&                        _path,
    JsonNode*                                 parseVector,
    ParseData*                                parseDataP
 )
 {
   std::string                     nodeName         = v.first.data();
   std::string                     nodeValue        = v.second.data();
-  std::string                     arrayElementName = getArrayElementName(path);
+  std::string                     arrayElementName = getArrayElementName(_path);
+  std::string                     path             = _path;
   bool                            treated;
 
   // If the node name is empty, boost will yield an empty name. This will happen only in the case of a vector.
@@ -275,7 +276,9 @@ static std::string jsonParse
   treated = treat(ciP, path, nodeValue, parseVector, parseDataP);
 
 
-  if ((isCompoundPath(path.c_str()) == true) && (nodeValue == ""))
+  boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
+  int                         noOfChildren = subtree.size();
+  if ((isCompoundPath(path.c_str()) == true) && (nodeValue == "") && (noOfChildren != 0))
   {
     std::string s;
 
@@ -297,7 +300,10 @@ static std::string jsonParse
     return ciP->answer;
   }
 
-  boost::property_tree::ptree subtree = (boost::property_tree::ptree) v.second;
+  if (noOfChildren == 0)
+    return "OK";
+
+  subtree = (boost::property_tree::ptree) v.second;
   BOOST_FOREACH(boost::property_tree::ptree::value_type &v2, subtree)
   {
     std::string out = jsonParse(ciP, v2, path, parseVector, parseDataP);
@@ -312,7 +318,7 @@ static std::string jsonParse
 *
 * jsonParse - 
 */
-std::string jsonParse(ConnectionInfo* ciP, const char* content, std::string requestType, JsonNode* parseVector, ParseData* parseDataP)
+std::string jsonParse(ConnectionInfo* ciP, const char* content, const std::string& requestType, JsonNode* parseVector, ParseData* parseDataP)
 {
   std::stringstream  ss;
   ptree              tree;

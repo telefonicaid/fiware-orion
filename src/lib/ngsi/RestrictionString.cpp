@@ -38,7 +38,7 @@
 *
 * RestrictionString::check - 
 */
-std::string RestrictionString::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string RestrictionString::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   return "OK";
 }
@@ -60,7 +60,7 @@ bool RestrictionString::isEmpty(void)
 *
 * RestrictionString::set - 
 */
-void RestrictionString::set(std::string value)
+void RestrictionString::set(const std::string& value)
 {
   string = value;
 }
@@ -82,7 +82,7 @@ std::string RestrictionString::get(void)
 *
 * RestrictionString::present - 
 */
-void RestrictionString::present(std::string indent)
+void RestrictionString::present(const std::string& indent)
 {
   if (string != "")
     PRINTF("%sRestrictionString: %s\n", indent.c_str(), string.c_str());
@@ -96,7 +96,7 @@ void RestrictionString::present(std::string indent)
 *
 * RestrictionString::render - 
 */
-std::string RestrictionString::render(Format format, std::string indent, bool comma)
+std::string RestrictionString::render(Format format, const std::string& indent, bool comma)
 {
   if (string == "")
     return "";

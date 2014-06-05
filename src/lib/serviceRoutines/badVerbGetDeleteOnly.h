@@ -37,6 +37,6 @@
 *
 * badVerbGetDeleteOnly - 
 */
-extern std::string badVerbGetDeleteOnly(ConnectionInfo* ciP, int components, std::vector<std::string> compV, ParseData* parseDataP);
+extern std::string badVerbGetDeleteOnly(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
 
 #endif
