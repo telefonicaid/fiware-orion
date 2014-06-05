@@ -555,7 +555,7 @@ function dbInsertEntity()
 
 # ------------------------------------------------------------------------------
 #
-# ftCurl
+# orionCurl
 #
 # Options:
 #   -X            <HTTP method>    (default: according to curl. GET if no payload, POST if with payload)
@@ -571,7 +571,7 @@ function dbInsertEntity()
 #
 # Any parameters are sent as is to 'curl'
 # 
-function ftCurl()
+function orionCurl()
 {
   #
   # Default values

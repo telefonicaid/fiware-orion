@@ -22,15 +22,13 @@
 
 --NAME--
 Accept header fail
-
 --SHELL-INIT--
-source harnessFunctions.sh
+
 dbInit CB
 brokerStart CB
 --SHELL--
 # Note that curl by default uses "Accept: */*" so this step is testing that "no header" is interpreted as
 # "Accept: */*" according to HTTP RFC
-source harnessFunctions.sh
 url="/NGSI10/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -42,11 +40,11 @@ payload='<?xml version="1.0"?>
   <attributeList/>
 </queryContextRequest>'
 
-ftCurl --url "$url" --payload "${payload}" --out " "
+orionCurl --url "$url" --payload "${payload}" --out " "
 
 # Example of payload from file:
 # echo $payload > payload_file
-# ftCurl --url "$url" --payload payload_file --out " "
+# orionCurl --url "$url" --payload payload_file --out " "
 --REGEXPECT--
 HTTP/1.1 200 OK
 Content-Length: 155
@@ -61,5 +59,4 @@ Date: REGEX(.*)
   </errorCode>
 </queryContextResponse>
 --TEARDOWN--
-source harnessFunctions.sh
 brokerStop CB
