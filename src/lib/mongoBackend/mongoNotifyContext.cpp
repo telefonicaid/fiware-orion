@@ -32,7 +32,7 @@
 
 /* ****************************************************************************
 *
-* mongoNofityContext -
+* mongoNotifyContext -
 */
 HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextResponse* responseP, const std::string& tenant) {
 
@@ -42,10 +42,10 @@ HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextR
      * to do with them */
 
     /* Process each ContextElement */
-    for (unsigned int ix= 0; ix < requestP->contextElementResponseVector.size(); ++ix) {
+    for (unsigned int ix = 0; ix < requestP->contextElementResponseVector.size(); ++ix) {
         /* We use 'ucr' to conform processContextElement signature but we are not doing anything with that */
         UpdateContextResponse ucr;
-        processContextElement(&requestP->contextElementResponseVector.get(ix)->contextElement, &ucr, "append", tenant);
+        processContextElement(&requestP->contextElementResponseVector.get(ix)->contextElement, &ucr, "append", tenant, "");
     }
 
     reqSemGive(__FUNCTION__, "ngsi10 notification");

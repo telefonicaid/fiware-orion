@@ -838,7 +838,7 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
 * processSubscriptions
 *
 */
-static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
+static bool processSubscriptions(const EntityId* enP, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -881,7 +881,7 @@ static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::
 
         /* Build entities vector */
         EntityIdVector enV;
-        enV.push_back(new EntityId(en.id, en.type, en.isPattern));
+        enV.push_back(new EntityId(enP->id, enP->type, enP->isPattern));
 
         /* Build attribute list vector */
         AttributeList attrL = subToAttributeList(sub);
@@ -1194,7 +1194,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
 * createEntity -
 *
 */
-static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string* errDetail, std::string tenant) {
+static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::string* errDetail, std::string tenant) {
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -1206,7 +1206,7 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
     ensureLocationIndex(tenant);
 
     if (!legalIdUsage(attrsV)) {
-        *errDetail = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: (" + e.toString() + ")";
+        *errDetail = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: (" + eP->toString() + ")";
         return false;
     }
 
@@ -1255,7 +1255,7 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
 
     }
 
-    BSONObj bsonId = e.type == "" ? BSON(ENT_ENTITY_ID << e.id) : BSON(ENT_ENTITY_ID << e.id << ENT_ENTITY_TYPE << e.type);
+    BSONObj bsonId = eP->type == "" ? BSON(ENT_ENTITY_ID << eP->id) : BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type);
     BSONObjBuilder insertedDocB;
     insertedDocB.append("_id", bsonId);
     insertedDocB.append(ENT_ATTRS, attrsToAdd.arr());
@@ -1348,16 +1348,21 @@ static bool removeEntity(std::string entityId, std::string entityType, ContextEl
 *
 * processContextElement -
 *
+* 0. Preparations
+* 1. Preconditions
+* 2. Get the complete list of entities from mongo
 */
-void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, std::string action, std::string tenant) {
+void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, const std::string& action, const std::string& tenant, const std::string& servicePath) {
 
     DBClientConnection* connection = getMongoConnection();
 
+    LM_T(LmtServicePath, ("Service Path: '%s'", servicePath.c_str()));
+
     /* Getting the entity in the request (helpful in other places) */
-    EntityId en = ceP->entityId;
+    EntityId* enP = &ceP->entityId;
 
     /* Not supporting isPattern = true currently */
-    if (isTrue(en.isPattern)) {
+    if (isTrue(enP->isPattern)) {
         buildGeneralErrorReponse(ceP, NULL, responseP, SccNotImplemented);
         return;
     }
@@ -1372,7 +1377,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
                 buildGeneralErrorReponse(ceP, ca, responseP, SccInvalidParameter,                                   
                                    std::string("action: ") + action +
-                                      " - entity: (" + en.toString(true) + ")" +
+                                      " - entity: (" + enP->toString(true) + ")" +
                                       " - offending attribute: " + aP->toString() +
                                       " - empty attribute not allowed in APPEND or UPDATE");
                 return;
@@ -1380,17 +1385,29 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         }
     }
 
-    /* Find entities (could be several ones in the case of no type or isPattern=true) */
-    const std::string  idString   = "_id." ENT_ENTITY_ID;
-    const std::string  typeString = "_id." ENT_ENTITY_TYPE;
-    BSONObj            query;
+    /* Find entities (could be several, in the case of no type or isPattern=true) */
+    char               path[MAX_SERVICE_NAME_LEN];
+    slashEscape(servicePath.c_str(), path, sizeof(path));
 
-    if (en.type == "") {
-        query = BSON(idString << en.id);
-    }
-    else {
-        query = BSON(idString << en.id << typeString << en.type);
-    }
+    const std::string  idString          = "_id." ENT_ENTITY_ID;
+    const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
+    const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
+    const std::string  servicePathValue  = std::string("^") + path + "$|" + "^" + path + "\\/.*";
+    BSONObj            doesntExist       = BSON("$exists" << false);
+    BSONObjBuilder     bob;
+
+    bob.append(idString, enP->id);
+
+    if (enP->type != "")
+      bob.append(typeString, enP->type);
+    
+    if (servicePath == "")
+      bob.append(servicePathString, doesntExist);
+    else
+      bob.appendRegex(servicePathString, servicePathValue);
+    
+    BSONObj query = bob.obj();
+
     auto_ptr<DBClientCursor> cursor;
 
     try {
@@ -1425,6 +1442,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         return;
     }
 
+
     bool atLeastOneResult = false;
     while (cursor->more()) {
         BSONObj r = cursor->next();
@@ -1448,9 +1466,9 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         /* We start with the attrs array in the entity document, which is manipulated by the
          * {update|delete|append}Attrsr() function for each one of the attributes in the
          * contextElement being processed. Then, we replace the resulting attrs array in the
-         * BSON document and update the entity document. It would be more efficient to map the
-         * entiry attrs to something like and hash map and manipulate there, but it is not seems
-         * easy using the Mongod driver BSON API. Note that we need to use newAttrs given that attrs is
+         * BSON document and the entity document is updated. It would be more efficient to map the
+         * entity attrs to something like a hash map and manipulate it there, but it does not seem
+         * easy, using the mongo driver BSON API. Note that we need to use newAttrs, given that attrs is
          * BSONObj, which is an inmutable type. FIXME P6: try to improve this */
         BSONObj attrs = r.getField(ENT_ATTRS).embeddedObject();
 
@@ -1465,7 +1483,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         double coordLat, coordLong;
         if (r.hasField(ENT_LOCATION)) {
             // FIXME P2: potentially, assertion error will happen if the field is not as expected. Although this shouldn't happen
-            // (if happens, it means that somebody has manipulated the DB out-of-band contex broker) a safer way of parsing BSON object
+            // (if it happens, it means that somebody has manipulated the DB out-of-band of the context broker), a safer way of parsing BSON object
             // will be needed. This is a general comment, applicable to many places in the mongoBackend code
             BSONObj loc = r.getObjectField(ENT_LOCATION);
             locAttr  = loc.getStringField(ENT_LOCATION_ATTRNAME);
@@ -1559,13 +1577,12 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
          * previous addTriggeredSubscriptions() invocations */
         std::string err;
-        processSubscriptions(en, &subsToNotify, &err, tenant);
+        processSubscriptions(enP, &subsToNotify, &err, tenant);
 
         /* To finish with this entity processing, add the corresponding ContextElementResponse to
          * the global response */
         cerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(cerP);
-
     }
 
     /* If the entity didn't already exist, we create it. Note that alternatively, we could do a count()
@@ -1574,13 +1591,13 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
         if (strcasecmp(action.c_str(), "append") != 0) {
             /* Only APPEND can create entities, thus error is returned in UPDATE or DELETE cases */
-            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, en.id);
+            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
         }
         else {            
 
             /* Creating the part of the response that doesn't depend on success or failure */
             ContextElementResponse* cerP = new ContextElementResponse();
-            cerP->contextElement.entityId.fill(en.id, en.type, "false");
+            cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
             for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                 ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
                 ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);                
@@ -1589,7 +1606,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             }
 
             std::string errReason, errDetail;
-            if (!createEntity(en, ceP->contextAttributeVector, &errDetail, tenant)) {
+            if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant)) {
                cerP->statusCode.fill(SccInvalidParameter, errDetail);
             }
             else {
@@ -1599,17 +1616,15 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 std::map<string, BSONObj*> subsToNotify;
                 for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                     std::string err;
-                    if (!addTriggeredSubscriptions(en.id, en.type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err, tenant)) {
+                    if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err, tenant)) {
                         cerP->statusCode.fill(SccReceiverInternalError, err);
                         responseP->contextElementResponseVector.push_back(cerP);
                         LM_RVE((err.c_str()));
                     }
                 }
-                processSubscriptions(en, &subsToNotify, &errReason, tenant);
+                processSubscriptions(enP, &subsToNotify, &errReason, tenant);
             }
             responseP->contextElementResponseVector.push_back(cerP);
         }
-
     }
-
 }

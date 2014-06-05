@@ -40,7 +40,7 @@
 *
 * mongoQueryContext - 
 */
-HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResponse* responseP, const std::string& tenant)
+HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResponse* responseP, const std::string& tenant, const std::string& servicePath)
 {
     reqSemTake(__FUNCTION__, "ngsi10 query request");
 
@@ -52,7 +52,7 @@ HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResp
     }
 
     std::string err;
-    if (!entitiesQuery(requestP->entityIdVector, requestP->attributeList, requestP->restriction, &responseP->contextElementResponseVector, &err, true, tenant)) {
+    if (!entitiesQuery(requestP->entityIdVector, requestP->attributeList, requestP->restriction, &responseP->contextElementResponseVector, &err, true, tenant, servicePath)) {
         responseP->errorCode.fill(SccReceiverInternalError, err);
         LM_E((responseP->errorCode.details.c_str()));
     }

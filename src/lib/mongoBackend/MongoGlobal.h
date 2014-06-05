@@ -66,6 +66,7 @@ using namespace mongo;
 #define ENT_ATTRS                    "attrs"
 #define ENT_ENTITY_ID                "id"
 #define ENT_ENTITY_TYPE              "type"
+#define ENT_SERVICE_PATH             "servicePath"
 #define ENT_ATTRS_NAME               "name"
 #define ENT_ATTRS_TYPE               "type"
 #define ENT_ATTRS_VALUE              "value"
@@ -122,11 +123,16 @@ using namespace mongo;
 
 /*****************************************************************************
 *
+* MAX_SERVICE_NAME_LEN
+*/
+#define MAX_SERVICE_NAME_LEN 1024
+
+/*****************************************************************************
+*
 * Macro to ease extracting fields from BSON objects
 */
 #define STR_FIELD(i, sf) std::string(i.getStringField(sf))
 #define C_STR_FIELD(i, sf) i.getStringField(sf)
-
 
 /*****************************************************************************
 *
@@ -283,7 +289,17 @@ extern bool includedAttribute(ContextAttribute attr, AttributeList* attrsV);
 * entitiesQuery -
 *
 */
-extern bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty, std::string tenant);
+extern bool entitiesQuery
+(
+  EntityIdVector                enV,
+  AttributeList                 attrL,
+  Restriction                   res,
+  ContextElementResponseVector* cerV,
+  std::string*                  err,
+  bool                          includeEmpty,
+  std::string                   tenant,
+  std::string                   servicePath
+);
 
 /* ****************************************************************************
 *
@@ -339,5 +355,15 @@ extern BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVec
 *
 */
 extern bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl, Format format, std::string tenant);
+
+/* ****************************************************************************
+*
+* slashEscape - 
+*
+* When the 'to' buffer is full, slashEscape returns.
+* No warnings, no nothing.
+* Make sure 'to' is big enough!
+*/
+extern void slashEscape(const char* from, char* to, unsigned int toLen);
 
 #endif

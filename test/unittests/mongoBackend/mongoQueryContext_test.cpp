@@ -22,8 +22,7 @@
 *
 * Author: Fermin Galan
 */
-#include "gtest/gtest.h"
-#include "testInit.h"
+#include "unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -36,11 +35,6 @@
 #include "ngsi10/QueryContextResponse.h"
 
 #include "mongo/client/dbclient.h"
-
-#include "commonMocks.h"
-
-using ::testing::_;
-using ::testing::Throw;
 
 /* ****************************************************************************
 *
@@ -333,6 +327,182 @@ static void prepareDatabaseWithCustomMetadata(void) {
     connection->insert(ENTITIES_COLL, en1);
     connection->insert(ENTITIES_COLL, en2);
 
+}
+
+/* ****************************************************************************
+*
+* prepareDatabaseWithServicePath -
+*
+*/
+static void prepareDatabaseWithServicePath(void)
+{
+  /* Set database */
+  setupDatabase();
+
+  DBClientConnection* connection = getMongoConnection();
+
+  /* We create the following entities:
+   *
+   * - E1:  { Type: T, ServicePath: /home,        Attribute: { A1, a1  } }
+   * - E2:  { Type: T, ServicePath: /home/kz,     Attribute: { A1, a2  } }
+   * - E3:  { Type: T, ServicePath: /home/fg,     Attribute: { A1, a3  } }
+   * - E4:  { Type: T, ServicePath: /home/kz/e4,  Attribute: { A1, a4  } }
+   * - E5:  { Type: T, ServicePath: /home/kz/e5,  Attribute: { A1, a5  } }
+   * - E6:  { Type: T, ServicePath: /home/fg/e6,  Attribute: { A1, a6  } }
+   * - E7:  { Type: T, ServicePath: /home2,       Attribute: { A1, a7  } }
+   * - E8:  { Type: T, ServicePath: /home2/kz,    Attribute: { A1, a8  } }
+   * - E9:  { Type: T, ServicePath: "",           Attribute: { A1, a9  } }
+   * - E10: { Type: T, ServicePath: NO,           Attribute: { A1, a10 } }
+   * - E11: { Type: T, ServicePath: /home3/e11,   Attribute: { A1, a11 } }
+   * - E12: { Type: T, ServicePath: /home3/e12,   Attribute: { A1, a12 } }
+   * - E13: { Type: T, ServicePath: /home3/e13,   Attribute: { A1, a13 } }
+   *
+   */
+
+  BSONObj e01 = BSON("_id" << BSON("id" << "E1"  << "type" << "T" << "servicePath" << "/home")       << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a1")));
+  BSONObj e02 = BSON("_id" << BSON("id" << "E2"  << "type" << "T" << "servicePath" << "/home/kz")    << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a2")));
+  BSONObj e03 = BSON("_id" << BSON("id" << "E3"  << "type" << "T" << "servicePath" << "/home/fg")    << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a3")));
+  BSONObj e04 = BSON("_id" << BSON("id" << "E4"  << "type" << "T" << "servicePath" << "/home/kz/e4") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a4")));
+  BSONObj e05 = BSON("_id" << BSON("id" << "E5"  << "type" << "T" << "servicePath" << "/home/kz/e5") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a5")));
+  BSONObj e06 = BSON("_id" << BSON("id" << "E6"  << "type" << "T" << "servicePath" << "/home/fg/e6") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a6")));
+  BSONObj e07 = BSON("_id" << BSON("id" << "E7"  << "type" << "T" << "servicePath" << "/home2")      << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a7")));
+  BSONObj e08 = BSON("_id" << BSON("id" << "E8"  << "type" << "T" << "servicePath" << "/home2/kz")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a8")));
+  BSONObj e09 = BSON("_id" << BSON("id" << "E9"  << "type" << "T" << "servicePath" << "")            << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a9")));
+  BSONObj e10 = BSON("_id" << BSON("id" << "E10" << "type" << "T")                                   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a10")));
+
+  BSONObj e11 = BSON("_id" << BSON("id" << "E11" << "type" << "T" << "servicePath" << "/home3/e11")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a11")));
+  BSONObj e12 = BSON("_id" << BSON("id" << "E12" << "type" << "T" << "servicePath" << "/home3/e12")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a12")));
+  BSONObj e13 = BSON("_id" << BSON("id" << "E13" << "type" << "T" << "servicePath" << "/home3/e13")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a13")));
+
+  connection->insert(ENTITIES_COLL, e01);
+  connection->insert(ENTITIES_COLL, e02);
+  connection->insert(ENTITIES_COLL, e03);
+  connection->insert(ENTITIES_COLL, e04);
+  connection->insert(ENTITIES_COLL, e05);
+  connection->insert(ENTITIES_COLL, e06);
+  connection->insert(ENTITIES_COLL, e07);
+  connection->insert(ENTITIES_COLL, e08);
+  connection->insert(ENTITIES_COLL, e09);
+  connection->insert(ENTITIES_COLL, e10);
+  connection->insert(ENTITIES_COLL, e11);
+  connection->insert(ENTITIES_COLL, e12);
+  connection->insert(ENTITIES_COLL, e13);
+}
+
+/* ****************************************************************************
+*
+* queryWithServicePathEntPatternType -
+*/
+TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType)
+{
+  HttpStatusCode         ms;
+  QueryContextRequest    qcReq;
+  QueryContextResponse   qcResponse;
+  QueryContextResponse   qcResponse2;
+  QueryContextResponse   qcResponse3;
+  QueryContextResponse   qcResponse4;
+  QueryContextResponse   qcResponse5;
+  QueryContextResponse   qcResponse6;
+  QueryContextResponse   qcResponse7;
+
+  utInit();
+  prepareDatabaseWithServicePath();
+
+  EntityId en("E.*", "T", "true");
+  qcReq.entityIdVector.push_back(&en);
+
+
+  // 1. Test that only 3 items are found for Service Path "/home/kz"
+  ms = mongoQueryContext(&qcReq, &qcResponse, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(3,        qcResponse.contextElementResponseVector.size());
+  EXPECT_STREQ("a2",  qcResponse.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a4",  qcResponse.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a5",  qcResponse.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->value.c_str());
+
+
+  // 2. Test that 6 items are found for Service Path "/home"
+  ms = mongoQueryContext(&qcReq, &qcResponse2, "", "/home");
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(6,        qcResponse2.contextElementResponseVector.size());
+  EXPECT_STREQ("a1",  qcResponse2.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a2",  qcResponse2.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a3",  qcResponse2.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a4",  qcResponse2.contextElementResponseVector[3]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a5",  qcResponse2.contextElementResponseVector[4]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a6",  qcResponse2.contextElementResponseVector[5]->contextElement.contextAttributeVector[0]->value.c_str());
+
+
+  // 3. Test that only 1 item is found without Service Path
+  ms = mongoQueryContext(&qcReq, &qcResponse3, "", "");
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(1,        qcResponse3.contextElementResponseVector.size());
+  EXPECT_STREQ("a10", qcResponse3.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  // 4. Test that 2 items are found for Service Path "/home2"
+  ms = mongoQueryContext(&qcReq, &qcResponse4, "", "/home2");
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(2,       qcResponse4.contextElementResponseVector.size());
+  EXPECT_STREQ("a7", qcResponse4.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a8", qcResponse4.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  // 5. Test that only ONE item AND the right one is found for Service path /home/e11, /home/e12, and /home/e13
+  ms = mongoQueryContext(&qcReq, &qcResponse5, "", "/home3/e11");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(1,        qcResponse5.contextElementResponseVector.size());
+  EXPECT_STREQ("a11", qcResponse5.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  ms = mongoQueryContext(&qcReq, &qcResponse6, "", "/home3/e12");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(1,        qcResponse6.contextElementResponseVector.size());
+  EXPECT_STREQ("a12", qcResponse6.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  ms = mongoQueryContext(&qcReq, &qcResponse7, "", "/home3/e13");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(1,        qcResponse7.contextElementResponseVector.size());
+  EXPECT_STREQ("a13", qcResponse7.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  utExit();
+}
+
+/* ****************************************************************************
+*
+* queryWithIdenticalEntitiesButDifferentServicePaths -
+*/
+TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePaths)
+{
+  EXPECT_STREQ("To implement", "In feature/392");
+}
+
+/* ****************************************************************************
+*
+* queryWithServicePathEntPatternNoType -
+*/
+TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType)
+{
+  EXPECT_STREQ("To implement", "In feature/392");
+}
+
+/* ****************************************************************************
+*
+* queryWithServicePathEntNoPatternType -
+*/
+TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternType)
+{
+  EXPECT_STREQ("To implement", "In feature/392");
+}
+
+/* ****************************************************************************
+*
+* queryWithServicePathEntNoPatternNoType -
+*/
+TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternNoType)
+{
+  EXPECT_STREQ("To implement", "In feature/392");
 }
 
 /* ****************************************************************************

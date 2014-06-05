@@ -524,7 +524,7 @@ bool includedAttribute(ContextAttribute attr, AttributeList* attrsV) {
 *
 * fillQueryEntFalse -
 */
-static void fillQueryEntFalse(BSONArrayBuilder& ba, EntityId* enP, bool withType = true) {
+static void fillQueryEntFalse(BSONArrayBuilder& ba, EntityId* enP, bool withType) {
 
     if (withType) {
         ba.append(BSON(ENT_ENTITY_ID << enP->id << ENT_ENTITY_TYPE << enP->type));
@@ -536,19 +536,41 @@ static void fillQueryEntFalse(BSONArrayBuilder& ba, EntityId* enP, bool withType
     }
 }
 
+
+
 /* ****************************************************************************
 *
 * fillQueryEntTrue -
+*
+* The regular expression for servicePath is an OR between the exact path and
+* the exact path followed by a slash ('/') and after that, any text (including slashes)
+*
+* If the servicePath is empty, then we only look for entities that have no service path 
+* associated ("$exists: false").
 */
-static void fillQueryEntTrue(BSONArrayBuilder& ba, EntityId* enP) {
-
+static void fillQueryEntTrue(BSONArrayBuilder& ba, EntityId* enP, const std::string& servicePath)
+{
     BSONObjBuilder     ent;
-    const std::string  idString   = "_id." ENT_ENTITY_ID;
-    const std::string  typeString = "_id." ENT_ENTITY_TYPE;
+    const std::string  idString          = "_id." ENT_ENTITY_ID;
+    const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
+    const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
     ent.appendRegex(idString, enP->id);
     if (enP->type != "") {
         ent.append(typeString, enP->type);
+    }
+
+    if (servicePath != "")
+    {
+      char path[MAX_SERVICE_NAME_LEN];
+      slashEscape(servicePath.c_str(), path, sizeof(path));
+      const std::string  servicePathValue = std::string("^") + path + "$|" + "^" + path + "\\/.*";
+      ent.appendRegex(servicePathString, servicePathValue);
+    }
+    else
+    {
+      BSONObj doesntExist = BSON("$exists" << false);
+      ent.append(servicePathString, doesntExist);
     }
 
     BSONObj entObj = ent.obj();
@@ -710,16 +732,28 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
 * empty value causes an error)
 *
 */
-bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty, std::string tenant) {
-
+bool entitiesQuery
+(
+  EntityIdVector                enV,
+  AttributeList                 attrL,
+  Restriction                   res,
+  ContextElementResponseVector* cerV,
+  std::string*                  err,
+  bool                          includeEmpty,
+  std::string                   tenant,
+  std::string                   servicePath
+)
+{
     DBClientConnection* connection = getMongoConnection();
+
+    LM_T(LmtServicePath, ("Service Path: '%s'", servicePath.c_str()));
 
     /* Query structure is as follows
      *
      * {
      *    "$or": [ ... ],            (always)
      *    "attrs.name": { ... },     (only if attributes are used in the query)
-     *    "location.coords": { ... } (only in the case of geo queries)
+     *    "location.coords": { ... } (only in the case of geo-queries)
      *  }
      *
      */
@@ -731,14 +765,16 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
 
     BSONArrayBuilder entFalseWType;
     BSONArrayBuilder entFalseWOType;
-    for (unsigned int ix = 0; ix < enV.size(); ++ix) {
-        if (isTrue(enV.get(ix)->isPattern)) {
+    for (unsigned int ix = 0; ix < enV.size(); ++ix)
+    {
+        if (isTrue(enV.get(ix)->isPattern))
+        {
             /* Part 1.1: add from 0 to N objects (in entTrue) to the $or array for entities
              * with isPatter=true. Note we are using the builder for the $or vector itself,
              * as in this case entities can be "directly" inserted. For the other two parts, we
              * just accumulate in this loop, as they need additional BSON composition before be
              * inserted in the $or array */
-            fillQueryEntTrue(orEnt, enV.get(ix));
+            fillQueryEntTrue(orEnt, enV.get(ix), servicePath);
         }
         else {
             /* Accumulating for later BSON composition (Part 1.2 and Part 1.3 below)*/
@@ -1229,7 +1265,7 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
 
     // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
     Restriction res;
-    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant)) {
+    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant, "")) {
         ncr.contextElementResponseVector.release();
         LM_RE(false, (err.c_str()));
     }
@@ -1247,7 +1283,7 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
             ContextElementResponseVector allCerV;
             AttributeList emptyList;
             // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
-            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false, tenant)) {
+            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false, tenant, "")) {
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
                 LM_RE(false, (err.c_str()));
@@ -1422,4 +1458,49 @@ bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, st
 
     ncar.contextRegistrationResponseVector.release();
     return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* slashEscape - escape all slashes in 'from' into 'to'
+*
+* If the 'to' buffer is not big enough, slashEscape returns with to's content set to 'ERROR'.
+*/
+void slashEscape(const char* from, char* to, unsigned int toLen)
+{
+  unsigned int ix      = 0;
+  unsigned int slashes = 0;
+
+  // 1. count number of slashes, to help to decide whether to return ERROR or not
+  while (from[ix] != 0)
+  {
+    if (from[ix] == '/')
+      ++slashes;
+
+    ++ix;
+  }
+  
+  // 2. If the escaped version of 'from' doesn't fit inside 'to', return ERROR as string
+  if ((strlen(from) + slashes + 1) > toLen)
+  {
+    strncpy(to, "ERROR", toLen);
+    return;
+  } 
+
+
+  // 3. Copy 'in' to 'from', including escapes for '/'
+  ix = 0;
+  while (*from != 0)
+  {
+    if (ix >= toLen - 2)
+      return;
+
+    if (*from == '/')
+      to[ix++] = '\\';
+    to[ix++] = *from;
+    ++from;
+    to[ix] = 0;
+  }
 }

@@ -52,7 +52,7 @@ HttpStatusCode mapDeleteIndividualContextEntity(const std::string& entityId, Sta
   ucRequest.contextElementVector.push_back(&ce);
   ucRequest.updateActionType.set("Delete");
 
-  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePath);
 
   *response = ucResponse.contextElementResponseVector.get(0)->statusCode;
 
