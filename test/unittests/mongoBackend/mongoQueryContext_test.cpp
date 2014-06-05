@@ -373,8 +373,8 @@ static void prepareDatabaseWithServicePath(void)
   connection->insert(ENTITIES_COLL, e04);
   connection->insert(ENTITIES_COLL, e05);
   connection->insert(ENTITIES_COLL, e06);
-  // connection->insert(ENTITIES_COLL, e07);
-  // connection->insert(ENTITIES_COLL, e08);
+  connection->insert(ENTITIES_COLL, e07);
+  connection->insert(ENTITIES_COLL, e08);
   connection->insert(ENTITIES_COLL, e09);
   connection->insert(ENTITIES_COLL, e10);
 }
@@ -390,6 +390,7 @@ TEST(mongoQueryContextRequest, queryWithServicePath)
   QueryContextResponse   qcResponse;
   QueryContextResponse   qcResponse2;
   QueryContextResponse   qcResponse3;
+  QueryContextResponse   qcResponse4;
 
   utInit();
   prepareDatabaseWithServicePath();
@@ -423,10 +424,18 @@ TEST(mongoQueryContextRequest, queryWithServicePath)
 
   // 3. Test that only 1 item is found without Service Path
   ms = mongoQueryContext(&qcReq, &qcResponse3, "", "");
-  ASSERT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk, ms);
 
-  ASSERT_EQ(1,        qcResponse3.contextElementResponseVector.size());
+  EXPECT_EQ(1,        qcResponse3.contextElementResponseVector.size());
   EXPECT_STREQ("a10", qcResponse3.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  // 4. Test that 2 items are found for Service Path "/home2"
+  ms = mongoQueryContext(&qcReq, &qcResponse4, "", "/home2");
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(2,       qcResponse4.contextElementResponseVector.size());
+  EXPECT_STREQ("a7", qcResponse4.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a8", qcResponse4.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
 
   utExit();
 }
