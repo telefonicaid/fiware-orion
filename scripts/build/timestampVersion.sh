@@ -20,7 +20,7 @@
 
 # Calculating version for RPM
 currentVersion=$(grep "define ORION_VERSION" src/app/contextBroker/version.h  | awk -F\" '{ print $2 }')
-# We assume that currenVersion has the following format "0.14.0-next"
+# We assume that currentVersion has the following format: "0.14.0-next"
 baseToken=$(echo $currentVersion | awk -F '-' '{print $1}')
 timeToken=$(date "+%Y%m%d%H%M%S")
 newVersion=${baseToken}_${timeToken}
