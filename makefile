@@ -280,7 +280,16 @@ unit_test: build_unit_test
         fi
 	@echo '------------------------------- unit_test ended ---------------------------------'
 
-functional_test: install_debug build_unit_test
+functional_test: install
+	./test/functionalTest/testHarness.sh
+
+functional_test_debug: install_debug
+	./test/functionalTest/testHarness.sh
+
+ft:  functional_test
+ftd: functional_test_debug
+
+old_functional_test: install_debug build_unit_test
 	if [ -z "${BROKER_PORT}" ]; then \
 	    echo "Execute '. scripts/testEnv.sh' before executing the tests"; \
 	    exit 1; \
