@@ -335,6 +335,58 @@ static int outFormatCheck(ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
+* servicePathCheck - 
+*
+* Not static just to let unit tests call this function
+*/
+int servicePathCheck(ConnectionInfo* ciP)
+{
+  // 1. Max 10 paths  - ONLY ONE path allowed at this moment
+  // 2. Max 10 levels in each path
+  // 3. Max 10 characters in each path component
+  // 4. Only alphanum and underscore allowed (just like in tenants)
+  
+  std::vector<std::string> compV;
+  int                      components;
+
+  components = stringSplit(ciP->servicePath, '/', compV);
+
+  if (components > 10)
+  {
+    OrionError e(SccBadRequest, "too many components in ServicePath");
+    ciP->answer = e.render(ciP->outFormat, "");
+    return 1;
+  }
+
+  for (int ix = 0; ix < components; ++ix)
+  {
+    if (strlen(compV[ix].c_str()) > 10)
+    {
+      OrionError e(SccBadRequest, std::string("component-name too long in ServicePath '") + ciP->servicePath + "'");
+      ciP->answer = e.render(ciP->outFormat, "");
+      return 2;
+    }
+
+    const char* comp = compV[ix].c_str();
+
+    for (unsigned int cIx = 0; cIx < strlen(comp); ++cIx)
+    {
+      if (!isalnum(comp[cIx]) && (comp[cIx] != '_'))
+      {
+        OrionError e(SccBadRequest, std::string("component '") + comp + " ' of ServicePath contains illegal character '" + *comp + "'");
+        ciP->answer = e.render(ciP->outFormat, "");
+        return 3;
+      }
+    }
+  }
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
 * contentTypeCheck -
 *
 * NOTE
@@ -444,6 +496,13 @@ static int connectionTreat
     ciP->outFormat            = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
       ciP->outFormat = XML; // XML is default output format
+
+    ciP->servicePath = ciP->httpHeaders.servicePath;
+    if (servicePathCheck(ciP) != 0)
+    {
+      LM_W(("Error in ServicerPath header"));
+      restReply(ciP, ciP->answer);
+    }
 
     if (contentTypeCheck(ciP) != 0)
     {
