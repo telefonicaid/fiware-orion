@@ -538,13 +538,13 @@ EOF
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
+          <id>OfficeRoom</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
             <name>temperature</name>
             <type>degree</type>
-            <contextValue>14</contextValue>
+            <contextValue>12</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -556,13 +556,13 @@ EOF
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
+          <id>ConferenceRoom</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
             <name>temperature</name>
             <type>degree</type>
-            <contextValue>12</contextValue>
+            <contextValue>14</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -720,18 +720,18 @@ EOF
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
+          <id>OfficeRoom</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
             <name>temperature</name>
             <type>degree</type>
-            <contextValue>14</contextValue>
+            <contextValue>12</contextValue>
           </contextAttribute>
           <contextAttribute>
             <name>pressure</name>
             <type>clima</type>
-            <contextValue>p23</contextValue>
+            <contextValue>p2300</contextValue>
           </contextAttribute>
           <contextAttribute>
             <name>lightstatus</name>
@@ -748,18 +748,18 @@ EOF
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
+          <id>ConferenceRoom</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
             <name>temperature</name>
             <type>degree</type>
-            <contextValue>12</contextValue>
+            <contextValue>14</contextValue>
           </contextAttribute>
           <contextAttribute>
             <name>pressure</name>
             <type>clima</type>
-            <contextValue>p2300</contextValue>
+            <contextValue>p23</contextValue>
           </contextAttribute>
           <contextAttribute>
             <name>lightstatus</name>
