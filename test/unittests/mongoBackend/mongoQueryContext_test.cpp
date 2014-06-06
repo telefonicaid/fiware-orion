@@ -400,6 +400,16 @@ static void prepareDatabaseWithServicePath(const std::string modifier)
     BSONObj e = BSON("_id" << BSON("id" << "E3" << "type" << "OOO" << "servicePath" << "/home/fg/124")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ae_2")));
     connection->insert(ENTITIES_COLL, e);
   }
+  else if (modifier == "IdenticalEntitiesButDifferentServicePaths")
+  {
+    BSONObj ie1 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/01")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ie_01")));
+    BSONObj ie2 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/02")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ie_02")));
+    BSONObj ie3 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/03")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ie_03")));
+
+    connection->insert(ENTITIES_COLL, ie1);
+    connection->insert(ENTITIES_COLL, ie2);
+    connection->insert(ENTITIES_COLL, ie3);
+  }
 }
 
 /* ****************************************************************************
@@ -477,29 +487,38 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
   QueryContextResponse   qcResponse1;
   QueryContextResponse   qcResponse2;
   QueryContextResponse   qcResponse3;
+  QueryContextResponse   qcResponse4;
 
   utInit();
-  prepareDatabaseWithServicePath("");
+  prepareDatabaseWithServicePath("IdenticalEntitiesButDifferentServicePaths");
 
-  EntityId en("E.*", "T", "true");
+  EntityId en("IE", "T", "false");
   qcReq.entityIdVector.push_back(&en);
 
 
-  // Test that only ONE item AND the right one is found for Service path /home/e11, /home/e12, and /home/e13
-  ms = mongoQueryContext(&qcReq, &qcResponse1, "", "/home3/e11");
+  // Test that three items are found for Service path /home/fg
+  ms = mongoQueryContext(&qcReq, &qcResponse1, "", "/home/fg");
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(1,        qcResponse1.contextElementResponseVector.size());
-  EXPECT_STREQ("a11", qcResponse1.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_EQ(3,        qcResponse1.contextElementResponseVector.size());
+  EXPECT_STREQ("ie_01", qcResponse1.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("ie_02", qcResponse1.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("ie_03", qcResponse1.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->value.c_str());
 
-  ms = mongoQueryContext(&qcReq, &qcResponse2, "", "/home3/e12");
+  // Test that only ONE item AND the right one is found for Service paths /home/fg/01, /home/fg/02, and /home/fg/03
+  ms = mongoQueryContext(&qcReq, &qcResponse2, "", "/home/fg/01");
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(1,        qcResponse2.contextElementResponseVector.size());
-  EXPECT_STREQ("a12", qcResponse2.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_EQ(1,          qcResponse2.contextElementResponseVector.size());
+  EXPECT_STREQ("ie_01", qcResponse2.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
 
-  ms = mongoQueryContext(&qcReq, &qcResponse3, "", "/home3/e13");
+  ms = mongoQueryContext(&qcReq, &qcResponse3, "", "/home/fg/02");
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(1,        qcResponse3.contextElementResponseVector.size());
-  EXPECT_STREQ("a13", qcResponse3.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_EQ(1,          qcResponse3.contextElementResponseVector.size());
+  EXPECT_STREQ("ie_02", qcResponse3.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  ms = mongoQueryContext(&qcReq, &qcResponse4, "", "/home/fg/03");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(1,          qcResponse4.contextElementResponseVector.size());
+  EXPECT_STREQ("ie_03", qcResponse4.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
 
   utExit();
 }
