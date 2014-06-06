@@ -750,8 +750,6 @@ bool entitiesQuery
     /* Part 1: entities */
     BSONArrayBuilder orEnt;
 
-    BSONArrayBuilder entFalseWType;
-    BSONArrayBuilder entFalseWOType;
     for (unsigned int ix = 0; ix < enV.size(); ++ix)
       fillQueryEntity(orEnt, enV.get(ix), servicePath);
 
