@@ -25,7 +25,7 @@ baseToken=$(echo $currentVersion | awk -F '-' '{print $1}')
 timeToken=$(date "+%Y%m%d%H%M%S")
 newVersion=${baseToken}_${timeToken}
 
-# Chaning version
+# Changing version
 echo "changing: <$currentVersion> to <$newVersion>"
 sed "s/$currentVersion/$newVersion/" src/app/contextBroker/version.h > /tmp/version.h
 mv /tmp/version.h src/app/contextBroker/version.h
