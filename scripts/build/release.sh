@@ -21,7 +21,7 @@
 # ------------------------------------------------------------------------------
 #
 # Example execution:
-#   scripts/release.sh 0.4.0 4 2.3.3 4 changelog
+#   scripts/build/release.sh 0.4.0 4 2.3.3 4 changelog
 #
 progName=$0
 
