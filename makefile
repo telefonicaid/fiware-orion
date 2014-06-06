@@ -197,6 +197,26 @@ install_libs: release
 install_debug_libs: debug
 	make post_install_libs CMAKE_BUILD_TYPE=BUILD_DEBUG
 
+rpm-ts:
+	# This target assumes that scripts/build/timestampVersion.sh has been previously called before "make rpm-ts"
+	rm -f rpm/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
+	git archive --format tar --prefix=contextBroker-$(BROKER_VERSION)/ HEAD |  gzip >  $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
+	# It seems that git archive doesn't take into account changes in the local copy not commited. Thus, we need to do this "in place" .tar.gz
+	# replacement to inject the modified version.sh file
+	cd $(RPM_TOPDIR)/SOURCES && tar xfvz contextBroker-$(BROKER_VERSION).tar.gz && cd -
+	cp src/app/contextBroker/version.h $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION)/src/app/contextBroker/version.h
+	rm $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
+	cd $(RPM_TOPDIR)/SOURCES && tar cfvz contextBroker-$(BROKER_VERSION).tar.gz contextBroker-$(BROKER_VERSION) && cd -
+	rm -rf $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION)
+	# -------------
+	rpmbuild -ba $(RPM_TOPDIR)/SPECS/contextBroker.spec \
+		--define '_topdir $(RPM_TOPDIR)' \
+		--define 'broker_version $(BROKER_VERSION)' \
+		--define 'broker_release $(BROKER_RELEASE)' \
+		--define 'fiware_version $(FIWARE_VERSION)' \
+		--define 'fiware_release $(FIWARE_RELEASE)' \
+		--define 'build_arch $(BUILD_ARCH)'
+	git checkout src/app/contextBroker/version.h
 
 rpm: 
 	rm -f rpm/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
