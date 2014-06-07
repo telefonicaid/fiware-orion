@@ -326,7 +326,6 @@ static void prepareDatabaseWithCustomMetadata(void) {
 
     connection->insert(ENTITIES_COLL, en1);
     connection->insert(ENTITIES_COLL, en2);
-
 }
 
 /* ****************************************************************************
@@ -334,7 +333,7 @@ static void prepareDatabaseWithCustomMetadata(void) {
 * prepareDatabaseWithServicePath -
 *
 */
-static void prepareDatabaseWithServicePath(void)
+static void prepareDatabaseWithServicePath(const std::string modifier)
 {
   /* Set database */
   setupDatabase();
@@ -387,11 +386,37 @@ static void prepareDatabaseWithServicePath(void)
   connection->insert(ENTITIES_COLL, e11);
   connection->insert(ENTITIES_COLL, e12);
   connection->insert(ENTITIES_COLL, e13);
+
+  if (modifier == "")
+    return;
+
+  if (modifier == "patternNoType")
+  {
+    BSONObj e = BSON("_id" << BSON("id" << "E" << "type" << "OOO" << "servicePath" << "/home/kz/123")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ae_1")));
+    connection->insert(ENTITIES_COLL, e);
+  }
+  else if (modifier == "noPatternNoType")
+  {
+    BSONObj e = BSON("_id" << BSON("id" << "E3" << "type" << "OOO" << "servicePath" << "/home/fg/124")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ae_2")));
+    connection->insert(ENTITIES_COLL, e);
+  }
+  else if (modifier == "IdenticalEntitiesButDifferentServicePaths")
+  {
+    BSONObj ie1 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/01")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ie_01")));
+    BSONObj ie2 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/02")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ie_02")));
+    BSONObj ie3 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/03")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ie_03")));
+
+    connection->insert(ENTITIES_COLL, ie1);
+    connection->insert(ENTITIES_COLL, ie2);
+    connection->insert(ENTITIES_COLL, ie3);
+  }
 }
 
 /* ****************************************************************************
 *
 * queryWithServicePathEntPatternType -
+*
+* FIXME P4: Fermin to inspect whether the function has enough EXPECTs 
 */
 TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType)
 {
@@ -406,65 +431,101 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType)
   QueryContextResponse   qcResponse7;
 
   utInit();
-  prepareDatabaseWithServicePath();
+  prepareDatabaseWithServicePath("patternType");
 
   EntityId en("E.*", "T", "true");
   qcReq.entityIdVector.push_back(&en);
 
 
   // 1. Test that only 3 items are found for Service Path "/home/kz"
+  qcResponse.errorCode.fill(SccOk, ""); // All OK - qcResponse.errorCode should be untouched
   ms = mongoQueryContext(&qcReq, &qcResponse, "", "/home/kz");
   EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk,   qcResponse.errorCode.code);
+  EXPECT_STREQ("OK", qcResponse.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   qcResponse.errorCode.details.c_str());
 
-  EXPECT_EQ(3,        qcResponse.contextElementResponseVector.size());
+  EXPECT_EQ(3, qcResponse.contextElementResponseVector.size());
+
+  EXPECT_STREQ("A1",  qcResponse.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->type.c_str());
   EXPECT_STREQ("a2",  qcResponse.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",  qcResponse.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->type.c_str());
   EXPECT_STREQ("a4",  qcResponse.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",  qcResponse.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->type.c_str());
   EXPECT_STREQ("a5",  qcResponse.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->value.c_str());
 
 
   // 2. Test that 6 items are found for Service Path "/home"
+  qcResponse2.errorCode.fill(SccOk, ""); // All OK - qcResponse.errorCode should be untouched
   ms = mongoQueryContext(&qcReq, &qcResponse2, "", "/home");
   EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk,   qcResponse2.errorCode.code);
+  EXPECT_STREQ("OK", qcResponse2.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   qcResponse2.errorCode.details.c_str());
 
   EXPECT_EQ(6,        qcResponse2.contextElementResponseVector.size());
+
+  EXPECT_STREQ("A1",  qcResponse2.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse2.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->type.c_str());
   EXPECT_STREQ("a1",  qcResponse2.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",  qcResponse2.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse2.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->type.c_str());
   EXPECT_STREQ("a2",  qcResponse2.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",  qcResponse2.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse2.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->type.c_str());
   EXPECT_STREQ("a3",  qcResponse2.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",  qcResponse2.contextElementResponseVector[3]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse2.contextElementResponseVector[3]->contextElement.contextAttributeVector[0]->type.c_str());
   EXPECT_STREQ("a4",  qcResponse2.contextElementResponseVector[3]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",  qcResponse2.contextElementResponseVector[4]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse2.contextElementResponseVector[4]->contextElement.contextAttributeVector[0]->type.c_str());
   EXPECT_STREQ("a5",  qcResponse2.contextElementResponseVector[4]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",  qcResponse2.contextElementResponseVector[5]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse2.contextElementResponseVector[5]->contextElement.contextAttributeVector[0]->type.c_str());
   EXPECT_STREQ("a6",  qcResponse2.contextElementResponseVector[5]->contextElement.contextAttributeVector[0]->value.c_str());
 
 
   // 3. Test that only 1 item is found without Service Path
+  qcResponse3.errorCode.fill(SccOk, ""); // All OK - qcResponse.errorCode should be untouched
   ms = mongoQueryContext(&qcReq, &qcResponse3, "", "");
   EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk,   qcResponse3.errorCode.code);
+  EXPECT_STREQ("OK", qcResponse3.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   qcResponse3.errorCode.details.c_str());
 
   EXPECT_EQ(1,        qcResponse3.contextElementResponseVector.size());
+
+  EXPECT_STREQ("A1",  qcResponse3.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse3.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->type.c_str());
   EXPECT_STREQ("a10", qcResponse3.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
 
   // 4. Test that 2 items are found for Service Path "/home2"
+  qcResponse4.errorCode.fill(SccOk, ""); // All OK - qcResponse.errorCode should be untouched
   ms = mongoQueryContext(&qcReq, &qcResponse4, "", "/home2");
   EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk,   qcResponse4.errorCode.code);
+  EXPECT_STREQ("OK", qcResponse4.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   qcResponse4.errorCode.details.c_str());
 
   EXPECT_EQ(2,       qcResponse4.contextElementResponseVector.size());
-  EXPECT_STREQ("a7", qcResponse4.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
-  EXPECT_STREQ("a8", qcResponse4.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
 
-  // 5. Test that only ONE item AND the right one is found for Service path /home/e11, /home/e12, and /home/e13
-  ms = mongoQueryContext(&qcReq, &qcResponse5, "", "/home3/e11");
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(1,        qcResponse5.contextElementResponseVector.size());
-  EXPECT_STREQ("a11", qcResponse5.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("A1",  qcResponse4.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse4.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("a7",  qcResponse4.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
 
-  ms = mongoQueryContext(&qcReq, &qcResponse6, "", "/home3/e12");
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(1,        qcResponse6.contextElementResponseVector.size());
-  EXPECT_STREQ("a12", qcResponse6.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
-
-  ms = mongoQueryContext(&qcReq, &qcResponse7, "", "/home3/e13");
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(1,        qcResponse7.contextElementResponseVector.size());
-  EXPECT_STREQ("a13", qcResponse7.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("A1",  qcResponse4.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse4.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("a8",  qcResponse4.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
 
   utExit();
 }
@@ -472,37 +533,290 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType)
 /* ****************************************************************************
 *
 * queryWithIdenticalEntitiesButDifferentServicePaths -
+*
+* FIXME P4: Fermin to inspect whether the function has enough EXPECTs 
 */
 TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePaths)
 {
-  EXPECT_STREQ("To implement", "In feature/392");
+  HttpStatusCode         ms;
+  QueryContextRequest    qcReq;
+  QueryContextResponse   qcResponse1;
+  QueryContextResponse   qcResponse2;
+  QueryContextResponse   qcResponse3;
+  QueryContextResponse   qcResponse4;
+
+  utInit();
+  prepareDatabaseWithServicePath("IdenticalEntitiesButDifferentServicePaths");
+
+  EntityId en("IE", "T", "false");
+  qcReq.entityIdVector.push_back(&en);
+
+
+  // Test that three items are found for Service path /home/fg
+  qcResponse1.errorCode.fill(SccOk, ""); // All OK - qcResponse.errorCode should be untouched
+  ms = mongoQueryContext(&qcReq, &qcResponse1, "", "/home/fg");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk,   qcResponse1.errorCode.code);
+  EXPECT_STREQ("OK", qcResponse1.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   qcResponse1.errorCode.details.c_str());
+
+  EXPECT_EQ(3, qcResponse1.contextElementResponseVector.size());
+
+  EXPECT_STREQ("A1",    qcResponse1.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1",   qcResponse1.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("ie_01", qcResponse1.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",    qcResponse1.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1",   qcResponse1.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("ie_02", qcResponse1.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",    qcResponse1.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1",   qcResponse1.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("ie_03", qcResponse1.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->value.c_str());
+
+
+  // Test that only ONE item AND the right one is found for Service paths /home/fg/01, /home/fg/02, and /home/fg/03
+  qcResponse2.errorCode.fill(SccOk, ""); // All OK - qcResponse.errorCode should be untouched
+  ms = mongoQueryContext(&qcReq, &qcResponse2, "", "/home/fg/01");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk,   qcResponse2.errorCode.code);
+  EXPECT_STREQ("OK", qcResponse2.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   qcResponse2.errorCode.details.c_str());
+
+  EXPECT_EQ(1,          qcResponse2.contextElementResponseVector.size());
+
+  EXPECT_STREQ("A1",    qcResponse2.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1",   qcResponse2.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("ie_01", qcResponse2.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+
+  // Same test for /home/fg/02
+  qcResponse3.errorCode.fill(SccOk, ""); // All OK - qcResponse.errorCode should be untouched
+  ms = mongoQueryContext(&qcReq, &qcResponse3, "", "/home/fg/02");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk,   qcResponse3.errorCode.code);
+  EXPECT_STREQ("OK", qcResponse3.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   qcResponse3.errorCode.details.c_str());
+
+  EXPECT_EQ(1,          qcResponse3.contextElementResponseVector.size());
+
+  EXPECT_STREQ("A1",    qcResponse3.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1",   qcResponse3.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("ie_02", qcResponse3.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+
+  // Same test for /home/fg/03
+  qcResponse4.errorCode.fill(SccOk, ""); // All OK - qcResponse.errorCode should be untouched
+  ms = mongoQueryContext(&qcReq, &qcResponse4, "", "/home/fg/03");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk,   qcResponse4.errorCode.code);
+  EXPECT_STREQ("OK", qcResponse4.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   qcResponse4.errorCode.details.c_str());
+
+  EXPECT_EQ(1,          qcResponse4.contextElementResponseVector.size());
+
+  EXPECT_STREQ("A1",    qcResponse4.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1",   qcResponse4.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("ie_03", qcResponse4.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  utExit();
 }
 
 /* ****************************************************************************
 *
 * queryWithServicePathEntPatternNoType -
+*
+* FIXME P4: Fermin to inspect whether the function has enough EXPECTs 
 */
 TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType)
 {
-  EXPECT_STREQ("To implement", "In feature/392");
+  HttpStatusCode         ms;
+  QueryContextRequest    qcReq;
+  QueryContextResponse   qcResponse;
+  QueryContextResponse   qcResponse2;
+  QueryContextResponse   qcResponse3;
+  QueryContextResponse   qcResponse4;
+
+  utInit();
+  prepareDatabaseWithServicePath("patternNoType");
+
+  EntityId en("E.*", "", "true");
+  qcReq.entityIdVector.push_back(&en);
+
+
+  // 1. Test that only 3 items are found for Service Path "/home/kz"
+  qcResponse.errorCode.fill(SccOk, ""); // All OK - qcResponse.errorCode should be untouched
+  ms = mongoQueryContext(&qcReq, &qcResponse, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk,   qcResponse.errorCode.code);
+  EXPECT_STREQ("OK", qcResponse.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   qcResponse.errorCode.details.c_str());
+
+  EXPECT_EQ(4,         qcResponse.contextElementResponseVector.size());
+
+  EXPECT_STREQ("A1",   qcResponse.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1",  qcResponse.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("a2",   qcResponse.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",   qcResponse.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1",  qcResponse.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("a4",   qcResponse.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",   qcResponse.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1",  qcResponse.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("a5",   qcResponse.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",   qcResponse.contextElementResponseVector[3]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1",  qcResponse.contextElementResponseVector[3]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("ae_1", qcResponse.contextElementResponseVector[3]->contextElement.contextAttributeVector[0]->value.c_str());
+
+
+  // 2. Test that 7 items are found for Service Path "/home"
+  qcResponse2.errorCode.fill(SccOk, ""); // All OK - qcResponse.errorCode should be untouched
+  ms = mongoQueryContext(&qcReq, &qcResponse2, "", "/home");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk,   qcResponse2.errorCode.code);
+  EXPECT_STREQ("OK", qcResponse2.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   qcResponse2.errorCode.details.c_str());
+
+  EXPECT_EQ(7, qcResponse2.contextElementResponseVector.size());
+
+  EXPECT_STREQ("A1",  qcResponse2.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse2.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("a1",  qcResponse2.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",  qcResponse2.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse2.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("a2",  qcResponse2.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",  qcResponse2.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse2.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("a3",  qcResponse2.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",  qcResponse2.contextElementResponseVector[3]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse2.contextElementResponseVector[3]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("a4",  qcResponse2.contextElementResponseVector[3]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",  qcResponse2.contextElementResponseVector[4]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse2.contextElementResponseVector[4]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("a5",  qcResponse2.contextElementResponseVector[4]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",  qcResponse2.contextElementResponseVector[5]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse2.contextElementResponseVector[5]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("a6",  qcResponse2.contextElementResponseVector[5]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",  qcResponse2.contextElementResponseVector[6]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse2.contextElementResponseVector[6]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("ae_1",qcResponse2.contextElementResponseVector[6]->contextElement.contextAttributeVector[0]->value.c_str());
+
+
+  // 3. Test that only 1 item is found without Service Path
+  qcResponse3.errorCode.fill(SccOk, ""); // All OK - qcResponse.errorCode should be untouched
+  ms = mongoQueryContext(&qcReq, &qcResponse3, "", "");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk,   qcResponse3.errorCode.code);
+  EXPECT_STREQ("OK", qcResponse3.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   qcResponse3.errorCode.details.c_str());
+
+  EXPECT_EQ(1, qcResponse3.contextElementResponseVector.size());
+
+  EXPECT_STREQ("A1",  qcResponse3.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse3.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("a10", qcResponse3.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  // 4. Test that 2 items are found for Service Path "/home2"
+  qcResponse4.errorCode.fill(SccOk, ""); // All OK - qcResponse.errorCode should be untouched
+  ms = mongoQueryContext(&qcReq, &qcResponse4, "", "/home2");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk,   qcResponse4.errorCode.code);
+  EXPECT_STREQ("OK", qcResponse4.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   qcResponse4.errorCode.details.c_str());
+
+  EXPECT_EQ(2, qcResponse4.contextElementResponseVector.size());
+
+  EXPECT_STREQ("A1",  qcResponse4.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse4.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("a7",  qcResponse4.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  EXPECT_STREQ("A1",  qcResponse4.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse4.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("a8",  qcResponse4.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  utExit();
 }
 
 /* ****************************************************************************
 *
 * queryWithServicePathEntNoPatternType -
+*
+* FIXME P4: Fermin to inspect whether the function has enough EXPECTs 
 */
 TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternType)
 {
-  EXPECT_STREQ("To implement", "In feature/392");
+  HttpStatusCode         ms;
+  QueryContextRequest    qcReq;
+  QueryContextResponse   qcResponse;
+
+  utInit();
+  prepareDatabaseWithServicePath("noPatternType");
+
+  EntityId en("E3", "T", "false");
+  qcReq.entityIdVector.push_back(&en);
+
+  qcResponse.errorCode.fill(SccOk, ""); // All OK - qcResponse.errorCode should be untouched
+  ms = mongoQueryContext(&qcReq, &qcResponse, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccContextElementNotFound,     qcResponse.errorCode.code);
+  EXPECT_STREQ("No context element found", qcResponse.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",                         qcResponse.errorCode.details.c_str());
+
+  EXPECT_EQ(0, qcResponse.contextElementResponseVector.size());
+
+
+  qcResponse.errorCode.fill(SccOk, ""); // All OK - qcResponse.errorCode should be untouched
+  ms = mongoQueryContext(&qcReq, &qcResponse, "", "/home/fg");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk,   qcResponse.errorCode.code);
+  EXPECT_STREQ("OK", qcResponse.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   qcResponse.errorCode.details.c_str());
+
+  EXPECT_EQ(1, qcResponse.contextElementResponseVector.size());
+
+  EXPECT_STREQ("A1",  qcResponse.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->name.c_str());
+  EXPECT_STREQ("TA1", qcResponse.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->type.c_str());
+  EXPECT_STREQ("a3",  qcResponse.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  utExit();
 }
 
 /* ****************************************************************************
 *
 * queryWithServicePathEntNoPatternNoType -
+*
+* FIXME P4: Fermin to inspect whether the function has enough EXPECTs 
 */
 TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternNoType)
 {
-  EXPECT_STREQ("To implement", "In feature/392");
+  HttpStatusCode         ms;
+  QueryContextRequest    qcReq;
+  QueryContextResponse   qcResponse;
+
+  utInit();
+  prepareDatabaseWithServicePath("noPatternNoType");
+
+  EntityId en("E3", "", "false");
+  qcReq.entityIdVector.push_back(&en);
+
+
+  // Test ...
+  ms = mongoQueryContext(&qcReq, &qcResponse, "", "/home/fg");
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(2,         qcResponse.contextElementResponseVector.size());
+  EXPECT_STREQ("a3",   qcResponse.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("ae_2", qcResponse.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  utExit();
 }
 
 /* ****************************************************************************
