@@ -209,6 +209,7 @@ rpm-ts:
 	cd $(RPM_TOPDIR)/SOURCES && tar cfvz contextBroker-$(BROKER_VERSION).tar.gz contextBroker-$(BROKER_VERSION) && cd -
 	rm -rf $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION)
 	# -------------
+	git checkout src/app/contextBroker/version.h
 	rpmbuild -ba $(RPM_TOPDIR)/SPECS/contextBroker.spec \
 		--define '_topdir $(RPM_TOPDIR)' \
 		--define 'broker_version $(BROKER_VERSION)' \
@@ -216,7 +217,6 @@ rpm-ts:
 		--define 'fiware_version $(FIWARE_VERSION)' \
 		--define 'fiware_release $(FIWARE_RELEASE)' \
 		--define 'build_arch $(BUILD_ARCH)'
-	git checkout src/app/contextBroker/version.h
 
 rpm: 
 	rm -f rpm/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
