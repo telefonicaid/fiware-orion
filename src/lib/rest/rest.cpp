@@ -144,7 +144,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "content-type") == 0)    headerP->contentType    = value;
   else if (strcasecmp(key.c_str(), "content-length") == 0)  headerP->contentLength  = atoi(value);
   else if (strcasecmp(key.c_str(), "fiware-service") == 0)  headerP->tenant         = value;
-  else if (strcasecmp(key.c_str(), "ServicePath") == 0)     headerP->servicePath    = value;
+  else if (strcasecmp(key.c_str(), "service-path") == 0)     headerP->servicePath    = value;
   else
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
 
@@ -373,7 +373,7 @@ int servicePathCheck(ConnectionInfo* ciP)
     {
       if (!isalnum(comp[cIx]) && (comp[cIx] != '_'))
       {
-        OrionError e(SccBadRequest, std::string("component '") + comp + " ' of ServicePath contains illegal character '" + *comp + "'");
+        OrionError e(SccBadRequest, std::string("component '") + comp + " ' of ServicePath contains illegal character '" + comp[cIx] + "'");
         ciP->answer = e.render(ciP->outFormat, "");
         return 3;
       }
