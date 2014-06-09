@@ -1212,7 +1212,6 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
 
     if (!legalIdUsage(attrsV)) {
         *errDetail = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: (" + eP->toString() + ")";
-        LM_W(("illegal id usage: %s", errDetail->c_str()));
         return false;
     }
 
@@ -1221,16 +1220,11 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
     double coordLat;
     double coordLong;
     if (!processLocation(attrsV, locAttr, coordLat, coordLong, errDetail))
-    {
-      LM_W(("processLocation failed - no entity created"));
       return false;
-    }
-
 
 
     int now = getCurrentTime();    
     BSONArrayBuilder attrsToAdd;
-    LM_T(LmtServicePath, ("attrsV.size: %lu", attrsV.size()));
 
     for (unsigned int ix = 0; ix < attrsV.size(); ++ix) {
         std::string attrId = attrsV.get(ix)->getId();
@@ -1281,9 +1275,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
     } 
 
     BSONObjBuilder insertedDocB;
-
     insertedDocB.append("_id", bsonId);
-
     insertedDocB.append(ENT_ATTRS, attrsToAdd.arr());
     insertedDocB.append(ENT_CREATION_DATE, now);
     insertedDocB.append(ENT_MODIFICATION_DATE,now);
@@ -1626,7 +1618,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
 
     /*
-     * If the entity didn't already exist, we create it. Note that alternatively, we could do a count()
+     * If the entity doesn't already exist, we create it. Note that alternatively, we could do a count()
      * before the query() to check this. However this would add a second interaction with MongoDB.
      *
      * Here we set the ServicePath if set in the request (if APPEND, of course).
@@ -1639,7 +1631,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
         if (strcasecmp(action.c_str(), "append") != 0) {
             /* Only APPEND can create entities, thus error is returned in UPDATE or DELETE cases */
-            LM_W(("Only APPEND can create entities"));
             buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
         }
         else {            
