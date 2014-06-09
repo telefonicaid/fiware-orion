@@ -66,11 +66,31 @@ function vMsg()
 
 # -----------------------------------------------------------------------------
 #
+# Init file already sourced?
+#
+if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
+then
+  if [ -f scripts/testEnv.sh ]
+  then
+    vMsg Sourcing scripts/testEnv.sh
+    source scripts/testEnv.sh
+  else
+    echo "--------------------------------------------------------------------------"
+    echo "Please source scripts/testEnv.sh before running the functional test suite."
+    echo "--------------------------------------------------------------------------"
+    exit 1
+  fi
+fi
+
+
+
+# -----------------------------------------------------------------------------
+#
 # Parsing parameters
 #
 verbose=off
 mode=all
-TEST_FILTER=${TEST_FILTER:-"*"}
+TEST_FILTER=${TEST_FILTER:-"*.*test"}
 dryrun=off
 leakTest=off
 
@@ -128,7 +148,7 @@ SRC_TOP=$(pwd)
 cd - > /dev/null
 vMsg Git repo home: $SRC_TOP
 cd test/valgrind
-
+vMsg In directory $(pwd)
 
 
 # -----------------------------------------------------------------------------
@@ -217,14 +237,20 @@ function brokerStop()
 #
 function processResult()
 {
-
+    filename=$1
     # Get info from valgrind
-    startLine1=$(grep -n "LEAK SUMMARY" $1 | awk -F: '{ print $1 }' | head -1)
-    startLine2=$(grep -n "LEAK SUMMARY" $1 | awk -F: '{ print $1 }' | tail -1)
+    startLine1=$(grep -n "LEAK SUMMARY" $filename | awk -F: '{ print $1 }' | head -1)
+    startLine2=$(grep -n "LEAK SUMMARY" $filename | awk -F: '{ print $1 }' | tail -1)
 
+    if [ "$startLine1" == "" ] || [ "$startLine2" == "" ]
+    then
+        return
+    fi
+
+    typeset -i headEndLine1
     headEndLine1=$startLine1+7
 
-    head -$headEndLine1 $1 | tail -8 > valgrind.leakSummary
+    head -$headEndLine1 $filename | tail -8 > valgrind.leakSummary
 
     definitelyLost1=$(grep 'definitely lost' valgrind.leakSummary | awk '{ print $4 }')
     indirectlyLost1=$(grep 'indirectly lost' valgrind.leakSummary | awk '{ print $4 }')
@@ -243,8 +269,9 @@ function processResult()
     \rm valgrind.leakSummary valgrind.leakSummary2
 
     lost=$(add $definitelyLost1 $indirectlyLost1 $definitelyLost2 $indirectlyLost2)
-
 }
+
+
 
 # -----------------------------------------------------------------------------
 #
@@ -295,7 +322,7 @@ function setNumberOfTests()
 
   if [ "$runPure" -eq "1" ]
   then
-    for vtest in $(ls ${TEST_FILTER}.vtest 2> /dev/null)
+    for vtest in $(ls $TEST_FILTER 2> /dev/null)
     do
       noOfTests=$noOfTests+1
     done
@@ -303,7 +330,7 @@ function setNumberOfTests()
 
   if [ "$runHarness" -eq "1" ]
   then
-    for file in $(find ../testharness -name ${TEST_FILTER}.test)
+    for file in $(find ../functionalTest/cases -name "$TEST_FILTER")
     do
       noOfTests=$noOfTests+1
     done
@@ -393,7 +420,7 @@ then
   then
     fileList="leakTest.xtest"
   else
-    fileList=$(ls ${TEST_FILTER}.vtest 2> /dev/null)
+    fileList=$(ls $TEST_FILTER 2> /dev/null)
   fi
 
   for vtest in $fileList
@@ -456,6 +483,11 @@ then
   done
 fi
 
+#
+# No diff tool for harnessTest when running from valgrind test suite
+#
+unset CB_DIFF_TOOL
+
 if [ "$runHarness" -eq "1" ]
 then
   if [ "$BROKER_PORT" == "" ]
@@ -464,39 +496,69 @@ then
     exit 1
   fi
 
-  for file in $(find ../testharness -name ${TEST_FILTER}.test | sort)
+  cd $SRC_TOP/test/functionalTest/cases
+  vMsg TEST_FILTER: $TEST_FILTER
+  for file in $(find . -name "$TEST_FILTER" | sort)
   do
     htest=$(basename $file | awk -F '.' '{print $1}')
     directory=$(dirname $file)
+    file=$htest.test
+
+    vMsg file: $file
+    vMsg htest: $htest
+
     testNo=$testNo+1
     printTestLinePrefix
     echo -n $testNoString $htest ...
 
     # In the case of harness test, we check that the test is implemented checking
     # that the word VALGRIND_READY apears in the .test file (usually, in a commented line)
-    grep VALGRIND_READY $file > /dev/null 2>&1
+    grep VALGRIND_READY $SRC_TOP/test/functionalTest/cases/$directory/$file > /dev/null 2>&1
     if [ "$?" -ne "0" ]
     then
       printNotImplementedString $htest
       continue
     fi
 
+    cd $SRC_TOP
     printImplementedString $htest
     typeset -i lost
     lost=0
 
     if [ "$dryrun" == "off" ]
     then
-      VALGRIND=1 ../../scripts/testHarness.sh $file > /dev/null 2>&1    
+      vMsg "------------------------------------------------"
+      vMsg running harnessTest.sh with $file in $(pwd)
+      vMsg "------------------------------------------------"
+      VALGRIND=1 test/functionalTest/testHarness.sh --filter $file > /tmp/testHarness 2>&1
+      status=$?
+      if [ "$status" != "0" ]
+      then
+        mv /tmp/testHarness /tmp/testHarness.$file
+        echo -n " FAILURE! functional test ended with error code $status. "
+        # FIXME P4: NO EXIT here - sometimes harness tests fail under valgrind ...
+      fi
 
+      if [ ! -f /tmp/valgrind.out ]
+      then
+        echo " FAILURE! No valgrind output for functional test $file"
+        exit 3
+      fi
+
+      mv /tmp/valgrind.out test/functionalTest/cases/$directory/$htest.valgrind.out
+      
       typeset -i headEndLine1
       typeset -i headEndLine2
-      processResult ${directory}/${htest}.valgrind.out
+      vMsg processing $directory/$htest.valgrind.out in $(pwd)
+      vMsg "calling processResult"
+      processResult test/functionalTest/cases/$directory/$htest.valgrind.out
+      vMsg "called processResult"
     fi
+    cd - > /dev/null
 
     if [ "$lost" != "0" ]
     then
-      failedTest "test/testharness/$htest.valgrind.*" $htest $lost
+      failedTest "test/functionalTest/cases/$htest.valgrind.*" $htest $lost
     else
       echo " " $okString
     fi

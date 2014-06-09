@@ -79,10 +79,10 @@ all: prepare_release release
 di: install_debug
 
 compile_info:
-	./scripts/compileInfo.sh
+	./scripts/build/compileInfo.sh
 
 compile_info_release:
-	./scripts/compileInfo.sh --release
+	./scripts/build/compileInfo.sh --release
 
 prepare_release: compile_info_release
 	mkdir -p  BUILD_RELEASE || true
@@ -280,7 +280,16 @@ unit_test: build_unit_test
         fi
 	@echo '------------------------------- unit_test ended ---------------------------------'
 
-functional_test: install_debug build_unit_test
+functional_test: install
+	./test/functionalTest/testHarness.sh
+
+functional_test_debug: install_debug
+	./test/functionalTest/testHarness.sh
+
+ft:  functional_test
+ftd: functional_test_debug
+
+old_functional_test: install_debug build_unit_test
 	if [ -z "${BROKER_PORT}" ]; then \
 	    echo "Execute '. scripts/testEnv.sh' before executing the tests"; \
 	    exit 1; \
@@ -409,5 +418,11 @@ payload_check: xml_check check_delimiter json_check
 cppcheck:
 	cppcheck --xml -j 8 --enable=all -I src/lib/ src/ 2> cppcheck-result.xml
 	cat cppcheck-result.xml | grep "error file" | wc -l
+
+sonar_metrics: coverage
+	scripts/build/sonarProperties.sh $(BROKER_VERSION) > sonar-project.properties 
+	cd BUILD_COVERAGE/src && gcovr --gcov-exclude='.*parseArgs.*' --gcov-exclude='.*logMsg.*' -x -o ../../coverage.xml && cd ../../
+	sed s#filename=\"/var/develenv/jenkins/jobs/orion-sonar/workspace/src/#filename=\"src/#g ./coverage.xml > ./coverage_sonar.xml
+	cppcheck --xml -j 8 --enable=all -I src/lib/ -i src/lib/parseArgs -i src/lib/logMsg src/ 2>cppcheck-result.xml
 
 .PHONY: rpm mock mock32 mock64 valgrind

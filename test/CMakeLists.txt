@@ -18,5 +18,5 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
-ADD_SUBDIRECTORY(testharness)
+ADD_SUBDIRECTORY(functionalTest/cases)
 ADD_SUBDIRECTORY(unittests)

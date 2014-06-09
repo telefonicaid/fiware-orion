@@ -42,7 +42,7 @@ execute_process(COMMAND            echo $USER
                 OUTPUT_VARIABLE    USER)
 
 
-execute_process(COMMAND            sh ../scripts/osDistro.sh
+execute_process(COMMAND            sh ../scripts/build/osDistro.sh
                 OUTPUT_VARIABLE    DISTRO)
 
 execute_process(COMMAND            sh ../scripts/rapidxmlVersion.sh
