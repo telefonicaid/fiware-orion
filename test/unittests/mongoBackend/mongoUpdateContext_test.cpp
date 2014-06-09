@@ -9364,12 +9364,15 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
 
 /* ****************************************************************************
 *
-* servicePath -
+* servicePathEntityCreation - 
 *
 * FIXME P5: to follow the example of the rest of this file, a lot more should be 
 *           'expected' ...
+*
+* FIXME P6: attack mongo directly instead of using mongoQueryContext to verify
+*           that the update has been successful.
 */
-TEST(mongoUpdateContextRequest, servicePath)
+TEST(mongoUpdateContextRequest, servicePathEntityCreation)
 {
   HttpStatusCode         ms;
   UpdateContextRequest   ucReq;

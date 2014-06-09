@@ -1469,7 +1469,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     //
     // FIXME P6: Once we allow for ServicePath to be modified, this loop must be looked at.
     //
-    bool atLeastOneResult = false;
     int  docs             = 0;
     
     while (cursor->more()) {
@@ -1480,7 +1479,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         std::string entityType = STR_FIELD(r.getField("_id").embeddedObject(), ENT_ENTITY_TYPE);
 
         LM_T(LmtServicePath, ("Found entity '%s' for ServicePath '%s'", entityId.c_str(), servicePath.c_str()));
-        atLeastOneResult = true;
 
         ContextElementResponse* cerP = new ContextElementResponse();
         cerP->contextElement.entityId.fill(entityId, entityType, "false");
@@ -1625,7 +1623,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
      * Actually, the 'slash-escaped' ServicePath (variable: 'path') is sent to the function createEntity
      * which sets the ServicePath for the entity.
      */
-    if (!atLeastOneResult) {
+    if (docs == 0) {
       LM_T(LmtServicePath, ("No docs found for service path '%s' - so, let's insert it, shall we?", servicePath.c_str()));
 
 
