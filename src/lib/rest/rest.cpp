@@ -144,7 +144,11 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "content-type") == 0)    headerP->contentType    = value;
   else if (strcasecmp(key.c_str(), "content-length") == 0)  headerP->contentLength  = atoi(value);
   else if (strcasecmp(key.c_str(), "fiware-service") == 0)  headerP->tenant         = value;
-  else if (strcasecmp(key.c_str(), "ServicePath") == 0)     headerP->servicePath    = value;
+  else if (strcasecmp(key.c_str(), "service-path") == 0)
+  {
+    headerP->servicePath         = value;
+    headerP->servicePathReceived = true;
+  }
   else
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
 
@@ -349,13 +353,24 @@ int servicePathCheck(ConnectionInfo* ciP)
   std::vector<std::string> compV;
   int                      components;
 
+
+  if (ciP->httpHeaders.servicePathReceived == false)
+    return 0;
+
+  if (ciP->servicePath.c_str()[0] != '/')
+  {
+    OrionError e(SccBadRequest, "Only 'absolute' Service Paths allowed (a service path must begin with '/')");
+    ciP->answer = e.render(ciP->outFormat, "");
+    return 1;
+  }
+
   components = stringSplit(ciP->servicePath, '/', compV);
 
   if (components > 10)
   {
     OrionError e(SccBadRequest, "too many components in ServicePath");
     ciP->answer = e.render(ciP->outFormat, "");
-    return 1;
+    return 2;
   }
 
   for (int ix = 0; ix < components; ++ix)
@@ -364,7 +379,7 @@ int servicePathCheck(ConnectionInfo* ciP)
     {
       OrionError e(SccBadRequest, std::string("component-name too long in ServicePath '") + ciP->servicePath + "'");
       ciP->answer = e.render(ciP->outFormat, "");
-      return 2;
+      return 3;
     }
 
     const char* comp = compV[ix].c_str();
@@ -373,9 +388,9 @@ int servicePathCheck(ConnectionInfo* ciP)
     {
       if (!isalnum(comp[cIx]) && (comp[cIx] != '_'))
       {
-        OrionError e(SccBadRequest, std::string("component '") + comp + " ' of ServicePath contains illegal character '" + *comp + "'");
+        OrionError e(SccBadRequest, std::string("component '") + comp + " ' of ServicePath contains illegal character '" + comp[cIx] + "'");
         ciP->answer = e.render(ciP->outFormat, "");
-        return 3;
+        return 4;
       }
     }
   }
@@ -491,6 +506,7 @@ static int connectionTreat
     LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
+    
     ciP->tenantFromHttpHeader = ciP->httpHeaders.tenant;
     LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));
     ciP->outFormat            = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
