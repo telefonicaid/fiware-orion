@@ -37,8 +37,9 @@ typedef struct HttpHeaders
 {
   HttpHeaders()
   {
-    gotHeaders    = false;
-    contentLength = 0;
+    gotHeaders          = false;
+    servicePathReceived = false;
+    contentLength       = 0;
   }
 
   bool          gotHeaders;
@@ -49,6 +50,8 @@ typedef struct HttpHeaders
   std::string   contentType;
   std::string   tenant;
   std::string   servicePath;
+  bool          servicePathReceived;
+
   unsigned int  contentLength;
   std::string   connection;
 } HttpHeaders;

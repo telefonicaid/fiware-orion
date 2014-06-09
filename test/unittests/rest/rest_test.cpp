@@ -41,23 +41,38 @@ TEST(rest, servicePathCheck)
   ConnectionInfo  ci;
   int             r;
 
+
+  // 0. OK - as no Service Path has been received ...
+  ci.servicePath = "";
+  r = servicePathCheck(&ci);
+  EXPECT_EQ(0, r);
+
+  // Mark that a Service Path has been received
+  ci.httpHeaders.servicePathReceived = true;
+
   // 1. OK
   ci.servicePath = "/h1/_h2/h3/_h4/h5/_h6/h7/_h8/h9/_h10h10h10";
   r = servicePathCheck(&ci);
   EXPECT_EQ(0, r);
 
+  // Not starting with '/'
+  ci.servicePath = "x";
+  r = servicePathCheck(&ci);
+  EXPECT_EQ(1, r);
+
   // 2. More than 10 components in Service Path
   ci.servicePath = "/h1/h2/h3/h4/h5/h6/h7/h8/h9/h10/h11";
   r = servicePathCheck(&ci);
-  EXPECT_EQ(1, r);
+  EXPECT_EQ(2, r);
 
   // More than 10 chars in path component of Service Path
   ci.servicePath = "/h0123456789";
   r = servicePathCheck(&ci);
-  EXPECT_EQ(2, r);
+  EXPECT_EQ(3, r);
 
   // Bad character ('-') in Service Path
   ci.servicePath = "/h-0";
   r = servicePathCheck(&ci);
-  EXPECT_EQ(3, r);
+  EXPECT_EQ(4, r);
+
 }
