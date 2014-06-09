@@ -1319,20 +1319,36 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
 * removeEntity -
 *
 */
-static bool removeEntity(std::string entityId, std::string entityType, ContextElementResponse* cerP, std::string tenant) {
+static bool removeEntity
+(
+  const std::string&       entityId,
+  const std::string&       entityType,
+  ContextElementResponse*  cerP,
+  const std::string&       tenant,
+  const std::string&       servicePath
+)
+{
+    const std::string    idString          = "_id." ENT_ENTITY_ID;
+    const std::string    typeString        = "_id." ENT_ENTITY_TYPE;
+    const std::string    servicePathString = "_id." ENT_SERVICE_PATH;
+    DBClientConnection*  connection        = getMongoConnection();
+    BSONObj              doesntExist       = BSON("$exists" << false);
+    BSONObjBuilder       bob;
+    BSONObj              query;
 
-    const std::string idString   = "_id." ENT_ENTITY_ID;
-    const std::string typeString = "_id." ENT_ENTITY_TYPE;
+    bob.append(idString, entityId);
+    if (entityType == "")
+      bob.append(typeString, doesntExist);
+    else
+      bob.append(typeString, entityType);
 
-    DBClientConnection* connection = getMongoConnection();
+    if (servicePath == "")
+      bob.append(servicePathString, doesntExist);
+    else
+      bob.append(servicePathString, servicePath);
 
-    BSONObj query;
-    if (entityType == "") {
-        query = BSON(idString << entityId << typeString << BSON("$exists" << false));
-    }
-    else {
-        query = BSON(idString << entityId << typeString << entityType);
-    }
+    query = bob.obj();
+
     try {
         LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", getEntitiesCollectionName(tenant).c_str(),
                            query.toString().c_str()));
@@ -1487,11 +1503,13 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
         /* If the vector of Context Attributes is empty and the operation was DELETE, then delete the entity */
         if (strcasecmp(action.c_str(), "delete") == 0 && ceP->contextAttributeVector.size() == 0) {
-            removeEntity(entityId, entityType, cerP, tenant);
+            LM_T(LmtServicePath, ("Removing entity"));
+            removeEntity(entityId, entityType, cerP, tenant, entitySPath);
             responseP->contextElementResponseVector.push_back(cerP);
             continue;
         }
 
+        LM_T(LmtServicePath, ("ceP->contextAttributeVector.size: %d", ceP->contextAttributeVector.size()));
         /* We start with the attrs array in the entity document, which is manipulated by the
          * {update|delete|append}Attrsr() function for each one of the attributes in the
          * contextElement being processed. Then, we replace the resulting attrs array in the

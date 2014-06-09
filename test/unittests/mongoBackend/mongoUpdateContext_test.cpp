@@ -9550,3 +9550,120 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation)
 
   utExit();
 }
+
+
+
+/* ****************************************************************************
+*
+* servicePathEntityDeletion - 
+*/
+TEST(mongoUpdateContextRequest, servicePathEntityDeletion)
+{
+  HttpStatusCode         ms;
+  UpdateContextRequest   ucReq;
+  UpdateContextRequest   ucReq2;
+  UpdateContextResponse  ucRes1;
+  UpdateContextResponse  ucRes2;
+  UpdateContextResponse  ucRes3;
+  UpdateContextResponse  ucRes4;
+  ContextElement         ce;
+  ContextElement         ce2;
+  ContextAttribute       ca("A1", "TA1", "kz01");
+  EntityId               e("E1", "T1", "false");
+  QueryContextRequest    qcReq;
+  QueryContextResponse   qcRes1;
+  QueryContextResponse   qcRes2;
+  QueryContextResponse   qcRes3;
+
+  qcReq.entityIdVector.push_back(&e);
+
+  utInit();
+
+  ce.entityId.fill("E1", "T1", "false");
+  ce2.entityId.fill("E1", "T1", "false");
+  ce.contextAttributeVector.push_back(&ca);
+  ucReq.contextElementVector.push_back(&ce);
+  ucReq2.contextElementVector.push_back(&ce2);
+
+  // 1. Create an Entity with Service Path /home/kz
+  // 2. Create another Entity with Service Path /home/kz/01
+  // 3. Create another Entity with Service Path /home/kz/02
+  // 4. Query entities with Service Path /home/kz - make sure we find three entities
+  // 5. Remove entity with Service Path /home/kz/01
+  // 6. Query entities with Service Path /home/kz - make sure we find two entities
+  // 7. Remove entity with Service Path /home/kz
+  // 8. Query entities with Service Path /home/kz - make sure we find ZERO entities
+
+
+  
+  // 1. Create an Entity with Service Path /home/kz
+  ca.value = "kz";
+  ucReq.updateActionType.set("APPEND");
+  ms = mongoUpdateContext(&ucReq, &ucRes1, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, ucRes1.errorCode.code);
+  EXPECT_EQ(0, ucRes1.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, ucRes1.errorCode.details.size());
+  ASSERT_EQ(1, ucRes1.contextElementResponseVector.size());
+
+
+  // 2. Create another Entity with Service Path /home/kz/01
+  ca.value = "kz01";
+  ucReq.updateActionType.set("APPEND");
+  ms = mongoUpdateContext(&ucReq, &ucRes2, "", "/home/kz/01");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, ucRes2.errorCode.code);
+  EXPECT_EQ(0, ucRes2.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, ucRes2.errorCode.details.size());
+  ASSERT_EQ(1, ucRes2.contextElementResponseVector.size());
+
+
+  // 3. Create another Entity with Service Path /home/kz/02
+  ca.value = "kz02";
+  ucReq.updateActionType.set("APPEND");
+  ms = mongoUpdateContext(&ucReq, &ucRes3, "", "/home/kz/02");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, ucRes3.errorCode.code);
+  EXPECT_EQ(0, ucRes3.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, ucRes3.errorCode.details.size());
+  ASSERT_EQ(1, ucRes3.contextElementResponseVector.size());
+
+
+  // 4. Query entities with Service Path /home/kz - make sure we find three entities
+  ms = mongoQueryContext(&qcReq, &qcRes1, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, qcRes1.errorCode.code);
+  EXPECT_EQ(0, qcRes1.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, qcRes1.errorCode.details.size());
+  ASSERT_EQ(3, qcRes1.contextElementResponseVector.size());
+  
+  // 5. Remove entity with Service Path /home/kz/01
+  LM_M(("----------------------------  Remove entity with Service Path /home/kz/01"));
+  ucReq2.updateActionType.set("DELETE");
+  ms = mongoUpdateContext(&ucReq2, &ucRes2, "", "/home/kz/01");
+  EXPECT_EQ(SccOk, ms);
+
+  LM_M(("-----------------------------------------------------------------------------"));
+  // 6. Query entities with Service Path /home/kz - make sure we find two entities
+  ms = mongoQueryContext(&qcReq, &qcRes2, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, qcRes2.errorCode.code);
+  EXPECT_EQ(0, qcRes2.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, qcRes2.errorCode.details.size());
+  ASSERT_EQ(2, qcRes2.contextElementResponseVector.size());
+
+  // 7. Remove entity with Service Path /home/kz
+  ucReq2.updateActionType.set("DELETE");
+  ms = mongoUpdateContext(&ucReq2, &ucRes2, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+
+  // 8. Query entities with Service Path /home/kz - make sure we find ZERO entities
+  ms = mongoQueryContext(&qcReq, &qcRes3, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccContextElementNotFound, qcRes3.errorCode.code);
+  EXPECT_STREQ("No context element found", qcRes3.errorCode.reasonPhrase.c_str());
+  EXPECT_EQ(0, qcRes3.errorCode.details.size());
+  ASSERT_EQ(0, qcRes3.contextElementResponseVector.size());
+
+  utExit();
+}
