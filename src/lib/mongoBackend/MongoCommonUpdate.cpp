@@ -1265,7 +1265,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
 
     if (servicePath == "")
     {
-      LM_T(LmtServicePath, ("Empty service path: $exists: false"));
+      LM_T(LmtServicePath, ("Empty service path"));
       bsonId = eP->type == "" ? BSON(ENT_ENTITY_ID << eP->id) : BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type);
     }
     else
