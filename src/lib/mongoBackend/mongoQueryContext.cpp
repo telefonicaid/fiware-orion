@@ -52,6 +52,7 @@ HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResp
     }
 
     std::string err;
+    LM_T(LmtServicePath, ("Service Path: '%s'", servicePath.c_str()));
     if (!entitiesQuery(requestP->entityIdVector, requestP->attributeList, requestP->restriction, &responseP->contextElementResponseVector, &err, true, tenant, servicePath)) {
         responseP->errorCode.fill(SccReceiverInternalError, err);
         LM_E((responseP->errorCode.details.c_str()));

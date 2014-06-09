@@ -1198,11 +1198,12 @@ static bool processContextAttributeVector (ContextElement*               ceP,
 * createEntity -
 *
 */
-static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::string* errDetail, std::string tenant) {
+static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::string* errDetail, std::string tenant, const std::string& servicePath) {
 
     DBClientConnection* connection = getMongoConnection();
 
     LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName(tenant).c_str()));
+    LM_T(LmtServicePath, ("Creating entity '%s' for Service Path '%s'", eP->id.c_str(), servicePath.c_str()));
 
     /* Actually we don't know if this is the first entity (thus, the collection is being created) or not. However, we can
      * invoke ensureLocationIndex() in anycase, given that it is harmless in the case the collection and index already
@@ -1211,6 +1212,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
 
     if (!legalIdUsage(attrsV)) {
         *errDetail = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: (" + eP->toString() + ")";
+        LM_W(("illegal id usage: %s", errDetail->c_str()));
         return false;
     }
 
@@ -1218,16 +1220,23 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
     std::string locAttr;
     double coordLat;
     double coordLong;
-    if (!processLocation(attrsV, locAttr, coordLat, coordLong, errDetail)) {
-        return false;
+    if (!processLocation(attrsV, locAttr, coordLat, coordLong, errDetail))
+    {
+      LM_W(("processLocation failed - no entity created"));
+      return false;
     }
+
+
 
     int now = getCurrentTime();    
     BSONArrayBuilder attrsToAdd;
+    LM_T(LmtServicePath, ("attrsV.size: %lu", attrsV.size()));
+
     for (unsigned int ix = 0; ix < attrsV.size(); ++ix) {
         std::string attrId = attrsV.get(ix)->getId();
 
         BSONObjBuilder bsonAttr;
+
         bsonAttr.appendElements(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
                                      ENT_ATTRS_TYPE << attrsV.get(ix)->type <<                                     
                                      ENT_ATTRS_CREATION_DATE << now <<
@@ -1252,16 +1261,29 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
 
         /* Custom metadata */
         BSONObj mdV;
-        if (contextAttributeCustomMetadataToBson(mdV, attrsV.get(ix))) {
+        if (contextAttributeCustomMetadataToBson(mdV, attrsV.get(ix)))
             bsonAttr.appendArray(ENT_ATTRS_MD, mdV);
-        }
-        attrsToAdd.append(bsonAttr.obj());
 
+        attrsToAdd.append(bsonAttr.obj());
     }
 
-    BSONObj bsonId = eP->type == "" ? BSON(ENT_ENTITY_ID << eP->id) : BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type);
+    BSONObj bsonId;
+
+    if (servicePath == "")
+    {
+      LM_T(LmtServicePath, ("Empty service path: $exists: false"));
+      bsonId = eP->type == "" ? BSON(ENT_ENTITY_ID << eP->id) : BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type);
+    }
+    else
+    {
+      LM_T(LmtServicePath, ("Service path string: %s", servicePath.c_str()));
+      bsonId = eP->type == "" ? BSON(ENT_ENTITY_ID << eP->id) : BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type << ENT_SERVICE_PATH << servicePath);
+    } 
+
     BSONObjBuilder insertedDocB;
+
     insertedDocB.append("_id", bsonId);
+
     insertedDocB.append(ENT_ATTRS, attrsToAdd.arr());
     insertedDocB.append(ENT_CREATION_DATE, now);
     insertedDocB.append(ENT_MODIFICATION_DATE,now);
@@ -1360,7 +1382,8 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
     DBClientConnection* connection = getMongoConnection();
 
-    LM_T(LmtServicePath, ("Service Path: '%s'", servicePath.c_str()));
+    LM_T(LmtServicePath, ("Updating entity '%s' for Service Path: '%s', action '%s'",
+                          ceP->entityId.id.c_str(), servicePath.c_str(), action.c_str()));
 
     /* Getting the entity in the request (helpful in other places) */
     EntityId* enP = &ceP->entityId;
@@ -1447,14 +1470,24 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     }
 
 
+    //
+    // Going through the list of found entities.
+    // As ServicePath cannot be modified, inside this loop nothing will be done
+    // about ServicePath (The ServicePath was present in the mongo query to obtain the list)
+    //
+    // FIXME P6: Once we allow for ServicePath to be modified, this loop must be looked at.
+    //
     bool atLeastOneResult = false;
+    int  docs             = 0;
+    
     while (cursor->more()) {
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
-
+        ++docs;
         std::string entityId = STR_FIELD(r.getField("_id").embeddedObject(), ENT_ENTITY_ID);
         std::string entityType = STR_FIELD(r.getField("_id").embeddedObject(), ENT_ENTITY_TYPE);
 
+        LM_T(LmtServicePath, ("Found entity '%s' for ServicePath '%s'", entityId.c_str(), servicePath.c_str()));
         atLeastOneResult = true;
 
         ContextElementResponse* cerP = new ContextElementResponse();
@@ -1501,7 +1534,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             continue;
         }
 
-        /* Now that attrs containts the final status of the attributes after processing the whole
+        /* Now that attrs contains the final status of the attributes after processing the whole
          * list of attributes in the ContextElement, update entity attributes in database */
         BSONObjBuilder updateSet, updateUnset;
         updateSet.appendArray(ENT_ATTRS, attrs);
@@ -1588,13 +1621,25 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         cerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(cerP);
     }
+    LM_T(LmtServicePath, ("Docs found: %d", docs));
 
-    /* If the entity didn't already exist, we create it. Note that alternatively, we could do a count()
-     * before the query() to check this. However this would add a second interaction with MongoDB */
+
+
+    /*
+     * If the entity didn't already exist, we create it. Note that alternatively, we could do a count()
+     * before the query() to check this. However this would add a second interaction with MongoDB.
+     *
+     * Here we set the ServicePath if set in the request (if APPEND, of course).
+     * Actually, the 'slash-escaped' ServicePath (variable: 'path') is sent to the function createEntity
+     * which sets the ServicePath for the entity.
+     */
     if (!atLeastOneResult) {
+      LM_T(LmtServicePath, ("No docs found for service path '%s' - so, let's insert it, shall we?", servicePath.c_str()));
+
 
         if (strcasecmp(action.c_str(), "append") != 0) {
             /* Only APPEND can create entities, thus error is returned in UPDATE or DELETE cases */
+            LM_W(("Only APPEND can create entities"));
             buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
         }
         else {            
@@ -1610,7 +1655,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             }
 
             std::string errReason, errDetail;
-            if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant)) {
+            if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant, servicePath)) {
                cerP->statusCode.fill(SccInvalidParameter, errDetail);
             }
             else {
