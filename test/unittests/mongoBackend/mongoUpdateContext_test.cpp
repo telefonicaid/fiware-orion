@@ -31,10 +31,13 @@
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContext.h"
+#include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
+#include "ngsi10/QueryContextRequest.h"
+#include "ngsi10/QueryContextResponse.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -106,7 +109,7 @@
 * - appendMdNoActualChanges
 * - updateMdNoActualChanges
 *
-* (N=2 without lost of generality)
+* (N=2 without loss of generality)
 *
 * With isPattern=true:
 *
@@ -121,6 +124,8 @@
 * mocked MongoDB. Actually, we think is very much powerfull to check that everything is ok at
 * MongoDB layer.
 *
+*
+* Lastly a few tests with Service Path
 */
 
 /* ****************************************************************************
@@ -9304,15 +9309,11 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
 */
 TEST(mongoUpdateContextRequest, mongoDbQueryFail)
 {
-
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;    
 
     utInit();
-
-    /* Set database */
-    setupDatabase();
 
     /* Prepare mock */
     const DBException e = DBException("boom!!", 33);
@@ -9357,4 +9358,84 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
     delete connectionMock;
 
     utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* servicePath -
+*
+* FIXME P5: to follow the example of the rest of this file, a lot more should be 
+*           'expected' ...
+*/
+TEST(mongoUpdateContextRequest, servicePath)
+{
+  HttpStatusCode         ms;
+  UpdateContextRequest   ucReq;
+  UpdateContextResponse  ucRes1;
+  UpdateContextResponse  ucRes2;
+  UpdateContextResponse  ucRes3;
+  ContextElement         ce;
+  ContextAttribute       ca("A1", "TA1", "kz01");
+
+  utInit();
+
+  ce.entityId.fill("E1", "T1", "false");
+  ce.contextAttributeVector.push_back(&ca);
+  ucReq.contextElementVector.push_back(&ce);
+
+
+  ca.value = "kz";
+  ucReq.updateActionType.set("APPEND");
+  ms = mongoUpdateContext(&ucReq, &ucRes3, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, ucRes3.errorCode.code);
+  EXPECT_EQ(0, ucRes3.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, ucRes3.errorCode.details.size());
+  ASSERT_EQ(1, ucRes3.contextElementResponseVector.size());
+
+
+  ca.value = "kz01";
+  ucReq.updateActionType.set("APPEND");
+  ms = mongoUpdateContext(&ucReq, &ucRes1, "", "/home/kz/01");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, ucRes1.errorCode.code);
+  EXPECT_EQ(0, ucRes1.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, ucRes1.errorCode.details.size());
+  ASSERT_EQ(1, ucRes1.contextElementResponseVector.size());
+
+
+  ca.value = "kz02";
+  ucReq.updateActionType.set("APPEND");
+  ms = mongoUpdateContext(&ucReq, &ucRes2, "", "/home/kz/02");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, ucRes2.errorCode.code);
+  EXPECT_EQ(0, ucRes2.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, ucRes2.errorCode.details.size());
+  ASSERT_EQ(1, ucRes2.contextElementResponseVector.size());
+
+  // Now query E1/A1 in Service Path /home/kz/01
+  EntityId              e("E1", "T1", "false");
+  QueryContextRequest   qcReq;
+  QueryContextResponse  qcRes1;
+  QueryContextResponse  qcRes2;
+
+  qcReq.entityIdVector.push_back(&e);
+  ms = mongoQueryContext(&qcReq, &qcRes1, "", "/home/kz/01");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, qcRes1.errorCode.code);
+  EXPECT_EQ(0, qcRes1.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, qcRes1.errorCode.details.size());
+  ASSERT_EQ(1, qcRes1.contextElementResponseVector.size());
+
+
+  ms = mongoQueryContext(&qcReq, &qcRes2, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, qcRes2.errorCode.code);
+  EXPECT_EQ(0, qcRes2.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, qcRes2.errorCode.details.size());
+  ASSERT_EQ(3, qcRes2.contextElementResponseVector.size());
+
+  utExit();
 }
