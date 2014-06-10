@@ -9366,6 +9366,11 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
 /* ****************************************************************************
 *
 * servicePathEntityUpdates - 
+*
+* FIXME P5: to follow the example of the rest of this file, a lot more should be 'expected' ...
+*
+* FIXME P6: attack mongo directly instead of using mongoQueryContext to verify
+*           that the update has been successful.
 */
 TEST(mongoUpdateContextRequest, servicePathEntityUpdates)
 {
@@ -9474,8 +9479,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdates)
 *
 * servicePathEntityCreation - 
 *
-* FIXME P5: to follow the example of the rest of this file, a lot more should be 
-*           'expected' ...
+* FIXME P5: to follow the example of the rest of this file, a lot more should be 'expected' ...
 *
 * FIXME P6: attack mongo directly instead of using mongoQueryContext to verify
 *           that the update has been successful.
@@ -9556,6 +9560,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation)
 /* ****************************************************************************
 *
 * servicePathEntityDeletion - 
+*
+* FIXME P5: to follow the example of the rest of this file, a lot more should be 'expected' ...
+*
+* FIXME P6: attack mongo directly instead of using mongoQueryContext to verify
+*           that the update has been successful.
 */
 TEST(mongoUpdateContextRequest, servicePathEntityDeletion)
 {
