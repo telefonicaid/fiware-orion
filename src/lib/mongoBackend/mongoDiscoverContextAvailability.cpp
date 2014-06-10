@@ -50,7 +50,10 @@ static bool associationsQuery
   const std::string&    scope,
   MetadataVector*       mdV,
   std::string*          err,
-  const std::string&    tenant
+  const std::string&    tenant,
+  int                   offset,
+  int                   limit,
+  bool                  details
 )
 {
     DBClientConnection* connection = getMongoConnection();
@@ -88,14 +91,17 @@ static bool associationsQuery
     }
     queryB.append(attrField, BSON("$in" << attrArray.arr()));
 
-    /* Do query in MongoDB */
-    BSONObj query = queryB.obj();
+    /* Do the query in MongoDB */
     auto_ptr<DBClientCursor> cursor;
-    try {
+    Query                    query(queryB.obj());
+    Query                    sortCriteria  = query.sort(BSON("_id" << 1));
+    
+    try
+    {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getAssociationsCollectionName(tenant).c_str(), query.toString().c_str()));
 
         mongoSemTake(__FUNCTION__, "query in AssociationsCollection");
-        cursor = connection->query(getAssociationsCollectionName(tenant).c_str(), query);
+        cursor = connection->query(getAssociationsCollectionName(tenant).c_str(), query, limit, offset);
 
         /*
          * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
@@ -182,7 +188,7 @@ static HttpStatusCode associationsDiscoverContextAvailability
 
     MetadataVector mdV;
     std::string err;
-    if (!associationsQuery(&requestP->entityIdVector, &requestP->attributeList, scope, &mdV, &err, tenant)) {
+    if (!associationsQuery(&requestP->entityIdVector, &requestP->attributeList, scope, &mdV, &err, tenant, offset, limit, details)) {
         responseP->errorCode.fill(SccReceiverInternalError, std::string("Database error: ") + err);
         LM_RE(SccOk,(responseP->errorCode.details.c_str()));
     }

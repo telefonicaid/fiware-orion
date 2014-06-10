@@ -1266,7 +1266,11 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(2,res.responseVector.size());
+    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_STREQ("", res.responseVector.get(0)->errorCode.reasonPhrase.c_str());
+    EXPECT_STREQ("", res.responseVector.get(0)->errorCode.details.c_str());
+
+    ASSERT_EQ(2, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(2, RES_CNTX_REG(0).entityIdVector.size());
     EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector.get(0)->id);
@@ -1286,9 +1290,6 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 2)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 2)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
     /* Context registration element #2 */
     ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
@@ -2060,7 +2061,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDBQueryAssociationFail)
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
-    EXPECT_EQ("Database error: collection: unittest.associations - query(): { srcEnt: { $in: [ { id: \"E1\", type: \"T1\" } ] }, attrs.src: { $in: [ \"A4\" ] } } - exception: boom!!", res.errorCode.details);
+    EXPECT_EQ("Database error: collection: unittest.associations - query(): { query: { srcEnt: { $in: [ { id: \"E1\", type: \"T1\" } ] }, attrs.src: { $in: [ \"A4\" ] } }, orderby: { _id: 1 } } - exception: boom!!", res.errorCode.details);
     EXPECT_EQ(0,res.responseVector.size());
 
     /* Release mock */

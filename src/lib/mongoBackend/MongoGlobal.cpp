@@ -787,9 +787,8 @@ bool entitiesQuery
     //
 
     /* Do the query on MongoDB */
-    BSONObj                   bquery      = finalQuery.obj();
     auto_ptr<DBClientCursor>  cursor;
-    Query                     query(bquery);
+    Query                     query(finalQuery.obj());
     Query                     sortCriteria  = query.sort(BSON("creDate" << 1));
 
     LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
@@ -1101,21 +1100,27 @@ bool registrationsQuery
          * make the query fail*/
         queryBuilder.append(contextRegistrationAttrsNames, BSON("$in" << attrs.arr()));
     }
-    BSONObj query = queryBuilder.obj();
 
     /* Do the query on MongoDB */
     //FIXME P2: use field selector to include the only relevant field: contextRegistration array (e.g. "expiration" is not needed)
+// #define USE_SORT_THAT_DESTROYS_UNIT_TESTS 1
     auto_ptr<DBClientCursor> cursor;
+    Query                    query(queryBuilder.obj());
+#ifdef USE_SORT_THAT_DESTROYS_UNIT_TESTS
+    Query                    sortCriteria  = query.sort(BSON("_id" << 1));
+#endif
 
     LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(tenant).c_str(), query.toString().c_str()));
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
     mongoSemTake(__FUNCTION__, "query in RegistrationsCollection");
 
-    try {
-        cursor = connection->query(getRegistrationsCollectionName(tenant).c_str(), query);
+    try
+    {
+        cursor = connection->query(getRegistrationsCollectionName(tenant).c_str(), query, limit, offset);
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection");
     }
-    catch( const DBException &e ) {
+    catch (const DBException& e)
+    {
 
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo db exception)");
         *err = std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
@@ -1124,8 +1129,8 @@ bool registrationsQuery
 
         return false;
     }
-    catch(...) {
-
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo generic exception)");
         *err = std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
@@ -1135,12 +1140,14 @@ bool registrationsQuery
     }
 
     /* Process query result */
-    while (cursor->more()) {
+    while (cursor->more())
+    {
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
         std::vector<BSONElement> queryContextRegistrationV = r.getField(REG_CONTEXT_REGISTRATION).Array();
-        for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix) {
+        for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
+        {
             processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV);
         }
 
@@ -1150,7 +1157,6 @@ bool registrationsQuery
          * NGSI doesn't forbid to registry exactly twice the same context registration element in the
          * same registration ID. Thus, it could be interesting to post-process the response vector, to
          * "compact" removing duplicated responses.*/
-
     }
 
     return true;
