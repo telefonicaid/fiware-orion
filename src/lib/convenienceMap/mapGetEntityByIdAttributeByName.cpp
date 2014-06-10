@@ -45,5 +45,5 @@ HttpStatusCode mapGetEntityByIdAttributeByName(const std::string& id, const std:
   request.entityIdVector.push_back(&entityId);
   request.attributeList.push_back(attributeName);
 
-  return mongoDiscoverContextAvailability(&request, response, ciP->tenant);
+  return mongoDiscoverContextAvailability(&request, response, ciP->tenant, ciP->uriParam);
 }

@@ -25,7 +25,6 @@
 *
 * Author: Fermín Galán
 */
-
 #include "logMsg/logMsg.h"
 
 #include "mongo/client/dbclient.h"
@@ -42,8 +41,8 @@
 #include "ngsi10/UpdateContextResponse.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
-
 #include "ngsiNotify/Notifier.h"
+#include "rest/uriParamNames.h"
 
 using namespace mongo;
 
@@ -298,7 +297,10 @@ extern bool entitiesQuery
   std::string*                  err,
   bool                          includeEmpty,
   std::string                   tenant,
-  std::string                   servicePath
+  std::string                   servicePath,
+  int                           offset  = DEFAULT_PAGINATION_OFFSET_INT,
+  int                           limit   = DEFAULT_PAGINATION_LIMIT_INT,
+  bool                          details = false
 );
 
 /* ****************************************************************************
@@ -306,7 +308,17 @@ extern bool entitiesQuery
 * registrationsQuery -
 *
 */
-extern bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistrationResponseVector* cerV, std::string* err, std::string tenant);
+extern bool registrationsQuery
+(
+  EntityIdVector                      enV,
+  AttributeList                       attrL,
+  ContextRegistrationResponseVector*  crrV,
+  std::string*                        err,
+  const std::string&                  tenant,
+  int                                 offset  = DEFAULT_PAGINATION_OFFSET_INT,
+  int                                 limit   = DEFAULT_PAGINATION_LIMIT_INT,
+  bool                                details = false
+);
 
 /* ****************************************************************************
 *

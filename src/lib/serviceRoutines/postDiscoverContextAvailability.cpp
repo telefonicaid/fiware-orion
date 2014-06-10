@@ -47,7 +47,7 @@ std::string postDiscoverContextAvailability(ConnectionInfo* ciP, int components,
 
   parseDataP->dcar.res.present("");
   jsonDcarPresent(parseDataP);
-  ciP->httpStatusCode = mongoDiscoverContextAvailability(&parseDataP->dcar.res, &dcar, ciP->tenant);
+  ciP->httpStatusCode = mongoDiscoverContextAvailability(&parseDataP->dcar.res, &dcar, ciP->tenant, ciP->uriParam);
   answer = dcar.render(DiscoverContextAvailability, ciP->outFormat, "");
   return answer;
 }
