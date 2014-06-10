@@ -163,8 +163,17 @@ static bool associationsQuery
 *
 * associationsDiscoverContextAvailability -
 */
-static HttpStatusCode associationsDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, const std::string& scope, const std::string& tenant) {
-
+static HttpStatusCode associationsDiscoverContextAvailability
+(
+  DiscoverContextAvailabilityRequest*   requestP,
+  DiscoverContextAvailabilityResponse*  responseP,
+  const std::string&                    scope,
+  const std::string&                    tenant,
+  int                                   offset,
+  int                                   limit,
+  bool                                  details
+)
+{
     if (scope == SCOPE_VALUE_ASSOC_ALL) {
         LM_W(("%s scope not supported", SCOPE_VALUE_ASSOC_ALL));
         responseP->errorCode.fill(SccNotImplemented, std::string("Not supported scope: '") + SCOPE_VALUE_ASSOC_ALL + "'");
@@ -177,6 +186,8 @@ static HttpStatusCode associationsDiscoverContextAvailability(DiscoverContextAva
         responseP->errorCode.fill(SccReceiverInternalError, std::string("Database error: ") + err);
         LM_RE(SccOk,(responseP->errorCode.details.c_str()));
     }
+
+    LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
     /* Query for associated entities */
     for (unsigned int ix = 0; ix < mdV.size(); ++ix) {
@@ -229,14 +240,27 @@ static HttpStatusCode associationsDiscoverContextAvailability(DiscoverContextAva
 *
 * conventionalDiscoverContextAvailability -
 */
-static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, const std::string& tenant) {
+static HttpStatusCode conventionalDiscoverContextAvailability
+(
+  DiscoverContextAvailabilityRequest*   requestP,
+  DiscoverContextAvailabilityResponse*  responseP,
+  const std::string&                    tenant,
+  int                                   offset,
+  int                                   limit,
+  bool                                  details
+)
+{
     std::string err;
-    if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err, tenant)) {
+
+    LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
+    if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err, tenant, offset, limit, details))
+    {
         responseP->errorCode.fill(SccReceiverInternalError, err);
         LM_RE(SccOk,(responseP->errorCode.details.c_str()));
     }
 
-    if (responseP->responseVector.size() == 0) {
+    if (responseP->responseVector.size() == 0)
+    {
         /* If the responseV is empty, we haven't found any entity and have to fill the status code part in the
          * response */
         responseP->errorCode.fill(SccContextElementNotFound);
@@ -250,8 +274,19 @@ static HttpStatusCode conventionalDiscoverContextAvailability(DiscoverContextAva
 *
 * mongoDiscoverContextAvailability - 
 */
-HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, const std::string& tenant)
+HttpStatusCode mongoDiscoverContextAvailability
+(
+  DiscoverContextAvailabilityRequest*        requestP,
+  DiscoverContextAvailabilityResponse*       responseP,
+  const std::string&                         tenant,
+  std::map<std::string, std::string>&        uriParams
+)
 {
+  int          offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
+  int          limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
+  std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
+  bool         details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+
   reqSemTake(__FUNCTION__, "mongo ngsi9 discovery request");
 
   LM_T(LmtMongo, ("DiscoverContextAvailability Request"));  
@@ -268,7 +303,7 @@ HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityReque
     std::string scopeValue = requestP->restriction.scopeVector.get(0)->value;
 
     if (scopeType == SCOPE_TYPE_ASSOC) {
-      HttpStatusCode ms = associationsDiscoverContextAvailability(requestP, responseP, scopeValue, tenant);
+      HttpStatusCode ms = associationsDiscoverContextAvailability(requestP, responseP, scopeValue, tenant, offset, limit, details);
       reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request (association)");
       return ms;
     }
@@ -277,7 +312,7 @@ HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityReque
     }
   }
 
-  HttpStatusCode hsCode = conventionalDiscoverContextAvailability(requestP, responseP, tenant);
+  HttpStatusCode hsCode = conventionalDiscoverContextAvailability(requestP, responseP, tenant, offset, limit, details);
   if (hsCode != SccOk)
     ++noOfDiscoveryErrors;
 

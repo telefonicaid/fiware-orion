@@ -9436,7 +9436,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdates)
   QueryContextResponse  qcRes1;
 
   qcReq1.entityIdVector.push_back(&e);
-  ms = mongoQueryContext(&qcReq1, &qcRes1, "", "/home/kz");
+  ms = mongoQueryContext(&qcReq1, &qcRes1, "", "/home/kz", uriParams);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(0, qcRes1.errorCode.code);
   EXPECT_EQ(0, qcRes1.errorCode.reasonPhrase.size());
@@ -9463,7 +9463,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdates)
   QueryContextResponse  qcRes2;
 
   qcReq2.entityIdVector.push_back(&e);
-  ms = mongoQueryContext(&qcReq2, &qcRes2, "", "/home/kz");
+  ms = mongoQueryContext(&qcReq2, &qcRes2, "", "/home/kz", uriParams);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(0, qcRes2.errorCode.code);
   EXPECT_EQ(0, qcRes2.errorCode.reasonPhrase.size());
@@ -9537,7 +9537,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation)
   QueryContextResponse  qcRes2;
 
   qcReq.entityIdVector.push_back(&e);
-  ms = mongoQueryContext(&qcReq, &qcRes1, "", "/home/kz/01");
+  ms = mongoQueryContext(&qcReq, &qcRes1, "", "/home/kz/01", uriParams);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(0, qcRes1.errorCode.code);
   EXPECT_EQ(0, qcRes1.errorCode.reasonPhrase.size());
@@ -9545,7 +9545,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation)
   ASSERT_EQ(1, qcRes1.contextElementResponseVector.size());
 
 
-  ms = mongoQueryContext(&qcReq, &qcRes2, "", "/home/kz");
+  ms = mongoQueryContext(&qcReq, &qcRes2, "", "/home/kz", uriParams);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(0, qcRes2.errorCode.code);
   EXPECT_EQ(0, qcRes2.errorCode.reasonPhrase.size());
@@ -9639,7 +9639,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion)
 
 
   // 4. Query entities with Service Path /home/kz - make sure we find three entities
-  ms = mongoQueryContext(&qcReq, &qcRes1, "", "/home/kz");
+  ms = mongoQueryContext(&qcReq, &qcRes1, "", "/home/kz", uriParams);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(0, qcRes1.errorCode.code);
   EXPECT_EQ(0, qcRes1.errorCode.reasonPhrase.size());
@@ -9654,7 +9654,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion)
 
   LM_M(("-----------------------------------------------------------------------------"));
   // 6. Query entities with Service Path /home/kz - make sure we find two entities
-  ms = mongoQueryContext(&qcReq, &qcRes2, "", "/home/kz");
+  ms = mongoQueryContext(&qcReq, &qcRes2, "", "/home/kz", uriParams);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(0, qcRes2.errorCode.code);
   EXPECT_EQ(0, qcRes2.errorCode.reasonPhrase.size());
@@ -9667,7 +9667,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion)
   EXPECT_EQ(SccOk, ms);
 
   // 8. Query entities with Service Path /home/kz - make sure we find ZERO entities
-  ms = mongoQueryContext(&qcReq, &qcRes3, "", "/home/kz");
+  ms = mongoQueryContext(&qcReq, &qcRes3, "", "/home/kz", uriParams);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccContextElementNotFound, qcRes3.errorCode.code);
   EXPECT_STREQ("No context element found", qcRes3.errorCode.reasonPhrase.c_str());

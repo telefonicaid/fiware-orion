@@ -26,6 +26,7 @@
 * Author: Fermin Galan Marquez
 */
 #include <string>
+#include <map>
 
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
@@ -38,10 +39,11 @@
 */
 extern HttpStatusCode mongoQueryContext
 (
-  QueryContextRequest*  requestP,
-  QueryContextResponse* responseP,
-  const std::string&    tenant      = "",
-  const std::string&    servicePath = ""
+  QueryContextRequest*                       requestP,
+  QueryContextResponse*                      responseP,
+  const std::string&                         tenant,
+  const std::string&                         servicePath,
+  std::map<std::string, std::string>&        uriParams
 );
 
 #endif

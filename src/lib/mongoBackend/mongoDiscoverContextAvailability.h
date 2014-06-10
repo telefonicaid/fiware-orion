@@ -26,6 +26,7 @@
 * Author: Fermin Galan Marquez
 */
 #include <string>
+#include <map>
 
 #include "rest/HttpStatusCode.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
@@ -37,6 +38,12 @@
 *
 * mongoDiscoverContextAvailability - 
 */
-extern HttpStatusCode mongoDiscoverContextAvailability(DiscoverContextAvailabilityRequest* requestP, DiscoverContextAvailabilityResponse* responseP, const std::string& tenant = "");
+extern HttpStatusCode mongoDiscoverContextAvailability
+(
+  DiscoverContextAvailabilityRequest*        requestP,
+  DiscoverContextAvailabilityResponse*       responseP,
+  const std::string&                         tenant,
+  std::map<std::string, std::string>&        uriParams
+);
 
 #endif

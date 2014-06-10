@@ -32,6 +32,26 @@
 *
 * Names of the URI parameters
 */
-#define URI_PARAM_NOTIFY_FORMAT    "notifyFormat"
+#define URI_PARAM_NOTIFY_FORMAT       "notifyFormat"
+#define URI_PARAM_PAGINATION_OFFSET   "offset"
+#define URI_PARAM_PAGINATION_LIMIT    "limit"
+#define URI_PARAM_PAGINATION_DETAILS  "details"
+
+
+
+/* ****************************************************************************
+*
+* Values for URI parameters
+*/
+#define DEFAULT_PAGINATION_OFFSET       "0"
+#define DEFAULT_PAGINATION_OFFSET_INT   0
+#define MAX_PAGINATION_OFFSET           "1000000"
+
+#define DEFAULT_PAGINATION_LIMIT        "20"
+#define DEFAULT_PAGINATION_LIMIT_INT    20
+#define MAX_PAGINATION_LIMIT            "1000"
+
+#define DEFAULT_PARAM_NOTIFY_FORMAT     ""
+#define DEFAULT_PAGINATION_DETAILS      "off"
 
 #endif

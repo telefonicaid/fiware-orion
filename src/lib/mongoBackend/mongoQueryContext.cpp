@@ -40,8 +40,20 @@
 *
 * mongoQueryContext - 
 */
-HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResponse* responseP, const std::string& tenant, const std::string& servicePath)
+HttpStatusCode mongoQueryContext
+(
+  QueryContextRequest*                       requestP,
+  QueryContextResponse*                      responseP,
+  const std::string&                         tenant,
+  const std::string&                         servicePath,
+  std::map<std::string, std::string>&        uriParams
+)
 {
+    int         offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
+    int         limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
+    std::string detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
+    bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+
     reqSemTake(__FUNCTION__, "ngsi10 query request");
 
     LM_T(LmtMongo, ("QueryContext Request"));    
@@ -51,9 +63,23 @@ HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResp
         LM_W(("Restriction found but not supported at mongo backend"));
     }
 
-    std::string err;
     LM_T(LmtServicePath, ("Service Path: '%s'", servicePath.c_str()));
-    if (!entitiesQuery(requestP->entityIdVector, requestP->attributeList, requestP->restriction, &responseP->contextElementResponseVector, &err, true, tenant, servicePath)) {
+    std::string err;
+    bool        ok;
+
+    ok = entitiesQuery(requestP->entityIdVector,
+                       requestP->attributeList,
+                       requestP->restriction,
+                       &responseP->contextElementResponseVector,
+                       &err,
+                       true,
+                       tenant,
+                       servicePath,
+                       offset,
+                       limit,
+                       details);
+    if (!ok)
+    {
         responseP->errorCode.fill(SccReceiverInternalError, err);
         LM_E((responseP->errorCode.details.c_str()));
     }

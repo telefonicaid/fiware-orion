@@ -1026,7 +1026,6 @@ static bool processContextAttributeVector (ContextElement*               ceP,
          * "append" it would keep the true value untouched */
         bool actualUpdate = true;
         if (strcasecmp(action.c_str(), "update") == 0) {
-          LM_M(("UPDATE: targetAttr.name:%s, targetAttr.value:%s", targetAttr->name.c_str(), targetAttr->value.c_str()));
             if (updateAttribute(attrs, newAttrs, targetAttr, actualUpdate)) {
                 entityModified = actualUpdate || entityModified;
                 attrs = newAttrs;

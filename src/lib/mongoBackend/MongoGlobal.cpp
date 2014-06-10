@@ -727,7 +727,10 @@ bool entitiesQuery
   std::string*                  err,
   bool                          includeEmpty,
   std::string                   tenant,
-  std::string                   servicePath
+  std::string                   servicePath,
+  int                           offset,
+  int                           limit,
+  bool                          details
 )
 {
     DBClientConnection* connection = getMongoConnection();
@@ -775,6 +778,8 @@ bool entitiesQuery
        std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
        finalQuery.append(locCoords, areaQuery);
     }
+
+    LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
     /* Do the query on MongoDB */
     BSONObj query = finalQuery.obj();
@@ -1017,8 +1022,18 @@ static void processContextRegistrationElement (BSONObj cr, EntityIdVector enV, A
 * ContextRegistrationResponseVector or error.
 *
 */
-bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistrationResponseVector* crrV, std::string* err, std::string tenant) {
-
+bool registrationsQuery
+(
+  EntityIdVector                      enV,
+  AttributeList                       attrL,
+  ContextRegistrationResponseVector*  crrV,
+  std::string*                        err,
+  const std::string&                  tenant,
+  int                                 offset,
+  int                                 limit,
+  bool                                details
+)
+{
     DBClientConnection* connection = getMongoConnection();
 
     /* Build query based on arguments */
@@ -1031,6 +1046,7 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
     BSONArrayBuilder entityOr;
     BSONArrayBuilder entitiesWithType;
     BSONArrayBuilder entitiesWithoutType;    
+
     for (unsigned int ix = 0; ix < enV.size(); ++ix) {        
         EntityId* en = enV.get(ix);
         if (isTrue(en->isPattern)) {
@@ -1081,9 +1097,11 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
     //FIXME P2: use field selector to include the only relevant field: contextRegistration array (e.g. "expiration" is not needed)
     auto_ptr<DBClientCursor> cursor;
 
+    LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(tenant).c_str(), query.toString().c_str()));
+    LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
+    mongoSemTake(__FUNCTION__, "query in RegistrationsCollection");
+
     try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(tenant).c_str(), query.toString().c_str()));
-        mongoSemTake(__FUNCTION__, "query in RegistrationsCollection");
         cursor = connection->query(getRegistrationsCollectionName(tenant).c_str(), query);
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection");
     }

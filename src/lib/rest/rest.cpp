@@ -111,7 +111,68 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       return MHD_YES;
     }
   }
+  else if (key == URI_PARAM_PAGINATION_OFFSET)
+  {
+    char* cP = (char*) val;
 
+    while (*cP != 0)
+    {
+      if ((*cP < '0') || (*cP > '9'))
+      {
+        OrionError error(SccBadRequest, std::string("Bad pagination offset: '") + value + "' (must be a decimal number)");
+        ciP->httpStatusCode = SccBadRequest;
+        ciP->answer         = error.render(ciP->outFormat, "");
+        return MHD_YES;
+      }
+
+      ++cP;
+    }
+  }
+  else if (key == URI_PARAM_PAGINATION_LIMIT)
+  {
+    char* cP = (char*) val;
+
+    while (*cP != 0)
+    {
+      if ((*cP < '0') || (*cP > '9'))
+      {
+        OrionError error(SccBadRequest, std::string("Bad pagination limit: '") + value + "' (must be a decimal number)");
+        ciP->httpStatusCode = SccBadRequest;
+        ciP->answer         = error.render(ciP->outFormat, "");
+        return MHD_YES;
+      }
+
+      ++cP;
+    }
+
+    int limit = atoi(val);
+    if (limit > atoi(MAX_PAGINATION_LIMIT))
+    {
+      OrionError error(SccBadRequest, std::string("Bad pagination limit: '") + value + "' (max: " + MAX_PAGINATION_LIMIT + ")");
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer         = error.render(ciP->outFormat, "");
+      return MHD_YES;
+    }
+    else if (limit == 0)
+    {
+      OrionError error(SccBadRequest, std::string("Bad pagination limit: '") + value + "' (a value of ZERO is unaccepted)");
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer         = error.render(ciP->outFormat, "");
+      return MHD_YES;
+    }
+  }
+  else if (key == URI_PARAM_PAGINATION_DETAILS)
+  {
+    if ((strcasecmp(value.c_str(), "on") != 0) && (strcasecmp(value.c_str(), "off") != 0))
+    {
+      OrionError error(SccBadRequest, std::string("Bad value for 'details': '") + value + "' (accepted: 'on', 'ON', 'off', 'OFF'. Default is 'off')");
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer         = error.render(ciP->outFormat, "");
+      return MHD_YES;
+    }
+  }
+  else
+    LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
 
   if (val != NULL)
     ciP->uriParam[key] = value;
@@ -180,7 +241,8 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 static Format wantedOutputSupported(const std::string& acceptList, std::string* charsetP)
 {
   std::vector<std::string>  vec;
-  char* copy;
+  char*                     copy;
+
   if (acceptList.length() == 0) 
   {
     /* HTTP RFC states that a missing Accept header must be interpreted as if the client is
@@ -191,7 +253,7 @@ static Format wantedOutputSupported(const std::string& acceptList, std::string* 
   {
     copy = strdup((char*) acceptList.c_str());
   }
-  char*                     cP   = copy;
+  char*  cP   = copy;
 
   do
   {
@@ -495,11 +557,15 @@ static int connectionTreat
     //
     // URI parameters
     // 
-    ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "";
+    ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]      = DEFAULT_PARAM_NOTIFY_FORMAT;
+    ciP->uriParam[URI_PARAM_PAGINATION_OFFSET]  = DEFAULT_PAGINATION_OFFSET;
+    ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
+    ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
+    
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
     if (ciP->httpStatusCode != SccOk)
     {
-      LM_W(("Error in URI arguments"));
+      LM_W(("Error in URI parameters"));
       restReply(ciP, ciP->answer);
       return MHD_YES;
     }
