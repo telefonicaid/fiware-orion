@@ -556,8 +556,7 @@ static void fillQueryEntity(BSONArrayBuilder& ba, EntityId* enP, const std::stri
   }
   else
   {
-    BSONObj doesntExist = BSON("$exists" << false);
-    ent.append(servicePathString, doesntExist);
+    ent.append(servicePathString, BSON("$exists" << false));
   }
 
   BSONObj entObj = ent.obj();

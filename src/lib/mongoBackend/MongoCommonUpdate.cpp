@@ -1332,18 +1332,17 @@ static bool removeEntity
     const std::string    typeString        = "_id." ENT_ENTITY_TYPE;
     const std::string    servicePathString = "_id." ENT_SERVICE_PATH;
     DBClientConnection*  connection        = getMongoConnection();
-    BSONObj              doesntExist       = BSON("$exists" << false);
     BSONObjBuilder       bob;
     BSONObj              query;
 
     bob.append(idString, entityId);
     if (entityType == "")
-      bob.append(typeString, doesntExist);
+      bob.append(typeString, BSON("$exists" << false));
     else
       bob.append(typeString, entityType);
 
     if (servicePath == "")
-      bob.append(servicePathString, doesntExist);
+      bob.append(servicePathString, BSON("$exists" << false));
     else
       bob.append(servicePathString, servicePath);
 
@@ -1429,7 +1428,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
     const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
     const std::string  servicePathValue  = std::string("^") + path + "$|" + "^" + path + "\\/.*";
-    BSONObj            doesntExist       = BSON("$exists" << false);
     BSONObjBuilder     bob;
 
     bob.append(idString, enP->id);
@@ -1438,7 +1436,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
       bob.append(typeString, enP->type);
     
     if (servicePath == "")
-      bob.append(servicePathString, doesntExist);
+      bob.append(servicePathString, BSON("$exists" << false));
     else
       bob.appendRegex(servicePathString, servicePathValue);
     
@@ -1584,9 +1582,9 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         char espath[MAX_SERVICE_NAME_LEN];
         slashEscape(entitySPath.c_str(), espath, sizeof(espath));
 
-        // doesntExist and servicePathString from earlier in this function
+        // servicePathString from earlier in this function
         if (servicePath == "")
-          bob.append(servicePathString, doesntExist);
+          bob.append(servicePathString, BSON("$exists" << false));
         else
           bob.appendRegex(servicePathString, espath);
         
