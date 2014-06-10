@@ -51,7 +51,7 @@ HttpStatusCode mapGetIndividualContextEntity(const std::string& entityId, Contex
    response->contextElement.entityId.fill(entityId, "", "false");
 
    qcRequest.entityIdVector.push_back(&entity);
-   ms = mongoQueryContext(&qcRequest, &qcResponse, ciP->tenant);
+   ms = mongoQueryContext(&qcRequest, &qcResponse, ciP->tenant, ciP->servicePath);
 
    if ((ms != SccOk) || (qcResponse.contextElementResponseVector.size() == 0))
    {

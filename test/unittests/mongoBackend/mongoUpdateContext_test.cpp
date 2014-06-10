@@ -31,10 +31,13 @@
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContext.h"
+#include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
+#include "ngsi10/QueryContextRequest.h"
+#include "ngsi10/QueryContextResponse.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -106,7 +109,7 @@
 * - appendMdNoActualChanges
 * - updateMdNoActualChanges
 *
-* (N=2 without lost of generality)
+* (N=2 without loss of generality)
 *
 * With isPattern=true:
 *
@@ -121,6 +124,8 @@
 * mocked MongoDB. Actually, we think is very much powerfull to check that everything is ok at
 * MongoDB layer.
 *
+*
+* Lastly a few tests with Service Path
 */
 
 /* ****************************************************************************
@@ -9284,8 +9289,9 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccReceiverInternalError, RES_CER_STATUS(0).code);
     EXPECT_EQ("Internal Server Error", RES_CER_STATUS(0).reasonPhrase);
+
     EXPECT_EQ("collection: unittest.entities "
-              "- update() query: { _id.id: \"E1\", _id.type: \"T1\" } "
+              "- update() query: { _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $exists: false } } "
               "- update() doc: { $set: { attrs: [ { name: \"A1\", type: \"TA1\", value: \"new_val\", modDate: 1360232700 }, { name: \"A2\", type: \"TA2\" } ], modDate: 1360232700 }, $unset: { location: 1 } } "
               "- exception: boom!!", RES_CER_STATUS(0).details);
 
@@ -9304,15 +9310,11 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
 */
 TEST(mongoUpdateContextRequest, mongoDbQueryFail)
 {
-
     HttpStatusCode         ms;
     UpdateContextRequest   req;
     UpdateContextResponse  res;    
 
     utInit();
-
-    /* Set database */
-    setupDatabase();
 
     /* Prepare mock */
     const DBException e = DBException("boom!!", 33);
@@ -9357,4 +9359,320 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
     delete connectionMock;
 
     utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* servicePathEntityUpdates - 
+*
+* FIXME P5: to follow the example of the rest of this file, a lot more should be 'expected' ...
+*
+* FIXME P6: attack mongo directly instead of using mongoQueryContext to verify
+*           that the update has been successful.
+*/
+TEST(mongoUpdateContextRequest, servicePathEntityUpdates)
+{
+  HttpStatusCode         ms;
+  UpdateContextRequest   ucReq;
+  UpdateContextResponse  ucRes1;
+  UpdateContextResponse  ucRes2;
+  UpdateContextResponse  ucRes3;
+  UpdateContextResponse  ucRes4;
+  ContextElement         ce;
+  ContextAttribute       ca("A1", "TA1", "kz01");
+
+  utInit();
+
+  ce.entityId.fill("E1", "T1", "false");
+  ce.contextAttributeVector.push_back(&ca);
+  ucReq.contextElementVector.push_back(&ce);
+
+  // 1. Create an Entity with Service Path /home/kz/01
+  // 2. Create another Entity with Service Path /home/kz/02
+  // 3. Update Entity with Service Path /home/kz/01
+  // 4. Query entities with Service Path /home/kz - make sure just ONE has changed
+  // 5. Update Entity with Service Path /home/kz
+  // 6. Query entities with Service Path /home/kz - make sure both have changed
+
+  
+  // 1. Create an Entity with Service Path /home/kz/01
+  ca.value = "kz01";
+  ucReq.updateActionType.set("APPEND");
+  ms = mongoUpdateContext(&ucReq, &ucRes1, "", "/home/kz/01");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, ucRes1.errorCode.code);
+  EXPECT_EQ(0, ucRes1.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, ucRes1.errorCode.details.size());
+  ASSERT_EQ(1, ucRes1.contextElementResponseVector.size());
+
+
+  // 2. Create another Entity with Service Path /home/kz/02
+  ca.value = "kz02";
+  ucReq.updateActionType.set("APPEND");
+  ms = mongoUpdateContext(&ucReq, &ucRes2, "", "/home/kz/02");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, ucRes2.errorCode.code);
+  EXPECT_EQ(0, ucRes2.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, ucRes2.errorCode.details.size());
+  ASSERT_EQ(1, ucRes2.contextElementResponseVector.size());
+
+
+  // 3. Update Entity with Service Path /home/kz/01
+  ca.value = "kz01-modified";
+  ucReq.updateActionType.set("UPDATE");
+  ms = mongoUpdateContext(&ucReq, &ucRes3, "", "/home/kz/01");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, ucRes3.errorCode.code);
+  EXPECT_EQ(0, ucRes3.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, ucRes3.errorCode.details.size());
+  ASSERT_EQ(1, ucRes3.contextElementResponseVector.size());
+
+
+  // 4. Query entities with Service Path /home/kz - make sure just ONE has changed 
+  EntityId              e("E1", "T1", "false");
+  QueryContextRequest   qcReq1;
+  QueryContextResponse  qcRes1;
+
+  qcReq1.entityIdVector.push_back(&e);
+  ms = mongoQueryContext(&qcReq1, &qcRes1, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, qcRes1.errorCode.code);
+  EXPECT_EQ(0, qcRes1.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, qcRes1.errorCode.details.size());
+  ASSERT_EQ(2, qcRes1.contextElementResponseVector.size());
+  EXPECT_STREQ("kz01-modified", qcRes1.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("kz02",          qcRes1.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+
+
+  // 5. Update Entity with Service Path /home/kz
+  LM_M(("***************************** 5. Update Entity with Service Path /home/kz (2 entities)"));
+  ca.value = "kz-modified";
+  ucReq.updateActionType.set("UPDATE");
+  ms = mongoUpdateContext(&ucReq, &ucRes4, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, ucRes4.errorCode.code);
+  EXPECT_EQ(0, ucRes4.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, ucRes4.errorCode.details.size());
+  ASSERT_EQ(2, ucRes4.contextElementResponseVector.size());
+
+
+  // 6. Query entities with Service Path /home/kz - make sure both have changed
+  QueryContextRequest   qcReq2;
+  QueryContextResponse  qcRes2;
+
+  qcReq2.entityIdVector.push_back(&e);
+  ms = mongoQueryContext(&qcReq2, &qcRes2, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, qcRes2.errorCode.code);
+  EXPECT_EQ(0, qcRes2.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, qcRes2.errorCode.details.size());
+  ASSERT_EQ(2, qcRes2.contextElementResponseVector.size());
+  EXPECT_STREQ("kz-modified", qcRes2.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("kz-modified", qcRes2.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  utExit();
+}
+
+/* ****************************************************************************
+*
+* servicePathEntityCreation - 
+*
+* FIXME P5: to follow the example of the rest of this file, a lot more should be 'expected' ...
+*
+* FIXME P6: attack mongo directly instead of using mongoQueryContext to verify
+*           that the update has been successful.
+*/
+TEST(mongoUpdateContextRequest, servicePathEntityCreation)
+{
+  HttpStatusCode         ms;
+  UpdateContextRequest   ucReq;
+  UpdateContextResponse  ucRes1;
+  UpdateContextResponse  ucRes2;
+  UpdateContextResponse  ucRes3;
+  ContextElement         ce;
+  ContextAttribute       ca("A1", "TA1", "kz01");
+
+  utInit();
+
+  ce.entityId.fill("E1", "T1", "false");
+  ce.contextAttributeVector.push_back(&ca);
+  ucReq.contextElementVector.push_back(&ce);
+
+
+  ca.value = "kz";
+  ucReq.updateActionType.set("APPEND");
+  ms = mongoUpdateContext(&ucReq, &ucRes3, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, ucRes3.errorCode.code);
+  EXPECT_EQ(0, ucRes3.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, ucRes3.errorCode.details.size());
+  ASSERT_EQ(1, ucRes3.contextElementResponseVector.size());
+
+
+  ca.value = "kz01";
+  ucReq.updateActionType.set("APPEND");
+  ms = mongoUpdateContext(&ucReq, &ucRes1, "", "/home/kz/01");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, ucRes1.errorCode.code);
+  EXPECT_EQ(0, ucRes1.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, ucRes1.errorCode.details.size());
+  ASSERT_EQ(1, ucRes1.contextElementResponseVector.size());
+
+
+  ca.value = "kz02";
+  ucReq.updateActionType.set("APPEND");
+  ms = mongoUpdateContext(&ucReq, &ucRes2, "", "/home/kz/02");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, ucRes2.errorCode.code);
+  EXPECT_EQ(0, ucRes2.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, ucRes2.errorCode.details.size());
+  ASSERT_EQ(1, ucRes2.contextElementResponseVector.size());
+
+  // Now query E1/A1 in Service Path /home/kz/01
+  EntityId              e("E1", "T1", "false");
+  QueryContextRequest   qcReq;
+  QueryContextResponse  qcRes1;
+  QueryContextResponse  qcRes2;
+
+  qcReq.entityIdVector.push_back(&e);
+  ms = mongoQueryContext(&qcReq, &qcRes1, "", "/home/kz/01");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, qcRes1.errorCode.code);
+  EXPECT_EQ(0, qcRes1.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, qcRes1.errorCode.details.size());
+  ASSERT_EQ(1, qcRes1.contextElementResponseVector.size());
+
+
+  ms = mongoQueryContext(&qcReq, &qcRes2, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, qcRes2.errorCode.code);
+  EXPECT_EQ(0, qcRes2.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, qcRes2.errorCode.details.size());
+  ASSERT_EQ(3, qcRes2.contextElementResponseVector.size());
+
+  utExit();
+}
+
+
+
+/* ****************************************************************************
+*
+* servicePathEntityDeletion - 
+*
+* FIXME P5: to follow the example of the rest of this file, a lot more should be 'expected' ...
+*
+* FIXME P6: attack mongo directly instead of using mongoQueryContext to verify
+*           that the update has been successful.
+*/
+TEST(mongoUpdateContextRequest, servicePathEntityDeletion)
+{
+  HttpStatusCode         ms;
+  UpdateContextRequest   ucReq;
+  UpdateContextRequest   ucReq2;
+  UpdateContextResponse  ucRes1;
+  UpdateContextResponse  ucRes2;
+  UpdateContextResponse  ucRes3;
+  UpdateContextResponse  ucRes4;
+  ContextElement         ce;
+  ContextElement         ce2;
+  ContextAttribute       ca("A1", "TA1", "kz01");
+  EntityId               e("E1", "T1", "false");
+  QueryContextRequest    qcReq;
+  QueryContextResponse   qcRes1;
+  QueryContextResponse   qcRes2;
+  QueryContextResponse   qcRes3;
+
+  qcReq.entityIdVector.push_back(&e);
+
+  utInit();
+
+  ce.entityId.fill("E1", "T1", "false");
+  ce2.entityId.fill("E1", "T1", "false");
+  ce.contextAttributeVector.push_back(&ca);
+  ucReq.contextElementVector.push_back(&ce);
+  ucReq2.contextElementVector.push_back(&ce2);
+
+  // 1. Create an Entity with Service Path /home/kz
+  // 2. Create another Entity with Service Path /home/kz/01
+  // 3. Create another Entity with Service Path /home/kz/02
+  // 4. Query entities with Service Path /home/kz - make sure we find three entities
+  // 5. Remove entity with Service Path /home/kz/01
+  // 6. Query entities with Service Path /home/kz - make sure we find two entities
+  // 7. Remove entity with Service Path /home/kz
+  // 8. Query entities with Service Path /home/kz - make sure we find ZERO entities
+
+
+  
+  // 1. Create an Entity with Service Path /home/kz
+  ca.value = "kz";
+  ucReq.updateActionType.set("APPEND");
+  ms = mongoUpdateContext(&ucReq, &ucRes1, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, ucRes1.errorCode.code);
+  EXPECT_EQ(0, ucRes1.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, ucRes1.errorCode.details.size());
+  ASSERT_EQ(1, ucRes1.contextElementResponseVector.size());
+
+
+  // 2. Create another Entity with Service Path /home/kz/01
+  ca.value = "kz01";
+  ucReq.updateActionType.set("APPEND");
+  ms = mongoUpdateContext(&ucReq, &ucRes2, "", "/home/kz/01");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, ucRes2.errorCode.code);
+  EXPECT_EQ(0, ucRes2.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, ucRes2.errorCode.details.size());
+  ASSERT_EQ(1, ucRes2.contextElementResponseVector.size());
+
+
+  // 3. Create another Entity with Service Path /home/kz/02
+  ca.value = "kz02";
+  ucReq.updateActionType.set("APPEND");
+  ms = mongoUpdateContext(&ucReq, &ucRes3, "", "/home/kz/02");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, ucRes3.errorCode.code);
+  EXPECT_EQ(0, ucRes3.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, ucRes3.errorCode.details.size());
+  ASSERT_EQ(1, ucRes3.contextElementResponseVector.size());
+
+
+  // 4. Query entities with Service Path /home/kz - make sure we find three entities
+  ms = mongoQueryContext(&qcReq, &qcRes1, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, qcRes1.errorCode.code);
+  EXPECT_EQ(0, qcRes1.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, qcRes1.errorCode.details.size());
+  ASSERT_EQ(3, qcRes1.contextElementResponseVector.size());
+  
+  // 5. Remove entity with Service Path /home/kz/01
+  LM_M(("----------------------------  Remove entity with Service Path /home/kz/01"));
+  ucReq2.updateActionType.set("DELETE");
+  ms = mongoUpdateContext(&ucReq2, &ucRes2, "", "/home/kz/01");
+  EXPECT_EQ(SccOk, ms);
+
+  LM_M(("-----------------------------------------------------------------------------"));
+  // 6. Query entities with Service Path /home/kz - make sure we find two entities
+  ms = mongoQueryContext(&qcReq, &qcRes2, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0, qcRes2.errorCode.code);
+  EXPECT_EQ(0, qcRes2.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, qcRes2.errorCode.details.size());
+  ASSERT_EQ(2, qcRes2.contextElementResponseVector.size());
+
+  // 7. Remove entity with Service Path /home/kz
+  ucReq2.updateActionType.set("DELETE");
+  ms = mongoUpdateContext(&ucReq2, &ucRes2, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+
+  // 8. Query entities with Service Path /home/kz - make sure we find ZERO entities
+  ms = mongoQueryContext(&qcReq, &qcRes3, "", "/home/kz");
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccContextElementNotFound, qcRes3.errorCode.code);
+  EXPECT_STREQ("No context element found", qcRes3.errorCode.reasonPhrase.c_str());
+  EXPECT_EQ(0, qcRes3.errorCode.details.size());
+  ASSERT_EQ(0, qcRes3.contextElementResponseVector.size());
+
+  utExit();
 }
