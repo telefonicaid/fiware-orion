@@ -767,11 +767,11 @@ bool entitiesQuery
     }
     std::string attrNames = ENT_ATTRS "." ENT_ATTRS_NAME;
     if (attrs.arrSize() > 0) {
-        /* If we don't do this checking, the {$in: [] } in the attribute name part will
-         * make the query fail*/
-        finalQuery.append(attrNames, BSON("$in" << attrs.arr()));
+      /* If we don't do this checking, the {$in: [] } in the attribute name part will
+       * make the query fail*/
+      finalQuery.append(attrNames, BSON("$in" << attrs.arr()));
     }
-
+ 
     /* Part 3: geo-location */
     BSONObj areaQuery;
     if (processAreaScope(res.scopeVector, areaQuery)) {
@@ -781,13 +781,23 @@ bool entitiesQuery
 
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
+    //
+    // if (details == 'on'), count the number of matches in mongo, and return an error 
+    // with that info incase of error.
+    //
+
     /* Do the query on MongoDB */
-    BSONObj query = finalQuery.obj();
-    auto_ptr<DBClientCursor> cursor;
-    try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
-        mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
-        cursor = connection->query(getEntitiesCollectionName(tenant).c_str(), query);
+    BSONObj                   bquery      = finalQuery.obj();
+    auto_ptr<DBClientCursor>  cursor;
+    Query                     query(bquery);
+    Query                     sortCriteria  = query.sort(BSON("creDate" << 1));
+
+    LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
+    mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
+
+    try
+    {
+        cursor = connection->query(getEntitiesCollectionName(tenant).c_str(), query, limit, offset);
 
         /*
          * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
