@@ -300,7 +300,8 @@ extern bool entitiesQuery
   std::string                   servicePath,
   int                           offset  = DEFAULT_PAGINATION_OFFSET_INT,
   int                           limit   = DEFAULT_PAGINATION_LIMIT_INT,
-  bool                          details = false
+  bool                          details = false,
+  long long*                    countP  = NULL
 );
 
 /* ****************************************************************************
@@ -317,7 +318,8 @@ extern bool registrationsQuery
   const std::string&                  tenant,
   int                                 offset  = DEFAULT_PAGINATION_OFFSET_INT,
   int                                 limit   = DEFAULT_PAGINATION_LIMIT_INT,
-  bool                                details = false
+  bool                                details = false,
+  long long*                          countP  = NULL
 );
 
 /* ****************************************************************************

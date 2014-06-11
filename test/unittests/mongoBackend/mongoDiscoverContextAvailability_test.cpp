@@ -295,21 +295,21 @@ static void prepareDatabasePatternTrue(void) {
               );
 
   BSONObj reg2 = BSON(
-              "_id" << "ee48" <<
+              "_id" << "ff48" <<
               "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
               "contextRegistration" << BSON_ARRAY(cr3)
               );
 
   BSONObj reg3 = BSON(
-              "_id" << "ee00" <<
+              "_id" << "ff80" <<
               "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
               "contextRegistration" << BSON_ARRAY(cr4)
               );
 
   BSONObj reg4 = BSON(
-              "_id" << "ff00" <<
+              "_id" << "ff90" <<
               "expiration" << 1879048191 <<
               "subscriptions" << BSONArray() <<
               "contextRegistration" << BSON_ARRAY(cr5)
@@ -319,8 +319,156 @@ static void prepareDatabasePatternTrue(void) {
   connection->insert(REGISTRATIONS_COLL, reg2);
   connection->insert(REGISTRATIONS_COLL, reg3);
   connection->insert(REGISTRATIONS_COLL, reg4);
-
 }
+
+/* ****************************************************************************
+*
+* prepareDatabaseForPagination -
+*/
+static void prepareDatabaseForPagination(void)
+{
+  /* Set database */
+  setupDatabase();
+
+  DBClientConnection* connection = getMongoConnection();
+
+  /* We create the following registrations:
+   *
+   * - Reg1: CR: (E1 for http://cr1.com)
+   * - Reg2: CR: (E2 for http://cr2.com)
+   * - Reg3: CR: (E3 for http://cr3.com)
+   * - Reg4: CR: (E4 for http://cr4.com)
+   * - Reg5: CR: (E5 for http://cr5.com)
+   *
+   */
+
+  BSONObj cr1 = BSON("providingApplication" << "http://cr1.com" << "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+  BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" << "entities" << BSON_ARRAY(BSON("id" << "E2" << "type" << "T1")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+  BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" << "entities" << BSON_ARRAY(BSON("id" << "E3" << "type" << "T1")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+  BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" << "entities" << BSON_ARRAY(BSON("id" << "E4" << "type" << "T1")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+  BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" << "entities" << BSON_ARRAY(BSON("id" << "E5" << "type" << "T1")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+
+  BSONObj reg1 = BSON("_id" << OID("51307b66f481db11bf860001") << "expiration" << 1879048191 << "contextRegistration" << BSON_ARRAY(cr1));
+  BSONObj reg2 = BSON("_id" << OID("51307b66f481db11bf860002") << "expiration" << 1879048191 << "contextRegistration" << BSON_ARRAY(cr2));
+  BSONObj reg3 = BSON("_id" << OID("51307b66f481db11bf860003") << "expiration" << 1879048191 << "contextRegistration" << BSON_ARRAY(cr3));
+  BSONObj reg4 = BSON("_id" << OID("51307b66f481db11bf860004") << "expiration" << 1879048191 << "contextRegistration" << BSON_ARRAY(cr4));
+  BSONObj reg5 = BSON("_id" << OID("51307b66f481db11bf860005") << "expiration" << 1879048191 << "contextRegistration" << BSON_ARRAY(cr5));
+
+  connection->insert(REGISTRATIONS_COLL, reg1);
+  connection->insert(REGISTRATIONS_COLL, reg2);
+  connection->insert(REGISTRATIONS_COLL, reg3);
+  connection->insert(REGISTRATIONS_COLL, reg4);
+  connection->insert(REGISTRATIONS_COLL, reg5);
+}
+
+/* ****************************************************************************
+*
+* pagination - 
+*/
+TEST(mongoDiscoverContextAvailabilityRequest, pagination)
+{
+  HttpStatusCode                       ms;
+  DiscoverContextAvailabilityRequest   req;
+  DiscoverContextAvailabilityResponse  res0;
+  DiscoverContextAvailabilityResponse  res1;
+  DiscoverContextAvailabilityResponse  res2;
+  DiscoverContextAvailabilityResponse  res3;
+  DiscoverContextAvailabilityResponse  res4;
+  DiscoverContextAvailabilityResponse  res5;
+
+  utInit();
+  prepareDatabaseForPagination();
+
+  EntityId en("E.*", "", "true");
+  req.entityIdVector.push_back(&en);
+
+  // 0. discovery with details=on, just to find number of hits
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
+  ms = mongoDiscoverContextAvailability(&req, &res0, "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk,         res0.errorCode.code);
+  EXPECT_STREQ("OK",       res0.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("Count: 5", res0.errorCode.details.c_str());
+  ASSERT_EQ(5,       res0.responseVector.size());
+  EXPECT_EQ("E1",    res0.responseVector[0]->contextRegistration.entityIdVector[0]->id);
+  EXPECT_EQ("E2",    res0.responseVector[1]->contextRegistration.entityIdVector[0]->id);
+  EXPECT_EQ("E3",    res0.responseVector[2]->contextRegistration.entityIdVector[0]->id);
+  EXPECT_EQ("E4",    res0.responseVector[3]->contextRegistration.entityIdVector[0]->id);
+  EXPECT_EQ("E5",    res0.responseVector[4]->contextRegistration.entityIdVector[0]->id);
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
+
+  // 1. Ask for all 5 registrations
+  ms = mongoDiscoverContextAvailability(&req, &res1, "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(NO_CODE, res1.errorCode.code);
+  EXPECT_STREQ("",   res1.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   res1.errorCode.details.c_str());
+  ASSERT_EQ(5,       res1.responseVector.size());
+  EXPECT_EQ("E1",    res1.responseVector[0]->contextRegistration.entityIdVector[0]->id);
+  EXPECT_EQ("E2",    res1.responseVector[1]->contextRegistration.entityIdVector[0]->id);
+  EXPECT_EQ("E3",    res1.responseVector[2]->contextRegistration.entityIdVector[0]->id);
+  EXPECT_EQ("E4",    res1.responseVector[3]->contextRegistration.entityIdVector[0]->id);
+  EXPECT_EQ("E5",    res1.responseVector[4]->contextRegistration.entityIdVector[0]->id);
+
+  // 2. Ask for only the first registration
+  uriParams[URI_PARAM_PAGINATION_OFFSET] = "0";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "1";
+  ms = mongoDiscoverContextAvailability(&req, &res2, "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(NO_CODE, res2.errorCode.code);
+  EXPECT_STREQ("",   res2.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   res2.errorCode.details.c_str());
+  ASSERT_EQ(1,       res2.responseVector.size());
+  EXPECT_EQ("E1",    res2.responseVector[0]->contextRegistration.entityIdVector[0]->id);
+
+  // 3. Ask for only the second registration
+  uriParams[URI_PARAM_PAGINATION_OFFSET] = "1";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "1";
+  ms = mongoDiscoverContextAvailability(&req, &res3, "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(NO_CODE, res3.errorCode.code);
+  EXPECT_STREQ("",   res3.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   res3.errorCode.details.c_str());
+  ASSERT_EQ(1,       res3.responseVector.size());
+  EXPECT_EQ("E2",    res3.responseVector[0]->contextRegistration.entityIdVector[0]->id);
+
+  // 4. Ask for registrations 3-5
+  uriParams[URI_PARAM_PAGINATION_OFFSET] = "2";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
+  ms = mongoDiscoverContextAvailability(&req, &res4, "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(NO_CODE, res4.errorCode.code);
+  EXPECT_STREQ("",   res4.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   res4.errorCode.details.c_str());
+  ASSERT_EQ(3,       res4.responseVector.size());
+  EXPECT_EQ("E3",    res4.responseVector[0]->contextRegistration.entityIdVector[0]->id);
+  EXPECT_EQ("E4",    res4.responseVector[1]->contextRegistration.entityIdVector[0]->id);
+  EXPECT_EQ("E5",    res4.responseVector[2]->contextRegistration.entityIdVector[0]->id);
+
+  // 5. Ask for non-existing registrations 7-8
+  uriParams[URI_PARAM_PAGINATION_OFFSET] = "6";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "2";
+  ms = mongoDiscoverContextAvailability(&req, &res5, "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccContextElementNotFound,     res5.errorCode.code);
+  EXPECT_STREQ("No context element found", res5.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",                         res5.errorCode.details.c_str());
+  ASSERT_EQ(0, res5.responseVector.size());
+
+  // 6. Ask for non-existing registrations 7-8, with details ON
+  uriParams[URI_PARAM_PAGINATION_OFFSET]   = "6";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]    = "2";
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
+  ms = mongoDiscoverContextAvailability(&req, &res5, "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccContextElementNotFound,                             res5.errorCode.code);
+  EXPECT_STREQ("No context element found",                         res5.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("Number of matching registrations: 5. Offset is 6", res5.errorCode.details.c_str());
+  ASSERT_EQ(0, res5.responseVector.size());
+
+  utExit();
+}
+
 
 /* ****************************************************************************
 *
@@ -1266,7 +1414,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(2,res.responseVector.size());
+    ASSERT_EQ(2, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(2, RES_CNTX_REG(0).entityIdVector.size());
     EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector.get(0)->id);
@@ -1287,8 +1435,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 2)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
     EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+    EXPECT_STREQ("", res.responseVector.get(0)->errorCode.reasonPhrase.c_str());
+    EXPECT_STREQ("", res.responseVector.get(0)->errorCode.details.c_str());
 
     /* Context registration element #2 */
     ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
@@ -2014,9 +2162,12 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
+
     EXPECT_EQ("collection: unittest.registrations "
-              "- query(): { $or: [ { contextRegistration.entities: { $in: [ { id: \"E3\", type: \"T3\" }, { type: \"T3\", id: \"E3\" } ] } }, { contextRegistration.entities.id: { $in: {} } } ], expiration: { $gt: 1360232700 } } "
-              "- exception: boom!!", res.errorCode.details);
+              "- query(): { query: { $or: [ { contextRegistration.entities: { $in: [ { id: \"E3\", type: \"T3\" }, { type: \"T3\", id: \"E3\" } ] } }, "
+              "{ contextRegistration.entities.id: { $in: {} } } ], "
+              "expiration: { $gt: 1360232700 } }"
+              ", orderby: { _id: 1 } } - exception: boom!!", res.errorCode.details);
     EXPECT_EQ(0,res.responseVector.size());
 
     /* Release mock */
@@ -2060,7 +2211,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDBQueryAssociationFail)
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
-    EXPECT_EQ("Database error: collection: unittest.associations - query(): { srcEnt: { $in: [ { id: \"E1\", type: \"T1\" } ] }, attrs.src: { $in: [ \"A4\" ] } } - exception: boom!!", res.errorCode.details);
+    EXPECT_EQ("Database error: collection: unittest.associations - query(): { query: { srcEnt: { $in: [ { id: \"E1\", type: \"T1\" } ] }, attrs.src: { $in: [ \"A4\" ] } }, orderby: { _id: 1 } } - exception: boom!!", res.errorCode.details);
     EXPECT_EQ(0,res.responseVector.size());
 
     /* Release mock */

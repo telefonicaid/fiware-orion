@@ -1,2 +1,3 @@
 - Fix: entitiesQuery() method (used in queryContext and NGSI10 subscriptions) has been re-written, making it more clear and optimal (PR #405)
 - Add: ServicePath support for specifying to which service path entities belong in NGSI10 queryContext and updateContext operations (issue #392)
+- Add: Pagination, using URI parameters 'offset' and 'limit' (and 'details' for extra details) (issue #395)

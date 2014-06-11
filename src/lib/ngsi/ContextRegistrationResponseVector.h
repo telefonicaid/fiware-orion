@@ -47,6 +47,8 @@ typedef struct ContextRegistrationResponseVector
   std::string                   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void                          present(const std::string& indent);
   void                          release(void);
+
+  ContextRegistrationResponse*  operator[](unsigned int ix)       { if (ix < vec.size()) return vec[ix]; else return NULL; }
 } ContextRegistrationResponseVector;
 
 #endif

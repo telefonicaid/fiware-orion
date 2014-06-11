@@ -730,7 +730,8 @@ bool entitiesQuery
   std::string                   servicePath,
   int                           offset,
   int                           limit,
-  bool                          details
+  bool                          details,
+  long long*                    countP
 )
 {
     DBClientConnection* connection = getMongoConnection();
@@ -782,25 +783,37 @@ bool entitiesQuery
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
     /* Do the query on MongoDB */
-    BSONObj query = finalQuery.obj();
-    auto_ptr<DBClientCursor> cursor;
-    try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
-        mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
-        cursor = connection->query(getEntitiesCollectionName(tenant).c_str(), query);
+    auto_ptr<DBClientCursor>  cursor;
+    BSONObj                   bquery = finalQuery.obj();
+    Query                     query(bquery);
+    Query                     sortCriteria  = query.sort(BSON(ENT_CREATION_DATE << 1));
 
-        /*
-         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
-         * exception ourselves
-         */
-        if (cursor.get() == NULL) {
+    LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
+    mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
+
+    try
+    {
+        if ((details == true) && (countP != NULL))
+        {
+          *countP = connection->count(getEntitiesCollectionName(tenant).c_str(), bquery);
+        }
+
+        cursor = connection->query(getEntitiesCollectionName(tenant).c_str(), query, limit, offset);
+
+        //
+        // We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+        // raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+        // exception ourselves
+        //
+        if (cursor.get() == NULL)
+        {
            throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
+
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
     }
-    catch( const DBException &e ) {
-
+    catch (const DBException& e)
+    {
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo db exception)");
         *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
@@ -808,8 +821,8 @@ bool entitiesQuery
 
         LM_RE(false,(err->c_str()));
     }
-    catch(...) {
-
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo generic exception)");
         *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
@@ -919,7 +932,6 @@ bool entitiesQuery
     }
 
     return true;
-
 }
 
 /*****************************************************************************
@@ -1031,7 +1043,8 @@ bool registrationsQuery
   const std::string&                  tenant,
   int                                 offset,
   int                                 limit,
-  bool                                details
+  bool                                details,
+  long long*                          countP
 )
 {
     DBClientConnection* connection = getMongoConnection();
@@ -1091,22 +1104,30 @@ bool registrationsQuery
          * make the query fail*/
         queryBuilder.append(contextRegistrationAttrsNames, BSON("$in" << attrs.arr()));
     }
-    BSONObj query = queryBuilder.obj();
 
     /* Do the query on MongoDB */
-    //FIXME P2: use field selector to include the only relevant field: contextRegistration array (e.g. "expiration" is not needed)
-    auto_ptr<DBClientCursor> cursor;
+    // FIXME P2: use field selector to include the only relevant field: contextRegistration array (e.g. "expiration" is not needed)
+    auto_ptr<DBClientCursor>  cursor;
+    BSONObj                   bquery = queryBuilder.obj();
+    Query                     query(bquery);
+    Query                     sortCriteria  = query.sort(BSON("_id" << 1));
 
     LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(tenant).c_str(), query.toString().c_str()));
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
     mongoSemTake(__FUNCTION__, "query in RegistrationsCollection");
 
-    try {
-        cursor = connection->query(getRegistrationsCollectionName(tenant).c_str(), query);
+    try
+    {
+        if ((details == true) && (countP != NULL))
+        {
+          *countP = connection->count(getRegistrationsCollectionName(tenant).c_str(), bquery);
+        }
+
+        cursor = connection->query(getRegistrationsCollectionName(tenant).c_str(), query, limit, offset);
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection");
     }
-    catch( const DBException &e ) {
-
+    catch (const DBException& e)
+    {
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo db exception)");
         *err = std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
@@ -1114,8 +1135,8 @@ bool registrationsQuery
 
         return false;
     }
-    catch(...) {
-
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo generic exception)");
         *err = std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
@@ -1125,12 +1146,14 @@ bool registrationsQuery
     }
 
     /* Process query result */
-    while (cursor->more()) {
+    while (cursor->more())
+    {
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
         std::vector<BSONElement> queryContextRegistrationV = r.getField(REG_CONTEXT_REGISTRATION).Array();
-        for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix) {
+        for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
+        {
             processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV);
         }
 
@@ -1140,7 +1163,6 @@ bool registrationsQuery
          * NGSI doesn't forbid to registry exactly twice the same context registration element in the
          * same registration ID. Thus, it could be interesting to post-process the response vector, to
          * "compact" removing duplicated responses.*/
-
     }
 
     return true;

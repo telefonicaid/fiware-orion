@@ -271,7 +271,7 @@ static void prepareDatabaseWithAttributeIds(void) {
 
 /* ****************************************************************************
 *
-* prepareDatabaseWithAttributeCustomMetadta -
+* prepareDatabaseWithAttributeCustomMetadata -
 *
 * This function is called before every test, to populate some information in the
 * entities collection.
@@ -410,6 +410,147 @@ static void prepareDatabaseWithServicePath(const std::string modifier)
     connection->insert(ENTITIES_COLL, ie2);
     connection->insert(ENTITIES_COLL, ie3);
   }
+}
+
+/* ****************************************************************************
+*
+* prepareDatabaseWithServicePath -
+*
+*/
+static void prepareDatabaseForPagination(void)
+{
+  /* Set database */
+  setupDatabase();
+
+  DBClientConnection* connection = getMongoConnection();
+
+  /* We create the following entities:
+   *
+   * - E1:  { Type: T, Attribute: { A1, a1  } }
+   * - E2:  { Type: T, Attribute: { A1, a2  } }
+   * - E3:  { Type: T, Attribute: { A1, a3  } }
+   * - E4:  { Type: T, Attribute: { A1, a4  } }
+   * - E5:  { Type: T, Attribute: { A1, a5  } }
+   * - E6:  { Type: T, Attribute: { A1, a6  } }
+   *
+   */
+
+  BSONObj e01 = BSON("_id" << BSON("id" << "E1"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a1")));
+  BSONObj e02 = BSON("_id" << BSON("id" << "E2"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a2")));
+  BSONObj e03 = BSON("_id" << BSON("id" << "E3"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a3")));
+  BSONObj e04 = BSON("_id" << BSON("id" << "E4"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a4")));
+  BSONObj e05 = BSON("_id" << BSON("id" << "E5"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a5")));
+  BSONObj e06 = BSON("_id" << BSON("id" << "E6"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a6")));
+
+  connection->insert(ENTITIES_COLL, e01);
+  connection->insert(ENTITIES_COLL, e02);
+  connection->insert(ENTITIES_COLL, e03);
+  connection->insert(ENTITIES_COLL, e04);
+  connection->insert(ENTITIES_COLL, e05);
+  connection->insert(ENTITIES_COLL, e06);
+}
+
+/* ****************************************************************************
+*
+* queryWithServicePathEntPatternType -
+*
+* FIXME P4: Fermin to inspect whether the function has enough EXPECTs 
+*/
+TEST(mongoQueryContextRequest, queryWithPagination)
+{
+  HttpStatusCode         ms;
+  QueryContextRequest    qcReq;
+  QueryContextResponse   qcResponse0;
+  QueryContextResponse   qcResponse1;
+  QueryContextResponse   qcResponse2;
+  QueryContextResponse   qcResponse3;
+  QueryContextResponse   qcResponse4;
+  QueryContextResponse   qcResponse5;
+  QueryContextResponse   qcResponse6;
+  QueryContextResponse   qcResponse7;
+
+  utInit();
+  prepareDatabaseForPagination();
+
+  EntityId en("E.*", "T", "true");
+  qcReq.entityIdVector.push_back(&en);
+
+
+  // 0. query with details=on, to get the total number of matching entities
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
+  ms = mongoQueryContext(&qcReq, &qcResponse0, "", "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk,         qcResponse0.errorCode.code);
+  EXPECT_STREQ("OK",       qcResponse0.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("Count: 6", qcResponse0.errorCode.details.c_str());
+  EXPECT_EQ(6,     qcResponse0.contextElementResponseVector.size());
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
+
+  // 1. query all six entities, using default offset/limit
+  ms = mongoQueryContext(&qcReq, &qcResponse1, "", "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0,     qcResponse1.errorCode.code);
+  EXPECT_STREQ("", qcResponse1.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("", qcResponse1.errorCode.details.c_str());
+  EXPECT_EQ(6,     qcResponse1.contextElementResponseVector.size());
+
+
+  // 2, make pagination give us only the first hit
+  uriParams[URI_PARAM_PAGINATION_LIMIT] = "1";
+  ms = mongoQueryContext(&qcReq, &qcResponse2, "", "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0,       qcResponse2.errorCode.code);
+  EXPECT_STREQ("",   qcResponse2.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   qcResponse2.errorCode.details.c_str());
+  EXPECT_EQ(1,       qcResponse2.contextElementResponseVector.size());
+  EXPECT_STREQ("a1", qcResponse2.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  // 3, make pagination give us only the second hit
+  uriParams[URI_PARAM_PAGINATION_OFFSET] = "1";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "1";
+  ms = mongoQueryContext(&qcReq, &qcResponse3, "", "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0,       qcResponse3.errorCode.code);
+  EXPECT_STREQ("",   qcResponse3.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   qcResponse3.errorCode.details.c_str());
+  EXPECT_EQ(1,       qcResponse3.contextElementResponseVector.size());
+  EXPECT_STREQ("a2", qcResponse3.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  // 4, make pagination give us hits 3-5
+  uriParams[URI_PARAM_PAGINATION_OFFSET] = "2";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
+  ms = mongoQueryContext(&qcReq, &qcResponse4, "", "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0,       qcResponse4.errorCode.code);
+  EXPECT_STREQ("",   qcResponse4.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",   qcResponse4.errorCode.details.c_str());
+  EXPECT_EQ(3,       qcResponse4.contextElementResponseVector.size());
+  EXPECT_STREQ("a3", qcResponse4.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a4", qcResponse4.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+  EXPECT_STREQ("a5", qcResponse4.contextElementResponseVector[2]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  // 5, ask for non-existing hits 
+  uriParams[URI_PARAM_PAGINATION_OFFSET] = "7";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
+  ms = mongoQueryContext(&qcReq, &qcResponse5, "", "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccContextElementNotFound,       qcResponse5.errorCode.code);
+  EXPECT_STREQ("No context element found",   qcResponse5.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("",                           qcResponse5.errorCode.details.c_str());
+  EXPECT_EQ(0, qcResponse5.contextElementResponseVector.size());
+
+  // 6, ask for non-existing hits, with details ON
+  uriParams[URI_PARAM_PAGINATION_OFFSET]   = "7";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]    = "3";
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
+  ms = mongoQueryContext(&qcReq, &qcResponse5, "", "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccContextElementNotFound,                        qcResponse5.errorCode.code);
+  EXPECT_STREQ("No context element found",                    qcResponse5.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("Number of matching entities: 6. Offset is 7", qcResponse5.errorCode.details.c_str());
+  EXPECT_EQ(0, qcResponse5.contextElementResponseVector.size());
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -2397,9 +2538,8 @@ TEST(mongoQueryContextRequest, mongoDbQueryFail)
 
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
-
     EXPECT_EQ("collection: unittest.entities - "
-              "query(): { $or: [ { _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $exists: false } } ] } - "
+              "query(): { query: { $or: [ { _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $exists: false } } ] }, orderby: { creDate: 1 } } - "
               "exception: boom!!", res.errorCode.details);
     EXPECT_EQ(0,res.contextElementResponseVector.size());
 
