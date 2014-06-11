@@ -460,7 +460,8 @@ TEST(mongoQueryContextRequest, queryWithPagination)
 {
   HttpStatusCode         ms;
   QueryContextRequest    qcReq;
-  QueryContextResponse   qcResponse;
+  QueryContextResponse   qcResponse0;
+  QueryContextResponse   qcResponse1;
   QueryContextResponse   qcResponse2;
   QueryContextResponse   qcResponse3;
   QueryContextResponse   qcResponse4;
@@ -475,13 +476,23 @@ TEST(mongoQueryContextRequest, queryWithPagination)
   qcReq.entityIdVector.push_back(&en);
 
 
-  // 1. query all six entities, using default offset/limit
-  ms = mongoQueryContext(&qcReq, &qcResponse, "", "", uriParams);
+  // 0. query with details=on, to get the total number of matching entities
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
+  ms = mongoQueryContext(&qcReq, &qcResponse0, "", "", uriParams);
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0,     qcResponse.errorCode.code);
-  EXPECT_STREQ("", qcResponse.errorCode.reasonPhrase.c_str());
-  EXPECT_STREQ("", qcResponse.errorCode.details.c_str());
-  EXPECT_EQ(6,     qcResponse.contextElementResponseVector.size());
+  EXPECT_EQ(SccOk,         qcResponse0.errorCode.code);
+  EXPECT_STREQ("OK",       qcResponse0.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("Count: 6", qcResponse0.errorCode.details.c_str());
+  EXPECT_EQ(6,     qcResponse0.contextElementResponseVector.size());
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
+
+  // 1. query all six entities, using default offset/limit
+  ms = mongoQueryContext(&qcReq, &qcResponse1, "", "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(0,     qcResponse1.errorCode.code);
+  EXPECT_STREQ("", qcResponse1.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("", qcResponse1.errorCode.details.c_str());
+  EXPECT_EQ(6,     qcResponse1.contextElementResponseVector.size());
 
 
   // 2, make pagination give us only the first hit

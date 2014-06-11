@@ -257,9 +257,10 @@ static HttpStatusCode conventionalDiscoverContextAvailability
 )
 {
     std::string err;
+    long long   count;
 
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
-    if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err, tenant, offset, limit, details))
+    if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err, tenant, offset, limit, details, &count))
     {
         responseP->errorCode.fill(SccReceiverInternalError, err);
         LM_RE(SccOk,(responseP->errorCode.details.c_str()));
@@ -267,15 +268,15 @@ static HttpStatusCode conventionalDiscoverContextAvailability
 
     if (responseP->responseVector.size() == 0)
     {
+      //
       // If the responseV is empty, we haven't found any entity and have to fill the status code part in the response.
       //
       // However, if the response was empty due to a too high pagination offset,
       // and if the user has asked for 'details' (as URI parameter), then the response should include information about
       // the number of hits without pagination.
+      //
       if (details)
       {
-        long long count = registrationsCount(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err, tenant);
-
         if ((count > 0) && (offset >= count))
         {
           char details[256];
@@ -288,6 +289,13 @@ static HttpStatusCode conventionalDiscoverContextAvailability
 
       responseP->errorCode.fill(SccContextElementNotFound);
       return SccOk;
+    }
+    else if (details == true)
+    {
+      char details[64];
+
+      snprintf(details, sizeof(details), "Count: %lld", count);
+      responseP->errorCode.fill(SccOk, details);
     }
 
     return SccOk;

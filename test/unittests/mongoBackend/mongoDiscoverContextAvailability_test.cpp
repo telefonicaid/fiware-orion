@@ -369,6 +369,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pagination)
 {
   HttpStatusCode                       ms;
   DiscoverContextAvailabilityRequest   req;
+  DiscoverContextAvailabilityResponse  res0;
   DiscoverContextAvailabilityResponse  res1;
   DiscoverContextAvailabilityResponse  res2;
   DiscoverContextAvailabilityResponse  res3;
@@ -380,6 +381,21 @@ TEST(mongoDiscoverContextAvailabilityRequest, pagination)
 
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
+
+  // 0. discovery with details=on, just to find number of hits
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
+  ms = mongoDiscoverContextAvailability(&req, &res0, "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk,         res0.errorCode.code);
+  EXPECT_STREQ("OK",       res0.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("Count: 5", res0.errorCode.details.c_str());
+  ASSERT_EQ(5,       res0.responseVector.size());
+  EXPECT_EQ("E1",    res0.responseVector[0]->contextRegistration.entityIdVector[0]->id);
+  EXPECT_EQ("E2",    res0.responseVector[1]->contextRegistration.entityIdVector[0]->id);
+  EXPECT_EQ("E3",    res0.responseVector[2]->contextRegistration.entityIdVector[0]->id);
+  EXPECT_EQ("E4",    res0.responseVector[3]->contextRegistration.entityIdVector[0]->id);
+  EXPECT_EQ("E5",    res0.responseVector[4]->contextRegistration.entityIdVector[0]->id);
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
 
   // 1. Ask for all 5 registrations
   ms = mongoDiscoverContextAvailability(&req, &res1, "", uriParams);
@@ -394,7 +410,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pagination)
   EXPECT_EQ("E4",    res1.responseVector[3]->contextRegistration.entityIdVector[0]->id);
   EXPECT_EQ("E5",    res1.responseVector[4]->contextRegistration.entityIdVector[0]->id);
 
-  // 1. Ask for only the first registration
+  // 2. Ask for only the first registration
   uriParams[URI_PARAM_PAGINATION_OFFSET] = "0";
   uriParams[URI_PARAM_PAGINATION_LIMIT]  = "1";
   ms = mongoDiscoverContextAvailability(&req, &res2, "", uriParams);
@@ -405,7 +421,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pagination)
   ASSERT_EQ(1,       res2.responseVector.size());
   EXPECT_EQ("E1",    res2.responseVector[0]->contextRegistration.entityIdVector[0]->id);
 
-  // 2. Ask for only the second registration
+  // 3. Ask for only the second registration
   uriParams[URI_PARAM_PAGINATION_OFFSET] = "1";
   uriParams[URI_PARAM_PAGINATION_LIMIT]  = "1";
   ms = mongoDiscoverContextAvailability(&req, &res3, "", uriParams);
@@ -416,7 +432,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pagination)
   ASSERT_EQ(1,       res3.responseVector.size());
   EXPECT_EQ("E2",    res3.responseVector[0]->contextRegistration.entityIdVector[0]->id);
 
-  // 3. Ask for registrations 3-5
+  // 4. Ask for registrations 3-5
   uriParams[URI_PARAM_PAGINATION_OFFSET] = "2";
   uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
   ms = mongoDiscoverContextAvailability(&req, &res4, "", uriParams);
@@ -429,7 +445,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pagination)
   EXPECT_EQ("E4",    res4.responseVector[1]->contextRegistration.entityIdVector[0]->id);
   EXPECT_EQ("E5",    res4.responseVector[2]->contextRegistration.entityIdVector[0]->id);
 
-  // 4. Ask for non-existing registrations 7-8
+  // 5. Ask for non-existing registrations 7-8
   uriParams[URI_PARAM_PAGINATION_OFFSET] = "6";
   uriParams[URI_PARAM_PAGINATION_LIMIT]  = "2";
   ms = mongoDiscoverContextAvailability(&req, &res5, "", uriParams);
@@ -439,7 +455,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pagination)
   EXPECT_STREQ("",                         res5.errorCode.details.c_str());
   ASSERT_EQ(0, res5.responseVector.size());
 
-  // 5. Ask for non-existing registrations 7-8, with details ON
+  // 6. Ask for non-existing registrations 7-8, with details ON
   uriParams[URI_PARAM_PAGINATION_OFFSET]   = "6";
   uriParams[URI_PARAM_PAGINATION_LIMIT]    = "2";
   uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";

@@ -730,7 +730,8 @@ bool entitiesQuery
   std::string                   servicePath,
   int                           offset,
   int                           limit,
-  bool                          details
+  bool                          details,
+  long long*                    countP
 )
 {
     DBClientConnection* connection = getMongoConnection();
@@ -783,42 +784,54 @@ bool entitiesQuery
 
     /* Do the query on MongoDB */
     auto_ptr<DBClientCursor>  cursor;
-    Query                     query(finalQuery.obj());
+    BSONObj                   bquery = finalQuery.obj();
+    Query                     query(bquery);
     Query                     sortCriteria  = query.sort(BSON(ENT_CREATION_DATE << 1));
 
     LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
     mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
 
+    char* colName = strdup(getEntitiesCollectionName(tenant).c_str());
     try
     {
-        cursor = connection->query(getEntitiesCollectionName(tenant).c_str(), query, limit, offset);
+        if ((details == true) && (countP != NULL))
+        {
+          *countP = connection->count(colName, bquery);
+        }
 
-        /*
-         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
-         * exception ourselves
-         */
-        if (cursor.get() == NULL) {
+        cursor = connection->query(colName, query, limit, offset);
+
+        //
+        // We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+        // raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+        // exception ourselves
+        //
+        if (cursor.get() == NULL)
+        {
            throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
-        mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
-    }
-    catch( const DBException &e ) {
 
+        mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
+        free(colName);
+    }
+    catch (const DBException& e)
+    {
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo db exception)");
         *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
 
+        free(colName);
         LM_RE(false,(err->c_str()));
     }
-    catch(...) {
-
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo generic exception)");
         *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
 
+        free(colName);
         LM_RE(false, (err->c_str()));
     }
 
@@ -1034,7 +1047,8 @@ bool registrationsQuery
   const std::string&                  tenant,
   int                                 offset,
   int                                 limit,
-  bool                                details
+  bool                                details,
+  long long*                          countP
 )
 {
     DBClientConnection* connection = getMongoConnection();
@@ -1096,28 +1110,36 @@ bool registrationsQuery
     }
 
     /* Do the query on MongoDB */
-    //FIXME P2: use field selector to include the only relevant field: contextRegistration array (e.g. "expiration" is not needed)
-    auto_ptr<DBClientCursor> cursor;
-    Query                    query(queryBuilder.obj());
-    Query                    sortCriteria  = query.sort(BSON("_id" << 1));
+    // FIXME P2: use field selector to include the only relevant field: contextRegistration array (e.g. "expiration" is not needed)
+    auto_ptr<DBClientCursor>  cursor;
+    BSONObj                   bquery = queryBuilder.obj();
+    Query                     query(bquery);
+    Query                     sortCriteria  = query.sort(BSON("_id" << 1));
 
     LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(tenant).c_str(), query.toString().c_str()));
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
     mongoSemTake(__FUNCTION__, "query in RegistrationsCollection");
 
+    char* colName = strdup(getRegistrationsCollectionName(tenant).c_str());
     try
     {
-        cursor = connection->query(getRegistrationsCollectionName(tenant).c_str(), query, limit, offset);
+        if ((details == true) && (countP != NULL))
+        {
+          *countP = connection->count(colName, bquery);
+        }
+
+        cursor = connection->query(colName, query, limit, offset);
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection");
+        free(colName);
     }
     catch (const DBException& e)
     {
-
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo db exception)");
         *err = std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
 
+        free(colName);
         return false;
     }
     catch (...)
@@ -1127,6 +1149,7 @@ bool registrationsQuery
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
 
+        free(colName);
         return false;
     }
 
@@ -1480,246 +1503,4 @@ void slashEscape(const char* from, char* to, unsigned int toLen)
     ++from;
     to[ix] = 0;
   }
-}
-
-
-
-/* ****************************************************************************
-*
-* registrationsCount -
-*
-* This method is used by discoverContextAvailabililty.
-* It takes a vector with entities and a vector with attributes as input and returns the corresponding
-* ContextRegistrationResponseVector or error.
-*
-*/
-long long registrationsCount
-(
-  EntityIdVector                      enV,
-  AttributeList                       attrL,
-  ContextRegistrationResponseVector*  crrV,
-  std::string*                        err,
-  const std::string&                  tenant
-)
-{
-  long long           count;
-  DBClientConnection* connection = getMongoConnection();
-
-  /* Build query based on arguments */
-  // FIXME P2: this implementation need to be refactored for cleanup
-  std::string contextRegistrationEntities     = REG_CONTEXT_REGISTRATION "." REG_ENTITIES;
-  std::string contextRegistrationEntitiesId   = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_ID;
-  std::string contextRegistrationEntitiesType = REG_CONTEXT_REGISTRATION "." REG_ENTITIES "." REG_ENTITY_TYPE;
-  std::string contextRegistrationAttrsNames   = REG_CONTEXT_REGISTRATION "." REG_ATTRS    "." REG_ATTRS_NAME;
-
-  BSONArrayBuilder entityOr;
-  BSONArrayBuilder entitiesWithType;
-  BSONArrayBuilder entitiesWithoutType;    
-
-  for (unsigned int ix = 0; ix < enV.size(); ++ix)
-  {
-    EntityId* en = enV.get(ix);
-    if (isTrue(en->isPattern))
-    {
-      BSONObjBuilder b;
-
-      b.appendRegex(contextRegistrationEntitiesId, en->id);
-      if (en->type != "")
-      {
-        b.append(contextRegistrationEntitiesType, en->type);
-      }
-      entityOr.append(b.obj());
-    }
-    else  /* isPattern = false */
-    {
-      if (en->type == "")
-      {
-        entitiesWithoutType.append(en->id);
-        LM_T(LmtMongo, ("Entity discovery without type: id '%s'", en->id.c_str()));
-      }
-      else 
-      {
-        /* We have detected that sometimes mongo stores { id: ..., type ...} and others { type: ..., id: ...},
-           so we have to take both them into account */
-        entitiesWithType.append(BSON(REG_ENTITY_ID << en->id << REG_ENTITY_TYPE << en->type));
-        entitiesWithType.append(BSON(REG_ENTITY_TYPE << en->type << REG_ENTITY_ID << en->id));
-        LM_T(LmtMongo, ("Entity discovery: {id: %s, type: %s}", en->id.c_str(), en->type.c_str()));
-      }
-    }
-  }
-
-  BSONArrayBuilder attrs;
-  for (unsigned int ix = 0; ix < attrL.size(); ++ix)
-  {
-    std::string attrName = attrL.get(ix);
-    attrs.append(attrName);
-    LM_T(LmtMongo, ("Attribute discovery: '%s'", attrName.c_str()));
-  }
-
-  entityOr.append(BSON(contextRegistrationEntities << BSON("$in" << entitiesWithType.arr())));
-  entityOr.append(BSON(contextRegistrationEntitiesId << BSON("$in" <<entitiesWithoutType.arr())));
-
-  /* The $or clause could be omitted if it contains only one element, but we can assume that
-   * it has no impact on MongoDB query optimizer */
-  BSONObjBuilder queryBuilder;
-  queryBuilder.append("$or", entityOr.arr());
-  queryBuilder.append(REG_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
-  if (attrs.arrSize() > 0)
-  {
-    /* If we don't do this checking, the {$in: [] } in the attribute name part will
-     * make the query fail*/
-    queryBuilder.append(contextRegistrationAttrsNames, BSON("$in" << attrs.arr()));
-  }
-
-  /* Do the query on MongoDB */
-  // FIXME P2: use field selector to include the only relevant field: contextRegistration array (e.g. "expiration" is not needed)
-  BSONObj                   query = queryBuilder.obj();
-
-  LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(tenant).c_str(), query.toString().c_str()));
-  mongoSemTake(__FUNCTION__, "query in RegistrationsCollection");
-
-  try
-  {
-    count = connection->count(getRegistrationsCollectionName(tenant).c_str(), query);
-    mongoSemGive(__FUNCTION__, "query in RegistrationsCollection");
-  }
-  catch (const DBException& e)
-  {
-    mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo db exception)");
-    *err = std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
-      " - query(): " + query.toString() +
-      " - exception: " + e.what();
-
-    return -1;
-  }
-  catch (...)
-  {
-    mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo generic exception)");
-    *err = std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
-      " - query(): " + query.toString() +
-      " - exception: " + "generic";
-
-    return -1;
-  }
-
-  return count;
-}
-
-/* ****************************************************************************
-*
-* entitiesCount -
-*
-* This method is used by queryContext.
-* It takes a vector with entities and a vector with attributes as input and returns the corresponding
-* ContextElementResponseVector or error.
-*
-* Note the includeEmpty argument. This is used if we don't want the result to include empty
-* attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is aimed at
-* subscribeContext case, as empty values can cause problems in the case of federating Context
-* Brokers (the notifyContext is processed as an updateContext and in the latter case, an
-* empty value causes an error)
-*
-*/
-long long entitiesCount
-(
-  EntityIdVector                enV,
-  AttributeList                 attrL,
-  Restriction                   res,
-  ContextElementResponseVector* cerV,
-  std::string*                  err,
-  bool                          includeEmpty,
-  std::string                   tenant,
-  std::string                   servicePath
-)
-{
-  long long           count;
-  DBClientConnection* connection = getMongoConnection();
-
-  LM_T(LmtServicePath, ("Service Path: '%s'", servicePath.c_str()));
-
-  /* Query structure is as follows
-   *
-   * {
-   *    "$or": [ ... ],            (always)
-   *    "attrs.name": { ... },     (only if attributes are used in the query)
-   *    "location.coords": { ... } (only in the case of geo-queries)
-   *  }
-   *
-   */
-
-  BSONObjBuilder finalQuery;
-
-  /* Part 1: entities */
-  BSONArrayBuilder orEnt;
-
-  for (unsigned int ix = 0; ix < enV.size(); ++ix)
-  {
-    fillQueryEntity(orEnt, enV.get(ix), servicePath);
-  }
-
-  /* The result of orEnt is appended to the final query */
-  finalQuery.append("$or", orEnt.arr());
-
-  /* Part 2: attributes */
-  BSONArrayBuilder attrs;
-  for (unsigned int ix = 0; ix < attrL.size(); ++ix)
-  {
-    std::string attrName = attrL.get(ix);
-    attrs.append(attrName);
-    LM_T(LmtMongo, ("Attribute query token: '%s'", attrName.c_str()));
-  }
-
-  std::string attrNames = ENT_ATTRS "." ENT_ATTRS_NAME;
-  if (attrs.arrSize() > 0)
-  {
-    /* If we don't do this checking, the {$in: [] } in the attribute name part will
-     * make the query fail*/
-    finalQuery.append(attrNames, BSON("$in" << attrs.arr()));
-  }
-
-  /* Part 3: geo-location */
-  BSONObj areaQuery;
-  if (processAreaScope(res.scopeVector, areaQuery))
-  {
-    std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
-    finalQuery.append(locCoords, areaQuery);
-  }
-
-  //
-  // FIXME P7: if (details == 'on'), count the number of matches in mongo, and return an error 
-  //           with that info in case of error.
-  //
-
-  // Do the query on MongoDB
-  BSONObj  query = finalQuery.obj();
-
-  LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
-  mongoSemTake(__FUNCTION__, "count-query in EntitiesCollection");
-
-  try
-  {
-    count = connection->count(getEntitiesCollectionName(tenant).c_str(), query);
-    mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
-  }
-  catch (const DBException &e)
-  {
-    mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo db exception)");
-    *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
-      " - query(): " + query.toString() +
-      " - exception: " + e.what();
-
-    LM_RE(-1, (err->c_str()));
-  }
-  catch (...)
-  {
-    mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo generic exception)");
-    *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
-      " - query(): " + query.toString() +
-      " - exception: " + "generic";
-
-    LM_RE(-1, (err->c_str()));
-  }
-
-  LM_T(LmtPagination, ("Found %d entities", count));
-  return count;
 }

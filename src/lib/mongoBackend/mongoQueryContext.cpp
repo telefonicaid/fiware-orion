@@ -65,6 +65,7 @@ HttpStatusCode mongoQueryContext
 
     std::string err;
     bool        ok;
+    long long   count = -1;
 
     reqSemTake(__FUNCTION__, "ngsi10 query request");
     ok = entitiesQuery(requestP->entityIdVector,
@@ -77,7 +78,8 @@ HttpStatusCode mongoQueryContext
                        servicePath,
                        offset,
                        limit,
-                       details);
+                       details,
+                       &count);
     reqSemGive(__FUNCTION__, "ngsi10 query request");
 
     if (!ok)
@@ -88,7 +90,7 @@ HttpStatusCode mongoQueryContext
     else if (responseP->contextElementResponseVector.size() == 0)
     {
       //
-      // If query hasn't any result we have to fill the status code part in the response
+      // If the query has an empty response, we have to fill in the status code part in the response.
       //
       // However, if the response was empty due to a too high pagination offset,
       // and if the user has asked for 'details' (as URI parameter, then the response should include information about
@@ -97,15 +99,6 @@ HttpStatusCode mongoQueryContext
 
       if (details)
       {
-        long long count = entitiesCount(requestP->entityIdVector,
-                                        requestP->attributeList,
-                                        requestP->restriction,
-                                        &responseP->contextElementResponseVector,
-                                        &err,
-                                        true,
-                                        tenant,
-                                        servicePath);
-
         if ((count > 0) && (offset >= count))
         {
           char details[256];
@@ -117,6 +110,13 @@ HttpStatusCode mongoQueryContext
       }
 
       responseP->errorCode.fill(SccContextElementNotFound);
+    }
+    else if (details == true)
+    {
+      char details[64];
+
+      snprintf(details, sizeof(details), "Count: %lld", count);
+      responseP->errorCode.fill(SccOk, details);
     }
 
     return SccOk;
