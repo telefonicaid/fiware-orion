@@ -767,11 +767,11 @@ bool entitiesQuery
     }
     std::string attrNames = ENT_ATTRS "." ENT_ATTRS_NAME;
     if (attrs.arrSize() > 0) {
-      /* If we don't do this checking, the {$in: [] } in the attribute name part will
-       * make the query fail*/
-      finalQuery.append(attrNames, BSON("$in" << attrs.arr()));
+        /* If we don't do this checking, the {$in: [] } in the attribute name part will
+         * make the query fail*/
+        finalQuery.append(attrNames, BSON("$in" << attrs.arr()));
     }
- 
+
     /* Part 3: geo-location */
     BSONObj areaQuery;
     if (processAreaScope(res.scopeVector, areaQuery)) {
@@ -782,8 +782,8 @@ bool entitiesQuery
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
     //
-    // if (details == 'on'), count the number of matches in mongo, and return an error 
-    // with that info incase of error.
+    // FIXME P7: if (details == 'on'), count the number of matches in mongo, and return an error 
+    //           with that info in case of error.
     //
 
     /* Do the query on MongoDB */
@@ -1103,12 +1103,9 @@ bool registrationsQuery
 
     /* Do the query on MongoDB */
     //FIXME P2: use field selector to include the only relevant field: contextRegistration array (e.g. "expiration" is not needed)
-// #define USE_SORT_THAT_DESTROYS_UNIT_TESTS 1
     auto_ptr<DBClientCursor> cursor;
     Query                    query(queryBuilder.obj());
-#ifdef USE_SORT_THAT_DESTROYS_UNIT_TESTS
     Query                    sortCriteria  = query.sort(BSON("_id" << 1));
-#endif
 
     LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(tenant).c_str(), query.toString().c_str()));
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
