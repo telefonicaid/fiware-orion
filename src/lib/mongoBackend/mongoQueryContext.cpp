@@ -113,6 +113,11 @@ HttpStatusCode mongoQueryContext
     }
     else if (details == true)
     {
+      //
+      // If all was OK, but the details URI param was set to 'on', then the responses error code details
+      // 'must' contain the total count of hits.
+      //
+
       char details[64];
 
       snprintf(details, sizeof(details), "Count: %lld", count);
