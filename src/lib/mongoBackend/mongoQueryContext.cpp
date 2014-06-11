@@ -54,19 +54,19 @@ HttpStatusCode mongoQueryContext
     std::string detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
     bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
-    reqSemTake(__FUNCTION__, "ngsi10 query request");
-
-    LM_T(LmtMongo, ("QueryContext Request"));    
+    LM_T(LmtMongo, ("QueryContext Request"));
+    LM_T(LmtServicePath, ("Service Path: '%s'", servicePath.c_str()));
+    LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
     /* FIXME: restriction not supported for the moment */
     if (!requestP->restriction.attributeExpression.isEmpty()) {
         LM_W(("Restriction found but not supported at mongo backend"));
     }
 
-    LM_T(LmtServicePath, ("Service Path: '%s'", servicePath.c_str()));
     std::string err;
     bool        ok;
 
+    reqSemTake(__FUNCTION__, "ngsi10 query request");
     ok = entitiesQuery(requestP->entityIdVector,
                        requestP->attributeList,
                        requestP->restriction,
@@ -78,16 +78,46 @@ HttpStatusCode mongoQueryContext
                        offset,
                        limit,
                        details);
+    reqSemGive(__FUNCTION__, "ngsi10 query request");
+
     if (!ok)
     {
         responseP->errorCode.fill(SccReceiverInternalError, err);
         LM_E((responseP->errorCode.details.c_str()));
     }
-    else if (responseP->contextElementResponseVector.size() == 0) {
-      /* If query hasn't any result we have to fill the status code part in the response */
+    else if (responseP->contextElementResponseVector.size() == 0)
+    {
+      //
+      // If query hasn't any result we have to fill the status code part in the response
+      //
+      // However, if the response was empty due to a too high pagination offset,
+      // and if the user has asked for 'details' (as URI parameter, then the response should include information about
+      // the number of hits without pagination.
+      //
+
+      if (details)
+      {
+        long long count = entitiesCount(requestP->entityIdVector,
+                                        requestP->attributeList,
+                                        requestP->restriction,
+                                        &responseP->contextElementResponseVector,
+                                        &err,
+                                        true,
+                                        tenant,
+                                        servicePath);
+
+        if ((count > 0) && (offset >= count))
+        {
+          char details[256];
+
+          snprintf(details, sizeof(details), "Number of matching entities: %lld. Offset is %d", count, offset);
+          responseP->errorCode.fill(SccContextElementNotFound, details);
+          return SccOk;
+        }
+      }
+
       responseP->errorCode.fill(SccContextElementNotFound);
     }
 
-    reqSemGive(__FUNCTION__, "ngsi10 query request");
     return SccOk;
 }

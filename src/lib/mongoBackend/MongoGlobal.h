@@ -396,4 +396,31 @@ extern long long registrationsCount
   const std::string&                  tenant
 );
 
+/* ****************************************************************************
+*
+* entitiesCount -
+*
+* This method is used by queryContext.
+* It takes a vector with entities and a vector with attributes as input and returns the corresponding
+* ContextElementResponseVector or error.
+*
+* Note the includeEmpty argument. This is used if we don't want the result to include empty
+* attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is aimed at
+* subscribeContext case, as empty values can cause problems in the case of federating Context
+* Brokers (the notifyContext is processed as an updateContext and in the latter case, an
+* empty value causes an error)
+*
+*/
+extern long long entitiesCount
+(
+  EntityIdVector                enV,
+  AttributeList                 attrL,
+  Restriction                   res,
+  ContextElementResponseVector* cerV,
+  std::string*                  err,
+  bool                          includeEmpty,
+  std::string                   tenant,
+  std::string                   servicePath
+);
+
 #endif

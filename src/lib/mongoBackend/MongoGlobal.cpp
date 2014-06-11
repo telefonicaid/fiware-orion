@@ -928,7 +928,6 @@ bool entitiesQuery
     }
 
     return true;
-
 }
 
 /*****************************************************************************
@@ -1579,7 +1578,6 @@ long long registrationsCount
 
   /* Do the query on MongoDB */
   // FIXME P2: use field selector to include the only relevant field: contextRegistration array (e.g. "expiration" is not needed)
-  auto_ptr<DBClientCursor>  cursor;
   BSONObj                   query = queryBuilder.obj();
 
   LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(tenant).c_str(), query.toString().c_str()));
@@ -1609,5 +1607,124 @@ long long registrationsCount
     return -1;
   }
 
+  return count;
+}
+
+/* ****************************************************************************
+*
+* entitiesCount -
+*
+* This method is used by queryContext.
+* It takes a vector with entities and a vector with attributes as input and returns the corresponding
+* ContextElementResponseVector or error.
+*
+* Note the includeEmpty argument. This is used if we don't want the result to include empty
+* attributes, i.e. the ones that cause '<contextValue></contextValue>'. This is aimed at
+* subscribeContext case, as empty values can cause problems in the case of federating Context
+* Brokers (the notifyContext is processed as an updateContext and in the latter case, an
+* empty value causes an error)
+*
+*/
+long long entitiesCount
+(
+  EntityIdVector                enV,
+  AttributeList                 attrL,
+  Restriction                   res,
+  ContextElementResponseVector* cerV,
+  std::string*                  err,
+  bool                          includeEmpty,
+  std::string                   tenant,
+  std::string                   servicePath
+)
+{
+  long long           count;
+  DBClientConnection* connection = getMongoConnection();
+
+  LM_T(LmtServicePath, ("Service Path: '%s'", servicePath.c_str()));
+
+  /* Query structure is as follows
+   *
+   * {
+   *    "$or": [ ... ],            (always)
+   *    "attrs.name": { ... },     (only if attributes are used in the query)
+   *    "location.coords": { ... } (only in the case of geo-queries)
+   *  }
+   *
+   */
+
+  BSONObjBuilder finalQuery;
+
+  /* Part 1: entities */
+  BSONArrayBuilder orEnt;
+
+  for (unsigned int ix = 0; ix < enV.size(); ++ix)
+  {
+    fillQueryEntity(orEnt, enV.get(ix), servicePath);
+  }
+
+  /* The result of orEnt is appended to the final query */
+  finalQuery.append("$or", orEnt.arr());
+
+  /* Part 2: attributes */
+  BSONArrayBuilder attrs;
+  for (unsigned int ix = 0; ix < attrL.size(); ++ix)
+  {
+    std::string attrName = attrL.get(ix);
+    attrs.append(attrName);
+    LM_T(LmtMongo, ("Attribute query token: '%s'", attrName.c_str()));
+  }
+
+  std::string attrNames = ENT_ATTRS "." ENT_ATTRS_NAME;
+  if (attrs.arrSize() > 0)
+  {
+    /* If we don't do this checking, the {$in: [] } in the attribute name part will
+     * make the query fail*/
+    finalQuery.append(attrNames, BSON("$in" << attrs.arr()));
+  }
+
+  /* Part 3: geo-location */
+  BSONObj areaQuery;
+  if (processAreaScope(res.scopeVector, areaQuery))
+  {
+    std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
+    finalQuery.append(locCoords, areaQuery);
+  }
+
+  //
+  // FIXME P7: if (details == 'on'), count the number of matches in mongo, and return an error 
+  //           with that info in case of error.
+  //
+
+  // Do the query on MongoDB
+  BSONObj  query = finalQuery.obj();
+
+  LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
+  mongoSemTake(__FUNCTION__, "count-query in EntitiesCollection");
+
+  try
+  {
+    count = connection->count(getEntitiesCollectionName(tenant).c_str(), query);
+    mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
+  }
+  catch (const DBException &e)
+  {
+    mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo db exception)");
+    *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
+      " - query(): " + query.toString() +
+      " - exception: " + e.what();
+
+    LM_RE(-1, (err->c_str()));
+  }
+  catch (...)
+  {
+    mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo generic exception)");
+    *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
+      " - query(): " + query.toString() +
+      " - exception: " + "generic";
+
+    LM_RE(-1, (err->c_str()));
+  }
+
+  LM_T(LmtPagination, ("Found %d entities", count));
   return count;
 }

@@ -528,6 +528,17 @@ TEST(mongoQueryContextRequest, queryWithPagination)
   EXPECT_STREQ("",                           qcResponse5.errorCode.details.c_str());
   EXPECT_EQ(0, qcResponse5.contextElementResponseVector.size());
 
+  // 6, ask for non-existing hits, with details ON
+  uriParams[URI_PARAM_PAGINATION_OFFSET]   = "7";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]    = "3";
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
+  ms = mongoQueryContext(&qcReq, &qcResponse5, "", "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccContextElementNotFound,                        qcResponse5.errorCode.code);
+  EXPECT_STREQ("No context element found",                    qcResponse5.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("Number of matching entities: 6. Offset is 7", qcResponse5.errorCode.details.c_str());
+  EXPECT_EQ(0, qcResponse5.contextElementResponseVector.size());
+
   utExit();
 }
 
