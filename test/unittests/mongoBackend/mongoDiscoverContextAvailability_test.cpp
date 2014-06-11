@@ -1414,10 +1414,6 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
-    EXPECT_STREQ("", res.responseVector.get(0)->errorCode.reasonPhrase.c_str());
-    EXPECT_STREQ("", res.responseVector.get(0)->errorCode.details.c_str());
-
     ASSERT_EQ(2, res.responseVector.size());
     /* Context registration element #1 */
     ASSERT_EQ(2, RES_CNTX_REG(0).entityIdVector.size());
@@ -1438,6 +1434,9 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 2)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 2)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
+    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_STREQ("", res.responseVector.get(0)->errorCode.reasonPhrase.c_str());
+    EXPECT_STREQ("", res.responseVector.get(0)->errorCode.details.c_str());
 
     /* Context registration element #2 */
     ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
