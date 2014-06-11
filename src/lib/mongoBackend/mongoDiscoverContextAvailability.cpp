@@ -257,7 +257,7 @@ static HttpStatusCode conventionalDiscoverContextAvailability
 )
 {
     std::string err;
-    long long   count;
+    long long   count = -1;
 
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
     if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err, tenant, offset, limit, details, &count))
@@ -292,6 +292,11 @@ static HttpStatusCode conventionalDiscoverContextAvailability
     }
     else if (details == true)
     {
+      //
+      // If all was OK, but the details URI param was set to 'on', then the responses error code details
+      // 'must' contain the total count of hits.
+      //
+
       char details[64];
 
       snprintf(details, sizeof(details), "Count: %lld", count);
