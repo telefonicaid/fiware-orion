@@ -791,15 +791,14 @@ bool entitiesQuery
     LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
     mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
 
-    char* colName = strdup(getEntitiesCollectionName(tenant).c_str());
     try
     {
         if ((details == true) && (countP != NULL))
         {
-          *countP = connection->count(colName, bquery);
+          *countP = connection->count(getEntitiesCollectionName(tenant).c_str(), bquery);
         }
 
-        cursor = connection->query(colName, query, limit, offset);
+        cursor = connection->query(getEntitiesCollectionName(tenant).c_str(), query, limit, offset);
 
         //
         // We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
@@ -812,7 +811,6 @@ bool entitiesQuery
         }
 
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
-        free(colName);
     }
     catch (const DBException& e)
     {
@@ -821,7 +819,6 @@ bool entitiesQuery
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
 
-        free(colName);
         LM_RE(false,(err->c_str()));
     }
     catch (...)
@@ -831,7 +828,6 @@ bool entitiesQuery
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
 
-        free(colName);
         LM_RE(false, (err->c_str()));
     }
 
@@ -1120,17 +1116,15 @@ bool registrationsQuery
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
     mongoSemTake(__FUNCTION__, "query in RegistrationsCollection");
 
-    char* colName = strdup(getRegistrationsCollectionName(tenant).c_str());
     try
     {
         if ((details == true) && (countP != NULL))
         {
-          *countP = connection->count(colName, bquery);
+          *countP = connection->count(getRegistrationsCollectionName(tenant).c_str(), bquery);
         }
 
-        cursor = connection->query(colName, query, limit, offset);
+        cursor = connection->query(getRegistrationsCollectionName(tenant).c_str(), query, limit, offset);
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection");
-        free(colName);
     }
     catch (const DBException& e)
     {
@@ -1139,7 +1133,6 @@ bool registrationsQuery
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
 
-        free(colName);
         return false;
     }
     catch (...)
@@ -1149,7 +1142,6 @@ bool registrationsQuery
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
 
-        free(colName);
         return false;
     }
 
