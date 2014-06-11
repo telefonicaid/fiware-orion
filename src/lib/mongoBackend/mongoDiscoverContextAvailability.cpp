@@ -167,7 +167,7 @@ static bool associationsQuery
 
 /* ****************************************************************************
 *
- associationsDiscoverContextAvailability -
+* associationsDiscoverContextAvailability -
 */
 static HttpStatusCode associationsDiscoverContextAvailability
 (
@@ -268,8 +268,9 @@ static HttpStatusCode conventionalDiscoverContextAvailability
     if (responseP->responseVector.size() == 0)
     {
       // If the responseV is empty, we haven't found any entity and have to fill the status code part in the response.
-      // If the response was empty due to a too high pagination offset,
-      // and if the user has asked for 'details' (as URI parameter, then the response should include information about
+      //
+      // However, if the response was empty due to a too high pagination offset,
+      // and if the user has asked for 'details' (as URI parameter), then the response should include information about
       // the number of hits without pagination.
       if (details)
       {

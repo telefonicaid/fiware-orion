@@ -781,11 +781,6 @@ bool entitiesQuery
 
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
-    //
-    // FIXME P7: if (details == 'on'), count the number of matches in mongo, and return an error 
-    //           with that info in case of error.
-    //
-
     /* Do the query on MongoDB */
     auto_ptr<DBClientCursor>  cursor;
     Query                     query(finalQuery.obj());
