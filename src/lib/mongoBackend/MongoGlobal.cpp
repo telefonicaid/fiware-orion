@@ -784,7 +784,7 @@ bool entitiesQuery
     /* Do the query on MongoDB */
     auto_ptr<DBClientCursor>  cursor;
     Query                     query(finalQuery.obj());
-    Query                     sortCriteria  = query.sort(BSON("creDate" << 1));
+    Query                     sortCriteria  = query.sort(BSON(ENT_CREATION_DATE << 1));
 
     LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
     mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
