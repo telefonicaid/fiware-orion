@@ -439,6 +439,17 @@ TEST(mongoDiscoverContextAvailabilityRequest, pagination)
   EXPECT_STREQ("",                         res5.errorCode.details.c_str());
   ASSERT_EQ(0, res5.responseVector.size());
 
+  // 5. Ask for non-existing registrations 7-8, with details ON
+  uriParams[URI_PARAM_PAGINATION_OFFSET]   = "6";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]    = "2";
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
+  ms = mongoDiscoverContextAvailability(&req, &res5, "", uriParams);
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccContextElementNotFound,                             res5.errorCode.code);
+  EXPECT_STREQ("No context element found",                         res5.errorCode.reasonPhrase.c_str());
+  EXPECT_STREQ("Number of matching registrations: 5. Offset is 6", res5.errorCode.details.c_str());
+  ASSERT_EQ(0, res5.responseVector.size());
+
   utExit();
 }
 

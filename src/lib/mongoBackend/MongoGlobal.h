@@ -378,4 +378,22 @@ extern bool processAvailabilitySubscription(EntityIdVector enV, AttributeList at
 */
 extern void slashEscape(const char* from, char* to, unsigned int toLen);
 
+/* ****************************************************************************
+*
+* registrationsCount -
+*
+* This method is used by discoverContextAvailabililty.
+* It takes a vector with entities and a vector with attributes as input and returns the corresponding
+* ContextRegistrationResponseVector or error.
+*
+*/
+extern long long registrationsCount
+(
+  EntityIdVector                      enV,
+  AttributeList                       attrL,
+  ContextRegistrationResponseVector*  crrV,
+  std::string*                        err,
+  const std::string&                  tenant
+);
+
 #endif
