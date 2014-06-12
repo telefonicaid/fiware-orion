@@ -660,11 +660,12 @@ function orionCurl()
   fi
   
   _BUILTINS='-s -S --dump-header /tmp/httpHeaders.out'
+
 #   echo '==============================================================================================================================================================='
-#   echo "echo $_payload | curl $_URL $_PAYLOAD $_METHOD --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\" $HTTP_TENANT $_BUILTINS $_xtra"
+#   echo "echo \"${_payload}\" | curl $_URL $_PAYLOAD $_METHOD --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\" $HTTP_TENANT $_BUILTINS $_xtra"
 #   echo '==============================================================================================================================================================='
 
-  _response=$(echo $_payload | curl $_URL $_PAYLOAD $_METHOD --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $HTTP_TENANT $_BUILTINS $_xtra)
+  _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Expect: " --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $HTTP_TENANT $_BUILTINS $_xtra)
   
   #
   # Remove "Connection: Keep-Alive" header and print headers out
@@ -672,18 +673,20 @@ function orionCurl()
   sed '/Connection: Keep-Alive/d' /tmp/httpHeaders.out
   
   #
-  # Print and beautify response body
+  # Print and beautify response body (IF ANY)
   #
-  if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == "" ]
+  if [ "$_response" != "" ]
   then
-    echo $_response | xmllint --format -
-  elif [ "$_outFormat" == application/json ]
-  then
-    echo $_response | python -mjson.tool
-  else
-    echo $_response | xmllint --format -
+    if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == "" ]
+    then
+      echo $_response | xmllint --format -
+    elif [ "$_outFormat" == application/json ]
+    then
+      echo $_response | python -mjson.tool
+    else
+      echo $_response | xmllint --format -
+    fi
   fi
-  
 }
 
 export -f dbInit
