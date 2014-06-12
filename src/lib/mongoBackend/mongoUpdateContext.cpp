@@ -55,6 +55,7 @@ HttpStatusCode mongoUpdateContext
     reqSemTake(__FUNCTION__, "ngsi10 update request");
 
     /* Process each ContextElement */
+    // FIXME P10: processContextElement is passed servicePathV[0], but for Service Path vectors to work, we need to pass the entire vector
     for (unsigned int ix= 0; ix < requestP->contextElementVector.size(); ++ix) {        
         processContextElement(requestP->contextElementVector.get(ix), responseP, requestP->updateActionType.get(), tenant, servicePathV[0]);
     }
