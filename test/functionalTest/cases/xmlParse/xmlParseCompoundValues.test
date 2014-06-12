@@ -66,7 +66,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 # 2. Compound contextValue with vector
 echo "2: +++++++++++++++++++++++++++++++++"
@@ -107,7 +107,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 # 3. Compound contextValue with vector but one of the items have an incorrect tagname
 echo "3: +++++++++++++++++++++++++++++++++"
@@ -148,7 +148,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 # 4. Compound contextValue with vector but two type-attributes
 #INVALID_XML
@@ -190,7 +190,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 # 5. Compound contextValue with vector but type-attribute with value != 'vector'
 echo "5: +++++++++++++++++++++++++++++++++"
@@ -231,7 +231,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 # 6. Compound contextValue with vector but with unknown attribute
 echo "6: +++++++++++++++++++++++++++++++++"
@@ -272,7 +272,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 # 7. Compound contextValue with vector and contextValue as a vector
 echo "7: +++++++++++++++++++++++++++++++++"
@@ -299,7 +299,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 # 8. Compound contextValue with struct that has two fields with the same name
 echo "8: +++++++++++++++++++++++++++++++++"
@@ -328,7 +328,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++++++

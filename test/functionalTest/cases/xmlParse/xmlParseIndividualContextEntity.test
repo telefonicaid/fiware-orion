@@ -46,7 +46,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </contextAttribute>
   </contextAttributeList>
 </appendContextElementRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 echo "4: ++++++++++++++ PUT that fails +++++++++++++++"
 url="/NGSI10/contextEntities/ENTITY_ID"
@@ -61,7 +61,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </contextAttribute>
   </contextAttributeList>
 </updateContextElementRequest>'
-curlXml ${url} "${payload}" "-X PUT"
+orionCurl --url "$url" --payload "${payload}" "-X PUT"
 
 echo "5: ++++++++++++ Register an entity +++++++++++++++++"
 url="/NGSI9/registerContext"
@@ -86,7 +86,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </contextRegistrationList>
     <duration>PT1H</duration>
   </registerContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 echo "6: ++++++++++++ GET that is OK +++++++++++++++++"
 curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID"
@@ -104,7 +104,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </contextAttribute>
   </contextAttributeList>
 </updateContextElementRequest>'
-curlXml ${url} "${payload}" "-X PUT"
+orionCurl --url "$url" --payload "${payload}" "-X PUT"
 
 echo "8: +++++++++++++ DELETE that is OK ++++++++++++++++"
 curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
