@@ -662,7 +662,7 @@ function orionCurl()
   _BUILTINS='-s -S --dump-header /tmp/httpHeaders.out'
 
 #   echo '==============================================================================================================================================================='
-#   echo "echo \"${_payload}\" | curl $_URL $_PAYLOAD $_METHOD --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\" $HTTP_TENANT $_BUILTINS $_xtra"
+#   echo "echo \"${_payload}\" | curl $_URL $_PAYLOAD $_METHOD --header "Expect: " --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\" $HTTP_TENANT $_BUILTINS $_xtra"
 #   echo '==============================================================================================================================================================='
 
   _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Expect: " --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $HTTP_TENANT $_BUILTINS $_xtra)
