@@ -46,17 +46,17 @@
 */
 HttpStatusCode mongoUpdateContext
 (
-  UpdateContextRequest*                requestP,
-  UpdateContextResponse*               responseP,
-  const std::string&                   tenant,
-  const std::string&                   servicePath
+  UpdateContextRequest*            requestP,
+  UpdateContextResponse*           responseP,
+  const std::string&               tenant,
+  const std::vector<std::string>&  servicePathV
 )
 {
     reqSemTake(__FUNCTION__, "ngsi10 update request");
 
     /* Process each ContextElement */
     for (unsigned int ix= 0; ix < requestP->contextElementVector.size(); ++ix) {        
-        processContextElement(requestP->contextElementVector.get(ix), responseP, requestP->updateActionType.get(), tenant, servicePath);
+        processContextElement(requestP->contextElementVector.get(ix), responseP, requestP->updateActionType.get(), tenant, servicePathV[0]);
     }
 
     /* Note that although individual processContextElements() invokations returns MsConnectionError, this

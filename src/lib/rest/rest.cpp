@@ -343,7 +343,7 @@ static int outFormatCheck(ConnectionInfo* ciP)
 *
 * Not static just to let unit tests call this function
 */
-int servicePathCheck(ConnectionInfo* ciP)
+int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 {
   // 1. Max 10 paths  - ONLY ONE path allowed at this moment
   // 2. Max 10 levels in each path
@@ -357,18 +357,18 @@ int servicePathCheck(ConnectionInfo* ciP)
   if (ciP->httpHeaders.servicePathReceived == false)
     return 0;
 
-  if (ciP->servicePath.c_str()[0] != '/')
+  if (servicePath[0] != '/')
   {
     OrionError e(SccBadRequest, "Only 'absolute' Service Paths allowed (a service path must begin with '/')");
     ciP->answer = e.render(ciP->outFormat, "");
     return 1;
   }
 
-  components = stringSplit(ciP->servicePath, '/', compV);
+  components = stringSplit(servicePath, '/', compV);
 
   if (components > 10)
   {
-    OrionError e(SccBadRequest, "too many components in ServicePath");
+    OrionError e(SccBadRequest, std::string("too many components in ServicePath '") + servicePath + "'");
     ciP->answer = e.render(ciP->outFormat, "");
     return 2;
   }
@@ -377,7 +377,7 @@ int servicePathCheck(ConnectionInfo* ciP)
   {
     if (strlen(compV[ix].c_str()) > 10)
     {
-      OrionError e(SccBadRequest, std::string("component-name too long in ServicePath '") + ciP->servicePath + "'");
+      OrionError e(SccBadRequest, std::string("component-name too long in ServicePath '") + servicePath + "'");
       ciP->answer = e.render(ciP->outFormat, "");
       return 3;
     }
@@ -393,6 +393,42 @@ int servicePathCheck(ConnectionInfo* ciP)
         return 4;
       }
     }
+  }
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* servicePathFix - 
+*/
+int servicePathFix(ConnectionInfo* ciP)
+{
+  int servicePaths = stringSplit(ciP->servicePath, ',', ciP->servicePathV);
+
+  if (servicePaths == 0)
+    return 0;
+
+  if (servicePaths > 10)
+  {
+    OrionError e(SccBadRequest, "too many service paths - a maximum of ten service paths is allowed");
+    ciP->answer = e.render(ciP->outFormat, "");
+    return 5;
+  }
+
+  for (int ix = 0; ix < servicePaths; ++ix)
+  {
+    ciP->servicePathV[ix] = std::string(wsStrip((char*) ciP->servicePathV[ix].c_str()));
+    LM_T(LmtServicePath, ("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
+  }
+
+  for (int ix = 0; ix < servicePaths; ++ix)
+  {
+    int s;
+    if ((s = servicePathCheck(ciP, ciP->servicePathV[ix].c_str())) != 0)
+      return s;
   }
 
   return 0;
@@ -514,7 +550,7 @@ static int connectionTreat
       ciP->outFormat = XML; // XML is default output format
 
     ciP->servicePath = ciP->httpHeaders.servicePath;
-    if (servicePathCheck(ciP) != 0)
+    if (servicePathFix(ciP) != 0)
     {
       LM_W(("Error in ServicerPath header"));
       restReply(ciP, ciP->answer);
