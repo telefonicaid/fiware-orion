@@ -694,9 +694,9 @@ export -f brokerStop
 export -f localBrokerStop
 export -f accumulatorStart
 export -f accumulatorStop
-export -f curlXml
-export -f curlIt
-export -f curlJson
+# export -f curlXml
+# export -f curlIt
+# export -f curlJson
 export -f orionCurl
 export -f printXmlWithHeaders
 export -f printJsonWithHeaders
