@@ -68,6 +68,7 @@ TEST(postRegisterContext, ok)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  ci.servicePathV.push_back("");
   ci.outFormat    = XML;
   ci.inFormat     = XML;
   ci.payload      = testBuf;
@@ -86,6 +87,7 @@ TEST(postRegisterContext, ok)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  ci2.servicePathV.push_back("");
   ci2.outFormat    = XML;
   ci2.inFormat     = XML;
   ci2.payload      = testBuf;

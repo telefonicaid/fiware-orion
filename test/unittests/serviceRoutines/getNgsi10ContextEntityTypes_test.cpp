@@ -59,6 +59,7 @@ TEST(getNgsi10ContextEntityTypes, notFound)
 
   utInit();
 
+  ci.servicePathV.push_back("");
   ci.outFormat = XML;
   out          = restService(&ci, rs);
 

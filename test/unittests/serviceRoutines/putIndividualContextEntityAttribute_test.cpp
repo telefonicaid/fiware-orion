@@ -59,6 +59,7 @@ TEST(putIndividualContextEntityAttribute, xml)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   
+  ci.servicePathV.push_back("");
   ci.outFormat    = XML;
   ci.inFormat     = XML;
   ci.payload      = testBuf;
@@ -84,6 +85,7 @@ TEST(putIndividualContextEntityAttribute, json)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   
+  ci.servicePathV.push_back("");
   ci.outFormat    = JSON;
   ci.inFormat     = JSON;
   ci.payload      = testBuf;

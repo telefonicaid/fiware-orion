@@ -79,6 +79,7 @@ TEST(mapGetIndividualContextEntityAttributes, notFoundThenFound)
 
   prepareDatabase("E1", "Room");
 
+  ci.servicePathV.push_back("");
   ms = mapGetIndividualContextEntityAttributes("NotFound", &response, &ci);
   EXPECT_EQ(ms, SccOk);
 

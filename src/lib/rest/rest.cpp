@@ -409,7 +409,10 @@ int servicePathFix(ConnectionInfo* ciP)
   int servicePaths = stringSplit(ciP->servicePath, ',', ciP->servicePathV);
 
   if (servicePaths == 0)
+  {
+    ciP->servicePathV.push_back("");
     return 0;
+  }
 
   if (servicePaths > 10)
   {

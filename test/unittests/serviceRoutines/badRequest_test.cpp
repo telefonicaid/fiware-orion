@@ -49,6 +49,7 @@ TEST(badRequest, ok)
 
   utInit();
 
+  ci.servicePathV.push_back("");
   out = restService(&ci, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
