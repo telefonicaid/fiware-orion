@@ -106,6 +106,7 @@ public:
   std::string                tenantFromHttpHeader;
   std::string                tenant;
   std::string                servicePath;
+  std::vector<std::string>   servicePathV;
   HttpHeaders                httpHeaders;
   char*                      payload;
   int                        payloadSize;

@@ -49,7 +49,10 @@ TEST(badVerbGetPutDeleteOnly, ok)
 {
   ConnectionInfo  ci("/ngsi10/contextEntities/entityId01/attributes/temperature/14",  "POST", "1.1");
   std::string     expected = ""; // Bad verb gives no payload, only HTTP headers
-  std::string     out      = restService(&ci, rs);
+  std::string     out;
+
+  ci.servicePathV.push_back("");
+  out = restService(&ci, rs);
 
   EXPECT_EQ(expected, out);
   EXPECT_EQ("Allow", ci.httpHeader[0]);

@@ -40,7 +40,13 @@
 *
 * mongoQueryContext - 
 */
-HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResponse* responseP, const std::string& tenant, const std::string& servicePath)
+HttpStatusCode mongoQueryContext
+(
+  QueryContextRequest*             requestP,
+  QueryContextResponse*            responseP,
+  const std::string&               tenant,
+  const std::vector<std::string>&  servicePathV
+)
 {
     reqSemTake(__FUNCTION__, "ngsi10 query request");
 
@@ -52,8 +58,10 @@ HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResp
     }
 
     std::string err;
-    LM_T(LmtServicePath, ("Service Path: '%s'", servicePath.c_str()));
-    if (!entitiesQuery(requestP->entityIdVector, requestP->attributeList, requestP->restriction, &responseP->contextElementResponseVector, &err, true, tenant, servicePath)) {
+    LM_T(LmtServicePath, ("Service Path: '%s'", servicePathV[0].c_str()));
+
+    // FIXME P10: entitiesQuery is passed servicePathV[0], but for Service Path vectors to work, we need to pass the entire vector
+    if (!entitiesQuery(requestP->entityIdVector, requestP->attributeList, requestP->restriction, &responseP->contextElementResponseVector, &err, true, tenant, servicePathV[0])) {
         responseP->errorCode.fill(SccReceiverInternalError, err);
         LM_E((responseP->errorCode.details.c_str()));
     }

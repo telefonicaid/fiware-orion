@@ -65,6 +65,7 @@ TEST(getAttributeValueInstance, notFound)
 
   utInit();
   
+  ci.servicePathV.push_back("");
   ci.outFormat = XML;
   out          = restService(&ci, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -92,6 +93,8 @@ TEST(getAttributeValueInstance, found)
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
+
+  ci1.servicePathV.push_back("");
   ci1.outFormat    = XML;
   ci1.inFormat     = XML;
   ci1.payload      = testBuf;
@@ -100,6 +103,7 @@ TEST(getAttributeValueInstance, found)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  ci2.servicePathV.push_back("");
   ci2.outFormat    = XML;
   out              = restService(&ci2, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());

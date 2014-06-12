@@ -51,11 +51,14 @@ TEST(deleteIndividualContextEntityAttribute, ok)
 {
   ConnectionInfo  ci("/ngsi10/contextEntities/entity901/attributes/aa",  "DELETE", "1.1");
   const char*     outfile = "ngsi10.deleteIndividualContextEntityAttribute.valid.xml";
+  std::string     out;
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  std::string out = restService(&ci, rs);
+
+  ci.servicePathV.push_back("");
+  out = restService(&ci, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

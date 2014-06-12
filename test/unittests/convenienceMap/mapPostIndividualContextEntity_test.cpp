@@ -89,6 +89,7 @@ TEST(mapPostIndividualContextEntity, emptyDb)
 
   utInit();
 
+  ci.servicePathV.push_back("");
   ms = mapPostIndividualContextEntity("MPICE", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk, response.errorCode.code);
@@ -116,6 +117,7 @@ TEST(mapPostIndividualContextEntity, found)
 
   request.attributeDomainName.set("ad");
 
+  ci.servicePathV.push_back("");
   ms = mapPostIndividualContextEntity("MPICE", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(200, response.errorCode.code);
@@ -141,6 +143,7 @@ TEST(mapPostIndividualContextEntity, newEntity)
 
   request.attributeDomainName.set("ad");
 
+  ci.servicePathV.push_back("");
   ms = mapPostIndividualContextEntity("MPICE2", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk, response.errorCode.code);

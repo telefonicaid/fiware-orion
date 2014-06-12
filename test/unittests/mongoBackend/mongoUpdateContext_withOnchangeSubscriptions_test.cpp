@@ -22,11 +22,7 @@
 *
 * Author: Fermin Galan
 */
-
-
-#include "gtest/gtest.h"
-#include "gmock/gmock.h"
-#include "testInit.h"
+#include "unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -41,12 +37,7 @@
 
 #include "mongo/client/dbclient.h"
 
-#include "commonMocks.h"
 
-using ::testing::_;
-using ::testing::Throw;
-using ::testing::Invoke;
-using ::testing::Return;
 
 /* ****************************************************************************
 *
@@ -431,7 +422,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -499,7 +492,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -563,7 +558,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -634,7 +631,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -709,7 +708,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -780,7 +781,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -848,7 +851,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -916,7 +921,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -980,7 +987,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1046,7 +1055,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1114,7 +1125,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1178,7 +1191,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
     prepareDatabaseWithNoTypeSubscriptions();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1244,7 +1259,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1310,7 +1327,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1376,7 +1395,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1429,7 +1450,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1483,7 +1506,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1536,7 +1561,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1589,7 +1616,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1657,7 +1686,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1728,7 +1759,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1794,7 +1827,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1862,7 +1897,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1932,7 +1969,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1996,7 +2035,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2063,7 +2104,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2131,7 +2174,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2195,7 +2240,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2261,7 +2308,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2327,7 +2376,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2393,7 +2444,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2446,7 +2499,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2500,7 +2555,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2553,7 +2610,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2606,7 +2665,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2674,7 +2735,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2745,7 +2808,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2811,7 +2876,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2879,7 +2946,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2949,7 +3018,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3013,7 +3084,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3075,7 +3148,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    servicePathVector.push_back("");
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

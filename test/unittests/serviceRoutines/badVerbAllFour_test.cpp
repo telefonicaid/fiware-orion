@@ -59,21 +59,25 @@ TEST(badVerbAllFour, error)
 
   utInit();
 
+  ci1.servicePathV.push_back("");
   out = restService(&ci1, rs);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci1.httpHeader[0]);
   EXPECT_EQ("POST, GET, PUT, DELETE", ci1.httpHeaderValue[0]);
 
+  ci2.servicePathV.push_back("");
   out = restService(&ci2, rs);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci2.httpHeader[0]);
   EXPECT_EQ("POST, GET, PUT, DELETE", ci2.httpHeaderValue[0]);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  ci3.servicePathV.push_back("");
   out = restService(&ci3, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  ci4.servicePathV.push_back("");
   out = restService(&ci4, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 

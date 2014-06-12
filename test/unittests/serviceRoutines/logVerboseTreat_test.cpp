@@ -59,6 +59,7 @@ TEST(logVerboseTreat, get)
 
   utInit();
 
+  ci.servicePathV.push_back("");
   ci.outFormat = XML;
   out          = restService(&ci, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -85,16 +86,19 @@ TEST(logVerboseTreat, put)
 
   utInit();
 
+  ci1.servicePathV.push_back("");
   ci1.outFormat = XML;
   out          = restService(&ci1, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci2.servicePathV.push_back("");
   ci2.outFormat = XML;
   out          = restService(&ci2, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci3.servicePathV.push_back("");
   ci3.outFormat = XML;
   out          = restService(&ci3, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
@@ -117,6 +121,7 @@ TEST(logVerboseTreat, post)
 
   utInit();
 
+  ci.servicePathV.push_back("");
   ci.outFormat = XML;
   out          = restService(&ci, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -141,11 +146,13 @@ TEST(logVerboseTreat, delete)
 
   utInit();
 
+  ci1.servicePathV.push_back("");
   ci1.outFormat = XML;
   out          = restService(&ci1, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci2.servicePathV.push_back("");
   ci2.outFormat = XML;
   out          = restService(&ci2, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
@@ -198,81 +205,97 @@ TEST(logVerboseTreat, put2)
 
   utInit();
 
+  ci01.servicePathV.push_back("");
   ci01.outFormat = XML;
   out          = restService(&ci01, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile01)) << "Error getting test data from '" << outfile01 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci02.servicePathV.push_back("");
   ci02.outFormat = XML;
   out          = restService(&ci02, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile02)) << "Error getting test data from '" << outfile02 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci03.servicePathV.push_back("");
   ci03.outFormat = XML;
   out          = restService(&ci03, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile03)) << "Error getting test data from '" << outfile03 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci04.servicePathV.push_back("");
   ci04.outFormat = XML;
   out          = restService(&ci04, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile04)) << "Error getting test data from '" << outfile04 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci05.servicePathV.push_back("");
   ci05.outFormat = XML;
   out          = restService(&ci05, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile05)) << "Error getting test data from '" << outfile05 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci06.servicePathV.push_back("");
   ci06.outFormat = XML;
   out          = restService(&ci06, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile06)) << "Error getting test data from '" << outfile06 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci07.servicePathV.push_back("");
   ci07.outFormat = XML;
   out          = restService(&ci07, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile07)) << "Error getting test data from '" << outfile07 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci08.servicePathV.push_back("");
   ci08.outFormat = XML;
   out          = restService(&ci08, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile08)) << "Error getting test data from '" << outfile08 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci09.servicePathV.push_back("");
   ci09.outFormat = XML;
   out          = restService(&ci09, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile09)) << "Error getting test data from '" << outfile09 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci10.servicePathV.push_back("");
   ci10.outFormat = XML;
   out          = restService(&ci10, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile10)) << "Error getting test data from '" << outfile10 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci11.servicePathV.push_back("");
   ci11.outFormat = XML;
   out          = restService(&ci11, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile11)) << "Error getting test data from '" << outfile11 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci12.servicePathV.push_back("");
   ci12.outFormat = XML;
   out          = restService(&ci12, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile12)) << "Error getting test data from '" << outfile12 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci13.servicePathV.push_back("");
   ci13.outFormat = XML;
   out          = restService(&ci13, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile13)) << "Error getting test data from '" << outfile13 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci14.servicePathV.push_back("");
   ci14.outFormat = XML;
   out          = restService(&ci14, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile14)) << "Error getting test data from '" << outfile14 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci15.servicePathV.push_back("");
   ci15.outFormat = XML;
   out          = restService(&ci15, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile15)) << "Error getting test data from '" << outfile15 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
+  ci16.servicePathV.push_back("");
   ci16.outFormat = XML;
   out          = restService(&ci16, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile16)) << "Error getting test data from '" << outfile16 << "'";

@@ -58,6 +58,7 @@ TEST(getContextEntitiesAttributes, notFound)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  ci.servicePathV.push_back("");
   ci.outFormat = XML;
   out          = restService(&ci, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());

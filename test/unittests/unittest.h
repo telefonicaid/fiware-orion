@@ -25,6 +25,7 @@
 *
 * Author: Ken Zangelin
 */
+#include "gtest/gtest.h"
 #include "testDataFromFile.h"
 #include "commonMocks.h"
 #include "testInit.h"
@@ -37,6 +38,7 @@
 */
 using ::testing::_;
 using ::testing::Throw;
+using ::testing::Invoke;
 using ::testing::Return;
 using ::testing::MatchesRegex;
 
@@ -49,6 +51,14 @@ using ::testing::MatchesRegex;
 extern std::map<std::string, std::string> uriParams;
 
  
+
+/* ****************************************************************************
+*
+* servicePathVector - 
+*/
+extern std::vector<std::string> servicePathVector;
+
+
 
 /* ****************************************************************************
 *

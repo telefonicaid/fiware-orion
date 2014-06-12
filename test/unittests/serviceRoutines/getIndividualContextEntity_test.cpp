@@ -55,6 +55,7 @@ TEST(getIndividualContextEntity, notFound)
   const char*    outfile = "ngsi10.contextElementResponse.getIndividualContextEntity.valid.xml";
   std::string    out;
 
+  ci.servicePathV.push_back("");
   ci.outFormat = XML;
   out          = restService(&ci, rs);
 
