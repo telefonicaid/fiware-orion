@@ -402,9 +402,9 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 
 /* ****************************************************************************
 *
-* servicePathFix - 
+* servicePathSplit - 
 */
-int servicePathFix(ConnectionInfo* ciP)
+int servicePathSplit(ConnectionInfo* ciP)
 {
   int servicePaths = stringSplit(ciP->servicePath, ',', ciP->servicePathV);
 
@@ -553,7 +553,7 @@ static int connectionTreat
       ciP->outFormat = XML; // XML is default output format
 
     ciP->servicePath = ciP->httpHeaders.servicePath;
-    if (servicePathFix(ciP) != 0)
+    if (servicePathSplit(ciP) != 0)
     {
       LM_W(("Error in ServicerPath header"));
       restReply(ciP, ciP->answer);
