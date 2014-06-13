@@ -649,7 +649,7 @@ function orionCurl()
     fi
   fi
 
-  if [ "$_method" != "" ];     then    _METHOD=' -X "'$_method'"';   fi
+  if [ "$_method" != "" ];     then    _METHOD=' -X '$_method;   fi
   if [ "$_httpTenant" != "" ]; then    _HTTP_TENANT='--header "Fiware-Service:'$_httpTenant'"';  fi
 
   if [ "$_urlTenant" != "" ]
