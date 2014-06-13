@@ -9,7 +9,7 @@
 #
 # Orion Context Broker is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# MERCHANTABILITY or FIrTNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 # General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
@@ -41,13 +41,11 @@ payload='<updateContextAttributeRequest>
     </contextMetadata>
   </metadata>
 </updateContextAttributeRequest>'
-curlXml "$url" "$payload" "-X PUT"
-echo
+orionCurl -X "PUT" --url "$url" --payload "${payload}" 
 
 echo "1: ++++++++++++++++++++"
 url=/ngsi10/contextEntities/E01/attributes/A1/left
-curlXmlNoPayload "$url" "-X GET"
-echo
+orionCurl --url "$url"
 
 echo "2: ++++++++++++++++++++"
 url=/ngsi10/contextEntities/E01/attributes
@@ -68,8 +66,7 @@ payload='<appendContextElementRequest>
     </contextAttribute>
   </contextAttributeList>
 </appendContextElementRequest>'
-curlXml "$url" "$payload"
-echo
+orionCurl --url "$url" --payload "${payload}"
 
 echo "3: ++++++++++++++++++++"
 url=/ngsi10/contextEntities/E01/attributes/A1/left
@@ -84,13 +81,11 @@ payload='<updateContextAttributeRequest>
     </contextMetadata>
   </metadata>
 </updateContextAttributeRequest>'
-curlXml "$url" "$payload" "-X PUT"
-echo
+orionCurl --url "$url" --payload "${payload}" -X "PUT"
 
 echo "4: ++++++++++++++++++++"
 url=/ngsi10/contextEntities/E01/attributes/A1/left
-curlXmlNoPayload "$url"
-echo
+orionCurl --url "$url"
 
 echo "5: ++++++++++++++++++++"
 url=/ngsi10/contextEntities/E01/attributes/A1/left
@@ -105,8 +100,7 @@ payload='<updateContextAttributeRequest>
     </contextMetadata>
   </metadata>
 </updateContextAttributeRequest>'
-curlXml "$url" "$payload" "-X POST"
-echo
+orionCurl --url "$url" --payload "${payload}"
 
 echo "6: ++++++++++++++++++++"
 url=/ngsi10/contextEntities/E01/attributes/A1/right
@@ -121,23 +115,19 @@ payload='<updateContextAttributeRequest>
     </contextMetadata>
   </metadata>
 </updateContextAttributeRequest>'
-curlXml "$url" "$payload" "-X PUT"
-echo
+orionCurl --url "$url" --payload "${payload}" -X "PUT"
 
 echo "7: ++++++++++++++++++++"
 url=/ngsi10/contextEntities/E01/attributes/A1/right
-curlXmlNoPayload "$url" "-X DELETE"
-echo
+orionCurl --url "$url" -X "DELETE"
 
 echo "8: ++++++++++++++++++++"
 url=/ngsi10/contextEntities/E01/attributes/A1/left
-curlXmlNoPayload "$url" "-X DELETE"
-echo
+orionCurl --url "$url" -X "DELETE"
 
 echo "9: ++++++++++++++++++++"
 url=/ngsi10/contextEntities/E01/attributes/A1/left
-curlXmlNoPayload "$url" "-X GET"
-echo
+orionCurl --url "$url"
 
 --REGEXPECT--
 0: ++++++++++++++++++++
@@ -152,7 +142,6 @@ Date: REGEX(.*)
   <reasonPhrase>No context element found</reasonPhrase>
   <details>E01</details>
 </statusCode>
-
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 268
@@ -168,7 +157,6 @@ Date: REGEX(.*)
     <details>Entity-Attribute pair: 'E01-A1'</details>
   </statusCode>
 </contextAttributeResponse>
-
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 685
@@ -200,7 +188,6 @@ Date: REGEX(.*)
     </contextAttributeResponse>
   </contextResponseList>
 </appendContextElementResponse>
-
 3: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 80
@@ -212,7 +199,6 @@ Date: REGEX(.*)
   <code>200</code>
   <reasonPhrase>OK</reasonPhrase>
 </statusCode>
-
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 495
@@ -240,13 +226,11 @@ Date: REGEX(.*)
     <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </contextAttributeResponse>
-
 5: ++++++++++++++++++++
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
 Allow: GET, PUT, DELETE
 Date: REGEX(.*)
-
 
 6: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -260,7 +244,6 @@ Date: REGEX(.*)
   <reasonPhrase>Bad Request</reasonPhrase>
   <details>unmatching metadata ID value URI/payload: 'right' vs 'left'</details>
 </statusCode>
-
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 198
@@ -273,7 +256,6 @@ Date: REGEX(.*)
   <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
   <details>action: DELETE - entity: (E01, ) - offending attribute: A1</details>
 </statusCode>
-
 8: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 80
@@ -285,7 +267,6 @@ Date: REGEX(.*)
   <code>200</code>
   <reasonPhrase>OK</reasonPhrase>
 </statusCode>
-
 9: ++++++++++++++++++++
 HTTP/1.1 200 OK
 Content-Length: 268
@@ -301,6 +282,5 @@ Date: REGEX(.*)
     <details>Entity-Attribute pair: 'E01-A1'</details>
   </statusCode>
 </contextAttributeResponse>
-
 --TEARDOWN--
 brokerStop CB

@@ -75,10 +75,10 @@ payload='{
     ],
     "updateAction": "APPEND"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}" --json
 
 echo "=== 2. Query the entity"
-curlJsonNoPayload /NGSI10/contextEntities/Room1
+orionCurl --url "/NGSI10/contextEntities/Room1" --json
 
 echo "=== 3. Update the entity changing metadata value an adding a new one"
 url="/NGSI10/updateContext"
@@ -111,10 +111,10 @@ payload='{
     ],
     "updateAction": "UPDATE"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}" --json
 
 echo "=== 4. Query the entity"
-curlJsonNoPayload /NGSI10/contextEntities/Room1
+orionCurl --url "/NGSI10/contextEntities/Room1" --json
 
 echo "=== 5. Append a new attribute with metadata"
 url="/NGSI10/updateContext"
@@ -147,10 +147,10 @@ payload='{
     ],
     "updateAction": "APPEND"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}" --json
 
 echo "=== 6. Query the entity"
-curlJsonNoPayload /NGSI10/contextEntities/Room1
+orionCurl --url "/NGSI10/contextEntities/Room1" --json
 
 echo "=== 7. Remove an attribute with metadata"
 url="/NGSI10/updateContext"
@@ -171,10 +171,10 @@ payload='{
     ],
     "updateAction": "DELETE"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}" --json
 
 echo "=== 8. Query the entity"
-curlJsonNoPayload /NGSI10/contextEntities/Room1
+orionCurl --url "/NGSI10/contextEntities/Room1" --json
 
 --REGEXPECT--
 === 1. Create an entity with an attribute with metadata
