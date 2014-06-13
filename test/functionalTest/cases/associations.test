@@ -76,8 +76,7 @@ payload='<?xml version="1.0"?>
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>'
-curlXml "$url" "$payload"
-echo
+orionCurl --url "$url" --payload "${payload}"
 --REGEXPECT--
 HTTP/1.1 200 OK
 Content-Length: 141
@@ -89,6 +88,5 @@ Date: REGEX(.*)
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
-
 --TEARDOWN--
 brokerStop CB
