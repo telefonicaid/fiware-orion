@@ -64,9 +64,8 @@ HttpStatusCode mongoUpdateContext
     {
 
         /* Process each ContextElement */
-        // FIXME P10: processContextElement is passed servicePathV[0], but for Service Path vectors to work, we need to pass the entire vector
         for (unsigned int ix= 0; ix < requestP->contextElementVector.size(); ++ix) {
-            processContextElement(requestP->contextElementVector.get(ix), responseP, requestP->updateActionType.get(), tenant, servicePathV[0]);
+            processContextElement(requestP->contextElementVector.get(ix), responseP, requestP->updateActionType.get(), tenant, servicePathV);
         }
 
         /* Note that although individual processContextElements() invokations returns MsConnectionError, this

@@ -1386,12 +1386,12 @@ static bool removeEntity
 * 1. Preconditions
 * 2. Get the complete list of entities from mongo
 */
-void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, const std::string& action, const std::string& tenant, const std::string& servicePath) {
+void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, const std::string& action, const std::string& tenant, const std::vector<std::string>& servicePath) {
 
     DBClientConnection* connection = getMongoConnection();
 
     LM_T(LmtServicePath, ("Updating entity '%s' for Service Path: '%s', action '%s'",
-                          ceP->entityId.id.c_str(), servicePath.c_str(), action.c_str()));
+                          ceP->entityId.id.c_str(), servicePath[0].c_str(), action.c_str()));
 
     /* Getting the entity in the request (helpful in other places) */
     EntityId* enP = &ceP->entityId;
@@ -1422,7 +1422,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
     /* Find entities (could be several, in the case of no type or isPattern=true) */
     char               path[MAX_SERVICE_NAME_LEN];
-    slashEscape(servicePath.c_str(), path, sizeof(path));
+    slashEscape(servicePath[0].c_str(), path, sizeof(path));
 
     const std::string  idString          = "_id." ENT_ENTITY_ID;
     const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
@@ -1435,7 +1435,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     if (enP->type != "")
       bob.append(typeString, enP->type);
     
-    if (servicePath == "")
+    if (servicePath[0] == "")
       bob.append(servicePathString, BSON("$exists" << false));
     else
       bob.appendRegex(servicePathString, servicePathValue);
@@ -1494,7 +1494,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         std::string entityType  = STR_FIELD(r.getField("_id").embeddedObject(), ENT_ENTITY_TYPE);
         std::string entitySPath = STR_FIELD(r.getField("_id").embeddedObject(), ENT_SERVICE_PATH);
 
-        LM_T(LmtServicePath, ("Found entity '%s' for ServicePath '%s'", entityId.c_str(), servicePath.c_str()));
+        LM_T(LmtServicePath, ("Found entity '%s' for ServicePath '%s'", entityId.c_str(), servicePath[0].c_str()));
 
         ContextElementResponse* cerP = new ContextElementResponse();
         cerP->contextElement.entityId.fill(entityId, entityType, "false");
@@ -1583,7 +1583,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         slashEscape(entitySPath.c_str(), espath, sizeof(espath));
 
         // servicePathString from earlier in this function
-        if (servicePath == "")
+        if (servicePath[0] == "")
           bob.append(servicePathString, BSON("$exists" << false));
         else
           bob.appendRegex(servicePathString, espath);
@@ -1660,7 +1660,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
      * which sets the ServicePath for the entity.
      */
     if (docs == 0) {
-      LM_T(LmtServicePath, ("No docs found for service path '%s' - so, let's insert it, shall we?", servicePath.c_str()));
+      LM_T(LmtServicePath, ("No docs found for service path '%s' - so, let's insert it, shall we?", servicePath[0].c_str()));
 
 
         if (strcasecmp(action.c_str(), "append") != 0) {
@@ -1680,7 +1680,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             }
 
             std::string errReason, errDetail;
-            if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant, servicePath)) {
+            if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant, servicePath[0])) {
                cerP->statusCode.fill(SccInvalidParameter, errDetail);
             }
             else {

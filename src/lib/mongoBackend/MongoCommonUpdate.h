@@ -36,6 +36,6 @@ using namespace mongo;
 * processContextElement -
 *
 */
-extern void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, const std::string& action, const std::string& tenant, const std::string& servicePath);
+extern void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, const std::string& action, const std::string& tenant, const std::vector<std::string>& servicePath);
 
 #endif

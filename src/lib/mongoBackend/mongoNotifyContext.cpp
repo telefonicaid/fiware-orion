@@ -45,7 +45,12 @@ HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextR
     for (unsigned int ix = 0; ix < requestP->contextElementResponseVector.size(); ++ix) {
         /* We use 'ucr' to conform processContextElement signature but we are not doing anything with that */
         UpdateContextResponse ucr;
-        processContextElement(&requestP->contextElementResponseVector.get(ix)->contextElement, &ucr, "append", tenant, "");
+
+        // FIXME P10
+        std::vector<std::string> servicePathV;
+        servicePathV.push_back("");
+
+        processContextElement(&requestP->contextElementResponseVector.get(ix)->contextElement, &ucr, "append", tenant, servicePathV);
     }
 
     reqSemGive(__FUNCTION__, "ngsi10 notification");
