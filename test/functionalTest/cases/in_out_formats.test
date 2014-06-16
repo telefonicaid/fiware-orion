@@ -28,19 +28,7 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-acceptJson="Accept: application/json"
-acceptXml="Accept: application/xml"
-acceptBoth="Accept: application/xml, application/json"
-acceptText="Accept: text/plain"
-acceptNothing="Accept:"
-
-contentTypeJson="Content-Type: application/json"
-contentTypeXml="Content-Type: application/xml"
-contentTypeBoth="Content-Type: application/xml, application/json"
-contentTypeText="Content-Type: text/plain"
-contentTypeNothing="Content-Type:"
-
-url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+url="/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -78,52 +66,52 @@ echo '================================================================='
 echo
 
 echo "0.1: Query the Entity just to make sure it is there"
-curlIt "XML" "$url" "$payload" "$contentTypeXml" "$acceptXml"
+orionCurl --url "$url" --payload "${payload}"
 echo '================================================================='
 echo
 
 echo "1.1: Unrecognized Content-Type, Accepts ONLY JSON: 415, response in JSON"
-curlIt "JSON" "$url" "$payload" "$contentTypeText" "$acceptJson"
+orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out "application/json"
 echo '================================================================='
 echo
 
 echo "1.2: Unrecognized Content-Type, Accepts ONLY XML: 415, response in XML"
-curlIt "XML" "$url" "$payload" "$contentTypeText" "$acceptXml"
+orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out "application/xml"
 echo '================================================================='
 echo
 
 echo "1.3: Unrecognized Content-Type, Accepts BOTH JSON and XML: 415, response in XML"
-curlIt "XML" "$url" "$payload" "$contentTypeText" "$acceptBoth"
+orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out "application/xml, application/json"
 echo '================================================================='
 echo
 
 echo "1.4: Unrecognized Content-Type, Accepts text/plain: 415, response in XML"
-curlIt "XML" "$url" "$payload" "$contentTypeText" "$acceptText"
+orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out "text/plain"
 echo '================================================================='
 echo
 
 echo "1.5: Unrecognized Content-Type, Accepts NOTHING: 415, response in XML"
-curlIt "XML" "$url" "$payload" "$contentTypeText" "$acceptNothing"
+orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out " "
 echo '================================================================='
 echo
 
 echo "2.1: Content-Type OK, Accepts ONLY JSON: 200, response in JSON"
-curlIt "JSON" "$url" "$payload" "$contentTypeXml" "$acceptJson"
+orionCurl --url "$url" --payload "${payload}" --in "application/xml" --out "application/json"
 echo '================================================================='
 echo
 
 echo "2.2: Content-Type OK, Accepts ONLY XML: 200, response in XML"
-curlIt "XML" "$url" "$payload" "$contentTypeXml" "$acceptXml"
+orionCurl --url "$url" --payload "${payload}" --in "application/xml" --out "application/xml"
 echo '================================================================='
 echo
 
 echo "2.3: Content-Type OK, Accepts BOTH JSON and XML: 200, response in XML"
-curlIt "XML" "$url" "$payload" "$contentTypeXml" "$acceptBoth"
+orionCurl --url "$url" --payload "${payload}" --in "application/xml" --out "application/xml, application/json"
 echo '================================================================='
 echo
 
 echo "2.4: Content-Type OK, Accepts text/plain: 406, Response in XML"
-curlIt "XML" "$url" "$payload" "$contentTypeXml" "$acceptText"
+orionCurl --url "$url" --payload "${payload}" --in "application/xml" --out "text/plain"
 echo '================================================================='
 echo
 
