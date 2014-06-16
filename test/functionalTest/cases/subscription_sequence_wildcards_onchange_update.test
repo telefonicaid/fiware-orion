@@ -82,7 +82,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 
 
@@ -109,7 +109,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
 </updateContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 
 
@@ -136,7 +136,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 
 
@@ -163,7 +163,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 
 
@@ -173,7 +173,7 @@ payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
   <subscriptionId>'$SUB_ID'</subscriptionId>
 </unsubscribeContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 
 

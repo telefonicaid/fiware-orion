@@ -27,7 +27,7 @@ dbInit CB
 brokerStart CB 0-255 IPV4
 
 --SHELL--
-url="/kz/NGSI9/registerContext"
+url="/NGSI9/registerContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -77,7 +77,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>'
-curlXmlTenants ${url} "${payload}" "fiware-tenant: fg"
+orionCurl --url "$url" --payload "$payload" --urlTenant "kz"
 
 
 --REGEXPECT--

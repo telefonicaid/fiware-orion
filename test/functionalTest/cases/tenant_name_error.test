@@ -80,40 +80,40 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 
 # 1. OK
 echo "1: ++++++++++"
-url="/_kzg0123456789012345/NGSI9/registerContext"
-curlXml ${url} "${payload}"
+url="/NGSI9/registerContext"
+orionCurl --url "$url" --payload "$payload" --urlTenant "_kzg0123456789012345"
 echo
 echo
 
 
 # 2. Long tenant name
-url="/kz12345678901234567890/NGSI9/registerContext"
+url="/NGSI9/registerContext"
 echo "2: ++++++++++"
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "$payload" --urlTenant "kz12345678901234567890"
 echo
 echo
 
 
 # 3. Bad character in tenant name
-url="/kz+fg/NGSI9/registerContext"
+url="/NGSI9/registerContext"
 echo "3: ++++++++++"
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "$payload" --urlTenant "kz+fg"
 echo
 echo
 
 
 # 4. Reserved name in tenant name
-url="/log/NGSI9/registerContext"
+url="/NGSI9/registerContext"
 echo "4: ++++++++++"
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "$payload" --urlTenant "log"
 echo
 echo
 
 
 # 5. Reserved name (strange case) in tenant name
-url="/log/NgSi9/registerContext"
+url="/NgSi9/registerContext"
 echo "5: ++++++++++"
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "$payload" --urlTenant "log"
 --REGEXPECT--
 1: ++++++++++
 HTTP/1.1 200 OK
