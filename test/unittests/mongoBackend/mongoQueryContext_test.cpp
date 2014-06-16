@@ -43,6 +43,15 @@
 * Note that these tests are similar in structure to the ones in DiscoverContextAvailability,
 * due to both operations behaves quite similar regarding entities and attributes matching
 *
+* With servicePath:
+*
+* - queryWithServicePathEntPatternType
+* - queryWithIdenticalEntitiesButDifferentServicePaths
+* - queryWithServicePathEntPatternNoType
+* - queryWithServicePathEntNoPatternType
+* - queryWithServicePathEntNoPatternNoType
+* - queryWithSeveralServicePaths
+*
 * With isPattern=false:
 *
 * - query1Ent0Attr
@@ -842,6 +851,68 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternNoType)
   EXPECT_EQ(2,         qcResponse.contextElementResponseVector.size());
   EXPECT_STREQ("a3",   qcResponse.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
   EXPECT_STREQ("ae_2", qcResponse.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+
+  utExit();
+}
+
+/* ****************************************************************************
+*
+* queryWithSeveralServicePaths -
+*
+*/
+TEST(mongoQueryContextRequest, queryWithSeveralServicePaths)
+{
+  HttpStatusCode         ms;
+  QueryContextRequest    req;
+  QueryContextResponse   res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabaseWithServicePath("patternType");
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E.*", "T", "true");
+  req.entityIdVector.push_back(&en);
+  servicePathVector.clear();
+  servicePathVector.push_back("/home/kz/e4");
+  servicePathVector.push_back("/home3/e12");
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(0 , res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(2, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E4", RES_CER(0).entityId.id);
+  EXPECT_EQ("T", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("a4", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+  /* Context Element response # 2 */
+  EXPECT_EQ("E12", RES_CER(1).entityId.id);
+  EXPECT_EQ("T", RES_CER(1).entityId.type);
+  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+  ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+  EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
+  EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
+  EXPECT_EQ("a12", RES_CER_ATTR(1, 0)->value);
+  EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
 
   utExit();
 }
