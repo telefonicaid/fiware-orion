@@ -650,11 +650,11 @@ function orionCurl()
   fi
 
   if [ "$_method" != "" ];     then    _METHOD=' -X '$_method;   fi
-  if [ "$_httpTenant" != "" ]; then    _HTTP_TENANT='--header "Fiware-Service:'$_httpTenant'"';  fi
-
+  if [ "$_httpTenant" != "" ]; then    _HTTP_TENANT='--header "Fiware-Service: '$_httpTenant'"';  fi
+  
   if [ "$_urlTenant" != "" ]
   then
-    _URL=$_host:$_port/$_tenant$_url
+    _URL=$_host:$_port/$_urlTenant$_url
   else
     _URL=$_host:$_port$_url
   fi
@@ -662,10 +662,10 @@ function orionCurl()
   _BUILTINS='-s -S --dump-header /tmp/httpHeaders.out'
 
 #   echo '==============================================================================================================================================================='
-#   echo "echo \"${_payload}\" | curl $_URL $_PAYLOAD $_METHOD --header "Expect: " --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\" $HTTP_TENANT $_BUILTINS $_xtra"
+#   echo "echo \"${_payload}\" | curl $_URL $_PAYLOAD $_METHOD --header \"Expect: \" --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\" $_HTTP_TENANT $_BUILTINS $_xtra"
 #   echo '==============================================================================================================================================================='
 
-  _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Expect: " --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $HTTP_TENANT $_BUILTINS $_xtra)
+  _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Expect: " --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_HTTP_TENANT $_BUILTINS $_xtra)
   
   #
   # Remove "Connection: Keep-Alive" header and print headers out
@@ -701,11 +701,11 @@ export -f accumulatorStop
 # export -f curlIt
 # export -f curlJson
 export -f orionCurl
-export -f printXmlWithHeaders
-export -f printJsonWithHeaders
-export -f curlXmlNoPayload
-export -f curlJsonNoPayload
-export -f curlNoPayload
-export -f curlXmlTenants
+# export -f printXmlWithHeaders
+# export -f printJsonWithHeaders
+# export -f curlXmlNoPayload
+# export -f curlJsonNoPayload
+# export -f curlNoPayload
+# export -f curlXmlTenants
 export -f dbInsertEntity
 export -f mongoCmd
