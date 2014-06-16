@@ -28,10 +28,10 @@ brokerStart CB
 
 --SHELL--
 echo "1: ++++++++ GET that fails +++++++++++++++++++++"
-curlJsonNoPayload "/NGSI10/contextEntities/ENTITY_ID"
+orionCurl --url "/NGSI10/contextEntities/ENTITY_ID" --json
 
 echo "2: ++++++++ DELETE that fails +++++++++++++++++++++"
-curlJsonNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
+orionCurl --url "/NGSI10/contextEntities/ENTITY_ID" -X "DELETE" --json
 
 echo "3: ++++++++ POST that is OK ++++++++++++++++++++"
 url="/NGSI10/contextEntities/ENTITY_ID"
@@ -45,7 +45,7 @@ payload='{
     }
   ]
 }'
-curlJson ${url} "${payload}"
+orionCurl --url ${url} --payload "${payload}" --json
 
 echo "4: +++++++++ PUT that fails +++++++++++++++++++"
 url="/NGSI10/contextEntities/ENTITY_ID"
@@ -59,7 +59,7 @@ payload='{
     }
   ]
 }'
-curlJson ${url} "${payload}" "-X PUT"
+orionCurl --url ${url} --payload "${payload}" -X "PUT" --json
 
 echo "5: +++++++++ Register an entity +++++++++++++++++"
 url="/NGSI9/registerContext"
@@ -85,10 +85,10 @@ payload='{
     ],
     "duration": "PT1H"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url ${url} --payload "${payload}" --json
 
 echo "6: ++++++++++++ GET that is OK +++++++++++++++++"
-curlJsonNoPayload "/NGSI10/contextEntities/ENTITY_ID"
+orionCurl --url "/NGSI10/contextEntities/ENTITY_ID" --json
 
 echo "7: +++++++++++++ PUT that is OK ++++++++++++++++"
 url="/NGSI10/contextEntities/ENTITY_ID"
@@ -102,10 +102,10 @@ payload='{
     }
   ]
 }'
-curlJson ${url} "${payload}" "-X PUT"
+orionCurl --url ${url} --payload "${payload}" -X "PUT" --json 
 
 echo "8: ++++++++++++++ DELETE that is OK +++++++++++++++"
-curlJsonNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
+orionCurl --url "/NGSI10/contextEntities/ENTITY_ID" -X "DELETE" --json
 
 --REGEXPECT--
 1: ++++++++ GET that fails +++++++++++++++++++++

@@ -70,7 +70,7 @@ payload='{
   ],
   "duration": "PT1M"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url ${url} --payload "${payload}" --json
 
 echo "2: ***********************************"
 --REGEXPECT--

@@ -64,7 +64,7 @@ payload='{
   ],
   "updateAction": "APPEND"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url ${url} --payload "${payload}" --json
 
 echo "2: ***********************************"
 
@@ -110,7 +110,7 @@ payload='{
   ],
   "duration": "PT1M"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url ${url} --payload "${payload}" --json
 
 echo "3: ***********************************"
 url="/NGSI10/updateContext"
@@ -148,7 +148,7 @@ payload='{
   ],
   "updateAction": "UPDATE"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url ${url} --payload "${payload}" --json
 
 echo "4: ***********************************"
 --REGEXPECT--
