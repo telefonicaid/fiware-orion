@@ -59,7 +59,6 @@ TEST(getNgsi10ContextEntityTypesAttribute, notFound)
 
   utInit();
 
-  ci.servicePathV.push_back("");
   ci.outFormat = XML;
   out          = restService(&ci, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";

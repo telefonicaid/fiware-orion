@@ -500,8 +500,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType)
 
   // 3. Test that only 1 item is found without Service Path
   qcResponse3.errorCode.fill(SccOk, ""); // All OK - qcResponse.errorCode should be untouched
-  servicePathVector.clear();
-  servicePathVector.push_back("");
+  servicePathVector.clear();  
   ms = mongoQueryContext(&qcReq, &qcResponse3, "", servicePathVector);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk,   qcResponse3.errorCode.code);
@@ -732,7 +731,6 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType)
   // 3. Test that only 1 item is found without Service Path
   qcResponse3.errorCode.fill(SccOk, ""); // All OK - qcResponse.errorCode should be untouched
   servicePathVector.clear();
-  servicePathVector.push_back("");
   ms = mongoQueryContext(&qcReq, &qcResponse3, "", servicePathVector);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk,   qcResponse3.errorCode.code);
@@ -874,7 +872,6 @@ TEST(mongoQueryContextRequest, query1Ent0Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -930,7 +927,6 @@ TEST(mongoQueryContextRequest, query1Ent1Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -980,7 +976,6 @@ TEST(mongoQueryContextRequest, query1Ent1AttrSameName)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1041,7 +1036,6 @@ TEST(mongoQueryContextRequest, queryNEnt0Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1114,7 +1108,6 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrSingle)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1170,7 +1163,6 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrMulti)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1239,7 +1231,6 @@ TEST(mongoQueryContextRequest, queryNEntNAttr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1302,8 +1293,7 @@ TEST(mongoQueryContextRequest, query1Ent0AttrFail)
     req.entityIdVector.push_back(&en);
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1343,8 +1333,7 @@ TEST(mongoQueryContextRequest, query1Ent1AttrFail)
     req.attributeList.push_back("A3");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1385,8 +1374,7 @@ TEST(mongoQueryContextRequest, query1EntWA0AttrFail)
     req.attributeList.push_back("A1");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();   
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1426,7 +1414,6 @@ TEST(mongoQueryContextRequest, query1EntWA1Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1478,7 +1465,6 @@ TEST(mongoQueryContextRequest, queryNEntWA0Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1545,7 +1531,6 @@ TEST(mongoQueryContextRequest, queryNEntWA1Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1601,7 +1586,6 @@ TEST(mongoQueryContextRequest, queryNoType)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1676,7 +1660,6 @@ TEST(mongoQueryContextRequest, queryIdMetadata)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1739,7 +1722,6 @@ TEST(mongoQueryContextRequest, queryCustomMetadata)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1810,8 +1792,7 @@ TEST(mongoQueryContextRequest, queryPattern0Attr)
     req.entityIdVector.push_back(&en);
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1879,7 +1860,6 @@ TEST(mongoQueryContextRequest, queryPattern1AttrSingle)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1929,8 +1909,7 @@ TEST(mongoQueryContextRequest, queryPattern1AttrMulti)
     req.attributeList.push_back("A2");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoQueryContext(&req, &res, "", servicePathVector);    
 
     /* Check response is as expected */
@@ -1993,8 +1972,7 @@ TEST(mongoQueryContextRequest, queryPatternNAttr)
     req.attributeList.push_back("A2");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -2057,8 +2035,7 @@ TEST(mongoQueryContextRequest, queryPatternFail)
     req.entityIdVector.push_back(&en);
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -2098,8 +2075,7 @@ TEST(mongoQueryContextRequest, queryMixPatternAndNotPattern)
     req.entityIdVector.push_back(&en2);
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -2185,7 +2161,6 @@ TEST(mongoQueryContextRequest, queryNoTypePattern)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -2281,7 +2256,6 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -2371,7 +2345,6 @@ TEST(mongoQueryContextRequest, queryCustomMetadataPattern)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -2470,7 +2443,6 @@ TEST(mongoQueryContextRequest, mongoDbQueryFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -2480,7 +2452,7 @@ TEST(mongoQueryContextRequest, mongoDbQueryFail)
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
 
     EXPECT_EQ("collection: unittest.entities - "
-              "query(): { $or: [ { _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $exists: false } } ] } - "
+              "query(): { $or: [ { _id.id: \"E1\", _id.type: \"T1\" } ], _id.servicePath: { $exists: false } } - "
               "exception: boom!!", res.errorCode.details);
     EXPECT_EQ(0,res.contextElementResponseVector.size());
 

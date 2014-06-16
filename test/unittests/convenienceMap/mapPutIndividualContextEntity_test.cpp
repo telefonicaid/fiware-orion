@@ -90,7 +90,6 @@ TEST(mapPutIndividualContextEntity, updateOkAndError)
   request.attributeDomainName.set("ad");
 
   // OK
-  ci.servicePathV.push_back("");
   ms = mapPutIndividualContextEntity("MPICE", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(200, response.errorCode.code);

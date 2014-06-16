@@ -247,7 +247,6 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -329,7 +328,6 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -411,7 +409,6 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -505,7 +502,6 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -596,7 +592,6 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -684,8 +679,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -774,7 +768,6 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1PlusSimpleValu
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -874,8 +867,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2PlusSimpleValu
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -972,7 +964,6 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundObject)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1050,8 +1041,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundObjectToSimple)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1129,7 +1119,6 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundObje
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1207,8 +1196,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundObjectToSimp
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1287,7 +1275,6 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundVector)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1368,7 +1355,6 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundVectorToSimple)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1446,7 +1432,6 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundVect
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1527,7 +1512,6 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundVectorToSimp
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */

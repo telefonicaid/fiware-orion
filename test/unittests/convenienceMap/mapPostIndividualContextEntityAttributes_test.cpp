@@ -92,7 +92,6 @@ TEST(mapPostIndividualContextEntityAttributes, newEntityThenNewEntity)
   prepareDatabase("MPICE", "ttt");
   request.attributeDomainName.set("ad");
 
-  ci.servicePathV.push_back("");
   ms = mapPostIndividualContextEntityAttributes("MPICE", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk, response.errorCode.code);

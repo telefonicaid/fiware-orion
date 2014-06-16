@@ -76,7 +76,6 @@ TEST(putSubscriptionConvOp, put)
   ci1.inFormat     = XML;
   ci1.payload      = NULL;
   ci1.payloadSize  = 0;
-  ci1.servicePathV.push_back("");
   out              = restService(&ci1, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
   
@@ -86,7 +85,6 @@ TEST(putSubscriptionConvOp, put)
   ci2.inFormat     = XML;
   ci2.payload      = testBuf;
   ci2.payloadSize  = strlen(testBuf);
-  ci2.servicePathV.push_back("");
   out              = restService(&ci2, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -97,7 +95,6 @@ TEST(putSubscriptionConvOp, put)
   ci3.inFormat     = XML;
   ci3.payload      = testBuf;
   ci3.payloadSize  = strlen(testBuf);
-  ci3.servicePathV.push_back("");
   out              = restService(&ci3, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -106,7 +103,6 @@ TEST(putSubscriptionConvOp, put)
   ci4.inFormat     = XML;
   ci4.payload      = NULL;
   ci4.payloadSize  = 0;
-  ci4.servicePathV.push_back("");
   out              = restService(&ci4, rs);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow",       ci4.httpHeader[0]);

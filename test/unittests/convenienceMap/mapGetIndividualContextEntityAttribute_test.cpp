@@ -79,7 +79,7 @@ TEST(mapGetIndividualContextEntityAttribute, okAndNotOk)
 
   prepareDatabase("E1", "Room");
 
-  ci.servicePathV.push_back("");
+  //ci.servicePathV.push_back("");
   ms = mapGetIndividualContextEntityAttribute("E1", "A1", &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk, response.statusCode.code);

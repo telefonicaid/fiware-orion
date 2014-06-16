@@ -526,18 +526,12 @@ bool includedAttribute(ContextAttribute attr, AttributeList* attrsV) {
 *
 * fillQueryEntity -
 *
-* The regular expression for servicePath is an OR between the exact path and
-* the exact path followed by a slash ('/') and after that, any text (including slashes)
-*
-* If the servicePath is empty, then we only look for entities that have no service path 
-* associated ("$exists: false").
 */
-static void fillQueryEntity(BSONArrayBuilder& ba, EntityId* enP, const std::string& servicePath)
+static void fillQueryEntity(BSONArrayBuilder& ba, EntityId* enP)
 {
   BSONObjBuilder     ent;
   const std::string  idString          = "_id." ENT_ENTITY_ID;
-  const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
-  const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
+  const std::string  typeString        = "_id." ENT_ENTITY_TYPE;  
 
   if (enP->isPattern == "true")
     ent.appendRegex(idString, enP->id);
@@ -547,23 +541,63 @@ static void fillQueryEntity(BSONArrayBuilder& ba, EntityId* enP, const std::stri
   if (enP->type != "")
     ent.append(typeString, enP->type);
 
-  if (servicePath != "")
-  {
-    char path[MAX_SERVICE_NAME_LEN];
-    slashEscape(servicePath.c_str(), path, sizeof(path));
-    const std::string  servicePathValue = std::string("^") + path + "$|" + "^" + path + "\\/.*";
-    ent.appendRegex(servicePathString, servicePathValue);
-  }
-  else
-  {
-    ent.append(servicePathString, BSON("$exists" << false));
-  }
-
   BSONObj entObj = ent.obj();
   ba.append(entObj);
 
   LM_T(LmtMongo, ("Entity query token: '%s'", entObj.toString().c_str()));
 }
+
+
+/* ****************************************************************************
+*
+* fillQueryServicePath -
+*
+* The regular expression for servicePath is an OR between the exact path and
+* the exact path followed by a slash ('/') and after that, any text (including slashes)
+*
+* If the servicePath is empty, then we only look for entities that have no service path
+* associated ("$exists: false").
+*/
+static void fillQueryServicePath(BSONObjBuilder& bo, const std::vector<std::string>& servicePath)
+{
+
+    if (servicePath.size() > 0)
+    {
+
+#if 0
+        // This solution is based on { $in: [ ... ]}. However, it is not clear how to compose regex
+        // in a BSONArrayBuilder, see http://stackoverflow.com/questions/24243276/include-regex-elements-in-bsonarraybuilder
+        BSONArrayBuilder ba;
+        for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix) {
+            LM_T(LmtServicePath, ("Service Path: '%s'", servicePath[ix].c_str()));
+            char path[MAX_SERVICE_NAME_LEN];
+            slashEscape(servicePath[ix].c_str(), path, sizeof(path));
+            const std::string  servicePathValue = std::string("^") + path + "$|" + "^" + path + "\\/.*";
+            BSONElement be;
+            ba.appendRegex(servicePathValue);
+        }
+        bo.append("$in", ba.arr());
+#endif
+
+        // This solution is based on making the "or" inside the regex, using the "|" as delimiter
+        std::string  servicePathValue = "";
+        for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix) {
+            LM_T(LmtServicePath, ("Service Path: '%s'", servicePath[ix].c_str()));
+            char path[MAX_SERVICE_NAME_LEN];
+            slashEscape(servicePath[ix].c_str(), path, sizeof(path));
+            servicePathValue += std::string("^") + path + "$|" + "^" + path + "\\/.*";
+            if (ix < servicePath.size() - 1) {
+                servicePathValue += std::string("|");
+            }
+        }
+        bo.append("$regex", servicePathValue);
+    }
+    else
+    {
+      bo.append("$exists", false);
+    }
+}
+
 
 /* ****************************************************************************
 *
@@ -720,24 +754,23 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
 */
 bool entitiesQuery
 (
-  EntityIdVector                enV,
-  AttributeList                 attrL,
-  Restriction                   res,
-  ContextElementResponseVector* cerV,
-  std::string*                  err,
-  bool                          includeEmpty,
-  std::string                   tenant,
-  std::string                   servicePath
+  EntityIdVector                   enV,
+  AttributeList                    attrL,
+  Restriction                      res,
+  ContextElementResponseVector*    cerV,
+  std::string*                     err,
+  bool                             includeEmpty,
+  std::string                      tenant,
+  const std::vector<std::string>&  servicePath
 )
 {
-    DBClientConnection* connection = getMongoConnection();
-
-    LM_T(LmtServicePath, ("Service Path: '%s'", servicePath.c_str()));
+    DBClientConnection* connection = getMongoConnection();    
 
     /* Query structure is as follows
      *
      * {
      *    "$or": [ ... ],            (always)
+     *    "id.servicePath: { ... }   (always, in some cases using {$exists: false})
      *    "attrs.name": { ... },     (only if attributes are used in the query)
      *    "location.coords": { ... } (only in the case of geo-queries)
      *  }
@@ -750,12 +783,18 @@ bool entitiesQuery
     BSONArrayBuilder orEnt;
 
     for (unsigned int ix = 0; ix < enV.size(); ++ix)
-      fillQueryEntity(orEnt, enV.get(ix), servicePath);
+      fillQueryEntity(orEnt, enV.get(ix));
 
     /* The result of orEnt is appended to the final query */
     finalQuery.append("$or", orEnt.arr());
 
-    /* Part 2: attributes */
+    /* Part 2: service path */
+    const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
+    BSONObjBuilder inServicePath;
+    fillQueryServicePath(inServicePath, servicePath);
+    finalQuery.append(servicePathString, inServicePath.obj());
+
+    /* Part 3: attributes */
     BSONArrayBuilder attrs;
     for (unsigned int ix = 0; ix < attrL.size(); ++ix) {
         std::string attrName = attrL.get(ix);
@@ -769,7 +808,7 @@ bool entitiesQuery
         finalQuery.append(attrNames, BSON("$in" << attrs.arr()));
     }
 
-    /* Part 3: geo-location */
+    /* Part 4: geo-location */
     BSONObj areaQuery;
     if (processAreaScope(res.scopeVector, areaQuery)) {
        std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
@@ -1216,8 +1255,10 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
     NotifyContextRequest ncr;
 
     // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
-    Restriction res;
-    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant, "")) {
+    // FIXME P10: we are using an empty service path vector until serive paths get implemented for subscriptions
+    std::vector<std::string> servicePathV;
+    Restriction res;    
+    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant, servicePathV)) {
         ncr.contextElementResponseVector.release();
         LM_RE(false, (err.c_str()));
     }
@@ -1235,7 +1276,8 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
             ContextElementResponseVector allCerV;
             AttributeList emptyList;
             // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
-            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false, tenant, "")) {
+            // FIXME P10: we are using an empty service path vector until serive paths get implemented for subscriptions
+            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false, tenant, servicePathV)) {
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
                 LM_RE(false, (err.c_str()));

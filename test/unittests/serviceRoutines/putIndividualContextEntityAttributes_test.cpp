@@ -65,7 +65,7 @@ TEST(putIndividualContextEntityAttributes, notFound)
   ci.inFormat     = XML;
   ci.payload      = testBuf;
   ci.payloadSize  = strlen(testBuf);
-  ci.servicePathV.push_back("");
+
   out             = restService(&ci, rs);
 
   EXPECT_STREQ(expectedBuf, out.c_str());

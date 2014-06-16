@@ -85,7 +85,6 @@ TEST(mapDeleteIndividualContextEntityAttribute, notFound)
 
   prepareDatabase("ID", "NAME");
 
-  ci.servicePathV.push_back("");
   mapDeleteIndividualContextEntityAttribute("ID2", "NAME2", &sc, &ci);
 
   EXPECT_EQ(SccContextElementNotFound, sc.code);
@@ -115,7 +114,6 @@ TEST(mapDeleteIndividualContextEntityAttribute, ok)
     .WillByDefault(Return(1360232700));
   setTimer(timerMock);
 
-  ci.servicePathV.push_back("");
   mapDeleteIndividualContextEntityAttribute(id, name, &sc, &ci);
 
   EXPECT_EQ(SccOk, sc.code);

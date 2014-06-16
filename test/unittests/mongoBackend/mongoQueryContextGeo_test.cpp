@@ -186,8 +186,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -285,7 +284,6 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -405,7 +403,6 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -484,7 +481,6 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn1)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -584,7 +580,6 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn2)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -683,7 +678,6 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn3)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -763,7 +757,6 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut1)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -842,7 +835,6 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut2)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    servicePathVector.push_back("");
     ms = mongoQueryContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */

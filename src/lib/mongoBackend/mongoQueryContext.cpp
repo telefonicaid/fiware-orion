@@ -57,11 +57,9 @@ HttpStatusCode mongoQueryContext
         LM_W(("Restriction found but not supported at mongo backend"));
     }
 
-    std::string err;
-    LM_T(LmtServicePath, ("Service Path: '%s'", servicePathV[0].c_str()));
+    std::string err;    
 
-    // FIXME P10: entitiesQuery is passed servicePathV[0], but for Service Path vectors to work, we need to pass the entire vector
-    if (!entitiesQuery(requestP->entityIdVector, requestP->attributeList, requestP->restriction, &responseP->contextElementResponseVector, &err, true, tenant, servicePathV[0])) {
+    if (!entitiesQuery(requestP->entityIdVector, requestP->attributeList, requestP->restriction, &responseP->contextElementResponseVector, &err, true, tenant, servicePathV)) {
         responseP->errorCode.fill(SccReceiverInternalError, err);
         LM_E((responseP->errorCode.details.c_str()));
     }

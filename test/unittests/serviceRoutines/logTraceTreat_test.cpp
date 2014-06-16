@@ -62,7 +62,6 @@ TEST(logTraceTreat, get)
 
   lmTraceSet(NULL);
 
-  ci.servicePathV.push_back("");
   ci.outFormat = XML;
   out          = restService(&ci, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -89,19 +88,16 @@ TEST(logTraceTreat, put)
 
   utInit();
 
-  ci1.servicePathV.push_back("");
   ci1.outFormat = XML;
   out          = restService(&ci1, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ci2.servicePathV.push_back("");
   ci2.outFormat = XML;
   out          = restService(&ci2, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ci3.servicePathV.push_back("");
   ci3.outFormat = XML;
   out          = restService(&ci3, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
@@ -124,7 +120,6 @@ TEST(logTraceTreat, post)
 
   utInit();
 
-  ci.servicePathV.push_back("");
   ci.outFormat = XML;
   out          = restService(&ci, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -153,7 +148,6 @@ TEST(logTraceTreat, deleteIndividual)
 
   utInit();
 
-  ci0.servicePathV.push_back("");
   ci0.outFormat = XML;
   out          = restService(&ci0, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile0)) << "Error getting test data from '" << outfile0 << "'";
@@ -164,13 +158,11 @@ TEST(logTraceTreat, deleteIndividual)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ci2.servicePathV.push_back("");
   ci2.outFormat = XML;
   out          = restService(&ci2, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ci3.servicePathV.push_back("");
   ci3.outFormat = XML;
   out          = restService(&ci3, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
@@ -195,13 +187,11 @@ TEST(logTraceTreat, deleteAll)
 
   utInit();
 
-  ci1.servicePathV.push_back("");
   ci1.outFormat = XML;
   out           = restService(&ci1, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  ci2.servicePathV.push_back("");
   ci2.outFormat = XML;
   out           = restService(&ci2, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";

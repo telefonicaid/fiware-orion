@@ -146,8 +146,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -267,8 +266,7 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -376,8 +374,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -474,8 +471,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -572,8 +568,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -682,8 +677,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -785,8 +779,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -889,8 +882,7 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -992,8 +984,7 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1095,8 +1086,7 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1196,8 +1186,7 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1296,8 +1285,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();   
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
@@ -1400,8 +1388,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     req.updateActionType.set("DELETE");
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();
-    servicePathVector.push_back("");
+    servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
