@@ -770,7 +770,7 @@ bool entitiesQuery
      *
      * {
      *    "$or": [ ... ],            (always)
-     *    "id.servicePath: { ... }   (always, in some cases using {$exists: false})
+     *    "_id.servicePath: { ... }   (always, in some cases using {$exists: false})
      *    "attrs.name": { ... },     (only if attributes are used in the query)
      *    "location.coords": { ... } (only in the case of geo-queries)
      *  }
