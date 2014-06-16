@@ -28,10 +28,10 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++++ GET that fails ++++++++++++++++++"
-curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID"
+orionCurl --url "/NGSI10/contextEntities/ENTITY_ID"
 
 echo "2: ++++++++++++ DELETE that fails +++++++++++++++++"
-curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
+orionCurl --url "/NGSI10/contextEntities/ENTITY_ID" -X "DELETE"
 
 echo "3: ++++++++++++ POST that is ok ++++++++++++++++"
 url="/NGSI10/contextEntities/ENTITY_ID"
@@ -89,7 +89,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "${payload}"
 
 echo "6: ++++++++++++ GET that is OK +++++++++++++++++"
-curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID"
+orionCurl --url "/NGSI10/contextEntities/ENTITY_ID"
 
 echo "7: ++++++++++++++ PUT that is OK +++++++++++++++"
 url="/NGSI10/contextEntities/ENTITY_ID"
@@ -107,7 +107,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "${payload}" "-X PUT"
 
 echo "8: +++++++++++++ DELETE that is OK ++++++++++++++++"
-curlXmlNoPayload "/NGSI10/contextEntities/ENTITY_ID" "-X DELETE"
+orionCurl --url "/NGSI10/contextEntities/ENTITY_ID" -X "DELETE"
 
 --REGEXPECT--
 1: +++++++++++ GET that fails ++++++++++++++++++

@@ -104,17 +104,17 @@ orionCurl --url "$url" --payload "${payload}"
 echo "5: ++++++++++++++++++++"
 
 # Now try the GET method
-curlXmlNoPayload "/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01"
+orionCurl --url "/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01"
 
 echo "6: ++++++++++++++++++++"
 
 # And a GET that fails
-curlXmlNoPayload "/NGSI9/contextEntities/ENTITY_ID2/attributes"
+orionCurl --url "/NGSI9/contextEntities/ENTITY_ID2/attributes"
 
 echo "7: ++++++++++++++++++++"
 
 # DELETE and PUT should give errors
-curlXmlNoPayload "/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01" "-X DELETE"
+orionCurl --url "/NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_01" -X "DELETE"
 
 echo "8: ++++++++++++++++++++"
 
