@@ -54,7 +54,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlXmlTenants "$url" "$payload" "fiware-service: t_01"
+orionCurl --url "$url" --payload "${payload}" --httpTenant "t_01"
 echo
 
 
@@ -80,7 +80,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlXmlTenants "$url" "$payload" "fiware-service: t_02"
+orionCurl --url "$url" --payload "${payload}" --httpTenant "t_02"
 echo
 
 
@@ -105,7 +105,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXmlTenants "$url" "$payload" "fiware-service: t_01"
+orionCurl --url "$url" --payload "${payload}" --httpTenant "t_01"
 echo
 
 
@@ -130,7 +130,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXmlTenants "$url" "$payload" "fiware-service: t_02"
+orionCurl --url "$url" --payload "${payload}" --httpTenant "t_02"
 echo
 
 

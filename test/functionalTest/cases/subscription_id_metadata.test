@@ -99,7 +99,7 @@ payload='<?xml version="1.0"?>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
 
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 echo "Accumulated data:"
 curl localhost:${LISTENER_PORT}/dump -s -S

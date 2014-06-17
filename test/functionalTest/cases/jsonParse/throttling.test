@@ -40,7 +40,7 @@ payload='{
   "reference" : "http://localhost:${LISTENER_PORT}/notify",
   "throttling" : "PT5H"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url ${url} --payload "${payload}" --json
 
 echo "2: +++++++++++++++++++++++++++++"
 --REGEXPECT--

@@ -52,7 +52,7 @@ payload='{
         }
     ]
 }'
-curlJson ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 echo "=== 2. Create an entity with metadata (a notification with metadata is sent)"
@@ -86,7 +86,7 @@ payload='{
     ],
     "updateAction": "APPEND"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 echo "=== 3. Change the value (a notification with metadata is sent)"
@@ -120,7 +120,7 @@ payload='{
     ],
     "updateAction": "UPDATE"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 echo "=== 4. Change the metadata (a notification with metadata is sent)"
@@ -154,7 +154,7 @@ payload='{
     ],
     "updateAction": "UPDATE"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 echo "=== 5. Change both value and metadata (a notification with metadata is sent)"
@@ -188,7 +188,7 @@ payload='{
     ],
     "updateAction": "UPDATE"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 echo "=== 6. Update without changes (no notification is sent)"
@@ -222,7 +222,7 @@ payload='{
     ],
     "updateAction": "UPDATE"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 echo "=== Get accumulated data (4 messages)"

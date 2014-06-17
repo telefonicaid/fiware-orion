@@ -78,7 +78,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "${payload}"
 
 echo "+++++ Registration Done +++++"
 
@@ -99,7 +99,7 @@ payload='<?xml version="1.0"?>
       <attribute>pressure</attribute>
     </attributeList>
   </discoverContextAvailabilityRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "${payload}"
 
 echo "+++++ Discovery Done +++++"
 

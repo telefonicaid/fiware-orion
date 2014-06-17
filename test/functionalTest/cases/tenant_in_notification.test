@@ -30,7 +30,7 @@ brokerStart CB 30,60,185 IPV4 -multiservice url
 --SHELL--
 echo "1. Subscribe to changes in  E/att" # reference will never be reached as it stops in the accumulator
 echo "+++++++++++++++++++++++++++++++++"
-url="/kz/NGSI10/subscribeContext"
+url="/NGSI10/subscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -52,14 +52,14 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload" --urlTenant "kz"
 echo
 echo
 
 
 echo "2. Update/Append E/att"
 echo "++++++++++++++++++++++"
-url="/kz/NGSI10/updateContext"
+url="/NGSI10/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -78,7 +78,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload" --urlTenant "kz"
 echo
 echo
 

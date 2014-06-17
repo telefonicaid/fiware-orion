@@ -33,7 +33,7 @@ brokerStart CB 0-255 IPV4 "$extraParams"
 # Register a Sensor of temperature
 #
 echo "+++ 1: Register a Sensor of temperature"
-url="https://localhost:${BROKER_PORT}/NGSI9/registerContext"
+url="/NGSI9/registerContext"
 payload='<?xml version="1.0"?>
 <registerContextRequest>
   <contextRegistrationList>
@@ -54,8 +54,8 @@ payload='<?xml version="1.0"?>
   </contextRegistrationList>
   <duration>PT1H</duration>
 </registerContextRequest>'
+orionCurl --host "https://localhost" --url "$url" --payload "${payload}" "--cacert /tmp/harnessTest.pem"
 
-curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: application/xml" "--cacert /tmp/harnessTest.pem"
 echo
 echo
 
@@ -63,7 +63,7 @@ echo
 # Discovery
 #
 echo "+++ 2: Discover the Sensor of temperature"
-url="https://localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability"
+url="/NGSI9/discoverContextAvailability"
 payload='<?xml version="1.0"?>
 <discoverContextAvailabilityRequest>
   <entityIdList>
@@ -75,8 +75,8 @@ payload='<?xml version="1.0"?>
     <attribute>temperature</attribute>
   </attributeList>
 </discoverContextAvailabilityRequest>'
+orionCurl --host "https://localhost" --url "$url" --payload "${payload}" "--cacert /tmp/harnessTest.pem"
 
-curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: application/xml" "--cacert /tmp/harnessTest.pem"
 
 --REGEXPECT--
 +++ 1: Register a Sensor of temperature

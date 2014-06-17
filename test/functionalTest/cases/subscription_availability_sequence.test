@@ -53,7 +53,7 @@ payload='<?xml version="1.0"?>
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 
 
@@ -110,7 +110,7 @@ payload='<?xml version="1.0"?>
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 
 echo Notification count from mongo:
@@ -141,7 +141,7 @@ payload='<?xml version="1.0"?>
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 
 echo "4: ++++++++++++++++++++"
@@ -165,7 +165,7 @@ payload='<?xml version="1.0"?>
   <subscriptionId>'$SUB_ID'</subscriptionId>
 </updateContextAvailabilitySubscriptionRequest>'
 
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 echo Notification count from mongo:
 mongoCmd ${BROKER_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -197,7 +197,7 @@ payload='<?xml version="1.0"?>
     <registrationId></registrationId>
   </registerContextRequest>'
 
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 
 
@@ -226,7 +226,7 @@ payload='<?xml version="1.0"?>
   <registrationId></registrationId>
 </registerContextRequest>'
 
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 
 echo Notification count from mongo:
@@ -240,7 +240,7 @@ payload='<?xml version="1.0"?>
   <subscriptionId>'$SUB_ID'</subscriptionId>
 </unsubscribeContextAvailabilityRequest>'
 
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 
 echo "8: ++++++++++++++++++++"
@@ -250,7 +250,7 @@ payload='<?xml version="1.0"?>
   <subscriptionId>'$SUB_ID'</subscriptionId>
 </unsubscribeContextAvailabilityRequest>'
 
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 
 echo "9: ++++++++++++++++++++"
@@ -278,7 +278,7 @@ payload='<?xml version="1.0"?>
   <registrationId></registrationId>
 </registerContextRequest>'
 
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 echo Accumulated data:
 curl localhost:${LISTENER_PORT}/dump -s -S 

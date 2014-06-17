@@ -29,7 +29,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: Empty context attribute value for JSON"
-url=localhost:${BROKER_PORT}/NGSI10/updateContext
+url=/NGSI10/updateContext
 payload='{
     "contextElements":
     [
@@ -49,7 +49,7 @@ payload='{
     ],
     "updateAction":"APPEND"
 }'
-curlIt "JSON" "$url" "$payload" "Content-Type: application/json" "Accept: application/json"
+orionCurl --url "$url" --payload "${payload}" --json
 echo
 echo
 echo "2: Empty context attribute value for XML"
@@ -64,15 +64,14 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
         <contextAttribute>
           <name>nnn</name>
           <type>ttt</type>
-          <contextValue>
-          </contextValue>
+          <contextValue></contextValue>
         </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlIt "XML" "$url" "$payload" "Content-Type: application/xml" "Accept: application/xml"
+orionCurl --url "$url" --payload "${payload}"
 
 --REGEXPECT--
 1: Empty context attribute value for JSON

@@ -51,7 +51,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++++++

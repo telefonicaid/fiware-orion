@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: ++++++++++++++++++++"
-url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+url="/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -38,10 +38,10 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </entityIdList>
   <attributeList/>
 </queryContextRequest>'
-curlIt "xml" "$url" "$payload" "Content-Type:"
+orionCurl --url "$url" --payload "$payload" --in " "
 
 echo "2: ++++++++++++++++++++"
-url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+url="/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -51,12 +51,12 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </entityIdList>
   <attributeList/>
 </queryContextRequest>'
-curlIt "xml" "$url" "$payload" "Content-Type: application/x-www-form-encoded"
+orionCurl --url "$url" --payload "$payload" --in "application/x-www-form-encoded"
 
 
 echo "3: ++++++++++++++++++++"
 # Check that the ending "; charset=..." works (for XML)
-url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+url="/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -66,12 +66,12 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </entityIdList>
   <attributeList/>
 </queryContextRequest>'
-curlIt "XML" "$url" "$payload" "Content-Type: application/xml; charset=UTF-8"
+orionCurl --url "$url" --payload "$payload" --in "application/xml; charset=UTF-8"
 
 
 echo "4: ++++++++++++++++++++"
 # Check that the ending "; charset=..." works (for JSON)
-url="localhost:${BROKER_PORT}/NGSI10/queryContext"
+url="/NGSI10/queryContext"
 payload='{
   "entities": [
     {
@@ -82,7 +82,7 @@ payload='{
   ],
   "attributes": [ ]
 }'
-curlIt "XML" "$url" "$payload" 'Content-Type: application/json; charset=UTF-8'
+orionCurl --url "$url" --payload "$payload" --in "application/json; charset=UTF-8" --out "application/xml"
 
 --REGEXPECT--
 1: ++++++++++++++++++++
