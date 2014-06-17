@@ -118,7 +118,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
       LM_RE(false, ("MongoDB connection failed, after %d retries: '%s'", retries, err.c_str()));
     }
 
-    /* Authentication is different depending if multiserive is used or not. In the case of not
+    /* Authentication is different depending if multiservice is used or not. In the case of not
      * using multiservice, we authenticate in the single-service database. In the case of using
      * multiservice, it isn't a default database that we know at contextBroker start time (when
      * this connection function is invoked) so we authenticate on the admin database, which provides
