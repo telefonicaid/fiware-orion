@@ -46,7 +46,7 @@ HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextR
         /* We use 'ucr' to conform processContextElement signature but we are not doing anything with that */
         UpdateContextResponse ucr;
 
-        // FIXME P10: we need to pass an empty service path vector in order to fullfill the processContextElement signature(). To review,
+        // FIXME P10: we need to pass an empty service path vector in order to fulfill the processContextElement signature(). To review,
         // once we implement service path also for subscriptions/notifications
         std::vector<std::string> servicePathV;        
 
