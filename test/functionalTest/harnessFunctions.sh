@@ -606,7 +606,6 @@ function orionCurl()
     shift
   done
 
-
   #
   # Sanity check of parameters
   #
@@ -635,7 +634,6 @@ function orionCurl()
   _URL=''
   _HTTP_TENANT=''
 
-
   #
   # Set up the compound variables
   #
@@ -650,8 +648,7 @@ function orionCurl()
   fi
 
   if [ "$_method" != "" ];     then    _METHOD=' -X '$_method;   fi
-  if [ "$_httpTenant" != "" ]; then    _HTTP_TENANT='--header "Fiware-Service: '$_httpTenant'"';  fi
-  
+  if [ "$_httpTenant" != "" ]; then    _HTTP_TENANT='--header "Fiware-Service:'$_httpTenant'"';  fi
   if [ "$_urlTenant" != "" ]
   then
     _URL=$_host:$_port/$_urlTenant$_url
@@ -662,10 +659,17 @@ function orionCurl()
   _BUILTINS='-s -S --dump-header /tmp/httpHeaders.out'
 
 #   echo '==============================================================================================================================================================='
-#   echo "echo \"${_payload}\" | curl $_URL $_PAYLOAD $_METHOD --header \"Expect: \" --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\" $_HTTP_TENANT $_BUILTINS $_xtra"
+#   echo "echo \"${_payload}\" | curl $_URL $_PAYLOAD $_METHOD ${_HTTP_TENANT} --header \"Expect:\" --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\"  $_BUILTINS $_xtra"
 #   echo '==============================================================================================================================================================='
-
-  _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Expect: " --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_HTTP_TENANT $_BUILTINS $_xtra)
+  
+  _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
+  
+  # FIXME: This should 'if' be refactored: if we use the $_HTTP_TENANT variable
+  # within curl it will not render correctly. We have to find another way.
+  if [ "$_httpTenant" != "" ]
+  then    
+    _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
+  fi
   
   #
   # Remove "Connection: Keep-Alive" header and print headers out
@@ -698,14 +702,14 @@ export -f localBrokerStop
 export -f accumulatorStart
 export -f accumulatorStop
 # export -f curlXml
-# export -f curlIt
+export -f curlIt
 # export -f curlJson
 export -f orionCurl
-# export -f printXmlWithHeaders
+export -f printXmlWithHeaders
 # export -f printJsonWithHeaders
 # export -f curlXmlNoPayload
 # export -f curlJsonNoPayload
 # export -f curlNoPayload
-# export -f curlXmlTenants
+export -f curlXmlTenants
 export -f dbInsertEntity
 export -f mongoCmd

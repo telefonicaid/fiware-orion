@@ -27,10 +27,9 @@ URI params and subscriptions
 dbInit CB
 brokerStart CB 31,60
 accumulatorStart localhost $LISTENER_PORT
-
 --SHELL--
 
-# 0. URI params for curlXml
+# 0. URI params for orionCurl
 
 echo "1. Subscribe to E/attr1 giving notifyFormat=XML"
 echo "==============================================="
@@ -56,7 +55,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -85,7 +84,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -114,7 +113,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -142,7 +141,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-curlIt "JSON" "localhost:${BROKER_PORT}${url}" "$payload" "Content-Type: application/xml" "Accept: application/json"
+orionCurl --url "$url" --payload "$payload" --in "application/xml" --out "application/json"
 echo
 echo
 
@@ -168,7 +167,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
 url="/NGSI10/updateContext"
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -191,7 +190,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
 url="/NGSI10/updateContext"
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -214,7 +213,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
 url="/NGSI10/updateContext"
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
@@ -237,7 +236,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
 url="/NGSI10/updateContext"
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
