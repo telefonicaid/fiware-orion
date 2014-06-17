@@ -61,7 +61,6 @@ TEST(getContextEntityTypeAttributeContainer, nothingFound)
 
   utInit();
 
-  ci.servicePathV.push_back("");
   ci.outFormat = XML;
   out          = restService(&ci, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
@@ -98,7 +97,6 @@ TEST(getContextEntityTypeAttributeContainer, somethingFound)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
 
-  ci1.servicePathV.push_back("");
   ci1.outFormat    = XML;
   ci1.inFormat     = XML;
   ci1.payload      = testBuf;
@@ -118,7 +116,6 @@ TEST(getContextEntityTypeAttributeContainer, somethingFound)
   //
   // Now discover
   //
-  ci2.servicePathV.push_back("");
   ci2.outFormat = XML;
   out           = restService(&ci2, rs);
 

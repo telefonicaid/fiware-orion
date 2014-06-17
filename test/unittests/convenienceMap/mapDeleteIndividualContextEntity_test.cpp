@@ -83,7 +83,6 @@ TEST(mapDeleteIndividualContextEntity, notFound)
   std::string     id = "XXX";
   ConnectionInfo  ci;
 
-  ci.servicePathV.push_back("");
   ci.tenant = "";
 
   prepareDatabase("ID", "TYPE");
@@ -107,7 +106,6 @@ TEST(mapDeleteIndividualContextEntity, ok)
   std::string     type      = "TYPE";
   ConnectionInfo  ci;
 
-  ci.servicePathV.push_back("");
   ci.tenant = "";
 
   /* Set timer */

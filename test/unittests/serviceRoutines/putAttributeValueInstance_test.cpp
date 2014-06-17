@@ -73,7 +73,6 @@ TEST(putAttributeValueInstance, notFound)
   
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  ci1.servicePathV.push_back("");
   ci1.outFormat    = XML;
   ci1.inFormat     = XML;
   ci1.payload      = testBuf;
@@ -83,7 +82,6 @@ TEST(putAttributeValueInstance, notFound)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  ci2.servicePathV.push_back("");
   ci2.outFormat    = XML;
   ci2.inFormat     = XML;
   ci2.payload      = testBuf;
@@ -93,7 +91,6 @@ TEST(putAttributeValueInstance, notFound)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
-  ci3.servicePathV.push_back("");
   ci3.outFormat    = XML;
   ci3.inFormat     = XML;
   ci3.payload      = testBuf;
@@ -124,7 +121,6 @@ TEST(putAttributeValueInstance, found)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  ci1.servicePathV.push_back("");
   ci1.outFormat    = XML;
   ci1.inFormat     = XML;
   ci1.payload      = testBuf;
@@ -134,7 +130,6 @@ TEST(putAttributeValueInstance, found)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  ci2.servicePathV.push_back("");
   ci2.outFormat    = XML;
   ci2.inFormat     = XML;
   ci2.payload      = testBuf;

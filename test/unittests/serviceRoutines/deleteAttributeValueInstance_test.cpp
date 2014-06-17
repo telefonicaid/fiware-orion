@@ -65,7 +65,6 @@ TEST(deleteAttributeValueInstance, notFound)
 
   utInit();
   
-  ci.servicePathV.push_back("");
   ci.outFormat = XML;
   out          = restService(&ci, rs);
 
@@ -94,7 +93,6 @@ TEST(deleteAttributeValueInstance, found)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  ci1.servicePathV.push_back("");
   ci1.outFormat    = XML;
   ci1.inFormat     = XML;
   ci1.payload      = testBuf;
@@ -103,7 +101,6 @@ TEST(deleteAttributeValueInstance, found)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  ci2.servicePathV.push_back("");
   ci2.outFormat    = XML;
   out              = restService(&ci2, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());

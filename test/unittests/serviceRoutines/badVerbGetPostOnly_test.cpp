@@ -51,7 +51,6 @@ TEST(badVerbGetPostOnly, ok)
   std::string     expected = "";  // no payload for bad verb, only http headers to indicate the error
   std::string     out;
 
-  ci.servicePathV.push_back("");
   out = restService(&ci, rs);
 
   EXPECT_EQ(expected, out);

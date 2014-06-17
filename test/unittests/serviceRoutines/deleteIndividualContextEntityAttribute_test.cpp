@@ -57,7 +57,6 @@ TEST(deleteIndividualContextEntityAttribute, ok)
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
-  ci.servicePathV.push_back("");
   out = restService(&ci, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 

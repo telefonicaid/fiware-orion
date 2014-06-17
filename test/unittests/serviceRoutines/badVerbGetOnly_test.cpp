@@ -53,7 +53,6 @@ TEST(badVerbGetOnly, ok)
   std::string     expected = ""; // Bad verb gives no payload, only HTTP headers
   std::string     out;
 
-  ci.servicePathV.push_back("");
   out = restService(&ci, rs);
 
   EXPECT_EQ(expected, out);

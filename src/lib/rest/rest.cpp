@@ -410,7 +410,7 @@ int servicePathSplit(ConnectionInfo* ciP)
 
   if (servicePaths == 0)
   {
-    ciP->servicePathV.push_back("");
+    /* In this case the result is a 0 lenght vector */
     return 0;
   }
 

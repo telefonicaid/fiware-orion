@@ -81,7 +81,6 @@ TEST(putAvailabilitySubscriptionConvOp, put)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
 
-  ci1.servicePathV.push_back("");
   ci1.payload      = testBuf;
   ci1.payloadSize  = strlen(testBuf);
   out              = restService(&ci1, rs);
@@ -95,7 +94,6 @@ TEST(putAvailabilitySubscriptionConvOp, put)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
-  ci2.servicePathV.push_back("");
   out = restService(&ci2, rs);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci2.httpHeader[0]);
@@ -105,7 +103,6 @@ TEST(putAvailabilitySubscriptionConvOp, put)
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
 
-  ci3.servicePathV.push_back("");
   ci3.payload      = testBuf;
   ci3.payloadSize  = strlen(testBuf);
   out              = restService(&ci3, rs);
@@ -113,21 +110,18 @@ TEST(putAvailabilitySubscriptionConvOp, put)
 
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
-  ci4.servicePathV.push_back("");
   out = restService(&ci4, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile5)) << "Error getting test data from '" << outfile5 << "'";
-  ci5.servicePathV.push_back("");
   ci5.payload      = testBuf;
   ci5.payloadSize  = strlen(testBuf);
   out              = restService(&ci5, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
-  ci6.servicePathV.push_back("");
   out = restService(&ci6, rs);
   EXPECT_EQ("", out);
   EXPECT_EQ("Allow", ci6.httpHeader[0]);

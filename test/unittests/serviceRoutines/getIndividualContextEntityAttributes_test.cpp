@@ -57,7 +57,6 @@ TEST(getIndividualContextEntityAttributes, notFound)
 
   utInit();
 
-  ci.servicePathV.push_back("");
   ci.outFormat = XML;
   out          = restService(&ci, rs);
 
