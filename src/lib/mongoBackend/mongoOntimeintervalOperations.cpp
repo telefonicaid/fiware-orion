@@ -125,7 +125,7 @@ HttpStatusCode mongoGetContextElementResponses(const EntityIdVector& enV, const 
     LM_T(LmtMongo, ("Get Notify Context Request operation"));
 
     // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
-    // FIXME P10: we are using an empty service path vector until serive paths get implemented for subscriptions
+    // FIXME P10: we are using an empty service path vector until service paths get implemented for subscriptions
     std::vector<std::string> servicePath;
     Restriction res;
     if (!entitiesQuery(enV, attrL, res, cerV, err, true, tenant, servicePath)) {

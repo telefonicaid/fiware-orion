@@ -118,7 +118,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
       LM_RE(false, ("MongoDB connection failed, after %d retries: '%s'", retries, err.c_str()));
     }
 
-    /* Authentication is different depending if multiserive is used or not. In the case of not
+    /* Authentication is different depending if multiservice is used or not. In the case of not
      * using multiservice, we authenticate in the single-service database. In the case of using
      * multiservice, it isn't a default database that we know at contextBroker start time (when
      * this connection function is invoked) so we authenticate on the admin database, which provides
@@ -770,7 +770,7 @@ bool entitiesQuery
      *
      * {
      *    "$or": [ ... ],            (always)
-     *    "id.servicePath: { ... }   (always, in some cases using {$exists: false})
+     *    "_id.servicePath: { ... }   (always, in some cases using {$exists: false})
      *    "attrs.name": { ... },     (only if attributes are used in the query)
      *    "location.coords": { ... } (only in the case of geo-queries)
      *  }
@@ -1255,7 +1255,7 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
     NotifyContextRequest ncr;
 
     // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
-    // FIXME P10: we are using an empty service path vector until serive paths get implemented for subscriptions
+    // FIXME P10: we are using an empty service path vector until service paths get implemented for subscriptions
     std::vector<std::string> servicePathV;
     Restriction res;    
     if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant, servicePathV)) {
