@@ -28,8 +28,8 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++ create vector compound +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/contextEntities/EVector"
+payload='{
   "attributes": [
     {
       "name": "att",
@@ -70,12 +70,12 @@ echo "1: +++++++++ create vector compound +++++++++++"
       ]
     }
   ]
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "2: +++++++++ create object compound +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/contextEntities/EObject"
+payload='{
   "attributes": [
     {
       "name": "att",
@@ -114,24 +114,28 @@ echo "2: +++++++++ create object compound +++++++++++"
       ]
     }
   ]
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "3: ++++++++++ query for vector compound by valueID 'ground' ++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector/attributes/att/ground -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+orionCurl --url "/NGSI10/contextEntities/EVector/attributes/att/ground" --json
 
 echo "4: ++++++++++ query for vector compound by valueID 'wall' ++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector/attributes/att/wall -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+orionCurl --url "/NGSI10/contextEntities/EVector/attributes/att/wall" --json
 
 echo "5: ++++++++++ query for object compound by valueID 'ground' ++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject/attributes/att/ground -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+orionCurl --url "/NGSI10/contextEntities/EObject/attributes/att/ground" --json
 
 echo "6: ++++++++++ query for object compound by valueID 'wall' ++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject/attributes/att/wall -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
-
+orionCurl --url "/NGSI10/contextEntities/EObject/attributes/att/wall" --json
 
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 685
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextResponses": [
         {
@@ -169,6 +173,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject/attributes/att/wall
     ]
 }
 2: +++++++++ create object compound +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 685
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextResponses": [
         {
@@ -206,6 +215,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject/attributes/att/wall
     ]
 }
 3: ++++++++++ query for vector compound by valueID 'ground' ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 490
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "attributes": [
         {
@@ -240,6 +254,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject/attributes/att/wall
     }
 }
 4: ++++++++++ query for vector compound by valueID 'wall' ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 488
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "attributes": [
         {
@@ -274,6 +293,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject/attributes/att/wall
     }
 }
 5: ++++++++++ query for object compound by valueID 'ground' ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 445
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "attributes": [
         {
@@ -304,6 +328,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject/attributes/att/wall
     }
 }
 6: ++++++++++ query for object compound by valueID 'wall' ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 443
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "attributes": [
         {

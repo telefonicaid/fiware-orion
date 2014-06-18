@@ -28,8 +28,8 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++ create vector compound +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/EVector"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
     <contextAttribute>
@@ -83,12 +83,12 @@ echo "1: +++++++++ create vector compound +++++++++++"
       </metadata>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 echo "2: +++++++++ create object compound +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/EObject"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
     <contextAttribute>
@@ -134,17 +134,22 @@ echo "2: +++++++++ create object compound +++++++++++"
       </metadata>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++ query for vector compound by attribute ++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector/attributes/att -s -S --header 'Accept: application/xml' | xmllint --format -
+orionCurl --url "/NGSI10/contextEntities/EVector/attributes/att"
 
 echo "4: ++++++++++ query for object compound by attribute ++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector/attributes/att -s -S --header 'Accept: application/xml' | xmllint --format -
+orionCurl --url "/NGSI10/contextEntities/EVector/attributes/att"
 
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1038
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -183,6 +188,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector/attributes/att -s -
   </contextResponseList>
 </appendContextElementResponse>
 2: +++++++++ create object compound +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1038
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -221,6 +231,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector/attributes/att -s -
   </contextResponseList>
 </appendContextElementResponse>
 3: ++++++++++ query for vector compound by attribute ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1380
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextAttributeResponse>
   <contextAttributeList>
@@ -281,6 +296,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector/attributes/att -s -
   </statusCode>
 </contextAttributeResponse>
 4: ++++++++++ query for object compound by attribute ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1380
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextAttributeResponse>
   <contextAttributeList>

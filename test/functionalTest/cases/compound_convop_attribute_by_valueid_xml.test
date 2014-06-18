@@ -28,8 +28,8 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++ create vector compound +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/EVector"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
     <contextAttribute>
@@ -83,12 +83,12 @@ echo "1: +++++++++ create vector compound +++++++++++"
       </metadata>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 echo "2: +++++++++ create object compound +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/EObject"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
     <contextAttribute>
@@ -134,24 +134,29 @@ echo "2: +++++++++ create object compound +++++++++++"
       </metadata>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++ query for vector compound by valueID 'ground' ++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector/attributes/A/ground -s -S --header 'Accept: application/xml' | xmllint --format -
+orionCurl --url "/NGSI10/contextEntities/EVector/attributes/A/ground"
 
 echo "4: ++++++++++ query for vector compound by valueID 'wall' ++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector/attributes/A/wall -s -S --header 'Accept: application/xml' | xmllint --format -
+orionCurl --url "/NGSI10/contextEntities/EVector/attributes/A/wall"
 
 echo "5: ++++++++++ query for object compound by valueID 'ground' ++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject/attributes/A/ground -s -S --header 'Accept: application/xml' | xmllint --format -
+orionCurl --url "/NGSI10/contextEntities/EObject/attributes/A/ground"
 
 echo "6: ++++++++++ query for object compound by valueID 'wall' ++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject/attributes/A/wall -s -S --header 'Accept: application/xml' | xmllint --format -
+orionCurl --url "/NGSI10/contextEntities/EObject/attributes/A/wall"
 
 
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1034
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -190,6 +195,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject/attributes/A/wall -
   </contextResponseList>
 </appendContextElementResponse>
 2: +++++++++ create object compound +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1034
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -228,6 +238,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject/attributes/A/wall -
   </contextResponseList>
 </appendContextElementResponse>
 3: ++++++++++ query for vector compound by valueID 'ground' ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 786
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextAttributeResponse>
   <contextAttributeList>
@@ -263,6 +278,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject/attributes/A/wall -
   </statusCode>
 </contextAttributeResponse>
 4: ++++++++++ query for vector compound by valueID 'wall' ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 784
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextAttributeResponse>
   <contextAttributeList>
@@ -298,6 +318,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject/attributes/A/wall -
   </statusCode>
 </contextAttributeResponse>
 5: ++++++++++ query for object compound by valueID 'ground' ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 660
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextAttributeResponse>
   <contextAttributeList>
@@ -329,6 +354,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject/attributes/A/wall -
   </statusCode>
 </contextAttributeResponse>
 6: ++++++++++ query for object compound by valueID 'wall' ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 658
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextAttributeResponse>
   <contextAttributeList>
