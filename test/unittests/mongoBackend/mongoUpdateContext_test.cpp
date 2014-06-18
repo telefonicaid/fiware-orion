@@ -122,9 +122,14 @@
 *
 * Lastly a few tests with Service Path
 *
-* - servicePathEntityUpdates
-* - servicePathEntityCreation
-* - servicePathEntityDeletion
+* - servicePathEntityUpdate_3levels
+* - servicePathEntityUpdate_2levels
+* - servicePathEntityAppend_3levels
+* - servicePathEntityAppend_2levels
+* - servicePathEntityCreation_2levels
+* - servicePathEntityCreation_3levels
+* - servicePathEntityDeletion_2levels
+* - servicePathEntityDeletion_3levels
 * - servicePathEntityVectorNotAllowed
 *
 * Note these tests are not "canonical" unit tests. Canon says that in this case we should have
@@ -271,6 +276,37 @@ static void prepareDatabaseWithAttributeIds(void) {
                           )
                       );
     connection->insert(ENTITIES_COLL, en);
+
+}
+
+/* ****************************************************************************
+*
+* prepareDatabaseWithServicePaths -
+*
+* This function is called before every test, to populate some information in the
+* entities collection.
+*/
+static void prepareDatabaseWithServicePaths(void) {
+
+    /* Set database */
+    setupDatabase();
+
+
+    /* Create entities with service path */
+    DBClientConnection* connection = getMongoConnection();
+    BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1" << "servicePath" << "/home/kz/01") <<
+                       "attrs" << BSON_ARRAY(
+                          BSON("name" << "A1" << "type" << "TA1" << "value" << "kz01")
+                          )
+                      );
+
+    BSONObj en2 = BSON("_id" << BSON("id" << "E1" << "type" << "T1" << "servicePath" << "/home/kz/02") <<
+                       "attrs" << BSON_ARRAY(
+                          BSON("name" << "A1" << "type" << "TA1" << "value" << "kz02")
+                          )
+                      );
+    connection->insert(ENTITIES_COLL, en1);
+    connection->insert(ENTITIES_COLL, en2);
 
 }
 
@@ -9423,356 +9459,736 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
 }
 
 
-
 /* ****************************************************************************
 *
-* servicePathEntityUpdates - 
+* servicePathEntityUpdates_3levels -
 *
-* FIXME P5: to follow the example of the rest of this file, a lot more should be 'expected' ...
-*
-* FIXME P6: attack mongo directly instead of using mongoQueryContext to verify
-*           that the update has been successful.
 */
-TEST(mongoUpdateContextRequest, servicePathEntityUpdates)
+TEST(mongoUpdateContextRequest, servicePathEntityUpdate_3levels)
 {
   HttpStatusCode         ms;
-  UpdateContextRequest   ucReq;
-  UpdateContextResponse  ucRes1;
-  UpdateContextResponse  ucRes2;
-  UpdateContextResponse  ucRes3;
-  UpdateContextResponse  ucRes4;
-  ContextElement         ce;
-  ContextAttribute       ca("A1", "TA1", "kz01");
+  UpdateContextRequest   req;
+  UpdateContextResponse  res;
 
   utInit();
 
+  /* Prepare database */
+  prepareDatabaseWithServicePaths();
+
+  /* Forge the request (from "inside" to "outside") */
+  ContextElement         ce;
   ce.entityId.fill("E1", "T1", "false");
+  ContextAttribute ca("A1", "TA1", "kz01-modified");
   ce.contextAttributeVector.push_back(&ca);
-  ucReq.contextElementVector.push_back(&ce);
-
-  // 1. Create an Entity with Service Path /home/kz/01
-  // 2. Create another Entity with Service Path /home/kz/02
-  // 3. Update Entity with Service Path /home/kz/01
-  // 4. Query entities with Service Path /home/kz - make sure just ONE has changed
-  // 5. Update Entity with Service Path /home/kz
-  // 6. Query entities with Service Path /home/kz - make sure both have changed
-
-  
-  // 1. Create an Entity with Service Path /home/kz/01
-  ca.value = "kz01";
-  ucReq.updateActionType.set("APPEND");
-  servicePathVector.clear();
+  req.contextElementVector.push_back(&ce);
+  req.updateActionType.set("UPDATE");
   servicePathVector.push_back("/home/kz/01");
-  ms = mongoUpdateContext(&ucReq, &ucRes1, "", servicePathVector);
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+
+  /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0, ucRes1.errorCode.code);
-  EXPECT_EQ(0, ucRes1.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, ucRes1.errorCode.details.size());
-  ASSERT_EQ(1, ucRes1.contextElementResponseVector.size());
 
+  EXPECT_EQ(0, res.errorCode.code);
+  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.errorCode.details.size());
 
-  // 2. Create another Entity with Service Path /home/kz/02
-  ca.value = "kz02";
-  ucReq.updateActionType.set("APPEND");
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz/02");
-  ms = mongoUpdateContext(&ucReq, &ucRes2, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0, ucRes2.errorCode.code);
-  EXPECT_EQ(0, ucRes2.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, ucRes2.errorCode.details.size());
-  ASSERT_EQ(1, ucRes2.contextElementResponseVector.size());
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+  /* Context Element response # 1 */
+  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("T1", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
+  /* Check that every involved collection at MongoDB is as expected */
+  /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+   * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-  // 3. Update Entity with Service Path /home/kz/01
-  ca.value = "kz01-modified";
-  ucReq.updateActionType.set("UPDATE");
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz/01");
-  ms = mongoUpdateContext(&ucReq, &ucRes3, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0, ucRes3.errorCode.code);
-  EXPECT_EQ(0, ucRes3.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, ucRes3.errorCode.details.size());
-  ASSERT_EQ(1, ucRes3.contextElementResponseVector.size());
+  DBClientConnection* connection = getMongoConnection();
 
+  /* entities collection */
+  BSONObj ent;
+  std::vector<BSONElement> attrs;
+  ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
-  // 4. Query entities with Service Path /home/kz - make sure just ONE has changed 
-  EntityId              e("E1", "T1", "false");
-  QueryContextRequest   qcReq1;
-  QueryContextResponse  qcRes1;
+  ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/01"));
+  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+  EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+  attrs = ent.getField("attrs").Array();
+  ASSERT_EQ(1, attrs.size());
+  BSONObj a1 = getAttr(attrs, "A1", "TA1");
+  EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+  EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+  EXPECT_STREQ("kz01-modified", C_STR_FIELD(a1, "value"));
+  EXPECT_EQ(1360232700, a1.getIntField("modDate"));
 
-  qcReq1.entityIdVector.push_back(&e);
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz");
-  ms = mongoQueryContext(&qcReq1, &qcRes1, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0, qcRes1.errorCode.code);
-  EXPECT_EQ(0, qcRes1.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, qcRes1.errorCode.details.size());
-  ASSERT_EQ(2, qcRes1.contextElementResponseVector.size());
-  EXPECT_STREQ("kz01-modified", qcRes1.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
-  EXPECT_STREQ("kz02",          qcRes1.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
-
-
-  // 5. Update Entity with Service Path /home/kz
-  LM_M(("***************************** 5. Update Entity with Service Path /home/kz (2 entities)"));
-  ca.value = "kz-modified";
-  ucReq.updateActionType.set("UPDATE");
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz");
-  ms = mongoUpdateContext(&ucReq, &ucRes4, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0, ucRes4.errorCode.code);
-  EXPECT_EQ(0, ucRes4.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, ucRes4.errorCode.details.size());
-  ASSERT_EQ(2, ucRes4.contextElementResponseVector.size());
-
-
-  // 6. Query entities with Service Path /home/kz - make sure both have changed
-  QueryContextRequest   qcReq2;
-  QueryContextResponse  qcRes2;
-
-  qcReq2.entityIdVector.push_back(&e);
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz");
-  ms = mongoQueryContext(&qcReq2, &qcRes2, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0, qcRes2.errorCode.code);
-  EXPECT_EQ(0, qcRes2.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, qcRes2.errorCode.details.size());
-  ASSERT_EQ(2, qcRes2.contextElementResponseVector.size());
-  EXPECT_STREQ("kz-modified", qcRes2.contextElementResponseVector[0]->contextElement.contextAttributeVector[0]->value.c_str());
-  EXPECT_STREQ("kz-modified", qcRes2.contextElementResponseVector[1]->contextElement.contextAttributeVector[0]->value.c_str());
+  ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/02"));
+  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+  EXPECT_FALSE(ent.hasField("modDate"));
+  attrs = ent.getField("attrs").Array();
+  ASSERT_EQ(1, attrs.size());
+  a1 = getAttr(attrs, "A1", "TA1");
+  EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+  EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+  EXPECT_STREQ("kz02", C_STR_FIELD(a1, "value"));
+  EXPECT_FALSE(a1.hasField("modDate"));
 
   utExit();
 }
 
 /* ****************************************************************************
 *
-* servicePathEntityCreation - 
+* servicePathEntityUpdates_2levels -
 *
-* FIXME P5: to follow the example of the rest of this file, a lot more should be 'expected' ...
-*
-* FIXME P6: attack mongo directly instead of using mongoQueryContext to verify
-*           that the update has been successful.
 */
-TEST(mongoUpdateContextRequest, servicePathEntityCreation)
+TEST(mongoUpdateContextRequest, servicePathEntityUpdate_2levels)
 {
   HttpStatusCode         ms;
-  UpdateContextRequest   ucReq;
-  UpdateContextResponse  ucRes1;
-  UpdateContextResponse  ucRes2;
-  UpdateContextResponse  ucRes3;
-  ContextElement         ce;
-  ContextAttribute       ca("A1", "TA1", "kz01");
+  UpdateContextRequest   req;
+  UpdateContextResponse  res;
 
   utInit();
 
+  /* Prepare database */
+  prepareDatabaseWithServicePaths();
+
+  /* Forge the request (from "inside" to "outside") */
+  ContextElement         ce;
   ce.entityId.fill("E1", "T1", "false");
+  ContextAttribute ca("A1", "TA1", "kz-modified");
   ce.contextAttributeVector.push_back(&ca);
-  ucReq.contextElementVector.push_back(&ce);
-
-
-  ca.value = "kz";
-  ucReq.updateActionType.set("APPEND");
-  servicePathVector.clear();
+  req.contextElementVector.push_back(&ce);
+  req.updateActionType.set("UPDATE");
   servicePathVector.push_back("/home/kz");
-  ms = mongoUpdateContext(&ucReq, &ucRes3, "", servicePathVector);
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+
+  /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0, ucRes3.errorCode.code);
-  EXPECT_EQ(0, ucRes3.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, ucRes3.errorCode.details.size());
-  ASSERT_EQ(1, ucRes3.contextElementResponseVector.size());
 
+  EXPECT_EQ(0, res.errorCode.code);
+  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.errorCode.details.size());
 
-  ca.value = "kz01";
-  ucReq.updateActionType.set("APPEND");
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz/01");
-  ms = mongoUpdateContext(&ucReq, &ucRes1, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0, ucRes1.errorCode.code);
-  EXPECT_EQ(0, ucRes1.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, ucRes1.errorCode.details.size());
-  ASSERT_EQ(1, ucRes1.contextElementResponseVector.size());
+  ASSERT_EQ(2, res.contextElementResponseVector.size());
+  /* Context Element response # 1 */
+  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("T1", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
+  /* Context Element response # 2 */
+  EXPECT_EQ("E1", RES_CER(1).entityId.id);
+  EXPECT_EQ("T1", RES_CER(1).entityId.type);
+  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+  ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+  EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
+  EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
+  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->metadataVector.size());
+  EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
 
-  ca.value = "kz02";
-  ucReq.updateActionType.set("APPEND");
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz/02");
-  ms = mongoUpdateContext(&ucReq, &ucRes2, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0, ucRes2.errorCode.code);
-  EXPECT_EQ(0, ucRes2.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, ucRes2.errorCode.details.size());
-  ASSERT_EQ(1, ucRes2.contextElementResponseVector.size());
+  /* Check that every involved collection at MongoDB is as expected */
+  /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+   * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-  // Now query E1/A1 in Service Path /home/kz/01
-  EntityId              e("E1", "T1", "false");
-  QueryContextRequest   qcReq;
-  QueryContextResponse  qcRes1;
-  QueryContextResponse  qcRes2;
+  DBClientConnection* connection = getMongoConnection();
 
-  qcReq.entityIdVector.push_back(&e);
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz/01");
-  ms = mongoQueryContext(&qcReq, &qcRes1, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0, qcRes1.errorCode.code);
-  EXPECT_EQ(0, qcRes1.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, qcRes1.errorCode.details.size());
-  ASSERT_EQ(1, qcRes1.contextElementResponseVector.size());
+  /* entities collection */
+  BSONObj ent;
+  std::vector<BSONElement> attrs;
+  ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz");
-  ms = mongoQueryContext(&qcReq, &qcRes2, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0, qcRes2.errorCode.code);
-  EXPECT_EQ(0, qcRes2.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, qcRes2.errorCode.details.size());
-  ASSERT_EQ(3, qcRes2.contextElementResponseVector.size());
+  ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/01"));
+  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+  EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+  attrs = ent.getField("attrs").Array();
+  ASSERT_EQ(1, attrs.size());
+  BSONObj a1 = getAttr(attrs, "A1", "TA1");
+  EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+  EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+  EXPECT_STREQ("kz-modified", C_STR_FIELD(a1, "value"));
+  EXPECT_EQ(1360232700, a1.getIntField("modDate"));
+
+  ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/02"));
+  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+  EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+  attrs = ent.getField("attrs").Array();
+  ASSERT_EQ(1, attrs.size());
+  a1 = getAttr(attrs, "A1", "TA1");
+  EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+  EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+  EXPECT_STREQ("kz-modified", C_STR_FIELD(a1, "value"));
+  EXPECT_EQ(1360232700, a1.getIntField("modDate"));
 
   utExit();
 }
 
+/* ****************************************************************************
+*
+* servicePathEntityAppend_3levels -
+*
+*/
+TEST(mongoUpdateContextRequest, servicePathEntityAppend_3levels)
+{
+  HttpStatusCode         ms;
+  UpdateContextRequest   req;
+  UpdateContextResponse  res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabaseWithServicePaths();
+
+  /* Forge the request (from "inside" to "outside") */
+  ContextElement         ce;
+  ce.entityId.fill("E1", "T1", "false");
+  ContextAttribute ca("A2", "TA2", "new");
+  ce.contextAttributeVector.push_back(&ca);
+  req.contextElementVector.push_back(&ce);
+  req.updateActionType.set("APPEND");
+  servicePathVector.push_back("/home/kz/01");
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(0, res.errorCode.code);
+  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.errorCode.details.size());
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+  /* Context Element response # 1 */
+  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("T1", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+  /* Check that every involved collection at MongoDB is as expected */
+  /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+   * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+  DBClientConnection* connection = getMongoConnection();
+
+  /* entities collection */
+  BSONObj ent;
+  std::vector<BSONElement> attrs;
+  ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
+
+  ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/01"));
+  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+  EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+  attrs = ent.getField("attrs").Array();
+  ASSERT_EQ(2, attrs.size());
+  BSONObj a1 = getAttr(attrs, "A1", "TA1");
+  BSONObj a2 = getAttr(attrs, "A2", "TA2");
+  EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+  EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+  EXPECT_STREQ("kz01", C_STR_FIELD(a1, "value"));
+  EXPECT_FALSE(a1.hasField("modDate"));
+  EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+  EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
+  EXPECT_STREQ("new", C_STR_FIELD(a2, "value"));
+  EXPECT_EQ(1360232700, a2.getIntField("modDate"));
+  EXPECT_EQ(1360232700, a2.getIntField("creDate"));
+
+  ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/02"));
+  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+  EXPECT_FALSE(ent.hasField("modDate"));
+  attrs = ent.getField("attrs").Array();
+  ASSERT_EQ(1, attrs.size());
+  a1 = getAttr(attrs, "A1", "TA1");
+  EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+  EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+  EXPECT_STREQ("kz02", C_STR_FIELD(a1, "value"));
+  EXPECT_FALSE(a1.hasField("modDate"));
+
+  utExit();
+}
+
+/* ****************************************************************************
+*
+* servicePathEntityAppend_2levels -
+*
+*/
+TEST(mongoUpdateContextRequest, servicePathEntityAppend_2levels)
+{
+  HttpStatusCode         ms;
+  UpdateContextRequest   req;
+  UpdateContextResponse  res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabaseWithServicePaths();
+
+  /* Forge the request (from "inside" to "outside") */
+  ContextElement         ce;
+  ce.entityId.fill("E1", "T1", "false");
+  ContextAttribute ca("A2", "TA2", "new");
+  ce.contextAttributeVector.push_back(&ca);
+  req.contextElementVector.push_back(&ce);
+  req.updateActionType.set("APPEND");
+  servicePathVector.push_back("/home/kz");
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(0, res.errorCode.code);
+  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.errorCode.details.size());
+
+  ASSERT_EQ(2, res.contextElementResponseVector.size());
+  /* Context Element response # 1 */
+  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("T1", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+  /* Context Element response # 2 */
+  EXPECT_EQ("E1", RES_CER(1).entityId.id);
+  EXPECT_EQ("T1", RES_CER(1).entityId.type);
+  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+  ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+  EXPECT_EQ("A2", RES_CER_ATTR(1, 0)->name);
+  EXPECT_EQ("TA2", RES_CER_ATTR(1, 0)->type);
+  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->metadataVector.size());
+  EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+
+  /* Check that every involved collection at MongoDB is as expected */
+  /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+   * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+  DBClientConnection* connection = getMongoConnection();
+
+  /* entities collection */
+  BSONObj ent;
+  std::vector<BSONElement> attrs;
+  ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
+
+  ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/01"));
+  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+  EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+  attrs = ent.getField("attrs").Array();
+  ASSERT_EQ(2, attrs.size());
+  BSONObj a1 = getAttr(attrs, "A1", "TA1");
+  BSONObj a2 = getAttr(attrs, "A2", "TA2");
+  EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+  EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+  EXPECT_STREQ("kz01", C_STR_FIELD(a1, "value"));
+  EXPECT_FALSE(a1.hasField("modDate"));
+  EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+  EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
+  EXPECT_STREQ("new", C_STR_FIELD(a2, "value"));
+  EXPECT_EQ(1360232700, a2.getIntField("modDate"));
+  EXPECT_EQ(1360232700, a2.getIntField("creDate"));
+
+  ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/02"));
+  EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+  EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+  EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+  attrs = ent.getField("attrs").Array();
+  ASSERT_EQ(2, attrs.size());
+  a1 = getAttr(attrs, "A1", "TA1");
+  a2 = getAttr(attrs, "A2", "TA2");
+  EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+  EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+  EXPECT_STREQ("kz02", C_STR_FIELD(a1, "value"));
+  EXPECT_FALSE(a1.hasField("modDate"));
+  EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+  EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
+  EXPECT_STREQ("new", C_STR_FIELD(a2, "value"));
+  EXPECT_EQ(1360232700, a2.getIntField("modDate"));
+  EXPECT_EQ(1360232700, a2.getIntField("creDate"));
+
+  utExit();
+}
+
+/* ****************************************************************************
+*
+* servicePathEntityCreation_2levels -
+*
+*/
+TEST(mongoUpdateContextRequest, servicePathEntityCreation_2levels)
+{
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    utInit();
+
+    /* Prepare database */
+    prepareDatabaseWithServicePaths();
+
+    /* Forge the request (from "inside" to "outside") */
+    ContextElement         ce;
+    ce.entityId.fill("E1", "T1", "false");
+    ContextAttribute ca("A1", "TA1", "fg");
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("APPEND");
+    servicePathVector.push_back("/home/fg");
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientConnection* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent;
+    std::vector<BSONElement> attrs;
+    ASSERT_EQ(3, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/01"));
+    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    BSONObj a1 = getAttr(attrs, "A1", "TA1");
+    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("kz01", C_STR_FIELD(a1, "value"));
+    EXPECT_FALSE(a1.hasField("modDate"));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/02"));
+    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    a1 = getAttr(attrs, "A1", "TA1");
+    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("kz02", C_STR_FIELD(a1, "value"));
+    EXPECT_FALSE(a1.hasField("modDate"));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/fg"));
+    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    a1 = getAttr(attrs, "A1", "TA1");
+    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("fg", C_STR_FIELD(a1, "value"));
+    EXPECT_EQ(1360232700, a1.getIntField("modDate"));
+    EXPECT_EQ(1360232700, a1.getIntField("creDate"));
+
+    utExit();
+
+}
+
+/* ****************************************************************************
+*
+* servicePathEntityCreation_3levels -
+*
+*/
+TEST(mongoUpdateContextRequest, servicePathEntityCreation_3levels)
+{
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    utInit();
+
+    /* Prepare database */
+    prepareDatabaseWithServicePaths();
+
+    /* Forge the request (from "inside" to "outside") */
+    ContextElement         ce;
+    ce.entityId.fill("E1", "T1", "false");
+    ContextAttribute ca("A1", "TA1", "fg");
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("APPEND");
+    servicePathVector.push_back("/home/fg/01");
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientConnection* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent;
+    std::vector<BSONElement> attrs;
+    ASSERT_EQ(3, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/01"));
+    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    BSONObj a1 = getAttr(attrs, "A1", "TA1");
+    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("kz01", C_STR_FIELD(a1, "value"));
+    EXPECT_FALSE(a1.hasField("modDate"));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/02"));
+    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    a1 = getAttr(attrs, "A1", "TA1");
+    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("kz02", C_STR_FIELD(a1, "value"));
+    EXPECT_FALSE(a1.hasField("modDate"));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/fg/01"));
+    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    a1 = getAttr(attrs, "A1", "TA1");
+    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("fg", C_STR_FIELD(a1, "value"));
+    EXPECT_EQ(1360232700, a1.getIntField("modDate"));
+    EXPECT_EQ(1360232700, a1.getIntField("creDate"));
+
+    utExit();
+
+}
+
+/* ****************************************************************************
+*
+* servicePathEntityDeletion_2levels -
+*
+*/
+TEST(mongoUpdateContextRequest, servicePathEntityDeletion_2levels)
+{
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    utInit();
+
+    /* Prepare database */
+    prepareDatabaseWithServicePaths();
+
+    /* Forge the request (from "inside" to "outside") */
+    ContextElement         ce;
+    ce.entityId.fill("E1", "T1", "false");
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("DELETE");
+    servicePathVector.push_back("/home/kz");
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(2, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+    /* Context Element response # 2 */
+    EXPECT_EQ("E1", RES_CER(1).entityId.id);
+    EXPECT_EQ("T1", RES_CER(1).entityId.type);
+    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+    ASSERT_EQ(0, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientConnection* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent;
+    std::vector<BSONElement> attrs;
+    ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
+
+    utExit();
+}
 
 
 /* ****************************************************************************
 *
-* servicePathEntityDeletion - 
+* servicePathEntityDeletion_3levels -
 *
-* FIXME P5: to follow the example of the rest of this file, a lot more should be 'expected' ...
-*
-* FIXME P6: attack mongo directly instead of using mongoQueryContext to verify
-*           that the update has been successful.
 */
-TEST(mongoUpdateContextRequest, servicePathEntityDeletion)
+TEST(mongoUpdateContextRequest, servicePathEntityDeletion_3levels)
 {
-  HttpStatusCode         ms;
-  UpdateContextRequest   ucReq;
-  UpdateContextRequest   ucReq2;
-  UpdateContextResponse  ucRes1;
-  UpdateContextResponse  ucRes2;
-  UpdateContextResponse  ucRes3;
-  UpdateContextResponse  ucRes4;
-  ContextElement         ce;
-  ContextElement         ce2;
-  ContextAttribute       ca("A1", "TA1", "kz01");
-  EntityId               e("E1", "T1", "false");
-  QueryContextRequest    qcReq;
-  QueryContextResponse   qcRes1;
-  QueryContextResponse   qcRes2;
-  QueryContextResponse   qcRes3;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
-  qcReq.entityIdVector.push_back(&e);
+    utInit();
 
-  utInit();
+    /* Prepare database */
+    prepareDatabaseWithServicePaths();
 
-  ce.entityId.fill("E1", "T1", "false");
-  ce2.entityId.fill("E1", "T1", "false");
-  ce.contextAttributeVector.push_back(&ca);
-  ucReq.contextElementVector.push_back(&ce);
-  ucReq2.contextElementVector.push_back(&ce2);
+    /* Forge the request (from "inside" to "outside") */
+    ContextElement         ce;
+    ce.entityId.fill("E1", "T1", "false");
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("DELETE");
+    servicePathVector.push_back("/home/kz/01");
 
-  // 1. Create an Entity with Service Path /home/kz
-  // 2. Create another Entity with Service Path /home/kz/01
-  // 3. Create another Entity with Service Path /home/kz/02
-  // 4. Query entities with Service Path /home/kz - make sure we find three entities
-  // 5. Remove entity with Service Path /home/kz/01
-  // 6. Query entities with Service Path /home/kz - make sure we find two entities
-  // 7. Remove entity with Service Path /home/kz
-  // 8. Query entities with Service Path /home/kz - make sure we find ZERO entities
+    /* Invoke the function in mongoBackend library */
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
 
-  
-  // 1. Create an Entity with Service Path /home/kz
-  ca.value = "kz";
-  ucReq.updateActionType.set("APPEND");
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz");
-  ms = mongoUpdateContext(&ucReq, &ucRes1, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0, ucRes1.errorCode.code);
-  EXPECT_EQ(0, ucRes1.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, ucRes1.errorCode.details.size());
-  ASSERT_EQ(1, ucRes1.contextElementResponseVector.size());
+    EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
 
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
-  // 2. Create another Entity with Service Path /home/kz/01
-  ca.value = "kz01";
-  ucReq.updateActionType.set("APPEND");
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz/01");
-  ms = mongoUpdateContext(&ucReq, &ucRes2, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0, ucRes2.errorCode.code);
-  EXPECT_EQ(0, ucRes2.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, ucRes2.errorCode.details.size());
-  ASSERT_EQ(1, ucRes2.contextElementResponseVector.size());
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
+    DBClientConnection* connection = getMongoConnection();
 
-  // 3. Create another Entity with Service Path /home/kz/02
-  ca.value = "kz02";
-  ucReq.updateActionType.set("APPEND");
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz/02");
-  ms = mongoUpdateContext(&ucReq, &ucRes3, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0, ucRes3.errorCode.code);
-  EXPECT_EQ(0, ucRes3.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, ucRes3.errorCode.details.size());
-  ASSERT_EQ(1, ucRes3.contextElementResponseVector.size());
+    /* entities collection */
+    BSONObj ent;
+    std::vector<BSONElement> attrs;
+    ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/02"));
+    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_FALSE(ent.hasField("modDate"));
+    attrs = ent.getField("attrs").Array();
+    ASSERT_EQ(1, attrs.size());
+    BSONObj a1 = getAttr(attrs, "A1", "TA1");
+    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("kz02", C_STR_FIELD(a1, "value"));
+    EXPECT_FALSE(a1.hasField("modDate"));
 
-  // 4. Query entities with Service Path /home/kz - make sure we find three entities
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz");
-  ms = mongoQueryContext(&qcReq, &qcRes1, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0, qcRes1.errorCode.code);
-  EXPECT_EQ(0, qcRes1.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, qcRes1.errorCode.details.size());
-  ASSERT_EQ(3, qcRes1.contextElementResponseVector.size());
-  
-  // 5. Remove entity with Service Path /home/kz/01
-  LM_M(("----------------------------  Remove entity with Service Path /home/kz/01"));
-  ucReq2.updateActionType.set("DELETE");
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz/01");
-  ms = mongoUpdateContext(&ucReq2, &ucRes2, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-
-  LM_M(("-----------------------------------------------------------------------------"));
-  // 6. Query entities with Service Path /home/kz - make sure we find two entities
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz");
-  ms = mongoQueryContext(&qcReq, &qcRes2, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(0, qcRes2.errorCode.code);
-  EXPECT_EQ(0, qcRes2.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, qcRes2.errorCode.details.size());
-  ASSERT_EQ(2, qcRes2.contextElementResponseVector.size());
-
-  // 7. Remove entity with Service Path /home/kz
-  ucReq2.updateActionType.set("DELETE");
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz");
-  ms = mongoUpdateContext(&ucReq2, &ucRes2, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-
-  // 8. Query entities with Service Path /home/kz - make sure we find ZERO entities
-  servicePathVector.clear();
-  servicePathVector.push_back("/home/kz");
-  ms = mongoQueryContext(&qcReq, &qcRes3, "", servicePathVector);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(SccContextElementNotFound, qcRes3.errorCode.code);
-  EXPECT_STREQ("No context element found", qcRes3.errorCode.reasonPhrase.c_str());
-  EXPECT_EQ(0, qcRes3.errorCode.details.size());
-  ASSERT_EQ(0, qcRes3.contextElementResponseVector.size());
-
-  utExit();
+    utExit();
 }
 
 /* ****************************************************************************
