@@ -68,6 +68,14 @@ std::map<std::string, std::string> uriParams;
 
 /* ****************************************************************************
 *
+* servicePathVector - 
+*/
+std::vector<std::string> servicePathVector;
+
+
+
+/* ****************************************************************************
+*
 * utInit - unit test init
 *
 */
@@ -109,6 +117,12 @@ void utInit(void)
   uriParams[URI_PARAM_PAGINATION_OFFSET]   = DEFAULT_PAGINATION_OFFSET;
   uriParams[URI_PARAM_PAGINATION_LIMIT]    = DEFAULT_PAGINATION_LIMIT;
   uriParams[URI_PARAM_PAGINATION_DETAILS]  = DEFAULT_PAGINATION_DETAILS;
+
+  //
+  // Resetting servicePathVector
+  //
+  servicePathVector.clear();
+
 }
 
 

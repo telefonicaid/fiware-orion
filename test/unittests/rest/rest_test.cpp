@@ -28,7 +28,8 @@
 #include "logMsg/traceLevels.h"
 #include "rest/ConnectionInfo.h"
 
-extern int servicePathCheck(ConnectionInfo* ciP);
+extern int servicePathCheck(ConnectionInfo* ciP, const char* path);
+extern int servicePathSplit(ConnectionInfo* ciP);
 
 
 
@@ -41,10 +42,9 @@ TEST(rest, servicePathCheck)
   ConnectionInfo  ci;
   int             r;
 
-
   // 0. OK - as no Service Path has been received ...
   ci.servicePath = "";
-  r = servicePathCheck(&ci);
+  r = servicePathCheck(&ci, ci.servicePath.c_str());
   EXPECT_EQ(0, r);
 
   // Mark that a Service Path has been received
@@ -52,27 +52,84 @@ TEST(rest, servicePathCheck)
 
   // 1. OK
   ci.servicePath = "/h1/_h2/h3/_h4/h5/_h6/h7/_h8/h9/_h10h10h10";
-  r = servicePathCheck(&ci);
+  r = servicePathCheck(&ci, ci.servicePath.c_str());
   EXPECT_EQ(0, r);
 
   // Not starting with '/'
   ci.servicePath = "x";
-  r = servicePathCheck(&ci);
+  r = servicePathCheck(&ci, ci.servicePath.c_str());
   EXPECT_EQ(1, r);
 
   // 2. More than 10 components in Service Path
   ci.servicePath = "/h1/h2/h3/h4/h5/h6/h7/h8/h9/h10/h11";
-  r = servicePathCheck(&ci);
+  r = servicePathCheck(&ci, ci.servicePath.c_str());
   EXPECT_EQ(2, r);
 
   // More than 10 chars in path component of Service Path
   ci.servicePath = "/h0123456789";
-  r = servicePathCheck(&ci);
+  r = servicePathCheck(&ci, ci.servicePath.c_str());
   EXPECT_EQ(3, r);
 
   // Bad character ('-') in Service Path
   ci.servicePath = "/h-0";
-  r = servicePathCheck(&ci);
+  r = servicePathCheck(&ci, ci.servicePath.c_str());
   EXPECT_EQ(4, r);
+}
 
+
+/* ****************************************************************************
+*
+* rest.servicePathSplit - 
+*/
+TEST(rest, servicePathSplit)
+{
+  ConnectionInfo  ci1;
+  ConnectionInfo  ci2;
+  ConnectionInfo  ci3;
+  ConnectionInfo  ci4;
+  ConnectionInfo  ci5;
+  int             r;
+
+  // 1. OK - as no Service Path has been received ...
+  LM_M(("---- 1 -----"));
+  ci1.servicePath = "";
+  r = servicePathSplit(&ci1);
+  EXPECT_EQ(0, r);
+  LM_M(("---- 1 -----"));
+
+
+  // 2. OK - one service path
+  ci2.httpHeaders.servicePathReceived = true;
+  LM_M(("---- 2 -----"));
+  ci2.servicePath = "/h1/_h2/h3/_h4/h5/_h6/h7/_h8/h9/_h10h10h10";
+  r = servicePathSplit(&ci2);
+  EXPECT_EQ(0, r);
+  LM_M(("---- 2 -----"));
+
+  // 3. OK - two service paths
+  LM_M(("---- 3 -----"));
+  ci3.httpHeaders.servicePathReceived = true;
+  ci3.servicePath = "/h1/_h2/h3/_h4/h5/_h6/h7/_h8/h9/_h10h10h10, /1/2/3";
+  r = servicePathSplit(&ci3);
+  EXPECT_EQ(0, r);
+  EXPECT_STREQ("", ci3.answer.c_str());
+  LM_M(("---- 3 -----"));
+
+  // 4. OK - nine service paths
+  LM_M(("---- 4 -----"));
+  ci4.httpHeaders.servicePathReceived = true;
+  ci4.servicePath = "/home/kz/01, /home/kz/02, /home/kz/03, /home/kz/04, /home/kz/05, /home/kz/06, /home/kz/07, /home/kz/08, /home/kz/09";
+  r = servicePathSplit(&ci4);
+  EXPECT_EQ(0, r);
+  EXPECT_STREQ("", ci4.answer.c_str());
+  LM_M(("---- 4 -----"));
+
+  // 5. NOT OK - eleven service paths
+  LM_M(("---- 5 -----"));
+  ci5.httpHeaders.servicePathReceived = true;
+  ci5.servicePath = "/home/kz/01, /home/kz/02, /home/kz/03, /home/kz/04, /home/kz/05, /home/kz/06, /home/kz/07, /home/kz/08, /home/kz/09, /home/kz/10, /home/kz/11";
+  r = servicePathSplit(&ci5);
+  EXPECT_EQ(5, r);
+  EXPECT_EQ(177, ci5.answer.size());
+  LM_M(("---- 5 -----"));
 }

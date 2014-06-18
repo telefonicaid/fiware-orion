@@ -52,9 +52,9 @@ payload='<?xml version="1.0"?>
     </contextRegistrationList>
     <registrationId></registrationId>
   </registerContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "${payload}"
 
-REG_ID=$(echo "$response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
+REG_ID=$(echo "$_response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
 echo "++++++++++++++++++++"
 
@@ -74,7 +74,7 @@ payload='<?xml version="1.0"?>
       <attribute>pressure</attribute>
     </attributeList>
   </discoverContextAvailabilityRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "${payload}"
 
 --REGEXPECT--
 HTTP/1.1 200 OK

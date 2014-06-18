@@ -27,43 +27,43 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-curlJson "/NGSI9/registerContext" "{}"
+orionCurl --url "/NGSI9/registerContext" --payload "{}" --json
 echo "1: ++++++++++++++++++++"
 
-curlJson "/NGSI9/discoverContextAvailability" "{}"
+orionCurl --url "/NGSI9/discoverContextAvailability" --payload "{}" --json
 echo "2: ++++++++++++++++++++"
 
-curlJson "/NGSI9/subscribeContextAvailability" "{}"
+orionCurl --url "/NGSI9/subscribeContextAvailability" --payload "{}" --json
 echo "3: ++++++++++++++++++++"
 
-curlJson "/NGSI9/updateContextAvailabilitySubscription" "{}"
+orionCurl --url "/NGSI9/updateContextAvailabilitySubscription" --payload "{}" --json
 echo "4: ++++++++++++++++++++"
 
-curlJson "/NGSI9/unsubscribeContextAvailability" "{}"
+orionCurl --url "/NGSI9/unsubscribeContextAvailability" --payload "{}" --json
 echo "5: ++++++++++++++++++++"
 
-curlJson "/NGSI10/queryContext" "{}"
+orionCurl --url "/NGSI10/queryContext" --payload "{}" --json
 echo "6: ++++++++++++++++++++"
 
-curlJson "/NGSI10/updateContext" "{}"
+orionCurl --url "/NGSI10/updateContext" --payload "{}" --json
 echo "7: ++++++++++++++++++++"
 
-curlJson "/NGSI10/subscribeContext" "{}"
+orionCurl --url "/NGSI10/subscribeContext" --payload "{}" --json
 echo "8: ++++++++++++++++++++"
 
-curlJson "/NGSI10/updateContextSubscription" "{}"
+orionCurl --url "/NGSI10/updateContextSubscription" --payload "{}" --json
 echo "9: ++++++++++++++++++++"
 
-curlJson "/NGSI10/unsubscribeContext" "{}"
+orionCurl --url "/NGSI10/unsubscribeContext" --payload "{}" --json
 echo "10: ++++++++++++++++++++"
 
-curlJson "/NGSI9/notSupportedRequest" "{}"
+orionCurl --url "/NGSI9/notSupportedRequest" --payload "{}" --json
 echo "11: ++++++++++++++++++++"
 
-curlJson "/NGSI10/notSupportedRequest" "{}"
+orionCurl --url "/NGSI10/notSupportedRequest" --payload "{}" --json
 echo "12: ++++++++++++++++++++"
 
-curlJson "/notSupportedRequest" "{}"
+orionCurl --url "/notSupportedRequest" --payload "{}" --json
 echo "13: ++++++++++++++++++++"
 
 --REGEXPECT--

@@ -290,18 +290,18 @@ extern bool includedAttribute(ContextAttribute attr, AttributeList* attrsV);
 */
 extern bool entitiesQuery
 (
-  EntityIdVector                enV,
-  AttributeList                 attrL,
-  Restriction                   res,
-  ContextElementResponseVector* cerV,
-  std::string*                  err,
-  bool                          includeEmpty,
-  std::string                   tenant,
-  std::string                   servicePath,
-  int                           offset  = DEFAULT_PAGINATION_OFFSET_INT,
-  int                           limit   = DEFAULT_PAGINATION_LIMIT_INT,
-  bool                          details = false,
-  long long*                    countP  = NULL
+  EntityIdVector                   enV,
+  AttributeList                    attrL,
+  Restriction                      res,
+  ContextElementResponseVector*    cerV,
+  std::string*                     err,
+  bool                             includeEmpty,
+  std::string                      tenant,
+  const std::vector<std::string>&  servicePath,
+  int                              offset  = DEFAULT_PAGINATION_OFFSET_INT,
+  int                              limit   = DEFAULT_PAGINATION_LIMIT_INT,
+  bool                             details = false,
+  long long*                       countP  = NULL
 );
 
 /* ****************************************************************************

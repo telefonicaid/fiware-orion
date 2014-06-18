@@ -40,10 +40,10 @@
 */
 extern HttpStatusCode mongoUpdateContext
 (
-  UpdateContextRequest*                requestP,
-  UpdateContextResponse*               responseP,
-  const std::string&                   tenant      = "",
-  const std::string&                   servicePath = ""
+  UpdateContextRequest*            requestP,
+  UpdateContextResponse*           responseP,
+  const std::string&               tenant,
+  const std::vector<std::string>&  servicePathV
 );
 
 #endif

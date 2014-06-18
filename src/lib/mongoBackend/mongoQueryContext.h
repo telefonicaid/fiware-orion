@@ -39,11 +39,11 @@
 */
 extern HttpStatusCode mongoQueryContext
 (
-  QueryContextRequest*                       requestP,
-  QueryContextResponse*                      responseP,
-  const std::string&                         tenant,
-  const std::string&                         servicePath,
-  std::map<std::string, std::string>&        uriParams
+  QueryContextRequest*                  requestP,
+  QueryContextResponse*                 responseP,
+  const std::string&                    tenant,
+  const std::vector<std::string>&       servicePathV,
+  std::map<std::string, std::string>&   uriParams
 );
 
 #endif

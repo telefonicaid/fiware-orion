@@ -58,6 +58,16 @@ echo "+++++ 4: service path must start with a '/'"
 orionCurl --url /NGSI10/queryContext --payload "$payload" --servicePath 'X'
 echo
 
+echo "+++++ 5: four service paths"
+orionCurl --url /NGSI10/queryContext --payload "$payload" --servicePath '/home/kz/1, /home/kz/2, /home/kz/3, /home/kz/4'
+echo
+echo "+++++ 6: service paths from log file"
+grep servicePathSplit /tmp/contextBrokerLog | awk -F\] '{ print $2 }'
+echo
+
+echo "+++++ 7: eleven service paths"
+orionCurl --url /NGSI10/queryContext --payload "$payload" --servicePath '/home/kz/1, /home/kz/2, /home/kz/3, /home/kz/4, /home/kz/5, /home/kz/6, /home/kz/7, /home/kz/88, /home/kz/9, /home/kz/10, /home/kz/11'
+echo
 --REGEXPECT--
 +++++ 0. OK
 HTTP/1.1 200 OK
@@ -90,7 +100,7 @@ Date: REGEX(.*)
 +++++ 2. Too many levels in path
 HTTP/1.1 200 OK
 Connection: close
-Content-Length: 145
+Content-Length: 183
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -98,7 +108,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>too many components in ServicePath</details>
+  <details>too many components in ServicePath '/h1/h2/h3/h4/h5/h6/h7/h8/h9/h10/h11'</details>
 </orionError>
 
 +++++ 3: bad char in component
@@ -127,6 +137,45 @@ Date: REGEX(.*)
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
   <details>Only 'absolute' Service Paths allowed (a service path must begin with '/')</details>
+</orionError>
+
++++++ 5: four service paths
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+
++++++ 6: service paths from log file
+ servicePathSplit: Service Path 0: '/h012345678/h1/h2/h3/h4/h5/h6/h7/h8/h9'
+ servicePathSplit: Service Path 0: '/h0123456789'
+ servicePathSplit: Service Path 0: '/h1/h2/h3/h4/h5/h6/h7/h8/h9/h10/h11'
+ servicePathSplit: Service Path 0: '/h-1/h2/h3/h4/h5/h6/h7/h8/h9/h9'
+ servicePathSplit: Service Path 0: 'X'
+ servicePathSplit: Service Path 0: '/home/kz/1'
+ servicePathSplit: Service Path 1: '/home/kz/2'
+ servicePathSplit: Service Path 2: '/home/kz/3'
+ servicePathSplit: Service Path 3: '/home/kz/4'
+
++++++ 7: eleven service paths
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 177
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<orionError>
+  <code>400</code>
+  <reasonPhrase>Bad Request</reasonPhrase>
+  <details>too many service paths - a maximum of ten service paths is allowed</details>
 </orionError>
 
 --TEARDOWN--

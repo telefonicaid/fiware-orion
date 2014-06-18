@@ -18,45 +18,14 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
 
-# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+# Calculating version for RPM
+currentVersion=$(grep "define ORION_VERSION" src/app/contextBroker/version.h  | awk -F\" '{ print $2 }')
+# We assume that currentVersion has the following format: "0.14.0-next"
+baseToken=$(echo $currentVersion | awk -F '-' '{print $1}')
+timeToken=$(date "+%Y%m%d%H%M%S")
+newVersion=${baseToken}_${timeToken}
 
---NAME--
-JSON throttling
---SHELL-INIT--
-dbInit CB
-brokerStart CB
-
---SHELL--
-echo "1: +++++++++++++++++++++++++++++"
-url="/ngsi10/subscribeContext"
-payload='{
-  "entities" : [
-    {
-      "type" : "Room",
-      "isPattern" : "false",
-      "id" : "OfficeRoom"
-    }
-  ],
-  "reference" : "http://localhost:${LISTENER_PORT}/notify",
-  "throttling" : "PT5H"
-}'
-orionCurl --url ${url} --payload "${payload}" --json
-
-echo "2: +++++++++++++++++++++++++++++"
---REGEXPECT--
-1: +++++++++++++++++++++++++++++
-HTTP/1.1 200 OK
-Content-Length: 137
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "subscribeResponse": {
-        "duration": "PT24H", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
-        "throttling": "PT5H"
-    }
-}
-2: +++++++++++++++++++++++++++++
---TEARDOWN--
-brokerStop CB
+# Changing version
+echo "changing: <$currentVersion> to <$newVersion>"
+sed "s/$currentVersion/$newVersion/" src/app/contextBroker/version.h > /tmp/version.h
+mv /tmp/version.h src/app/contextBroker/version.h

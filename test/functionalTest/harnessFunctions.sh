@@ -313,187 +313,6 @@ function accumulatorStart()
   done
 }
 
-
-
-# ------------------------------------------------------------------------------
-#
-# printXmlWithHeaders - 
-#
-function printXmlWithHeaders()
-{
-  text=$1
-
-  cat headers.out
-
-  if [ "$text" != "" ]
-  then
-    echo "$text" | xmllint --format -
-  fi
-
-  rm headers.out
-}
-
-
-
-# ------------------------------------------------------------------------------
-#
-# printJsonWithHeaders - 
-#
-function printJsonWithHeaders()
-{
-  text=$1
-
-  cat headers.out
-
-  if [ "$text" != "" ]
-  then
-    echo "${text}" | python -mjson.tool
-  fi
-
-  rm headers.out
-}
-
-
-
-# ------------------------------------------------------------------------------
-#
-# curlIt- 
-#
-# URL: You also have to specify host, port
-# 
-function curlIt()
-{
-  _outFormat="$1"
-  _url="$2"
-  _payload="$3"
-  _contenttype="$4"
-  _accept="$5"
-  _extraoptions="$6"
-  _httpTenant="$7"
-
-  _params="-s -S --dump-header headers.out"
-
-  if [ "$_extraoptions" == "" ] && [ "$_httpTenant" != "" ]
-  then
-    response=$(echo ${_payload} | (curl ${_url} ${_params} --header "${_contenttype}" --header "${_accept}" --header "Expect:" --header "$_httpTenant" -d @- ))
-  else
-    response=$(echo ${_payload} | (curl ${_url} ${_params} --header "${_contenttype}" --header "${_accept}" --header "Expect:" ${_extraoptions} -d @- ))
-  fi
-
-  if [ "$_outFormat" == "XML" ] || [ "$_outFormat" == "xml" ]
-  then
-    printXmlWithHeaders "${response}"
-  elif [ "$_outFormat" == "JSON" ] || [ "$_outFormat" == "json" ]
-  then
-    printJsonWithHeaders "${response}"
-  fi
-}
-
-
-
-# ------------------------------------------------------------------------------
-#
-# curlXml - 
-#
-# Helper function.
-#
-function curlXml()
-{
-  _url="$1"
-  _payload="$2"
-  shift
-  shift
-  _extraoptions=$*
-  
-  curlIt "XML" "localhost:${BROKER_PORT}${_url}" "${_payload}" "Content-Type: application/xml" "Accept: application/xml" "$_extraoptions"
-}
-
-function curlXmlTenants()
-{
-  _url="$1"
-  _payload="$2"
-  _tenant="$3"
-  
-  curlIt "XML" "localhost:${BROKER_PORT}${_url}" "${_payload}" "Content-Type: application/xml" "Accept: application/xml" "" "$_tenant"
-}
-
-
-# ------------------------------------------------------------------------------
-#
-# curlJson - 
-#
-# Helper function.
-#
-function curlJson()
-{
-  _url="$1"
-  _payload="$2"
-  _extraoptions="$3"
-  
-  curlIt "JSON" "localhost:${BROKER_PORT}${_url}" "${_payload}" "Content-Type: application/json" "Accept: application/json" "${_extraoptions}"
-}
-
-
-
-# ------------------------------------------------------------------------------
-#
-# curlNoPayload - 
-#
-function curlNoPayload()
-{
-  _outFormat="$1"
-  _url="$2"
-  _extraoptions="$3"
-  _contenttype="$4"
-  _accept="$5"
-   
-  _params="-s -S --dump-header headers.out "
-  
-  _response=$(curl localhost:${BROKER_PORT}${_url} ${_params} ${_extraoptions} --header "${_contenttype}" --header "${_accept}")
-    
-  if [ "$_outFormat" == "XML" ] || [ "$_outFormat" == "xml" ]
-  then
-    printXmlWithHeaders "${_response}"
-  elif [ "$_outFormat" == "JSON" ] || [ "$_outFormat" == "json" ]
-  then
-    printJsonWithHeaders "${_response}"
-  fi
-}
-
-
-
-# ------------------------------------------------------------------------------
-#
-# curlXmlNoPayload - 
-#
-# Helper function.
-#
-function curlXmlNoPayload()
-{
-  _url="$1"
-  _extraoptions="$2"
-  
-  curlNoPayload "XML" "$_url" "$_extraoptions" "Content-Type: application/xml" "Accept: application/xml"
-}
-
-
-
-# ------------------------------------------------------------------------------
-#
-# curlJsonNoPayload - 
-#
-# Helper function.
-#
-function curlJsonNoPayload()
-{
-  _url="$1"
-  _extraoptions="$2"
-  
-  curlNoPayload "JSON" "$_url" "$_extraoptions" "Content-Type: application/json" "Accept: application/json"
-}
-
-
-
 # ------------------------------------------------------------------------------
 #
 # mongoCmd - 
@@ -611,7 +430,6 @@ function orionCurl()
     shift
   done
 
-
   #
   # Sanity check of parameters
   #
@@ -654,22 +472,40 @@ function orionCurl()
     fi
   fi
 
-  if [ "$_method"      != "" ]; then    _METHOD=' -X "'$_method'"';   fi
-  if [ "$_httpTenant"  != "" ]; then    _HTTP_TENANT='--header "fiware-service:'$_httpTenant'"';  fi
 
+  if [ "$_method" != "" ];     then    _METHOD=' -X '$_method;   fi
+  #if [ "$_httpTenant" != "" ]; then    _HTTP_TENANT='--header "Fiware-Service:'$_httpTenant'"';  fi
   if [ "$_urlTenant" != "" ]
   then
-    _URL=$_host:$_port/$_tenant$_url
+    _URL=$_host:$_port/$_urlTenant$_url
   else
     _URL=$_host:$_port$_url
   fi
   
   _BUILTINS='-s -S --dump-header /tmp/httpHeaders.out'
-  # echo '==============================================================================================================================================================='
-  # echo "echo $_payload | curl $_URL $_PAYLOAD $_METHOD --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\" $HTTP_TENANT $_BUILTINS  --header "service-path: $_servicePath" $_xtra"
-  # echo '==============================================================================================================================================================='
 
-  _response=$(echo $_payload | curl $_URL $_PAYLOAD $_METHOD --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $HTTP_TENANT $_BUILTINS --header "service-path: $_servicePath" $_xtra)
+#   echo '==============================================================================================================================================================='
+#   echo "echo \"${_payload}\" | curl $_URL $_PAYLOAD $_METHOD ${_HTTP_TENANT} --header \"Expect:\" --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\"  $_BUILTINS --header "service-path: $_servicePath" $_xtra"
+#   echo '==============================================================================================================================================================='   
+  
+  # FIXME: This should 'if' be refactored: if we use the $_HTTP_TENANT variable
+  # within curl it will not render correctly. We have to find another way.
+  if [ "$_httpTenant" != "" ]
+  then
+     if [ "$_servicePath" != "" ]
+     then
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "service-path: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
+     else
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
+     fi
+  else
+     if [ "$_servicePath" != "" ]
+     then
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "service-path: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
+     else
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
+     fi
+  fi
   
   #
   # Remove "Connection: Keep-Alive" header and print headers out
@@ -677,18 +513,20 @@ function orionCurl()
   sed '/Connection: Keep-Alive/d' /tmp/httpHeaders.out
   
   #
-  # Print and beautify response body
+  # Print and beautify response body (IF ANY)
   #
-  if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == "" ]
+  if [ "$_response" != "" ]
   then
-    echo $_response | xmllint --format -
-  elif [ "$_outFormat" == application/json ]
-  then
-    echo $_response | python -mjson.tool
-  else
-    echo $_response | xmllint --format -
+    if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == "" ]
+    then
+      echo $_response | xmllint --format -
+    elif [ "$_outFormat" == application/json ]
+    then
+      echo $_response | python -mjson.tool
+    else
+      echo $_response | xmllint --format -
+    fi
   fi
-  
 }
 
 export -f dbInit
@@ -699,15 +537,6 @@ export -f brokerStop
 export -f localBrokerStop
 export -f accumulatorStart
 export -f accumulatorStop
-export -f curlXml
-export -f curlIt
-export -f curlJson
 export -f orionCurl
-export -f printXmlWithHeaders
-export -f printJsonWithHeaders
-export -f curlXmlNoPayload
-export -f curlJsonNoPayload
-export -f curlNoPayload
-export -f curlXmlTenants
 export -f dbInsertEntity
 export -f mongoCmd

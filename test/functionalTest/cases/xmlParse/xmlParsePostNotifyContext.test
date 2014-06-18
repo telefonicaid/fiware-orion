@@ -96,7 +96,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </contextElementResponse>
   </contextResponseList>
 </notifyContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "${payload}"
 
 echo "++++++++++++++++++++"
 --REGEXPECT--

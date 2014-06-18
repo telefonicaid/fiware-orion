@@ -62,7 +62,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 #   1. err: unknown path
 #INVALID_XML
@@ -88,7 +88,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 
 #   2. ok:  One string 's1' == 'STRING' as compound value (contextValue is a struct)
@@ -114,7 +114,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 
 #   3. ok:  's1' and 's2' (== 'STRING2')
@@ -141,7 +141,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 
 #   4. err: Two items with same name in struct 's1' + 's2' + 's1'
@@ -169,7 +169,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 
 #   5. ok:  contextValue is a vector with one item
@@ -195,7 +195,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 
 #   6. ok:  contextValue is a vector with five items
@@ -225,7 +225,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 
 #   7. err: contextValue is a vector with five items + one item with a bad name
@@ -256,7 +256,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 
 #   8. ok: two structs with two values each
@@ -289,7 +289,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 --REGEXPECT--
 0: +++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK

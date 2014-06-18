@@ -49,7 +49,7 @@ payload='<?xml version="1.0"?>
   <duration>PT1H</duration>
   <registrationId></registrationId>
 </registerContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "${payload}"
 
 echo "1: ++++++++++++++++++++"
 
@@ -86,7 +86,7 @@ payload='<?xml version="1.0"?>
   <duration>PT1H</duration>
   <registrationId></registrationId>
 </registerContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "${payload}"
 
 echo "2: ++++++++++++++++++++"
 
@@ -110,7 +110,7 @@ payload='<?xml version="1.0"?>
     </scope>
   </restriction>
 </discoverContextAvailabilityRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "${payload}"
 
 echo "3: ++++++++++++++++++++"
 

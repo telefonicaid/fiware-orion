@@ -85,7 +85,7 @@ payload='<?xml version="1.0"?>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
 
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 echo Notification count from mongo:
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -117,7 +117,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 echo Notification count from mongo:
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -131,7 +131,7 @@ payload='<?xml version="1.0"?>
   <subscriptionId>'$SUB_ID'</subscriptionId>
   <throttling>PT6S</throttling>
 </updateContextSubscriptionRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 echo Notification count from mongo:
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -167,7 +167,7 @@ payload='<?xml version="1.0"?>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
 
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 echo Notification count from mongo:
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -200,7 +200,7 @@ payload='<?xml version="1.0"?>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
 
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 
 
@@ -226,7 +226,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 echo Notification count from mongo:
 mongoCmd ${BROKER_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
@@ -253,7 +253,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
 </updateContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 
 
@@ -263,7 +263,7 @@ payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
   <subscriptionId>'$SUB_ID'</subscriptionId>
 </unsubscribeContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 
 
@@ -287,7 +287,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "$payload"
 echo
 
 

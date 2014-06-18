@@ -93,7 +93,7 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "${payload}"
 echo
 
 echo "1: ++++++++++ Madrid in 14 kms ++++++++++"
@@ -123,7 +123,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </scope>
   </restriction>
 </queryContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "${payload}"
 echo
 
 
@@ -154,7 +154,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </scope>
   </restriction>
 </queryContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "${payload}"
 echo
 
 
@@ -186,7 +186,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </scope>
   </restriction>
 </queryContextRequest>'
-curlXml "$url" "$payload"
+orionCurl --url "$url" --payload "${payload}"
 echo
 
 --REGEXPECT--

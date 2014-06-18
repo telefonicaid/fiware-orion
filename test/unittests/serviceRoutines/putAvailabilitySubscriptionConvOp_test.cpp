@@ -102,6 +102,7 @@ TEST(putAvailabilitySubscriptionConvOp, put)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+
   ci3.payload      = testBuf;
   ci3.payloadSize  = strlen(testBuf);
   out              = restService(&ci3, rs);

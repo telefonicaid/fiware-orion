@@ -46,23 +46,32 @@
 */
 HttpStatusCode mongoUpdateContext
 (
-  UpdateContextRequest*                requestP,
-  UpdateContextResponse*               responseP,
-  const std::string&                   tenant,
-  const std::string&                   servicePath
+  UpdateContextRequest*            requestP,
+  UpdateContextResponse*           responseP,
+  const std::string&               tenant,
+  const std::vector<std::string>&  servicePathV
 )
 {
     reqSemTake(__FUNCTION__, "ngsi10 update request");
 
-    /* Process each ContextElement */
-    for (unsigned int ix= 0; ix < requestP->contextElementVector.size(); ++ix) {        
-        processContextElement(requestP->contextElementVector.get(ix), responseP, requestP->updateActionType.get(), tenant, servicePath);
+    /* Check that the service path vector has only one element, returning error otherwise */
+    if (servicePathV.size() > 1)
+    {
+        LM_W(("service path length (%d) greater than one in update", servicePathV.size()));
+        responseP->errorCode.fill(SccBadRequest, "service path length greater than one in update");
     }
+    else
+    {
 
-    /* Note that although individual processContextElements() invokations returns MsConnectionError, this
-       error get "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
-       consider the overall mongoUpdateContext() as MsOk. */
+        /* Process each ContextElement */
+        for (unsigned int ix= 0; ix < requestP->contextElementVector.size(); ++ix) {
+            processContextElement(requestP->contextElementVector.get(ix), responseP, requestP->updateActionType.get(), tenant, servicePathV);
+        }
 
+        /* Note that although individual processContextElements() invokations returns MsConnectionError, this
+           error get "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
+           consider the overall mongoUpdateContext() as MsOk. */
+    }
     reqSemGive(__FUNCTION__, "ngsi10 update request");
     return SccOk;
 }
