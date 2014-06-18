@@ -27,8 +27,8 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="utf-8" ?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="utf-8" ?>
 <updateContextRequest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <contextElementList>
     <contextElement>
@@ -1062,10 +1062,15 @@ brokerStart CB
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "${payload}"
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 37330
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>

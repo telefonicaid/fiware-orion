@@ -29,8 +29,8 @@ brokerStart CM 0-255
 
 --SHELL--
 # Do a NGSI10 request to check the operation is avoided
-response=$((curl localhost:${CM_PORT}/NGSI10/queryContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">
@@ -41,14 +41,14 @@ response=$((curl localhost:${CM_PORT}/NGSI10/queryContext -s -S --dump-header he
     <attribute>pressure</attribute>
     <attribute>lightstatus</attribute>
   </attributeList>
-</queryContextRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+</queryContextRequest>'
+orionCurl --url "$url" --payload "${payload}" --port ${CM_PORT}
+
 echo "1: ++++++++++++++++++++"
 # Do initial registration in the CM
-response=$((curl localhost:${CM_PORT}/NGSI9/registerContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+
+url="/NGSI9/registerContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -72,38 +72,37 @@ response=$((curl localhost:${CM_PORT}/NGSI9/registerContext -s -S --dump-header 
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>
-EOF)
-REG_ID=$(echo "$response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-cat headers.out
-echo $response | xmllint --format -
+  </registerContextRequest>'
+orionCurl --url "$url" --payload "${payload}" --port ${CM_PORT}
+
+REG_ID=$(echo "$_response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
+
 echo "2: ++++++++++++++++++++"
 
 # Check the registration in CM 
-response=$((curl localhost:${CM_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-  <discoverContextAvailabilityRequest>
-    <entityIdList>
-      <entityId type="Room" isPattern="false">
-        <id>ConferenceRoom</id>
-      </entityId>
-      <entityId type="Room" isPattern="false">
-        <id>OfficeRoom</id>
-      </entityId>
-    </entityIdList>
-    <attributeList>
-      <attribute>temperature</attribute>
-      <attribute>pressure</attribute>
-    </attributeList>
-  </discoverContextAvailabilityRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<discoverContextAvailabilityRequest>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>ConferenceRoom</id>
+    </entityId>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>temperature</attribute>
+    <attribute>pressure</attribute>
+  </attributeList>
+</discoverContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "${payload}" --port ${CM_PORT}
+
 echo "3: ++++++++++++++++++++"
 
 # Check the registration in PSB
-response=$((curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
       <entityId type="Room" isPattern="false">
@@ -117,15 +116,14 @@ response=$((curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -
       <attribute>temperature</attribute>
       <attribute>pressure</attribute>
     </attributeList>
-  </discoverContextAvailabilityRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+  </discoverContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "${payload}"
+
 echo "4: ++++++++++++++++++++"
 
 # Update registration in CM
-response=$((curl localhost:${CM_PORT}/NGSI9/registerContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI9/registerContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -145,45 +143,42 @@ response=$((curl localhost:${CM_PORT}/NGSI9/registerContext -s -S --dump-header 
       </contextRegistration>
     </contextRegistrationList>
     <duration>PT5H</duration>
-    <registrationId>$REG_ID</registrationId>
-  </registerContextRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+    <registrationId>'$REG_ID'</registrationId>
+  </registerContextRequest>'
+orionCurl --url "$url" --payload "${payload}" --port ${CM_PORT}
+
 echo "5: ++++++++++++++++++++"
 
 # Check the registration in CM
-response=$((curl localhost:${CM_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-  <discoverContextAvailabilityRequest>
-    <entityIdList>
-      <entityId type="Car" isPattern="false">
-        <id>MyCar</id>
-      </entityId>
-    </entityIdList>
-    <attributeList>
-    </attributeList>
-  </discoverContextAvailabilityRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<discoverContextAvailabilityRequest>
+  <entityIdList>
+    <entityId type="Car" isPattern="false">
+      <id>MyCar</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+  </attributeList>
+</discoverContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "${payload}" --port ${CM_PORT}
+
 echo "6: ++++++++++++++++++++"
 
 # Check the registration in PSB
-response=$((curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-  <discoverContextAvailabilityRequest>
-    <entityIdList>
-      <entityId type="Car" isPattern="false">
-        <id>MyCar</id>
-      </entityId>
-    </entityIdList>
-    <attributeList>
-    </attributeList>
-  </discoverContextAvailabilityRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<discoverContextAvailabilityRequest>
+  <entityIdList>
+    <entityId type="Car" isPattern="false">
+      <id>MyCar</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+  </attributeList>
+</discoverContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "${payload}"
+
 echo "7: ++++++++++++++++++++"
 
 # Check that everything is ok at database layer
