@@ -27,8 +27,8 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -58,16 +58,14 @@ brokerStart CB
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 echo
 echo "+++++++++ vector compound created +++++++++++"
-echo
-echo
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @-) <<EOF
-{
+url="/NGSI10/queryContext"
+payload='{
     "entities": [
         {
             "type": "T",
@@ -75,9 +73,15 @@ echo
             "id": "EVector"
         }
     ]
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 628
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -103,42 +107,45 @@ EOF
 </updateContextResponse>
 
 +++++++++ vector compound created +++++++++++
-
+HTTP/1.1 200 OK
+Content-Length: 647
+Content-Type: application/json
+Date: REGEX(.*)
 
 {
-  "contextResponses" : [
-    {
-      "contextElement" : {
-        "type" : "T",
-        "isPattern" : "false",
-        "id" : "EVector",
-        "attributes" : [
-          {
-            "name" : "att",
-            "type" : "compound",
-            "value" : [
-              "22",
-              {
-                "x" : [
-                  "x1",
-                  "x2"
-                ],
-                "y" : "3"
-              },
-              [
-                "z1",
-                "z2"
-              ]
-            ]
-          }
-        ]
-      },
-      "statusCode" : {
-        "code" : "200",
-        "reasonPhrase" : "OK"
-      }
-    }
-  ]
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "att", 
+                        "type": "compound", 
+                        "value": [
+                            "22", 
+                            {
+                                "x": [
+                                    "x1", 
+                                    "x2"
+                                ], 
+                                "y": "3"
+                            }, 
+                            [
+                                "z1", 
+                                "z2"
+                            ]
+                        ]
+                    }
+                ], 
+                "id": "EVector", 
+                "isPattern": "false", 
+                "type": "T"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
 }
 --TEARDOWN--
 brokerStop CB
