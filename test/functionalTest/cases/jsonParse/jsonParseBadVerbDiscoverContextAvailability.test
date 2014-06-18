@@ -70,7 +70,7 @@ payload='{
   ],
   "duration": "PT1M"
 }'
-curlJson "$url" "$payload"
+orionCurl --url "$url" --payload "${payload}" --json
 
 echo "+++++ Registration Done +++++++++++++++"
 
@@ -106,7 +106,7 @@ payload='{
     ]
   }
 }'
-curlJson "$url" "$payload" "-X BAD_VERB"
+orionCurl --url "$url" -X "BAD_VERB" --payload "${payload}" --json 
 
 echo "+++++ Discovery Done +++++++++++++++"
 --REGEXPECT--

@@ -47,9 +47,9 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <duration>PT1H</duration>
   <providingApplication>http://kz.tid.es/abc</providingApplication>
 </registerProviderRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
-REG_ID=$(echo "$response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
+REG_ID=$(echo "$_response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
 # Make a discovery to see that the registration went OK
 echo "2: ++++++++++++++++++++"
@@ -62,7 +62,7 @@ payload='<?xml version="1.0"?>
       </entityId>
     </entityIdList>
   </discoverContextAvailabilityRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 # Modify the first registration
 echo "3: ++++++++++++++++++++"
@@ -86,10 +86,9 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <providingApplication>http://kz.tid.es/abc2</providingApplication>
   <registrationId>'$REG_ID'</registrationId>
 </registerProviderRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 echo "4: ++++++++++++++++++++"
-
 # Now discover that very registration again to see the change
 url="/NGSI9/discoverContextAvailability"
 payload='<?xml version="1.0"?>
@@ -100,21 +99,19 @@ payload='<?xml version="1.0"?>
       </entityId>
     </entityIdList>
   </discoverContextAvailabilityRequest>'
-curlXml ${url} "${payload}"
+orionCurl --url "$url" --payload "${payload}"
 
 echo "5: ++++++++++++++++++++"
-
 # Now try the GET method
-curlXmlNoPayload "/NGSI9/contextEntities/ENTITY_ID/attributes"
+orionCurl --url "/NGSI9/contextEntities/ENTITY_ID/attributes"
 
 echo "6: ++++++++++++++++++++"
-
 # And a GET that fails
-curlXmlNoPayload "/NGSI9/contextEntities/ENTITY_ID2/attributes"
-echo "7: ++++++++++++++++++++"
+orionCurl --url "/NGSI9/contextEntities/ENTITY_ID2/attributes"
 
+echo "7: ++++++++++++++++++++"
 # DELETE and PUT should give errors
-curlXmlNoPayload "/NGSI9/contextEntities/ENTITY_ID/attributes" "-X DELETE"
+orionCurl --url "/NGSI9/contextEntities/ENTITY_ID/attributes" -X "DELETE"
 
 echo "8: ++++++++++++++++++++"
 url="/NGSI9/contextEntities/ENTITY_ID/attributes"
@@ -135,7 +132,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <duration>PT2H</duration>
   <providingApplication>http://kz.tid.es/abc2</providingApplication>
 </registerProviderRequest>'
-curlXml ${url} "${payload}" "-X PUT"
+orionCurl --url "$url" --payload "${payload}" -X "PUT"
 
 echo "9: ++++++++++++++++++++"
 

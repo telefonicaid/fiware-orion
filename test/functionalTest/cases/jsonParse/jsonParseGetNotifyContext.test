@@ -96,7 +96,7 @@ payload='{
     }
   ]
 }'
-curlJson ${url} "${payload}" "-X GET"
+orionCurl --url ${url} --payload "${payload}" -X "GET"
 
 --REGEXPECT--
 1: ***********************************

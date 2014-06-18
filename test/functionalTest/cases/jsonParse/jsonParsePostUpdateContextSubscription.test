@@ -57,7 +57,7 @@ payload='{
   ],
   "throttling": "P5Y"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url ${url} --payload "${payload}" --json
 
 echo "2: ***********************************"
 url="/NGSI10/subscribeContext"
@@ -107,9 +107,9 @@ payload='{
   ],
   "throttling": "P5Y"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url ${url} --payload "${payload}" --json
 
-SUB_ID=$(echo "$response" | grep subscriptionId | awk -F\" '{ print $4}')
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 
 echo "3: ***********************************"
 url="/NGSI10/updateContextSubscription"
@@ -141,7 +141,7 @@ payload='{
   ],
   "throttling": "P4Y"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url ${url} --payload "${payload}" --json
 
 echo "4: ***********************************"
 --REGEXPECT--

@@ -33,7 +33,7 @@ payload='{
   "duration" : "P1M",
   "providingApplication" : "http://mysensors.com/Rooms"
 }'
-curlJson "${url}" "${payload}"
+orionCurl --url "${url}" --payload "${payload}" --json
 
 echo "2: ***********************************"
 url="/ngsi9/contextEntities/Room1/attributes/temperature"
@@ -41,7 +41,7 @@ payload='{
   "duration" : "P1M",
   "providingApplication" : "http://mysensors.com/Rooms"
 }'
-curlJson "${url}" "${payload}"
+orionCurl --url "${url}" --payload "${payload}" --json
 
 echo "3: ***********************************"
 url="/ngsi9/contextEntities/Room1/attributes/pressure"
@@ -49,7 +49,7 @@ payload='{
   "duration" : "P1M",
   "providingApplication" : "http://mysensors.com/Rooms"
 }'
-curlJson "${url}" "${payload}"
+orionCurl --url "${url}" --payload "${payload}" --json
 
 --REGEXPECT--
 1: ***********************************

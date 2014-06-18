@@ -72,7 +72,7 @@ payload='{
     }
   ]
 }'
-curlJson ${url} "${payload}"
+orionCurl --url ${url} --payload "${payload}" --json
 
 echo "2: ***********************************"
 --REGEXPECT--

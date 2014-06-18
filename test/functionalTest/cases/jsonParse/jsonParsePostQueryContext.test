@@ -61,7 +61,7 @@ payload='{
     ]
   }
 }'
-curlJson ${url} "${payload}"
+orionCurl --url ${url} --payload "${payload}" --json
 
 echo "2: ***********************************"
 url="/NGSI9/registerContext"
@@ -106,7 +106,7 @@ payload='{
   ],
   "duration": "PT1M"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url ${url} --payload "${payload}" --json
 
 echo "3: ***********************************"
 url="/NGSI10/queryContext"
@@ -142,7 +142,7 @@ payload='{
     ]
   }
 }'
-curlJson ${url} "${payload}"
+orionCurl --url ${url} --payload "${payload}" --json
 
 echo "4: ***********************************"
 --REGEXPECT--

@@ -33,7 +33,7 @@ url="/NGSI9/unsubscribeContextAvailability"
 payload='{
   "subscriptionId": "012345678901234567890123"
 }'
-curlJson ${url} "${payload}"
+orionCurl --url ${url} --payload "${payload}" --json
 
 
 echo "2: ***********************************"
