@@ -144,6 +144,11 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "content-type") == 0)    headerP->contentType    = value;
   else if (strcasecmp(key.c_str(), "content-length") == 0)  headerP->contentLength  = atoi(value);
   else if (strcasecmp(key.c_str(), "fiware-service") == 0)  headerP->tenant         = value;
+  else if (strcasecmp(key.c_str(), "service-path") == 0)
+  {
+    headerP->servicePath         = value;
+    headerP->servicePathReceived = true;
+  }
   else
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
 
@@ -334,6 +339,108 @@ static int outFormatCheck(ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
+* servicePathCheck - 
+*
+* Not static just to let unit tests call this function
+*/
+int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
+{
+  // 1. Max 10 paths  - ONLY ONE path allowed at this moment
+  // 2. Max 10 levels in each path
+  // 3. Max 10 characters in each path component
+  // 4. Only alphanum and underscore allowed (just like in tenants)
+  
+  std::vector<std::string> compV;
+  int                      components;
+
+
+  if (ciP->httpHeaders.servicePathReceived == false)
+    return 0;
+
+  if (servicePath[0] != '/')
+  {
+    OrionError e(SccBadRequest, "Only 'absolute' Service Paths allowed (a service path must begin with '/')");
+    ciP->answer = e.render(ciP->outFormat, "");
+    return 1;
+  }
+
+  components = stringSplit(servicePath, '/', compV);
+
+  if (components > 10)
+  {
+    OrionError e(SccBadRequest, std::string("too many components in ServicePath '") + servicePath + "'");
+    ciP->answer = e.render(ciP->outFormat, "");
+    return 2;
+  }
+
+  for (int ix = 0; ix < components; ++ix)
+  {
+    if (strlen(compV[ix].c_str()) > 10)
+    {
+      OrionError e(SccBadRequest, std::string("component-name too long in ServicePath '") + servicePath + "'");
+      ciP->answer = e.render(ciP->outFormat, "");
+      return 3;
+    }
+
+    const char* comp = compV[ix].c_str();
+
+    for (unsigned int cIx = 0; cIx < strlen(comp); ++cIx)
+    {
+      if (!isalnum(comp[cIx]) && (comp[cIx] != '_'))
+      {
+        OrionError e(SccBadRequest, std::string("component '") + comp + " ' of ServicePath contains illegal character '" + comp[cIx] + "'");
+        ciP->answer = e.render(ciP->outFormat, "");
+        return 4;
+      }
+    }
+  }
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* servicePathSplit - 
+*/
+int servicePathSplit(ConnectionInfo* ciP)
+{
+  int servicePaths = stringSplit(ciP->servicePath, ',', ciP->servicePathV);
+
+  if (servicePaths == 0)
+  {
+    /* In this case the result is a 0 lenght vector */
+    return 0;
+  }
+
+  if (servicePaths > 10)
+  {
+    OrionError e(SccBadRequest, "too many service paths - a maximum of ten service paths is allowed");
+    ciP->answer = e.render(ciP->outFormat, "");
+    return 5;
+  }
+
+  for (int ix = 0; ix < servicePaths; ++ix)
+  {
+    ciP->servicePathV[ix] = std::string(wsStrip((char*) ciP->servicePathV[ix].c_str()));
+    LM_T(LmtServicePath, ("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
+  }
+
+  for (int ix = 0; ix < servicePaths; ++ix)
+  {
+    int s;
+    if ((s = servicePathCheck(ciP, ciP->servicePathV[ix].c_str())) != 0)
+      return s;
+  }
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
 * contentTypeCheck -
 *
 * NOTE
@@ -438,11 +545,19 @@ static int connectionTreat
     LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
+    
     ciP->tenantFromHttpHeader = ciP->httpHeaders.tenant;
     LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));
     ciP->outFormat            = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
       ciP->outFormat = XML; // XML is default output format
+
+    ciP->servicePath = ciP->httpHeaders.servicePath;
+    if (servicePathSplit(ciP) != 0)
+    {
+      LM_W(("Error in ServicerPath header"));
+      restReply(ciP, ciP->answer);
+    }
 
     if (contentTypeCheck(ciP) != 0)
     {

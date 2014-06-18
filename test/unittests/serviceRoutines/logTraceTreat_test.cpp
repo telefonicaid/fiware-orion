@@ -148,13 +148,13 @@ TEST(logTraceTreat, deleteIndividual)
 
   utInit();
 
-  ci1.outFormat = XML;
+  ci0.outFormat = XML;
   out          = restService(&ci0, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile0)) << "Error getting test data from '" << outfile0 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   ci1.outFormat = XML;
-  out          = restService(&ci1, rs);
+  out           = restService(&ci1, rs);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

@@ -55,7 +55,7 @@ HttpStatusCode mapPutIndividualContextEntityAttributes(const std::string& entity
   ucRequest.contextElementVector.push_back(&ce);
   ucRequest.updateActionType.set("Update");
 
-  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
 
   ContextAttributeResponse* carP = new ContextAttributeResponse();
   ContextElement*           ceP  = &ucResponse.contextElementResponseVector.get(0)->contextElement;

@@ -68,6 +68,14 @@ std::map<std::string, std::string> uriParams;
 
 /* ****************************************************************************
 *
+* servicePathVector - 
+*/
+std::vector<std::string> servicePathVector;
+
+
+
+/* ****************************************************************************
+*
 * utInit - unit test init
 *
 */
@@ -105,6 +113,12 @@ void utInit(void)
   // Default mime type for notifications: application/xml
   //
   uriParams[URI_PARAM_NOTIFY_FORMAT] = "XML";
+
+
+  //
+  // Resetting servicePathVector
+  //
+  servicePathVector.clear();
 }
 
 

@@ -389,6 +389,7 @@ function dbInsertEntity()
 #   --json        (in/out JSON)    (if --in/out is used AFTER --json, it overrides) 
 #   --httpTenant  <tenant>         (tenant in HTTP header)
 #   --urlTenant   <tenant>         (tenant in URL)
+#   --servicePath <path>           (Service Path in HTTP header)
 #
 # Any parameters are sent as is to 'curl'
 # 
@@ -406,6 +407,7 @@ function orionCurl()
   _outFormat=application/xml
   _json=""
   _httpTenant=""
+  _servicePath=""
   _urlTenant=""
   _xtra=''
 
@@ -420,6 +422,7 @@ function orionCurl()
     elif [ "$1" == "--out" ]; then             _outFormat="$2"; shift;
     elif [ "$1" == "--json" ]; then            _inFormat=application/json; _outFormat=application/json; shift;
     elif [ "$1" == "--httpTenant" ]; then      _httpTenant="$2"; shift;
+    elif [ "$1" == "--servicePath" ]; then     _servicePath="$2"; shift;
     elif [ "$1" == "--urlTenant" ]; then       _urlTenant="$2"; shift;
     else                                       _xtra="$_xtra $1"; shift;
     fi
@@ -454,6 +457,7 @@ function orionCurl()
   _METHOD=''
   _URL=''
   _HTTP_TENANT=''
+  _SERVICE_PATH=''
 
   #
   # Set up the compound variables
@@ -468,6 +472,7 @@ function orionCurl()
     fi
   fi
 
+
   if [ "$_method" != "" ];     then    _METHOD=' -X '$_method;   fi
   #if [ "$_httpTenant" != "" ]; then    _HTTP_TENANT='--header "Fiware-Service:'$_httpTenant'"';  fi
   if [ "$_urlTenant" != "" ]
@@ -480,17 +485,27 @@ function orionCurl()
   _BUILTINS='-s -S --dump-header /tmp/httpHeaders.out'
 
 #   echo '==============================================================================================================================================================='
-#   echo "echo \"${_payload}\" | curl $_URL $_PAYLOAD $_METHOD ${_HTTP_TENANT} --header \"Expect:\" --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\"  $_BUILTINS $_xtra"
+#   echo "echo \"${_payload}\" | curl $_URL $_PAYLOAD $_METHOD ${_HTTP_TENANT} --header \"Expect:\" --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\"  $_BUILTINS --header "service-path: $_servicePath" $_xtra"
 #   echo '==============================================================================================================================================================='   
   
   # FIXME: This should 'if' be refactored: if we use the $_HTTP_TENANT variable
   # within curl it will not render correctly. We have to find another way.
   if [ "$_httpTenant" != "" ]
-  then    
-    _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
+  then
+     if [ "$_servicePath" != "" ]
+     then
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "service-path: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
+     else
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
+     fi
   else
-    _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
-  fi  
+     if [ "$_servicePath" != "" ]
+     then
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "service-path: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
+     else
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
+     fi
+  fi
   
   #
   # Remove "Connection: Keep-Alive" header and print headers out

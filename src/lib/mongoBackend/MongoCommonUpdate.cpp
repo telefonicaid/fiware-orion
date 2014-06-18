@@ -329,7 +329,7 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         /* Update metadata */
         BSONArrayBuilder mdNewVBuilder;
 
-        /* First add the metadata elements comming in the request */
+        /* First add the metadata elements coming in the request */
         for (unsigned int ix = 0; ix < ca.metadataVector.size() ; ++ix) {
             Metadata* md = ca.metadataVector.get(ix);
             /* Skip not custom metadata */
@@ -381,7 +381,7 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
             }
         }
         else {
-            // FIXME P6: in the case of composed value, it's more difficult to know if an attribute
+            // FIXME P6: in the case of compound value, it's more difficult to know if an attribute
             // has really changed its value (many levels have to be traversed). Until we can develop the
             // matching logic, we consider actualUpdate always true.
             *actualUpdate = true;
@@ -842,7 +842,7 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
 * processSubscriptions
 *
 */
-static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
+static bool processSubscriptions(const EntityId* enP, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -885,7 +885,7 @@ static bool processSubscriptions(EntityId en, map<string, BSONObj*>* subs, std::
 
         /* Build entities vector */
         EntityIdVector enV;
-        enV.push_back(new EntityId(en.id, en.type, en.isPattern));
+        enV.push_back(new EntityId(enP->id, enP->type, enP->isPattern));
 
         /* Build attribute list vector */
         AttributeList attrL = subToAttributeList(sub);
@@ -1026,6 +1026,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
          * "append" it would keep the true value untouched */
         bool actualUpdate = true;
         if (strcasecmp(action.c_str(), "update") == 0) {
+          LM_M(("UPDATE: targetAttr.name:%s, targetAttr.value:%s", targetAttr->name.c_str(), targetAttr->value.c_str()));
             if (updateAttribute(attrs, newAttrs, targetAttr, actualUpdate)) {
                 entityModified = actualUpdate || entityModified;
                 attrs = newAttrs;
@@ -1198,7 +1199,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
 * createEntity -
 *
 */
-static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string* errDetail, std::string tenant) {
+static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::string* errDetail, std::string tenant, const std::vector<std::string>& servicePathV) {
 
     DBClientConnection* connection = getMongoConnection();
 
@@ -1210,7 +1211,7 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
     ensureLocationIndex(tenant);
 
     if (!legalIdUsage(attrsV)) {
-        *errDetail = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: (" + e.toString() + ")";
+        *errDetail = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: (" + eP->toString() + ")";
         return false;
     }
 
@@ -1218,16 +1219,18 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
     std::string locAttr;
     double coordLat;
     double coordLong;
-    if (!processLocation(attrsV, locAttr, coordLat, coordLong, errDetail)) {
-        return false;
-    }
+    if (!processLocation(attrsV, locAttr, coordLat, coordLong, errDetail))
+      return false;
+
 
     int now = getCurrentTime();    
     BSONArrayBuilder attrsToAdd;
+
     for (unsigned int ix = 0; ix < attrsV.size(); ++ix) {
         std::string attrId = attrsV.get(ix)->getId();
 
         BSONObjBuilder bsonAttr;
+
         bsonAttr.appendElements(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
                                      ENT_ATTRS_TYPE << attrsV.get(ix)->type <<                                     
                                      ENT_ATTRS_CREATION_DATE << now <<
@@ -1252,14 +1255,25 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
 
         /* Custom metadata */
         BSONObj mdV;
-        if (contextAttributeCustomMetadataToBson(mdV, attrsV.get(ix))) {
+        if (contextAttributeCustomMetadataToBson(mdV, attrsV.get(ix)))
             bsonAttr.appendArray(ENT_ATTRS_MD, mdV);
-        }
-        attrsToAdd.append(bsonAttr.obj());
 
+        attrsToAdd.append(bsonAttr.obj());
     }
 
-    BSONObj bsonId = e.type == "" ? BSON(ENT_ENTITY_ID << e.id) : BSON(ENT_ENTITY_ID << e.id << ENT_ENTITY_TYPE << e.type);
+    BSONObj bsonId;
+
+    if (servicePathV.size() == 0)
+    {
+      LM_T(LmtServicePath, ("Empty service path"));
+      bsonId = eP->type == "" ? BSON(ENT_ENTITY_ID << eP->id) : BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type);
+    }
+    else
+    {
+      LM_T(LmtServicePath, ("Service path string: %s", servicePathV[0].c_str()));
+      bsonId = eP->type == "" ? BSON(ENT_ENTITY_ID << eP->id) : BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type << ENT_SERVICE_PATH << servicePathV[0]);
+    } 
+
     BSONObjBuilder insertedDocB;
     insertedDocB.append("_id", bsonId);
     insertedDocB.append(ENT_ATTRS, attrsToAdd.arr());
@@ -1304,20 +1318,35 @@ static bool createEntity(EntityId e, ContextAttributeVector attrsV, std::string*
 * removeEntity -
 *
 */
-static bool removeEntity(std::string entityId, std::string entityType, ContextElementResponse* cerP, std::string tenant) {
+static bool removeEntity
+(
+  const std::string&       entityId,
+  const std::string&       entityType,
+  ContextElementResponse*  cerP,
+  const std::string&       tenant,
+  const std::string&       servicePath
+)
+{
+    const std::string    idString          = "_id." ENT_ENTITY_ID;
+    const std::string    typeString        = "_id." ENT_ENTITY_TYPE;
+    const std::string    servicePathString = "_id." ENT_SERVICE_PATH;
+    DBClientConnection*  connection        = getMongoConnection();
+    BSONObjBuilder       bob;
+    BSONObj              query;
 
-    const std::string idString   = "_id." ENT_ENTITY_ID;
-    const std::string typeString = "_id." ENT_ENTITY_TYPE;
+    bob.append(idString, entityId);
+    if (entityType == "")
+      bob.append(typeString, BSON("$exists" << false));
+    else
+      bob.append(typeString, entityType);
 
-    DBClientConnection* connection = getMongoConnection();
+    if (servicePath == "")
+      bob.append(servicePathString, BSON("$exists" << false));
+    else
+      bob.append(servicePathString, servicePath);
 
-    BSONObj query;
-    if (entityType == "") {
-        query = BSON(idString << entityId << typeString << BSON("$exists" << false));
-    }
-    else {
-        query = BSON(idString << entityId << typeString << entityType);
-    }
+    query = bob.obj();
+
     try {
         LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", getEntitiesCollectionName(tenant).c_str(),
                            query.toString().c_str()));
@@ -1352,16 +1381,19 @@ static bool removeEntity(std::string entityId, std::string entityType, ContextEl
 *
 * processContextElement -
 *
+* 0. Preparations
+* 1. Preconditions
+* 2. Get the complete list of entities from mongo
 */
-void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, std::string action, std::string tenant) {
+void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, const std::string& action, const std::string& tenant, const std::vector<std::string>& servicePathV) {
 
     DBClientConnection* connection = getMongoConnection();
 
     /* Getting the entity in the request (helpful in other places) */
-    EntityId en = ceP->entityId;
+    EntityId* enP = &ceP->entityId;
 
     /* Not supporting isPattern = true currently */
-    if (isTrue(en.isPattern)) {
+    if (isTrue(enP->isPattern)) {
         buildGeneralErrorReponse(ceP, NULL, responseP, SccNotImplemented);
         return;
     }
@@ -1376,7 +1408,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
                 buildGeneralErrorReponse(ceP, ca, responseP, SccInvalidParameter,                                   
                                    std::string("action: ") + action +
-                                      " - entity: (" + en.toString(true) + ")" +
+                                      " - entity: (" + enP->toString(true) + ")" +
                                       " - offending attribute: " + aP->toString() +
                                       " - empty attribute not allowed in APPEND or UPDATE");
                 return;
@@ -1384,17 +1416,35 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         }
     }
 
-    /* Find entities (could be several ones in the case of no type or isPattern=true) */
-    const std::string  idString   = "_id." ENT_ENTITY_ID;
-    const std::string  typeString = "_id." ENT_ENTITY_TYPE;
-    BSONObj            query;
+    /* Find entities (could be several, in the case of no type or isPattern=true) */
+    const std::string  idString          = "_id." ENT_ENTITY_ID;
+    const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
+    const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
 
-    if (en.type == "") {
-        query = BSON(idString << en.id);
+    BSONObjBuilder     bob;
+
+    bob.append(idString, enP->id);
+
+    if (enP->type != "")
+      bob.append(typeString, enP->type);
+    
+    if (servicePathV.size() == 0)
+    {
+      bob.append(servicePathString, BSON("$exists" << false));
+      LM_T(LmtServicePath, ("Updating entity '%s' (no Service Path), action '%s'", ceP->entityId.id.c_str(), action.c_str()));
     }
-    else {
-        query = BSON(idString << en.id << typeString << en.type);
+    else
+    {
+      LM_T(LmtServicePath, ("Updating entity '%s' for Service Path: '%s', action '%s'", ceP->entityId.id.c_str(), servicePathV[0].c_str(), action.c_str()));
+      char               path[MAX_SERVICE_NAME_LEN];
+      slashEscape(servicePathV[0].c_str(), path, sizeof(path));
+      const std::string  servicePathValue  = std::string("^") + path + "$|" + "^" + path + "\\/.*";
+      bob.appendRegex(servicePathString, servicePathValue);
+
     }
+    
+    BSONObj query = bob.obj();
+
     auto_ptr<DBClientCursor> cursor;
 
     try {
@@ -1429,32 +1479,44 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         return;
     }
 
-    bool atLeastOneResult = false;
+
+    //
+    // Going through the list of found entities.
+    // As ServicePath cannot be modified, inside this loop nothing will be done
+    // about ServicePath (The ServicePath was present in the mongo query to obtain the list)
+    //
+    // FIXME P6: Once we allow for ServicePath to be modified, this loop must be looked at.
+    //
+    int docs = 0;
+    
     while (cursor->more()) {
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+        ++docs;
+        std::string entityId    = STR_FIELD(r.getField("_id").embeddedObject(), ENT_ENTITY_ID);
+        std::string entityType  = STR_FIELD(r.getField("_id").embeddedObject(), ENT_ENTITY_TYPE);
+        std::string entitySPath = STR_FIELD(r.getField("_id").embeddedObject(), ENT_SERVICE_PATH);
 
-        std::string entityId = STR_FIELD(r.getField("_id").embeddedObject(), ENT_ENTITY_ID);
-        std::string entityType = STR_FIELD(r.getField("_id").embeddedObject(), ENT_ENTITY_TYPE);
-
-        atLeastOneResult = true;
+        LM_T(LmtServicePath, ("Found entity '%s' in ServicePath '%s'", entityId.c_str(), entitySPath.c_str()));
 
         ContextElementResponse* cerP = new ContextElementResponse();
         cerP->contextElement.entityId.fill(entityId, entityType, "false");
 
         /* If the vector of Context Attributes is empty and the operation was DELETE, then delete the entity */
         if (strcasecmp(action.c_str(), "delete") == 0 && ceP->contextAttributeVector.size() == 0) {
-            removeEntity(entityId, entityType, cerP, tenant);
+            LM_T(LmtServicePath, ("Removing entity"));
+            removeEntity(entityId, entityType, cerP, tenant, entitySPath);
             responseP->contextElementResponseVector.push_back(cerP);
             continue;
         }
 
+        LM_T(LmtServicePath, ("ceP->contextAttributeVector.size: %d", ceP->contextAttributeVector.size()));
         /* We start with the attrs array in the entity document, which is manipulated by the
          * {update|delete|append}Attrsr() function for each one of the attributes in the
          * contextElement being processed. Then, we replace the resulting attrs array in the
-         * BSON document and update the entity document. It would be more efficient to map the
-         * entiry attrs to something like and hash map and manipulate there, but it is not seems
-         * easy using the Mongod driver BSON API. Note that we need to use newAttrs given that attrs is
+         * BSON document and the entity document is updated. It would be more efficient to map the
+         * entity attrs to something like a hash map and manipulate it there, but it does not seem
+         * easy, using the mongo driver BSON API. Note that we need to use newAttrs, given that attrs is
          * BSONObj, which is an inmutable type. FIXME P6: try to improve this */
         BSONObj attrs = r.getField(ENT_ATTRS).embeddedObject();
 
@@ -1469,7 +1531,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         double coordLat, coordLong;
         if (r.hasField(ENT_LOCATION)) {
             // FIXME P2: potentially, assertion error will happen if the field is not as expected. Although this shouldn't happen
-            // (if happens, it means that somebody has manipulated the DB out-of-band contex broker) a safer way of parsing BSON object
+            // (if it happens, it means that somebody has manipulated the DB out-of-band of the context broker), a safer way of parsing BSON object
             // will be needed. This is a general comment, applicable to many places in the mongoBackend code
             BSONObj loc = r.getObjectField(ENT_LOCATION);
             locAttr  = loc.getStringField(ENT_LOCATION_ATTRNAME);
@@ -1483,8 +1545,9 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             continue;
         }
 
-        /* Now that attrs containts the final status of the attributes after processing the whole
+        /* Now that attrs contains the final status of the attributes after processing the whole
          * list of attributes in the ContextElement, update entity attributes in database */
+        LM_T(LmtServicePath, ("Updating the attributes of the ContextElement"));
         BSONObjBuilder updateSet, updateUnset;
         updateSet.appendArray(ENT_ATTRS, attrs);
         updateSet.append(ENT_MODIFICATION_DATE, getCurrentTime());
@@ -1504,20 +1567,37 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         else {
             updatedEntity = BSON("$set" << updateSet.obj() << "$unset" << updateUnset.obj());
         }
+
         /* Note that the query that we build for updating is slighty different than the query used
          * for selecting the entities to process. In particular, the "no type" branch in the if
          * sentence selects precisely the entity with no type, using the {$exists: false} clause */
-        BSONObj query;
-        if (entityType == "") {
-            query = BSON(idString << entityId << typeString << BSON("$exists" << false));
-        }
-        else {
-            query = BSON(idString << entityId << typeString << entityType);
-        }
-        try {
+        BSONObjBuilder bob;
+
+        // idString, typeString from earlier in this function
+        bob.append(idString, entityId);
+
+        if (entityType == "")
+          bob.append(typeString, BSON("$exists" << false));
+        else
+          bob.append(typeString, entityType);
+        
+        // The servicePath of THIS object is entitySPath        
+        char espath[MAX_SERVICE_NAME_LEN];
+        slashEscape(entitySPath.c_str(), espath, sizeof(espath));
+
+        // servicePathString from earlier in this function
+        if (servicePathV.size() == 0)
+          bob.append(servicePathString, BSON("$exists" << false));
+        else
+          bob.appendRegex(servicePathString, espath);
+        
+        BSONObj query = bob.obj();
+
+        try
+        {
             LM_T(LmtMongo, ("update() in '%s' collection: {%s, %s}", getEntitiesCollectionName(tenant).c_str(),
-                               query.toString().c_str(),
-                               updatedEntity.toString().c_str()));
+                            query.toString().c_str(),
+                            updatedEntity.toString().c_str()));
             mongoSemTake(__FUNCTION__, "update in EntitiesCollection");
             connection->update(getEntitiesCollectionName(tenant).c_str(), query, updatedEntity);
             mongoSemGive(__FUNCTION__, "update in EntitiesCollection");
@@ -1563,28 +1643,36 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
          * previous addTriggeredSubscriptions() invocations */
         std::string err;
-        processSubscriptions(en, &subsToNotify, &err, tenant);
+        processSubscriptions(enP, &subsToNotify, &err, tenant);
 
         /* To finish with this entity processing, add the corresponding ContextElementResponse to
          * the global response */
         cerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(cerP);
-
     }
+    LM_T(LmtServicePath, ("Docs found: %d", docs));
 
-    /* If the entity didn't already exist, we create it. Note that alternatively, we could do a count()
-     * before the query() to check this. However this would add a second interaction with MongoDB */
-    if (!atLeastOneResult) {
+
+
+    /*
+     * If the entity doesn't already exist, we create it. Note that alternatively, we could do a count()
+     * before the query() to check this. However this would add a second interaction with MongoDB.
+     *
+     * Here we set the ServicePath if set in the request (if APPEND, of course).
+     * Actually, the 'slash-escaped' ServicePath (variable: 'path') is sent to the function createEntity
+     * which sets the ServicePath for the entity.
+     */
+    if (docs == 0) {      
 
         if (strcasecmp(action.c_str(), "append") != 0) {
             /* Only APPEND can create entities, thus error is returned in UPDATE or DELETE cases */
-            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, en.id);
+            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
         }
         else {            
 
             /* Creating the part of the response that doesn't depend on success or failure */
             ContextElementResponse* cerP = new ContextElementResponse();
-            cerP->contextElement.entityId.fill(en.id, en.type, "false");
+            cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
             for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                 ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
                 ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);                
@@ -1593,7 +1681,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             }
 
             std::string errReason, errDetail;
-            if (!createEntity(en, ceP->contextAttributeVector, &errDetail, tenant)) {
+            if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant, servicePathV)) {
                cerP->statusCode.fill(SccInvalidParameter, errDetail);
             }
             else {
@@ -1603,17 +1691,15 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 std::map<string, BSONObj*> subsToNotify;
                 for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                     std::string err;
-                    if (!addTriggeredSubscriptions(en.id, en.type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err, tenant)) {
+                    if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err, tenant)) {
                         cerP->statusCode.fill(SccReceiverInternalError, err);
                         responseP->contextElementResponseVector.push_back(cerP);
                         LM_RVE((err.c_str()));
                     }
                 }
-                processSubscriptions(en, &subsToNotify, &errReason, tenant);
+                processSubscriptions(enP, &subsToNotify, &errReason, tenant);
             }
             responseP->contextElementResponseVector.push_back(cerP);
         }
-
     }
-
 }

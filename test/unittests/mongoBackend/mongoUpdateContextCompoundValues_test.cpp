@@ -246,7 +246,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -326,7 +327,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -406,7 +408,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -498,7 +501,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -587,7 +591,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -674,7 +679,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2)
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();    
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -761,7 +767,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1PlusSimpleValu
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -860,7 +867,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2PlusSimpleValu
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();    
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -955,7 +963,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundObject)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1032,7 +1041,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundObjectToSimple)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();    
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1108,7 +1118,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundObje
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1185,7 +1196,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundObjectToSimp
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();    
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1262,7 +1274,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundVector)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1341,7 +1354,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundVectorToSimple)
     req.updateActionType.set("UPDATE");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1417,7 +1431,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundVect
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1496,7 +1511,8 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundVectorToSimp
     req.updateActionType.set("APPEND");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res);
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

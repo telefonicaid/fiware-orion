@@ -62,7 +62,9 @@ static RestService rs[] =
 TEST(versionTreat, get_verbose)
 {
   ConnectionInfo ci("/log/verbose",  "GET", "1.1");
-  std::string out = restService(&ci, rs);
+  std::string out;
+
+  out = restService(&ci, rs);
   EXPECT_STREQ("OK", out.c_str());
 }
 
@@ -75,7 +77,9 @@ TEST(versionTreat, get_verbose)
 TEST(versionTreat, put_verbose)
 {
   ConnectionInfo ci("/log/verbose/3",  "PUT", "1.1");
-  std::string out = restService(&ci, rs);
+  std::string out;
+
+  out = restService(&ci, rs);
   EXPECT_STREQ("OK", out.c_str());
 }
 
@@ -88,7 +92,9 @@ TEST(versionTreat, put_verbose)
 TEST(versionTreat, post_verbose)
 {
   ConnectionInfo ci("/log/verbose/3",  "POST", "1.1");
-  std::string out = restService(&ci, rs);
+  std::string out;
+
+  out = restService(&ci, rs);
   EXPECT_STREQ("OK", out.c_str());
 }
 
@@ -101,7 +107,9 @@ TEST(versionTreat, post_verbose)
 TEST(versionTreat, delete_verbose)
 {
   ConnectionInfo ci("/log/verbose",  "DELETE", "1.1");
-  std::string out = restService(&ci, rs);
+  std::string out;
+
+  out = restService(&ci, rs);
   EXPECT_STREQ("OK", out.c_str());
 }
 
