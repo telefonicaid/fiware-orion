@@ -28,8 +28,8 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++ create vector compound +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/EVector"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
     <contextAttribute>
@@ -51,12 +51,12 @@ echo "1: +++++++++ create vector compound +++++++++++"
       </contextValue>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-echo "3: ++++++++++ query for vector compound in XML ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "2: ++++++++++ query for vector compound in XML ++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId isPattern="false">
@@ -64,11 +64,16 @@ echo "3: ++++++++++ query for vector compound in XML ++++++++++"
         </entityId>
   </entityIdList>
   <attributeList/>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 492
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -87,7 +92,12 @@ EOF
     </contextAttributeResponse>
   </contextResponseList>
 </appendContextElementResponse>
-3: ++++++++++ query for vector compound in XML ++++++++++
+2: ++++++++++ query for vector compound in XML ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 994
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>

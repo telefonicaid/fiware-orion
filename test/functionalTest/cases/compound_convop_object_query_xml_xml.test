@@ -27,9 +27,9 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "2: +++++++++ create object compound +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "1: +++++++++ create object compound +++++++++++"
+url="/NGSI10/contextEntities/EObject"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
     <contextAttribute>
@@ -47,12 +47,12 @@ echo "2: +++++++++ create object compound +++++++++++"
       </contextValue>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-echo "4: ++++++++++ query for object compound in XML ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "2: ++++++++++ query for object compound in XML ++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId isPattern="false">
@@ -60,11 +60,16 @@ echo "4: ++++++++++ query for object compound in XML ++++++++++"
         </entityId>
   </entityIdList>
   <attributeList/>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
-2: +++++++++ create object compound +++++++++++
+1: +++++++++ create object compound +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 492
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -83,7 +88,12 @@ EOF
     </contextAttributeResponse>
   </contextResponseList>
 </appendContextElementResponse>
-4: ++++++++++ query for object compound in XML ++++++++++
+2: ++++++++++ query for object compound in XML ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 844
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
