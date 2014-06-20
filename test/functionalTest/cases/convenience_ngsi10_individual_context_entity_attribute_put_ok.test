@@ -29,8 +29,8 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. create entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/Room1"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
     <contextAttribute>
@@ -49,55 +49,60 @@ echo "+++++ 1. create entity +++++"
       <contextValue>720</contextValue>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 echo "+++++ 2. put an entity with type +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperature -s -S --header 'Content-Type: application/xml' -X PUT -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/Room1/attributes/temperature"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextAttributeRequest>
   <type>centigrade</type>
   <contextValue>10</contextValue>
-</updateContextAttributeRequest>
-EOF
+</updateContextAttributeRequest>'
+orionCurl --url "$url" --payload "$payload" -X "PUT"
 
 echo "+++++ 3. query +++++"
-curl localhost:${BROKER_PORT}/ngsi10/contextEntities/Room1 -s -S --header 'Content-Type: application/xml' | xmllint --format -
+orionCurl --url "/ngsi10/contextEntities/Room1"
 
 echo "+++++ 4. put an entity without type +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperature -s -S --header 'Content-Type: application/xml' -X PUT -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/Room1/attributes/temperature" 
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextAttributeRequest>
   <contextValue>31</contextValue>
-</updateContextAttributeRequest>
-EOF
+</updateContextAttributeRequest>'
+orionCurl --url "$url" --payload "$payload" -X "PUT"
 
 echo "+++++ 5. query again +++++"
-curl localhost:${BROKER_PORT}/ngsi10/contextEntities/Room1 -s -S --header 'Content-Type: application/xml' | xmllint --format -
+orionCurl --url "/ngsi10/contextEntities/Room1"
 
 echo "+++++ 6. update without type (JSON) +++++"
-(curl localhost:${BROKER_PORT}/ngsi10/contextEntities/Room1/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/contextEntities/Room1/attributes/temperature" 
+payload='{
   "value": "39"
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" -X "PUT" --json
 
 echo "+++++ 7. query (JSON) +++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+orionCurl --url "/NGSI10/contextEntities/Room1/attributes/temperature" --json
 
 echo "+++++ 8. update with type (JSON) +++++"
-(curl localhost:${BROKER_PORT}/ngsi10/contextEntities/Room1/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/contextEntities/Room1/attributes/temperature" 
+payload='{
   "type": "Fahrenheit",
   "value": "99"
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" -X "PUT" --json
 
 echo "+++++ 9. query (JSON) +++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+orionCurl --url "/NGSI10/contextEntities/Room1/attributes/temperature" --json
 
 --REGEXPECT--
 +++++ 1. create entity +++++
+HTTP/1.1 200 OK
+Content-Length: 821
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -127,12 +132,22 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
   </contextResponseList>
 </appendContextElementResponse>
 +++++ 2. put an entity with type +++++
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <statusCode>
   <code>200</code>
   <reasonPhrase>OK</reasonPhrase>
 </statusCode>
 +++++ 3. query +++++
+HTTP/1.1 200 OK
+Content-Length: 771
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
@@ -163,12 +178,22 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
   </statusCode>
 </contextElementResponse>
 +++++ 4. put an entity without type +++++
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <statusCode>
   <code>200</code>
   <reasonPhrase>OK</reasonPhrase>
 </statusCode>
 +++++ 5. query again +++++
+HTTP/1.1 200 OK
+Content-Length: 771
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
@@ -199,11 +224,21 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
   </statusCode>
 </contextElementResponse>
 +++++ 6. update without type (JSON) +++++
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "code": "200",
     "reasonPhrase": "OK"
 }
 +++++ 7. query (JSON) +++++
+HTTP/1.1 200 OK
+Content-Length: 282
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "attributes": [
         {
@@ -223,11 +258,21 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
     }
 }
 +++++ 8. update with type (JSON) +++++
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "code": "200",
     "reasonPhrase": "OK"
 }
 +++++ 9. query (JSON) +++++
+HTTP/1.1 200 OK
+Content-Length: 282
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "attributes": [
         {
