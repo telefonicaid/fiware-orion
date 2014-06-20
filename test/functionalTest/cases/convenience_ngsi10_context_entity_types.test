@@ -30,12 +30,12 @@ brokerStart CB
 
 # query for all entities of type "Room"
 echo "1: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
+orionCurl --url "/NGSI10/contextEntityTypes/Room"
 
 # Add an entity of type Room, with one attribute: 'temperature'
 echo "2: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format - ) << EOF
-<updateContextRequest>
+url="/NGSI10/updateContext"
+payload='<updateContextRequest>
   <contextElementList>
     <contextElement>
       <entityId type="Room" isPattern="false">
@@ -58,24 +58,28 @@ echo "2: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 # query for all entities of type "Room"
 echo "3: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
-
+orionCurl --url "/NGSI10/contextEntityTypes/Room"
 
 # query for all entities of type "Room2"
 echo "4: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room2 -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
-echo "5: ++++++++++++++++++++"
+orionCurl --url "/NGSI10/contextEntityTypes/Room2"
 
 # DELETE is not allowed
-curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room -s -S -X DELETE --include --header 'Content-Type: application/xml' --header 'Accept: application/xml'
+echo "5: ++++++++++++++++++++"
+orionCurl --url "/NGSI10/contextEntityTypes/Room" -X "DELETE"
 
 --REGEXPECT--
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
@@ -84,6 +88,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room -s -S -X DELETE --i
   </errorCode>
 </queryContextResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 857
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -115,6 +124,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room -s -S -X DELETE --i
   </contextResponseList>
 </updateContextResponse>
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 858
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
@@ -146,6 +160,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room -s -S -X DELETE --i
   </contextResponseList>
 </queryContextResponse>
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
