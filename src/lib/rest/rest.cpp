@@ -410,7 +410,7 @@ int servicePathSplit(ConnectionInfo* ciP)
 
   if (servicePaths == 0)
   {
-    /* In this case the result is a 0 lenght vector */
+    /* In this case the result is a 0 length vector */
     return 0;
   }
 
@@ -418,7 +418,7 @@ int servicePathSplit(ConnectionInfo* ciP)
   {
     OrionError e(SccBadRequest, "too many service paths - a maximum of ten service paths is allowed");
     ciP->answer = e.render(ciP->outFormat, "");
-    return 5;
+    return -1;
   }
 
   for (int ix = 0; ix < servicePaths; ++ix)
@@ -430,6 +430,7 @@ int servicePathSplit(ConnectionInfo* ciP)
   for (int ix = 0; ix < servicePaths; ++ix)
   {
     int s;
+
     if ((s = servicePathCheck(ciP, ciP->servicePathV[ix].c_str())) != 0)
       return s;
   }
