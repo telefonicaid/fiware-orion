@@ -42,7 +42,7 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
   QueryContextResponse  qcr;
   std::string           answer;
    
-  ciP->httpStatusCode = mongoQueryContext(&parseDataP->qcr.res, &qcr, ciP->tenant, ciP->servicePathV);
+  ciP->httpStatusCode = mongoQueryContext(&parseDataP->qcr.res, &qcr, ciP->tenant, ciP->servicePathV, ciP->uriParam);
   answer = qcr.render(QueryContext, ciP->outFormat, "");
 
   return answer;

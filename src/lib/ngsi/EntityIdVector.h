@@ -47,6 +47,8 @@ typedef struct EntityIdVector
   unsigned int size(void);
   EntityId*    get(int ix);
   void         release();
+
+  EntityId*    operator[](unsigned int ix)       { if (ix < vec.size()) return vec[ix]; else return NULL; }
 } EntityIdVector;
 
 #endif

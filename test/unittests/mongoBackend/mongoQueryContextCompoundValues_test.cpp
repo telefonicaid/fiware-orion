@@ -145,7 +145,7 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoQueryContext(&req, &res, "", servicePathVector);
+    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -209,8 +209,7 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue2)
     req.entityIdVector.push_back(&en);
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
-    ms = mongoQueryContext(&req, &res, "", servicePathVector);
+    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -272,8 +271,7 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue1PlusSimpleValue)
     req.entityIdVector.push_back(&en);
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
-    ms = mongoQueryContext(&req, &res, "", servicePathVector);
+    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -340,8 +338,7 @@ TEST(mongoQueryContextCompoundValuesRequest, CompoundValue2PlusSimpleValue)
     req.entityIdVector.push_back(&en);
 
     /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
-    ms = mongoQueryContext(&req, &res, "", servicePathVector);
+    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

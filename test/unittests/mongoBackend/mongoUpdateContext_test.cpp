@@ -10221,6 +10221,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   /* Invoke the function in mongoBackend library */
   ms = mongoUpdateContext(&ucReq, &ucRes, "", servicePathVector);
 
+
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
   ASSERT_EQ(0, ucRes.contextElementResponseVector.size());

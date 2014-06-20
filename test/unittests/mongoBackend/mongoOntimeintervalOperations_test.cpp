@@ -524,9 +524,9 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_dbfail)
     /* Check results */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("collection: unittest.entities - "
-              "query(): { $or: [ { _id.id: \"E1\", _id.type: \"T\" }, { _id.id: \"E2\", _id.type: \"T\" } ], _id.servicePath: { $exists: false }, "
-              "attrs.name: { $in: [ \"A1\", \"A2\", \"A3\", \"A4\" ] } } - "
-              "exception: boom!!", err);
+              "query(): { query: { $or: [ { _id.id: \"E1\", _id.type: \"T\" }, { _id.id: \"E2\", _id.type: \"T\" } ], _id.servicePath: { $exists: false }, "
+              "attrs.name: { $in: [ \"A1\", \"A2\", \"A3\", \"A4\" ] } }, orderby: { creDate: 1 } } - "
+              "exception: boom!!", err);    
 
     /* Release mock */
     delete connectionMock;
