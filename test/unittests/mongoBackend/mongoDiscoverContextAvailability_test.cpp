@@ -42,6 +42,17 @@
 *
 * Tests
 *
+* With pagination:
+*
+* - paginationDetails
+* - paginationAll
+* - paginationOnlyFirst
+* - paginationOnlySecond
+* - paginationRange
+* - paginationNonExisting
+* - paginationNonExistingOverlap
+* - paginationNonExistingDetails
+*
 * With isPattern=false:
 *
 * - noPatternAttrsAll - discover all the attributes of an entity in the same registration
@@ -343,10 +354,10 @@ static void prepareDatabaseForPagination(void)
    */
 
   BSONObj cr1 = BSON("providingApplication" << "http://cr1.com" << "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
-  BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" << "entities" << BSON_ARRAY(BSON("id" << "E2" << "type" << "T1")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
-  BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" << "entities" << BSON_ARRAY(BSON("id" << "E3" << "type" << "T1")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
-  BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" << "entities" << BSON_ARRAY(BSON("id" << "E4" << "type" << "T1")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
-  BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" << "entities" << BSON_ARRAY(BSON("id" << "E5" << "type" << "T1")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+  BSONObj cr2 = BSON("providingApplication" << "http://cr2.com" << "entities" << BSON_ARRAY(BSON("id" << "E2" << "type" << "T2")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+  BSONObj cr3 = BSON("providingApplication" << "http://cr3.com" << "entities" << BSON_ARRAY(BSON("id" << "E3" << "type" << "T3")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+  BSONObj cr4 = BSON("providingApplication" << "http://cr4.com" << "entities" << BSON_ARRAY(BSON("id" << "E4" << "type" << "T4")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
+  BSONObj cr5 = BSON("providingApplication" << "http://cr5.com" << "entities" << BSON_ARRAY(BSON("id" << "E5" << "type" << "T5")) << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "isDomain" << "true")));
 
   BSONObj reg1 = BSON("_id" << OID("51307b66f481db11bf860001") << "expiration" << 1879048191 << "contextRegistration" << BSON_ARRAY(cr1));
   BSONObj reg2 = BSON("_id" << OID("51307b66f481db11bf860002") << "expiration" << 1879048191 << "contextRegistration" << BSON_ARRAY(cr2));
@@ -363,112 +374,529 @@ static void prepareDatabaseForPagination(void)
 
 /* ****************************************************************************
 *
-* pagination - 
+* paginationDetails -
+*
 */
-TEST(mongoDiscoverContextAvailabilityRequest, pagination)
+TEST(mongoDiscoverContextAvailabilityRequest, paginationDetails)
 {
   HttpStatusCode                       ms;
   DiscoverContextAvailabilityRequest   req;
-  DiscoverContextAvailabilityResponse  res0;
-  DiscoverContextAvailabilityResponse  res1;
-  DiscoverContextAvailabilityResponse  res2;
-  DiscoverContextAvailabilityResponse  res3;
-  DiscoverContextAvailabilityResponse  res4;
-  DiscoverContextAvailabilityResponse  res5;
+  DiscoverContextAvailabilityResponse  res;
 
   utInit();
   prepareDatabaseForPagination();
 
+  /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
-
-  // 0. discovery with details=on, just to find number of hits
   uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
-  ms = mongoDiscoverContextAvailability(&req, &res0, "", uriParams);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(SccOk,         res0.errorCode.code);
-  EXPECT_STREQ("OK",       res0.errorCode.reasonPhrase.c_str());
-  EXPECT_STREQ("Count: 5", res0.errorCode.details.c_str());
-  ASSERT_EQ(5,       res0.responseVector.size());
-  EXPECT_EQ("E1",    res0.responseVector[0]->contextRegistration.entityIdVector[0]->id);
-  EXPECT_EQ("E2",    res0.responseVector[1]->contextRegistration.entityIdVector[0]->id);
-  EXPECT_EQ("E3",    res0.responseVector[2]->contextRegistration.entityIdVector[0]->id);
-  EXPECT_EQ("E4",    res0.responseVector[3]->contextRegistration.entityIdVector[0]->id);
-  EXPECT_EQ("E5",    res0.responseVector[4]->contextRegistration.entityIdVector[0]->id);
-  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
 
-  // 1. Ask for all 5 registrations
-  ms = mongoDiscoverContextAvailability(&req, &res1, "", uriParams);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(NO_CODE, res1.errorCode.code);
-  EXPECT_STREQ("",   res1.errorCode.reasonPhrase.c_str());
-  EXPECT_STREQ("",   res1.errorCode.details.c_str());
-  ASSERT_EQ(5,       res1.responseVector.size());
-  EXPECT_EQ("E1",    res1.responseVector[0]->contextRegistration.entityIdVector[0]->id);
-  EXPECT_EQ("E2",    res1.responseVector[1]->contextRegistration.entityIdVector[0]->id);
-  EXPECT_EQ("E3",    res1.responseVector[2]->contextRegistration.entityIdVector[0]->id);
-  EXPECT_EQ("E4",    res1.responseVector[3]->contextRegistration.entityIdVector[0]->id);
-  EXPECT_EQ("E5",    res1.responseVector[4]->contextRegistration.entityIdVector[0]->id);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
 
-  // 2. Ask for only the first registration
-  uriParams[URI_PARAM_PAGINATION_OFFSET] = "0";
-  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "1";
-  ms = mongoDiscoverContextAvailability(&req, &res2, "", uriParams);
+  /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(NO_CODE, res2.errorCode.code);
-  EXPECT_STREQ("",   res2.errorCode.reasonPhrase.c_str());
-  EXPECT_STREQ("",   res2.errorCode.details.c_str());
-  ASSERT_EQ(1,       res2.responseVector.size());
-  EXPECT_EQ("E1",    res2.responseVector[0]->contextRegistration.entityIdVector[0]->id);
 
-  // 3. Ask for only the second registration
-  uriParams[URI_PARAM_PAGINATION_OFFSET] = "1";
-  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "1";
-  ms = mongoDiscoverContextAvailability(&req, &res3, "", uriParams);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(NO_CODE, res3.errorCode.code);
-  EXPECT_STREQ("",   res3.errorCode.reasonPhrase.c_str());
-  EXPECT_STREQ("",   res3.errorCode.details.c_str());
-  ASSERT_EQ(1,       res3.responseVector.size());
-  EXPECT_EQ("E2",    res3.responseVector[0]->contextRegistration.entityIdVector[0]->id);
+  EXPECT_EQ(SccOk, res.errorCode.code);
+  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+  EXPECT_EQ("Count: 5", res.errorCode.details);
 
-  // 4. Ask for registrations 3-5
-  uriParams[URI_PARAM_PAGINATION_OFFSET] = "2";
-  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
-  ms = mongoDiscoverContextAvailability(&req, &res4, "", uriParams);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(NO_CODE, res4.errorCode.code);
-  EXPECT_STREQ("",   res4.errorCode.reasonPhrase.c_str());
-  EXPECT_STREQ("",   res4.errorCode.details.c_str());
-  ASSERT_EQ(3,       res4.responseVector.size());
-  EXPECT_EQ("E3",    res4.responseVector[0]->contextRegistration.entityIdVector[0]->id);
-  EXPECT_EQ("E4",    res4.responseVector[1]->contextRegistration.entityIdVector[0]->id);
-  EXPECT_EQ("E5",    res4.responseVector[2]->contextRegistration.entityIdVector[0]->id);
+  ASSERT_EQ(5,res.responseVector.size());
+  /* Context registration element #1 */
+  ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
+  EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
+  EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector.get(0)->type);
+  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+  ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
+  EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
+  EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
+  EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
+  EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
+  EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
-  // 5. Ask for non-existing registrations 7-8
-  uriParams[URI_PARAM_PAGINATION_OFFSET] = "6";
-  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "2";
-  ms = mongoDiscoverContextAvailability(&req, &res5, "", uriParams);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(SccContextElementNotFound,     res5.errorCode.code);
-  EXPECT_STREQ("No context element found", res5.errorCode.reasonPhrase.c_str());
-  EXPECT_STREQ("",                         res5.errorCode.details.c_str());
-  ASSERT_EQ(0, res5.responseVector.size());
+  /* Context registration element #2 */
+  ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
+  EXPECT_EQ("E2", RES_CNTX_REG(1).entityIdVector.get(0)->id);
+  EXPECT_EQ("T2", RES_CNTX_REG(1).entityIdVector.get(0)->type);
+  EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+  ASSERT_EQ(1, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
+  EXPECT_EQ("A1", RES_CNTX_REG_ATTR(1, 0)->name);
+  EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
+  EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
+  EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
+  EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+  EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
-  // 6. Ask for non-existing registrations 7-8, with details ON
-  uriParams[URI_PARAM_PAGINATION_OFFSET]   = "6";
-  uriParams[URI_PARAM_PAGINATION_LIMIT]    = "2";
-  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
-  ms = mongoDiscoverContextAvailability(&req, &res5, "", uriParams);
-  EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(SccContextElementNotFound,                             res5.errorCode.code);
-  EXPECT_STREQ("No context element found",                         res5.errorCode.reasonPhrase.c_str());
-  EXPECT_STREQ("Number of matching registrations: 5. Offset is 6", res5.errorCode.details.c_str());
-  ASSERT_EQ(0, res5.responseVector.size());
+  /* Context registration element #3 */
+  ASSERT_EQ(1, RES_CNTX_REG(2).entityIdVector.size());
+  EXPECT_EQ("E3", RES_CNTX_REG(2).entityIdVector.get(0)->id);
+  EXPECT_EQ("T3", RES_CNTX_REG(2).entityIdVector.get(0)->type);
+  EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector.get(0)->isPattern);
+  ASSERT_EQ(1, RES_CNTX_REG(2).contextRegistrationAttributeVector.size());
+  EXPECT_EQ("A1", RES_CNTX_REG_ATTR(2, 0)->name);
+  EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(2, 0)->type);
+  EXPECT_EQ("true", RES_CNTX_REG_ATTR(2, 0)->isDomain);
+  EXPECT_EQ("http://cr3.com", RES_CNTX_REG(2).providingApplication.get());
+  EXPECT_EQ(NO_CODE, res.responseVector.get(2)->errorCode.code);
+  EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
+
+  /* Context registration element #4 */
+  ASSERT_EQ(1, RES_CNTX_REG(3).entityIdVector.size());
+  EXPECT_EQ("E4", RES_CNTX_REG(3).entityIdVector.get(0)->id);
+  EXPECT_EQ("T4", RES_CNTX_REG(3).entityIdVector.get(0)->type);
+  EXPECT_EQ("false", RES_CNTX_REG(3).entityIdVector.get(0)->isPattern);
+  ASSERT_EQ(1, RES_CNTX_REG(3).contextRegistrationAttributeVector.size());
+  EXPECT_EQ("A1", RES_CNTX_REG_ATTR(3, 0)->name);
+  EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(3, 0)->type);
+  EXPECT_EQ("true", RES_CNTX_REG_ATTR(3, 0)->isDomain);
+  EXPECT_EQ("http://cr4.com", RES_CNTX_REG(3).providingApplication.get());
+  EXPECT_EQ(NO_CODE, res.responseVector.get(3)->errorCode.code);
+  EXPECT_EQ(0, res.responseVector.get(3)->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector.get(3)->errorCode.details.size());
+
+  /* Context registration element #5 */
+  ASSERT_EQ(1, RES_CNTX_REG(4).entityIdVector.size());
+  EXPECT_EQ("E5", RES_CNTX_REG(4).entityIdVector.get(0)->id);
+  EXPECT_EQ("T5", RES_CNTX_REG(4).entityIdVector.get(0)->type);
+  EXPECT_EQ("false", RES_CNTX_REG(4).entityIdVector.get(0)->isPattern);
+  ASSERT_EQ(1, RES_CNTX_REG(4).contextRegistrationAttributeVector.size());
+  EXPECT_EQ("A1", RES_CNTX_REG_ATTR(4, 0)->name);
+  EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(4, 0)->type);
+  EXPECT_EQ("true", RES_CNTX_REG_ATTR(4, 0)->isDomain);
+  EXPECT_EQ("http://cr5.com", RES_CNTX_REG(4).providingApplication.get());
+  EXPECT_EQ(NO_CODE, res.responseVector.get(4)->errorCode.code);
+  EXPECT_EQ(0, res.responseVector.get(4)->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector.get(4)->errorCode.details.size());
+
+  /* Release connection */
+  mongoDisconnect();
 
   utExit();
 }
 
+/* ****************************************************************************
+*
+* paginationAll -
+*
+*/
+TEST(mongoDiscoverContextAvailabilityRequest, paginationAll)
+{
+  HttpStatusCode                       ms;
+  DiscoverContextAvailabilityRequest   req;
+  DiscoverContextAvailabilityResponse  res;
+
+  utInit();
+  prepareDatabaseForPagination();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E.*", "", "true");
+  req.entityIdVector.push_back(&en);
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(5,res.responseVector.size());
+  /* Context registration element #1 */
+  ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
+  EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
+  EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector.get(0)->type);
+  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+  ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
+  EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
+  EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
+  EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
+  EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
+  EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+
+  /* Context registration element #2 */
+  ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
+  EXPECT_EQ("E2", RES_CNTX_REG(1).entityIdVector.get(0)->id);
+  EXPECT_EQ("T2", RES_CNTX_REG(1).entityIdVector.get(0)->type);
+  EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+  ASSERT_EQ(1, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
+  EXPECT_EQ("A1", RES_CNTX_REG_ATTR(1, 0)->name);
+  EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
+  EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
+  EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
+  EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+  EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+
+  /* Context registration element #3 */
+  ASSERT_EQ(1, RES_CNTX_REG(2).entityIdVector.size());
+  EXPECT_EQ("E3", RES_CNTX_REG(2).entityIdVector.get(0)->id);
+  EXPECT_EQ("T3", RES_CNTX_REG(2).entityIdVector.get(0)->type);
+  EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector.get(0)->isPattern);
+  ASSERT_EQ(1, RES_CNTX_REG(2).contextRegistrationAttributeVector.size());
+  EXPECT_EQ("A1", RES_CNTX_REG_ATTR(2, 0)->name);
+  EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(2, 0)->type);
+  EXPECT_EQ("true", RES_CNTX_REG_ATTR(2, 0)->isDomain);
+  EXPECT_EQ("http://cr3.com", RES_CNTX_REG(2).providingApplication.get());
+  EXPECT_EQ(NO_CODE, res.responseVector.get(2)->errorCode.code);
+  EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
+
+  /* Context registration element #4 */
+  ASSERT_EQ(1, RES_CNTX_REG(3).entityIdVector.size());
+  EXPECT_EQ("E4", RES_CNTX_REG(3).entityIdVector.get(0)->id);
+  EXPECT_EQ("T4", RES_CNTX_REG(3).entityIdVector.get(0)->type);
+  EXPECT_EQ("false", RES_CNTX_REG(3).entityIdVector.get(0)->isPattern);
+  ASSERT_EQ(1, RES_CNTX_REG(3).contextRegistrationAttributeVector.size());
+  EXPECT_EQ("A1", RES_CNTX_REG_ATTR(3, 0)->name);
+  EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(3, 0)->type);
+  EXPECT_EQ("true", RES_CNTX_REG_ATTR(3, 0)->isDomain);
+  EXPECT_EQ("http://cr4.com", RES_CNTX_REG(3).providingApplication.get());
+  EXPECT_EQ(NO_CODE, res.responseVector.get(3)->errorCode.code);
+  EXPECT_EQ(0, res.responseVector.get(3)->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector.get(3)->errorCode.details.size());
+
+  /* Context registration element #5 */
+  ASSERT_EQ(1, RES_CNTX_REG(4).entityIdVector.size());
+  EXPECT_EQ("E5", RES_CNTX_REG(4).entityIdVector.get(0)->id);
+  EXPECT_EQ("T5", RES_CNTX_REG(4).entityIdVector.get(0)->type);
+  EXPECT_EQ("false", RES_CNTX_REG(4).entityIdVector.get(0)->isPattern);
+  ASSERT_EQ(1, RES_CNTX_REG(4).contextRegistrationAttributeVector.size());
+  EXPECT_EQ("A1", RES_CNTX_REG_ATTR(4, 0)->name);
+  EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(4, 0)->type);
+  EXPECT_EQ("true", RES_CNTX_REG_ATTR(4, 0)->isDomain);
+  EXPECT_EQ("http://cr5.com", RES_CNTX_REG(4).providingApplication.get());
+  EXPECT_EQ(NO_CODE, res.responseVector.get(4)->errorCode.code);
+  EXPECT_EQ(0, res.responseVector.get(4)->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector.get(4)->errorCode.details.size());
+
+  /* Release connection */
+  mongoDisconnect();
+
+  utExit();
+}
+
+/* ****************************************************************************
+*
+* paginationOnlyFirst -
+*
+*/
+TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlyFirst)
+{
+  HttpStatusCode                       ms;
+  DiscoverContextAvailabilityRequest   req;
+  DiscoverContextAvailabilityResponse  res;
+
+  utInit();
+  prepareDatabaseForPagination();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E.*", "", "true");
+  req.entityIdVector.push_back(&en);
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
+  uriParams[URI_PARAM_PAGINATION_OFFSET] = "0";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "1";
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1,res.responseVector.size());
+  /* Context registration element #1 */
+  ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
+  EXPECT_EQ("E1", RES_CNTX_REG(0).entityIdVector.get(0)->id);
+  EXPECT_EQ("T1", RES_CNTX_REG(0).entityIdVector.get(0)->type);
+  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+  ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
+  EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
+  EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
+  EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
+  EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
+  EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+
+  /* Release connection */
+  mongoDisconnect();
+
+  utExit();
+}
+
+/* ****************************************************************************
+*
+* paginationOnlySecond -
+*
+*/
+TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlySecond)
+{
+  HttpStatusCode                       ms;
+  DiscoverContextAvailabilityRequest   req;
+  DiscoverContextAvailabilityResponse  res;
+
+  utInit();
+  prepareDatabaseForPagination();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E.*", "", "true");
+  req.entityIdVector.push_back(&en);
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
+  uriParams[URI_PARAM_PAGINATION_OFFSET] = "1";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "1";
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1,res.responseVector.size());
+  /* Context registration element #1 */
+  ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
+  EXPECT_EQ("E2", RES_CNTX_REG(0).entityIdVector.get(0)->id);
+  EXPECT_EQ("T2", RES_CNTX_REG(0).entityIdVector.get(0)->type);
+  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+  ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
+  EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
+  EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
+  EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
+  EXPECT_EQ("http://cr2.com", RES_CNTX_REG(0).providingApplication.get());
+  EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+
+  /* Release connection */
+  mongoDisconnect();
+
+  utExit();
+}
+
+/* ****************************************************************************
+*
+* paginationRange -
+*
+*/
+TEST(mongoDiscoverContextAvailabilityRequest, paginationRange)
+{
+  HttpStatusCode                       ms;
+  DiscoverContextAvailabilityRequest   req;
+  DiscoverContextAvailabilityResponse  res;
+
+  utInit();
+  prepareDatabaseForPagination();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E.*", "", "true");
+  req.entityIdVector.push_back(&en);
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
+  uriParams[URI_PARAM_PAGINATION_OFFSET] = "2";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(3,res.responseVector.size());
+  /* Context registration element #1 */
+  ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
+  EXPECT_EQ("E3", RES_CNTX_REG(0).entityIdVector.get(0)->id);
+  EXPECT_EQ("T3", RES_CNTX_REG(0).entityIdVector.get(0)->type);
+  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+  ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
+  EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
+  EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
+  EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
+  EXPECT_EQ("http://cr3.com", RES_CNTX_REG(0).providingApplication.get());
+  EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+
+  /* Context registration element #2 */
+  ASSERT_EQ(1, RES_CNTX_REG(1).entityIdVector.size());
+  EXPECT_EQ("E4", RES_CNTX_REG(1).entityIdVector.get(0)->id);
+  EXPECT_EQ("T4", RES_CNTX_REG(1).entityIdVector.get(0)->type);
+  EXPECT_EQ("false", RES_CNTX_REG(1).entityIdVector.get(0)->isPattern);
+  ASSERT_EQ(1, RES_CNTX_REG(1).contextRegistrationAttributeVector.size());
+  EXPECT_EQ("A1", RES_CNTX_REG_ATTR(1, 0)->name);
+  EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
+  EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
+  EXPECT_EQ("http://cr4.com", RES_CNTX_REG(1).providingApplication.get());
+  EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+  EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+
+  /* Context registration element #3 */
+  ASSERT_EQ(1, RES_CNTX_REG(2).entityIdVector.size());
+  EXPECT_EQ("E5", RES_CNTX_REG(2).entityIdVector.get(0)->id);
+  EXPECT_EQ("T5", RES_CNTX_REG(2).entityIdVector.get(0)->type);
+  EXPECT_EQ("false", RES_CNTX_REG(2).entityIdVector.get(0)->isPattern);
+  ASSERT_EQ(1, RES_CNTX_REG(2).contextRegistrationAttributeVector.size());
+  EXPECT_EQ("A1", RES_CNTX_REG_ATTR(2, 0)->name);
+  EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(2, 0)->type);
+  EXPECT_EQ("true", RES_CNTX_REG_ATTR(2, 0)->isDomain);
+  EXPECT_EQ("http://cr5.com", RES_CNTX_REG(2).providingApplication.get());
+  EXPECT_EQ(NO_CODE, res.responseVector.get(2)->errorCode.code);
+  EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
+
+  /* Release connection */
+  mongoDisconnect();
+
+  utExit();
+}
+
+/* ****************************************************************************
+*
+* paginationNonExisting -
+*
+*/
+TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExisting)
+{
+  HttpStatusCode                       ms;
+  DiscoverContextAvailabilityRequest   req;
+  DiscoverContextAvailabilityResponse  res;
+
+  utInit();
+  prepareDatabaseForPagination();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E.*", "", "true");
+  req.entityIdVector.push_back(&en);
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
+  uriParams[URI_PARAM_PAGINATION_OFFSET] = "6";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "2";
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
+  EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(0,res.responseVector.size());
+
+  /* Release connection */
+  mongoDisconnect();
+
+  utExit();
+}
+
+/* ****************************************************************************
+*
+* paginationNonExistingOverlap -
+*
+*/
+TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExistingOverlap)
+{
+  HttpStatusCode                       ms;
+  DiscoverContextAvailabilityRequest   req;
+  DiscoverContextAvailabilityResponse  res;
+
+  utInit();
+  prepareDatabaseForPagination();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E.*", "", "true");
+  req.entityIdVector.push_back(&en);
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
+  uriParams[URI_PARAM_PAGINATION_OFFSET] = "4";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]  = "4";
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1,res.responseVector.size());
+  /* Context registration element #1 */
+  ASSERT_EQ(1, RES_CNTX_REG(0).entityIdVector.size());
+  EXPECT_EQ("E5", RES_CNTX_REG(0).entityIdVector.get(0)->id);
+  EXPECT_EQ("T5", RES_CNTX_REG(0).entityIdVector.get(0)->type);
+  EXPECT_EQ("false", RES_CNTX_REG(0).entityIdVector.get(0)->isPattern);
+  ASSERT_EQ(1, RES_CNTX_REG(0).contextRegistrationAttributeVector.size());
+  EXPECT_EQ("A1", RES_CNTX_REG_ATTR(0, 0)->name);
+  EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
+  EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
+  EXPECT_EQ("http://cr5.com", RES_CNTX_REG(0).providingApplication.get());
+  EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
+  EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
+
+  /* Release connection */
+  mongoDisconnect();
+
+  utExit();
+}
+
+/* ****************************************************************************
+*
+* paginationNonExistingDetails -
+*
+*/
+TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExistingDetails)
+{
+  HttpStatusCode                       ms;
+  DiscoverContextAvailabilityRequest   req;
+  DiscoverContextAvailabilityResponse  res;
+
+  utInit();
+  prepareDatabaseForPagination();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E.*", "", "true");
+  req.entityIdVector.push_back(&en);
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
+  uriParams[URI_PARAM_PAGINATION_OFFSET]   = "6";
+  uriParams[URI_PARAM_PAGINATION_LIMIT]    = "2";
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
+  EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("Number of matching registrations: 5. Offset is 6", res.errorCode.details);
+
+  ASSERT_EQ(0,res.responseVector.size());
+
+  /* Release connection */
+  mongoDisconnect();
+
+  utExit();
+}
 
 /* ****************************************************************************
 *
