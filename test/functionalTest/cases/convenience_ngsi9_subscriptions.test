@@ -29,8 +29,8 @@ brokerStart CB
 --SHELL--
 # 1. Create a subscription
 echo "1: ++++++++++++++++++++"
-SUB_OUT=$((curl localhost:${BROKER_PORT}/ngsi9/contextAvailabilitySubscriptions -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/ngsi9/contextAvailabilitySubscriptions"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextAvailabilityRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">
@@ -47,15 +47,15 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/ngsi9/contextAvailabilitySubscriptions 
   </attributeList>
   <reference>http://10.1.1.1:80/test/interfaceNotification</reference>
   <duration>PT1M</duration>
-</subscribeContextAvailabilityRequest>
-EOF)
-SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$SUB_OUT"
+</subscribeContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "$payload"
+
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
 # 2. Update the subscription
 echo "2: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/contextAvailabilitySubscriptions/$SUB_ID -X PUT -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
-<?xml version="1.0"?>
+url="/NGSI9/contextAvailabilitySubscriptions/$SUB_ID"
+payload='<?xml version="1.0"?>
 <updateContextAvailabilitySubscriptionRequest>
 	<entityIdList>
 		<entityId type="Room" isPattern="false">
@@ -79,32 +79,48 @@ echo "2: ++++++++++++++++++++"
 			</operationScope>
 		</scope>
 	</restriction>
-  <subscriptionId>$SUB_ID</subscriptionId>
-</updateContextAvailabilitySubscriptionRequest>
-EOF
+  <subscriptionId>'$SUB_ID'</subscriptionId>
+</updateContextAvailabilitySubscriptionRequest>'
+orionCurl --url "$url" --payload "$payload" -X "PUT"
 
 # 3. Delete the subscription
 echo "3: ++++++++++++++++++++"
-curl localhost:${BROKER_PORT}/NGSI9/contextAvailabilitySubscriptions/$SUB_ID -X DELETE -s -S --header 'Content-Type: application/xml' | xmllint --format -
+orionCurl --url "/NGSI9/contextAvailabilitySubscriptions/$SUB_ID" -X "DELETE"
 
 # 4. Bad verb
 echo "4: ++++++++++++++++++++"
-curl localhost:${BROKER_PORT}/NGSI9/contextAvailabilitySubscriptions/$SUB_ID -X DELETE2 -s -S --header 'Content-Type: application/xml' --include
+orionCurl --url "/NGSI9/contextAvailabilitySubscriptions/$SUB_ID" -X "DELETE2"
+
 echo "5: ++++++++++++++++++++"
 --REGEXPECT--
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 167
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextAvailabilityResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
   <duration>PT1M</duration>
 </subscribeContextAvailabilityResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 184
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextAvailabilitySubscriptionResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
   <duration>P1Y</duration>
 </updateContextAvailabilitySubscriptionResponse>
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 231
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <unsubscribeContextAvailabilityResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
