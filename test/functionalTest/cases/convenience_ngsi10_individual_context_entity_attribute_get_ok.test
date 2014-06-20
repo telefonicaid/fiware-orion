@@ -29,8 +29,8 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. create an entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/entity01"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
@@ -40,14 +40,19 @@ echo "+++++ 1. create an entity +++++"
       <contextValue>10</contextValue>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 echo "+++++ 2. lookup the entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes/temperature -s -S --header 'Content-Type: application/xml' -X GET | xmllint --format - )
+orionCurl --url "/NGSI10/contextEntities/entity01/attributes/temperature" 
 
 --REGEXPECT--
 +++++ 1. create an entity +++++
+HTTP/1.1 200 OK
+Content-Length: 498
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -67,6 +72,11 @@ echo "+++++ 2. lookup the entity +++++"
   </contextResponseList>
 </appendContextElementResponse>
 +++++ 2. lookup the entity +++++
+HTTP/1.1 200 OK
+Content-Length: 336
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextAttributeResponse>
   <contextAttributeList>
