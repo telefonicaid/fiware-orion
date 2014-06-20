@@ -75,6 +75,20 @@ std::string QueryContextResponse::render(RequestType requestType, Format format,
 
   out += startTag(indent, tag, format, false);
 
+  if (contextElementResponseVector.size() > 0)
+  {
+    bool commaNeeded = (errorCode.code != SccNone);
+    out += contextElementResponseVector.render(QueryContext, format, indent + "  ", commaNeeded);
+  }
+
+  if (errorCode.code != SccNone)
+  {
+    out += errorCode.render(format, indent + "  ");
+  }
+
+#if 0
+  // I needed to adjust rednder function for details=on to work. Ken, please review that this code can be safely removed, after the
+  // above re-factoring
   if ((errorCode.code == SccNone) || (errorCode.code == SccOk))
   {
     if (contextElementResponseVector.size() == 0)
@@ -89,6 +103,7 @@ std::string QueryContextResponse::render(RequestType requestType, Format format,
   }
   else
      out += errorCode.render(format, indent + "  ");
+#endif
 
   out += endTag(indent, tag, format);
 
