@@ -29,8 +29,8 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. creating base entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/contextEntities/Room1"
+payload='{
   "attributes" : [
   {
     "name" : "temperature",
@@ -57,20 +57,25 @@ echo "+++++ 1. creating base entity +++++"
     ]
   }
   ]
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "+++++ 2. lookup the entity +++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+orionCurl --url "/NGSI10/contextEntities/Room1" --json
 
 echo "+++++ 3. lookup an attribute by valueID in JSON +++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperature/ground -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+orionCurl --url "/NGSI10/contextEntities/Room1/attributes/temperature/ground" --json
 
 echo "+++++ 4. lookup an attribute by the other valueID in XML +++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperature/wall -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format -
+orionCurl --url "/NGSI10/contextEntities/Room1/attributes/temperature/wall"
 
 --REGEXPECT--
 +++++ 1. creating base entity +++++
+HTTP/1.1 200 OK
+Content-Length: 705
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextResponses": [
         {
@@ -108,6 +113,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
     ]
 }
 +++++ 2. lookup the entity +++++
+HTTP/1.1 200 OK
+Content-Length: 693
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextElement": {
         "attributes": [
@@ -146,6 +156,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
     }
 }
 +++++ 3. lookup an attribute by valueID in JSON +++++
+HTTP/1.1 200 OK
+Content-Length: 323
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "attributes": [
         {
@@ -167,6 +182,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
     }
 }
 +++++ 4. lookup an attribute by the other valueID in XML +++++
+HTTP/1.1 200 OK
+Content-Length: 516
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextAttributeResponse>
   <contextAttributeList>

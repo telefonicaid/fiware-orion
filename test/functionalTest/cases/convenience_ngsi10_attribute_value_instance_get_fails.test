@@ -29,8 +29,8 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. create an entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/contextEntities/Room1"
+payload='{
   "attributes" : [
   {
     "name" : "temperature",
@@ -57,20 +57,25 @@ echo "+++++ 1. create an entity +++++"
     ]
   }
   ]
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "+++++ 2. lookup an attribute by valueID +++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperature/ground -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+orionCurl --url "/NGSI10/contextEntities/Room1/attributes/temperature/ground" --json
 
 echo "+++++ 3. delete an attribute by valueID +++++"
-curl localhost:${BROKER_PORT}/ngsi10/contextEntities/Room1/attributes/temperature/ground -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X DELETE | python -mjson.tool
+orionCurl --url "/ngsi10/contextEntities/Room1/attributes/temperature/ground" -X "DELETE" --json
 
 echo "+++++ 4. lookup the attribute again +++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperature/ground -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+orionCurl --url "/NGSI10/contextEntities/Room1/attributes/temperature/ground" --json
 
 --REGEXPECT--
 +++++ 1. create an entity +++++
+HTTP/1.1 200 OK
+Content-Length: 705
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextResponses": [
         {
@@ -108,6 +113,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
     ]
 }
 +++++ 2. lookup an attribute by valueID +++++
+HTTP/1.1 200 OK
+Content-Length: 323
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "attributes": [
         {
@@ -129,11 +139,21 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperatur
     }
 }
 +++++ 3. delete an attribute by valueID +++++
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "code": "200",
     "reasonPhrase": "OK"
 }
 +++++ 4. lookup the attribute again +++++
+HTTP/1.1 200 OK
+Content-Length: 159
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "statusCode": {
         "code": "404",

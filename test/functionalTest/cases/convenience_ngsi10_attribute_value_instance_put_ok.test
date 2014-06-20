@@ -29,8 +29,8 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. creating base entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/contextEntities/Room1"
+payload='{
   "attributes" : [
   {
     "name" : "temperature",
@@ -57,31 +57,36 @@ echo "+++++ 1. creating base entity +++++"
     ]
   }
   ]
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "+++++ 2. lookup the entity +++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+orionCurl --url "/NGSI10/contextEntities/Room1" --json
 
 echo "+++++ 3. change an attribute by valueID +++++"
-(curl localhost:${BROKER_PORT}/ngsi10/contextEntities/Room1/attributes/temperature/ground -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) <<EOF
-{
+url="/ngsi10/contextEntities/Room1/attributes/temperature/ground"
+payload='{
   "value": "18.4"
-}
-EOF
+ }'
+orionCurl --url "$url" --payload "$payload"  --json -X "PUT"
 
 echo "+++++ 4. change an attribute by the other valueID in XML +++++"
-(curl localhost:${BROKER_PORT}/ngsi10/contextEntities/Room1/attributes/temperature/wall -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) <<EOF
-{
+url="/ngsi10/contextEntities/Room1/attributes/temperature/wall"
+payload='{
   "value": "17.8"
-}
-EOF
+ }'
+orionCurl --url "$url" --payload "$payload" -X "PUT" --json
 
 echo "+++++ 5. lookup the entity again +++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+orionCurl --json --url "/NGSI10/contextEntities/Room1" 
 
 --REGEXPECT--
 +++++ 1. creating base entity +++++
+HTTP/1.1 200 OK
+Content-Length: 705
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextResponses": [
         {
@@ -119,6 +124,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Conte
     ]
 }
 +++++ 2. lookup the entity +++++
+HTTP/1.1 200 OK
+Content-Length: 693
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextElement": {
         "attributes": [
@@ -157,16 +167,31 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1 -s -S --header 'Conte
     }
 }
 +++++ 3. change an attribute by valueID +++++
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "code": "200",
     "reasonPhrase": "OK"
 }
 +++++ 4. change an attribute by the other valueID in XML +++++
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "code": "200",
     "reasonPhrase": "OK"
 }
 +++++ 5. lookup the entity again +++++
+HTTP/1.1 200 OK
+Content-Length: 695
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextElement": {
         "attributes": [
