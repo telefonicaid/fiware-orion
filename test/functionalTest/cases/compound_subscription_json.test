@@ -30,8 +30,8 @@ accumulatorStart
 
 --SHELL--
 echo "1: +++++++++ Prepare subscription +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/subscribeContext"
+payload='{
     "entities": [
         {
             "type": "T",
@@ -40,7 +40,7 @@ echo "1: +++++++++ Prepare subscription +++++++++++"
         }
     ],
     "attributes": [ ],
-    "reference": "http://127.0.0.1:${LISTENER_PORT}/notify",
+    "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
     "duration": "PT1H",
     "notifyConditions": [
         {
@@ -50,12 +50,12 @@ echo "1: +++++++++ Prepare subscription +++++++++++"
             ]
         }
     ]
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "2: ++++++++++ Create the entity attribute with vector value ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -85,12 +85,12 @@ echo "2: ++++++++++ Create the entity attribute with vector value ++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++ Update the entity attribute with object value ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -116,14 +116,19 @@ echo "3: ++++++++++ Update the entity attribute with object value ++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 #Get accumulated data
 curl localhost:${LISTENER_PORT}/dump -s -S
 
 --REGEXPECT--
 1: +++++++++ Prepare subscription +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 109
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "subscribeResponse": {
         "duration": "PT1H",
@@ -131,6 +136,11 @@ curl localhost:${LISTENER_PORT}/dump -s -S
     }
 }
 2: ++++++++++ Create the entity attribute with vector value ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 622
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -155,6 +165,11 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   </contextResponseList>
 </updateContextResponse>
 3: ++++++++++ Update the entity attribute with object value ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 622
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
