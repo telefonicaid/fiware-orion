@@ -38,19 +38,14 @@ TEST(QueryContextResponse, ok_xml)
 {
   StatusCode*           ecP = new StatusCode(SccOk, "Detail");
   StatusCode            ec(SccOk, "Detail2");
-  QueryContextResponse  qcr1;
-  QueryContextResponse  qcr2(ec);
+  QueryContextResponse  qcr(ec);
   std::string           out;
-  const char*           outfile  = "ngsi10.queryContextResponse.notFound.valid.xml";
+  const char*           outfile  = "ngsi10.queryContextResponse.ok.valid.xml";
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  out = qcr1.render(QueryContext, XML, "");
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  out = qcr2.render(QueryContext, XML, "");
+  out = qcr.render(QueryContext, XML, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   delete ecP;
@@ -212,6 +207,7 @@ TEST(QueryContextResponse, json_render)
   qcrP->errorCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename12)) << "Error getting test data from '" << filename12 << "'";
+  qcrP->errorCode.code = SccNone;
   out = qcrP->render(QueryContext, JSON, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -220,6 +216,7 @@ TEST(QueryContextResponse, json_render)
   qcrP->errorCode.fill(SccBadRequest, "no details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename13)) << "Error getting test data from '" << filename13 << "'";
+  qcrP->contextElementResponseVector.release();
   out = qcrP->render(QueryContext, JSON, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
