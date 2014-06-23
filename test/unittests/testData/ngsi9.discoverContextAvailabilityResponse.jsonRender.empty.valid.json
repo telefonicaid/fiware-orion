@@ -1,0 +1,7 @@
+{
+  "errorCode" : {
+    "code" : "500",
+    "reasonPhrase" : "Internal Server Error",
+    "details" : "Empty error and response vector"
+  }
+}

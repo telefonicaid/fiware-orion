@@ -94,6 +94,13 @@ std::string DiscoverContextAvailabilityResponse::render(RequestType requestType,
     out += errorCode.render(format, indent + "  ", false);
   }
 
+  /* Safety check: neither errorCode nor CER vector was filled by mongoBackend */
+  if (errorCode.code == SccNone && responseVector.size() == 0)
+  {
+      errorCode.fill(SccReceiverInternalError, "Empty error and response vector");
+      out += errorCode.render(format, indent + "  ");
+  }
+
 #if 0
   // I needed to adjust rednder function for details=on to work. Ken, please review that this code can be safely removed, after the
   // above re-factoring

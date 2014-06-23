@@ -86,6 +86,13 @@ std::string QueryContextResponse::render(RequestType requestType, Format format,
     out += errorCode.render(format, indent + "  ");
   }
 
+  /* Safety check: neither errorCode nor CER vector was filled by mongoBackend */
+  if (errorCode.code == SccNone && contextElementResponseVector.size() == 0)
+  {
+      errorCode.fill(SccReceiverInternalError, "Empty error and CER vector");
+      out += errorCode.render(format, indent + "  ");
+  }
+
 #if 0
   // I needed to adjust rednder function for details=on to work. Ken, please review that this code can be safely removed, after the
   // above re-factoring

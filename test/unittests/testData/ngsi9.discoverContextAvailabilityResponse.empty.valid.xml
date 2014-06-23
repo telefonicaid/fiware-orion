@@ -1,0 +1,7 @@
+<discoverContextAvailabilityResponse>
+  <errorCode>
+    <code>500</code>
+    <reasonPhrase>Internal Server Error</reasonPhrase>
+    <details>Empty error and response vector</details>
+  </errorCode>
+</discoverContextAvailabilityResponse>
