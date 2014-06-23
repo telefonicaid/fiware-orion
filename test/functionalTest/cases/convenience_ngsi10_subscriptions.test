@@ -29,8 +29,8 @@ brokerStart CB
 --SHELL--
 # 1. Create a subscription
 echo "1: ++++++++++++++++++++"
-SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/contextSubscriptions -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) << EOF
-<?xml version="1.0"?>
+url="/NGSI10/contextSubscriptions"
+payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">
@@ -41,7 +41,7 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/contextSubscriptions -s -S --hea
     <attribute>temperature</attribute>
     <attribute>lightstatus</attribute>
   </attributeList>
-  <reference>http://localhost:${LISTENER_PORT}/notify</reference>
+  <reference>http://localhost:'${LISTENER_PORT}'/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
     <notifyCondition>
@@ -52,32 +52,38 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/contextSubscriptions -s -S --hea
       </condValueList>          
     </notifyCondition>
   </notifyConditions>
-</subscribeContextRequest>
-EOF)
-SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$SUB_OUT"
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
 # 2. Update the subscription
 echo "2: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextSubscriptions/$SUB_ID -X PUT -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
-<?xml version="1.0"?>
+url="/NGSI10/contextSubscriptions/$SUB_ID" 
+payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>P1Y</duration>
-  <subscriptionId>$SUB_ID</subscriptionId>
+  <subscriptionId>'$SUB_ID'</subscriptionId>
   <throttling>PT6S</throttling>
-</updateContextSubscriptionRequest>
-EOF
+</updateContextSubscriptionRequest>'
+orionCurl --url "$url" --payload "$payload" -X "PUT"
 
 # 3. Delete the subscription
 echo "3: ++++++++++++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextSubscriptions/$SUB_ID -X DELETE -s -S --header 'Content-Type: application/xml' | xmllint --format -
+orionCurl --url "/NGSI10/contextSubscriptions/$SUB_ID" -X "DELETE"
 
 # 4. Bad verb
 echo "4: ++++++++++++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextSubscriptions/$SUB_ID -X DELETE2 -s -S --header 'Content-Type: application/xml' --include
+orionCurl --url "/NGSI10/contextSubscriptions/$SUB_ID" -X "DELETE2"
+
 echo "5: ++++++++++++++++++++"
 --REGEXPECT--
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 192
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
@@ -86,6 +92,11 @@ echo "5: ++++++++++++++++++++"
   </subscribeResponse>
 </subscribeContextResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 243
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextSubscriptionResponse>
   <subscribeResponse>
@@ -95,6 +106,11 @@ echo "5: ++++++++++++++++++++"
   </subscribeResponse>
 </updateContextSubscriptionResponse>
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 207
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <unsubscribeContextResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
