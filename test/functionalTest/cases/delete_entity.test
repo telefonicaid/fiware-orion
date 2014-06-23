@@ -27,9 +27,8 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -46,12 +45,12 @@ brokerStart CB
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-echo "3: ++++++++++++++++++++"
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "1: ++++++++++++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -61,12 +60,12 @@ echo "3: ++++++++++++++++++++"
   <attributeList>
         <attribute>temperature</attribute>
   </attributeList>
-</queryContextRequest>
-EOF
-echo "4: ++++++++++++++++++++"
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "2: ++++++++++++++++++++"
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -76,12 +75,12 @@ echo "4: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>DELETE</updateAction>
-</updateContextRequest>
-EOF
-echo "5: ++++++++++++++++++++"
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "3: ++++++++++++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -91,11 +90,15 @@ echo "5: ++++++++++++++++++++"
   <attributeList>
         <attribute>temperature</attribute>
   </attributeList>
-</queryContextRequest>
-EOF
-echo "6: ++++++++++++++++++++"
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 640
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -119,7 +122,12 @@ echo "6: ++++++++++++++++++++"
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-3: ++++++++++++++++++++
+1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 640
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
@@ -143,7 +151,12 @@ echo "6: ++++++++++++++++++++"
     </contextElementResponse>
   </contextResponseList>
 </queryContextResponse>
-4: ++++++++++++++++++++
+2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 407
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -160,7 +173,12 @@ echo "6: ++++++++++++++++++++"
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-5: ++++++++++++++++++++
+3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
@@ -168,6 +186,5 @@ echo "6: ++++++++++++++++++++"
     <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
-6: ++++++++++++++++++++
 --TEARDOWN--
 brokerStop CB

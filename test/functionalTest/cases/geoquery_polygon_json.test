@@ -29,8 +29,8 @@ brokerStart CB
 
 --SHELL--
 echo "0: +++++++++ Prepare entities +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/updateContext"
+payload='{
   "contextElements": [
   {
     "type": "Point",
@@ -91,12 +91,12 @@ echo "0: +++++++++ Prepare entities +++++++++++"
   }
   ],
   "updateAction": "APPEND"
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "1: ++++++++++ Rectangle in: A, B ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/queryContext"
+payload='{
   "entities": [
   {
     "type": "Point",
@@ -133,12 +133,12 @@ echo "1: ++++++++++ Rectangle in: A, B ++++++++++"
     }
     ]
   }
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "2: ++++++++++ Rectangle in: B, C ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/queryContext"
+payload='{
   "entities": [
   {
     "type": "Point",
@@ -175,12 +175,12 @@ echo "2: ++++++++++ Rectangle in: B, C ++++++++++"
     }
     ]
   }
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "3: ++++++++++ Triangle in: A ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/queryContext"
+payload='{
   "entities": [
   {
     "type": "Point",
@@ -213,12 +213,12 @@ echo "3: ++++++++++ Triangle in: A ++++++++++"
     }
     ]
   }
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "4: ++++++++++ Rectangle out: A ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/queryContext"
+payload='{
   "entities": [
   {
     "type": "Point",
@@ -256,12 +256,12 @@ echo "4: ++++++++++ Rectangle out: A ++++++++++"
     }
     ]
   }
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "5: ++++++++++ Triangle out: B, C ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/queryContext"
+payload='{
   "entities": [
   {
     "type": "Point",
@@ -295,11 +295,16 @@ echo "5: ++++++++++ Triangle out: B, C ++++++++++"
     }
     ]
   }
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 --REGEXPECT--
 0: +++++++++ Prepare entities +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1652
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextResponses": [
         {
@@ -380,6 +385,11 @@ EOF
     ]
 }
 1: ++++++++++ Rectangle in: A, B ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1120
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextResponses": [
         {
@@ -435,6 +445,11 @@ EOF
     ]
 }
 2: ++++++++++ Rectangle in: B, C ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1120
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextResponses": [
         {
@@ -490,6 +505,11 @@ EOF
     ]
 }
 3: ++++++++++ Triangle in: A ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 576
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextResponses": [
         {
@@ -520,6 +540,11 @@ EOF
     ]
 }
 4: ++++++++++ Rectangle out: A ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 576
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextResponses": [
         {
@@ -550,6 +575,11 @@ EOF
     ]
 }
 5: ++++++++++ Triangle out: B, C ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1120
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextResponses": [
         {

@@ -29,8 +29,8 @@ brokerStart CB
 
 --SHELL--
 echo "0: +++++++++ Prepare entities +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -92,12 +92,12 @@ echo "0: +++++++++ Prepare entities +++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 echo "1: ++++++++++ Rectangle in: A, B ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Point" isPattern="true">
@@ -135,12 +135,12 @@ echo "1: ++++++++++ Rectangle in: A, B ++++++++++"
       </operationScope>
     </scope>
   </restriction>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 echo "2: ++++++++++ Rectangle in: B, C ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Point" isPattern="true">
@@ -178,12 +178,12 @@ echo "2: ++++++++++ Rectangle in: B, C ++++++++++"
       </operationScope>
     </scope>
   </restriction>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++ Triangle in: A ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Point" isPattern="true">
@@ -217,12 +217,12 @@ echo "3: ++++++++++ Triangle in: A ++++++++++"
       </operationScope>
     </scope>
   </restriction>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-echo "2: ++++++++++ Rectangle out: A ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "4: ++++++++++ Rectangle out: A ++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Point" isPattern="true">
@@ -261,12 +261,12 @@ echo "2: ++++++++++ Rectangle out: A ++++++++++"
       </operationScope>
     </scope>
   </restriction>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-echo "3: ++++++++++ Triangle out: B, C ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "5: ++++++++++ Triangle out: B, C ++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Point" isPattern="true">
@@ -301,11 +301,16 @@ echo "3: ++++++++++ Triangle out: B, C ++++++++++"
       </operationScope>
     </scope>
   </restriction>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
 0: +++++++++ Prepare entities +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 2360
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -387,6 +392,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 1: ++++++++++ Rectangle in: A, B ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1612
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
@@ -443,6 +453,11 @@ EOF
   </contextResponseList>
 </queryContextResponse>
 2: ++++++++++ Rectangle in: B, C ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1612
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
@@ -499,6 +514,11 @@ EOF
   </contextResponseList>
 </queryContextResponse>
 3: ++++++++++ Triangle in: A ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 854
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
@@ -529,7 +549,12 @@ EOF
     </contextElementResponse>
   </contextResponseList>
 </queryContextResponse>
-2: ++++++++++ Rectangle out: A ++++++++++
+4: ++++++++++ Rectangle out: A ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 854
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
@@ -560,7 +585,12 @@ EOF
     </contextElementResponse>
   </contextResponseList>
 </queryContextResponse>
-3: ++++++++++ Triangle out: B, C ++++++++++
+5: ++++++++++ Triangle out: B, C ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1612
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
