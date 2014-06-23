@@ -2,6 +2,6 @@
   "errorCode" : {
     "code" : "500",
     "reasonPhrase" : "Internal Server Error",
-    "details" : "Empty error and response vector"
+    "details" : "Both the error-code structure and the response vector were empty"
   }
 }

@@ -89,7 +89,7 @@ std::string QueryContextResponse::render(RequestType requestType, Format format,
   /* Safety check: neither errorCode nor CER vector was filled by mongoBackend */
   if (errorCode.code == SccNone && contextElementResponseVector.size() == 0)
   {
-      errorCode.fill(SccReceiverInternalError, "Empty error and CER vector");
+      errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
       out += errorCode.render(format, indent + "  ");
   }
 

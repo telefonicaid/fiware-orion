@@ -2,6 +2,6 @@
   <errorCode>
     <code>500</code>
     <reasonPhrase>Internal Server Error</reasonPhrase>
-    <details>Empty error and response vector</details>
+    <details>Both the error-code structure and the response vector were empty</details>
   </errorCode>
 </discoverContextAvailabilityResponse>
