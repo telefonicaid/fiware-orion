@@ -29,99 +29,106 @@ brokerStart CB 1-2
 
 --SHELL--
 echo "=== 1. GET verbose level"
-curl localhost:${BROKER_PORT}/log/verbose 2> /dev/null
+orionCurl --url "/log/verbose" 2> /dev/null
 echo
 echo
 
 echo "=== 2. PUT verbose level"
-curl localhost:${BROKER_PORT}/log/verbose/5 -X PUT  2> /dev/null
+orionCurl --url "/log/verbose/5" -X "PUT" 2> /dev/null
 echo
 echo
 
 echo "=== 3. GET verbose level"
-curl localhost:${BROKER_PORT}/log/verbose  2> /dev/null
+orionCurl --url "/log/verbose" 2> /dev/null
 echo
 echo
 
 echo "=== 4. DELETE verbose level"
-curl localhost:${BROKER_PORT}/log/verbose -X DELETE  2> /dev/null
+orionCurl --url "/log/verbose" -X "DELETE" 2> /dev/null
 echo
 echo
 
 echo "=== 5. GET verbose level"
-curl localhost:${BROKER_PORT}/log/verbose  2> /dev/null
+orionCurl --url "/log/verbose" 2> /dev/null
 echo
 echo
 
 
 echo "=== 6. POST verbose level"
-curl localhost:${BROKER_PORT}/log/verbose/5 -X POST --include  2> /dev/null
+orionCurl --url "/log/verbose/5" -X "POST" --include 2> /dev/null
 echo
 echo
 
 
 echo "=== 7. GET trace level"
-curl localhost:${BROKER_PORT}/log/traceLevel  2> /dev/null
+orionCurl --url "/log/traceLevel" 2> /dev/null
 echo
 echo
 
 
 echo "=== 8. PUT trace level"
-curl localhost:${BROKER_PORT}/log/trace/5-10 -X PUT  2> /dev/null
+orionCurl --url "/log/traceLevel/5-10" -X "PUT" 2> /dev/null
 echo
 echo
 
 
 echo "=== 9. GET trace level"
-curl localhost:${BROKER_PORT}/log/traceLevel  2> /dev/null
+orionCurl --url "/log/traceLevel" 2> /dev/null
 echo
 echo
 
 
 echo "=== 10. POST trace level"
-curl localhost:${BROKER_PORT}/log/trace/101-102,105 -X POST --include  2> /dev/null
+orionCurl --url "/log/traceLevel/101-102,105" -X "POST" --include 2> /dev/null
 echo
 echo
 
 
 echo "=== 11. PUT trace level"
-curl localhost:${BROKER_PORT}/log/traceLevel/19,21-25 -X PUT  2> /dev/null
+orionCurl --url "/log/traceLevel/19,21-25" -X "PUT" 2> /dev/null
 echo
 echo
 
 
 echo "=== 12. GET trace level"
-curl localhost:${BROKER_PORT}/log/trace  2> /dev/null
+orionCurl --url "/log/traceLevel" 2> /dev/null
 echo
 echo
 
 
 echo "=== 13. DELETE trace level"
 curl localhost:${BROKER_PORT}/log/traceLevel/23 -X DELETE  2> /dev/null
+# FIXME: Y U NO orionCurl --url "/log/traceLevel/23" -X "DELETE" 2> /dev/null ?
 echo
 echo
 
 
 echo "=== 14. GET trace level"
-curl localhost:${BROKER_PORT}/log/traceLevel  2> /dev/null
+orionCurl --url "/log/traceLevel" 2> /dev/null
 echo
 echo
 
 
 echo "=== 15. DELETE trace level"
-curl localhost:${BROKER_PORT}/log/traceLevel -X DELETE  2> /dev/null
+orionCurl --url "/log/traceLevel" -X "DELETE" 2> /dev/null
 echo
 echo
 
 
 echo "=== 16. GET trace level"
-curl localhost:${BROKER_PORT}/log/traceLevel  2> /dev/null
+orionCurl --url "/log/traceLevel" 2> /dev/null
 echo
 echo
 
 
 --REGEXPECT--
 === 1. GET verbose level
+HTTP/1.1 200 OK
+Content-Length: 69
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
 <orion>
   <log>
     <verboseLevel>5</verboseLevel>
@@ -130,6 +137,12 @@ echo
 
 
 === 2. PUT verbose level
+HTTP/1.1 200 OK
+Content-Length: 90
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
 <orion>
   <log>
     <verboseLevel>verbose level set to 5</verboseLevel>
@@ -138,6 +151,12 @@ echo
 
 
 === 3. GET verbose level
+HTTP/1.1 200 OK
+Content-Length: 69
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
 <orion>
   <log>
     <verboseLevel>5</verboseLevel>
@@ -146,6 +165,12 @@ echo
 
 
 === 4. DELETE verbose level
+HTTP/1.1 200 OK
+Content-Length: 92
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
 <orion>
   <log>
     <verboseLevel>all verbose levels reset</verboseLevel>
@@ -154,6 +179,12 @@ echo
 
 
 === 5. GET verbose level
+HTTP/1.1 200 OK
+Content-Length: 69
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
 <orion>
   <log>
     <verboseLevel>0</verboseLevel>
@@ -170,6 +201,12 @@ Date: REGEX(.*)
 
 
 === 7. GET trace level
+HTTP/1.1 200 OK
+Content-Length: 69
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
 <orion>
   <log>
     <tracelevels>1-2</tracelevels>
@@ -178,6 +215,12 @@ Date: REGEX(.*)
 
 
 === 8. PUT trace level
+HTTP/1.1 200 OK
+Content-Length: 70
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
 <orion>
   <log>
     <tracelevels>5-10</tracelevels>
@@ -186,6 +229,12 @@ Date: REGEX(.*)
 
 
 === 9. GET trace level
+HTTP/1.1 200 OK
+Content-Length: 70
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
 <orion>
   <log>
     <tracelevels>5-10</tracelevels>
@@ -202,6 +251,12 @@ Date: REGEX(.*)
 
 
 === 11. PUT trace level
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
 <orion>
   <log>
     <tracelevels>19,21-25</tracelevels>
@@ -210,6 +265,12 @@ Date: REGEX(.*)
 
 
 === 12. GET trace level
+HTTP/1.1 200 OK
+Content-Length: 75
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
 <orion>
   <log>
     <tracelevels>19, 21-25</tracelevels>
@@ -226,6 +287,12 @@ Date: REGEX(.*)
 
 
 === 14. GET trace level
+HTTP/1.1 200 OK
+Content-Length: 82
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
 <orion>
   <log>
     <tracelevels>19, 21-22, 24-25</tracelevels>
@@ -234,6 +301,12 @@ Date: REGEX(.*)
 
 
 === 15. DELETE trace level
+HTTP/1.1 200 OK
+Content-Length: 86
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
 <orion>
   <log>
     <tracelevels>all trace levels off</tracelevels>
@@ -242,6 +315,12 @@ Date: REGEX(.*)
 
 
 === 16. GET trace level
+HTTP/1.1 200 OK
+Content-Length: 71
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
 <orion>
   <log>
     <tracelevels>empty</tracelevels>
