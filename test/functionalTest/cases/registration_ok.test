@@ -27,8 +27,8 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-REG_OUT=$((curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/registerContext"
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -52,14 +52,14 @@ REG_OUT=$((curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'C
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>
-EOF)
-REG_ID=$(echo "$REG_OUT" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$REG_OUT"
+  </registerContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+REG_ID=$(echo "$_response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
+
 echo "++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
       <entityId type="Room" isPattern="false">
@@ -73,12 +73,13 @@ echo "++++++++++++++++++++"
       <attribute>temperature</attribute>
       <attribute>pressure</attribute>
     </attributeList>
-  </discoverContextAvailabilityRequest>
-EOF
+  </discoverContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "$payload"
+
 echo "++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
       <entityId type="Room" isPattern="false">
@@ -90,12 +91,13 @@ echo "++++++++++++++++++++"
     </entityIdList>
     <attributeList>
     </attributeList>
-  </discoverContextAvailabilityRequest>
-EOF
+  </discoverContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "$payload"
+
 echo "++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/registerContext"
+payload='<?xml version="1.0"?>
     <registerContextRequest>
       <contextRegistrationList>
         <contextRegistration>
@@ -115,13 +117,14 @@ echo "++++++++++++++++++++"
         </contextRegistration>
       </contextRegistrationList>
       <duration>PT5H</duration>
-      <registrationId>$REG_ID</registrationId>
-    </registerContextRequest>
-EOF
+      <registrationId>'$REG_ID'</registrationId>
+    </registerContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+
 echo "++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
       <entityId type="Room" isPattern="false">
@@ -135,15 +138,26 @@ echo "++++++++++++++++++++"
       <attribute>temperature</attribute>
       <attribute>pressure</attribute>
     </attributeList>
-  </discoverContextAvailabilityRequest>
-EOF
+  </discoverContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "$payload"
+
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 902
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -170,6 +184,11 @@ EOF
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 902
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -196,12 +215,22 @@ EOF
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT5H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 791
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>

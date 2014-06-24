@@ -27,9 +27,9 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-
-(curl localhost:${BROKER_PORT}/NGSI9/notifyContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+echo "1: ++++++++++++++++++++"
+url="/NGSI9/notifyContextAvailability"
+payload='<?xml version="1.0"?>
 <notifyContextAvailabilityRequest>
   <subscriptionId>51307b66f481db11bf860001</subscriptionId>
   <contextRegistrationResponseList>
@@ -56,12 +56,12 @@ brokerStart CB
       </contextRegistration>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
-</notifyContextAvailabilityRequest>
-EOF
-echo "1: ++++++++++++++++++++"
+</notifyContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+echo "2: ++++++++++++++++++++"
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
       <entityId type="Room" isPattern="false">
@@ -69,11 +69,16 @@ echo "1: ++++++++++++++++++++"
       </entityId>
     </entityIdList>
     <attributeList/>
-  </discoverContextAvailabilityRequest>
-EOF
-echo "2: ++++++++++++++++++++"
+  </discoverContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
+1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 165
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <notifyContextAvailabilityResponse>
   <responseCode>
@@ -81,7 +86,12 @@ echo "2: ++++++++++++++++++++"
     <reasonPhrase>OK</reasonPhrase>
   </responseCode>
 </notifyContextAvailabilityResponse>
-1: ++++++++++++++++++++
+2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 970
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -109,6 +119,5 @@ echo "2: ++++++++++++++++++++"
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
-2: ++++++++++++++++++++
 --TEARDOWN--
 brokerStop CB

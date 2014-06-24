@@ -27,8 +27,8 @@ dbInit CB
 brokerStart CB 0
 
 --SHELL--
-REG_OUT=$((curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/registerContext"
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -52,14 +52,14 @@ REG_OUT=$((curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'C
     </contextRegistrationList>
     <duration>P300Y</duration>
     <registrationId></registrationId>
-  </registerContextRequest>
-EOF)
-REG_ID=$(echo "$REG_OUT" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$REG_OUT"
+  </registerContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+REG_ID=$(echo "$_response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
+
 echo "++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
       <entityId type="Room" isPattern="false">
@@ -73,17 +73,27 @@ echo "++++++++++++++++++++"
       <attribute>temperature</attribute>
       <attribute>pressure</attribute>
     </attributeList>
-  </discoverContextAvailabilityRequest>
-EOF
+  </discoverContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "++++++++++++++++++++"
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 142
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>P300Y</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 902
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>

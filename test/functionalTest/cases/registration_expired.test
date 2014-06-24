@@ -1,4 +1,4 @@
-# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+  # Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -27,8 +27,8 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-REG_OUT=$((curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/registerContext"
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -52,15 +52,15 @@ REG_OUT=$((curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'C
     </contextRegistrationList>
     <duration>PT5S</duration>
     <registrationId></registrationId>
-  </registerContextRequest>
-EOF)
-REG_ID=$(echo "$REG_OUT" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$REG_OUT"
+  </registerContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+REG_ID=$(echo "$_response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
+
 echo "1: ++++++++++++++++++++"
 
 # Do a discover context availability just after the registration (it works)
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
       <entityId type="Room" isPattern="false">
@@ -74,14 +74,14 @@ echo "1: ++++++++++++++++++++"
       <attribute>temperature</attribute>
       <attribute>pressure</attribute>
     </attributeList>
-  </discoverContextAvailabilityRequest>
-EOF
+  </discoverContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "2: ++++++++++++++++++++"
 
 # Do a discover context availability passed the expiration period (no result)
 sleep 6s
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
       <entityId type="Room" isPattern="false">
@@ -95,16 +95,26 @@ sleep 6s
       <attribute>temperature</attribute>
       <attribute>pressure</attribute>
     </attributeList>
-  </discoverContextAvailabilityRequest>
-EOF
+  </discoverContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT5S</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 902
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>
@@ -131,6 +141,11 @@ EOF
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 185
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <errorCode>
