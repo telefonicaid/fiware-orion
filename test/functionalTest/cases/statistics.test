@@ -28,10 +28,15 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-curl localhost:${BROKER_PORT}/statistics 2> /dev/null | xmllint --format -
+orionCurl --url "/statistics" 
 echo
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 191
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <orion>
   <xmlRequests>1</xmlRequests>

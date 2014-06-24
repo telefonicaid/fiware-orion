@@ -28,9 +28,8 @@ brokerStart CB
 accumulatorStart
 
 --SHELL--
-
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/registerContext"
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -54,12 +53,12 @@ accumulatorStart
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>
-EOF
-echo "1: ++++++++++++++++++++"
+  </registerContextRequest>'
+orionCurl --url "$url" --payload "${payload}"
 
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+echo "1: ++++++++++++++++++++"
+url="/NGSI9/registerContext"
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -83,12 +82,12 @@ echo "1: ++++++++++++++++++++"
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>
-EOF
-echo "2: ++++++++++++++++++++"
+  </registerContextRequest>'
+orionCurl --url "$url" --payload "${payload}"
 
-SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI9/subscribeContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
+echo "2: ++++++++++++++++++++"
+url="/NGSI9/subscribeContextAvailability"
+payload='<?xml version="1.0"?>
 <subscribeContextAvailabilityRequest>
         <entityIdList>
                 <entityId type="Room" isPattern="true">
@@ -100,16 +99,15 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI9/subscribeContextAvailability -s -
                 <attribute>occupancy</attribute>
                 <attribute>lightstatus</attribute>
         </attributeList>
-        <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
+        <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
         <duration>PT5H</duration>
-</subscribeContextAvailabilityRequest>
-EOF)
-SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$SUB_OUT"
-echo "3: ++++++++++++++++++++"
+</subscribeContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "${payload}"
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+echo "3: ++++++++++++++++++++"
+url="/NGSI9/registerContext"
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -130,12 +128,12 @@ echo "3: ++++++++++++++++++++"
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>
-EOF
-echo "4: ++++++++++++++++++++"
+  </registerContextRequest>'
+orionCurl --url "$url" --payload "${payload}"
 
-(curl localhost:${BROKER_PORT}/NGSI9/updateContextAvailabilitySubscription -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+echo "4: ++++++++++++++++++++"
+url="/NGSI9/updateContextAvailabilitySubscription"
+payload='<?xml version="1.0"?>
 <updateContextAvailabilitySubscriptionRequest>
         <entityIdList>
                 <entityId type="Room" isPattern="true">
@@ -148,13 +146,13 @@ echo "4: ++++++++++++++++++++"
                 <attribute>lightstatus</attribute>
         </attributeList>
         <duration>PT5H</duration>
-        <subscriptionId>$SUB_ID</subscriptionId>
-</updateContextAvailabilitySubscriptionRequest>
-EOF
-echo "5: ++++++++++++++++++++"
+        <subscriptionId>'$SUB_ID'</subscriptionId>
+</updateContextAvailabilitySubscriptionRequest>'
+orionCurl --url "$url" --payload "${payload}"
 
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+echo "5: ++++++++++++++++++++"
+url="/NGSI9/registerContext"
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -175,58 +173,93 @@ echo "5: ++++++++++++++++++++"
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>
-EOF
+  </registerContextRequest>'
+orionCurl --url "$url" --payload "${payload}"
+
 echo "6: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI9/unsubscribeContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/unsubscribeContextAvailability"
+payload='<?xml version="1.0"?>
 <unsubscribeContextAvailabilityRequest>
-        <subscriptionId>$SUB_ID</subscriptionId>
-</unsubscribeContextAvailabilityRequest>
-EOF
-echo "7: ++++++++++++++++++++"
+        <subscriptionId>'$SUB_ID'</subscriptionId>
+</unsubscribeContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "${payload}"
 
+echo "7: ++++++++++++++++++++"
 #Get accumulated data
 curl localhost:${LISTENER_PORT}/dump -s -S 
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 167
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextAvailabilityResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
   <duration>PT5H</duration>
 </subscribeContextAvailabilityResponse>
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 185
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextAvailabilitySubscriptionResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
   <duration>PT5H</duration>
 </updateContextAvailabilitySubscriptionResponse>
 5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 231
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <unsubscribeContextAvailabilityResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
