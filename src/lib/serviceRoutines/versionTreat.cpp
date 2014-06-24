@@ -81,6 +81,11 @@ std::string versionTreat(ConnectionInfo* ciP, int components, std::vector<std::s
   std::string uptime = parsedUptime(getTimer()->getCurrentTime() - startTime);
 #endif
 
+  if(ciP->outFormat == JSON)
+  {
+    out += startTag("", tag, tag, ciP->outFormat, false, false);
+    indent = "  ";
+  }
   out += startTag(indent, tag, ciP->outFormat);
   out += valueTag(indent + "  ", "version",       versionString,   ciP->outFormat, true);
   out += valueTag(indent + "  ", "uptime",        uptime,          ciP->outFormat, true);
@@ -89,7 +94,11 @@ std::string versionTreat(ConnectionInfo* ciP, int components, std::vector<std::s
   out += valueTag(indent + "  ", "compiled_by",   COMPILED_BY,     ciP->outFormat, true);
   out += valueTag(indent + "  ", "compiled_in",   COMPILED_IN,     ciP->outFormat, false);
   out += endTag(indent, tag, ciP->outFormat);
-
+  
+  if(ciP->outFormat == JSON)
+  {
+    out += endTag("", tag, ciP->outFormat);
+  }
   ciP->httpStatusCode = SccOk;
   return out;
 }
