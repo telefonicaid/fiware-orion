@@ -28,17 +28,21 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++++++++++++++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/Room1/attributes/temperature/foo/bar -s -S --header 'Content-Type: application/json' --header 'Accept: application/json'
-echo "2: +++++++++++++++++++++++++++++"
+orionCurl --url "/NGSI10/contextEntities/Room1/attributes/temperature/foo/bar" --json
+
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 186
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
-  "orionError" : {
-    "code" : "400",
-    "reasonPhrase" : "Bad Request",
-    "details" : "Service not recognized: /NGSI10/contextEntities/Room1/attributes/temperature/foo/bar"
-  }
+    "orionError": {
+        "code": "400", 
+        "details": "Service not recognized: /NGSI10/contextEntities/Room1/attributes/temperature/foo/bar", 
+        "reasonPhrase": "Bad Request"
+    }
 }
-2: +++++++++++++++++++++++++++++
 --TEARDOWN--
 brokerStop CB
