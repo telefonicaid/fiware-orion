@@ -325,8 +325,8 @@ coverage: install_coverage
 	    exit 1; \
 	fi
 	make test -C BUILD_COVERAGE ARGS="-D ExperimentalTest" TEST_VERBOSE=1 || true
-	@if [ -e test/functionalTest/*.diff ]; then \
-           echo "A .diff file was found in test/functionalTest, which means that ctest failed running the test. This can happen if a \"Ok\""; \
+	@if [ -e test/functionalTest/cases/*.diff ]; then \
+           echo "A .diff file was found in test/functionalTest/cases, which means that ctest failed running the test. This can happen if a \"Ok\""; \
            echo "token is used in the tests specification. Run \"test/functionalTest/testHarness.sh test/functionalTest/cases\" manually to find the problem."; \
 	   exit 1; \
 	fi
@@ -381,8 +381,8 @@ coverage_functional_test: install_coverage
 	    exit 1; \
 	fi
 	make test -C BUILD_COVERAGE ARGS="-D ExperimentalTest" TEST_VERBOSE=1 || true
-	@if [ -e test/functionalTest/*.diff ]; then \
-           echo "A .diff file was found in test/functionalTest, which means that ctest failed running the test. This can happen if a \"Ok\""; \
+	@if [ -e test/functionalTest/cases/*.diff ]; then \
+           echo "A .diff file was found in test/functionalTest/cases, which means that ctest failed running the test. This can happen if a \"Ok\""; \
            echo "token is used in the tests specification. Run \"test/functionalTest/testHarness.sh test/functionalTest/cases" manually to find the problem."; \
 	   exit 1; \
 	fi
