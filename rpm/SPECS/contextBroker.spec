@@ -183,6 +183,11 @@ rm -rf  /usr/share/contextBroker
 
 
 %changelog
+* Fri Jun 27 2014 Fermin Galan <fermin@tid.es> 0.14.0-1 (FIWARE-3.4.3-1)
+- Add: Pagination, using URI parameters 'offset' and 'limit' (and 'details' for extra details) (issue #395)
+- Add: ServicePath support for specifying to which service path entities belong in NGSI10 queryContext and updateContext operations (issue #392)
+- Fix: entitiesQuery() method (used in queryContext and NGSI10 subscriptions) has been re-written, making it more clear and optimal (PR #405)
+
 * Fri May 30 2014 Fermin Galan <fermin@tid.es> 0.13.0-1 (FIWARE-3.4.2-1)
 - Add: Rush can now be used as relayer for the broker, using the option '-rush' (issue #251)
 - Add: Custom metadata support (issue #252)
