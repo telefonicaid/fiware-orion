@@ -40,7 +40,8 @@ extern std::string startTag
   const std::string&  indent,
   const std::string&  tagName,
   Format              format,
-  bool                showTag = true
+  bool                showTag    = true,
+  bool                isToplevel = false
 );
 
 extern std::string startTag
@@ -65,9 +66,10 @@ extern std::string endTag
   const std::string&  indent,
   const std::string&  tagName,
   Format              format,
-  bool                comma    = false,
-  bool                isVector = false,
-  bool                nl       = true
+  bool                comma      = false,
+  bool                isVector   = false,
+  bool                nl         = true,
+  bool                isToplevel = false
 );
 
 

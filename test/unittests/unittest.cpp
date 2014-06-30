@@ -103,6 +103,9 @@ void utInit(void)
   ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
   setTimer(timerMock);
 
+  startTime       = getCurrentTime();
+  statisticsTime  = getCurrentTime();
+
   setupDatabase();
 
 #ifdef UT_DEBUG
