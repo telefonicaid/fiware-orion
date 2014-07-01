@@ -28,10 +28,25 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-curl localhost:${BROKER_PORT}/statistics 2> /dev/null | xmllint --format -
+# curl localhost:${BROKER_PORT}/statistics 2> /dev/null | xmllint --format -
+echo "+++++ 1. statistics in XML"
+orionCurl --url /statistics 
+echo
 echo
 
+
+echo "+++++ 2. statistics in JSON"
+orionCurl --url /statistics --json
+echo
+
+
 --REGEXPECT--
++++++ 1. statistics in XML
+HTTP/1.1 200 OK
+Content-Length: 191
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <orion>
   <xmlRequests>1</xmlRequests>
@@ -39,6 +54,23 @@ echo
   <uptime_in_secs>REGEX(\d+)</uptime_in_secs>
   <measuring_interval_in_secs>REGEX(\d+)</measuring_interval_in_secs>
 </orion>
+
+
++++++ 2. statistics in JSON
+HTTP/1.1 200 OK
+Content-Length: 172
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orion": {
+        "jsonRequests": "1",
+        "measuring_interval_in_secs": "1",
+        "statisticsRequests": "2",
+        "uptime_in_secs": "1",
+        "xmlRequests": "1"
+    }
+}
 
 --TEARDOWN--
 brokerStop CB

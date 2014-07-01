@@ -36,16 +36,26 @@
 *
 * startTag -  
 */
-std::string startTag(const std::string& indent, const std::string& tagName, Format format, bool showTag)
+std::string startTag(const std::string& indent, const std::string& tagName, Format format, bool showTag, bool isToplevel)
 {
   if (format == XML)
      return indent + "<" + tagName + ">\n";
   else if (format == JSON)
   {
-    if (showTag == false)
-      return indent + "{\n";
+    if (isToplevel)
+    {
+      if (showTag == false)
+        return indent + "{\n" + indent + "  {\n";
+      else
+        return indent + "{\n" + indent + "  " + "\"" + tagName + "\" : {\n";
+    }
     else
-      return indent + "\"" + tagName + "\" : {\n";
+    {
+      if (showTag == false)
+        return indent + "{\n";
+      else
+        return indent + "\"" + tagName + "\" : {\n";
+    }
   }
 
   return "Format not supported";
@@ -103,17 +113,26 @@ std::string endTag
   Format              format,
   bool                comma,
   bool                isVector,
-  bool                nl
+  bool                nl,
+  bool                isToplevel
 )
 {
   if (format == XML)
+  {
     return indent + "</" + tagName + ">\n";
+  }
+
+  if (isToplevel)
+  {
+    return indent + "}\n}\n";
+  }
 
   std::string out = indent;
-
-  out += isVector?  "]"  : "}";
-  out += comma?     ","  : "";
-  out += nl?        "\n" : "";
+    
+  out += isVector?    "]"  : "}";
+  out += comma?       ","  : "";
+  out += nl?          "\n" : "";
+  out += isToplevel?  "}"  : "";
 
   return out;
 }
