@@ -25,9 +25,9 @@ FILE (GLOB_RECURSE test_files ${CMAKE_CURRENT_SOURCE_DIR}/tests *.test)
 list (SORT test_files)
 FOREACH ( test_path ${test_files} )
     GET_FILENAME_COMPONENT ( test_file ${test_path} NAME_WE )
-    ADD_TEST( ${test_file} ${PROJECT_SOURCE_DIR}/scripts/testHarness.sh ${test_path} )
+    ADD_TEST( ${test_file} ${PROJECT_SOURCE_DIR}/test/functionalTest/testHarness.sh ${test_path} )
     set_tests_properties( ${test_file} PROPERTIES
         FAIL_REGULAR_EXPRESSION "[^a-z]Error;ERROR;Failed"
-        PASS_REGULAR_EXPRESSION "SUCCESS;Ok" )
+        PASS_REGULAR_EXPRESSION "SUCCESS;Ok;seconds" )
 ENDFOREACH (test_path)
 

@@ -309,19 +309,6 @@ functional_test_debug: install_debug
 ft:  functional_test
 ftd: functional_test_debug
 
-old_functional_test: install_debug build_unit_test
-	if [ -z "${BROKER_PORT}" ]; then \
-	    echo "Execute '. scripts/testEnv.sh' before executing the tests"; \
-	    exit 1; \
-	fi
-	make test -C BUILD_UNITTEST ARGS="-D ExperimentalTest" TEST_VERBOSE=1 || true
-	@if [ -e test/testharness/*.diff ]; then \
-           echo "A .diff file was found in test/testharness, which means that ctest failed running the test. This can happen if a \"Ok\""; \
-           echo "token is used in the tests specification. Run \"scripts/testHarness.sh /test/testharness\" manually to find the problem."; \
-	   exit 1; \
-	fi
-	@xsltproc scripts/cmake2junit.xsl BUILD_UNITTEST/Testing/`cat BUILD_UNITTEST/Testing/TAG| head -n1`/Test.xml  > BUILD_UNITTEST/functional_test.xml
-
 test: unit_test functional_test
 
 coverage: install_coverage
@@ -338,9 +325,9 @@ coverage: install_coverage
 	    exit 1; \
 	fi
 	make test -C BUILD_COVERAGE ARGS="-D ExperimentalTest" TEST_VERBOSE=1 || true
-	@if [ -e test/testharness/*.diff ]; then \
-           echo "A .diff file was found in test/testharness, which means that ctest failed running the test. This can happen if a \"Ok\""; \
-           echo "token is used in the tests specification. Run \"scripts/testHarness.sh /test/testharness\" manually to find the problem."; \
+	@if [ -e test/functionalTest/cases/*.diff ]; then \
+           echo "A .diff file was found in test/functionalTest/cases, which means that ctest failed running the test. This can happen if a \"Ok\""; \
+           echo "token is used in the tests specification. Run \"test/functionalTest/testHarness.sh test/functionalTest/cases\" manually to find the problem."; \
 	   exit 1; \
 	fi
 	@xsltproc scripts/cmake2junit.xsl BUILD_COVERAGE/Testing/`cat BUILD_COVERAGE/Testing/TAG| head -n1`/Test.xml  > BUILD_COVERAGE/functional_test.xml
@@ -394,9 +381,9 @@ coverage_functional_test: install_coverage
 	    exit 1; \
 	fi
 	make test -C BUILD_COVERAGE ARGS="-D ExperimentalTest" TEST_VERBOSE=1 || true
-	@if [ -e test/testharness/*.diff ]; then \
-           echo "A .diff file was found in test/testharness, which means that ctest failed running the test. This can happen if a \"Ok\""; \
-           echo "token is used in the tests specification. Run \"scripts/testHarness.sh /test/testharness\" manually to find the problem."; \
+	@if [ -e test/functionalTest/cases/*.diff ]; then \
+           echo "A .diff file was found in test/functionalTest/cases, which means that ctest failed running the test. This can happen if a \"Ok\""; \
+           echo "token is used in the tests specification. Run \"test/functionalTest/testHarness.sh test/functionalTest/cases" manually to find the problem."; \
 	   exit 1; \
 	fi
 	@xsltproc scripts/cmake2junit.xsl BUILD_COVERAGE/Testing/`cat BUILD_COVERAGE/Testing/TAG| head -n1`/Test.xml  > BUILD_COVERAGE/functional_test.xml
