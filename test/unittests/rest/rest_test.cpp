@@ -129,7 +129,7 @@ TEST(rest, servicePathSplit)
   ci5.httpHeaders.servicePathReceived = true;
   ci5.servicePath = "/home/kz/01, /home/kz/02, /home/kz/03, /home/kz/04, /home/kz/05, /home/kz/06, /home/kz/07, /home/kz/08, /home/kz/09, /home/kz/10, /home/kz/11";
   r = servicePathSplit(&ci5);
-  EXPECT_EQ(5, r);
+  EXPECT_EQ(-1, r);
   EXPECT_EQ(177, ci5.answer.size());
   LM_M(("---- 5 -----"));
 }

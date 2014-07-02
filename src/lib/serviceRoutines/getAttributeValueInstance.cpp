@@ -55,7 +55,7 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   request.entityIdVector.push_back(eP);
   request.attributeList.push_back(attributeName);
 
-  ciP->httpStatusCode = mongoQueryContext(&request, &response, ciP->tenant, ciP->servicePathV);
+  ciP->httpStatusCode = mongoQueryContext(&request, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
   if (response.contextElementResponseVector.size() == 0)
   {

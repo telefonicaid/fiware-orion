@@ -126,7 +126,7 @@ following the following procedure (optional):
 * Install the required tools:
 
 ```
-sudo yum install python python-flask curl libxml2 nc mongodb valgrind libxslt
+sudo yum install python python-flask python-jinja2 curl libxml2 nc mongodb valgrind libxslt 
 ```
 
 * Run valgrind tests (it takes some time, please be patient):

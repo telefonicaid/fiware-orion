@@ -82,11 +82,33 @@ std::string DiscoverContextAvailabilityResponse::render(RequestType requestType,
   // no JSON commas necessary
   //
   out += startTag(indent, tag, format, false);
+  
+  if (responseVector.size() > 0)
+  {
+    bool commaNeeded = (errorCode.code != SccNone);
+    out += responseVector.render(format, indent + "  ", commaNeeded);
+  }
 
+  if (errorCode.code != SccNone)
+  {
+    out += errorCode.render(format, indent + "  ", false);
+  }
+
+  /* Safety check: neither errorCode nor CER vector was filled by mongoBackend */
+  if (errorCode.code == SccNone && responseVector.size() == 0)
+  {
+      errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
+      out += errorCode.render(format, indent + "  ");
+  }
+
+#if 0
+  // I needed to adjust rednder function for details=on to work. Ken, please review that this code can be safely removed, after the
+  // above re-factoring
   if (errorCode.code == SccNone)
      out += responseVector.render(format, indent + "  ", false);
   else
      out += errorCode.render(format, indent + "  ", false);
+#endif
 
   out += endTag(indent, tag, format);
 

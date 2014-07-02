@@ -2,6 +2,6 @@
   <errorCode>
     <code>200</code>
     <reasonPhrase>OK</reasonPhrase>
-    <details>detail</details>
+    <details>Detail2</details>
   </errorCode>
 </queryContextResponse>
