@@ -28,9 +28,8 @@ brokerStart CB
 accumulatorStart
 
 --SHELL--
-
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/registerContext"
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -54,12 +53,12 @@ accumulatorStart
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>
-EOF
-echo "1: ++++++++++++++++++++"
+  </registerContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+echo "1: ++++++++++++++++++++"
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -81,12 +80,12 @@ echo "1: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-echo "2: ++++++++++++++++++++"
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
+echo "2: ++++++++++++++++++++"
+url="/NGSI10/subscribeContext"
+payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -95,7 +94,7 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
   </entityIdList>
   <attributeList>
   </attributeList>
-  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
+  <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
   <duration>PT5H</duration>
   <notifyConditions>
         <notifyCondition>
@@ -105,32 +104,31 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
           </condValueList>
         </notifyCondition>
   </notifyConditions>
-</subscribeContextRequest>
-EOF)
-SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$SUB_OUT"
-echo "3: ++++++++++++++++++++"
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
+echo "3: ++++++++++++++++++++"
 #Wait 4 seconds, so we will receive two notifications
 sleep 4
 
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI10/unsubscribeContext"
+payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
-  <subscriptionId>$SUB_ID</subscriptionId>
-</unsubscribeContextRequest>
-EOF
-echo "4: ++++++++++++++++++++"
+  <subscriptionId>'$SUB_ID'</subscriptionId>
+</unsubscribeContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
+echo "4: ++++++++++++++++++++"
+url="/NGSI10/subscribeContext"
+payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
           <id>OfficeRoom</id>
         </entityId>
   </entityIdList>
-  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
+  <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
   <duration>PT5H</duration>
   <notifyConditions>
         <notifyCondition>
@@ -140,25 +138,24 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
           </condValueList>
         </notifyCondition>
   </notifyConditions>
-</subscribeContextRequest>
-EOF)
-SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$SUB_OUT"
-echo "5: ++++++++++++++++++++"
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
+echo "5: ++++++++++++++++++++"
 #Wait 5 seconds, so we will receive two notifications
 sleep 5
 
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI10/unsubscribeContext"
+payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
-  <subscriptionId>$SUB_ID</subscriptionId>
-</unsubscribeContextRequest>
-EOF
-echo "6: ++++++++++++++++++++"
+  <subscriptionId>'$SUB_ID'</subscriptionId>
+</unsubscribeContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
+echo "6: ++++++++++++++++++++"
+url="/NGSI10/subscribeContext"
+payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -169,7 +166,7 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
         <attribute>temperature</attribute>
         <attribute>lightstatus</attribute>
   </attributeList>
-  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
+  <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
         <notifyCondition>
@@ -181,14 +178,13 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
           <restriction>restriction</restriction>
         </notifyCondition>
   </notifyConditions>
-</subscribeContextRequest>
-EOF)
-SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$SUB_OUT"
-echo "7: ++++++++++++++++++++"
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+echo "7: ++++++++++++++++++++"
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -205,12 +201,12 @@ echo "7: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-echo "8: ++++++++++++++++++++"
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+echo "8: ++++++++++++++++++++"
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -227,28 +223,38 @@ echo "8: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>DELETE</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+
 echo "9: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI10/unsubscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI10/unsubscribeContext"
+payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
-  <subscriptionId>$SUB_ID</subscriptionId>
-</unsubscribeContextRequest>
-EOF
-echo "10: ++++++++++++++++++++"
+  <subscriptionId>'$SUB_ID'</subscriptionId>
+</unsubscribeContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
+echo "10: ++++++++++++++++++++"
 #Get accumulated data
 curl localhost:${LISTENER_PORT}/dump -s -S
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 805
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -278,6 +284,11 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   </contextResponseList>
 </updateContextResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 192
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
@@ -286,6 +297,11 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   </subscribeResponse>
 </subscribeContextResponse>
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 207
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <unsubscribeContextResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -295,6 +311,11 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   </statusCode>
 </unsubscribeContextResponse>
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 192
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
@@ -303,6 +324,11 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   </subscribeResponse>
 </subscribeContextResponse>
 5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 207
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <unsubscribeContextResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
@@ -312,6 +338,11 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   </statusCode>
 </unsubscribeContextResponse>
 6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 192
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
@@ -320,6 +351,11 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   </subscribeResponse>
 </subscribeContextResponse>
 7: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 640
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -344,6 +380,11 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   </contextResponseList>
 </updateContextResponse>
 8: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 636
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -368,6 +409,11 @@ curl localhost:${LISTENER_PORT}/dump -s -S
   </contextResponseList>
 </updateContextResponse>
 9: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 207
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <unsubscribeContextResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>

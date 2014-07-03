@@ -28,8 +28,8 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++ create vector compound +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/EVector"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
     <contextAttribute>
@@ -51,12 +51,12 @@ echo "1: +++++++++ create vector compound +++++++++++"
       </contextValue>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-echo "5: ++++++++++ query for vector compound in JSON ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+echo "2: ++++++++++ query for vector compound in JSON ++++++++++"
+url="/NGSI10/queryContext"
+payload='{
     "entities": [
         {
             "type": "",
@@ -64,11 +64,16 @@ echo "5: ++++++++++ query for vector compound in JSON ++++++++++"
             "id": "EVector"
         }
     ]
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 492
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -87,37 +92,42 @@ EOF
     </contextAttributeResponse>
   </contextResponseList>
 </appendContextElementResponse>
-5: ++++++++++ query for vector compound in JSON ++++++++++
+2: ++++++++++ query for vector compound in JSON ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 646
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextResponses": [
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "att",
-                        "type": "compound",
+                        "name": "att", 
+                        "type": "compound", 
                         "value": [
-                            "22",
+                            "22", 
                             {
                                 "x": [
-                                    "x1",
+                                    "x1", 
                                     "x2"
-                                ],
+                                ], 
                                 "y": "3"
-                            },
+                            }, 
                             [
-                                "z1",
+                                "z1", 
                                 "z2"
                             ]
                         ]
                     }
-                ],
-                "id": "EVector",
-                "isPattern": "false",
+                ], 
+                "id": "EVector", 
+                "isPattern": "false", 
                 "type": ""
-            },
+            }, 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
         }

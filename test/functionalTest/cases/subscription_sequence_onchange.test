@@ -30,8 +30,8 @@ accumulatorStart
 
 --SHELL--
 
-SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- 2> /dev/null | xmllint --format -) <<EOF
-<?xml version="1.0"?>
+url="/NGSI10/subscribeContext"
+payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">
@@ -42,7 +42,7 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
     <attribute>temperature</attribute>
     <attribute>lightstatus</attribute>
   </attributeList>
-  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
+  <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
     <notifyCondition>
@@ -53,14 +53,13 @@ SUB_OUT=$((curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
       </condValueList>          
     </notifyCondition>
   </notifyConditions>
-</subscribeContextRequest>
-EOF)
-SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$SUB_OUT"
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 echo
 
 echo "1: ++++++++++++++++++++"
-url=/NGSI10/updateContext
+url="/NGSI10/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -297,6 +296,11 @@ curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
 echo
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 192
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>

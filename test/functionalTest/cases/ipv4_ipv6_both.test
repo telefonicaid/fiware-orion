@@ -31,16 +31,14 @@ accumulatorStart :: ${LISTENER2_PORT}
 
 --SHELL--
 echo "1: ++++++++++++++++++++"
-curl -g [::1]:${BROKER_PORT}/version 2> /dev/null | xmllint --format -
-echo
+orionCurl --url "/version" --host "[::1]" -g 2> /dev/null
 
 echo "2: ++++++++++++++++++++"
-curl 127.0.0.1:${BROKER_PORT}/version 2> /dev/null | xmllint --format -
-echo
+orionCurl --url "/version" --host "127.0.0.1" -g 2> /dev/null
 
 echo "3: ++++++++++++++++++++"
-SUB_OUT=$((curl -g [::1]:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- 2> /dev/null | xmllint --format -) <<EOF
-<?xml version="1.0"?>
+url="/NGSI10/subscribeContext"
+payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">
@@ -51,7 +49,7 @@ SUB_OUT=$((curl -g [::1]:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header '
     <attribute>temperature</attribute>
     <attribute>lightstatus</attribute>
   </attributeList>
-  <reference>http://::1:${LISTENER2_PORT}/notify</reference>
+  <reference>http://::1:'${LISTENER2_PORT}'/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
     <notifyCondition>
@@ -62,15 +60,15 @@ SUB_OUT=$((curl -g [::1]:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header '
       </condValueList>          
     </notifyCondition>
   </notifyConditions>
-</subscribeContextRequest>
-EOF)
-SUB_ID_V6=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$SUB_OUT"
-echo
+</subscribeContextRequest>'
+
+SUB_ID_V6=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' |
+awk -F '<' '{print $1}' | grep -v '^$' )
+orionCurl --url "$url" --payload "$payload" --host "[::1]" -g 2> /dev/null
 
 echo "4: ++++++++++++++++++++"
-SUB_OUT=$((curl 127.0.0.1:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- 2> /dev/null | xmllint --format -) <<EOF
-<?xml version="1.0"?>
+url="/NGSI10/subscribeContext"
+payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">
@@ -81,7 +79,7 @@ SUB_OUT=$((curl 127.0.0.1:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
     <attribute>temperature</attribute>
     <attribute>lightstatus</attribute>
   </attributeList>
-  <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
+  <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
     <notifyCondition>
@@ -92,15 +90,14 @@ SUB_OUT=$((curl 127.0.0.1:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
       </condValueList>
     </notifyCondition>
   </notifyConditions>
-</subscribeContextRequest>
-EOF)
+</subscribeContextRequest>'
+
 SUB_ID_V4=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$SUB_OUT"
-echo
+orionCurl --url "$url" --payload "$payload" --host "127.0.0.1" -g 2> /dev/null
 
 echo "5: ++++++++++++++++++++"
-(curl -g [::1]:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- 2> /dev/null | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -122,22 +119,24 @@ echo "5: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-echo
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload" --host "[::1]" -g 2> /dev/null
 
 echo "6: ++++++++++++++++++++"
 #Get accumulated data
 curl -g [::1]:${LISTENER2_PORT}/dump -s -S 2> /dev/null
-echo
 
 echo "7: ++++++++++++++++++++"
 #Get accumulated data
 curl 127.0.0.1:${LISTENER_PORT}/dump -s -S 2> /dev/null
-echo
 
 --REGEXPECT--
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <orion>
   <version>REGEX(.*)</version>
@@ -147,8 +146,12 @@ echo
   <compiled_by>REGEX(.*)</compiled_by>
   <compiled_in>REGEX(.*)</compiled_in>
 </orion>
-
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: REGEX(\d+)
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <orion>
   <version>REGEX(.*)</version>
@@ -158,8 +161,12 @@ echo
   <compiled_by>REGEX(.*)</compiled_by>
   <compiled_in>REGEX(.*)</compiled_in>
 </orion>
-
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 192
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
@@ -167,8 +174,12 @@ echo
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 192
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
@@ -176,8 +187,12 @@ echo
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-
 5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 805
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -206,7 +221,6 @@ echo
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-
 6: ++++++++++++++++++++
 POST http://::1:REGEX(\d+)/notify
 Content-Length: 738
@@ -241,7 +255,6 @@ Content-Type: application/xml
 </notifyContextRequest>
 
 =======================================
-
 7: ++++++++++++++++++++
 POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 738
@@ -276,7 +289,6 @@ Content-Type: application/xml
 </notifyContextRequest>
 
 =======================================
-
 --TEARDOWN--
 brokerStop CB
 accumulatorStop $LISTENER_PORT

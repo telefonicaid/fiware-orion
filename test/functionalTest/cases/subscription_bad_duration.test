@@ -30,8 +30,8 @@ brokerStart CB
 # Bad duration 1
 #INVALID_XML
 echo "1: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
+url="/NGSI10/subscribeContext"
+payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">
@@ -51,14 +51,14 @@ echo "1: ++++++++++++++++++++"
       </condValueList>          
     </notifyCondition>
   </notifyConditions>
-</subscribeContextRequest>
-EOF
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "${payload}"
 
 echo "2: ++++++++++++++++++++"
 # Bad duration 2
 #INVALID_XML
-(curl localhost:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
+url="/NGSI10/subscribeContext"
+payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">
@@ -78,11 +78,16 @@ echo "2: ++++++++++++++++++++"
       </condValueList>          
     </notifyCondition>
   </notifyConditions>
-</subscribeContextRequest>
-EOF
-echo "3: ++++++++++++++++++++"
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "${payload}"
+
 --REGEXPECT--
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 271
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeError>
@@ -94,6 +99,11 @@ echo "3: ++++++++++++++++++++"
   </subscribeError>
 </subscribeContextResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 271
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeError>
@@ -104,6 +114,5 @@ echo "3: ++++++++++++++++++++"
     </errorCode>
   </subscribeError>
 </subscribeContextResponse>
-3: ++++++++++++++++++++
 --TEARDOWN--
 brokerStop CB

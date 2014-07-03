@@ -27,9 +27,9 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "1: ++++++++++++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -40,12 +40,12 @@ brokerStart CB
         <attribute>pressure</attribute>
         <attribute>lightstatus</attribute>
   </attributeList>
-</queryContextRequest>
-EOF
-echo "1: ++++++++++++++++++++"
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "2: ++++++++++++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -55,12 +55,12 @@ echo "1: ++++++++++++++++++++"
   <attributeList>
         <attribute>temperature</attribute>
   </attributeList>
-</queryContextRequest>
-EOF
-echo "2: ++++++++++++++++++++"
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "3: ++++++++++++++++++++"
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -89,28 +89,12 @@ echo "2: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-echo "3: ++++++++++++++++++++"
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-  </entityIdList>
-  <attributeList>
-        <attribute>pressure</attribute>
-        <attribute>lightstatus</attribute>
-  </attributeList>
-</queryContextRequest>
-EOF
 echo "4: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -118,30 +102,46 @@ echo "4: ++++++++++++++++++++"
         </entityId>
   </entityIdList>
   <attributeList>
-        <attribute>temperature</attribute>
+        <attribute>pressure</attribute>
+        <attribute>lightstatus</attribute>
   </attributeList>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+
 echo "5: ++++++++++++++++++++"
-
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
+          <id>OfficeRoom</id>
         </entityId>
   </entityIdList>
   <attributeList>
-        <attribute>pressure</attribute>
-        <attribute>lightstatus</attribute>
+        <attribute>temperature</attribute>
   </attributeList>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+
 echo "6: ++++++++++++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+  </entityIdList>
+  <attributeList>
+        <attribute>pressure</attribute>
+        <attribute>lightstatus</attribute>
+  </attributeList>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "7: ++++++++++++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -151,12 +151,12 @@ echo "6: ++++++++++++++++++++"
   <attributeList>
         <attribute>temperature</attribute>
   </attributeList>
-</queryContextRequest>
-EOF
-echo "7: ++++++++++++++++++++"
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "8: ++++++++++++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -169,12 +169,12 @@ echo "7: ++++++++++++++++++++"
   <attributeList>
         <attribute>temperature</attribute>
   </attributeList>
-</queryContextRequest>
-EOF
-echo "8: ++++++++++++++++++++"
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "9: ++++++++++++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -188,12 +188,12 @@ echo "8: ++++++++++++++++++++"
         <attribute>pressure</attribute>
         <attribute>lightstatus</attribute>
   </attributeList>
-</queryContextRequest>
-EOF
-echo "9: ++++++++++++++++++++"
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "10: ++++++++++++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -205,12 +205,12 @@ echo "9: ++++++++++++++++++++"
         <attribute>lightstatus</attribute>
         <attribute>temperature</attribute>
   </attributeList>
-</queryContextRequest>
-EOF
-echo "10: ++++++++++++++++++++"
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "11: ++++++++++++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="kRoom" isPattern="false">
@@ -222,12 +222,12 @@ echo "10: ++++++++++++++++++++"
         <attribute>lightstatus</attribute>
         <attribute>temperature</attribute>
   </attributeList>
-</queryContextRequest>
-EOF
-echo "11: ++++++++++++++++++++"
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "12: ++++++++++++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -236,12 +236,12 @@ echo "11: ++++++++++++++++++++"
   </entityIdList>
   <attributeList>
   </attributeList>
-</queryContextRequest>
-EOF
-echo "12: ++++++++++++++++++++"
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "13: ++++++++++++++++++++"
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -263,12 +263,12 @@ echo "12: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-echo "13: ++++++++++++++++++++"
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "14: ++++++++++++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -277,12 +277,12 @@ echo "13: ++++++++++++++++++++"
   </entityIdList>
   <attributeList>
   </attributeList>  
-</queryContextRequest>
-EOF
-echo "14: ++++++++++++++++++++"
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "15: ++++++++++++++++++++"
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -304,12 +304,12 @@ echo "14: ++++++++++++++++++++"
         </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-echo "15: ++++++++++++++++++++"
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "16: ++++++++++++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -321,12 +321,12 @@ echo "15: ++++++++++++++++++++"
   </entityIdList>
   <attributeList>
   </attributeList>
-</queryContextRequest>
-EOF
-echo "16: ++++++++++++++++++++"
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "17: ++++++++++++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -339,12 +339,12 @@ echo "16: ++++++++++++++++++++"
   <attributeList>
         <attribute>temperature</attribute>
   </attributeList>
-</queryContextRequest>
-EOF
-echo "17: ++++++++++++++++++++"
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "18: ++++++++++++++++++++"
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -373,12 +373,12 @@ echo "17: ++++++++++++++++++++"
         </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-echo "18: ++++++++++++++++++++"
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "19: ++++++++++++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="true">
@@ -388,12 +388,12 @@ echo "18: ++++++++++++++++++++"
   <attributeList>
         <attribute>temperature</attribute>
   </attributeList>
-</queryContextRequest>
-EOF
-echo "19: ++++++++++++++++++++"
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "20: ++++++++++++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="true">
@@ -405,17 +405,16 @@ echo "19: ++++++++++++++++++++"
         <attribute>pressure</attribute>
         <attribute>lightstatus</attribute>
   </attributeList>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+
 --REGEXPECT--
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
@@ -424,6 +423,24 @@ EOF
   </errorCode>
 </queryContextResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1186
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -465,71 +482,25 @@ EOF
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-3: ++++++++++++++++++++
+4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
-</queryContextResponse>
-4: ++++++++++++++++++++
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>12</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
 </queryContextResponse>
 5: ++++++++++++++++++++
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
-6: ++++++++++++++++++++
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>14</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
-7: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 640
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
@@ -551,6 +522,30 @@ EOF
         <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+7: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 644
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
@@ -572,14 +567,58 @@ EOF
   </contextResponseList>
 </queryContextResponse>
 8: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1188
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>12</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>14</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
 </queryContextResponse>
 9: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
@@ -588,6 +627,11 @@ EOF
   </errorCode>
 </queryContextResponse>
 10: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
@@ -596,6 +640,24 @@ EOF
   </errorCode>
 </queryContextResponse>
 11: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+12: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 640
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
@@ -619,7 +681,12 @@ EOF
     </contextElementResponse>
   </contextResponseList>
 </queryContextResponse>
-12: ++++++++++++++++++++
+13: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 805
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -648,7 +715,12 @@ EOF
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-13: ++++++++++++++++++++
+14: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 983
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
@@ -682,7 +754,12 @@ EOF
     </contextElementResponse>
   </contextResponseList>
 </queryContextResponse>
-14: ++++++++++++++++++++
+15: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 809
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -711,7 +788,12 @@ EOF
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-15: ++++++++++++++++++++
+16: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1872
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
@@ -773,7 +855,12 @@ EOF
     </contextElementResponse>
   </contextResponseList>
 </queryContextResponse>
-16: ++++++++++++++++++++
+17: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 640
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
@@ -797,7 +884,12 @@ EOF
     </contextElementResponse>
   </contextResponseList>
 </queryContextResponse>
-17: ++++++++++++++++++++
+18: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1188
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -839,28 +931,15 @@ EOF
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-18: ++++++++++++++++++++
+19: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1193
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>14</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
@@ -879,12 +958,53 @@ EOF
         <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>14</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
   </contextResponseList>
 </queryContextResponse>
-19: ++++++++++++++++++++
+20: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1534
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom2</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>14</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
@@ -905,24 +1025,6 @@ EOF
             <name>lightstatus</name>
             <type>light</type>
             <contextValue>L23</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom2</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>14</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>

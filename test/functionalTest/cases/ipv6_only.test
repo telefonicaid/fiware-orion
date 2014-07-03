@@ -36,8 +36,8 @@ echo exit code: $?
 
 
 echo "2: ++++++++++++++++++++"
-SUB_OUT=$((curl -g [::1]:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
+url="/NGSI10/subscribeContext"
+payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
         <entityId type="Room" isPattern="false">
@@ -59,14 +59,14 @@ SUB_OUT=$((curl -g [::1]:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header '
           </condValueList>          
         </notifyCondition>
   </notifyConditions>
-</subscribeContextRequest>
-EOF)
-SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$SUB_OUT"
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "$payload" --host "[::1]" -g
+
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
 echo "3: ++++++++++++++++++++"
-(curl -g [::1]:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -88,8 +88,8 @@ echo "3: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload" --host "[::1]" -g
 
 echo "4: ++++++++++++++++++++"
 #Get accumulated data
@@ -103,6 +103,11 @@ curl 127.0.0.1:${LISTENER_PORT}/number -s -S
 1: ++++++++++++++++++++
 exit code: 7
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 192
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
@@ -111,6 +116,11 @@ exit code: 7
   </subscribeResponse>
 </subscribeContextResponse>
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 805
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>

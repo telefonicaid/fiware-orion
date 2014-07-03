@@ -27,8 +27,8 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
       <entityId type="Room" isPattern="false">
@@ -42,13 +42,13 @@ brokerStart CB
       <attribute>temperature</attribute>
       <attribute>pressure</attribute>
     </attributeList>
-  </discoverContextAvailabilityRequest>
-EOF
-echo "++++++++++++++++++++"
+  </discoverContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "$payload"
 
+echo "++++++++++++++++++++"
 # Updating non existing registration
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/registerContext"
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -69,10 +69,15 @@ echo "++++++++++++++++++++"
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId>51307b66f481db11bf860001</registrationId>
-  </registerContextRequest>
-EOF
+  </registerContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 185
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <errorCode>
@@ -81,6 +86,11 @@ EOF
   </errorCode>
 </discoverContextAvailabilityResponse>
 ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 288
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <registrationId>51307b66f481db11bf860001</registrationId>

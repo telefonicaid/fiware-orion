@@ -289,13 +289,13 @@ Date: REGEX(.*)
     <contextElementResponse>
       <contextElement>
         <entityId type="City" isPattern="false">
-          <id>Leganes</id>
+          <id>Madrid</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
             <name>location</name>
             <type>coords</type>
-            <contextValue>40.316667, -3.75</contextValue>
+            <contextValue>40.418889, -3.691944</contextValue>
             <metadata>
               <contextMetadata>
                 <name>location</name>
@@ -314,13 +314,13 @@ Date: REGEX(.*)
     <contextElementResponse>
       <contextElement>
         <entityId type="City" isPattern="false">
-          <id>Madrid</id>
+          <id>Leganes</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
             <name>location</name>
             <type>coords</type>
-            <contextValue>40.418889, -3.691944</contextValue>
+            <contextValue>40.316667, -3.75</contextValue>
             <metadata>
               <contextMetadata>
                 <name>location</name>
@@ -348,6 +348,31 @@ Date: REGEX(.*)
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="City" isPattern="false">
+          <id>Madrid</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>40.418889, -3.691944</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
     <contextElementResponse>
       <contextElement>
         <entityId type="City" isPattern="false">
@@ -383,31 +408,6 @@ Date: REGEX(.*)
             <name>location</name>
             <type>coords</type>
             <contextValue>40.316667, -3.75</contextValue>
-            <metadata>
-              <contextMetadata>
-                <name>location</name>
-                <type>string</type>
-                <value>WSG84</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="City" isPattern="false">
-          <id>Madrid</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>location</name>
-            <type>coords</type>
-            <contextValue>40.418889, -3.691944</contextValue>
             <metadata>
               <contextMetadata>
                 <name>location</name>

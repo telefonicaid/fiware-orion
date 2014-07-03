@@ -29,8 +29,8 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. create an entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/entity01"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
@@ -40,21 +40,25 @@ echo "+++++ 1. create an entity +++++"
       <contextValue>10</contextValue>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 echo "+++++ 2. lookup the entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X GET | xmllint --format - )
+orionCurl --url "/NGSI10/contextEntities/entity01"
 
 echo "+++++ 3. delete the entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X DELETE | xmllint --format - )
+orionCurl --url "/NGSI10/contextEntities/entity01" -X "DELETE"
 
 echo "+++++ 4. lookup the entity, but nothing found, as the entity has been just deleted +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X GET | xmllint --format - )
-
+orionCurl --url "/NGSI10/contextEntities/entity01"
 
 --REGEXPECT--
 +++++ 1. create an entity +++++
+HTTP/1.1 200 OK
+Content-Length: 498
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -74,6 +78,11 @@ echo "+++++ 4. lookup the entity, but nothing found, as the entity has been just
   </contextResponseList>
 </appendContextElementResponse>
 +++++ 2. lookup the entity +++++
+HTTP/1.1 200 OK
+Content-Length: 466
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
@@ -94,12 +103,22 @@ echo "+++++ 4. lookup the entity, but nothing found, as the entity has been just
   </statusCode>
 </contextElementResponse>
 +++++ 3. delete the entity +++++
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <statusCode>
   <code>200</code>
   <reasonPhrase>OK</reasonPhrase>
 </statusCode>
 +++++ 4. lookup the entity, but nothing found, as the entity has been just deleted +++++
+HTTP/1.1 200 OK
+Content-Length: 326
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>

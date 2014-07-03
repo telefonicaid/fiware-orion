@@ -420,7 +420,7 @@ function orionCurl()
     elif [ "$1" == "--payload" ]; then         _payload="$2"; shift;
     elif [ "$1" == "--in" ]; then              _inFormat="$2"; shift;
     elif [ "$1" == "--out" ]; then             _outFormat="$2"; shift;
-    elif [ "$1" == "--json" ]; then            _inFormat=application/json; _outFormat=application/json; shift;
+    elif [ "$1" == "--json" ]; then            _inFormat=application/json; _outFormat=application/json;
     elif [ "$1" == "--httpTenant" ]; then      _httpTenant="$2"; shift;
     elif [ "$1" == "--servicePath" ]; then     _servicePath="$2"; shift;
     elif [ "$1" == "--urlTenant" ]; then       _urlTenant="$2"; shift;

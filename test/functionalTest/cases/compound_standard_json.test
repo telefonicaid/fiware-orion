@@ -28,8 +28,8 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++ create vector compound +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/updateContext"
+payload='{
     "contextElements": [
         {
             "type": "T",
@@ -52,12 +52,12 @@ echo "1: +++++++++ create vector compound +++++++++++"
         }
     ],
     "updateAction": "APPEND"
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "2: +++++++++ create object compound +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/updateContext"
+payload='{
     "contextElements": [
         {
             "type": "T",
@@ -79,12 +79,12 @@ echo "2: +++++++++ create object compound +++++++++++"
         }
     ],
     "updateAction": "APPEND"
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "3: ++++++++++ query for vector compound in XML ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="T" isPattern="false">
@@ -92,12 +92,12 @@ echo "3: ++++++++++ query for vector compound in XML ++++++++++"
         </entityId>
   </entityIdList>
   <attributeList/>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 echo "4: ++++++++++ query for object compound in XML ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
         <entityId type="T" isPattern="false">
@@ -105,12 +105,12 @@ echo "4: ++++++++++ query for object compound in XML ++++++++++"
         </entityId>
   </entityIdList>
   <attributeList/>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 echo "5: ++++++++++ query for vector compound in JSON ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/queryContext"
+payload='{
     "entities": [
         {
             "type": "T",
@@ -118,12 +118,12 @@ echo "5: ++++++++++ query for vector compound in JSON ++++++++++"
             "id": "EVector"
         }
     ]
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 echo "6: ++++++++++ query for object compound in JSON ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-{
+url="/NGSI10/queryContext"
+payload='{
     "entities": [
         {
             "type": "T",
@@ -131,70 +131,85 @@ echo "6: ++++++++++ query for object compound in JSON ++++++++++"
             "id": "EObject"
         }
     ]
-}
-EOF
+}'
+orionCurl --url "$url" --payload "$payload" --json
 
 
 echo "7: ++++++++++ query for vector compound in XML convop ++++++++++"
-curl localhost:${BROKER_PORT}/ngsi10/contextEntities/EVector -s -S --header 'Content-Type: application/xml' | xmllint --format -
+orionCurl --url "/ngsi10/contextEntities/EVector"
 
 echo "8: ++++++++++ query for object compound in XML convop ++++++++++"
-curl localhost:${BROKER_PORT}/ngsi10/contextEntities/EObject -s -S --header 'Content-Type: application/xml' | xmllint --format -
+orionCurl --url "/ngsi10/contextEntities/EObject"
 
 echo "9: ++++++++++ query for vector compound in JSON convop ++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+orionCurl --url "/NGSI10/contextEntities/EVector" --json
 
 echo "10: ++++++++++ query for object compound in JSON convop ++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+orionCurl --url "/NGSI10/contextEntities/EObject" --json 
 
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 390
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextResponses": [
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "att",
-                        "type": "compound",
+                        "name": "att", 
+                        "type": "compound", 
                         "value": ""
                     }
-                ],
-                "id": "EVector",
-                "isPattern": "false",
+                ], 
+                "id": "EVector", 
+                "isPattern": "false", 
                 "type": "T"
-            },
+            }, 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
         }
     ]
 }
 2: +++++++++ create object compound +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 390
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextResponses": [
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "att",
-                        "type": "compound",
+                        "name": "att", 
+                        "type": "compound", 
                         "value": ""
                     }
-                ],
-                "id": "EObject",
-                "isPattern": "false",
+                ], 
+                "id": "EObject", 
+                "isPattern": "false", 
                 "type": "T"
-            },
+            }, 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
         }
     ]
 }
 3: ++++++++++ query for vector compound in XML ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 995
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
@@ -232,6 +247,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
   </contextResponseList>
 </queryContextResponse>
 4: ++++++++++ query for object compound in XML ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 845
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
@@ -265,74 +285,89 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
   </contextResponseList>
 </queryContextResponse>
 5: ++++++++++ query for vector compound in JSON ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 647
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextResponses": [
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "att",
-                        "type": "compound",
+                        "name": "att", 
+                        "type": "compound", 
                         "value": [
-                            "22",
+                            "22", 
                             {
                                 "x": [
-                                    "x1",
+                                    "x1", 
                                     "x2"
-                                ],
+                                ], 
                                 "y": "3"
-                            },
+                            }, 
                             [
-                                "z1",
+                                "z1", 
                                 "z2"
                             ]
                         ]
                     }
-                ],
-                "id": "EVector",
-                "isPattern": "false",
+                ], 
+                "id": "EVector", 
+                "isPattern": "false", 
                 "type": "T"
-            },
+            }, 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
         }
     ]
 }
 6: ++++++++++ query for object compound in JSON ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 578
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextResponses": [
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "att",
-                        "type": "compound",
+                        "name": "att", 
+                        "type": "compound", 
                         "value": {
                             "x": {
-                                "x1": "a",
+                                "x1": "a", 
                                 "x2": "b"
-                            },
+                            }, 
                             "y": [
-                                "y1",
+                                "y1", 
                                 "y2"
                             ]
                         }
                     }
-                ],
-                "id": "EObject",
-                "isPattern": "false",
+                ], 
+                "id": "EObject", 
+                "isPattern": "false", 
                 "type": "T"
-            },
+            }, 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
         }
     ]
 }
 7: ++++++++++ query for vector compound in XML convop ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 774
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
@@ -366,6 +401,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
   </statusCode>
 </contextElementResponse>
 8: ++++++++++ query for object compound in XML convop ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 640
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
@@ -395,62 +435,72 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
   </statusCode>
 </contextElementResponse>
 9: ++++++++++ query for vector compound in JSON convop ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 489
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextElement": {
         "attributes": [
             {
-                "name": "att",
-                "type": "compound",
+                "name": "att", 
+                "type": "compound", 
                 "value": [
-                    "22",
+                    "22", 
                     {
                         "x": [
-                            "x1",
+                            "x1", 
                             "x2"
-                        ],
+                        ], 
                         "y": "3"
-                    },
+                    }, 
                     [
-                        "z1",
+                        "z1", 
                         "z2"
                     ]
                 ]
             }
-        ],
-        "id": "EVector",
-        "isPattern": "false",
+        ], 
+        "id": "EVector", 
+        "isPattern": "false", 
         "type": ""
-    },
+    }, 
     "statusCode": {
-        "code": "200",
+        "code": "200", 
         "reasonPhrase": "OK"
     }
 }
 10: ++++++++++ query for object compound in JSON convop ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 436
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextElement": {
         "attributes": [
             {
-                "name": "att",
-                "type": "compound",
+                "name": "att", 
+                "type": "compound", 
                 "value": {
                     "x": {
-                        "x1": "a",
+                        "x1": "a", 
                         "x2": "b"
-                    },
+                    }, 
                     "y": [
-                        "y1",
+                        "y1", 
                         "y2"
                     ]
                 }
             }
-        ],
-        "id": "EObject",
-        "isPattern": "false",
+        ], 
+        "id": "EObject", 
+        "isPattern": "false", 
         "type": ""
-    },
+    }, 
     "statusCode": {
-        "code": "200",
+        "code": "200", 
         "reasonPhrase": "OK"
     }
 }

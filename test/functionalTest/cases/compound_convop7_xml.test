@@ -28,8 +28,8 @@ brokerStart CB 60,80
 
 --SHELL--
 echo "1: +++++++++ create vector compound +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/EVector"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
     <contextAttribute>
@@ -51,14 +51,19 @@ echo "1: +++++++++ create vector compound +++++++++++"
       </contextValue>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+orionCurl --url "$url" --payload "${payload}"
 
 echo "7: ++++++++++ query for vector compound in XML convop ++++++++++"
-curl localhost:${BROKER_PORT}/ngsi10/contextEntities/EVector -s -S --header 'Content-Type: application/xml' | xmllint --format -
+orionCurl --url "/ngsi10/contextEntities/EVector" 
 
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 492
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -78,6 +83,11 @@ curl localhost:${BROKER_PORT}/ngsi10/contextEntities/EVector -s -S --header 'Con
   </contextResponseList>
 </appendContextElementResponse>
 7: ++++++++++ query for vector compound in XML convop ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 774
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>

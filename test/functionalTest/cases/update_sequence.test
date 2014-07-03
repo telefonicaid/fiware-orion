@@ -27,8 +27,8 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -45,12 +45,12 @@ brokerStart CB
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "1: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -79,12 +79,12 @@ echo "1: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "2: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -101,12 +101,12 @@ echo "2: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "3: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -135,12 +135,12 @@ echo "3: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "4: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -157,12 +157,12 @@ echo "4: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "5: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -179,12 +179,12 @@ echo "5: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "6: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -213,12 +213,12 @@ echo "6: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "7: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -235,12 +235,12 @@ echo "7: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "8: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -257,12 +257,12 @@ echo "8: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "9: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -279,12 +279,12 @@ echo "9: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>DELETE</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "10: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -301,12 +301,12 @@ echo "10: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>DELETE</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "11: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -323,12 +323,12 @@ echo "11: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>DELETE</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "12: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -345,12 +345,12 @@ echo "12: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "13: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -379,12 +379,12 @@ echo "13: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "14: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -401,12 +401,12 @@ echo "14: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "15: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -428,12 +428,12 @@ echo "15: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "16: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -455,12 +455,12 @@ echo "16: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 echo "17: ++++++++++++++++++++"
 
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
         <contextElement>
@@ -489,10 +489,15 @@ echo "17: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 636
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -517,6 +522,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1178
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -559,6 +569,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 636
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -583,6 +598,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1178
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -625,6 +645,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 636
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -649,6 +674,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 636
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -673,6 +703,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1178
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -715,6 +750,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 7: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 834
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -740,6 +780,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 8: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 834
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -765,6 +810,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 9: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 636
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -789,6 +839,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 10: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 777
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -814,6 +869,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 11: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 777
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -839,6 +899,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 12: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 777
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -864,6 +929,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 13: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1319
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -907,6 +977,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 14: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 636
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -931,6 +1006,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 15: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 949
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -961,6 +1041,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 16: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 805
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -990,6 +1075,11 @@ EOF
   </contextResponseList>
 </updateContextResponse>
 17: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1178
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>

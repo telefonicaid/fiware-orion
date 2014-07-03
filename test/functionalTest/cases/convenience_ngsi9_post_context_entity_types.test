@@ -29,8 +29,8 @@ brokerStart CB
 --SHELL--
 
 echo "0: ++++++++++++++++++++"
-OUT=$((curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml'  -d @- | xmllint --format -) << EOF
-<registerProviderRequest>
+url="/NGSI9/contextEntityTypes/Room"
+payload='<registerProviderRequest>
   <metadata>
     <contextMetadata>
       <name>ID</name>
@@ -45,13 +45,14 @@ OUT=$((curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room -s -S --heade
   </metadata>
   <duration>PT1H</duration>
   <providingApplication>http://kz.tid.es/abc</providingApplication>
-</registerProviderRequest>
-EOF)
-echo "$OUT"
-REG_ID=$(echo "$OUT" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$')
+</registerProviderRequest>'
+orionCurl --url "$url" --payload "$payload"
+
+REG_ID=$(echo "$_response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$')
+
 echo "1: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml'  -d @- | xmllint --format -) << EOF
-<registerProviderRequest>
+url="/NGSI9/contextEntityTypes/Room"
+payload='<registerProviderRequest>
   <metadata>
     <contextMetadata>
       <name>ID</name>
@@ -66,12 +67,13 @@ echo "1: ++++++++++++++++++++"
   </metadata>
   <duration>PT2H</duration>
   <providingApplication>http://kz.tid.es/abc</providingApplication>
-  <registrationId>$REG_ID</registrationId>
-</registerProviderRequest>
-EOF
+  <registrationId>'$REG_ID'</registrationId>
+</registerProviderRequest>'
+orionCurl --url "$url" --payload "$payload"
+
 echo "2: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml'  -d @- | xmllint --format -) << EOF
-<registerProviderRequest>
+url="/NGSI9/contextEntityTypes/Room"
+payload='<registerProviderRequest>
   <metadata>
     <contextMetadata>
       <name>ID</name>
@@ -87,25 +89,41 @@ echo "2: ++++++++++++++++++++"
   <duration>PT3H</duration>
   <providingApplication>http://kz.tid.es/abc</providingApplication>
   <registrationId>012301230123012301230123</registrationId>
-</registerProviderRequest>
-EOF
+</registerProviderRequest>'
+orionCurl --url "$url" --payload "$payload"
+
 echo "3: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI9/contextEntityTypes/Room -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format -)
+orionCurl --url "/NGSI9/contextEntityTypes/Room"
 
 --REGEXPECT--
 0: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT2H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 288
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <registrationId>012301230123012301230123</registrationId>
@@ -116,6 +134,11 @@ echo "3: ++++++++++++++++++++"
   </errorCode>
 </registerContextResponse>
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 492
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
   <contextRegistrationResponseList>

@@ -33,11 +33,10 @@ accumulatorStart :: ${LISTENER2_PORT}
 echo "1: ++++++++++++++++++++"
 curl -g [::1]:${BROKER_PORT}/version --max-time 10 > /dev/null 2>&1
 echo exit code: $?
-echo
 
 echo "2: ++++++++++++++++++++"
-SUB_OUT=$((curl 127.0.0.1:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
+url="/NGSI10/subscribeContext"
+payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">
@@ -59,15 +58,14 @@ SUB_OUT=$((curl 127.0.0.1:${BROKER_PORT}/NGSI10/subscribeContext -s -S --header 
       </condValueList>          
     </notifyCondition>
   </notifyConditions>
-</subscribeContextRequest>
-EOF)
-SUB_ID=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-echo "$SUB_OUT"
-echo
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "$payload" --host "127.0.0.1"
+
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
 echo "3: ++++++++++++++++++++"
-(curl 127.0.0.1:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- 2> /dev/null | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -89,25 +87,27 @@ echo "3: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
-echo
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload" --host "127.0.0.1" 2> /dev/null
 
 echo "4: ++++++++++++++++++++"
 # Get accumulated data
 curl -g [::1]:${LISTENER2_PORT}/number -s -S 2> /dev/null
-echo
 
 echo "5: ++++++++++++++++++++"
 # Get accumulated data
 curl 127.0.0.1:${LISTENER_PORT}/number -s -S 2> /dev/null
-echo
+
 
 --REGEXPECT--
 1: ++++++++++++++++++++
 exit code: 7
-
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 192
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextResponse>
   <subscribeResponse>
@@ -115,8 +115,12 @@ exit code: 7
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 805
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -145,13 +149,10 @@ exit code: 7
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-
 4: ++++++++++++++++++++
 0
-
 5: ++++++++++++++++++++
 0
-
 --TEARDOWN--
 brokerStop CB
 accumulatorStop $LISTENER_PORT

@@ -81,14 +81,14 @@ std::string versionTreat(ConnectionInfo* ciP, int components, std::vector<std::s
   std::string uptime = parsedUptime(getTimer()->getCurrentTime() - startTime);
 #endif
 
-  out += startTag(indent, tag, ciP->outFormat);
+  out += startTag(indent, tag, ciP->outFormat, true, true);
   out += valueTag(indent + "  ", "version",       versionString,   ciP->outFormat, true);
   out += valueTag(indent + "  ", "uptime",        uptime,          ciP->outFormat, true);
   out += valueTag(indent + "  ", "git_hash",      GIT_HASH,        ciP->outFormat, true);
   out += valueTag(indent + "  ", "compile_time",  COMPILE_TIME,    ciP->outFormat, true);
   out += valueTag(indent + "  ", "compiled_by",   COMPILED_BY,     ciP->outFormat, true);
   out += valueTag(indent + "  ", "compiled_in",   COMPILED_IN,     ciP->outFormat, false);
-  out += endTag(indent, tag, ciP->outFormat);
+  out += endTag(indent, tag, ciP->outFormat, false, false, true, true);
 
   ciP->httpStatusCode = SccOk;
   return out;

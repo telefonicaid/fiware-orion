@@ -29,8 +29,8 @@ brokerStart CM 0-255
 
 --SHELL--
 # Do a NGSI10 request to check that the CM does not accept NGSI10 requests
-response=$((curl localhost:${CM_PORT}/NGSI10/queryContext -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">
@@ -41,15 +41,14 @@ response=$((curl localhost:${CM_PORT}/NGSI10/queryContext -s -S --dump-header he
     <attribute>pressure</attribute>
     <attribute>lightstatus</attribute>
   </attributeList>
-</queryContextRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+</queryContextRequest>'
+orionCurl --url "$url" --payload "${payload}" --port ${CM_PORT}
+
 echo "1: ++++++++++++++++++++"
 
 # Do initial registration in the CM
-response=$((curl localhost:${CM_PORT}/NGSI9/contextEntities/ConferenceRoom -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI9/contextEntities/ConferenceRoom"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
     <contextMetadata>
@@ -65,46 +64,44 @@ response=$((curl localhost:${CM_PORT}/NGSI9/contextEntities/ConferenceRoom -s -S
   </metadata>
   <duration>PT1H</duration>
   <providingApplication>http://localhost:1028/application</providingApplication>
-</registerProviderRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
-REG_ID=$(echo "$response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
+</registerProviderRequest>'
+orionCurl --url "$url" --payload "${payload}" --port ${CM_PORT}
+
+REG_ID=$(echo "$_response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
+
 echo "2: ++++++++++++++++++++"
 
 # Check the registration in CM 
-response=$((curl localhost:${CM_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
       <entityId type="" isPattern="false">
         <id>ConferenceRoom</id>
       </entityId>
     </entityIdList>
-  </discoverContextAvailabilityRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+  </discoverContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "${payload}" --port ${CM_PORT}
+
 echo "3: ++++++++++++++++++++"
 
 # Check the registration in PSB
-response=$((curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
       <entityId type="" isPattern="false">
         <id>ConferenceRoom</id>
       </entityId>
     </entityIdList>
-  </discoverContextAvailabilityRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+  </discoverContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "${payload}"
+
 echo "4: ++++++++++++++++++++"
 
 # Update registration in CM
-response=$((curl localhost:${CM_PORT}/NGSI9/contextEntities/MyCar -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI9/contextEntities/MyCar"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
     <contextMetadata>
@@ -120,41 +117,38 @@ response=$((curl localhost:${CM_PORT}/NGSI9/contextEntities/MyCar -s -S --dump-h
   </metadata>
   <duration>PT9H</duration>
   <providingApplication>http://localhost:1028/mycar</providingApplication>
-  <registrationId>$REG_ID</registrationId>
-</registerProviderRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+  <registrationId>'$REG_ID'</registrationId>
+</registerProviderRequest>'
+orionCurl --url "$url" --payload "${payload}" --port ${CM_PORT}
+
 echo "5: ++++++++++++++++++++"
 
 # Check the registration in CM
-response=$((curl localhost:${CM_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
       <entityId type="" isPattern="false">
         <id>MyCar</id>
       </entityId>
     </entityIdList>
-  </discoverContextAvailabilityRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+  </discoverContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "${payload}" --port ${CM_PORT}
+
 echo "6: ++++++++++++++++++++"
 
 # Check the registration in PSB
-response=$((curl localhost:${BROKER_PORT}/NGSI9/discoverContextAvailability -s -S --dump-header headers.out --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI9/discoverContextAvailability"
+payload='<?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
       <entityId type="" isPattern="false">
         <id>MyCar</id>
       </entityId>
     </entityIdList>
-  </discoverContextAvailabilityRequest>
-EOF)
-cat headers.out
-echo $response | xmllint --format -
+  </discoverContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "${payload}"
+
 echo "7: ++++++++++++++++++++"
 
 # Check that everything is ok at database layer

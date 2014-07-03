@@ -27,9 +27,9 @@ dbInit CB
 brokerStart CB 47-59
 
 --SHELL--
-echo "2: +++++++++ create object compound +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "1: +++++++++ create object compound +++++++++++"
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -55,12 +55,12 @@ echo "2: +++++++++ create object compound +++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
-echo "4: ++++++++++ query for object compound in XML ++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "2: ++++++++++ query for object compound in XML ++++++++++"
+url="/NGSI10/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
     <entityId type="T" isPattern="false">
@@ -68,11 +68,16 @@ echo "4: ++++++++++ query for object compound in XML ++++++++++"
     </entityId>
   </entityIdList>
   <attributeList/>
-</queryContextRequest>
-EOF
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
-2: +++++++++ create object compound +++++++++++
+1: +++++++++ create object compound +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 628
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -96,7 +101,12 @@ EOF
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-4: ++++++++++ query for object compound in XML ++++++++++
+2: ++++++++++ query for object compound in XML ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 845
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>

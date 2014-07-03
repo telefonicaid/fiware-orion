@@ -28,8 +28,8 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++ create vector compound +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/EVector"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
     <contextAttribute>
@@ -51,12 +51,12 @@ echo "1: +++++++++ create vector compound +++++++++++"
       </contextValue>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 echo "2: +++++++++ create object compound +++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/EObject"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
     <contextAttribute>
@@ -74,26 +74,28 @@ echo "2: +++++++++ create object compound +++++++++++"
       </contextValue>
     </contextAttribute>
   </contextAttributeList>
-</appendContextElementRequest>
-EOF
+</appendContextElementRequest>'
+orionCurl --url "$url" --payload "$payload"
 
+echo "3: ++++++++++ query for vector compound in XML convop ++++++++++"
+orionCurl --url "/ngsi10/contextEntities/EVector"
 
+echo "4: ++++++++++ query for object compound in XML convop ++++++++++"
+orionCurl --url "/ngsi10/contextEntities/EObject"
 
+echo "5: ++++++++++ query for vector compound in JSON convop ++++++++++"
+orionCurl --url "/NGSI10/contextEntities/EVector" --json
 
-echo "7: ++++++++++ query for vector compound in XML convop ++++++++++"
-curl localhost:${BROKER_PORT}/ngsi10/contextEntities/EVector -s -S --header 'Content-Type: application/xml' | xmllint --format -
-
-echo "8: ++++++++++ query for object compound in XML convop ++++++++++"
-curl localhost:${BROKER_PORT}/ngsi10/contextEntities/EObject -s -S --header 'Content-Type: application/xml' | xmllint --format -
-
-echo "9: ++++++++++ query for vector compound in JSON convop ++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EVector -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
-
-echo "10: ++++++++++ query for object compound in JSON convop ++++++++++"
-curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+echo "6: ++++++++++ query for object compound in JSON convop ++++++++++"
+orionCurl --url "/NGSI10/contextEntities/EObject" --json
 
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 492
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -113,6 +115,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
   </contextResponseList>
 </appendContextElementResponse>
 2: +++++++++ create object compound +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 492
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -131,7 +138,12 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
     </contextAttributeResponse>
   </contextResponseList>
 </appendContextElementResponse>
-7: ++++++++++ query for vector compound in XML convop ++++++++++
+3: ++++++++++ query for vector compound in XML convop ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 774
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
@@ -164,7 +176,12 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
     <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </contextElementResponse>
-8: ++++++++++ query for object compound in XML convop ++++++++++
+4: ++++++++++ query for object compound in XML convop ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 640
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
@@ -193,63 +210,73 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntities/EObject -s -S --header 'Con
     <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </contextElementResponse>
-9: ++++++++++ query for vector compound in JSON convop ++++++++++
+5: ++++++++++ query for vector compound in JSON convop ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 489
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextElement": {
         "attributes": [
             {
-                "name": "att",
-                "type": "compound",
+                "name": "att", 
+                "type": "compound", 
                 "value": [
-                    "22",
+                    "22", 
                     {
                         "x": [
-                            "x1",
+                            "x1", 
                             "x2"
-                        ],
+                        ], 
                         "y": "3"
-                    },
+                    }, 
                     [
-                        "z1",
+                        "z1", 
                         "z2"
                     ]
                 ]
             }
-        ],
-        "id": "EVector",
-        "isPattern": "false",
+        ], 
+        "id": "EVector", 
+        "isPattern": "false", 
         "type": ""
-    },
+    }, 
     "statusCode": {
-        "code": "200",
+        "code": "200", 
         "reasonPhrase": "OK"
     }
 }
-10: ++++++++++ query for object compound in JSON convop ++++++++++
+6: ++++++++++ query for object compound in JSON convop ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 436
+Content-Type: application/json
+Date: REGEX(.*)
+
 {
     "contextElement": {
         "attributes": [
             {
-                "name": "att",
-                "type": "compound",
+                "name": "att", 
+                "type": "compound", 
                 "value": {
                     "x": {
-                        "x1": "a",
+                        "x1": "a", 
                         "x2": "b"
-                    },
+                    }, 
                     "y": [
-                        "y1",
+                        "y1", 
                         "y2"
                     ]
                 }
             }
-        ],
-        "id": "EObject",
-        "isPattern": "false",
+        ], 
+        "id": "EObject", 
+        "isPattern": "false", 
         "type": ""
-    },
+    }, 
     "statusCode": {
-        "code": "200",
+        "code": "200", 
         "reasonPhrase": "OK"
     }
 }

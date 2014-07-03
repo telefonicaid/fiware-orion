@@ -28,9 +28,8 @@ brokerStart CB
 accumulatorStart
 
 --SHELL--
-
-(curl localhost:${BROKER_PORT}/NGSI9/subscribeContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/subscribeContextAvailability"
+payload='<?xml version="1.0"?>
 <subscribeContextAvailabilityRequest>
         <entityIdList>
                 <entityId type="Room" isPattern="false">
@@ -43,15 +42,15 @@ accumulatorStart
         <attributeList>
                 <attribute>temperature</attribute>
         </attributeList>
-        <reference>http://127.0.0.1:${LISTENER_PORT}/notify</reference>
+        <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
         <duration>PT5S</duration>
-</subscribeContextAvailabilityRequest>
-EOF
-echo "1: ++++++++++++++++++++"
+</subscribeContextAvailabilityRequest>'
+orionCurl --url "$url" --payload "${payload}"
 
+echo "1: ++++++++++++++++++++"
 #Do an register context inmediatelly after the subscription: notification is generated
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/registerContext"
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -72,14 +71,14 @@ echo "1: ++++++++++++++++++++"
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>
-EOF
-echo "2: ++++++++++++++++++++"
+  </registerContextRequest>'
+orionCurl --url "$url" --payload "${payload}"
 
+echo "2: ++++++++++++++++++++"
 #Do an register context after subscription expiration: notification is not generated
 sleep 6s
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
-<?xml version="1.0"?>
+url="/NGSI9/registerContext"
+payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
@@ -100,26 +99,41 @@ sleep 6s
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>
-EOF
-echo "3: ++++++++++++++++++++"
+  </registerContextRequest>'
+orionCurl --url "$url" --payload "${payload}"
 
+echo "3: ++++++++++++++++++++"
 #Get accumulated data
 curl localhost:${LISTENER_PORT}/dump -s -S
 
 --REGEXPECT--
+HTTP/1.1 200 OK
+Content-Length: 167
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <subscribeContextAvailabilityResponse>
   <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
   <duration>PT5S</duration>
 </subscribeContextAvailabilityResponse>
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 141
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <registerContextResponse>
   <duration>PT1H</duration>

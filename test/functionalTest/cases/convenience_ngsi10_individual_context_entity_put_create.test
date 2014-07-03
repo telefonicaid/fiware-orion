@@ -29,8 +29,8 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. put an entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X PUT -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/entity01"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
@@ -45,12 +45,12 @@ echo "+++++ 1. put an entity +++++"
       <contextValue>p23</contextValue>
     </contextAttribute>
   </contextAttributeList>
-</updateContextElementRequest>
-EOF
+</updateContextElementRequest>'
+orionCurl --url "$url" --payload "$payload" -X "PUT"
 
 echo "+++++ 2. create the entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/entity01"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
@@ -65,12 +65,12 @@ echo "+++++ 2. create the entity +++++"
       <contextValue>p23</contextValue>
     </contextAttribute>
   </contextAttributeList>
-</updateContextElementRequest>
-EOF
+</updateContextElementRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 echo "+++++ 3. put an entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01 -s -S --header 'Content-Type: application/xml' -X PUT -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+url="/NGSI10/contextEntities/entity01"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
@@ -85,12 +85,17 @@ echo "+++++ 3. put an entity +++++"
       <contextValue>p23</contextValue>
     </contextAttribute>
   </contextAttributeList>
-</updateContextElementRequest>
-EOF
+</updateContextElementRequest>'
+orionCurl --url "$url" --payload "$payload" -X "PUT"
 
 
 --REGEXPECT--
 +++++ 1. put an entity +++++
+HTTP/1.1 200 OK
+Content-Length: 203
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextElementResponse>
   <errorCode>
@@ -100,6 +105,11 @@ EOF
   </errorCode>
 </updateContextElementResponse>
 +++++ 2. create the entity +++++
+HTTP/1.1 200 OK
+Content-Length: 654
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <appendContextElementResponse>
   <contextResponseList>
@@ -124,6 +134,11 @@ EOF
   </contextResponseList>
 </appendContextElementResponse>
 +++++ 3. put an entity +++++
+HTTP/1.1 200 OK
+Content-Length: 654
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextElementResponse>
   <contextResponseList>

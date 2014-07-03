@@ -30,12 +30,12 @@ brokerStart CB
 
 # query for all entities of type "Room"
 echo "1: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room/attributes/temperature -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
+orionCurl --url "/NGSI10/contextEntityTypes/Room/attributes/temperature"
 
 # Add an entity of type Room, with one attribute: 'temperature'
 echo "2: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format - ) << EOF
-<updateContextRequest>
+url="/NGSI10/updateContext"
+payload='<updateContextRequest>
   <contextElementList>
     <contextElement>
       <entityId type="Room" isPattern="false">
@@ -58,17 +58,17 @@ echo "2: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 # query for all entities of type "Room", attribute 'temperature'
 echo "3: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room/attributes/temperature -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format - )
+orionCurl --url "/NGSI10/contextEntityTypes/Room/attributes/temperature"
 
 # Add another attribute for entity ConferenceRoom - 'pressure'
 echo "4: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' -d @- | xmllint --format - ) << EOF
-<updateContextRequest>
+url="/NGSI10/updateContext"
+payload='<updateContextRequest>
   <contextElementList>
     <contextElement>
       <entityId type="Room" isPattern="false">
@@ -91,27 +91,32 @@ echo "4: ++++++++++++++++++++"
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
-</updateContextRequest>
-EOF
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 # Now, query again for entities of type "Room", attribute 'temperature', making sure attribute 'pressure' isn't found
 echo "5: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room/attributes/temperature -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format -)
+orionCurl --url "/NGSI10/contextEntityTypes/Room/attributes/temperature"
 
 # And, query for entities of type "Room", attribute 'pressure' ...
 echo "6: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room/attributes/pressure -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format -)
+orionCurl --url "/NGSI10/contextEntityTypes/Room/attributes/pressure"
 
 # query for all entities of type "Room2", attribute 'temperature'
 echo "7: ++++++++++++++++++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room2/attributes/temperature -s -S --header 'Content-Type: application/xml' --header 'Accept: application/xml' | xmllint --format -)
-echo "8: ++++++++++++++++++++"
+orionCurl --url "/NGSI10/contextEntityTypes/Room2/attributes/temperature"
 
 # DELETE is not allowed
-curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room/attributes/temperature -s -S -X DELETE --include --header 'Content-Type: application/xml' --header 'Accept: application/xml'
+echo "8: ++++++++++++++++++++"
+orionCurl --url "/NGSI10/contextEntityTypes/Room/attributes/temperature" -X "DELETE"
 
 --REGEXPECT--
 1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
@@ -120,6 +125,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room/attributes/temperat
   </errorCode>
 </queryContextResponse>
 2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 857
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -151,6 +161,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room/attributes/temperat
   </contextResponseList>
 </updateContextResponse>
 3: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 858
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
@@ -182,6 +197,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room/attributes/temperat
   </contextResponseList>
 </queryContextResponse>
 4: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 852
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <updateContextResponse>
   <contextResponseList>
@@ -213,6 +233,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room/attributes/temperat
   </contextResponseList>
 </updateContextResponse>
 5: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 858
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
@@ -244,6 +269,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room/attributes/temperat
   </contextResponseList>
 </queryContextResponse>
 6: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 854
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <contextResponseList>
@@ -275,6 +305,11 @@ curl localhost:${BROKER_PORT}/NGSI10/contextEntityTypes/Room/attributes/temperat
   </contextResponseList>
 </queryContextResponse>
 7: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>

@@ -80,40 +80,34 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 
 # 1. OK
 echo "1: ++++++++++"
-url="/NGSI9/registerContext"
-orionCurl --url "$url" --payload "$payload" --urlTenant "_kzg0123456789012345"
+orionCurl --url "/NGSI9/registerContext" --payload "$payload" --urlTenant "_kzg0123456789012345"
 echo
 echo
 
 
 # 2. Long tenant name
-url="/NGSI9/registerContext"
 echo "2: ++++++++++"
-orionCurl --url "$url" --payload "$payload" --urlTenant "kz12345678901234567890"
+orionCurl --url "/NGSI9/registerContext" --payload "$payload" --urlTenant "kz12345678901234567890"
 echo
 echo
 
 
-# 3. Bad character in tenant name
-url="/NGSI9/registerContext"
+# 3. Bad character in tenant name"
 echo "3: ++++++++++"
-orionCurl --url "$url" --payload "$payload" --urlTenant "kz+fg"
+orionCurl --url "/NGSI9/registerContext" --payload "$payload" --urlTenant "kz+fg"
 echo
 echo
 
 
 # 4. Reserved name in tenant name
-url="/NGSI9/registerContext"
 echo "4: ++++++++++"
-orionCurl --url "$url" --payload "$payload" --urlTenant "log"
+orionCurl --url "/NGSI9/registerContext" --payload "$payload" --urlTenant "log"
 echo
 echo
-
 
 # 5. Reserved name (strange case) in tenant name
-url="/NgSi9/registerContext"
 echo "5: ++++++++++"
-orionCurl --url "$url" --payload "$payload" --urlTenant "log"
+orionCurl --url "/NGSI9/registerContext" --payload "$payload" --urlTenant "log"
 --REGEXPECT--
 1: ++++++++++
 HTTP/1.1 200 OK

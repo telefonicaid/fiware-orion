@@ -29,10 +29,15 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. get an entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes/attr01 -s -S --header 'Content-Type: application/xml' -X GET | xmllint --format - )
+orionCurl --url "/NGSI10/contextEntities/entity01/attributes/attr01"
 
 --REGEXPECT--
 +++++ 1. get an entity +++++
+HTTP/1.1 200 OK
+Content-Length: 258
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <contextAttributeResponse>
   <contextAttributeList/>

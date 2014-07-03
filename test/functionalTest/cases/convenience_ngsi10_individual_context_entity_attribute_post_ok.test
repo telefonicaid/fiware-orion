@@ -21,16 +21,16 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Convenience Individual Context Entity Attribute - POST FAILS
+Convenience Individual Context Entity Attribute - POST OK
 
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "+++++ 1. post an entity +++++"
-(curl localhost:${BROKER_PORT}/NGSI10/contextEntities/entity01/attributes/attr01 -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF
-<?xml version="1.0" encoding="UTF-8"?>
+echo "+++++ 1. post an attribute to a non-existing entity +++++"
+url="/NGSI10/contextEntities/entity01/attributes/attr01"
+payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextAttributeRequest>
   <type>Room</type>
   <contextValue>10</contextValue>
@@ -46,11 +46,16 @@ echo "+++++ 1. post an entity +++++"
       <value>V2</value> 
     </contextMetadata>
   </metadata>
-</updateContextAttributeRequest>
-EOF
+</updateContextAttributeRequest>'
+orionCurl --url "$url" --payload "$payload"
 
 --REGEXPECT--
-+++++ 1. post an entity +++++
++++++ 1. post an attribute to a non-existing entity +++++
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/xml
+Date: REGEX(.*)
+
 <?xml version="1.0"?>
 <statusCode>
   <code>200</code>
