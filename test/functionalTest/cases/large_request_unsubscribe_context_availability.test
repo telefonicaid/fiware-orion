@@ -33,20 +33,23 @@ tr -dc A-Za-z0-9 </dev/urandom |  head -c 1500000 > $BIGFILE
 
 # Note that we are not including an actual XML payload, but in this test what matters
 # is the size, not the format of the data
-orionCurl --url "/NGSI9/unsuscribeContextAvailability" --payload "$BIGFILE"
+orionCurl --url "/NGSI9/unsubscribeContextAvailability" --payload "$BIGFILE"
 
 rm $BIGFILE
 --REGEXPECT--
 HTTP/1.1 413 Request Entity Too Large
-Content-Length: 174
+Content-Length: 327
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
-<orionError>
-  <code>413</code>
-  <reasonPhrase>Request Entity Too Large</reasonPhrase>
-  <details>payload size: 1500000, max size supported: 1048576</details>
-</orionError>
+<unsubscribeContextAvailabilityResponse>
+  <subscriptionId>000000000000000000000000</subscriptionId>
+  <statusCode>
+    <code>413</code>
+    <reasonPhrase>Request Entity Too Large</reasonPhrase>
+    <details>payload size: 1500000, max size supported: 1048576</details>
+  </statusCode>
+</unsubscribeContextAvailabilityResponse>
 --TEARDOWN--
 brokerStop CB
