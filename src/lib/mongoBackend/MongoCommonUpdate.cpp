@@ -1043,12 +1043,12 @@ static bool processContextAttributeVector (ContextElement*               ceP,
             }
 
             /* Check aspects related with location */
-            if (targetAttr->getLocation().length() > 0 ) {
+            if (targetAttr->getLocation().length() > 0 && targetAttr->name != locAttr) {
                 cerP->statusCode.fill(SccInvalidParameter,
                                       std::string("action: UPDATE") +
                                       std::string(" - entity: (") + eP->toString() + ")" +
                                       std::string(" - offending attribute: ") + targetAttr->toString() +
-                                      std::string(" - location attribute has to be defined at creation time, with APPEND"));
+                                      std::string(" - location nature of an attribute has to be defined at creation time, with APPEND"));
                 return false;
             }
 
