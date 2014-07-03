@@ -28,9 +28,7 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "0: +++++++++ Prepare entities +++++++++++"
-
-# Create entities corresponding to the three cities
+echo "1. Create entity corresponding to Madrid"
 url="/NGSI10/updateContext"
 payload='{
   "contextElements": [
@@ -52,7 +50,18 @@ payload='{
       ]
     }
     ]
-  },
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+sleep 1.1
+
+echo "2. Create entity corresponding to Alcobendas"
+url="/NGSI10/updateContext"
+payload='{
+  "contextElements": [
   {
     "type": "City",
     "isPattern": "false",
@@ -71,7 +80,19 @@ payload='{
       ]
     }
     ]
-  },
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+sleep 1.1
+
+
+echo "3. Create entity corresponding to Leganes"
+url="/NGSI10/updateContext"
+payload='{
+  "contextElements": [
   {
     "type": "City",
     "isPattern": "false",
@@ -96,7 +117,8 @@ payload='{
 }'
 orionCurl --url "$url" --payload "$payload" --json
 
-echo "1: ++++++++++ Madrid in 14 kms ++++++++++"
+
+echo "4: ++++++++++ Madrid in 14 kms ++++++++++"
 # Query inside 14 kms radius from Madrid center
 url="/NGSI10/queryContext"
 payload='{
@@ -124,7 +146,7 @@ payload='{
 }'
 orionCurl --url "$url" --payload "$payload" --json
 
-echo "2: +++++++++++ Madrid in 15 kms +++++++++"
+echo "5: +++++++++++ Madrid in 15 kms +++++++++"
 # Query inside 15 kms radius from Madrid center
 url="/NGSI10/queryContext"
 payload='{
@@ -152,7 +174,7 @@ payload='{
 }'
 orionCurl --url "$url" --payload "$payload" --json
 
-echo "3: ++++++++++++ Madrid out 14 kms ++++++++"
+echo "6: ++++++++++++ Madrid out 14 kms ++++++++"
 # Query in 14 kms radius outside Madrid center
 url="/NGSI10/queryContext"
 payload='{
@@ -182,9 +204,9 @@ payload='{
 orionCurl --url "$url" --payload "$payload" --json
 
 --REGEXPECT--
-0: +++++++++ Prepare entities +++++++++++
+1. Create entity corresponding to Madrid
 HTTP/1.1 200 OK
-Content-Length: 1669
+Content-Length: 576
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -214,7 +236,18 @@ Date: REGEX(.*)
                 "code": "200",
                 "reasonPhrase": "OK"
             }
-        },
+        }
+    ]
+}
+
+2. Create entity corresponding to Alcobendas
+HTTP/1.1 200 OK
+Content-Length: 580
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
         {
             "contextElement": {
                 "attributes": [
@@ -239,7 +272,18 @@ Date: REGEX(.*)
                 "code": "200",
                 "reasonPhrase": "OK"
             }
-        },
+        }
+    ]
+}
+
+3. Create entity corresponding to Leganes
+HTTP/1.1 200 OK
+Content-Length: 577
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
         {
             "contextElement": {
                 "attributes": [
@@ -267,7 +311,7 @@ Date: REGEX(.*)
         }
     ]
 }
-1: ++++++++++ Madrid in 14 kms ++++++++++
+4: ++++++++++ Madrid in 14 kms ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1157
 Content-Type: application/json
@@ -327,7 +371,7 @@ Date: REGEX(.*)
         }
     ]
 }
-2: +++++++++++ Madrid in 15 kms +++++++++
+5: +++++++++++ Madrid in 15 kms +++++++++
 HTTP/1.1 200 OK
 Content-Length: 1725
 Content-Type: application/json
@@ -412,7 +456,7 @@ Date: REGEX(.*)
         }
     ]
 }
-3: ++++++++++++ Madrid out 14 kms ++++++++
+6: ++++++++++++ Madrid out 14 kms ++++++++
 HTTP/1.1 200 OK
 Content-Length: 600
 Content-Type: application/json

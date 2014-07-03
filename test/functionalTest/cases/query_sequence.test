@@ -42,6 +42,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </attributeList>
 </queryContextRequest>'
 orionCurl --url "$url" --payload "$payload"
+sleep 1.1
 
 echo "2: ++++++++++++++++++++"
 url="/NGSI10/queryContext"
@@ -323,6 +324,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </attributeList>
 </queryContextRequest>'
 orionCurl --url "$url" --payload "$payload"
+sleep 1.1
 
 echo "17: ++++++++++++++++++++"
 url="/NGSI10/queryContext"
@@ -342,7 +344,30 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 </queryContextRequest>'
 orionCurl --url "$url" --payload "$payload"
 
-echo "18: ++++++++++++++++++++"
+echo "18.1: ++++++++++++++++++++"
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+        <contextElement>
+          <entityId type="Room" isPattern="false">
+            <id>ConferenceRoom2</id>
+          </entityId>
+          <contextAttributeList>
+            <contextAttribute>
+              <name>temperature</name>
+              <type>degree</type>
+              <contextValue>14</contextValue>
+            </contextAttribute>
+          </contextAttributeList>
+        </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+sleep 1.1
+
+echo "18.2: ++++++++++++++++++++"
 url="/NGSI10/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
@@ -356,18 +381,6 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
               <name>temperature</name>
               <type>degree</type>
               <contextValue>12</contextValue>
-            </contextAttribute>
-          </contextAttributeList>
-        </contextElement>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-            <id>ConferenceRoom2</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
-              <name>temperature</name>
-              <type>degree</type>
-              <contextValue>14</contextValue>
             </contextAttribute>
           </contextAttributeList>
         </contextElement>
@@ -884,9 +897,9 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </queryContextResponse>
-18: ++++++++++++++++++++
+18.1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1188
+Content-Length: 645
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -896,7 +909,7 @@ Date: REGEX(.*)
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
-          <id>OfficeRoom2</id>
+          <id>ConferenceRoom2</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
@@ -911,10 +924,21 @@ Date: REGEX(.*)
         <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+18.2: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 641
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom2</id>
+          <id>OfficeRoom2</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
@@ -943,7 +967,7 @@ Date: REGEX(.*)
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom2</id>
+          <id>ConferenceRoom</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
@@ -961,7 +985,7 @@ Date: REGEX(.*)
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
+          <id>ConferenceRoom2</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
@@ -990,24 +1014,6 @@ Date: REGEX(.*)
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom2</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>14</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
           <id>ConferenceRoom</id>
         </entityId>
         <contextAttributeList>
@@ -1025,6 +1031,24 @@ Date: REGEX(.*)
             <name>lightstatus</name>
             <type>light</type>
             <contextValue>L23</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom2</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>14</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
