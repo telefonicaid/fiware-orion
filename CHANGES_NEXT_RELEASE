@@ -1,1 +1,1 @@
-o Fix:  errors in JSON rendering for '/statistics' fixed (Issue #428)
+o Fix:  errors in JSON rendering for '/statistics' and '/version' fixed (Issue #428)

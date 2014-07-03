@@ -39,7 +39,7 @@ orionCurl --url "/version" --json
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 283
+Content-Length: REGEX(\d+)
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -54,7 +54,7 @@ Date: REGEX(.*)
 </orion>
 2: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 262
+Content-Length: REGEX(\d+)
 Content-Type: application/json
 Date: REGEX(.*)
 

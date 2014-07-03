@@ -288,6 +288,31 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
+                        "value": "40.418889, -3.691944"
+                    }
+                ],
+                "id": "Madrid",
+                "isPattern": "false",
+                "type": "City"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
                         "value": "40.316667, -3.75"
                     }
                 ],
@@ -299,7 +324,17 @@ Date: REGEX(.*)
                 "code": "200",
                 "reasonPhrase": "OK"
             }
-        },
+        }
+    ]
+}
+2: +++++++++++ Madrid in 15 kms +++++++++
+HTTP/1.1 200 OK
+Content-Length: 1725
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
         {
             "contextElement": {
                 "attributes": [
@@ -324,17 +359,7 @@ Date: REGEX(.*)
                 "code": "200",
                 "reasonPhrase": "OK"
             }
-        }
-    ]
-}
-2: +++++++++++ Madrid in 15 kms +++++++++
-HTTP/1.1 200 OK
-Content-Length: 1725
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
+        },
         {
             "contextElement": {
                 "attributes": [
@@ -377,31 +402,6 @@ Date: REGEX(.*)
                     }
                 ],
                 "id": "Leganes",
-                "isPattern": "false",
-                "type": "City"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        },
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WSG84"
-                            }
-                        ],
-                        "name": "location",
-                        "type": "coords",
-                        "value": "40.418889, -3.691944"
-                    }
-                ],
-                "id": "Madrid",
                 "isPattern": "false",
                 "type": "City"
             },

@@ -943,7 +943,7 @@ Date: REGEX(.*)
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom</id>
+          <id>ConferenceRoom2</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
@@ -961,7 +961,7 @@ Date: REGEX(.*)
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom2</id>
+          <id>ConferenceRoom</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
@@ -990,6 +990,24 @@ Date: REGEX(.*)
     <contextElementResponse>
       <contextElement>
         <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom2</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>14</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
           <id>ConferenceRoom</id>
         </entityId>
         <contextAttributeList>
@@ -1007,24 +1025,6 @@ Date: REGEX(.*)
             <name>lightstatus</name>
             <type>light</type>
             <contextValue>L23</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>ConferenceRoom2</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>14</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>

@@ -133,7 +133,7 @@ curl 127.0.0.1:${LISTENER_PORT}/dump -s -S 2> /dev/null
 --REGEXPECT--
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 283
+Content-Length: 282
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -148,7 +148,7 @@ Date: REGEX(.*)
 </orion>
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 283
+Content-Length: 282
 Content-Type: application/xml
 Date: REGEX(.*)
 
