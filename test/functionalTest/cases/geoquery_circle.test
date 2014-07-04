@@ -27,7 +27,7 @@ dbInit CB
 brokerStart CB
 --SHELL--
 
-echo "0: +++++++++ Prepare entities +++++++++++"
+echo "1: +++++++++ Prepare entity for Madrid +++++++++++"
 # Create entities corresponding to the three cities
 url=/NGSI10/updateContext
 payload='<?xml version="1.0"?>
@@ -52,6 +52,19 @@ payload='<?xml version="1.0"?>
         </contextAttribute>
       </contextAttributeList>
     </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url "$url" --payload "${payload}"
+echo
+sleep 1.1
+
+echo "2: +++++++++ Prepare entity for Alcobendas +++++++++++"
+# Create entities corresponding to the three cities
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
     <contextElement>
       <entityId type="City" isPattern="false">
         <id>Alcobendas</id>
@@ -71,6 +84,19 @@ payload='<?xml version="1.0"?>
         </contextAttribute>
       </contextAttributeList>
     </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url "$url" --payload "${payload}"
+echo
+sleep 1.1
+
+echo "3: +++++++++ Prepare entity for Leganes +++++++++++"
+# Create entities corresponding to the three cities
+url=/NGSI10/updateContext
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
     <contextElement>
       <entityId type="City" isPattern="false">
         <id>Leganes</id>
@@ -96,7 +122,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "${payload}"
 echo
 
-echo "1: ++++++++++ Madrid in 14 kms ++++++++++"
+echo "4: ++++++++++ Madrid in 14 kms ++++++++++"
 # Query inside 14 kms radius from Madrid center
 url=/NGSI10/queryContext
 payload='<?xml version="1.0" encoding="UTF-8"?>
@@ -127,7 +153,7 @@ orionCurl --url "$url" --payload "${payload}"
 echo
 
 
-echo "2: +++++++++++ Madrid in 15 kms +++++++++"
+echo "5: +++++++++++ Madrid in 15 kms +++++++++"
 # Query inside 15 kms radius from Madrid center
 url=/NGSI10/queryContext
 payload='<?xml version="1.0" encoding="UTF-8"?>
@@ -158,7 +184,7 @@ orionCurl --url "$url" --payload "${payload}"
 echo
 
 
-echo "3: ++++++++++++ Madrid out 14 kms ++++++++"
+echo "6: ++++++++++++ Madrid out 14 kms ++++++++"
 # Query in 14 kms radius outside Madrid center
 url=/NGSI10/queryContext
 payload='<?xml version="1.0" encoding="UTF-8"?>
@@ -190,9 +216,9 @@ orionCurl --url "$url" --payload "${payload}"
 echo
 
 --REGEXPECT--
-0: +++++++++ Prepare entities +++++++++++
+1: +++++++++ Prepare entity for Madrid +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 2377
+Content-Length: 856
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -224,6 +250,18 @@ Date: REGEX(.*)
         <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+2: +++++++++ Prepare entity for Alcobendas +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 860
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
     <contextElementResponse>
       <contextElement>
         <entityId type="City" isPattern="false">
@@ -249,6 +287,18 @@ Date: REGEX(.*)
         <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+3: +++++++++ Prepare entity for Leganes +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 857
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
     <contextElementResponse>
       <contextElement>
         <entityId type="City" isPattern="false">
@@ -277,7 +327,7 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 
-1: ++++++++++ Madrid in 14 kms ++++++++++
+4: ++++++++++ Madrid in 14 kms ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1649
 Content-Type: application/xml
@@ -339,7 +389,7 @@ Date: REGEX(.*)
   </contextResponseList>
 </queryContextResponse>
 
-2: +++++++++++ Madrid in 15 kms +++++++++
+5: +++++++++++ Madrid in 15 kms +++++++++
 HTTP/1.1 200 OK
 Content-Length: 2431
 Content-Type: application/xml
@@ -426,7 +476,7 @@ Date: REGEX(.*)
   </contextResponseList>
 </queryContextResponse>
 
-3: ++++++++++++ Madrid out 14 kms ++++++++
+6: ++++++++++++ Madrid out 14 kms ++++++++
 HTTP/1.1 200 OK
 Content-Length: 878
 Content-Type: application/xml
