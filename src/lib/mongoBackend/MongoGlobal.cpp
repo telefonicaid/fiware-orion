@@ -118,7 +118,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
       LM_RE(false, ("MongoDB connection failed, after %d retries: '%s'", retries, err.c_str()));
     }
 
-    /* Authentication is different depending if multiserive is used or not. In the case of not
+    /* Authentication is different depending if multiservice is used or not. In the case of not
      * using multiservice, we authenticate in the single-service database. In the case of using
      * multiservice, it isn't a default database that we know at contextBroker start time (when
      * this connection function is invoked) so we authenticate on the admin database, which provides
@@ -520,42 +520,84 @@ bool includedAttribute(ContextAttribute attr, AttributeList* attrsV) {
     return false;
 }
 
-/* ****************************************************************************
-*
-* fillQueryEntFalse -
-*/
-static void fillQueryEntFalse(BSONArrayBuilder& ba, EntityId* enP, bool withType = true) {
 
-    if (withType) {
-        ba.append(BSON(ENT_ENTITY_ID << enP->id << ENT_ENTITY_TYPE << enP->type));
-        LM_T(LmtMongo, ("Entity query token (isPattern=false): {id: %s, type: %s}", enP->id.c_str(), enP->type.c_str()));
-    }
-    else {
-        ba.append(enP->id);
-        LM_T(LmtMongo, ("Entity query token (isPattern=false): {id: %s}", enP->id.c_str()));
-    }
-}
 
 /* ****************************************************************************
 *
-* fillQueryEntTrue -
+* fillQueryEntity -
+*
 */
-static void fillQueryEntTrue(BSONArrayBuilder& ba, EntityId* enP) {
+static void fillQueryEntity(BSONArrayBuilder& ba, EntityId* enP)
+{
+  BSONObjBuilder     ent;
+  const std::string  idString          = "_id." ENT_ENTITY_ID;
+  const std::string  typeString        = "_id." ENT_ENTITY_TYPE;  
 
-    BSONObjBuilder     ent;
-    const std::string  idString   = "_id." ENT_ENTITY_ID;
-    const std::string  typeString = "_id." ENT_ENTITY_TYPE;
-
+  if (enP->isPattern == "true")
     ent.appendRegex(idString, enP->id);
-    if (enP->type != "") {
-        ent.append(typeString, enP->type);
-    }
+  else
+    ent.append(idString, enP->id);
 
-    BSONObj entObj = ent.obj();
-    ba.append(entObj);
+  if (enP->type != "")
+    ent.append(typeString, enP->type);
 
-    LM_T(LmtMongo, ("Entity query token (isPattern=true): '%s'", entObj.toString().c_str()));
+  BSONObj entObj = ent.obj();
+  ba.append(entObj);
+
+  LM_T(LmtMongo, ("Entity query token: '%s'", entObj.toString().c_str()));
 }
+
+
+/* ****************************************************************************
+*
+* fillQueryServicePath -
+*
+* The regular expression for servicePath is an OR between the exact path and
+* the exact path followed by a slash ('/') and after that, any text (including slashes)
+*
+* If the servicePath is empty, then we only look for entities that have no service path
+* associated ("$exists: false").
+*/
+static void fillQueryServicePath(BSONObjBuilder& bo, const std::vector<std::string>& servicePath)
+{
+
+    if (servicePath.size() > 0)
+    {
+
+#if 0
+        // This solution is based on { $in: [ ... ]}. However, it is not clear how to compose regex
+        // in a BSONArrayBuilder, see http://stackoverflow.com/questions/24243276/include-regex-elements-in-bsonarraybuilder
+        BSONArrayBuilder ba;
+        for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix) {
+            LM_T(LmtServicePath, ("Service Path: '%s'", servicePath[ix].c_str()));
+            char path[MAX_SERVICE_NAME_LEN];
+            slashEscape(servicePath[ix].c_str(), path, sizeof(path));
+            const std::string  servicePathValue = std::string("^") + path + "$|" + "^" + path + "\\/.*";
+            BSONElement be;
+            ba.appendRegex(servicePathValue);
+        }
+        bo.append("$in", ba.arr());
+#endif
+
+        // This solution is based on making the "or" inside the regex, using the "|" as delimiter
+        std::string  servicePathValue = "";
+        for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix) {
+            LM_T(LmtServicePath, ("Service Path: '%s'", servicePath[ix].c_str()));
+            char path[MAX_SERVICE_NAME_LEN];
+            slashEscape(servicePath[ix].c_str(), path, sizeof(path));
+            servicePathValue += std::string("^") + path + "$|" + "^" + path + "\\/.*";
+            if (ix < servicePath.size() - 1) {
+                servicePathValue += std::string("|");
+            }
+        }
+        bo.append("$regex", servicePathValue);
+    }
+    else
+    {
+      bo.append("$exists", false);
+    }
+}
+
 
 /* ****************************************************************************
 *
@@ -710,16 +752,31 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
 * empty value causes an error)
 *
 */
-bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty, std::string tenant) {
-
-    DBClientConnection* connection = getMongoConnection();
+bool entitiesQuery
+(
+  EntityIdVector                   enV,
+  AttributeList                    attrL,
+  Restriction                      res,
+  ContextElementResponseVector*    cerV,
+  std::string*                     err,
+  bool                             includeEmpty,
+  std::string                      tenant,
+  const std::vector<std::string>&  servicePath,
+  int                              offset,
+  int                              limit,
+  bool                             details,
+  long long*                       countP
+)
+{
+    DBClientConnection* connection = getMongoConnection();    
 
     /* Query structure is as follows
      *
      * {
      *    "$or": [ ... ],            (always)
+     *    "_id.servicePath: { ... }   (always, in some cases using {$exists: false})
      *    "attrs.name": { ... },     (only if attributes are used in the query)
-     *    "location.coords": { ... } (only in the case of geo queries)
+     *    "location.coords": { ... } (only in the case of geo-queries)
      *  }
      *
      */
@@ -729,45 +786,19 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
     /* Part 1: entities */
     BSONArrayBuilder orEnt;
 
-    BSONArrayBuilder entFalseWType;
-    BSONArrayBuilder entFalseWOType;
-    for (unsigned int ix = 0; ix < enV.size(); ++ix) {
-        if (isTrue(enV.get(ix)->isPattern)) {
-            /* Part 1.1: add from 0 to N objects (in entTrue) to the $or array for entities
-             * with isPatter=true. Note we are using the builder for the $or vector itself,
-             * as in this case entities can be "directly" inserted. For the other two parts, we
-             * just accumulate in this loop, as they need additional BSON composition before be
-             * inserted in the $or array */
-            fillQueryEntTrue(orEnt, enV.get(ix));
-        }
-        else {
-            /* Accumulating for later BSON composition (Part 1.2 and Part 1.3 below)*/
-            if (enV.get(ix)->type == "") {
-                fillQueryEntFalse(entFalseWOType, enV.get(ix), false);
-            }
-            else {
-                fillQueryEntFalse(entFalseWType, enV.get(ix), true);
-            }
-        }
-    }
+    for (unsigned int ix = 0; ix < enV.size(); ++ix)
+      fillQueryEntity(orEnt, enV.get(ix));
 
-    /* Part 1.2: add up to one object in the $or array for entities isPattern=false with type
-     * (check size to avoid "{ _id: { $in: {} } }" that would make the query fail) */
-    if (entFalseWType.arrSize() > 0) {
-        orEnt.append(BSON("_id" << BSON("$in" << entFalseWType.arr())));
-    }
-
-    /* Part 1.3: add up to one object to the $or array for entities isPattern=false without type
-     * (check size to avoid "{ _id: { $in: {} } }" that would make the query fail) */
-    if (entFalseWOType.arrSize() > 0) {
-        std::string idId = "_id." ENT_ENTITY_ID;
-        orEnt.append(BSON(idId << BSON("$in" << entFalseWOType.arr())));
-    }
-
-    /* Finally the result of the 3 parts is appended to the final query */
+    /* The result of orEnt is appended to the final query */
     finalQuery.append("$or", orEnt.arr());
 
-    /* Part 2: attributes */
+    /* Part 2: service path */
+    const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
+    BSONObjBuilder inServicePath;
+    fillQueryServicePath(inServicePath, servicePath);
+    finalQuery.append(servicePathString, inServicePath.obj());
+
+    /* Part 3: attributes */
     BSONArrayBuilder attrs;
     for (unsigned int ix = 0; ix < attrL.size(); ++ix) {
         std::string attrName = attrL.get(ix);
@@ -781,33 +812,47 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
         finalQuery.append(attrNames, BSON("$in" << attrs.arr()));
     }
 
-    /* Part 3: geo-location */
+    /* Part 4: geo-location */
     BSONObj areaQuery;
     if (processAreaScope(res.scopeVector, areaQuery)) {
        std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
        finalQuery.append(locCoords, areaQuery);
     }
 
-    /* Do the query on MongoDB */
-    BSONObj query = finalQuery.obj();
-    auto_ptr<DBClientCursor> cursor;
-    try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
-        mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
-        cursor = connection->query(getEntitiesCollectionName(tenant).c_str(), query);
+    LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
-        /*
-         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
-         * exception ourselves
-         */
-        if (cursor.get() == NULL) {
+    /* Do the query on MongoDB */
+    auto_ptr<DBClientCursor>  cursor;
+    BSONObj                   bquery = finalQuery.obj();
+    Query                     query(bquery);
+    Query                     sortCriteria  = query.sort(BSON(ENT_CREATION_DATE << 1));
+
+    LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
+    mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
+
+    try
+    {
+        if ((details == true) && (countP != NULL))
+        {
+          *countP = connection->count(getEntitiesCollectionName(tenant).c_str(), bquery);
+        }
+
+        cursor = connection->query(getEntitiesCollectionName(tenant).c_str(), query, limit, offset);
+
+        //
+        // We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+        // raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+        // exception ourselves
+        //
+        if (cursor.get() == NULL)
+        {
            throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
+
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
     }
-    catch( const DBException &e ) {
-
+    catch (const DBException& e)
+    {
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo db exception)");
         *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
@@ -815,8 +860,8 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
 
         LM_RE(false,(err->c_str()));
     }
-    catch(...) {
-
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo generic exception)");
         *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
@@ -926,7 +971,6 @@ bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, Con
     }
 
     return true;
-
 }
 
 /*****************************************************************************
@@ -1029,8 +1073,19 @@ static void processContextRegistrationElement (BSONObj cr, EntityIdVector enV, A
 * ContextRegistrationResponseVector or error.
 *
 */
-bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistrationResponseVector* crrV, std::string* err, std::string tenant) {
-
+bool registrationsQuery
+(
+  EntityIdVector                      enV,
+  AttributeList                       attrL,
+  ContextRegistrationResponseVector*  crrV,
+  std::string*                        err,
+  const std::string&                  tenant,
+  int                                 offset,
+  int                                 limit,
+  bool                                details,
+  long long*                          countP
+)
+{
     DBClientConnection* connection = getMongoConnection();
 
     /* Build query based on arguments */
@@ -1043,6 +1098,7 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
     BSONArrayBuilder entityOr;
     BSONArrayBuilder entitiesWithType;
     BSONArrayBuilder entitiesWithoutType;    
+
     for (unsigned int ix = 0; ix < enV.size(); ++ix) {        
         EntityId* en = enV.get(ix);
         if (isTrue(en->isPattern)) {
@@ -1087,20 +1143,30 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
          * make the query fail*/
         queryBuilder.append(contextRegistrationAttrsNames, BSON("$in" << attrs.arr()));
     }
-    BSONObj query = queryBuilder.obj();
 
     /* Do the query on MongoDB */
-    //FIXME P2: use field selector to include the only relevant field: contextRegistration array (e.g. "expiration" is not needed)
-    auto_ptr<DBClientCursor> cursor;
+    // FIXME P2: use field selector to include the only relevant field: contextRegistration array (e.g. "expiration" is not needed)
+    auto_ptr<DBClientCursor>  cursor;
+    BSONObj                   bquery = queryBuilder.obj();
+    Query                     query(bquery);
+    Query                     sortCriteria  = query.sort(BSON("_id" << 1));
 
-    try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(tenant).c_str(), query.toString().c_str()));
-        mongoSemTake(__FUNCTION__, "query in RegistrationsCollection");
-        cursor = connection->query(getRegistrationsCollectionName(tenant).c_str(), query);
+    LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(tenant).c_str(), query.toString().c_str()));
+    LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
+    mongoSemTake(__FUNCTION__, "query in RegistrationsCollection");
+
+    try
+    {
+        if ((details == true) && (countP != NULL))
+        {
+          *countP = connection->count(getRegistrationsCollectionName(tenant).c_str(), bquery);
+        }
+
+        cursor = connection->query(getRegistrationsCollectionName(tenant).c_str(), query, limit, offset);
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection");
     }
-    catch( const DBException &e ) {
-
+    catch (const DBException& e)
+    {
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo db exception)");
         *err = std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
@@ -1108,8 +1174,8 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
 
         return false;
     }
-    catch(...) {
-
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo generic exception)");
         *err = std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
@@ -1119,12 +1185,14 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
     }
 
     /* Process query result */
-    while (cursor->more()) {
+    while (cursor->more())
+    {
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
         std::vector<BSONElement> queryContextRegistrationV = r.getField(REG_CONTEXT_REGISTRATION).Array();
-        for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix) {
+        for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
+        {
             processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV);
         }
 
@@ -1134,7 +1202,6 @@ bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistra
          * NGSI doesn't forbid to registry exactly twice the same context registration element in the
          * same registration ID. Thus, it could be interesting to post-process the response vector, to
          * "compact" removing duplicated responses.*/
-
     }
 
     return true;
@@ -1228,8 +1295,10 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
     NotifyContextRequest ncr;
 
     // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
-    Restriction res;
-    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant)) {
+    // FIXME P10: we are using an empty service path vector until service paths get implemented for subscriptions
+    std::vector<std::string> servicePathV;
+    Restriction res;    
+    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant, servicePathV)) {
         ncr.contextElementResponseVector.release();
         LM_RE(false, (err.c_str()));
     }
@@ -1247,7 +1316,8 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
             ContextElementResponseVector allCerV;
             AttributeList emptyList;
             // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
-            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false, tenant)) {
+            // FIXME P10: we are using an empty service path vector until serive paths get implemented for subscriptions
+            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false, tenant, servicePathV)) {
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
                 LM_RE(false, (err.c_str()));
@@ -1422,4 +1492,49 @@ bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, st
 
     ncar.contextRegistrationResponseVector.release();
     return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* slashEscape - escape all slashes in 'from' into 'to'
+*
+* If the 'to' buffer is not big enough, slashEscape returns with to's content set to 'ERROR'.
+*/
+void slashEscape(const char* from, char* to, unsigned int toLen)
+{
+  unsigned int ix      = 0;
+  unsigned int slashes = 0;
+
+  // 1. count number of slashes, to help to decide whether to return ERROR or not
+  while (from[ix] != 0)
+  {
+    if (from[ix] == '/')
+      ++slashes;
+
+    ++ix;
+  }
+  
+  // 2. If the escaped version of 'from' doesn't fit inside 'to', return ERROR as string
+  if ((strlen(from) + slashes + 1) > toLen)
+  {
+    strncpy(to, "ERROR", toLen);
+    return;
+  } 
+
+
+  // 3. Copy 'in' to 'from', including escapes for '/'
+  ix = 0;
+  while (*from != 0)
+  {
+    if (ix >= toLen - 2)
+      return;
+
+    if (*from == '/')
+      to[ix++] = '\\';
+    to[ix++] = *from;
+    ++from;
+    to[ix] = 0;
+  }
 }

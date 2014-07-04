@@ -50,6 +50,8 @@ typedef enum TraceLevels
   LmtIncompletePayload,
   LmtTenant = 30,
   LmtUriParams,
+  LmtServicePath,
+  LmtPagination,
 
   /* Parser (40-59) */
   LmtParse    = 40,

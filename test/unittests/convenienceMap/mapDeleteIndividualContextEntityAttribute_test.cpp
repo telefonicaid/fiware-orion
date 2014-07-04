@@ -114,10 +114,7 @@ TEST(mapDeleteIndividualContextEntityAttribute, ok)
     .WillByDefault(Return(1360232700));
   setTimer(timerMock);
 
-  LM_M(("-------------------------------------------------"));
-  LM_M(("getTimer: %p", getTimer()));
   mapDeleteIndividualContextEntityAttribute(id, name, &sc, &ci);
-  LM_M(("getTimer: %p", getTimer()));
 
   EXPECT_EQ(SccOk, sc.code);
   EXPECT_STREQ("OK", sc.reasonPhrase.c_str());

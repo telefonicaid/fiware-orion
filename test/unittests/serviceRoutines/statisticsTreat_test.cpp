@@ -54,12 +54,18 @@ static RestService rs[] =
 TEST(statisticsTreat, delete)
 {
   ConnectionInfo ci("/statistics",  "DELETE", "1.1");
-  const char*    outfile   = "orion.statistics.ok.valid.xml";
+  const char*    outfile1   = "orion.statistics.ok.valid.xml";
+  const char*    outfile2   = "orion.statistics.ok.valid.json";
   std::string    out;
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  out       = restService(&ci, rs);
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  ci.outFormat = JSON;
   out       = restService(&ci, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -75,21 +81,19 @@ TEST(statisticsTreat, delete)
 TEST(statisticsTreat, get)
 {
   ConnectionInfo ci("/statistics",  "GET", "1.1");
-  const char*    outfile   = "orion.statistics2.ok.valid.xml";
+  const char*    outfile1  = "orion.statistics2.ok.valid.xml";
+  const char*    outfile2  = "orion.statistics2.ok.valid.json";
   std::string    out;
 
   utInit();
 
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   out = restService(&ci, rs);
-  
-  char* outStart = (char*) out.c_str();
+  EXPECT_STREQ(expectedBuf, out.c_str());
 
-  // Remove last char in expectedBuf
-  expectedBuf[strlen(expectedBuf) - 1] = 0;
-
-  // Shorten'out' to be of same length as expectedBuf
-  outStart[strlen(expectedBuf)]    = 0;
+  ci.outFormat = JSON;
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  out = restService(&ci, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

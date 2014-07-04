@@ -1,0 +1,638 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# fermin at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Geo query test (polygon)
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+echo "0: +++++++++ Prepare entities +++++++++++"
+url="/NGSI10/updateContext"
+payload='{
+  "contextElements": [
+  {
+    "type": "Point",
+    "isPattern": "false",
+    "id": "A",
+    "attributes": [
+    {
+      "name": "location",
+      "type": "coords",
+      "value": "3, 2",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WSG84"
+        }
+      ]
+    }
+    ]
+  },
+  {
+    "type": "Point",
+    "isPattern": "false",
+    "id": "B",
+    "attributes": [
+    {
+      "name": "location",
+      "type": "coords",
+      "value": "5, 5",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WSG84"
+        }
+      ]
+    }
+    ]
+  },
+  {
+    "type": "Point",
+    "isPattern": "false",
+    "id": "C",
+    "attributes": [
+    {
+      "name": "location",
+      "type": "coords",
+      "value": "7, 4",
+      "metadatas": [
+        {
+          "name": "location",
+          "type": "string",
+          "value": "WSG84"
+        }
+      ]
+    }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+echo "1: ++++++++++ Rectangle in: A, B ++++++++++"
+url="/NGSI10/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE_Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "0",
+            "longitude": "0"
+          },
+          {
+            "latitude": "0",
+            "longitude": "6"
+          },
+          {
+            "latitude": "6",
+            "longitude": "6"
+          },
+          {
+            "latitude": "6",
+            "longitude": "0"
+          }
+          ]
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+echo "2: ++++++++++ Rectangle in: B, C ++++++++++"
+url="/NGSI10/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE_Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "3",
+            "longitude": "3"
+          },
+          {
+            "latitude": "3",
+            "longitude": "8"
+          },
+          {
+            "latitude": "11",
+            "longitude": "8"
+          },
+          {
+            "latitude": "11",
+            "longitude": "3"
+          }
+          ]
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+echo "3: ++++++++++ Triangle in: A ++++++++++"
+url="/NGSI10/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE_Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "0",
+            "longitude": "0"
+          },
+          {
+            "latitude": "0",
+            "longitude": "6"
+          },
+          {
+            "latitude": "6",
+            "longitude": "0"
+          }
+          ]
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+echo "4: ++++++++++ Rectangle out: A ++++++++++"
+url="/NGSI10/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE_Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "3",
+            "longitude": "3"
+          },
+          {
+            "latitude": "3",
+            "longitude": "8"
+          },
+          {
+            "latitude": "11",
+            "longitude": "8"
+          },
+          {
+            "latitude": "11",
+            "longitude": "3"
+          }
+          ],
+          "inverted": "true"
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+echo "5: ++++++++++ Triangle out: B, C ++++++++++"
+url="/NGSI10/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE_Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "0",
+            "longitude": "0"
+          },
+          {
+            "latitude": "0",
+            "longitude": "6"
+          },
+          {
+            "latitude": "6",
+            "longitude": "0"
+          }
+          ],
+          "inverted": "true"
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+
+--REGEXPECT--
+0: +++++++++ Prepare entities +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1652
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "C",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+1: ++++++++++ Rectangle in: A, B ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1120
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "3, 2"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+2: ++++++++++ Rectangle in: B, C ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1120
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "7, 4"
+                    }
+                ],
+                "id": "C",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+3: ++++++++++ Triangle in: A ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 576
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "3, 2"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+4: ++++++++++ Rectangle out: A ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 576
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "3, 2"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+5: ++++++++++ Triangle out: B, C ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1120
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "7, 4"
+                    }
+                ],
+                "id": "C",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+--TEARDOWN--
+brokerStop CB

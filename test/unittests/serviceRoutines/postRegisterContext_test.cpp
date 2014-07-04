@@ -68,6 +68,7 @@ TEST(postRegisterContext, ok)
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+
   ci.outFormat    = XML;
   ci.inFormat     = XML;
   ci.payload      = testBuf;

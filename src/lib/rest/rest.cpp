@@ -113,7 +113,68 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       return MHD_YES;
     }
   }
+  else if (key == URI_PARAM_PAGINATION_OFFSET)
+  {
+    char* cP = (char*) val;
 
+    while (*cP != 0)
+    {
+      if ((*cP < '0') || (*cP > '9'))
+      {
+        OrionError error(SccBadRequest, std::string("Bad pagination offset: '") + value + "' (must be a decimal number)");
+        ciP->httpStatusCode = SccBadRequest;
+        ciP->answer         = error.render(ciP->outFormat, "");
+        return MHD_YES;
+      }
+
+      ++cP;
+    }
+  }
+  else if (key == URI_PARAM_PAGINATION_LIMIT)
+  {
+    char* cP = (char*) val;
+
+    while (*cP != 0)
+    {
+      if ((*cP < '0') || (*cP > '9'))
+      {
+        OrionError error(SccBadRequest, std::string("Bad pagination limit: '") + value + "' (must be a decimal number)");
+        ciP->httpStatusCode = SccBadRequest;
+        ciP->answer         = error.render(ciP->outFormat, "");
+        return MHD_YES;
+      }
+
+      ++cP;
+    }
+
+    int limit = atoi(val);
+    if (limit > atoi(MAX_PAGINATION_LIMIT))
+    {
+      OrionError error(SccBadRequest, std::string("Bad pagination limit: '") + value + "' (max: " + MAX_PAGINATION_LIMIT + ")");
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer         = error.render(ciP->outFormat, "");
+      return MHD_YES;
+    }
+    else if (limit == 0)
+    {
+      OrionError error(SccBadRequest, std::string("Bad pagination limit: '") + value + "' (a value of ZERO is unaccepted)");
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer         = error.render(ciP->outFormat, "");
+      return MHD_YES;
+    }
+  }
+  else if (key == URI_PARAM_PAGINATION_DETAILS)
+  {
+    if ((strcasecmp(value.c_str(), "on") != 0) && (strcasecmp(value.c_str(), "off") != 0))
+    {
+      OrionError error(SccBadRequest, std::string("Bad value for 'details': '") + value + "' (accepted: 'on', 'ON', 'off', 'OFF'. Default is 'off')");
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer         = error.render(ciP->outFormat, "");
+      return MHD_YES;
+    }
+  }
+  else
+    LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
 
   if (val != NULL)
     ciP->uriParam[key] = value;
@@ -146,6 +207,11 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "content-type") == 0)    headerP->contentType    = value;
   else if (strcasecmp(key.c_str(), "content-length") == 0)  headerP->contentLength  = atoi(value);
   else if (strcasecmp(key.c_str(), "fiware-service") == 0)  headerP->tenant         = value;
+  else if (strcasecmp(key.c_str(), "service-path") == 0)
+  {
+    headerP->servicePath         = value;
+    headerP->servicePathReceived = true;
+  }
   else
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
 
@@ -177,7 +243,8 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 static Format wantedOutputSupported(const std::string& acceptList, std::string* charsetP)
 {
   std::vector<std::string>  vec;
-  char* copy;
+  char*                     copy;
+
   if (acceptList.length() == 0) 
   {
     /* HTTP RFC states that a missing Accept header must be interpreted as if the client is
@@ -188,7 +255,7 @@ static Format wantedOutputSupported(const std::string& acceptList, std::string* 
   {
     copy = strdup((char*) acceptList.c_str());
   }
-  char*                     cP   = copy;
+  char*  cP   = copy;
 
   do
   {
@@ -335,6 +402,109 @@ static int outFormatCheck(ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
+* servicePathCheck - 
+*
+* Not static just to let unit tests call this function
+*/
+int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
+{
+  // 1. Max 10 paths  - ONLY ONE path allowed at this moment
+  // 2. Max 10 levels in each path
+  // 3. Max 10 characters in each path component
+  // 4. Only alphanum and underscore allowed (just like in tenants)
+  
+  std::vector<std::string> compV;
+  int                      components;
+
+
+  if (ciP->httpHeaders.servicePathReceived == false)
+    return 0;
+
+  if (servicePath[0] != '/')
+  {
+    OrionError e(SccBadRequest, "Only 'absolute' Service Paths allowed (a service path must begin with '/')");
+    ciP->answer = e.render(ciP->outFormat, "");
+    return 1;
+  }
+
+  components = stringSplit(servicePath, '/', compV);
+
+  if (components > 10)
+  {
+    OrionError e(SccBadRequest, std::string("too many components in ServicePath '") + servicePath + "'");
+    ciP->answer = e.render(ciP->outFormat, "");
+    return 2;
+  }
+
+  for (int ix = 0; ix < components; ++ix)
+  {
+    if (strlen(compV[ix].c_str()) > 10)
+    {
+      OrionError e(SccBadRequest, std::string("component-name too long in ServicePath '") + servicePath + "'");
+      ciP->answer = e.render(ciP->outFormat, "");
+      return 3;
+    }
+
+    const char* comp = compV[ix].c_str();
+
+    for (unsigned int cIx = 0; cIx < strlen(comp); ++cIx)
+    {
+      if (!isalnum(comp[cIx]) && (comp[cIx] != '_'))
+      {
+        OrionError e(SccBadRequest, std::string("component '") + comp + " ' of ServicePath contains illegal character '" + comp[cIx] + "'");
+        ciP->answer = e.render(ciP->outFormat, "");
+        return 4;
+      }
+    }
+  }
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* servicePathSplit - 
+*/
+int servicePathSplit(ConnectionInfo* ciP)
+{
+  int servicePaths = stringSplit(ciP->servicePath, ',', ciP->servicePathV);
+
+  if (servicePaths == 0)
+  {
+    /* In this case the result is a 0 length vector */
+    return 0;
+  }
+
+  if (servicePaths > 10)
+  {
+    OrionError e(SccBadRequest, "too many service paths - a maximum of ten service paths is allowed");
+    ciP->answer = e.render(ciP->outFormat, "");
+    return -1;
+  }
+
+  for (int ix = 0; ix < servicePaths; ++ix)
+  {
+    ciP->servicePathV[ix] = std::string(wsStrip((char*) ciP->servicePathV[ix].c_str()));
+    LM_T(LmtServicePath, ("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
+  }
+
+  for (int ix = 0; ix < servicePaths; ++ix)
+  {
+    int s;
+
+    if ((s = servicePathCheck(ciP, ciP->servicePathV[ix].c_str())) != 0)
+      return s;
+  }
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
 * contentTypeCheck -
 *
 * NOTE
@@ -428,22 +598,34 @@ static int connectionTreat
     //
     // URI parameters
     // 
-    ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "";
+    ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]      = DEFAULT_PARAM_NOTIFY_FORMAT;
+    ciP->uriParam[URI_PARAM_PAGINATION_OFFSET]  = DEFAULT_PAGINATION_OFFSET;
+    ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
+    ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
+    
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
     if (ciP->httpStatusCode != SccOk)
     {
-      LM_W(("Error in URI arguments"));
+      LM_W(("Error in URI parameters"));
       restReply(ciP, ciP->answer);
       return MHD_YES;
     }
     LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
+    
     ciP->tenantFromHttpHeader = ciP->httpHeaders.tenant;
     LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));
     ciP->outFormat            = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
       ciP->outFormat = XML; // XML is default output format
+
+    ciP->servicePath = ciP->httpHeaders.servicePath;
+    if (servicePathSplit(ciP) != 0)
+    {
+      LM_W(("Error in ServicerPath header"));
+      restReply(ciP, ciP->answer);
+    }
 
     if (contentTypeCheck(ciP) != 0)
     {

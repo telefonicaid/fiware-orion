@@ -246,6 +246,7 @@ SET (SOURCES
     rest/Verb_test.cpp
     rest/restReply_test.cpp
     rest/RestService_test.cpp
+    rest/rest_test.cpp
 )
 
 SET (HEADERS

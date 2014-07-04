@@ -38,19 +38,14 @@ TEST(QueryContextResponse, ok_xml)
 {
   StatusCode*           ecP = new StatusCode(SccOk, "Detail");
   StatusCode            ec(SccOk, "Detail2");
-  QueryContextResponse  qcr1;
-  QueryContextResponse  qcr2(ec);
+  QueryContextResponse  qcr(ec);
   std::string           out;
-  const char*           outfile  = "ngsi10.queryContextResponse.notFound.valid.xml";
+  const char*           outfile  = "ngsi10.queryContextResponse.ok.valid.xml";
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  out = qcr1.render(QueryContext, XML, "");
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  out = qcr2.render(QueryContext, XML, "");
+  out = qcr.render(QueryContext, XML, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   delete ecP;
@@ -79,6 +74,7 @@ TEST(QueryContextResponse, json_render)
   const char*              filename11 = "ngsi10.queryContextResponse.jsonRender11.valid.json";
   const char*              filename12 = "ngsi10.queryContextResponse.jsonRender12.valid.json";
   const char*              filename13 = "ngsi10.queryContextResponse.jsonRender13.valid.json";
+  const char*              filename14 = "ngsi10.queryContextResponse.jsonRender14.valid.json";
   QueryContextResponse*    qcrP;
   ContextElementResponse*  cerP;
   Metadata*                mdP;
@@ -208,20 +204,28 @@ TEST(QueryContextResponse, json_render)
 
 
 
-  // 12  QueryContextResponse::errorCode OK and contextElementResponseVector filled id (no details)
+  // 12. QueryContextResponse::errorCode OK and contextElementResponseVector filled id (no details)
   qcrP->errorCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename12)) << "Error getting test data from '" << filename12 << "'";
+  qcrP->errorCode.code = SccNone;
   out = qcrP->render(QueryContext, JSON, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
-  // 13  QueryContextResponse::errorCode NOT OK and contextElementResponseVector filled id (with details)
+  // 13. QueryContextResponse::errorCode NOT OK and contextElementResponseVector filled id (with details)
   qcrP->errorCode.fill(SccBadRequest, "no details");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename13)) << "Error getting test data from '" << filename13 << "'";
   out = qcrP->render(QueryContext, JSON, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
+
+  // 14. contextElementResponseVector is released and the render method should give an almost empty response
+  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename14)) << "Error getting test data from '" << filename14 << "'";
+  qcrP->contextElementResponseVector.release();
+  out = qcrP->render(QueryContext, JSON, "");
+  EXPECT_STREQ(expectedBuf, out.c_str());
+
 
   utExit();
 }

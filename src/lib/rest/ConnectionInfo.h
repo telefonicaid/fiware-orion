@@ -64,6 +64,7 @@ public:
     parseDataP             = NULL;
     verb                   = NOVERB;
     tenant                 = "";
+    servicePath            = "";
 
     memset(payloadWord, 0, sizeof(payloadWord));
   }
@@ -82,6 +83,7 @@ public:
     compoundValueP         = NULL;
     parseDataP             = NULL;
     tenant                 = "";
+    servicePath            = "";
 
     memset(payloadWord, 0, sizeof(payloadWord));
 
@@ -103,6 +105,8 @@ public:
   std::string                tenantFromUrl;
   std::string                tenantFromHttpHeader;
   std::string                tenant;
+  std::string                servicePath;
+  std::vector<std::string>   servicePathV;
   HttpHeaders                httpHeaders;
   char*                      payload;
   int                        payloadSize;

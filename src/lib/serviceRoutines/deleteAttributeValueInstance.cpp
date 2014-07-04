@@ -63,7 +63,7 @@ std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, st
   request.updateActionType.set("DELETE");
 
   response.errorCode.code = SccNone;
-  ciP->httpStatusCode = mongoUpdateContext(&request, &response, ciP->tenant);
+  ciP->httpStatusCode = mongoUpdateContext(&request, &response, ciP->tenant, ciP->servicePathV);
   
   StatusCode statusCode;
   if (response.contextElementResponseVector.size() == 0)

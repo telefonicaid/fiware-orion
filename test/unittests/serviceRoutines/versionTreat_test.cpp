@@ -48,7 +48,9 @@ static RestService rs[] =
 TEST(versionTreat, ok)
 {
   ConnectionInfo  ci("/version",  "GET", "1.1");
-  std::string     out       = restService(&ci, rs);
+  std::string     out;
+
+  out = restService(&ci, rs);
 
   // FIXME P2: Some day we'll do this ...
   //

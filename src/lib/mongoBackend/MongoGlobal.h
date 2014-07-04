@@ -25,7 +25,6 @@
 *
 * Author: Fermín Galán
 */
-
 #include "logMsg/logMsg.h"
 
 #include "mongo/client/dbclient.h"
@@ -42,8 +41,8 @@
 #include "ngsi10/UpdateContextResponse.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
-
 #include "ngsiNotify/Notifier.h"
+#include "rest/uriParamNames.h"
 
 using namespace mongo;
 
@@ -66,6 +65,7 @@ using namespace mongo;
 #define ENT_ATTRS                    "attrs"
 #define ENT_ENTITY_ID                "id"
 #define ENT_ENTITY_TYPE              "type"
+#define ENT_SERVICE_PATH             "servicePath"
 #define ENT_ATTRS_NAME               "name"
 #define ENT_ATTRS_TYPE               "type"
 #define ENT_ATTRS_VALUE              "value"
@@ -122,11 +122,16 @@ using namespace mongo;
 
 /*****************************************************************************
 *
+* MAX_SERVICE_NAME_LEN
+*/
+#define MAX_SERVICE_NAME_LEN 1024
+
+/*****************************************************************************
+*
 * Macro to ease extracting fields from BSON objects
 */
 #define STR_FIELD(i, sf) std::string(i.getStringField(sf))
 #define C_STR_FIELD(i, sf) i.getStringField(sf)
-
 
 /*****************************************************************************
 *
@@ -283,14 +288,39 @@ extern bool includedAttribute(ContextAttribute attr, AttributeList* attrsV);
 * entitiesQuery -
 *
 */
-extern bool entitiesQuery(EntityIdVector enV, AttributeList attrL, Restriction res, ContextElementResponseVector* cerV, std::string* err, bool includeEmpty, std::string tenant);
+extern bool entitiesQuery
+(
+  EntityIdVector                   enV,
+  AttributeList                    attrL,
+  Restriction                      res,
+  ContextElementResponseVector*    cerV,
+  std::string*                     err,
+  bool                             includeEmpty,
+  std::string                      tenant,
+  const std::vector<std::string>&  servicePath,
+  int                              offset  = DEFAULT_PAGINATION_OFFSET_INT,
+  int                              limit   = DEFAULT_PAGINATION_LIMIT_INT,
+  bool                             details = false,
+  long long*                       countP  = NULL
+);
 
 /* ****************************************************************************
 *
 * registrationsQuery -
 *
 */
-extern bool registrationsQuery(EntityIdVector enV, AttributeList attrL, ContextRegistrationResponseVector* cerV, std::string* err, std::string tenant);
+extern bool registrationsQuery
+(
+  EntityIdVector                      enV,
+  AttributeList                       attrL,
+  ContextRegistrationResponseVector*  crrV,
+  std::string*                        err,
+  const std::string&                  tenant,
+  int                                 offset  = DEFAULT_PAGINATION_OFFSET_INT,
+  int                                 limit   = DEFAULT_PAGINATION_LIMIT_INT,
+  bool                                details = false,
+  long long*                          countP  = NULL
+);
 
 /* ****************************************************************************
 *
@@ -339,5 +369,15 @@ extern BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVec
 *
 */
 extern bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl, Format format, std::string tenant);
+
+/* ****************************************************************************
+*
+* slashEscape - 
+*
+* When the 'to' buffer is full, slashEscape returns.
+* No warnings, no nothing.
+* Make sure 'to' is big enough!
+*/
+extern void slashEscape(const char* from, char* to, unsigned int toLen);
 
 #endif

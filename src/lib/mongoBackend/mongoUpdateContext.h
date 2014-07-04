@@ -25,8 +25,10 @@
 *
 * Author: Fermin Galan Marquez
 */
+#include <map>
 #include <string>
 
+#include "rest/HttpStatusCode.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
 
@@ -36,6 +38,12 @@
 *
 * mongoUpdateContext - 
 */
-extern HttpStatusCode mongoUpdateContext(UpdateContextRequest* requestP, UpdateContextResponse* responseP, const std::string& tenant = "");
+extern HttpStatusCode mongoUpdateContext
+(
+  UpdateContextRequest*            requestP,
+  UpdateContextResponse*           responseP,
+  const std::string&               tenant,
+  const std::vector<std::string>&  servicePathV
+);
 
 #endif

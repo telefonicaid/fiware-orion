@@ -77,7 +77,7 @@ TEST(putAttributeValueInstance, notFound)
   ci1.inFormat     = XML;
   ci1.payload      = testBuf;
   ci1.payloadSize  = strlen(testBuf);
-  out             = restService(&ci1, rs);
+  out              = restService(&ci1, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
@@ -86,7 +86,7 @@ TEST(putAttributeValueInstance, notFound)
   ci2.inFormat     = XML;
   ci2.payload      = testBuf;
   ci2.payloadSize  = strlen(testBuf);
-  out             = restService(&ci2, rs);
+  out              = restService(&ci2, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
@@ -95,7 +95,7 @@ TEST(putAttributeValueInstance, notFound)
   ci3.inFormat     = XML;
   ci3.payload      = testBuf;
   ci3.payloadSize  = strlen(testBuf);
-  out             = restService(&ci3, rs);
+  out              = restService(&ci3, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

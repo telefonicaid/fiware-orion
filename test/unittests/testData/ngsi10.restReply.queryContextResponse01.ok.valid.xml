@@ -1,6 +1,7 @@
 <queryContextResponse>
   <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+    <details>detail</details>
   </errorCode>
 </queryContextResponse>

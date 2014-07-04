@@ -40,11 +40,22 @@
 *
 * mongoQueryContext - 
 */
-HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResponse* responseP, const std::string& tenant)
+HttpStatusCode mongoQueryContext
+(
+  QueryContextRequest*                 requestP,
+  QueryContextResponse*                responseP,
+  const std::string&                   tenant,
+  const std::vector<std::string>&      servicePathV,
+  std::map<std::string, std::string>&  uriParams
+)
 {
-    reqSemTake(__FUNCTION__, "ngsi10 query request");
+    int         offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
+    int         limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
+    std::string detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
+    bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
     LM_T(LmtMongo, ("QueryContext Request"));    
+    LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
     /* FIXME: restriction not supported for the moment */
     if (!requestP->restriction.attributeExpression.isEmpty()) {
@@ -52,15 +63,65 @@ HttpStatusCode mongoQueryContext(QueryContextRequest* requestP, QueryContextResp
     }
 
     std::string err;
-    if (!entitiesQuery(requestP->entityIdVector, requestP->attributeList, requestP->restriction, &responseP->contextElementResponseVector, &err, true, tenant)) {
+    bool        ok;
+    long long   count = -1;
+
+    reqSemTake(__FUNCTION__, "ngsi10 query request");
+    ok = entitiesQuery(requestP->entityIdVector,
+                       requestP->attributeList,
+                       requestP->restriction,
+                       &responseP->contextElementResponseVector,
+                       &err,
+                       true,
+                       tenant,
+                       servicePathV,
+                       offset,
+                       limit,
+                       details,
+                       &count);
+    reqSemGive(__FUNCTION__, "ngsi10 query request");
+
+    if (!ok)
+    {
         responseP->errorCode.fill(SccReceiverInternalError, err);
         LM_E((responseP->errorCode.details.c_str()));
     }
-    else if (responseP->contextElementResponseVector.size() == 0) {
-      /* If query hasn't any result we have to fill the status code part in the response */
+    else if (responseP->contextElementResponseVector.size() == 0)
+    {
+      //
+      // If the query has an empty response, we have to fill in the status code part in the response.
+      //
+      // However, if the response was empty due to a too high pagination offset,
+      // and if the user has asked for 'details' (as URI parameter, then the response should include information about
+      // the number of hits without pagination.
+      //
+
+      if (details)
+      {
+        if ((count > 0) && (offset >= count))
+        {
+          char details[256];
+
+          snprintf(details, sizeof(details), "Number of matching entities: %lld. Offset is %d", count, offset);
+          responseP->errorCode.fill(SccContextElementNotFound, details);
+          return SccOk;
+        }
+      }
+
       responseP->errorCode.fill(SccContextElementNotFound);
     }
+    else if (details == true)
+    {
+      //
+      // If all was OK, but the details URI param was set to 'on', then the responses error code details
+      // 'must' contain the total count of hits.
+      //
 
-    reqSemGive(__FUNCTION__, "ngsi10 query request");
+      char details[64];
+
+      snprintf(details, sizeof(details), "Count: %lld", count);
+      responseP->errorCode.fill(SccOk, details);
+    }
+
     return SccOk;
 }

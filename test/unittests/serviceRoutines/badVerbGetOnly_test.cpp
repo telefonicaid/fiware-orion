@@ -51,7 +51,9 @@ TEST(badVerbGetOnly, ok)
 {
   ConnectionInfo  ci("/version",  "PUT", "1.1");
   std::string     expected = ""; // Bad verb gives no payload, only HTTP headers
-  std::string     out      = restService(&ci, rs);
+  std::string     out;
+
+  out = restService(&ci, rs);
 
   EXPECT_EQ(expected, out);
   EXPECT_EQ("Allow", ci.httpHeader[0]);

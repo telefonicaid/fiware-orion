@@ -68,6 +68,14 @@ std::map<std::string, std::string> uriParams;
 
 /* ****************************************************************************
 *
+* servicePathVector - 
+*/
+std::vector<std::string> servicePathVector;
+
+
+
+/* ****************************************************************************
+*
 * utInit - unit test init
 *
 */
@@ -95,6 +103,9 @@ void utInit(void)
   ON_CALL(*timerMock, getCurrentTime()).WillByDefault(Return(1360232700));
   setTimer(timerMock);
 
+  startTime       = getCurrentTime();
+  statisticsTime  = getCurrentTime();
+
   setupDatabase();
 
 #ifdef UT_DEBUG
@@ -102,9 +113,19 @@ void utInit(void)
 #endif
 
   //
-  // Default mime type for notifications: application/xml
+  // URI parameters used for unit testing
+  //   Default mime type for notifications: application/xml
   //
-  uriParams[URI_PARAM_NOTIFY_FORMAT] = "XML";
+  uriParams[URI_PARAM_NOTIFY_FORMAT]       = "XML";
+  uriParams[URI_PARAM_PAGINATION_OFFSET]   = DEFAULT_PAGINATION_OFFSET;
+  uriParams[URI_PARAM_PAGINATION_LIMIT]    = DEFAULT_PAGINATION_LIMIT;
+  uriParams[URI_PARAM_PAGINATION_DETAILS]  = DEFAULT_PAGINATION_DETAILS;
+
+  //
+  // Resetting servicePathVector
+  //
+  servicePathVector.clear();
+
 }
 
 

@@ -49,7 +49,9 @@ TEST(badVerbGetPostOnly, ok)
 {
   ConnectionInfo ci("/ngsi9/contextEntities/aaa",  "PUT", "1.1");
   std::string     expected = "";  // no payload for bad verb, only http headers to indicate the error
-  std::string     out      = restService(&ci, rs);
+  std::string     out;
+
+  out = restService(&ci, rs);
 
   EXPECT_EQ(expected, out);
   EXPECT_EQ("Allow",      ci.httpHeader[0]);

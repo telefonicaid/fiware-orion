@@ -79,10 +79,10 @@ all: prepare_release release
 di: install_debug
 
 compile_info:
-	./scripts/compileInfo.sh
+	./scripts/build/compileInfo.sh
 
 compile_info_release:
-	./scripts/compileInfo.sh --release
+	./scripts/build/compileInfo.sh --release
 
 prepare_release: compile_info_release
 	mkdir -p  BUILD_RELEASE || true
@@ -197,6 +197,26 @@ install_libs: release
 install_debug_libs: debug
 	make post_install_libs CMAKE_BUILD_TYPE=BUILD_DEBUG
 
+rpm-ts:
+	# This target assumes that scripts/build/timestampVersion.sh has been previously called before "make rpm-ts"
+	rm -f rpm/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
+	git archive --format tar --prefix=contextBroker-$(BROKER_VERSION)/ HEAD |  gzip >  $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
+	# It seems that git archive doesn't take into account changes in the local copy not commited. Thus, we need to do this "in place" .tar.gz
+	# replacement to inject the modified version.sh file
+	cd $(RPM_TOPDIR)/SOURCES && tar xfvz contextBroker-$(BROKER_VERSION).tar.gz && cd -
+	cp src/app/contextBroker/version.h $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION)/src/app/contextBroker/version.h
+	rm $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
+	cd $(RPM_TOPDIR)/SOURCES && tar cfvz contextBroker-$(BROKER_VERSION).tar.gz contextBroker-$(BROKER_VERSION) && cd -
+	rm -rf $(RPM_TOPDIR)/SOURCES/contextBroker-$(BROKER_VERSION)
+	# -------------
+	git checkout src/app/contextBroker/version.h
+	rpmbuild -ba $(RPM_TOPDIR)/SPECS/contextBroker.spec \
+		--define '_topdir $(RPM_TOPDIR)' \
+		--define 'broker_version $(BROKER_VERSION)' \
+		--define 'broker_release $(BROKER_RELEASE)' \
+		--define 'fiware_version $(FIWARE_VERSION)' \
+		--define 'fiware_release $(FIWARE_RELEASE)' \
+		--define 'build_arch $(BUILD_ARCH)'
 
 rpm: 
 	rm -f rpm/SOURCES/contextBroker-$(BROKER_VERSION).tar.gz
@@ -280,18 +300,14 @@ unit_test: build_unit_test
         fi
 	@echo '------------------------------- unit_test ended ---------------------------------'
 
-functional_test: install_debug build_unit_test
-	if [ -z "${BROKER_PORT}" ]; then \
-	    echo "Execute '. scripts/testEnv.sh' before executing the tests"; \
-	    exit 1; \
-	fi
-	make test -C BUILD_UNITTEST ARGS="-D ExperimentalTest" TEST_VERBOSE=1 || true
-	@if [ -e test/testharness/*.diff ]; then \
-           echo "A .diff file was found in test/testharness, which means that ctest failed running the test. This can happen if a \"Ok\""; \
-           echo "token is used in the tests specification. Run \"scripts/testHarness.sh /test/testharness\" manually to find the problem."; \
-	   exit 1; \
-	fi
-	@xsltproc scripts/cmake2junit.xsl BUILD_UNITTEST/Testing/`cat BUILD_UNITTEST/Testing/TAG| head -n1`/Test.xml  > BUILD_UNITTEST/functional_test.xml
+functional_test: install
+	./test/functionalTest/testHarness.sh
+
+functional_test_debug: install_debug
+	./test/functionalTest/testHarness.sh
+
+ft:  functional_test
+ftd: functional_test_debug
 
 test: unit_test functional_test
 
@@ -309,9 +325,9 @@ coverage: install_coverage
 	    exit 1; \
 	fi
 	make test -C BUILD_COVERAGE ARGS="-D ExperimentalTest" TEST_VERBOSE=1 || true
-	@if [ -e test/testharness/*.diff ]; then \
-           echo "A .diff file was found in test/testharness, which means that ctest failed running the test. This can happen if a \"Ok\""; \
-           echo "token is used in the tests specification. Run \"scripts/testHarness.sh /test/testharness\" manually to find the problem."; \
+	@if [ -e test/functionalTest/cases/*.diff ]; then \
+           echo "A .diff file was found in test/functionalTest/cases, which means that ctest failed running the test. This can happen if a \"Ok\""; \
+           echo "token is used in the tests specification. Run \"test/functionalTest/testHarness.sh test/functionalTest/cases\" manually to find the problem."; \
 	   exit 1; \
 	fi
 	@xsltproc scripts/cmake2junit.xsl BUILD_COVERAGE/Testing/`cat BUILD_COVERAGE/Testing/TAG| head -n1`/Test.xml  > BUILD_COVERAGE/functional_test.xml
@@ -365,9 +381,9 @@ coverage_functional_test: install_coverage
 	    exit 1; \
 	fi
 	make test -C BUILD_COVERAGE ARGS="-D ExperimentalTest" TEST_VERBOSE=1 || true
-	@if [ -e test/testharness/*.diff ]; then \
-           echo "A .diff file was found in test/testharness, which means that ctest failed running the test. This can happen if a \"Ok\""; \
-           echo "token is used in the tests specification. Run \"scripts/testHarness.sh /test/testharness\" manually to find the problem."; \
+	@if [ -e test/functionalTest/cases/*.diff ]; then \
+           echo "A .diff file was found in test/functionalTest/cases, which means that ctest failed running the test. This can happen if a \"Ok\""; \
+           echo "token is used in the tests specification. Run \"test/functionalTest/testHarness.sh test/functionalTest/cases" manually to find the problem."; \
 	   exit 1; \
 	fi
 	@xsltproc scripts/cmake2junit.xsl BUILD_COVERAGE/Testing/`cat BUILD_COVERAGE/Testing/TAG| head -n1`/Test.xml  > BUILD_COVERAGE/functional_test.xml
@@ -409,5 +425,11 @@ payload_check: xml_check check_delimiter json_check
 cppcheck:
 	cppcheck --xml -j 8 --enable=all -I src/lib/ src/ 2> cppcheck-result.xml
 	cat cppcheck-result.xml | grep "error file" | wc -l
+
+sonar_metrics: coverage
+	scripts/build/sonarProperties.sh $(BROKER_VERSION) > sonar-project.properties 
+	cd BUILD_COVERAGE/src && gcovr --gcov-exclude='.*parseArgs.*' --gcov-exclude='.*logMsg.*' -x -o ../../coverage.xml && cd ../../
+	sed s#filename=\"/var/develenv/jenkins/jobs/orion-sonar/workspace/src/#filename=\"src/#g ./coverage.xml > ./coverage_sonar.xml
+	cppcheck --xml -j 8 --enable=all -I src/lib/ -i src/lib/parseArgs -i src/lib/logMsg src/ 2>cppcheck-result.xml
 
 .PHONY: rpm mock mock32 mock64 valgrind

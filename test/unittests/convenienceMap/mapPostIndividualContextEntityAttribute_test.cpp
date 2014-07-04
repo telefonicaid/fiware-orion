@@ -91,6 +91,7 @@ TEST(mapPostIndividualContextEntityAttribute, notFoundThenFound)
 
   prepareDatabase("MPICE", "ttt");
 
+  ci.servicePathV.push_back("");
   ms = mapPostIndividualContextEntityAttribute("MPICE", "A1", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(200, response.code);
