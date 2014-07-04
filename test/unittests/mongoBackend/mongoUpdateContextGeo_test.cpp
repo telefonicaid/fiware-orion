@@ -74,7 +74,8 @@ static void prepareDatabase(void) {
 
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "-5, 2")
+                        BSON("name" << "A1" << "type" << "TA1" << "value" << "-5, 2") <<
+                        BSON("name" << "A2" << "type" << "TA2" << "value" << "noloc")
                         ) <<
                      "location" << BSON("attrName" << "A1" << "coords" << BSON_ARRAY(-5.0 << 2.0))
                     );
@@ -190,13 +191,19 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     EXPECT_FALSE(ent.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
     EXPECT_EQ(-5, coordX(ent));
     EXPECT_EQ(2, coordY(ent));
@@ -208,7 +215,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
@@ -310,13 +317,19 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
     EXPECT_EQ(-5, coordX(ent));
     EXPECT_EQ(2, coordY(ent));
@@ -328,7 +341,7 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(2, attrs.size());
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    a2 = getAttr(attrs, "A2", "TA2");
     BSONObj a5 = getAttr(attrs, "A5", "TA5");
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
@@ -415,13 +428,19 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("2, -4", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
     EXPECT_EQ(2, coordX(ent));
     EXPECT_EQ(-4, coordY(ent));
@@ -433,7 +452,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
@@ -512,7 +531,13 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(0, attrs.size());
+    ASSERT_EQ(1, attrs.size());
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("location"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
@@ -522,7 +547,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
@@ -619,13 +644,19 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
     EXPECT_EQ(-5, coordX(ent));
     EXPECT_EQ(2, coordY(ent));
@@ -637,7 +668,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
@@ -721,13 +752,19 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
     EXPECT_EQ(-5, coordX(ent));
     EXPECT_EQ(2, coordY(ent));
@@ -739,7 +776,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
@@ -823,13 +860,19 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
     EXPECT_EQ(-5, coordX(ent));
     EXPECT_EQ(2, coordY(ent));
@@ -841,7 +884,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
@@ -926,13 +969,19 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
     EXPECT_EQ(-5, coordX(ent));
     EXPECT_EQ(2, coordY(ent));
@@ -944,7 +993,7 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
@@ -1028,13 +1077,19 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
     EXPECT_EQ(-5, coordX(ent));
     EXPECT_EQ(2, coordY(ent));
@@ -1046,7 +1101,7 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
@@ -1130,13 +1185,19 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
     EXPECT_EQ(-5, coordX(ent));
     EXPECT_EQ(2, coordY(ent));
@@ -1148,7 +1209,7 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
@@ -1227,13 +1288,19 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
     EXPECT_EQ(-5, coordX(ent));
     EXPECT_EQ(2, coordY(ent));
@@ -1245,7 +1312,7 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
@@ -1277,7 +1344,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1", "2, -4");
+    ContextAttribute ca("A2", "TA2", "2, -4");
     Metadata md("location", "string", "WSG84");
     ca.metadataVector.push_back(&md);
     ce.contextAttributeVector.push_back(&ca);
@@ -1301,8 +1368,8 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     EXPECT_EQ("T1", RES_CER(0).entityId.type);
     EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
@@ -1310,7 +1377,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     EXPECT_EQ("WSG84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: UPDATE - entity: (E1, T1) - offending attribute: A1 - location attribute has to be defined at creation time, with APPEND", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: UPDATE - entity: (E1, T1) - offending attribute: A2 - location nature of an attribute has to be defined at creation time, with APPEND", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1329,13 +1396,19 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
     EXPECT_EQ(-5, coordX(ent));
     EXPECT_EQ(2, coordY(ent));
@@ -1347,7 +1420,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
@@ -1432,13 +1505,19 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
+    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
+    EXPECT_FALSE(a2.hasField("creDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
     EXPECT_EQ(-5, coordX(ent));
     EXPECT_EQ(2, coordY(ent));
@@ -1450,7 +1529,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
+    a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
