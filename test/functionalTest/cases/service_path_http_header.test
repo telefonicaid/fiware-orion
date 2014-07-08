@@ -62,7 +62,7 @@ echo "+++++ 5: four service paths"
 orionCurl --url /NGSI10/queryContext --payload "$payload" --servicePath '/home/kz/1, /home/kz/2, /home/kz/3, /home/kz/4'
 echo
 echo "+++++ 6: service paths from log file"
-grep servicePathSplit /tmp/contextBrokerLog | awk -F\] '{ print $2 }'
+grep servicePathSplit /tmp/contextBrokerLog | awk -F\| '{ print $8 }'
 echo
 
 echo "+++++ 7: eleven service paths"
@@ -154,15 +154,15 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 +++++ 6: service paths from log file
- servicePathSplit: Service Path 0: '/h012345678/h1/h2/h3/h4/h5/h6/h7/h8/h9'
- servicePathSplit: Service Path 0: '/h0123456789'
- servicePathSplit: Service Path 0: '/h1/h2/h3/h4/h5/h6/h7/h8/h9/h10/h11'
- servicePathSplit: Service Path 0: '/h-1/h2/h3/h4/h5/h6/h7/h8/h9/h9'
- servicePathSplit: Service Path 0: 'X'
- servicePathSplit: Service Path 0: '/home/kz/1'
- servicePathSplit: Service Path 1: '/home/kz/2'
- servicePathSplit: Service Path 2: '/home/kz/3'
- servicePathSplit: Service Path 3: '/home/kz/4'
+ msg=Service Path 0: '/h012345678/h1/h2/h3/h4/h5/h6/h7/h8/h9'
+ msg=Service Path 0: '/h0123456789'
+ msg=Service Path 0: '/h1/h2/h3/h4/h5/h6/h7/h8/h9/h10/h11'
+ msg=Service Path 0: '/h-1/h2/h3/h4/h5/h6/h7/h8/h9/h9'
+ msg=Service Path 0: 'X'
+ msg=Service Path 0: '/home/kz/1'
+ msg=Service Path 1: '/home/kz/2'
+ msg=Service Path 2: '/home/kz/3'
+ msg=Service Path 3: '/home/kz/4'
 
 +++++ 7: eleven service paths
 HTTP/1.1 200 OK

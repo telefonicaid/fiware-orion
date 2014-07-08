@@ -152,7 +152,7 @@ static XmlRequest* xmlRequestGet(RequestType request, std::string method)
     if ((request == xmlRequest[ix].type) && ((xmlRequest[ix].method == method) || (xmlRequest[ix].method == "*")))
     {
       if (xmlRequest[ix].parseVector != NULL)
-        LM_V2(("Found xmlRequest of type %d, method '%s' - index %d (%s)", request, method.c_str(), ix, xmlRequest[ix].parseVector[0].path.c_str()));
+        LM_T(LmtHttpRequest, ("Found xmlRequest of type %d, method '%s' - index %d (%s)", request, method.c_str(), ix, xmlRequest[ix].parseVector[0].path.c_str()));
       return &xmlRequest[ix];
     }
   }

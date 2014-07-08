@@ -40,10 +40,27 @@
 *
 * Globals
 */
-static Timer*     timer             = NULL;
-int               startTime         = -1;
-int               statisticsTime    = -1;
-OrionExitFunction orionExitFunction = NULL;
+static Timer*          timer             = NULL;
+int                    startTime         = -1;
+int                    statisticsTime    = -1;
+OrionExitFunction      orionExitFunction = NULL;
+static struct timeval  logStartTime;
+
+
+
+/* ****************************************************************************
+*
+* transactionIdSet - 
+*/
+void transactionIdSet(int& transaction)
+{
+  if (transaction < 0)
+  {
+    logStartTime.tv_usec += 1;
+    transaction = 1;
+  }
+  snprintf(transactionId, sizeof(transactionId), "%lu-%03d-%011d", logStartTime.tv_sec, (int) logStartTime.tv_usec / 1000, transaction);
+}
 
 
 
@@ -68,6 +85,16 @@ void orionInit(OrionExitFunction exitFunction, const char* version)
   /* Set start time */
   startTime      = getCurrentTime();
   statisticsTime = startTime;
+
+  // startTime for log library
+  if (gettimeofday(&logStartTime, NULL) != 0)
+  {
+    fprintf(stderr, "gettimeofday: %s\n", strerror(errno));
+    orionExitFunction(1, "gettimeofday error");
+  }
+
+  int zero = 0;
+  transactionIdSet(zero);
 }
 
 

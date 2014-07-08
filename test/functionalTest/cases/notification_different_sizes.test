@@ -25,7 +25,7 @@ Notifications of different sizes
 --SHELL-INIT--
 
 dbInit CB
-brokerStart CB
+brokerStart CB 0-255
 accumulatorStart
 
 # Taking into account that the notification size depends on (but is not exactly equal to)
@@ -163,7 +163,7 @@ grep "HTTP request to send is too large" /tmp/contextBrokerLog | wc -l
 # Notification sizes. Note that if don't use the cut, some character in the log line prologue
 # breaks the test harness: @, :, [, ], ~, /, (, ), etc.
 echo "** Notification sizes:"
-grep "to HTTP server" /tmp/contextBrokerLog | awk -F\] '{ print $2 }'
+grep "to HTTP server" /tmp/contextBrokerLog | grep "Sending message" | awk -F\| '{ print $8 }'
 
 --REGEXPECT--
 HTTP/1.1 200 OK
@@ -231,9 +231,9 @@ Date: REGEX(.*)
 ** Too large errors:
 1
 ** Notification sizes:
- sendHttpSocket: Sending message 1 to HTTP server: sending static message of 19879 bytes to HTTP server
- sendHttpSocket: Sending message 2 to HTTP server: sending dynamic message of 21879 bytes to HTTP server
- sendHttpSocket: Sending message 3 to HTTP server: sending dynamic message of 8100881 bytes to HTTP server
+ msg=Sending message 1 to HTTP server: sending static message of 19879 bytes to HTTP server
+ msg=Sending message 2 to HTTP server: sending dynamic message of 21879 bytes to HTTP server
+ msg=Sending message 3 to HTTP server: sending dynamic message of 8100881 bytes to HTTP server
 --TEARDOWN--
 cp /tmp/contextBrokerLog /tmp/contextBrokerLog.notification_different_sizes
 brokerStop CB

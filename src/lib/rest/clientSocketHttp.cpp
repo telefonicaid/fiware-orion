@@ -57,9 +57,6 @@ int socketHttpConnect(const std::string& host, unsigned short port)
   struct addrinfo*    peer;
   char                port_str[10];
 
-
-  LM_VVV(("Generic Connect to: '%s'  port: '%d'", host.c_str(), port));
-
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_protocol = 0;
@@ -67,17 +64,17 @@ int socketHttpConnect(const std::string& host, unsigned short port)
   if (ipVersionUsed == IPV4) 
   {
     hints.ai_family = AF_INET;
-    LM_VVV(("Allow IPv4 only"));
+    LM_T(LmtIpVersion, ("Allow IPv4 only"));
   }
   else if (ipVersionUsed == IPV6)
   {
     hints.ai_family = AF_INET6;
-    LM_VVV(("Allow  IPv6 only"));
+    LM_T(LmtIpVersion, ("Allow  IPv6 only"));
   }
   else 
   {
     hints.ai_family = AF_UNSPEC;
-    LM_VVV(("Allow IPv4 or IPv6"));
+    LM_T(LmtIpVersion, ("Allow IPv4 or IPv6"));
   }
 
   snprintf(port_str, sizeof(port_str), "%d" , (int) port);

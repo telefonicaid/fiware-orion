@@ -118,4 +118,12 @@ extern int64_t toSeconds(int value, char what, bool dayPart);
 */
 extern int64_t parse8601(const std::string& s);
 
+
+
+/* ****************************************************************************
+*
+* transactionIdSet - 
+*/
+extern void transactionIdSet(int& transaction);
+
 #endif  // SRC_LIB_COMMON_GLOBALS_H_

@@ -28,179 +28,69 @@ dbInit CB
 brokerStart CB 1-2
 
 --SHELL--
-echo "=== 1. GET verbose level"
-orionCurl --url "/log/verbose" 2> /dev/null
-echo
-echo
-
-echo "=== 2. PUT verbose level"
-orionCurl --url "/log/verbose/5" -X "PUT" 2> /dev/null
-echo
-echo
-
-echo "=== 3. GET verbose level"
-orionCurl --url "/log/verbose" 2> /dev/null
-echo
-echo
-
-echo "=== 4. DELETE verbose level"
-orionCurl --url "/log/verbose" -X "DELETE" 2> /dev/null
-echo
-echo
-
-echo "=== 5. GET verbose level"
-orionCurl --url "/log/verbose" 2> /dev/null
-echo
-echo
-
-
-echo "=== 6. POST verbose level"
-orionCurl --url "/log/verbose/5" -X "POST" --include 2> /dev/null
-echo
-echo
-
-
-echo "=== 7. GET trace level"
+echo "=== 1. GET trace level"
 orionCurl --url "/log/traceLevel" 2> /dev/null
 echo
 echo
 
 
-echo "=== 8. PUT trace level"
+echo "=== 2. PUT trace level"
 orionCurl --url "/log/traceLevel/5-10" -X "PUT" 2> /dev/null
 echo
 echo
 
 
-echo "=== 9. GET trace level"
+echo "=== 3. GET trace level"
 orionCurl --url "/log/traceLevel" 2> /dev/null
 echo
 echo
 
 
-echo "=== 10. POST trace level"
+echo "=== 4. POST trace level"
 orionCurl --url "/log/traceLevel/101-102,105" -X "POST" --include 2> /dev/null
 echo
 echo
 
 
-echo "=== 11. PUT trace level"
+echo "=== 5. PUT trace level"
 orionCurl --url "/log/traceLevel/19,21-25" -X "PUT" 2> /dev/null
 echo
 echo
 
 
-echo "=== 12. GET trace level"
+echo "=== 6. GET trace level"
 orionCurl --url "/log/traceLevel" 2> /dev/null
 echo
 echo
 
 
-echo "=== 13. DELETE trace level"
+echo "=== 7. DELETE trace level"
 curl localhost:${BROKER_PORT}/log/traceLevel/23 -X DELETE  2> /dev/null
 # FIXME: Y U NO orionCurl --url "/log/traceLevel/23" -X "DELETE" 2> /dev/null ?
 echo
 echo
 
 
-echo "=== 14. GET trace level"
+echo "=== 8. GET trace level"
 orionCurl --url "/log/traceLevel" 2> /dev/null
 echo
 echo
 
 
-echo "=== 15. DELETE trace level"
+echo "=== 9. DELETE trace level"
 orionCurl --url "/log/traceLevel" -X "DELETE" 2> /dev/null
 echo
 echo
 
 
-echo "=== 16. GET trace level"
+echo "=== 10. GET trace level"
 orionCurl --url "/log/traceLevel" 2> /dev/null
 echo
 echo
 
 
 --REGEXPECT--
-=== 1. GET verbose level
-HTTP/1.1 200 OK
-Content-Length: 69
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orion>
-  <log>
-    <verboseLevel>5</verboseLevel>
-  </log>
-</orion>
-
-
-=== 2. PUT verbose level
-HTTP/1.1 200 OK
-Content-Length: 90
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orion>
-  <log>
-    <verboseLevel>verbose level set to 5</verboseLevel>
-  </log>
-</orion>
-
-
-=== 3. GET verbose level
-HTTP/1.1 200 OK
-Content-Length: 69
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orion>
-  <log>
-    <verboseLevel>5</verboseLevel>
-  </log>
-</orion>
-
-
-=== 4. DELETE verbose level
-HTTP/1.1 200 OK
-Content-Length: 92
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orion>
-  <log>
-    <verboseLevel>all verbose levels reset</verboseLevel>
-  </log>
-</orion>
-
-
-=== 5. GET verbose level
-HTTP/1.1 200 OK
-Content-Length: 69
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orion>
-  <log>
-    <verboseLevel>0</verboseLevel>
-  </log>
-</orion>
-
-
-=== 6. POST verbose level
-HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: GET, PUT, DELETE
-Date: REGEX(.*)
-
-
-
-=== 7. GET trace level
+=== 1. GET trace level
 HTTP/1.1 200 OK
 Content-Length: 69
 Content-Type: application/xml
@@ -214,7 +104,7 @@ Date: REGEX(.*)
 </orion>
 
 
-=== 8. PUT trace level
+=== 2. PUT trace level
 HTTP/1.1 200 OK
 Content-Length: 70
 Content-Type: application/xml
@@ -228,7 +118,7 @@ Date: REGEX(.*)
 </orion>
 
 
-=== 9. GET trace level
+=== 3. GET trace level
 HTTP/1.1 200 OK
 Content-Length: 70
 Content-Type: application/xml
@@ -242,7 +132,7 @@ Date: REGEX(.*)
 </orion>
 
 
-=== 10. POST trace level
+=== 4. POST trace level
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
 Allow: POST, GET, PUT, DELETE
@@ -250,7 +140,7 @@ Date: REGEX(.*)
 
 
 
-=== 11. PUT trace level
+=== 5. PUT trace level
 HTTP/1.1 200 OK
 Content-Length: 74
 Content-Type: application/xml
@@ -264,7 +154,7 @@ Date: REGEX(.*)
 </orion>
 
 
-=== 12. GET trace level
+=== 6. GET trace level
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/xml
@@ -278,7 +168,7 @@ Date: REGEX(.*)
 </orion>
 
 
-=== 13. DELETE trace level
+=== 7. DELETE trace level
 <orion>
   <log>
     <tracelevels removed>23</tracelevels removed>
@@ -286,7 +176,7 @@ Date: REGEX(.*)
 </orion>
 
 
-=== 14. GET trace level
+=== 8. GET trace level
 HTTP/1.1 200 OK
 Content-Length: 82
 Content-Type: application/xml
@@ -300,7 +190,7 @@ Date: REGEX(.*)
 </orion>
 
 
-=== 15. DELETE trace level
+=== 9. DELETE trace level
 HTTP/1.1 200 OK
 Content-Length: 86
 Content-Type: application/xml
@@ -314,7 +204,7 @@ Date: REGEX(.*)
 </orion>
 
 
-=== 16. GET trace level
+=== 10. GET trace level
 HTTP/1.1 200 OK
 Content-Length: 71
 Content-Type: application/xml

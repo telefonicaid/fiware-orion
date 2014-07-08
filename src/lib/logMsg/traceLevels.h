@@ -52,6 +52,8 @@ typedef enum TraceLevels
   LmtUriParams,
   LmtServicePath,
   LmtPagination,
+  LmtHttps,
+  LmtIpVersion,
 
   /* Parser (40-59) */
   LmtParse    = 40,

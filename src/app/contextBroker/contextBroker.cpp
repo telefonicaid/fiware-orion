@@ -1159,6 +1159,8 @@ static void rushParse(char* rush, std::string* rushHostP, unsigned short* rushPo
 */
 int main(int argC, char* argV[])
 {
+  strncpy(transactionId, "unset", sizeof(transactionId));
+
   unsigned short rushPort = 0;
   std::string    rushHost = "";
 
@@ -1183,6 +1185,11 @@ int main(int argC, char* argV[])
   paConfig("remove builtin", "-version");
   paConfig("remove builtin", "-h");
   paConfig("remove builtin", "-help");
+  paConfig("remove builtin", "-v");
+  paConfig("remove builtin", "-vv");
+  paConfig("remove builtin", "-vvv");
+  paConfig("remove builtin", "-vvvv");
+  paConfig("remove builtin", "-vvvvv");
 
   paConfig("man synopsis",                  (void*) "[options]");
   paConfig("man shortdescription",          (void*) "Options:");
@@ -1192,8 +1199,8 @@ int main(int argC, char* argV[])
   paConfig("man version",                   (void*) ORION_VERSION);
   paConfig("log to screen",                 (void*) true);
   paConfig("log to file",                   (void*) true);
-  paConfig("log file line format",          (void*) "TYPE:DATE:EXEC-AUX/FILE[LINE] FUNC: TEXT");
-  paConfig("screen line format",            (void*) "TYPE@TIME  FUNC[LINE]: TEXT");
+  paConfig("log file line format",          (void*) "lvl=TYPE | time=DATE T=TRANS_ID | file=FILE | lineNo=LINE | function=FUNC | msg=TEXT");
+  paConfig("screen line format",            (void*) "TYPE@TIME  FILE[LINE]: TEXT");
   paConfig("builtin prefix",                (void*) "ORION_");
   paConfig("usage and exit on any warning", (void*) true);
 
@@ -1224,9 +1231,9 @@ int main(int argC, char* argV[])
   //
   char* x = (char*) malloc(100000);
   sprintf(x, "A hundred thousand bytes lost here");
-  LM_V(("x: '%s'", x));
+  LM_M(("x: '%s'", x));
   x = (char*) "LOST";
-  LM_V(("x: '%s'", x));
+  LM_M(("x: '%s'", x));
 #endif
 
   RestService* rsP = restServiceV;
@@ -1259,8 +1266,8 @@ int main(int argC, char* argV[])
     if (loadFile(httpsCertFile, httpsCertificate, 2048) != 0)
       LM_X(1, ("Error loading certificate from '%s'", httpsCertFile));
 
-    LM_V(("httpsKeyFile:  '%s'", httpsKeyFile));
-    LM_V(("httpsCertFile: '%s'", httpsCertFile));
+    LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
+    LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
     restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, httpsPrivateServerKey, httpsCertificate);
 

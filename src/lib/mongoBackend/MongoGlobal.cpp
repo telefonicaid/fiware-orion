@@ -107,7 +107,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
       if (tryNo == 0)
         LM_W(("Cannot connect to mongo - doing %d retries with a %d microsecond interval", retries, RECONNECT_DELAY));
       else
-        LM_VVVVV(("Try %d connecting to mongo failed", tryNo));
+        LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
 
       usleep(RECONNECT_DELAY * 1000); // usleep accepts microseconds
     }

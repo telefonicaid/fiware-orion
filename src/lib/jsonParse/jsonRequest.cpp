@@ -118,7 +118,7 @@ static JsonRequest* jsonRequestGet(RequestType request, std::string method)
     if ((request == jsonRequest[ix].type) && (jsonRequest[ix].method == method))
     {
       if (jsonRequest[ix].parseVector != NULL)
-        LM_V2(("Found jsonRequest of type %d, method '%s' - index %d (%s)", request, method.c_str(), ix, jsonRequest[ix].parseVector[0].path.c_str()));
+        LM_T(LmtHttpRequest, ("Found jsonRequest of type %d, method '%s' - index %d (%s)", request, method.c_str(), ix, jsonRequest[ix].parseVector[0].path.c_str()));
       return &jsonRequest[ix];
     }
   }
