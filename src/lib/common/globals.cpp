@@ -56,7 +56,8 @@ static struct timeval  logStartTime;
 * of the broker is used as prefix (to almost guarantee its uniqueness among brokers)
 * Furthermore, a running number is appended for the transaction.
 * A 32 bit signed number is used, so its max value is 0x7FFFFFFF (2,147,483,647).
-* If the running number overflows, a millisecond is added to the startTime.
+*
+* If the running number overflows, a millisecond is added to the start time.
 *
 * The whole thing is stored in the thread variable 'transactionId', supported by the
 * logging library 'liblm'.
