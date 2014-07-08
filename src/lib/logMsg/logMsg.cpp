@@ -72,6 +72,8 @@ char*        progName;               /* needed for messages (and by lmLib) */
 char         progNameV[512];         /* where to store progName            */
 
 
+__thread char   transactionId[64];
+
 static sem_t sem;
 
 static void semInit(void)
@@ -153,9 +155,9 @@ static void semGive(void)
 #define SUB              1
 #define TRACE_LEVELS     256
 #define FDS_MAX          2
-#define LINE_MAX         (16 * 1024)
+#define LINE_MAX         (32 * 1024)
 #define TEXT_MAX         512
-#define FORMAT_LEN       512
+#define FORMAT_LEN       1024
 #define FORMAT_DEF       "TYPE:DATE:TID:EXEC/FILE[LINE] FUNC: TEXT"
 #define DEF1             "TYPE:EXEC/FUNC: TEXT"
 #define TIME_FORMAT_DEF  "%A %d %h %H:%M:%S %Y"
@@ -611,7 +613,7 @@ static char* dateGet(int index, char* line, int lineSize)
         ftime(&timebuffer);
         lm::gmtime_r(&secondsNow, &tmP);
         strftime(line_tmp, 80, fds[index].timeFormat, &tmP);
-        snprintf(line, lineSize, "%s(%.3d)", line_tmp, timebuffer.millitm);
+        snprintf(line, lineSize, "%s | ms=%.3d", line_tmp, timebuffer.millitm);
     }
     
     return line;
@@ -748,11 +750,11 @@ static char* lmLineFix
     int          tLev
 )
 {
-    char   xin[256];
-    int    fLen;
-    int    fi     = 0;
-    Fds*   fdP    = &fds[index];
-    char*  format = fdP->format;
+    char         xin[256];
+    int          fLen;
+    int          fi     = 0;
+    Fds*         fdP    = &fds[index];
+    char*        format = fdP->format;
 
     memset(line, 0, lineLen);
 
@@ -772,6 +774,8 @@ static char* lmLineFix
             STRING_ADD(timeGet(index, xin, sizeof(xin)), 4);
         else if (strncmp(&format[fi], "TID", 3) == 0)
             INT_ADD((int) tid, 3);
+        else if (strncmp(&format[fi], "TRANS_ID", 8) == 0)
+            STRING_ADD(transactionId, 8);
         else if (strncmp(&format[fi], "EXEC", 4) == 0)
             STRING_ADD(progName, 4);
         else if (strncmp(&format[fi], "AUX", 3) == 0)
@@ -791,12 +795,7 @@ static char* lmLineFix
     }
 
     if ((type == 'T') && (fdP->traceShow == true))
-        snprintf(xin, sizeof(xin), "%s%d%s\n",
-                   fdP->tMarkStart, tLev, fdP->tMarkEnd);
-#if 0
-    else if (type == 'P') /* type 'P' => tLev == errno */
-        snprintf(xin, sizeof(xin), ": %s\n", strerror(tLev)); 
-#endif
+        snprintf(xin, sizeof(xin), "%s%d%s\n", fdP->tMarkStart, tLev, fdP->tMarkEnd);
     else if (type == 'x') /* type 'x' => */
         snprintf(xin, sizeof(xin), ": %s\n", strerror(errno));
     else
@@ -1719,13 +1718,22 @@ LmStatus lmPathRegister(const char* path, const char* format, const char* timeFo
 *
 * lmOut - 
 */
-LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* fName,
-               int tLev, const char* stre , bool use_hook )
+LmStatus lmOut
+(
+  char*        text,
+  char         type,
+  const char*  file,
+  int          lineNo,
+  const char*  fName,
+  int          tLev,
+  const char*  stre,
+  bool         use_hook
+)
 {
     int   i;
     char* line = (char*) calloc(1, LINE_MAX);
     int   sz;
-    char  format[FORMAT_LEN + 1];
+    char* format = (char*) calloc(1, FORMAT_LEN + 1);
     char* tmP;
 
     tmP = strrchr((char*) file, '/');
@@ -1736,6 +1744,7 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
     {
         lmAddMsgBuf(text, type, file, lineNo, fName, tLev, (char*) stre);
         free(line);
+        free(format);        
         return LmsOk;
     } 
 
@@ -1784,9 +1793,9 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
         }
         else
         {
-            /* Danger: 'format' might be too short ... */
-            if (lmLineFix(i, format, sizeof(format), type, file, lineNo, fName, tLev) == NULL)
-               continue;
+          /* Danger: 'format' might be too short ... */
+          if (lmLineFix(i, format, FORMAT_LEN, type, file, lineNo, fName, tLev) == NULL)
+            continue;
 
             if ((strlen(format) + strlen(text) + strlen(line)) > LINE_MAX)
               snprintf(line, LINE_MAX, "%s[%d]: %s\n%c", file, lineNo, "LM ERROR: LINE TOO LONG", 0);
@@ -1841,6 +1850,7 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
 
         /* exit here, just in case */
         free(line);
+        free(format);        
         exit(tLev);
     }
     
@@ -1860,6 +1870,7 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
                 if ((s = lmClear(i, keepLines, lastLines)) != LmsOk)
                 {
                     free(line);
+                    free(format);        
                     semGive();
                     return s;
                 }
@@ -1868,6 +1879,7 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
     }
 
     free(line);
+    free(format);        
     semGive();
     return LmsOk;
 }
@@ -2674,14 +2686,15 @@ int lmSdGet(void)
 
 struct logMsg 
 {
-    char msg[256];
-    char type;
-    char file[256];
-    int  line;
-    char func[256];
-    int  tLev;
-    char stre[256];
-    struct logMsg* next;
+  char msg[256];
+  char type;
+  char file[256];
+  int  line;
+  char func[256];
+  int  tLev;
+  char stre[256];
+  char transactionId[64];
+  struct logMsg* next;
 };
 
 
@@ -2744,16 +2757,16 @@ void lmAddMsgBuf(char* text, char type, const char* file, int line, const char* 
 */
 void lmPrintMsgBuf()
 {
+  struct logMsg *logP;
 
-    struct logMsg *logP;
-
-    while (logMsgs) 
-    {
-        logP = logMsgs;
-        lmOut(logP->msg, logP->type, logP->file, logP->line, (char*) logP->func, logP->tLev, logP->stre);
-        logMsgs = logP->next;
-        ::free(logP);
-    }
+  while (logMsgs) 
+  {
+    logP = logMsgs;
+    strncpy(transactionId, logP->transactionId, sizeof(transactionId));
+    lmOut(logP->msg, logP->type, logP->file, logP->line, (char*) logP->func, logP->tLev, logP->stre, false);
+    logMsgs = logP->next;
+    ::free(logP);
+  }
 }
 
 

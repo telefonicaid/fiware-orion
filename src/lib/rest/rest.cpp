@@ -583,8 +583,9 @@ static int connectionTreat
    void**           con_cls
 )
 {
-  ConnectionInfo* ciP      = (ConnectionInfo*) *con_cls;
-  size_t          dataLen  = *upload_data_size;
+  ConnectionInfo*        ciP         = (ConnectionInfo*) *con_cls;
+  size_t                 dataLen     = *upload_data_size;
+  static int             transaction = 0;
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (ciP == NULL)
@@ -593,6 +594,10 @@ static int connectionTreat
       LM_RE(MHD_NO, ("Error allocating ConnectionInfo"));
         
     *con_cls = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
+
+    ++transaction;
+    transactionIdSet(transaction);
+
 
     //
     // URI parameters
@@ -733,7 +738,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
-      // LM_V(("Starting HTTPS daemon on IPv4 %s port %d", bindIp, port));
+      // LM_T(LmtMhd, ("Starting HTTPS daemon on IPv4 %s port %d", bindIp, port));
       mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_SSL, // MHD_USE_SELECT_INTERNALLY
                                    htons(port),
                                    NULL,
@@ -748,7 +753,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     }
     else
     {
-      LM_V(("Starting HTTP daemon on IPv4 %s port %d", bindIp, port));
+      LM_T(LmtMhd, ("Starting HTTP daemon on IPv4 %s port %d", bindIp, port));
       mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY
                                    htons(port),
                                    NULL,
@@ -761,7 +766,10 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     }
 
     if (mhdDaemon == NULL)
-      LM_RE(3, ("MHD_start_daemon failed"));
+    {
+      LM_E(("MHD_start_daemon failed"));
+      return 3;
+    }
   }  
 
   if ((ipVersion == IPV6) || (ipVersion == IPDUAL))
@@ -775,7 +783,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
-      LM_V(("Starting HTTPS daemon on IPv6 %s port %d", bindIPv6, port));
+      LM_T(LmtMhd, ("Starting HTTPS daemon on IPv6 %s port %d", bindIPv6, port));
       mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6 | MHD_USE_SSL,
                                       htons(port),
                                       NULL,
@@ -790,7 +798,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     }
     else
     {
-      LM_V(("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
+      LM_T(LmtMhd, ("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
       mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6,
                                       htons(port),
                                       NULL,
