@@ -761,7 +761,9 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_END);
 
       //LM_V(("Starting CoAP daemon on IPv4 %s port %d", bindIp, port));
-      coapDaemon->run(bindIp, port);
+
+      // IANA has assigned the port number 5683 and the service name "coap" [RFC6335].
+      coapDaemon->run(bindIp, port, 5683);
     }
 
     if (mhdDaemon == NULL)

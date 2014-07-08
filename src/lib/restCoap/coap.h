@@ -32,14 +32,15 @@ class Coap
   private:
 
     char             *host;
-    char             *portString;
-    unsigned short    port;
+    char             *coapPortStr;
+    unsigned short    httpPort;
+    unsigned short    coapPort;
 
     int   callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom);
     void  serve();
 
   public:
-    int   run(const char *_host, unsigned short _port);
+    int   run(const char *_host, unsigned short _httpPort, unsigned short _coapPort);
 
 
 };

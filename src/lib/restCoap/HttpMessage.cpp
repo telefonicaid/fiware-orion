@@ -71,7 +71,7 @@ CoapPDU* HttpMessage::toCoap()
   switch (this->_httpCode)
   {
     case 200:
-      pdu->setCode(CoapPDU::COAP_VALID);
+      pdu->setCode(CoapPDU::COAP_CONTENT);
       break;
     case 415:
       pdu->setCode(CoapPDU::COAP_UNSUPPORTED_CONTENT_FORMAT);

@@ -38,11 +38,10 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
 
   // Translate request from CoAP to HTTP and send it to MHD through loopback
   std::string httpResponse;
-  httpResponse = sendHttpRequest(host, port, request);
+  httpResponse = sendHttpRequest(host, httpPort, request);
   if (httpResponse == "")
   {
-    // Could not get an answer
-    //LM_V(("Could not get answer from HTTP module"));
+    // Could not get an answer from HTTP module
     boost::scoped_ptr<CoapPDU> res(new CoapPDU());
 
     res->setVersion(1);
@@ -170,7 +169,7 @@ void Coap::serve()
   hints.ai_flags     |= AI_NUMERICSERV;
   hints.ai_family     = PF_INET; // ipv4, PF_INET6 for ipv6 or PF_UNSPEC to let OS decide
 
-  int error = getaddrinfo(host, portString, &hints, &bindAddr);
+  int error = getaddrinfo(host, coapPortStr, &hints, &bindAddr);
   if (error)
   {
     //LM_V(("Could not start CoAP server: Error getting address info: %s.", gai_strerror(error)));
@@ -256,16 +255,17 @@ void Coap::serve()
 *
 * run -
 */
-int Coap::run(const char *_host, unsigned short _port)
+int Coap::run(const char *_host, unsigned short _httpPort, unsigned short _coapPort)
 {
   char* portString = new char[6];
-  snprintf(portString, 6, "%hd", _port);
+  snprintf(portString, 6, "%hd", _coapPort);
+  this->coapPortStr = new char[strlen(portString)];
+  strcpy(this->coapPortStr, portString);
 
-  this->port = _port;
+  this->httpPort = _httpPort;
+  this->coapPort = _coapPort;
   this->host = new char[strlen(_host)];
   strcpy(this->host, _host);
-  this->portString = new char[strlen(portString)];
-  strcpy(this->portString, portString);
 
   boost::thread *coapServerThread = new boost::thread(boost::bind(&Coap::serve, this));
 
