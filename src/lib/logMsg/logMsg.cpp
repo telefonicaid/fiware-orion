@@ -613,7 +613,7 @@ static char* dateGet(int index, char* line, int lineSize)
         ftime(&timebuffer);
         lm::gmtime_r(&secondsNow, &tmP);
         strftime(line_tmp, 80, fds[index].timeFormat, &tmP);
-        snprintf(line, lineSize, "%s | ms=%.3d | ", line_tmp, timebuffer.millitm);
+        snprintf(line, lineSize, "%s | ms=%.3d", line_tmp, timebuffer.millitm);
     }
     
     return line;

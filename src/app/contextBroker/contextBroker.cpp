@@ -83,7 +83,6 @@
 #include "common/Timer.h"
 #include "common/compileInfo.h"
 
-#include "serviceRoutines/logVerboseTreat.h"
 #include "serviceRoutines/logTraceTreat.h"
 
 #include "ngsi/ParseData.h"
@@ -448,11 +447,7 @@ RestService restServiceMTenant[] =
   { "DELETE", Ngsi10SubscriptionsConvOp,                   4, { "*", "ngsi10", "contextSubscriptions", "*"                    }, "",                                             deleteSubscriptionConvOp                  },
   { "*",      Ngsi10SubscriptionsConvOp,                   4, { "*", "ngsi10", "contextSubscriptions", "*"                    }, "",                                             badVerbPutDeleteOnly                      },
 
-  // log request
-  { "GET",    LogRequest,                                  2, { "log", "verbose"                                              }, "",                                             logVerboseTreat                           },
-  { "PUT",    LogRequest,                                  3, { "log", "verbose", "*"                                         }, "",                                             logVerboseTreat                           },
-  { "DELETE", LogRequest,                                  2, { "log", "verbose"                                              }, "",                                             logVerboseTreat                           },
-  { "*",      LogRequest,                                  3, { "log", "verbose", "*"                                         }, "",                                             badVerbGetPutDeleteOnly                   },
+  // log requests
 
   // The documentation (Installation and Admin Guide) says /log/trace ...
   { "GET",    LogRequest,                                  2, { "log", "trace"                                                }, "",                                             logTraceTreat                             },
@@ -607,11 +602,6 @@ RestService restServiceV[] =
   { "*",      Ngsi10SubscriptionsConvOp,                   3, { "ngsi10", "contextSubscriptions", "*"                         }, "",                                             badVerbPutDeleteOnly                      },
 
   // log request
-  { "GET",    LogRequest,                                  2, { "log", "verbose"                                              }, "",                                             logVerboseTreat                           },
-  { "PUT",    LogRequest,                                  3, { "log", "verbose", "*"                                         }, "",                                             logVerboseTreat                           },
-  { "DELETE", LogRequest,                                  2, { "log", "verbose"                                              }, "",                                             logVerboseTreat                           },
-  { "*",      LogRequest,                                  3, { "log", "verbose", "*"                                         }, "",                                             badVerbGetPutDeleteOnly                   },
-
   { "GET",    LogRequest,                                  2, { "log", "trace"                                                }, "",                                             logTraceTreat                             },
   { "PUT",    LogRequest,                                  3, { "log", "trace", "*"                                           }, "",                                             logTraceTreat                             },
   { "DELETE", LogRequest,                                  2, { "log", "trace"                                                }, "",                                             logTraceTreat                             },
@@ -710,10 +700,6 @@ RestService restServiceNgsi9[] =
 
 
   // log request
-  { "GET",    LogRequest,                                  2, { "log", "verbose"                                              }, "",                                             logVerboseTreat                           },
-  { "PUT",    LogRequest,                                  3, { "log", "verbose", "*"                                         }, "",                                             logVerboseTreat                           },
-  { "DELETE", LogRequest,                                  2, { "log", "verbose"                                              }, "",                                             logVerboseTreat                           },
-  { "*",      LogRequest,                                  3, { "log", "verbose", "*"                                         }, "",                                             badVerbGetPutDeleteOnly                   },
 
   // The documentation (Installation and Admin Guide) says /log/trace ...
   { "GET",    LogRequest,                                  2, { "log", "trace"                                                }, "",                                             logTraceTreat                             },
@@ -861,11 +847,6 @@ RestService restServiceNgsi9MTenant[] =
 
 
   // log request
-  { "GET",    LogRequest,                                  2, { "log", "verbose"                                              }, "",                                             logVerboseTreat                           },
-  { "PUT",    LogRequest,                                  3, { "log", "verbose", "*"                                         }, "",                                             logVerboseTreat                           },
-  { "DELETE", LogRequest,                                  2, { "log", "verbose"                                              }, "",                                             logVerboseTreat                           },
-  { "*",      LogRequest,                                  3, { "log", "verbose", "*"                                         }, "",                                             badVerbGetPutDeleteOnly                   },
-
   { "GET",    LogRequest,                                  2, { "log", "trace"                                                }, "",                                             logTraceTreat                             },
   { "PUT",    LogRequest,                                  3, { "log", "trace", "*"                                           }, "",                                             logTraceTreat                             },
   { "DELETE", LogRequest,                                  2, { "log", "trace"                                                }, "",                                             logTraceTreat                             },
@@ -1199,7 +1180,7 @@ int main(int argC, char* argV[])
   paConfig("man version",                   (void*) ORION_VERSION);
   paConfig("log to screen",                 (void*) true);
   paConfig("log to file",                   (void*) true);
-  paConfig("log file line format",          (void*) "lvl=TYPE | time=DATE T=TRANS_ID | file=FILE | lineNo=LINE | function=FUNC | msg=TEXT");
+  paConfig("log file line format",          (void*) "time=DATE | lvl=TYPE | trans=TRANS_ID | file=FILE | lineNo=LINE | function=FUNC | comp=Orion | msg=TEXT");
   paConfig("screen line format",            (void*) "TYPE@TIME  FILE[LINE]: TEXT");
   paConfig("builtin prefix",                (void*) "ORION_");
   paConfig("usage and exit on any warning", (void*) true);

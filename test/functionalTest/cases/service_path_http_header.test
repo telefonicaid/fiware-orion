@@ -62,7 +62,7 @@ echo "+++++ 5: four service paths"
 orionCurl --url /NGSI10/queryContext --payload "$payload" --servicePath '/home/kz/1, /home/kz/2, /home/kz/3, /home/kz/4'
 echo
 echo "+++++ 6: service paths from log file"
-grep servicePathSplit /tmp/contextBrokerLog | awk -F\| '{ print $8 }'
+grep servicePathSplit /tmp/contextBrokerLog | awk -F\| '{ print $9 }'
 echo
 
 echo "+++++ 7: eleven service paths"

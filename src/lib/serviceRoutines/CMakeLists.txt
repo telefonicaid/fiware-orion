@@ -24,7 +24,6 @@ SET (SOURCES
 versionTreat.cpp
 exitTreat.cpp
 leakTreat.cpp
-logVerboseTreat.cpp
 logTraceTreat.cpp
 postRegisterContext.cpp
 postDiscoverContextAvailability.cpp
@@ -86,7 +85,6 @@ deleteAttributeValueInstance.cpp
 SET (HEADERS
 versionTreat.h
 exitTreat.h
-logVerboseTreat.h
 logTraceTreat.h
 postRegisterContext.h
 postDiscoverContextAvailability.h

@@ -595,17 +595,6 @@ static int connectionTreat
         
     *con_cls = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
 
-    //
-    // Set the transaction ID
-    // To ensure a unique identifier of the transaction, the startTime down to milliseconds
-    // of the broker is used as prefix (to almost guarantee its uniqueness among brokers)
-    // Firthermore, a running number is appended for the transaction.
-    // A 32 bit signed number is used, so its max value is 0x7FFFFFFF (2,147,483,647).
-    // If the running nunber overflows, a millisecond is added to the startTime
-    //
-    // The whole thing is stored in the thread variable 'transactionId', supported by the
-    // logging library liblm.
-    //
     ++transaction;
     transactionIdSet(transaction);
 

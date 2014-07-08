@@ -122,7 +122,17 @@ extern int64_t parse8601(const std::string& s);
 
 /* ****************************************************************************
 *
-* transactionIdSet - 
+* transactionIdSet - set the transaction ID
+*
+* To ensure a unique identifier of the transaction, the startTime down to milliseconds
+* of the broker is used as prefix (to almost guarantee its uniqueness among brokers)
+* Furthermore, a running number is appended for the transaction.
+* A 32 bit signed number is used, so its max value is 0x7FFFFFFF (2,147,483,647).
+* If the running number overflows, a millisecond is added to the startTime.
+*
+* The whole thing is stored in the thread variable 'transactionId', supported by the
+* logging library 'liblm'.
+*
 */
 extern void transactionIdSet(int& transaction);
 

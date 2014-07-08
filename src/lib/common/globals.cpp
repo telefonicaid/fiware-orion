@@ -50,7 +50,17 @@ static struct timeval  logStartTime;
 
 /* ****************************************************************************
 *
-* transactionIdSet - 
+* transactionIdSet - set the transaction ID
+*
+* To ensure a unique identifier of the transaction, the startTime down to milliseconds
+* of the broker is used as prefix (to almost guarantee its uniqueness among brokers)
+* Furthermore, a running number is appended for the transaction.
+* A 32 bit signed number is used, so its max value is 0x7FFFFFFF (2,147,483,647).
+* If the running number overflows, a millisecond is added to the startTime.
+*
+* The whole thing is stored in the thread variable 'transactionId', supported by the
+* logging library 'liblm'.
+*
 */
 void transactionIdSet(int& transaction)
 {
@@ -82,16 +92,16 @@ void orionInit(OrionExitFunction exitFunction, const char* version)
   /* Set timer object (singleton) */
   setTimer(new Timer());
 
-  /* Set start time */
-  startTime      = getCurrentTime();
-  statisticsTime = startTime;
-
   // startTime for log library
   if (gettimeofday(&logStartTime, NULL) != 0)
   {
     fprintf(stderr, "gettimeofday: %s\n", strerror(errno));
     orionExitFunction(1, "gettimeofday error");
   }
+
+  /* Set start time and statisticsTime used by REST interface */
+  startTime      = logStartTime.tv_sec;
+  statisticsTime = startTime;
 
   int zero = 0;
   transactionIdSet(zero);
