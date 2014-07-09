@@ -24,25 +24,11 @@
 *
 * Author: TID Developer
 */
-#include <sys/socket.h>
-#include "cantcoap.h"
 
 class Coap
 {
-  private:
-
-    char             *host;
-    char             *coapPortStr;
-    unsigned short    httpPort;
-    unsigned short    coapPort;
-
-    int   callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom);
-    void  serve();
-
   public:
     int   run(const char *_host, unsigned short _httpPort, unsigned short _coapPort);
-
-
 };
 
 #endif // COAP_H
