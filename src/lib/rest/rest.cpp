@@ -594,7 +594,7 @@ static int connectionTreat
     // IP Address and port of caller
     //
     char            ip[32];
-    unsigned short  port;
+    unsigned short  port = 0;
 
     const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
     if (mciP != NULL)
@@ -602,7 +602,11 @@ static int connectionTreat
       port = (mciP->client_addr->sa_data[0] << 8) + mciP->client_addr->sa_data[1];
       snprintf(ip, sizeof(ip), "%d.%d.%d.%d", mciP->client_addr->sa_data[2]  & 0xFF, mciP->client_addr->sa_data[3]  & 0xFF, mciP->client_addr->sa_data[4] & 0xFF, mciP->client_addr->sa_data[5] & 0xFF);
     }
-
+    else
+    {
+      port = 0;
+      snprintf(ip, sizeof(ip), "IP unknown");
+    }
 
     //
     // Transaction

@@ -1186,6 +1186,7 @@ int main(int argC, char* argV[])
   paConfig("usage and exit on any warning", (void*) true);
 
   paParse(paArgs, argC, (char**) argV, 1, false);
+  lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
   std::string multitenant = mtenant;
   if ((multitenant != "off") && (multitenant != "header") && (multitenant != "url"))

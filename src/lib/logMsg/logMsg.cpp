@@ -573,11 +573,7 @@ static void traceFix(char* levelFormat, unsigned int way)
 */
 static char* dateGet(int index, char* line, int lineSize)
 {
-    char       line_tmp[80];
     time_t     secondsNow = time(NULL);
-    struct tm  tmP;
-
-    struct timeb timebuffer;
 
     if (strcmp(fds[index].timeFormat, "UNIX") == 0)
     {
@@ -603,17 +599,23 @@ static char* dateGet(int index, char* line, int lineSize)
         days  = tm;
 
         if (days != 0)
-            snprintf(line, lineSize, "%d days %02d:%02d:%02d",
-                 days, hours, mins, secs);
+            snprintf(line, lineSize, "%d days %02d:%02d:%02d", days, hours, mins, secs);
         else
             snprintf(line, lineSize, "%02d:%02d:%02d", hours, mins, secs);
     }
     else
     {
-        ftime(&timebuffer);
-        lm::gmtime_r(&secondsNow, &tmP);
-        strftime(line_tmp, 80, fds[index].timeFormat, &tmP);
-        snprintf(line, lineSize, "%s | ms=%.3d", line_tmp, timebuffer.millitm);
+      struct timeb timebuffer;
+      struct tm    tm;
+      char         line_tmp[80];
+      char         timeZone[20];
+
+      ftime(&timebuffer);
+      localtime_r(&secondsNow, &tm);
+      strftime(line_tmp, 80, fds[index].timeFormat, &tm);
+      strftime(timeZone, sizeof(timeZone), "%Z", &tm);
+
+      snprintf(line, lineSize, "%s.%.3d%s", line_tmp, timebuffer.millitm, timeZone);
     }
     
     return line;
@@ -1682,7 +1684,7 @@ LmStatus lmPathRegister(const char* path, const char* format, const char* timeFo
         {
             leaf_path = progName;
         }
-        snprintf(fileName, sizeof(fileName), "%s/%sLog", path, leaf_path);
+        snprintf(fileName, sizeof(fileName), "%s/%s.log", path, leaf_path);
     }
     else
     {
