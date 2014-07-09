@@ -597,7 +597,7 @@ static int connectionTreat
 
     ++transaction;
     transactionIdSet(transaction);
-
+    LM_I(("Starting transaction from %s:%d", "IP", 1010));
 
     //
     // URI parameters

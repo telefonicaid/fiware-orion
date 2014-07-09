@@ -395,6 +395,26 @@ do {                                                                      \
 #endif
 
 
+#ifdef LM_NO_I
+#define LM_I(s)
+#else
+/* ****************************************************************************
+*
+* LM_I - log message
+*/
+#define LM_I(s)                                                           \
+do {                                                                      \
+  char* text;                                                             \
+                                                                          \
+  if ((!lmSilent) && (text = lmTextGet s) != NULL)                        \
+  {                                                                       \
+    lmOut(text, 'I', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
+    ::free(text);                                                         \
+  }                                                                       \
+} while (0)
+#endif
+
+
 #ifdef LM_NO_H
 #define LM_H(s)
 #else
