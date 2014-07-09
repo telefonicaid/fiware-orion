@@ -187,7 +187,7 @@ curl localhost:${BROKER_PORT}/ngsi10/queryContext -s -S --header "Content-Type: 
 echo '4: +++++++++++++++++++++++++++++++++++++'
 curl localhost:${BROKER_PORT}/ngsi10/subscribeContext -s -S --header "Content-Type: application/xml" -d "$scr"
 echo '5: +++++++++++++++++++++++++++++++++++++'
-grep 'Got a circleRadius' /tmp/contextBroker.log | awk -F\| '{ print $9 }'
+grep 'Got a circleRadius' /tmp/contextBroker.log | awk -F\| '{ print $8 }'
 echo '6: +++++++++++++++++++++++++++++++++++++'
 
 --REGEXPECT--
