@@ -736,6 +736,35 @@ do                                                \
 
 /* ****************************************************************************
 *
+* longTypeName - 
+*/
+const char* longTypeName(char type)
+{
+  switch (type)
+  {
+  case 'W':  return "WARNING";
+  case 'E':  return "ERROR";
+  case 'P':  return "ERROR";
+  case 'X':  return "FATAL";
+  case 'T':  return "DEBUG";
+  case 'D':  return "DEBUG";
+  case 'V':  return "DEBUG";
+  case '2':  return "DEBUG";
+  case '3':  return "DEBUG";
+  case '4':  return "DEBUG";
+  case '5':  return "DEBUG";
+  case 'I':  return "INFO";
+  case 'M':  return "INFO";
+  case 'F':  return "INFO";
+  }
+
+  return "N/A";
+}
+
+
+
+/* ****************************************************************************
+*
 * lmLineFix - 
 */
 static char* lmLineFix
@@ -765,7 +794,7 @@ static char* lmLineFix
 
         tid = syscall(SYS_gettid);
         if (strncmp(&format[fi], "TYPE", 4) == 0)
-            CHAR_ADD((type == 'P')? 'E' : type, 4);
+            STRING_ADD(longTypeName(type), 4);
         else if (strncmp(&format[fi], "PID", 3) == 0)
             INT_ADD((int) getpid(), 3);
         else if (strncmp(&format[fi], "DATE", 4) == 0)

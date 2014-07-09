@@ -590,15 +590,37 @@ static int connectionTreat
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (ciP == NULL)
   {
-    if ((ciP = new ConnectionInfo(url, method, version, connection)) == NULL)
-      LM_RE(MHD_NO, ("Error allocating ConnectionInfo"));
-        
-    *con_cls = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
+    //
+    // IP Address and port of caller
+    //
+    char            ip[32];
+    unsigned short  port;
 
+    const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
+    if (mciP != NULL)
+    {
+      port = (mciP->client_addr->sa_data[0] << 8) + mciP->client_addr->sa_data[1];
+      snprintf(ip, sizeof(ip), "%d.%d.%d.%d", mciP->client_addr->sa_data[2]  & 0xFF, mciP->client_addr->sa_data[3]  & 0xFF, mciP->client_addr->sa_data[4] & 0xFF, mciP->client_addr->sa_data[5] & 0xFF);
+    }
+
+
+    //
+    // Transaction
+    //
     ++transaction;
     transactionIdSet(transaction);
-    LM_I(("Starting transaction from %s:%d", "IP", 1010));
+    LM_I(("Starting transaction from %s:%d", ip, port));
 
+
+    //
+    // ConnectionInfo
+    //
+    if ((ciP = new ConnectionInfo(url, method, version, connection)) == NULL)
+      LM_RE(MHD_NO, ("Error allocating ConnectionInfo"));
+    *con_cls = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
+    ciP->port = port;
+    ciP->ip   = ip;
+    
     //
     // URI parameters
     // 
@@ -712,6 +734,9 @@ static int connectionTreat
     restReply(ciP, ciP->answer);
   else
     serveFunction(ciP);
+
+  LM_I(("Transaction ended (%s:%d)", ciP->ip.c_str(), ciP->port));
+  strncpy(transactionId, "N/A", sizeof(transactionId));
 
   return MHD_YES;
 }

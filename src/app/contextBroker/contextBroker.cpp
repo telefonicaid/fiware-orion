@@ -1140,7 +1140,7 @@ static void rushParse(char* rush, std::string* rushHostP, unsigned short* rushPo
 */
 int main(int argC, char* argV[])
 {
-  strncpy(transactionId, "unset", sizeof(transactionId));
+  strncpy(transactionId, "N/A", sizeof(transactionId));
 
   unsigned short rushPort = 0;
   std::string    rushHost = "";
