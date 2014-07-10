@@ -41,14 +41,16 @@ db.collection.getIndexes()                    -- return index existent
 
 6- launch jmeter scripts file in Launcher VM without/with indexes
 ```
-./jmeter.sh -n -t  <script>.jmx  -JHOST=X.X.X.X -JTHREADS=100 -JRAMPUP=10 -JMAXAPPENDS=10000 -JRUNTIME=180 >> /<log_path>/jmeter_report_YYYYMMDD.log
-
+./jmeter.sh -n -t  <script>.jmx  -JHOST=X.X.X.X -JTHREADS=100 -JRAMPUP=10 -JMAXAPPENDS=10000  \
+-JRUNTIME=180 >> /<log_path>/jmeter_report_YYYYMMDD.log
 ```
 7- Generate report with summary of tests groups
-8- upload data in Loadosophia
-9- fill the report in Google doc
 
-#### Datasets:
+8- upload data in Loadosophia
+
+9- Collect results
+
+#### Scenarios:
 
 * without indexes and only queries with DB dropped and populated
 * with _id.id index only and only queries with DB dropped and populated
