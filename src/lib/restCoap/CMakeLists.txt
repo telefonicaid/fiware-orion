@@ -24,12 +24,14 @@ SET (SOURCES
     coap.cpp
     HttpProxy.cpp
     HttpMessage.cpp
+    CoapController.cpp
 )
 
 SET (HEADERS
     coap.h
     HttpProxy.h
     HttpMessage.h
+    CoapController.h
 )
 
 
