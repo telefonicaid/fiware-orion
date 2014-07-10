@@ -104,8 +104,7 @@ void orionInit(OrionExitFunction exitFunction, const char* version)
   startTime      = logStartTime.tv_sec;
   statisticsTime = startTime;
 
-  int zero = 0;
-  transactionIdSet(zero);
+  strncpy(transactionId, "N/A", sizeof(transactionId));
 }
 
 

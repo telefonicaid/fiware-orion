@@ -20,7 +20,7 @@
 
 #
 # FIXME - Capture Ctrl-C and send an /exit/harakiri to the broker
-# FIXME - Get a log line in /tmp/contextBrokerLog to assure an operation went well ("OK").
+# FIXME - Get a log line in /tmp/contextBroker.log to assure an operation went well ("OK").
 #         See logCheck for this. The calls to logCheck is commented until this is resolved.
 #
 #
@@ -180,9 +180,9 @@ function logCheck()
   noOf=$1
   pattern=$2
 
-  lines=$(grep "$pattern" /tmp/contextBrokerLog | wc -l)
+  lines=$(grep "$pattern" /tmp/contextBroker.log | wc -l)
 
-  # echo checking we have $noOf lines of \' $pattern \' in /tmp/contextBrokerLog
+  # echo checking we have $noOf lines of \' $pattern \' in /tmp/contextBroker.log
   if [ "$lines" != "$noOf" ]
   then
     echo " (ERROR)"
@@ -260,7 +260,7 @@ then
 
   vMsg starting contextBroker
   contextBroker -t255 > /tmp/superTestLog 2>&1
-  echo "contextBroker started - log file in /tmp/contextBrokerLog"
+  echo "contextBroker started - log file in /tmp/contextBroker.log"
   sleep 1
 else
   vMsg using external accumulator
@@ -370,8 +370,8 @@ function partTest()
     return
   fi
 
-  initialMatches=$(grep "Treating service $logPattern" /tmp/contextBrokerLog | wc -l)
-  okInitialMatches=$(grep "$okPattern" /tmp/contextBrokerLog | wc -l)
+  initialMatches=$(grep "Treating service $logPattern" /tmp/contextBroker.log | wc -l)
+  okInitialMatches=$(grep "$okPattern" /tmp/contextBroker.log | wc -l)
 
   echo -n $(date +%k:%M:%S) " - loop "${loop}" of "${loops}" - making $noOf $concept"
   repeat $noOf $op $file >> /tmp/superTestLog
