@@ -750,7 +750,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     else
     {
       LM_V(("Starting HTTP daemon on IPv4 %s port %d", bindIp, port));
-      mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION  | MHD_USE_DEBUG, // MHD_USE_SELECT_INTERNALLY
+      mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY
                                    htons(port),
                                    NULL,
                                    NULL,
@@ -760,7 +760,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_END);
 
-      //LM_V(("Starting CoAP daemon on IPv4 %s port %d", bindIp, port));
+      LM_T(LmtCoap, ("Starting CoAP daemon on IPv4 %s port %d", bindIp, port));
 
       // IANA has assigned the port number 5683 and the service name "coap" [RFC6335].
       coapDaemon->run(bindIp, port, 5683);

@@ -79,16 +79,14 @@ int Coap::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFr
 
     if (sent < 0)
     {
-      //LM_V(("Error sending packet: %ld.",sent));
-      perror(NULL);
+      LM_T(LmtCoap, ("Error sending packet: %ld.",sent));
       return 1;
     }
     else
     {
-      //LM_V(("Sent: %ld",sent));
+      LM_T(LmtCoap, ("Sent: %ld.",sent));
     }
-
-    return 1;
+    return 0;
   }
 
   boost::scoped_ptr<HttpMessage> hm(new HttpMessage(httpResponse));
