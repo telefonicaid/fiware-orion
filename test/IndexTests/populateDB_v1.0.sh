@@ -42,7 +42,7 @@ STEP=$4
 
 for (( COUNTER=0; COUNTER<=$MAX_ELEMENT; COUNTER+=$STEP)); do
 
-echo curl $ENDPOINT/NGSI10/updateContext --header 'Content-Type: application/xml' --header 'Fiware-Service: indexTest' -d '<?xml version="1.0" encoding="UTF-8"?><updateContextRequest><contextElementList><contextElement><entityId type="Room" isPattern="false"> <id>Room1_'$COUNTER'</id> </entityId><contextAttributeList> <contextAttribute><name>temperature</name><type>centigrade</type> <contextValue>'$RANDOM'</contextValue></contextAttribute><contextAttribute><name>pressure</name><type>mmHg</type> <contextValue>'$RANDOM'</contextValue></contextAttribute></contextAttributeList></contextElement></contextElementList><updateAction>APPEND</updateAction></updateContextRequest>'
+curl $ENDPOINT/NGSI10/updateContext --header 'Content-Type: application/xml' --header 'Fiware-Service: indexTest' -d '<?xml version="1.0" encoding="UTF-8"?><updateContextRequest><contextElementList><contextElement><entityId type="Room" isPattern="false"> <id>Room1_'$COUNTER'</id> </entityId><contextAttributeList> <contextAttribute><name>temperature</name><type>centigrade</type> <contextValue>'$RANDOM'</contextValue></contextAttribute><contextAttribute><name>pressure</name><type>mmHg</type> <contextValue>'$RANDOM'</contextValue></contextAttribute></contextAttributeList></contextElement></contextElementList><updateAction>APPEND</updateAction></updateContextRequest>'
 
 done
 echo
