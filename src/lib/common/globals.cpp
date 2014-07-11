@@ -160,7 +160,7 @@ int getCurrentTime(void)
 {
   if (getTimer() == NULL)
   {
-    LM_E(("getTimer() == NULL - calling exit function for library user"));
+    LM_T(LmtError, ("getTimer() == NULL - calling exit function for library user"));
     orionExitFunction(1, "getTimer() == NULL");
     return -1;
   }
@@ -198,7 +198,7 @@ int64_t toSeconds(int value, char what, bool dayPart)
   }
 
   if (result == -1)
-    LM_E(("ERROR in duration string!"));
+    LM_W(("Bad Input (ERROR in duration string)"));
 
   return result;
 }

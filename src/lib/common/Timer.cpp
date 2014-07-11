@@ -37,7 +37,7 @@ Timer::~Timer(void)
   // FIXME: This destructor is needed to avoid warning message.
   // Compilation fails when a warning occurs, and it is enabled
   // compilation option -Werror "warnings being treated as errors"
-  LM_W(("not implemented Timer destructor"));
+  LM_T(LmtNotImplemented, ("not implemented Timer destructor"));
 }
 
 /* ****************************************************************************

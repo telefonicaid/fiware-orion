@@ -105,7 +105,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
       }
 
       if (tryNo == 0)
-        LM_W(("Cannot connect to mongo - doing %d retries with a %d microsecond interval", retries, RECONNECT_DELAY));
+        LM_E(("Database Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
       else
         LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
 
@@ -450,7 +450,7 @@ bool includedEntity(EntityId en, EntityIdVector* entityIdV) {
         if (isTrue(en2->isPattern)) {
             regex_t regex;
             if (regcomp(&regex, en2->id.c_str(), 0) != 0) {
-                LM_E(("error compiling regex: '%s'", en2->id.c_str()));
+                LM_W(("Bad Input (error compiling regex: '%s')", en2->id.c_str()));
                 continue;
             }
             if (regexec(&regex, en.id.c_str(), 0, NULL, 0) == 0) {
@@ -679,11 +679,12 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
             geoScopes++;
         }
 
-        if (geoScopes == 1) {
-
-            if (!mongoLocationCapable()) {
-                LM_W(("location scope was found but your MongoDB version doesn't support it. Please upgrade MongoDB server to 2.4 or newer"));
-                return false;
+        if (geoScopes == 1)
+        {
+            if (!mongoLocationCapable())
+            {
+              LM_W(("Bad Input (location scope was found but your MongoDB version doesn't support it. Please upgrade MongoDB server to 2.4 or newer)"));
+              return false;
             }
 
             // FIXME P2: current version only support one geolocation scope. If the client includes several ones,
@@ -731,7 +732,7 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
     }
 
     if (geoScopes > 1) {
-        LM_W(("current version supports only one area scope: %d were found, the first one was used", geoScopes));
+        LM_W(("Bad Input (current version supports only one area scope: %d were found, the first one is used)", geoScopes));
     }
     return (geoScopes > 0);
 
@@ -926,9 +927,10 @@ bool entitiesQuery
                     caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);
                     compoundVectorResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
                 }
-                else {
-                    LM_E(("unknown BSON type"));
-                    continue;
+                else
+                {
+                  LM_T(LmtError, ("unknown BSON type"));
+                  continue;
                 }
 
                 /* Setting ID (if found) */

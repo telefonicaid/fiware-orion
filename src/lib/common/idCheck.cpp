@@ -52,7 +52,7 @@ std::string idCheck(const std::string& s)
     {}
     else
     {
-      LM_E(("invalid char: %c", *cP));
+      LM_W(("Bad Input (invalid char '%c' in ID string)", *cP));
       return "invalid char in ID string";
     }
 

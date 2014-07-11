@@ -215,7 +215,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 
 
   if ((strcasecmp(key.c_str(), "connection") == 0) && (headerP->connection != "") && (headerP->connection != "close"))
-     LM_W(("connection '%s' - currently not supported, sorry ...", headerP->connection.c_str()));
+    LM_T(LmtRest, ("connection '%s' - currently not supported, sorry ...", headerP->connection.c_str()));
 
   /* Note that the strategy to "fix" the Content-Type is to replace the ";" with 0
    * to "deactivate" this part of the string in the checking done at connectionTreat() */
@@ -331,7 +331,8 @@ static Format wantedOutputSupported(const std::string& acceptList, std::string* 
   else if (json == true)
     return JSON;
 
-  LM_RE(NOFORMAT, ("No valid 'Accept-format' found"));
+  LM_W(("Bad Input (no valid 'Accept-format' found)"));
+  return NOFORMAT;
 }
 
 
@@ -636,7 +637,7 @@ static int connectionTreat
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
     if (ciP->httpStatusCode != SccOk)
     {
-      LM_W(("Error in URI parameters"));
+      LM_W(("Bad Input (error in URI parameters)"));
       restReply(ciP, ciP->answer);
       return MHD_YES;
     }
@@ -653,18 +654,18 @@ static int connectionTreat
     ciP->servicePath = ciP->httpHeaders.servicePath;
     if (servicePathSplit(ciP) != 0)
     {
-      LM_W(("Error in ServicerPath header"));
+      LM_W(("Bad Input (error in ServicePath http-header)"));
       restReply(ciP, ciP->answer);
     }
 
     if (contentTypeCheck(ciP) != 0)
     {
-      LM_W(("Error in Content-Type"));
+      LM_W(("Bad Input (invalid mime-type in Content-Type http-header)"));
       restReply(ciP, ciP->answer);
     }
     else if (outFormatCheck(ciP) != 0)
     {
-      LM_W(("Bad Accepted Out-Format (in Accept header)"));
+      LM_W(("Bad Input (invalid mime-type in Accept http-header)"));
       restReply(ciP, ciP->answer);
     }
     else
@@ -796,7 +797,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
     if (mhdDaemon == NULL)
     {
-      LM_E(("MHD_start_daemon failed"));
+      LM_E(("Unable to start http services in port %d", port));
       return 3;
     }
   }  

@@ -310,7 +310,7 @@ static std::string circleInverted(const std::string& path, const std::string& va
 
   if (!isTrue(value) && !isFalse(value))
   {
-    LM_E(("bad string for circle/inverted: '%s'", value.c_str()));
+    LM_W(("Bad Input (invalid string for circle/inverted: '%s')", value.c_str()));
     parseDataP->errorString = "bad string for circle/inverted: '" + value + "'";
     return parseDataP->errorString;
   }

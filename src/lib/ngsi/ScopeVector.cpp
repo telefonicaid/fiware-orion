@@ -68,7 +68,7 @@ std::string ScopeVector::check(RequestType requestType, Format format, const std
 
     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
     {
-      LM_E(("error for scope %d: %s", ix, res.c_str()));
+      LM_W(("Bad Input (error in scope %d: %s)", ix, res.c_str()));
       return res;
     }
   }

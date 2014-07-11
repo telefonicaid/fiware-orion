@@ -103,7 +103,7 @@ std::string RegisterProviderRequest::check(RequestType requestType, Format forma
    else
       return "OK";
 
-   LM_W(("RegisterProviderRequest Error"));
+   LM_W(("Bad Input (RegisterProviderRequest Error: %s)", res.c_str()));
    return response.render(DiscoverContextAvailability, format, indent);
 }
 

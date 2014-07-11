@@ -76,25 +76,24 @@ std::string RegisterContextRequest::check(RequestType requestType, Format format
 
   if (predetectedError != "")
   {
-    LM_E(("predetectedError not empty"));
+    LM_T(LmtError, ("predetectedError not empty"));
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
   else if (contextRegistrationVector.size() == 0)
   {
-    LM_E(("contextRegistrationVector.size() == 0"));
+    LM_T(LmtError, ("contextRegistrationVector.size() == 0"));
     response.errorCode.fill(SccBadRequest, "Empty Context Registration List");
   }
   else if (((res = contextRegistrationVector.check(RegisterContext, format, indent, predetectedError, counter)) != "OK") ||
            ((res = duration.check(RegisterContext, format, indent, predetectedError, counter))                  != "OK") ||
            ((res = registrationId.check(RegisterContext, format, indent, predetectedError, counter))            != "OK"))
   {
-    LM_E(("Some check method failed: %s", res.c_str()));
+    LM_W(("Bad Input (check failed: %s)", res.c_str()));
     response.errorCode.fill(SccBadRequest, res);
   }
   else
     return "OK";
 
-  LM_E(("Not OK - returning rendered error result"));     
   return response.render(RegisterContext, format, indent);
 }
 

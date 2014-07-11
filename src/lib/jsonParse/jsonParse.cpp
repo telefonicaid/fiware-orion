@@ -296,7 +296,7 @@ static std::string jsonParse
     ciP->httpStatusCode = SccBadRequest;
     if (ciP->answer == "")
       ciP->answer = std::string("JSON Parse Error (unknown field: '") + path.c_str() + "')";
-    LM_E(("ERROR: '%s'", ciP->answer.c_str()));
+    LM_W(("Bad Input (%s)", ciP->answer.c_str()));
     return ciP->answer;
   }
 
@@ -336,7 +336,7 @@ std::string jsonParse(ConnectionInfo* ciP, const char* content, const std::strin
     std::string res = jsonParse(ciP, v, path, parseVector, parseDataP);
     if (res != "OK")
     {
-      LM_W(("Parse error: '%s'", res.c_str()));
+      LM_W(("Bad Input (JSON Parse error: '%s')", res.c_str()));
       return res;
     }
   }
