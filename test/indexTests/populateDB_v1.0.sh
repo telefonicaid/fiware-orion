@@ -29,24 +29,48 @@
 ###########################################
 
 if [ -z "$4" ]; then    
-    echo "It is necesary to define url, tenant, maximum element and step"
-	echo "  usage:  populateDB_v1.0.sh <http://hostname:port> <tenant> <1000000> <10>"
+    echo "It is necesary to define url, tenant, elements_number and step"
+	echo "  usage:  populateDB_v1.0.sh <http://hostname:port> <tenant> <100000> <10>"
 	exit
 fi
 
-
 ENDPOINT=$1
 TENANT=$2
-MAX_ELEMENT=$3
+ELEMENTS_NUMBER=$3
 STEP=$4
+MAX_ELEMENT=$(expr $ELEMENTS_NUMBER \* $STEP )
 
 for (( COUNTER=0; COUNTER<=$MAX_ELEMENT; COUNTER+=$STEP)); do
-
-curl $ENDPOINT/NGSI10/updateContext --header 'Content-Type: application/xml' --header 'Fiware-Service: indexTest' -d '<?xml version="1.0" encoding="UTF-8"?><updateContextRequest><contextElementList><contextElement><entityId type="Room" isPattern="false"> <id>Room1_'$COUNTER'</id> </entityId><contextAttributeList> <contextAttribute><name>temperature</name><type>centigrade</type> <contextValue>'$RANDOM'</contextValue></contextAttribute><contextAttribute><name>pressure</name><type>mmHg</type> <contextValue>'$RANDOM'</contextValue></contextAttribute></contextAttributeList></contextElement></contextElementList><updateAction>APPEND</updateAction></updateContextRequest>'
-
+(curl $ENDPOINT/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' --header 'Fiware-Service: indexTest' -d @- | xmllint --format - ) <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+    <updateContextRequest>
+        <contextElementList>
+            <contextElement>
+                <entityId type="Room" isPattern="false">
+                    <id>Room1_$COUNTER</id> 
+                </entityId>
+                <contextAttributeList>
+                    <contextAttribute>
+                        <name>temperature</name>
+                        <type>centigrade</type>
+                        <contextValue>$RANDOM</contextValue>
+                    </contextAttribute>
+                    <contextAttribute>
+                        <name>pressure</name>
+                        <type>mmHg</type>
+                        <contextValue>$RANDOM</contextValue>
+                    </contextAttribute>
+                </contextAttributeList>
+            </contextElement>
+        </contextElementList>
+        <updateAction>APPEND</updateAction>
+    </updateContextRequest>
+EOF
 done
+
 echo
 echo "--------------------------------------------------------------------------------------------------------------"
-echo "Finished populate DB in: "$ENDPOINT" and tenant: "$TENANT" -- ("$MAX_ELEMENT" elements with step of "$STEP")."
+echo "Database populate finished in: "$ENDPOINT" and tenant: "$TENANT
+echo "-- elements number ( "$ELEMENTS_NUMBER" ) with step ( "$STEP" ) = maximum element (" $MAX_ELEMENT ") --"
 echo "--------------------------------------------------------------------------------------------------------------"
-echo
+echo 
