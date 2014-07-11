@@ -1424,26 +1424,32 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
     DBClientConnection* connection = getMongoConnection();
 
     /* Update the document */
-    try {
-        BSONObj query = BSON("_id" << OID(subId));
-        BSONObj update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CASUB_COUNT << 1));
-        LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextAvailabilityCollectionName(tenant).c_str(),
-                        query.toString().c_str(),
-                        update.toString().c_str()));
+    BSONObj query = BSON("_id" << OID(subId));
+    BSONObj update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CASUB_COUNT << 1));
+    LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextAvailabilityCollectionName(tenant).c_str(),
+                    query.toString().c_str(),
+                    update.toString().c_str()));
 
-        mongoSemTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
+    mongoSemTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
+
+    try
+    {
         connection->update(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), query, update);
         mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
     }
-    catch( const DBException &e ) {
+    catch (const DBException &e)
+    {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo db exception)");
         *err = e.what();
-        LM_RE(SccOk, ("Database error '%s'", err->c_str()));
+        LM_E(("Database Error ('update[%s:%s] in %s', '%s')", query.toString().c_str(), update.toString().c_str(), getSubscribeContextAvailabilityCollectionName(tenant).c_str(), e.what));
+        return SccOk;
     }
-    catch(...) {
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo generic exception)");
         *err = "Database error - exception thrown";
-        LM_RE(SccOk, ("Database error - exception thrown"));
+        LM_E(("Database Error ('update[%s:%s] in %s', '%s')", query.toString().c_str(), update.toString().c_str(), getSubscribeContextAvailabilityCollectionName(tenant).c_str(), "generic exception"));
+        return SccOk;
     }
 
     return SccOk;

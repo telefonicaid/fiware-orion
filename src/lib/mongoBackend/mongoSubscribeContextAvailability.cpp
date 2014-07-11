@@ -109,7 +109,8 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
                                   std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                   " - insert(): " + subDoc.toString() +
                                   " - exception: " + e.what());
-        LM_RE(SccOk, ("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
+        LM_E(("Database Error (%s)", responseP->errorCode.reasonPhrase.c_str()));
+        return SccOk;
     }
     catch(...) {
         mongoSemGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (mongo generic exception)");
@@ -118,7 +119,8 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
                                   std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                   " - insert(): " + subDoc.toString() +
                                   " - exception: " + "generic");
-        LM_RE(SccOk, ("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
+        LM_E(("Database Error (%s)", responseP->errorCode.reasonPhrase.c_str()));
+        return SccOk;
     }
 
     /* Send notifications for matching context registrations */

@@ -89,7 +89,7 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
         }
         else
         {
-          LM_T(LmtError, ("Unknown type in compound value"));
+          LM_T(LmtMongo, ("Unknown type in compound value"));
         }
     }
 
@@ -119,7 +119,7 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
         }
         else
         {
-          LM_T(LmtError, ("Unknown type in compound value"));
+          LM_T(LmtMongo, ("Unknown type in compound value"));
         }
     }
 }
@@ -151,7 +151,7 @@ static void valueBson(ContextAttribute* ca, BSONObjBuilder& bsonAttr) {
         }
         else
         {
-          LM_T(LmtError, ("Unknown type in compound value"));
+          LM_T(LmtMongo, ("Unknown type in compound value"));
         }
     }
 
@@ -408,7 +408,7 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
             }
             else
             {
-              LM_T(LmtError, ("unknown BSON type"));
+              LM_T(LmtMongo, ("unknown BSON type"));
             }
 
         }
@@ -1290,9 +1290,11 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
     }
 
     BSONObj insertedDoc = insertedDocB.obj();
-    try {
-        LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), insertedDoc.toString().c_str()));
-        mongoSemTake(__FUNCTION__, "insert into EntitiesCollection");
+    LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), insertedDoc.toString().c_str()));
+    mongoSemTake(__FUNCTION__, "insert into EntitiesCollection");
+
+    try
+    {
         connection->insert(getEntitiesCollectionName(tenant).c_str(), insertedDoc);
         mongoSemGive(__FUNCTION__, "insert into EntitiesCollection");
     }
@@ -1302,6 +1304,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
                 " - insert(): " + insertedDoc.toString() +
                 " - exception: " + e.what();
 
+        LM_E(("Database Error (%s)", errDetail->c_str()));
         return false;
     }
     catch(...) {
@@ -1310,6 +1313,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
                 " - insert(): " + insertedDoc.toString() +
                 " - exception: " + "generic";
 
+        LM_E(("Database Error (%s)", errDetail->c_str()));
         return false;
     }
 

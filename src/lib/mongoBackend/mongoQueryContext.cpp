@@ -60,7 +60,7 @@ HttpStatusCode mongoQueryContext
     /* FIXME: restriction not supported for the moment */
     if (!requestP->restriction.attributeExpression.isEmpty())
     {
-      LM_T(LmtMongo, ("Restriction found but not supported at mongo backend"));
+      LM_W(("Bad Input (restriction found, but restrictions are not supported by mongo backend)"));
     }
 
     std::string err;

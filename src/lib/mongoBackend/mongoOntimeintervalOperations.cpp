@@ -55,17 +55,21 @@ HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, Context
         sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(subId)));
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
     }
-    catch( const DBException &e ) {
+    catch (const DBException &e)
+    {
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo db exception)");
         reqSemGive(__FUNCTION__, "get info on subscriptions (mongo db exception)");
         *err = e.what();
-        LM_RE(SccOk, ("Database error '%s'", err->c_str()));
+        LM_E(("Database Error ('findOne id=%s, coll=%s', '%s')", subId.c_str(), getSubscribeContextCollectionName(tenant).c_str(), e.what()));
+        return SccOk;
     }
-    catch(...) {
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo generic exception)");
         reqSemGive(__FUNCTION__, "get info on subscriptions (mongo generic exception)");
         *err = "Database error: received generic exception";
-        LM_RE(SccOk, ("Database error '%s'", "received generic exception"));
+        LM_E(("Database Error ('indOne id=%s, coll=%s', '%s')", subId.c_str(), getSubscribeContextCollectionName(tenant).c_str(), "generic exception"));
+        return SccOk;
     }
 
     LM_T(LmtMongo, ("retrieved subscription: %s", sub.toString().c_str()));
@@ -170,13 +174,13 @@ HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::str
     {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
         *err = e.what();
-        LM_W(("Database Error ('%s', '%s')", query.toString().c_str(), err->c_str()));
+        LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), err->c_str()));
     }
     catch (...)
     {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
         *err = "Generic Exception";
-        LM_W(("Database Error ('%s', '%s')", query.toString().c_str(), "Generic Exception"));
+        LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), "Generic Exception"));
     }
 
     reqSemGive(__FUNCTION__, "update subscription notifications");

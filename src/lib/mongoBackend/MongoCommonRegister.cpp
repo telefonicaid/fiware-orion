@@ -98,12 +98,14 @@ static bool processAssociations(MetadataVector mdV, std::string* err, std::strin
         catch( const DBException &e ) {
             mongoSemGive(__FUNCTION__, "insert into AssociationsCollection (mongo db exception)");
             *err = e.what();
-            LM_RE(false,("Database error '%s'", err->c_str()));
+            LM_E(("Database Error ('insert \"%s\" in %s', '%s')", doc.toString().c_str(), getAssociationsCollectionName(tenant).c_str(), e.what()));
+            return false;
         }
         catch(...) {
             mongoSemGive(__FUNCTION__, "insert into AssociationsCollection (mongo generic exception)");
             *err = "Generic Exception from mongo";
-            LM_RE(false, ("Database error: '%s'", err->c_str()));
+            LM_E(("Database Error ('insert \"%s\" in %s', '%s')", doc.toString().c_str(), getAssociationsCollectionName(tenant).c_str(), "generic error"));
+            return false;
         }
     }
     return true;
@@ -140,7 +142,8 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
         {
            mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection (mongo generic exception)");
            *err = "Generic Exception from mongo";
-           LM_RE(false, ("Database error: '%s'", err->c_str()));
+           LM_E(("Database Error ('findOne id=%s in %s', '%s')", mapSubId.c_str(), getSubscribeContextAvailabilityCollectionName(tenant).c_str(), "generic error"));
+           return false;
         }
 
         LM_T(LmtMongo, ("retrieved document: '%s'", sub.toString().c_str()));
@@ -154,8 +157,10 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
         Format format = sub.hasField(CASUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CASUB_FORMAT)) : XML;
 
         /* Send notification */
-        if (!processAvailabilitySubscription(triggerEntitiesV, attrL, subId.str(), STR_FIELD(sub, CSUB_REFERENCE), format, tenant)) {
-            ret = false;
+        if (!processAvailabilitySubscription(triggerEntitiesV, attrL, subId.str(), STR_FIELD(sub, CSUB_REFERENCE), format, tenant))
+        {
+          LM_T(LmtMongo, ("Notification failure"));
+          ret = false;
         }
 
         /* Release object created dynamically (including the value in the map created by
@@ -409,13 +414,16 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
         LM_T(LmtMongo, ("providingApplication registration: %s", requestP->contextRegistrationVector.get(ix)->providingApplication.c_str()));
 
         std::string err;
-        if (!processAssociations(cr->registrationMetadataVector, &err, tenant)) {
+        if (!processAssociations(cr->registrationMetadataVector, &err, tenant))
+        {
             responseP->errorCode.fill(SccReceiverInternalError);
-            LM_RE(SccOk, (err.c_str()));
+            LM_RE(SccOk, ("processAssociations: %s", err.c_str()));
         }
-        if (!addTriggeredSubscriptions(*cr, &subsToNotify, &err, tenant)) {
+
+        if (!addTriggeredSubscriptions(*cr, &subsToNotify, &err, tenant))
+        {
             responseP->errorCode.fill(SccReceiverInternalError, err);
-            LM_RE(SccOk, (err.c_str()));
+            LM_RE(SccOk, ("addTriggeredSubscriptions: %s", err.c_str()));
         }
 
     }
@@ -438,16 +446,19 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
                                   " - upsert update(): " + regDoc.toString() +
                                   " - exception: " + e.what());
 
-        LM_RE(SccOk,("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
+        LM_E(("Database Error (%s)", responseP->errorCode.reasonPhrase.c_str()));
+        return SccOk;
     }
-    catch(...) {
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (Generic Exception)");
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
                                   " - upsert update(): " + regDoc.toString() +
                                   " - exception: " + "generic");
 
-        LM_RE(SccOk,("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
+        LM_E(("Database Error (%s)", responseP->errorCode.reasonPhrase.c_str()));
+        return SccOk;
     }
 
     /* Send notifications for each one of the subscriptions accumulated by

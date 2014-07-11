@@ -987,7 +987,7 @@ void orionExit(int code, const std::string& reason)
 void exitFunc(void)
 {
   if (unlink(pidPath) != 0)
-    LM_T(LmtError, ("unlink(%s): %s", pidPath, strerror(errno)));
+    LM_T(LmtError, ("error removing PID file '%s': %s", pidPath, strerror(errno)));
 }
 
 const char* description =

@@ -81,13 +81,13 @@ int socketHttpConnect(const std::string& host, unsigned short port)
 
   if (getaddrinfo(host.c_str(), port_str, &hints, &peer) != 0)
   {
-    LM_E(("Notification fail to %s:%d (getaddrinfo: %s)", host.c_str(), port, strerror(errno)));
+    LM_E(("Notification failure for %s:%d (getaddrinfo: %s)", host.c_str(), port, strerror(errno)));
     return -1;
   }
 
   if ((fd = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol)) == -1)
   {
-    LM_E(("Notification fail to %s:%d (socket: %s)", host.c_str(), port, strerror(errno)));
+    LM_E(("Notification failure for %s:%d (socket: %s)", host.c_str(), port, strerror(errno)));
     return -1;
   }
 
@@ -95,7 +95,7 @@ int socketHttpConnect(const std::string& host, unsigned short port)
   {
     freeaddrinfo(peer);
     close(fd);
-    LM_E(("Notification fail to %s:%d (connect: %s)", host.c_str(), port, strerror(errno)));
+    LM_E(("Notification failure for %s:%d (connect: %s)", host.c_str(), port, strerror(errno)));
     return -1;
   }
 
@@ -272,12 +272,12 @@ std::string sendHttpSocket
 
   if (nb == -1)
   {
-    LM_E(("Notification fail to %s:%d (send: %s)", _ip.c_str(), port, strerror(errno)));
+    LM_E(("Notification failure for %s:%d (send: %s)", _ip.c_str(), port, strerror(errno)));
     return "error";
   }
   else if (nb != sz)
   {
-    LM_E(("Notification fail to %s:%d (not entire message sent)", _ip.c_str(), port));
+    LM_E(("Notification failure for %s:%d (not entire message sent)", _ip.c_str(), port));
     return "error";
   }
 

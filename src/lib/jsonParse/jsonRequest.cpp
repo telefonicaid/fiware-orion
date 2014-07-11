@@ -164,13 +164,13 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
   catch (std::exception &e)
   {
     std::string errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, std::string("JSON Parse Error: ") + e.what());
-    LM_W(("Bad Input (%s)", errorReply.c_str()));
+    LM_W(("Bad Input (JSON Parse Error: %s)", e.what()));
     return errorReply;
   }
   catch (...)
   {
     std::string errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, std::string("JSON Generic Error"));
-    LM_W(("Bad Input (%s)", errorReply.c_str()));
+    LM_W(("Bad Input (JSON parse generic error)"));
     return errorReply;
   }
 
