@@ -797,7 +797,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
     if (mhdDaemon == NULL)
     {
-      LM_E(("Unable to start http services in port %d", port));
+      LM_E(("Fatal error - unable to start http services in port %d", port));
       return 3;
     }
   }  

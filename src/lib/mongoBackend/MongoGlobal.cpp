@@ -1441,7 +1441,7 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
     {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo db exception)");
         *err = e.what();
-        LM_E(("Database Error ('update[%s:%s] in %s', '%s')", query.toString().c_str(), update.toString().c_str(), getSubscribeContextAvailabilityCollectionName(tenant).c_str(), e.what));
+        LM_E(("Database Error ('update[%s:%s] in %s', '%s')", query.toString().c_str(), update.toString().c_str(), getSubscribeContextAvailabilityCollectionName(tenant).c_str(), e.what()));
         return SccOk;
     }
     catch (...)
