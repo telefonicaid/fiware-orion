@@ -50,8 +50,8 @@ size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *user
   MemoryStruct *mem = (MemoryStruct *)userp;
 
   mem->memory = (char*)realloc(mem->memory, mem->size + realsize + 1);
-  if(mem->memory == NULL) {
-    //LM_V(("Not enough memory (realloc returned NULL)\n"));
+  if (mem->memory == NULL) {
+    LM_W(("Not enough memory (realloc returned NULL)\n"));
     return 0;
   }
 
@@ -67,7 +67,7 @@ size_t writeMemoryCallback(void *contents, size_t size, size_t nmemb, void *user
 *
 * sendHttpRequest -
 */
-std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
+std::string sendHttpRequest(const char *host, unsigned short port, CoapPDU *request)
 {
   char*         url                      = NULL;
   int           recvURILen               = 0;
@@ -103,7 +103,7 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
         break;
     }
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, httpVerb.c_str());
-    //LM_V(("Got an HTTP %s", httpVerb.c_str()));
+    LM_T(LmtCoap, ("Got an HTTP %s", httpVerb.c_str()));
 
 
     // --- Prepare headers
@@ -120,7 +120,7 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
           char buffer[options[i].optionValueLength + 1];
           memcpy(&buffer, options[i].optionValuePointer, options[i].optionValueLength);
           buffer[options[i].optionValueLength] = '\0';
-          //LM_V(("Got URI_PATH option: '%s'", buffer));
+          LM_T(LmtCoap, ("Got URI_PATH option: '%s'", buffer));
           break;
         }
         case CoapPDU::COAP_OPTION_CONTENT_FORMAT:
@@ -141,7 +141,7 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
               break;
           }
           headers = curl_slist_append(headers, string.c_str());
-          //LM_V(("Got CONTENT-FORMAT option: '%s'", string.c_str()));
+          LM_T(LmtCoap, ("Got CONTENT-FORMAT option: '%s'", string.c_str()));
           break;
         }
         case CoapPDU::COAP_OPTION_ACCEPT:
@@ -162,15 +162,12 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
               break;
           }
           headers = curl_slist_append(headers, string.c_str());
-          //LM_V(("Got ACCEPT option: '%s'", string.c_str()));
+          LM_T(LmtCoap, ("Got ACCEPT option: '%s'", string.c_str()));
           break;
         }
         default:
         {
-          char buffer[options[i].optionValueLength + 1];
-          memcpy(&buffer, options[i].optionValuePointer, options[i].optionValueLength);
-          buffer[options[i].optionValueLength] = '\0';
-          //LM_V(("Got unknown option: '%s'", buffer));
+          LM_T(LmtCoap, ("Got unknown option"));
           break;
         }
       }
@@ -184,11 +181,9 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
       contentLengthStringStream << request->getPayloadLength();
       std::string finalString = "Content-length: " + contentLengthStringStream.str();
       headers = curl_slist_append(headers, finalString.c_str());
-      //LM_V(("Got: '%s'", finalString.c_str()));
+      LM_T(LmtCoap, ("Got: '%s'", finalString.c_str()));
 
       // --- Set contents
-
-      //u_int8_t* payload = request->getPayloadCopy();
       char* payload = (char*)request->getPayloadCopy();
       curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
     }
@@ -202,7 +197,7 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
     strcpy(url, host);
     if (recvURILen > 0)
       strncat(url, uriBuffer, recvURILen);
-
+    LM_T(LmtCoap, ("URL: '%s'", url));
 
     // --- Prepare CURL handle with obtained options
     curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -218,7 +213,7 @@ std::string sendHttpRequest(char *host, unsigned short port, CoapPDU *request)
     res = curl_easy_perform(curl);
     if (res != CURLE_OK)
     {
-      fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+      LM_W(("curl_easy_perform() failed: %s\n", curl_easy_strerror(res)));
 
       // --- Cleanup curl environment
       curl_slist_free_all(headers);

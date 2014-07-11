@@ -25,7 +25,6 @@
 
 #include "coap.h"
 
-#include <stdio.h>
 #include <boost/thread.hpp>
 
 #include "CoapController.h"

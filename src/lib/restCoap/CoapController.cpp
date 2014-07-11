@@ -5,7 +5,6 @@
 #include <sys/time.h>
 #define __USE_POSIX 1
 #include <netdb.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -15,23 +14,62 @@
 #include <string>
 #include <string.h>
 
-#include <boost/thread.hpp>
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
-#include "HttpProxy.h"
-#include "HttpMessage.h"
-#include "coap.h"
+#include "restCoap/HttpProxy.h"
+#include "restCoap/HttpMessage.h"
+#include "restCoap/coap.h"
 
 CoapController::CoapController(const char *_host, unsigned short _httpPort, unsigned short _coapPort)
 {
   // Read host and port values
   httpPort    = _httpPort;
   coapPort    = _coapPort;
-  strcpy(host, _host);
+  host.assign(_host);
 
   char* portString = new char[6];
-  snprintf(portString, 6, "%hd", _coapPort);
-  coapPortStr = new char[strlen(portString)];
-  strcpy(coapPortStr, portString);
+  snprintf(portString, sizeof(portString), "%d", _coapPort);
+  coapPortStr.assign(portString);
+}
+
+/* ****************************************************************************
+*
+* sendDatagram -
+*/
+int CoapController::sendDatagram(int sockfd, boost::scoped_ptr<CoapPDU>& res, sockaddr* recvFrom)
+{
+  socklen_t addrLen = sizeof(struct sockaddr_in);
+  if (recvFrom->sa_family == AF_INET6) {
+    addrLen = sizeof(struct sockaddr_in6);
+  }
+
+  ssize_t sent = sendto(sockfd, res->getPDUPointer(), res->getPDULength(), 0, recvFrom, addrLen);
+
+  if (sent < 0)
+  {
+    LM_W(("Error sending packet: %ld.", sent));
+    return 1;
+  }
+  else
+  {
+    LM_T(LmtCoap, ("Sent: %ld bytes", sent));
+  }
+
+  return 0;
+}
+
+int CoapController::sendError(int sockfd, CoapPDU* req, sockaddr* recvFrom, CoapPDU::Code code)
+{
+  boost::scoped_ptr<CoapPDU> res(new CoapPDU());
+
+  res->setVersion(1);
+  res->setMessageID(req->getMessageID());
+  res->setCode(code);
+  res->setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
+  res->setToken(req->getTokenPointer(), req->getTokenLength());
+
+  return sendDatagram(sockfd, res, recvFrom);
 }
 
 /* ****************************************************************************
@@ -40,67 +78,24 @@ CoapController::CoapController(const char *_host, unsigned short _httpPort, unsi
 */
 int CoapController::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom)
 {
-  socklen_t addrLen = sizeof(struct sockaddr_in);
-  if (recvFrom->ss_family == AF_INET6) {
-    addrLen = sizeof(struct sockaddr_in6);
-  }
-
   // Translate request from CoAP to HTTP and send it to MHD through loopback
   std::string httpResponse;
-  httpResponse = sendHttpRequest(host, httpPort, request);
+  httpResponse = sendHttpRequest(host.c_str(), httpPort, request);
+
   if (httpResponse == "")
   {
     // Could not get an answer from HTTP module
-    boost::scoped_ptr<CoapPDU> res(new CoapPDU());
-
-    res->setVersion(1);
-    res->setMessageID((request->getMessageID()));
-    res->setCode(CoapPDU::COAP_INTERNAL_SERVER_ERROR);
-    res->setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
-    res->setToken(request->getTokenPointer(), request->getTokenLength());
-
-    ssize_t sent = sendto(sockfd, res->getPDUPointer(), res->getPDULength(), 0, (sockaddr*)recvFrom, addrLen);
-
-    if (sent < 0)
-    {
-      //LM_V(("Error sending packet: %ld.",sent));
-      perror(NULL);
-      return 1;
-    }
-    else
-    {
-      //LM_V(("Sent: %ld",sent));
-    }
-
+    sendError(sockfd, request, (sockaddr*)recvFrom, CoapPDU::COAP_INTERNAL_SERVER_ERROR);
     return 1;
   }
 
+  // Parse HTTM response
   boost::scoped_ptr<HttpMessage> hm(new HttpMessage(httpResponse));
 
-  // CoAP message is too big, must send error to requester
+  // If CoAP message is too big, must send error to requester
   if (hm->contentLength() > COAP_BUFFER_SIZE)
   {
-    boost::scoped_ptr<CoapPDU> res;
-
-    res->setVersion(1);
-    res->setMessageID((request->getMessageID()));
-    res->setCode(CoapPDU::COAP_REQUEST_ENTITY_TOO_LARGE);
-    res->setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
-    res->setToken(request->getTokenPointer(), request->getTokenLength());
-
-    ssize_t sent = sendto(sockfd, res->getPDUPointer(), res->getPDULength(), 0, (sockaddr*)recvFrom, addrLen);
-
-    if (sent < 0)
-    {
-      //LM_V(("Error sending packet: %ld.",sent));
-      perror(NULL);
-      return 1;
-    }
-    else
-    {
-      //LM_V(("Sent: %ld",sent));
-    }
-
+    sendError(sockfd, request, (sockaddr*)recvFrom, CoapPDU::COAP_REQUEST_ENTITY_TOO_LARGE);
     return 1;
   }
 
@@ -110,6 +105,7 @@ int CoapController::callback(CoapPDU *request, int sockfd, struct sockaddr_stora
   if (!coapResponse)
   {
     // Could not translate HTTP into CoAP
+    sendError(sockfd, request, (sockaddr*)recvFrom, CoapPDU::COAP_INTERNAL_SERVER_ERROR);
     return 1;
   }
 
@@ -134,18 +130,7 @@ int CoapController::callback(CoapPDU *request, int sockfd, struct sockaddr_stora
   };
 
   // Send the packet
-  ssize_t sent = sendto(sockfd, coapResponse->getPDUPointer(), coapResponse->getPDULength(), 0, (sockaddr*)recvFrom, addrLen);
-  if (sent < 0)
-  {
-    //LM_V(("Error sending packet: %ld.",sent));
-    perror(NULL);
-    return 1;
-  }
-  else
-  {
-    //LM_V(("Sent: %ld",sent));
-  }
-
+  sendDatagram(sockfd, coapResponse, (sockaddr*)recvFrom);
   return 0;
 }
 
@@ -172,16 +157,15 @@ void CoapController::serve()
   struct addrinfo hints;
 
   // Setting up bind address
-  memset(&hints, 0x00, sizeof(struct addrinfo));
-  hints.ai_flags      = 0;
+  memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_socktype   = SOCK_DGRAM;
   hints.ai_flags     |= AI_NUMERICSERV;
-  hints.ai_family     = PF_INET; // ipv4, PF_INET6 for ipv6 or PF_UNSPEC to let OS decide
+  hints.ai_family     = AF_INET; // ipv4, PF_INET6 for ipv6 or PF_UNSPEC to let OS decide
 
-  int error = getaddrinfo(host, coapPortStr, &hints, &bindAddr);
+  int error = getaddrinfo(host.c_str(), coapPortStr.c_str(), &hints, &bindAddr);
   if (error)
   {
-    //LM_V(("Could not start CoAP server: Error getting address info: %s.", gai_strerror(error)));
+    LM_W(("Could not start CoAP server: Error getting address info: %s.", gai_strerror(error)));
     return;
   }
 
@@ -191,7 +175,7 @@ void CoapController::serve()
   // Binding socket
   if (bind(sd, bindAddr->ai_addr, bindAddr->ai_addrlen) != 0)
   {
-    //LM_V(("Could not start CoAP server: Error binding socket"));
+    LM_W(("Could not start CoAP server: Error binding socket"));
     perror(NULL);
     return;
   }
@@ -205,7 +189,7 @@ void CoapController::serve()
     ret = recvfrom(sd, &buffer, COAP_BUFFER_SIZE, 0, (sockaddr*)&recvAddr, &recvAddrLen);
     if (ret == -1)
     {
-      //LM_V(("Error receiving data"));
+      LM_W(("Error receiving data"));
       return;
     }
 
@@ -214,27 +198,27 @@ void CoapController::serve()
     // validate packet
     if (ret > COAP_BUFFER_SIZE)
     {
-      //LM_V(("PDU too large to fit in pre-allocated buffer"));
+      LM_W(("PDU too large to fit in pre-allocated buffer"));
       continue;
     }
     recvPDU->setPDULength(ret);
     if (recvPDU->validate() != 1)
     {
-      //LM_V(("Malformed CoAP packet"));
+      LM_W(("Malformed CoAP packet"));
       continue;
     }
-    //LM_V(("Valid CoAP PDU received"));
+    LM_T(LmtCoap, ("Valid CoAP PDU received"));
 
     // Treat URI
     if (recvPDU->getURI(uriBuffer, COAP_URI_BUFFER_SIZE, &recvURILen) != 0)
     {
-      //LM_V(("Error retrieving URI"));
+      LM_W(("Error retrieving URI"));
       continue;
     }
 
     if (recvURILen == 0)
     {
-      //LM_V(("There is no URI associated with this Coap PDU"));
+      LM_T(LmtCoap, ("There is no URI associated with this Coap PDU"));
     }
     else
     {
@@ -249,10 +233,10 @@ void CoapController::serve()
 
     // no URI, handle cases
 
-    // code == 0, no payload, this is a ping request, send RST
+    // code == 0, no payload, this is a ping request, send RST?
     if ((recvPDU->getPDULength() == 0) && (recvPDU->getCode() == 0))
     {
-      //LM_V(("CoAP ping request"));
+      LM_T(LmtCoap, ("CoAP ping request"));
     }
 
   }
