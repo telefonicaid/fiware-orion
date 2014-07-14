@@ -287,12 +287,12 @@ std::string sendHttpSocket
 
       if (nb == -1)
       {
-        LM_T(LmtError, ("error recv from HTTP server: %s", strerror(errno)));
+        LM_T(LmtSoftError, ("error recv from HTTP server: %s", strerror(errno)));
         return "error";
       }
       else if ( nb >= TAM_BUF)
       {
-        LM_T(LmtError, ("recv from HTTP server too long"));
+        LM_T(LmtSoftError, ("recv from HTTP server too long"));
         return "error";
       }
       else
