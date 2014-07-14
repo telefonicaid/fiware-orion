@@ -79,21 +79,26 @@ int socketHttpConnect(const std::string& host, unsigned short port)
 
   snprintf(port_str, sizeof(port_str), "%d" , (int) port);
 
-  if (getaddrinfo(host.c_str(), port_str, &hints, &peer) != 0) {
-    LM_RE(-1, ("getaddrinfo('%s'): %s", host.c_str(), strerror(errno)));
+  if (getaddrinfo(host.c_str(), port_str, &hints, &peer) != 0)
+  {
+    LM_E(("Notification failure for %s:%d (getaddrinfo: %s)", host.c_str(), port, strerror(errno)));
+    return -1;
   }
 
-  if ((fd = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol)) == -1) {
-    LM_RE(-1, ("socket: %s", strerror(errno)));
+  if ((fd = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol)) == -1)
+  {
+    LM_E(("Notification failure for %s:%d (socket: %s)", host.c_str(), port, strerror(errno)));
+    return -1;
   }
 
   if (connect(fd, peer->ai_addr, peer->ai_addrlen) == -1)
   {
     freeaddrinfo(peer);
     close(fd);
-    LM_E(("connect(%s, %d): %s", host.c_str(), port, strerror(errno)));
+    LM_E(("Notification failure for %s:%d (connect: %s)", host.c_str(), port, strerror(errno)));
     return -1;
   }
+
   freeaddrinfo(peer);
   return fd;
 }
@@ -260,22 +265,36 @@ std::string sendHttpSocket
   LM_T(LmtClientOutputPayload, ("Sending message %lu to HTTP server: sending %s message of %d bytes to HTTP server", callNo, what, sz));
   LM_T(LmtClientOutputPayloadDump, ("Sending to HTTP server payload:\n%s", msg));
   nb = send(fd, msg, sz, 0);
-  if (msgDynamic != NULL) {
-      free (msgDynamic);
+  if (msgDynamic != NULL)
+  {
+      free(msgDynamic);
   }
 
   if (nb == -1)
-    LM_RE("error", ("error sending to HTTP server: %s", strerror(errno)));
+  {
+    LM_E(("Notification failure for %s:%d (send: %s)", _ip.c_str(), port, strerror(errno)));
+    return "error";
+  }
   else if (nb != sz)
-     LM_E(("error sending to HTTP server. Sent %d bytes of %d", nb, sz));
+  {
+    LM_E(("Notification failure for %s:%d (not entire message sent)", _ip.c_str(), port));
+    return "error";
+  }
 
-  if (waitForResponse) {
-      nb = recv(fd,&buffer,TAM_BUF-1,0);
+  if (waitForResponse)
+  {
+      nb = recv(fd, &buffer, TAM_BUF - 1, 0);
 
       if (nb == -1)
-        LM_RE("error", ("error recv from HTTP server: %s", strerror(errno)));
+      {
+        LM_T(LmtSoftError, ("error recv from HTTP server: %s", strerror(errno)));
+        return "error";
+      }
       else if ( nb >= TAM_BUF)
-         LM_RE("error", ("recv from HTTP server too long"));
+      {
+        LM_T(LmtSoftError, ("recv from HTTP server too long"));
+        return "error";
+      }
       else
       {
           memcpy(response, buffer, nb);
@@ -285,7 +304,8 @@ std::string sendHttpSocket
       if (strlen(response) > 0)
           result = response;
   }
-  else {
+  else
+  {
      LM_T(LmtClientInputPayload, ("not waiting for response"));
      result = "";
   }

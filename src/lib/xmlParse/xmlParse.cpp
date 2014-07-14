@@ -106,7 +106,7 @@ static bool treat(xml_node<>* node, const std::string& path, XmlNode* parseVecto
       int r;
 
       if ((r = parseVector[ix].treat(node, parseDataP)) != 0)
-        LM_E(("parse vector treat function error: %d", r));
+        LM_W(("Bad Input (xml parse error %d)", r));
 
       return true; // Node has been treated
     }
@@ -141,7 +141,7 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
     {
       ciP->httpStatusCode = SccBadRequest;
       ciP->answer = std::string("Bad value for XML attribute 'type' for '") + node->name() + "': '" + xmlAttribute + "'";
-      LM_W(("ERROR: '%s'", ciP->answer.c_str()));
+      LM_W(("Bad Input (%s)", ciP->answer.c_str()));
       return;
     }
     ciP->compoundValueRoot = containerP;
@@ -163,7 +163,7 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
       {
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer = std::string("Bad value for XML attribute 'type' for '") + name + "': '" + xmlAttribute + "'";
-        LM_W(("ERROR: '%s'", ciP->answer.c_str()));
+        LM_W(("Bad Input (%s)", ciP->answer.c_str()));
         return;
       }
     }
@@ -239,7 +239,7 @@ void xmlParse
     ciP->httpStatusCode = SccBadRequest;
     if (ciP->answer == "")
       ciP->answer = std::string("Unknown XML field: '") + name.c_str() + "'";
-    LM_W(("ERROR: '%s', PATH: '%s'   ", ciP->answer.c_str(), fatherPath.c_str()));
+    LM_W(("Bad Input (%s)", ciP->answer.c_str()));
     return;
   }
 
@@ -296,7 +296,10 @@ std::string entityIdParse(RequestType requestType, xml_node<>* node, EntityId* e
       LM_T(LmtEntityId, ("Got an isPattern for an entity: '%s'", entityIdP->isPattern.c_str()));
     }
     else
-      LM_RE("unsupported attribute for EntityId", ("Warning: unsupported attribute '%s' for EntityId", attr->name()));
+    {
+      LM_W(("Bad Input (unsupported attribute '%s' for EntityId)", attr->name()));
+      return "unsupported attribute for EntityId";
+    }
   }
 
   return "OK";

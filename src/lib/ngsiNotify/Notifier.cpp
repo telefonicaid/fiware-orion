@@ -48,11 +48,12 @@
 *
 * ~Notifier -
 */
-Notifier::~Notifier (void) {
-    // FIXME: This destructor is needed to avoid warning message. 
-    // Compilation fails when a warning occurs, and it is enabled 
-    // compilation option -Werror "warnings being treated as errors" 
-    LM_W(("not implemented Notifier destructor"));
+Notifier::~Notifier (void)
+{
+  // FIXME: This destructor is needed to avoid warning message. 
+  // Compilation fails when a warning occurs, and it is enabled 
+  // compilation option -Werror "warnings being treated as errors" 
+  LM_T(LmtNotImplemented, ("Notifier destructor is not implemented"));
 }
 
 /* ****************************************************************************

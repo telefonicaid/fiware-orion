@@ -57,12 +57,11 @@ HttpStatusCode mongoUpdateContext
     /* Check that the service path vector has only one element, returning error otherwise */
     if (servicePathV.size() > 1)
     {
-        LM_W(("service path length (%d) greater than one in update", servicePathV.size()));
+        LM_W(("Bad Input (service path length %d is greater than the one in update)", servicePathV.size()));
         responseP->errorCode.fill(SccBadRequest, "service path length greater than one in update");
     }
     else
     {
-
         /* Process each ContextElement */
         for (unsigned int ix= 0; ix < requestP->contextElementVector.size(); ++ix) {
             processContextElement(requestP->contextElementVector.get(ix), responseP, requestP->updateActionType.get(), tenant, servicePathV);

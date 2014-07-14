@@ -303,7 +303,7 @@ static int sourceEntityId(xml_node<>* node, ParseData* parseDataP)
   if (es != "OK")
   {
     parseDataP->errorString = es;
-    LM_W(("Error parsing entity: %s", es.c_str()));
+    LM_W(("Bad Input (error parsing entity: %s)", es.c_str()));
   }
 
   return 0;

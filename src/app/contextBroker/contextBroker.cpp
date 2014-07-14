@@ -976,7 +976,7 @@ void sigHandler(int sigNo)
 */
 void orionExit(int code, const std::string& reason)
 {
-  LM_E((reason.c_str()));
+  LM_E(("Exiting. Reason: %s", reason.c_str()));
   exit(code);
 }
 
@@ -987,7 +987,7 @@ void orionExit(int code, const std::string& reason)
 void exitFunc(void)
 {
   if (unlink(pidPath) != 0)
-    LM_E(("unlink(%s): %s", pidPath, strerror(errno)));
+    LM_T(LmtSoftError, ("error removing PID file '%s': %s", pidPath, strerror(errno)));
 }
 
 const char* description =

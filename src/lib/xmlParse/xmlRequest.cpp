@@ -157,7 +157,7 @@ static XmlRequest* xmlRequestGet(RequestType request, std::string method)
     }
   }
 
-  LM_E(("No request found for RequestType '%s', method '%s'", requestType(request), method.c_str()));
+  LM_W(("Bad Input (no request found for RequestType '%s', method '%s')", requestType(request), method.c_str()));
   return NULL;
 }
 
@@ -178,15 +178,15 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
   }
   catch (parse_error& e)
   {
-    LM_F(("doc:\n----------------------------------------------\n%s\n------------------------------------", content));
     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", "unknown", SccBadRequest, "XML Parse Error");
-    LM_RE(errorReply, ("PARSE ERROR: %s", e.what()));
+    LM_W(("Bad Input ('%s', '%s')", content, e.what()));
+    return errorReply;
   }
   catch (...)
   {
-    LM_F(("doc:\n----------------------------------------------\n%s\n------------------------------------", content));
     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", "unknown", SccBadRequest, "XML Parse Error");
-    LM_RE(errorReply, ("GENERIC ERROR during doc.parse"));
+    LM_W(("Bad Input (%s)", content));
+    return errorReply;
   }
 
   xml_node<>*   father = doc.first_node();
@@ -235,7 +235,8 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
     if (strncasecmp(payloadWord.c_str(), payloadStart, payloadWord.length()) != 0)
     {
       errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, std::string("Expected '") + payloadWord + "' payload, got '" + payloadStart + "'");
-      LM_RE(errorReply, ("Invalid payload: wanted: '%s', got '%s'", payloadWord.c_str(), payloadStart));
+      LM_W(("Bad Input (invalid  payload: wanted: '%s', got '%s')", payloadWord.c_str(), payloadStart));
+      return errorReply;
     }
   }
 
@@ -246,12 +247,15 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
   ciP->httpStatusCode = SccOk;
   xmlParse(ciP, NULL, father, "", "", reqP->parseVector, parseDataP);
   if (ciP->httpStatusCode != SccOk)
+  {
+    LM_W(("Bad Input (XML parse error)"));
     return restErrorReplyGet(ciP, ciP->outFormat, "", payloadWord, ciP->httpStatusCode, ciP->answer);
+  }
 
   LM_T(LmtParseCheck, ("Calling check for XML parsed tree (%s)", ciP->payloadWord));
   std::string check = reqP->check(parseDataP, ciP);
   if (check != "OK")
-     LM_E(("check(%s): %s", reqP->keyword.c_str(), check.c_str()));
+    LM_W(("Bad Input (%s: %s)", reqP->keyword.c_str(), check.c_str()));
 
   reqP->present(parseDataP);
 

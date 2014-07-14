@@ -74,7 +74,7 @@ std::string EntityIdVector::check(RequestType requestType, Format format, const 
   {
     if (vec.size() == 0)
     {
-      LM_E(("No entity list when it is mandatory"));
+      LM_W(("Bad Input (mandatory entity list missing)"));
       return "No entities";
     }
   }
@@ -84,7 +84,10 @@ std::string EntityIdVector::check(RequestType requestType, Format format, const 
     std::string res;
 
     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    {
+      LM_W(("Bad Input (invalid vector of EntityIds)"));
       return res;
+    }
   }
 
   return "OK";

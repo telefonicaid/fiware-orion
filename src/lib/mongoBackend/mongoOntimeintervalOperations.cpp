@@ -55,17 +55,21 @@ HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, Context
         sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(subId)));
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
     }
-    catch( const DBException &e ) {
+    catch (const DBException &e)
+    {
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo db exception)");
         reqSemGive(__FUNCTION__, "get info on subscriptions (mongo db exception)");
         *err = e.what();
-        LM_RE(SccOk, ("Database error '%s'", err->c_str()));
+        LM_E(("Database Error ('findOne id=%s, coll=%s', '%s')", subId.c_str(), getSubscribeContextCollectionName(tenant).c_str(), e.what()));
+        return SccOk;
     }
-    catch(...) {
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo generic exception)");
         reqSemGive(__FUNCTION__, "get info on subscriptions (mongo generic exception)");
         *err = "Database error: received generic exception";
-        LM_RE(SccOk, ("Database error '%s'", "received generic exception"));
+        LM_E(("Database Error ('indOne id=%s, coll=%s', '%s')", subId.c_str(), getSubscribeContextCollectionName(tenant).c_str(), "generic exception"));
+        return SccOk;
     }
 
     LM_T(LmtMongo, ("retrieved subscription: %s", sub.toString().c_str()));
@@ -152,28 +156,31 @@ HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::str
     DBClientConnection* connection = getMongoConnection();
 
     /* Update the document */
-    try {
-        BSONObj query = BSON("_id" << OID(subId));
-        BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CSUB_COUNT << 1));
-        LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextCollectionName(tenant).c_str(),
-                        query.toString().c_str(),
-                        update.toString().c_str()));
+    BSONObj query  = BSON("_id" << OID(subId));
+    BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CSUB_COUNT << 1));
 
-        mongoSemTake(__FUNCTION__, "update in SubscribeContextCollection");
+    LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextCollectionName(tenant).c_str(),
+                    query.toString().c_str(),
+                    update.toString().c_str()));
+
+    mongoSemTake(__FUNCTION__, "update in SubscribeContextCollection");
+
+    try
+    {
         connection->update(getSubscribeContextCollectionName(tenant).c_str(), query, update);
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection");
     }
-    catch( const DBException &e ) {
+    catch (const DBException &e)
+    {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
-        reqSemGive(__FUNCTION__, "update subscription notifications (mongo db exception)");
         *err = e.what();
-        LM_E(("Database error '%s'", err->c_str()));
+        LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), err->c_str()));
     }
-    catch(...) {
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
-        reqSemGive(__FUNCTION__, "update subscription notifications (mongo generic exception)");
         *err = "Generic Exception";
-        LM_E(("Database error: '%s'", err->c_str()));
+        LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), "Generic Exception"));
     }
 
     reqSemGive(__FUNCTION__, "update subscription notifications");

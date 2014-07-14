@@ -45,7 +45,7 @@ std::string badVerbGetOnly(ConnectionInfo* ciP, int components, std::vector<std:
   ciP->httpHeaderValue.push_back("GET");
   ciP->httpStatusCode = SccBadVerb;
 
-  LM_W(("bad verb for url '%s', method '%s'", ciP->url.c_str(), ciP->method.c_str()));
+  LM_W(("Bad Input (bad verb for url '%s', method '%s')", ciP->url.c_str(), ciP->method.c_str()));
 
   return "";
 }

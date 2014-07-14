@@ -87,8 +87,9 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
             compoundValueBson(child->childV, bo);
             b.append(bo.obj());
         }
-        else {
-            LM_E(("Unknown type in compound value"));
+        else
+        {
+          LM_T(LmtMongo, ("Unknown type in compound value"));
         }
     }
 
@@ -116,8 +117,9 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
             compoundValueBson(child->childV, bo);
             b.append(child->name, bo.obj());
         }
-        else {
-            LM_E(("Unknown type in compound value"));
+        else
+        {
+          LM_T(LmtMongo, ("Unknown type in compound value"));
         }
     }
 }
@@ -147,8 +149,9 @@ static void valueBson(ContextAttribute* ca, BSONObjBuilder& bsonAttr) {
             // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
             bsonAttr.append(ENT_ATTRS_VALUE, ca->compoundValueP->value);
         }
-        else {
-            LM_E(("Unknown type in compound value"));
+        else
+        {
+          LM_T(LmtMongo, ("Unknown type in compound value"));
         }
     }
 
@@ -403,8 +406,9 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
             else if (attr.getField(ENT_ATTRS_VALUE).type() == Array) {
                 newAttr.appendArray(ENT_ATTRS_VALUE, value.embeddedObject());
             }
-            else {
-                LM_E(("unknown BSON type"));
+            else
+            {
+              LM_T(LmtMongo, ("unknown BSON type"));
             }
 
         }
@@ -864,7 +868,7 @@ static bool processSubscriptions(const EntityId* enP, map<string, BSONObj*>* sub
         catch (...)
         {
            mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo generic exception)");
-           LM_E(("Got an exception during findOne of collection '%s'", getSubscribeContextCollectionName(tenant).c_str()));
+           LM_E(("Database Error ('findOne tenant=%s, id=%s', 'exception during findOne of collection '%s''", tenant.c_str(), mapSubId.c_str(), getSubscribeContextCollectionName(tenant).c_str()));
 
            *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str();
            return false;
@@ -1286,9 +1290,11 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
     }
 
     BSONObj insertedDoc = insertedDocB.obj();
-    try {
-        LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), insertedDoc.toString().c_str()));
-        mongoSemTake(__FUNCTION__, "insert into EntitiesCollection");
+    LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), insertedDoc.toString().c_str()));
+    mongoSemTake(__FUNCTION__, "insert into EntitiesCollection");
+
+    try
+    {
         connection->insert(getEntitiesCollectionName(tenant).c_str(), insertedDoc);
         mongoSemGive(__FUNCTION__, "insert into EntitiesCollection");
     }
@@ -1298,6 +1304,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
                 " - insert(): " + insertedDoc.toString() +
                 " - exception: " + e.what();
 
+        LM_E(("Database Error (%s)", errDetail->c_str()));
         return false;
     }
     catch(...) {
@@ -1306,6 +1313,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
                 " - insert(): " + insertedDoc.toString() +
                 " - exception: " + "generic";
 
+        LM_E(("Database Error (%s)", errDetail->c_str()));
         return false;
     }
 

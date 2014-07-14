@@ -97,7 +97,7 @@ static void registerContextForward(ConnectionInfo* ciP, ParseData* parseDataP, R
 
     std::string  s = xmlTreat(payloadStart, ciP, &responseData, RegisterResponse, "", &reqP);
     if (s != "OK")
-      LM_E(("Error parsing registerContextResponse: %s", s.c_str()));
+      LM_W(("Bad Input (error parsing registerContextResponse: %s)", s.c_str()));
     else
     {
       std::string fwdRegId = responseData.rcrs.res.registrationId.get();

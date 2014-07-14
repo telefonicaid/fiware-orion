@@ -180,8 +180,9 @@ static HttpStatusCode associationsDiscoverContextAvailability
   bool                                  details
 )
 {
-    if (scope == SCOPE_VALUE_ASSOC_ALL) {
-        LM_W(("%s scope not supported", SCOPE_VALUE_ASSOC_ALL));
+    if (scope == SCOPE_VALUE_ASSOC_ALL)
+    {
+        LM_W(("Bad Input (%s scope not supported)", SCOPE_VALUE_ASSOC_ALL));
         responseP->errorCode.fill(SccNotImplemented, std::string("Not supported scope: '") + SCOPE_VALUE_ASSOC_ALL + "'");
         return SccOk;
     }
@@ -331,10 +332,13 @@ HttpStatusCode mongoDiscoverContextAvailability
    * differently depending on the scope. Although OperationScope is a list in NGSI, we only support one
    * scope at the same time */
   int nScopes = requestP->restriction.scopeVector.size();
-  if (nScopes > 0) {
-    if (nScopes > 1) {
-      LM_W(("Using %d scopes: only the first one will be used", nScopes));
+  if (nScopes > 0)
+  {
+    if (nScopes > 1)
+    {
+      LM_W(("Bad Input (%d scopes: only the first one is used)", nScopes));
     }
+
     std::string scopeType  = requestP->restriction.scopeVector.get(0)->type;
     std::string scopeValue = requestP->restriction.scopeVector.get(0)->value;
 
@@ -343,8 +347,9 @@ HttpStatusCode mongoDiscoverContextAvailability
       reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request (association)");
       return ms;
     }
-    else {
-      LM_W(("Unsupported scope (%s, %s), doing conventional discoverContextAvailability", scopeType.c_str(), scopeValue.c_str()));
+    else
+    {
+      LM_W(("Bad Input (unsupported scope [%s, %s], doing conventional discoverContextAvailability)", scopeType.c_str(), scopeValue.c_str()));
     }
   }
 

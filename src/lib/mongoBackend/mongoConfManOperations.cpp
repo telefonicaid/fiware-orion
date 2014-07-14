@@ -59,13 +59,13 @@ void mongoSetFwdRegId(const std::string& regId, const std::string& fwdRegId, con
         // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
         mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (mongo db exception)");
-        LM_E(("Database error '%s'", e.what()));
+        LM_E(("Database Error ('update tenant=%s, id=%s', '%s')", tenant.c_str(), regId.c_str(), e.what()));
     }
     catch(...) {
         // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
         mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (mongo generic exception)");
-        LM_E(("Database error: '%s'", "generic exception"));
+        LM_E(("Database Error ('update tenant=%s, id=%s', '%s')", tenant.c_str(), regId.c_str(), "generic exception"));
     }
 
     reqSemGive(__FUNCTION__, "Mongo Set Forward RegId");
@@ -100,13 +100,13 @@ std::string mongoGetFwdRegId(const std::string& regId, const std::string& tenant
         // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
         mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection (mongo db exception)");
-        LM_E(("Database error '%s'", e.what()));
+        LM_E(("Database Error ('findOne tenant=%s, id=%s', '%s')", tenant.c_str(), regId.c_str(), e.what()));
     }
     catch(...) {
         // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
         mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection (mongo generic exception)");
-        LM_E(("Database error: 'generic exception'"));
+        LM_E(("Database Error ('findOne tenant=%s, id=%s', 'generic exception')", tenant.c_str(), regId.c_str()));
     }
 
     reqSemGive(__FUNCTION__, "Mongo Get Forward RegId");
