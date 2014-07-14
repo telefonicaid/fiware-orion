@@ -55,5 +55,6 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-cert' <certificate key file (for https)>]
                       [option '-rush' <rush host (IP:port)>]
                       [option '-multiservice' <service multi tenancy mode (off|url|header)>]
-
+                      [option '-coapport' <port to receive CoAP datagrams>]
+                      
 --TEARDOWN--

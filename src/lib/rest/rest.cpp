@@ -72,6 +72,7 @@
 */
 static RestService*              restServiceV          = NULL;
 static unsigned short            port                  = 0;
+static unsigned short            coapPort              = 0;
 static RestServeFunction         serveFunction         = NULL;
 static bool                      acceptTextXml         = false;
 static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
@@ -762,7 +763,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
       //LM_T(LmtCoap, ("Starting CoAP daemon on IPv4 %s port %d", bindIp, 5683));
       // IANA has assigned the port number 5683 and the service name "coap" [RFC6335].
-      coapDaemon->run(bindIp, port, 5683);
+      coapDaemon->run(bindIp, port, coapPort);
     }
 
     if (mhdDaemon == NULL)
@@ -825,11 +826,11 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 *           See Issue #256
 */
 void restInit
-(
-  RestService*        _restServiceV,
+(RestService*        _restServiceV,
   IpVersion           _ipVersion,
   const char*         _bindAddress,
   unsigned short      _port,
+  unsigned short      _coapPort,
   const std::string&  _multitenant,
   const std::string&  _rushHost,
   unsigned short      _rushPort,
@@ -843,6 +844,7 @@ void restInit
   const char* cert = _httpsCertificate;
 
   port          = _port;
+  coapPort      = _coapPort;
   restServiceV  = _restServiceV;
   ipVersionUsed = _ipVersion;
   serveFunction = (_serveFunction != NULL)? _serveFunction : serve;

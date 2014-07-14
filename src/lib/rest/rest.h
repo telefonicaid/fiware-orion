@@ -74,6 +74,7 @@ extern void restInit
    IpVersion           _ipVersion,
    const char*         _bindAddress,
    unsigned short      _port,
+   unsigned short      _coapPort,
    const std::string&  _multitenant   = "off",
    const std::string&  _rushHost      = "",
    unsigned short      _rushPort      = 0,
