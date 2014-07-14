@@ -256,7 +256,7 @@ int64_t parse8601(const std::string& s)
       if ((value == 0) && (*start != '0'))
       {
         free(toFree);
-        LM_E(("Bad Input (parse error for duration '%s')", start));
+        LM_W(("Bad Input (parse error for duration '%s')", start));
         return -1;
       }
 

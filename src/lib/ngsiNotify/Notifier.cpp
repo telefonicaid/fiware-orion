@@ -73,7 +73,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     
     if (!parseUrl(url, host, port, path, protocol))
     {
-      LM_E(("Bad Input (sending NotifyContextRequest: malformed URL: '%s')", url.c_str()));
+      LM_W(("Bad Input (sending NotifyContextRequest: malformed URL: '%s')", url.c_str()));
       return;
     }
 
@@ -128,7 +128,7 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     std::string  protocol;
     if (!parseUrl(url, host, port, path, protocol))
     {
-      LM_E(("Bad Input (sending NotifyContextAvailabilityRequest: malformed URL: '%s')", url.c_str()));
+      LM_W(("Bad Input (sending NotifyContextAvailabilityRequest: malformed URL: '%s')", url.c_str()));
       return;
     }
 

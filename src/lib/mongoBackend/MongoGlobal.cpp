@@ -419,13 +419,13 @@ void recoverOntimeIntervalThreads(std::string tenant) {
     catch (const DBException &e)
     {
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongo db exception)");
-        LM_W(("Database Error (DBException: %s)", e.what()));
+        LM_E(("Database Error (DBException: %s)", e.what()));
         return;
     }
     catch (...)
     {
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongo generic exception)");
-        LM_W(("Database Error (generic exception)"));
+        LM_E(("Database Error (generic exception)"));
         return;
     }
 
@@ -878,7 +878,7 @@ bool entitiesQuery
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
 
-        LM_W(("Database Error (%s)", err->c_str()));
+        LM_E(("Database Error (%s)", err->c_str()));
         return false;
     }
     catch (...)
@@ -888,7 +888,7 @@ bool entitiesQuery
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
 
-        LM_W(("Database Error (%s)", err->c_str()));
+        LM_E(("Database Error (%s)", err->c_str()));
         return false;
     }
 
@@ -1501,7 +1501,7 @@ bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, st
     if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant))
     {
        ncar.contextRegistrationResponseVector.release();
-       LM_W(("Database Error (%s)", err.c_str()));
+       LM_E(("Database Error (%s)", err.c_str()));
        return false;
     }
 
