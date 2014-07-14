@@ -112,7 +112,7 @@ typedef enum TraceLevels
   LmtIotaXmlReg,
   LmtIotaXmlObs,
   LmtRush,
-  LmtError,
+  LmtSoftError,
   LmtNotImplemented
 } TraceLevels;
 
