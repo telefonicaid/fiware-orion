@@ -1,5 +1,5 @@
-#ifndef HTTPPROXY_H
-#define HTTPPROXY_H
+#ifndef HTTP_PROXY_H
+#define HTTP_PROXY_H
 /*
 *
 * Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,16 +25,16 @@
 * Author: TID Developer
 */
 #include "cantcoap.h"
-#include "HttpMessage.h"
+#include "restCoap/HttpMessage.h"
 
 struct MemoryStruct {
-  char   *memory;
+  char*   memory;
   size_t  size;
 };
 
 static const int  COAP_URI_BUFFER_SIZE = 255;
 static const int  COAP_BUFFER_SIZE     = 1024;
 
-extern std::string  sendHttpRequest(const char *host, unsigned short port, CoapPDU * request);
+extern std::string  sendHttpRequest(const char* host, unsigned short port, CoapPDU* request);
 
-#endif // HTTPPROXY_H
+#endif // HTTP_PROXY_H

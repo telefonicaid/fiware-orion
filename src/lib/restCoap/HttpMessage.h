@@ -1,5 +1,5 @@
-#ifndef HTTPMESSAGE_H
-#define HTTPMESSAGE_H
+#ifndef HTTP_MESSAGE_H
+#define HTTP_MESSAGE_H
 /*
 *
 * Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
@@ -29,16 +29,16 @@
 
 class HttpMessage
 {
-    int _httpCode;
-    int _contentLength;
-    std::string _contentType;
-    std::string _body;
+    int          _httpCode;
+    int          _contentLength;
+    std::string  _contentType;
+    std::string  _body;
 
   public:
     HttpMessage(std::string theMessage);
 
     CoapPDU* toCoap();
-    int contentLength() { return _contentLength; }
+    int      contentLength() { return _contentLength; }
 };
 
-#endif // HTTPMESSAGE_H
+#endif // HTTP_MESSAGE_H

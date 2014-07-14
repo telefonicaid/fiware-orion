@@ -40,7 +40,8 @@ CoapController::CoapController(const char *_host, unsigned short _httpPort, unsi
 int CoapController::sendDatagram(int sockfd, boost::scoped_ptr<CoapPDU>& res, sockaddr* recvFrom)
 {
   socklen_t addrLen = sizeof(struct sockaddr_in);
-  if (recvFrom->sa_family == AF_INET6) {
+  if (recvFrom->sa_family == AF_INET6)
+  {
     addrLen = sizeof(struct sockaddr_in6);
   }
 
@@ -76,7 +77,7 @@ int CoapController::sendError(int sockfd, CoapPDU* req, sockaddr* recvFrom, Coap
 *
 * callback -
 */
-int CoapController::callback(CoapPDU *request, int sockfd, struct sockaddr_storage *recvFrom)
+int CoapController::callback(CoapPDU* request, int sockfd, struct sockaddr_storage* recvFrom)
 {
   // Translate request from CoAP to HTTP and send it to MHD through loopback
   std::string httpResponse;
@@ -121,16 +122,18 @@ int CoapController::callback(CoapPDU *request, int sockfd, struct sockaddr_stora
   case CoapPDU::COAP_NON_CONFIRMABLE:
     coapResponse->setType(CoapPDU::COAP_ACKNOWLEDGEMENT);
     break;
+
   case CoapPDU::COAP_ACKNOWLEDGEMENT:
   case CoapPDU::COAP_RESET:
     break;
+
   default:
     return 1;
     break;
   };
 
   // Send the packet
-  sendDatagram(sockfd, coapResponse, (sockaddr*)recvFrom);
+  sendDatagram(sockfd, coapResponse, (sockaddr*) recvFrom);
   return 0;
 }
 
@@ -176,7 +179,6 @@ void CoapController::serve()
   if (bind(sd, bindAddr->ai_addr, bindAddr->ai_addrlen) != 0)
   {
     LM_W(("Could not start CoAP server: Error binding socket"));
-    perror(NULL);
     return;
   }
 
@@ -186,14 +188,14 @@ void CoapController::serve()
     memset(buffer, 0, COAP_BUFFER_SIZE);
 
     // receive packet
-    ret = recvfrom(sd, &buffer, COAP_BUFFER_SIZE, 0, (sockaddr*)&recvAddr, &recvAddrLen);
+    ret = recvfrom(sd, &buffer, COAP_BUFFER_SIZE, 0, (sockaddr*) &recvAddr, &recvAddrLen);
     if (ret == -1)
     {
       LM_W(("Error receiving data"));
       return;
     }
 
-    boost::scoped_ptr<CoapPDU> recvPDU(new CoapPDU((uint8_t*)buffer, COAP_BUFFER_SIZE, COAP_BUFFER_SIZE));
+    boost::scoped_ptr<CoapPDU> recvPDU(new CoapPDU((uint8_t*) buffer, COAP_BUFFER_SIZE, COAP_BUFFER_SIZE));
 
     // validate packet
     if (ret > COAP_BUFFER_SIZE)
@@ -223,7 +225,7 @@ void CoapController::serve()
     else
     {
       // Invoke a callback thread
-      boost::thread *workerThread = new boost::thread(boost::bind(&CoapController::callback, this, recvPDU.get(), sd, &recvAddr));
+      boost::thread* workerThread = new boost::thread(boost::bind(&CoapController::callback, this, recvPDU.get(), sd, &recvAddr));
 
       // Wait for thread to finnish (like using no threads at all) for now
       workerThread->join();

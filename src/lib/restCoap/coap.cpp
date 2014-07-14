@@ -27,7 +27,7 @@
 
 #include <boost/thread.hpp>
 
-#include "CoapController.h"
+#include "restCoap/CoapController.h"
 
 
 /* ****************************************************************************

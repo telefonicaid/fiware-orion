@@ -23,7 +23,7 @@
 * Author: TID Developer
 */
 
-#include "HttpMessage.h"
+#include "restCoap/HttpMessage.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -62,6 +62,11 @@ HttpMessage::HttpMessage(std::string theMessage)
       if (pos < 0)
       {
         // Get HTTP code
+        // HTTP code is always 3 chars long starting at position 9
+        //
+        //   HTTP/1.1 200 OK
+        //            XXX
+        //
         _httpCode = atoi(line.substr(9, 3).c_str());
       }
       else
@@ -98,16 +103,18 @@ CoapPDU* HttpMessage::toCoap()
     case 200:
       pdu->setCode(CoapPDU::COAP_CONTENT);
       break;
+
     case 415:
       pdu->setCode(CoapPDU::COAP_UNSUPPORTED_CONTENT_FORMAT);
       break;
+
     default:
       pdu->httpStatusToCode(this->_httpCode);
       break;
   }
 
   // Set payload
-  uint8_t* data = (uint8_t*)this->_body.c_str();
+  uint8_t* data = (uint8_t*) this->_body.c_str();
   std::size_t length = this->_body.length();
   pdu->setPayload(data, length);
 
