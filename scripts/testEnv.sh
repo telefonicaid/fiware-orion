@@ -37,6 +37,9 @@ fi
 if [ -z "${CM_PORT}" ]; then
     CM_PORT=9998
 fi
+if [ -z "${COAP_PORT}" ]; then
+    COAP_PORT=5683
+fi
 
 # LISTENER_PORT - the port/socket where listening application for some test cases listens for connections
 if [ -z "${LISTENER_PORT}" ]; then

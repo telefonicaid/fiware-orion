@@ -538,7 +538,7 @@ function orionCurl()
 # Options:
 #   -X            <HTTP method>    (default: according to curl. GET if no payload, POST if with payload)
 #   --host        <host>           (default: localhost)
-#   --port        <port>           (default: $BROKER_PORT)
+#   --port        <port>           (default: $COAP_PORT)
 #   --url         <URL>            (default: empty string)
 #   --payload     <payload>        (default: NO PAYLOAD. Possible values: [filename | "${string}"])
 #   --in          (input payload)  (default: xml => application/xml, If 'json': application/json)
@@ -557,7 +557,7 @@ function coapCurl()
   #
   _method=""
   _host="0.0.0.0"
-  _port=5683 # default for coap
+  _port=$COAP_PORT # default for coap
   _url=""
   _payload=""
   _inFormat=""
