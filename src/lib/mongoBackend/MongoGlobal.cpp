@@ -929,7 +929,7 @@ bool entitiesQuery
                 }
                 else
                 {
-                  LM_T(LmtError, ("unknown BSON type"));
+                  LM_T(LmtSoftError, ("unknown BSON type"));
                   continue;
                 }
 
