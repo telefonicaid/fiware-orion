@@ -747,6 +747,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_END);
+
     }
     else
     {
@@ -761,13 +762,14 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_END);
 
-      //LM_T(LmtCoap, ("Starting CoAP daemon on IPv4 %s port %d", bindIp, 5683));
-      // IANA has assigned the port number 5683 and the service name "coap" [RFC6335].
-      coapDaemon->run(bindIp, port, coapPort);
     }
 
     if (mhdDaemon == NULL)
       LM_RE(3, ("MHD_start_daemon failed"));
+
+    //LM_T(LmtCoap, ("Starting CoAP daemon on IPv4 %s port %d", bindIp, 5683));
+    // IANA has assigned the port number 5683 and the service name "coap" [RFC6335].
+    coapDaemon->run(bindIp, port, coapPort);
   }  
 
   if ((ipVersion == IPV6) || (ipVersion == IPDUAL))
