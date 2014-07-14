@@ -1154,9 +1154,11 @@ static bool processContextAttributeVector (ContextElement*               ceP,
 
             }
         }
-        else {
-            cerP->statusCode.fill(SccInvalidParameter, std::string("unknown actionType: '") + action + "'");
-            LM_RE(false, ("Unknown actionType '%s'. This is a bug in the parsing layer checking!", action.c_str()));
+        else
+        {
+          cerP->statusCode.fill(SccInvalidParameter, std::string("unknown actionType: '") + action + "'");
+          LM_E(("BUG (unknown actionType '%s'. This is a bug in the parse layer checks)", action.c_str()));
+          return false;
         }
 
         /* Add those ONCHANGE subscription triggered by the just processed attribute. Note that
@@ -1164,9 +1166,11 @@ static bool processContextAttributeVector (ContextElement*               ceP,
          * is "bypassed" */
         if (actualUpdate) {
             std::string err;
-            if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, &err, tenant)) {
-                cerP->statusCode.fill(SccReceiverInternalError, err);
-                LM_RE(false, (err.c_str()));
+            if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, &err, tenant))
+            {
+              cerP->statusCode.fill(SccReceiverInternalError, err);
+              LM_E(("Database Error (%s)", err.c_str()));
+              return false;
             }
         }
 
@@ -1698,10 +1702,12 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 std::map<string, BSONObj*> subsToNotify;
                 for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
                     std::string err;
-                    if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err, tenant)) {
-                        cerP->statusCode.fill(SccReceiverInternalError, err);
-                        responseP->contextElementResponseVector.push_back(cerP);
-                        LM_RVE((err.c_str()));
+                    if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err, tenant))
+                    {
+                      cerP->statusCode.fill(SccReceiverInternalError, err);
+                      responseP->contextElementResponseVector.push_back(cerP);
+                      LM_E(("Database Error (%s)", err.c_str()));
+                      return;
                     }
                 }
                 processSubscriptions(enP, &subsToNotify, &errReason, tenant);

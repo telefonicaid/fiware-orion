@@ -911,7 +911,10 @@ int pidFile(void)
   sz = strlen(buffer);
   nb = write(fd, buffer, sz);
   if (nb != sz)
-    LM_RE(-2, ("PID File (written %d bytes and not %d to '%s': %s)", nb, sz, pidPath, strerror(errno)));
+  {
+    LM_E(("PID File (written %d bytes and not %d to '%s': %s)", nb, sz, pidPath, strerror(errno)));
+    return -2;
+  }
 
   return 0;
 }
@@ -1082,27 +1085,39 @@ static int loadFile(char* path, char* out, int outSize)
   int          fd = open(path, O_RDONLY);
 
   if (fd == -1)
-    LM_RE(-1, ("HTTPS Error (error opening '%s': %s)", path, strerror(errno)));
+  {
+    LM_E(("HTTPS Error (error opening '%s': %s)", path, strerror(errno)));
+    return -1;
+  }
 
   if (stat(path, &statBuf) != 0)
   {
     close(fd);
-    LM_RE(-1, ("HTTPS Error (error 'stating' '%s': %s)", path, strerror(errno)));
+    LM_E(("HTTPS Error (error 'stating' '%s': %s)", path, strerror(errno)));
+    return -1;
   }
 
   if (statBuf.st_size > outSize)
   {
     close(fd);
-    LM_RE(-1, ("HTTPS Error (file '%s' is TOO BIG (%d) - max size is %d bytes)", path, outSize));
+    LM_E(("HTTPS Error (file '%s' is TOO BIG (%d) - max size is %d bytes)", path, outSize));
+    return -1;
   }
 
   nb = read(fd, out, statBuf.st_size);
   close(fd);
 
   if (nb == -1)
-    LM_RE(-1, ("HTTPS Error (reading from '%s': %s)", path, strerror(errno)));
+  {
+    LM_E(("HTTPS Error (reading from '%s': %s)", path, strerror(errno)));
+    return -1;
+  }
+
   if (nb != statBuf.st_size)
-    LM_RE(-1, ("HTTPS Error (invalid size read from '%s': %d, wanted %d)", path, nb, statBuf.st_size));
+  {
+    LM_E(("HTTPS Error (invalid size read from '%s': %d, wanted %d)", path, nb, statBuf.st_size));
+    return -1;
+  }
 
   return 0;
 }
@@ -1121,7 +1136,7 @@ static int loadFile(char* path, char* out, int outSize)
 static void rushParse(char* rush, std::string* rushHostP, unsigned short* rushPortP)
 {
   char* colon = strchr(rush, ':');
-  char* copy  = strcpy(rush);
+  char* copy  = strdup(rush);
 
   if (colon == NULL)
     LM_X(1, ("Fatal Error (Bad syntax of '-rush' value: '%s' - expected syntax: 'host:port')", rush));

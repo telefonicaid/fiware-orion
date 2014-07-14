@@ -51,8 +51,10 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
      * OnIntervalThreadParams coming for the csubs document at thread creation time
      * from mongoBackend, we always needs that to get fresh lastNotification */
     ContextSubscriptionInfo csi;
-    if (mongoGetContextSubscriptionInfo(params->subId, &csi, &err, tenant) != SccOk) {
-        LM_RVE(("error invoking mongoGetContextSubscriptionInfo: '%s'", err.c_str()));
+    if (mongoGetContextSubscriptionInfo(params->subId, &csi, &err, tenant) != SccOk)
+    {
+      LM_E(("Database Error (error invoking mongoGetContextSubscriptionInfo"));
+      return;
     }
 
     int current = getCurrentTime();
@@ -65,10 +67,13 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
 
             /* Query database for data */
             NotifyContextRequest ncr;
-            if (mongoGetContextElementResponses(csi.entityIdVector, csi.attributeList, &(ncr.contextElementResponseVector), &err, tenant) != SccOk) {
-                csi.release();
-                ncr.contextElementResponseVector.release();
-                LM_RVE(("error invoking mongoGetContextElementResponses: '%s'", err.c_str()));
+            // FIXME P7: mongoGetContextElementResponses ALWAYS returns SccOk !!!
+            if (mongoGetContextElementResponses(csi.entityIdVector, csi.attributeList, &(ncr.contextElementResponseVector), &err, tenant) != SccOk)
+            {
+              csi.release();
+              ncr.contextElementResponseVector.release();
+              LM_E(("Database Error (error invoking mongoGetContextElementResponses"));
+              return;
             }
 
             if (ncr.contextElementResponseVector.size() > 0) {
@@ -83,9 +88,12 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
                 ncr.contextElementResponseVector.release();
 
                 /* Update database fields due to new notification */
-                if (mongoUpdateCsubNewNotification(params->subId, &err, tenant) != SccOk) {
-                    csi.release();
-                    LM_RVE(("error invoking mongoUpdateCsubNewNotification: '%s'", err.c_str()));
+                // FIXME P7: mongoUpdateCsubNewNotification ALWAYS returns SccOk !!!
+                if (mongoUpdateCsubNewNotification(params->subId, &err, tenant) != SccOk)
+                {
+                  csi.release();
+                  LM_E(("Database Error (error invoking mongoUpdateCsubNewNotification)"));
+                  return;
                 }
             }
             else {
@@ -98,7 +106,6 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
     }
 
     csi.release();
-
 }
 
 /* ****************************************************************************

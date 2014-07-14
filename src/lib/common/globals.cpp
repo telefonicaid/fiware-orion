@@ -256,7 +256,8 @@ int64_t parse8601(const std::string& s)
       if ((value == 0) && (*start != '0'))
       {
         free(toFree);
-        LM_RE(-1, ("parse error for '%s'", start));
+        LM_E(("Bad Input (parse error for duration '%s')", start));
+        return -1;
       }
 
       accumulated += toSeconds(value, what, dayPart);

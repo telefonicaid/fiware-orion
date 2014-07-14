@@ -156,7 +156,10 @@ static std::string attributeExpression(const std::string& path, const std::strin
   reqDataP->dcar.res.restriction.attributeExpression.set(value);
 
   if (value == "")
-     LM_RE("Empty attribute expression", ("Empty attribute expression"));
+  {
+    LM_W(("Bad Input (empty attribute expression)"));
+    return "Empty attribute expression";
+  }
 
   return "OK";
 }

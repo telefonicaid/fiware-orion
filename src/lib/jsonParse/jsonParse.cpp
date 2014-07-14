@@ -308,7 +308,10 @@ static std::string jsonParse
   {
     std::string out = jsonParse(ciP, v2, path, parseVector, parseDataP);
     if (out != "OK")
-      LM_RE(out, ("JSON Parse Error: '%s'", out.c_str()));
+    {
+      LM_W(("Bad Input (JSON parse error: '%s')", out.c_str()));
+      return out;
+    }
   }
 
   return "OK";

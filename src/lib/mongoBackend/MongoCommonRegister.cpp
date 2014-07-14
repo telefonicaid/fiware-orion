@@ -416,14 +416,15 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
         std::string err;
         if (!processAssociations(cr->registrationMetadataVector, &err, tenant))
         {
-            responseP->errorCode.fill(SccReceiverInternalError);
-            LM_RE(SccOk, ("processAssociations: %s", err.c_str()));
+          responseP->errorCode.fill(SccReceiverInternalError);
+          return SccOk;
         }
 
         if (!addTriggeredSubscriptions(*cr, &subsToNotify, &err, tenant))
         {
-            responseP->errorCode.fill(SccReceiverInternalError, err);
-            LM_RE(SccOk, ("addTriggeredSubscriptions: %s", err.c_str()));
+          responseP->errorCode.fill(SccReceiverInternalError, err);
+          LM_E(("Database Error (addTriggeredSubscriptions: %s)", err.c_str()));
+          return SccOk;
         }
 
     }

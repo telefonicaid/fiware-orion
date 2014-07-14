@@ -189,9 +189,11 @@ static HttpStatusCode associationsDiscoverContextAvailability
 
     MetadataVector mdV;
     std::string err;
-    if (!associationsQuery(&requestP->entityIdVector, &requestP->attributeList, scope, &mdV, &err, tenant, offset, limit, details)) {
+    if (!associationsQuery(&requestP->entityIdVector, &requestP->attributeList, scope, &mdV, &err, tenant, offset, limit, details))
+    {
         responseP->errorCode.fill(SccReceiverInternalError, std::string("Database error: ") + err);
-        LM_RE(SccOk,(responseP->errorCode.details.c_str()));
+        LM_E(("Database Error (%s)", err.c_str()));
+        return SccOk;
     }
 
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
@@ -223,9 +225,11 @@ static HttpStatusCode associationsDiscoverContextAvailability
         }
 
         ContextRegistrationResponseVector crrV;
-        if (!registrationsQuery(enV, attrL, &crrV, &err, tenant)) {
+        if (!registrationsQuery(enV, attrL, &crrV, &err, tenant))
+        {
             responseP->errorCode.fill(SccReceiverInternalError, err);
-            LM_RE(SccOk,(responseP->errorCode.details.c_str()));
+            LM_E(("Database Error (%s)", responseP->errorCode.details.c_str()));
+            return SccOk;
         }
 
         /* Accumulate in responseP */
@@ -264,7 +268,8 @@ static HttpStatusCode conventionalDiscoverContextAvailability
     if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err, tenant, offset, limit, details, &count))
     {
         responseP->errorCode.fill(SccReceiverInternalError, err);
-        LM_RE(SccOk,(responseP->errorCode.details.c_str()));
+        LM_E(("Database Error (%s)", responseP->errorCode.details.c_str()));
+        return SccOk;
     }
 
     if (responseP->responseVector.size() == 0)

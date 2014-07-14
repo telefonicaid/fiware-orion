@@ -621,7 +621,11 @@ static int connectionTreat
     // ConnectionInfo
     //
     if ((ciP = new ConnectionInfo(url, method, version, connection)) == NULL)
-      LM_RE(MHD_NO, ("Error allocating ConnectionInfo"));
+    {
+      LM_E(("Runtime Error (error allocating ConnectionInfo)"));
+      return MHD_NO;
+    }
+
     *con_cls = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
     ciP->port = port;
     ciP->ip   = ip;
@@ -755,13 +759,19 @@ static int connectionTreat
 static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
   if (port == 0)
-     LM_RE(1, ("Please call restInit before starting the REST service"));
+  {
+    LM_E(("BUG (please call restInit before starting the REST service)"));
+    return 1;
+  }
 
   if ((ipVersion == IPV4) || (ipVersion == IPDUAL)) 
   { 
     memset(&sad, 0, sizeof(sad));
     if (inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr)) != 1)
-      LM_RE(2, ("V4 inet_pton fail for %s", bindIp));
+    {
+      LM_E(("Runtime Error (V4 inet_pton fail for %s)", bindIp));
+      return 2;
+    }
 
     sad.sin_family = AF_INET;
     sad.sin_port   = htons(port);
@@ -797,7 +807,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
     if (mhdDaemon == NULL)
     {
-      LM_E(("Fatal error - unable to start http services in port %d", port));
+      LM_E(("Runtime Error (unable to start http services in port %d)", port));
       return 3;
     }
   }  
@@ -806,7 +816,10 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
   { 
     memset(&sad_v6, 0, sizeof(sad_v6));
     if (inet_pton(AF_INET6, bindIPv6, &(sad_v6.sin6_addr.s6_addr)) != 1)
-      LM_RE(1, ("V6 inet_pton fail for %s", bindIPv6));
+    {
+      LM_E(("Runtime Error (V6 inet_pton fail for %s)", bindIPv6));
+      return 1;
+    }
 
     sad_v6.sin6_family = AF_INET6;
     sad_v6.sin6_port = htons(port);
@@ -841,7 +854,10 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     }
 
     if (mhdDaemon_v6 == NULL)
-      LM_RE(1, ("MHD_start_daemon_v6 failed"));
+    {
+      LM_E(("Runtime Error (unable to start http services (IP v6) in port %d)", port));
+      return 1;
+    }
   }
 
   return 0;
