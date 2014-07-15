@@ -152,12 +152,41 @@ std::string sendHttpSocket
   ++callNo;
 
   // Preconditions check
-  if (port == 0)        LM_RE("error", ("port is ZERO"));
-  if (ip.empty())       LM_RE("error", ("ip is empty"));
-  if (verb.empty())     LM_RE("error", ("verb is empty"));
-  if (resource.empty()) LM_RE("error", ("resource is empty"));
-  if ((content_type.empty()) && (!content.empty())) LM_RE("error", ("Content-Type is empty but there is actual content"));
-  if ((!content_type.empty()) && (content.empty())) LM_RE("error", ("there is actual content but Content-Type is empty"));
+  if (port == 0)
+  {
+    LM_E(("Runtime Error (port is ZERO)"));
+    return "error";
+  }
+
+  if (ip.empty())
+  {
+    LM_E(("Runtime Error (ip is empty)"));
+    return "error";
+  }
+
+  if (verb.empty())
+  {
+    LM_E(("Runtime Error (verb is empty)"));
+    return "error";
+  }
+
+  if (resource.empty())
+  {
+    LM_E(("Runtime Error (resource is empty)"));
+    return "error";
+  }
+
+  if ((content_type.empty()) && (!content.empty()))
+  {
+    LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
+    return "error";
+  }
+
+  if ((!content_type.empty()) && (content.empty()))
+  {
+    LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
+    return "error";
+  }
 
   //
   // Rush
@@ -228,15 +257,21 @@ std::string sendHttpSocket
      *    + 1, for the \0 by the trailing character in C strings
      */
     int neededSize = content.length() + strlen(preContent) + 3;
-    if (neededSize > MAX_DYN_MSG_SIZE) {
-        LM_RE("error", ("HTTP request to send is too large: %d bytes", content.length() + strlen(preContent)));
+    if (neededSize > MAX_DYN_MSG_SIZE)
+    {
+      LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", content.length() + strlen(preContent)));
+      return "error";
     }
-    else if (neededSize > MAX_STA_MSG_SIZE) {
+    else if (neededSize > MAX_STA_MSG_SIZE)
+    {
         msgDynamic = (char*) calloc(sizeof(char), neededSize);
-        if (msgDynamic == NULL) {
-            LM_RE("error", ("dynamic memory allocation failure"));
+        if (msgDynamic == NULL)
+        {
+          LM_E(("Runtime Error (dynamic memory allocation failure)"));
+          return "error";
         }
-        msg = msgDynamic;
+
+        msg  = msgDynamic;
         what = (char*) "dynamic";
     }
 
@@ -257,7 +292,10 @@ std::string sendHttpSocket
   int fd = socketHttpConnect(ip, port); // Connecting to HTTP server
 
   if (fd == -1)
-    LM_RE("error", ("Unable to connect to HTTP server at %s:%d", ip.c_str(), port));
+  {
+    LM_E(("Runtime Error (unable to connect to HTTP server at %s:%d)", ip.c_str(), port));
+    return "error";
+  }
 
   int nb;
   int sz = strlen(msg);

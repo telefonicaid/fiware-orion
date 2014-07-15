@@ -197,7 +197,8 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
   if (father == NULL)
   {
     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", "unknown", SccBadRequest, "XML Parse Error");
-    LM_RE(errorReply, ("Parse Error"));
+    LM_W(("Bad Input (XML parse error)"));
+    return errorReply;
   }
 
   if (reqP == NULL)
@@ -206,7 +207,8 @@ std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseD
                                                SccBadRequest,
                                                std::string("Sorry, no request treating object found for RequestType '") + requestType(request) + "', method '" + ciP->method + "'");
 
-    LM_RE(errorReply, ("Sorry, no request treating object found for RequestType %d (%s), method %s", request, requestType(request), ciP->method.c_str()));
+    LM_W(("Bad Input (no request treating object found for RequestType %d (%s), method %s)", request, requestType(request), ciP->method.c_str()));
+    return errorReply;
   }
 
 

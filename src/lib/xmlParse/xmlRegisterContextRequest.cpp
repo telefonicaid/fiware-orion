@@ -410,7 +410,8 @@ static int entityIdList(xml_node<>* node, ParseData* parseDataP)
    if (parseDataP->rcr.crP->entityIdVectorPresent == true)
    {
      parseDataP->errorString = "Got an entityIdList when one was present already";
-     LM_RE(1, ("Got an entityIdList when one was present already!!!"));
+     LM_W(("Bad Input (more than one list of entityId)"));
+     return 1;
    }
 
    parseDataP->rcr.crP->entityIdVectorPresent = true;
