@@ -95,7 +95,7 @@ static bool processAssociations(MetadataVector mdV, std::string* err, std::strin
             mongoSemTake(__FUNCTION__, "insert into AssociationsCollection");
             connection->insert(getAssociationsCollectionName(tenant).c_str(), doc);
             mongoSemGive(__FUNCTION__, "insert into AssociationsCollection");
-            LM_I(("Successful operation in database (%s)", doc.toString().c_str()));
+            LM_I(("Database Operation Successful (%s)", doc.toString().c_str()));
         }
         catch (const DBException &e)
         {
@@ -140,7 +140,7 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
            mongoSemTake(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
            sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), BSON("_id" << OID(mapSubId)));
            mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
-           LM_I(("Successful operation in database (_id: %s)", mapSubId.c_str()));
+           LM_I(("Database Operation Successful (_id: %s)", mapSubId.c_str()));
         }
         catch (...)
         {
@@ -294,7 +294,7 @@ static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONOb
         }
 
         mongoSemGive(__FUNCTION__, "query in SubscribeContextAvailabilityCollection");
-        LM_I(("Successful operation in database (%s)", query.toString().c_str()));
+        LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException &e)
     {
@@ -448,7 +448,7 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
          * registerContext (either new registration or updating an existing one) */
         connection->update(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << oid), regDoc, true);
         mongoSemGive(__FUNCTION__, "update in RegistrationsCollection");
-        LM_I(("Successful operation in database (_id: %s)", oid.toString().c_str()));
+        LM_I(("Database Operation Successful (_id: %s)", oid.toString().c_str()));
     }
     catch( const DBException &e ) {
         mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (DBException)");

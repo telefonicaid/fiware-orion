@@ -62,7 +62,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
       sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), BSON("_id" << id));
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
 
-      LM_I(("Successful operation in database (findOne _id: %s)", id.toString().c_str()));
+      LM_I(("Database Operation Successful (findOne _id: %s)", id.toString().c_str()));
 
       if (sub.isEmpty())
       {
@@ -80,7 +80,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection (mongo assertion exception)");
       reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo assertion exception)");
       responseP->statusCode.fill(SccContextElementNotFound);
-      LM_E(("Bad Input (invalid OID format)"));
+      LM_W(("Bad Input (invalid OID format)"));
       return SccOk;
   }
   catch (const DBException &e)
@@ -116,7 +116,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
       mongoSemTake(__FUNCTION__, "remove in SubscribeContextAvailabilityCollection");
       connection->remove(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), BSON("_id" << OID(requestP->subscriptionId.get())));
       mongoSemGive(__FUNCTION__, "remove in SubscribeContextAvailabilityCollection");
-      LM_I(("Successful operation in database (remove _id: %s)", requestP->subscriptionId.get().c_str()));
+      LM_I(("Database Operation Successful (remove _id: %s)", requestP->subscriptionId.get().c_str()));
   }
   catch (const DBException &e)
   {

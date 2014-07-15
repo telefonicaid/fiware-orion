@@ -121,7 +121,7 @@ HttpStatusCode mongoSubscribeContext
         mongoSemTake(__FUNCTION__, "insert into SubscribeContextCollection");
         connection->insert(getSubscribeContextCollectionName(tenant).c_str(), subDoc);
         mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection");
-        LM_I(("Successful operation in database (insert %s)", subDoc.toString().c_str()));
+        LM_I(("Database Operation Successful (insert %s)", subDoc.toString().c_str()));
     }
     catch (const DBException &e)
     {

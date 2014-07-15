@@ -55,7 +55,7 @@ void mongoSetFwdRegId(const std::string& regId, const std::string& fwdRegId, con
         mongoSemTake(__FUNCTION__, "update in RegistrationsCollection");
         connection->update(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << OID(regId)), updateQuery);
         mongoSemGive(__FUNCTION__, "update in RegistrationsCollection");
-        LM_I(("Successful operation in database (update _id: %s, query: %s)", regId.c_str(), updateQuery.toString().c_str()));
+        LM_I(("Database Operation Successful (update _id: %s, query: %s)", regId.c_str(), updateQuery.toString().c_str()));
     }
     catch (const DBException &e)
     {
@@ -100,7 +100,7 @@ std::string mongoGetFwdRegId(const std::string& regId, const std::string& tenant
 
         LM_T(LmtMongo, ("reg doc: '%s'", doc.toString().c_str()));
         retVal = STR_FIELD(doc, REG_FWS_REGID);
-        LM_I(("Successful operation in database (findOne _id: %s)", regId.c_str()));
+        LM_I(("Database Operation Successful (findOne _id: %s)", regId.c_str()));
     }
     catch (const DBException &e)
     {

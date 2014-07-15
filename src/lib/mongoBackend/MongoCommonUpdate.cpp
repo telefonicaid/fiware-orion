@@ -808,7 +808,7 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
         }
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection");
 
-        LM_I(("Successful operation in database (%s)", query.toString().c_str()));
+        LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException &e)
     {
@@ -871,7 +871,7 @@ static bool processSubscriptions(const EntityId* enP, map<string, BSONObj*>* sub
            mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
            sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(mapSubId)));
            mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
-           LM_I(("Successful operation in database (findOne %s)", mapSubId.c_str()));
+           LM_I(("Database Operation Successful (findOne %s)", mapSubId.c_str()));
         }
         catch (...)
         {
@@ -923,7 +923,7 @@ static bool processSubscriptions(const EntityId* enP, map<string, BSONObj*>* sub
                 mongoSemTake(__FUNCTION__, "update in SubscribeContextCollection");
                 connection->update(getSubscribeContextCollectionName(tenant).c_str(), query, update);
                 mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection");
-                LM_I(("Successful operation in database (update: %s, query: %s)", update.toString().c_str(), query.toString().c_str()));
+                LM_I(("Database Operation Successful (update: %s, query: %s)", update.toString().c_str(), query.toString().c_str()));
             }
             catch (const DBException &e)
             {
@@ -1315,7 +1315,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
     {
         connection->insert(getEntitiesCollectionName(tenant).c_str(), insertedDoc);
         mongoSemGive(__FUNCTION__, "insert into EntitiesCollection");
-        LM_I(("Successful operation in database (insert %s)", insertedDoc.toString().c_str()));
+        LM_I(("Database Operation Successful (insert %s)", insertedDoc.toString().c_str()));
     }
     catch (const DBException &e)
     {
@@ -1381,7 +1381,7 @@ static bool removeEntity
         mongoSemTake(__FUNCTION__, "remove in EntitiesCollection");
         connection->remove(getEntitiesCollectionName(tenant).c_str(), query);
         mongoSemGive(__FUNCTION__, "remove in EntitiesCollection");
-        LM_I(("Successful operation in database (remove %s)", query.toString().c_str()));
+        LM_I(("Database Operation Successful (remove %s)", query.toString().c_str()));
     }
     catch (const DBException &e)
     {
@@ -1496,7 +1496,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         }
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
 
-        LM_I(("Successful operation in database (%s)", query.toString().c_str()));
+        LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException &e)
     {
@@ -1641,7 +1641,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             mongoSemTake(__FUNCTION__, "update in EntitiesCollection");
             connection->update(getEntitiesCollectionName(tenant).c_str(), query, updatedEntity);
             mongoSemGive(__FUNCTION__, "update in EntitiesCollection");
-            LM_I(("Successful operation in database (update %s)", query.toString().c_str()));
+            LM_I(("Database Operation Successful (update %s)", query.toString().c_str()));
         }
         catch (const DBException &e)
         {

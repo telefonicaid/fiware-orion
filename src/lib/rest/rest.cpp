@@ -612,7 +612,7 @@ static int connectionTreat
     // Transaction
     //
     transactionIdSet();
-    LM_I(("Starting transaction to %s:%d", ip, port));
+    LM_I(("Starting transaction from %s:%d%s", ip, port, url));
 
 
     //

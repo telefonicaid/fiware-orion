@@ -60,7 +60,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
         mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
         sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << id));
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
-        LM_I(("Successful operation in database (findOne _id: %s)", id.toString().c_str()));
+        LM_I(("Database Operation Successful (findOne _id: %s)", id.toString().c_str()));
     }
     catch (const AssertionException &e)
     {
@@ -71,7 +71,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo assertion exception)");
         reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo assertion exception)");
         responseP->statusCode.fill(SccContextElementNotFound);
-        LM_E(("Bad Input (invalid OID format)"));
+        LM_W(("Bad Input (invalid OID format)"));
         return SccOk;
     }
     catch (const DBException &e)
@@ -113,7 +113,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
         mongoSemTake(__FUNCTION__, "remove from SubscribeContextCollection");
         connection->remove(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(requestP->subscriptionId.get())));
         mongoSemGive(__FUNCTION__, "remove from SubscribeContextCollection");
-        LM_I(("Successful operation in database (remove _id: %s)", requestP->subscriptionId.get().c_str()));
+        LM_I(("Database Operation Successful (remove _id: %s)", requestP->subscriptionId.get().c_str()));
     }
     catch (const DBException &e)
     {

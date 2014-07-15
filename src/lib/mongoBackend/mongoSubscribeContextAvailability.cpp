@@ -102,7 +102,7 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
         mongoSemTake(__FUNCTION__, "insert into SubscribeContextAvailabilityCollection");
         connection->insert(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), subDoc);
         mongoSemGive(__FUNCTION__, "insert into SubscribeContextAvailabilityCollection");
-        LM_I(("Successful operation in database (insert %s)", subDoc.toString().c_str()));
+        LM_I(("Database Operation Successful (insert %s)", subDoc.toString().c_str()));
     }
     catch (const DBException &e)
     {

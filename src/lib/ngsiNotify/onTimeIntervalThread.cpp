@@ -83,7 +83,7 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
                 ncr.originator.set("localhost");
                 ncr.subscriptionId.set(params->subId);
 
-                LM_I(("Starting transaction for %s", csi.url.c_str()));
+                LM_I(("Starting transaction to %s", csi.url.c_str()));
                 params->notifier->sendNotifyContextRequest(&ncr, csi.url, tenant, csi.format);
                 LM_I(("Transaction ended (%s:%d)", csi.url.c_str()));
 

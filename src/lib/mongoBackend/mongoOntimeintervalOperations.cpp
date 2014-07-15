@@ -55,7 +55,7 @@ HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, Context
         mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
         sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(subId)));
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
-        LM_I(("Successful operation in database (findOne _id: %s)", subId.c_str()));
+        LM_I(("Database Operation Successful (findOne _id: %s)", subId.c_str()));
     }
     catch (const DBException &e)
     {
@@ -172,7 +172,7 @@ HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::str
     {
         connection->update(getSubscribeContextCollectionName(tenant).c_str(), query, update);
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection");
-        LM_I(("Successful operation in database (update: %s, query %s)", update.toString().c_str(), query.toString().c_str()));
+        LM_I(("Database Operation Successful (update: %s, query %s)", update.toString().c_str(), query.toString().c_str()));
     }
     catch (const DBException &e)
     {

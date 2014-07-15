@@ -57,7 +57,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
       mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
       sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << id));
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
-      LM_I(("Successful operation in database (findOne _id: %s)", id.toString().c_str()));
+      LM_I(("Database Operation Successful (findOne _id: %s)", id.toString().c_str()));
   }
   catch (const AssertionException &e)
   {
@@ -69,7 +69,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
       reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo assertion exception)");
 
       responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
-      LM_E(("Bad Input (invalid OID format)"));
+      LM_W(("Bad Input (invalid OID format)"));
       return SccOk;
   }
   catch (const DBException &e)
@@ -208,7 +208,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
       mongoSemTake(__FUNCTION__, "update in SubscribeContextCollection");
       connection->update(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(requestP->subscriptionId.get())), update);
       mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection");
-      LM_I(("Successful operation in database (update _id: %s, %s)", requestP->subscriptionId.get().c_str(), update.toString().c_str()));
+      LM_I(("Database Operation Successful (update _id: %s, %s)", requestP->subscriptionId.get().c_str(), update.toString().c_str()));
   }
   catch (const DBException &e)
   {

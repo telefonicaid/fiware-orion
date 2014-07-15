@@ -418,7 +418,7 @@ void recoverOntimeIntervalThreads(std::string tenant) {
             throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection");
-        LM_I(("Successful operation in database (%s)", query.toString().c_str()));
+        LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException &e)
     {
@@ -874,7 +874,7 @@ bool entitiesQuery
         }
 
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
-        LM_I(("Successful operation in database (%s)", query.toString().c_str()));
+        LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException& e)
     {
@@ -1191,7 +1191,7 @@ bool registrationsQuery
 
         cursor = connection->query(getRegistrationsCollectionName(tenant).c_str(), query, limit, offset);
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection");
-        LM_I(("Successful operation in database (%s)", query.toString().c_str()));
+        LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException& e)
     {
@@ -1465,7 +1465,7 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
     {
         connection->update(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), query, update);
         mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
-        LM_I(("Successful operation in database (%s)", query.toString().c_str()));
+        LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException &e)
     {

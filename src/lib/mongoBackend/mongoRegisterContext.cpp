@@ -69,7 +69,7 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
         mongoSemTake(__FUNCTION__, "findOne from RegistrationsCollection");
         reg = connection->findOne(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << id));
         mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection");
-        LM_I(("Successful operation in database (findOne _id: %s)", id.toString().c_str()));
+        LM_I(("Database Operation Successful (findOne _id: %s)", id.toString().c_str()));
     }
     catch (const AssertionException &e)
     {
@@ -82,7 +82,7 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
         responseP->errorCode.fill(SccContextElementNotFound);
         responseP->registrationId = requestP->registrationId;
         ++noOfRegistrationUpdateErrors;
-        LM_E(("Bad Input (invalid OID format)"));
+        LM_W(("Bad Input (invalid OID format)"));
         return SccOk;
     }
     catch (const DBException &e)

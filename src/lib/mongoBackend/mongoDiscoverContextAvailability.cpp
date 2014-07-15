@@ -112,7 +112,7 @@ static bool associationsQuery
             throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
         mongoSemGive(__FUNCTION__, "query in AssociationsCollection");
-        LM_I(("Successful operation in database (%s)", query.toString().c_str()));
+        LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException &e)
     {
