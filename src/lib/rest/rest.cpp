@@ -37,8 +37,6 @@
 #include "rest/OrionError.h"
 #include "rest/uriParamNames.h"
 
-#include "restCoap/coap.h"
-
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/select.h>
@@ -83,7 +81,6 @@ std::string                      rushHost              = "";
 unsigned short                   rushPort              = 0;
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
-static Coap*                     coapDaemon            = NULL;
 static struct sockaddr_in        sad;
 static struct sockaddr_in6       sad_v6;
 __thread char                    static_buffer[STATIC_BUFFER_SIZE + 1];
@@ -766,11 +763,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
     if (mhdDaemon == NULL)
       LM_RE(3, ("MHD_start_daemon failed"));
-
-    //LM_T(LmtCoap, ("Starting CoAP daemon on IPv4 %s port %d", bindIp, 5683));
-    // IANA has assigned the port number 5683 and the service name "coap" [RFC6335].
-    coapDaemon->run(bindIp, port, coapPort);
-  }  
+  }
 
   if ((ipVersion == IPV6) || (ipVersion == IPDUAL))
   { 
@@ -868,8 +861,6 @@ void restInit
 
   if ((_ipVersion == IPV6) || (_ipVersion == IPDUAL))
      strncpy(bindIPv6, bindIPv6, MAX_LEN_IP - 1);
-
-  coapDaemon = new Coap();
 
   // Starting REST interface
   int r;

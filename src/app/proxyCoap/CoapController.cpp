@@ -192,7 +192,7 @@ void CoapController::serve()
     if (ret == -1)
     {
       LM_W(("Error receiving data"));
-      return;
+      continue;
     }
 
     boost::scoped_ptr<CoapPDU> recvPDU(new CoapPDU((uint8_t*) buffer, COAP_BUFFER_SIZE, COAP_BUFFER_SIZE));
