@@ -174,8 +174,6 @@ int main(int argC, char* argV[])
   signal(SIGINT,  sigHandler);
   signal(SIGTERM, sigHandler);
 
-  //atexit(exitFunc);
-
   paConfig("remove builtin", "-d");
   paConfig("remove builtin", "-r");
   paConfig("remove builtin", "-w");
