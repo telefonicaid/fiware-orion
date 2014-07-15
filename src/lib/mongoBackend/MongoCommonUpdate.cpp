@@ -1157,7 +1157,8 @@ static bool processContextAttributeVector (ContextElement*               ceP,
         else
         {
           cerP->statusCode.fill(SccInvalidParameter, std::string("unknown actionType: '") + action + "'");
-          LM_E(("BUG (unknown actionType '%s'. This is a bug in the parse layer checks)", action.c_str()));
+          // This is a BUG in the parse layer checks
+          LM_E(("Runtime Error (unknown actionType '%s')", action.c_str()));
           return false;
         }
 

@@ -901,7 +901,7 @@ int pidFile(void)
 
   if (fd == -1)
   {
-    LM_I(("PID File (open '%s': %s", pidPath, strerror(errno)));
+    LM_E(("PID File (open '%s': %s", pidPath, strerror(errno)));
     return -1;
   }
 

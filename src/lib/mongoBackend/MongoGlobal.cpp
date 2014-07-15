@@ -153,7 +153,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
     if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
     {
         mongoSemGive(__FUNCTION__, "wrong mongo version format");
-        LM_E(("Invalid Database Version Format (%s)", versionString.c_str()));
+        LM_E(("Database Error (invalid version format: %s)", versionString.c_str()));
         return false;
     }
     LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)", versionString.c_str(), mongoVersionMayor, mongoVersionMinor, extra.c_str()));

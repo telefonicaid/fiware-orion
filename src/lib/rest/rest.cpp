@@ -760,7 +760,8 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 {
   if (port == 0)
   {
-    LM_E(("BUG (please call restInit before starting the REST service)"));
+    // This is a BUG
+    LM_E(("Fatal Error (port cannot be 0)"));
     return 1;
   }
 
@@ -769,7 +770,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     memset(&sad, 0, sizeof(sad));
     if (inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr)) != 1)
     {
-      LM_E(("Runtime Error (V4 inet_pton fail for %s)", bindIp));
+      LM_E(("Fatal Error (V4 inet_pton fail for %s)", bindIp));
       return 2;
     }
 
@@ -807,7 +808,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
     if (mhdDaemon == NULL)
     {
-      LM_E(("Runtime Error (unable to start http services in port %d)", port));
+      LM_E(("Fatal Error (unable to start http services in port %d)", port));
       return 3;
     }
   }  
@@ -817,7 +818,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     memset(&sad_v6, 0, sizeof(sad_v6));
     if (inet_pton(AF_INET6, bindIPv6, &(sad_v6.sin6_addr.s6_addr)) != 1)
     {
-      LM_E(("Runtime Error (V6 inet_pton fail for %s)", bindIPv6));
+      LM_E(("Fatal Error (V6 inet_pton fail for %s)", bindIPv6));
       return 1;
     }
 
@@ -855,7 +856,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
     if (mhdDaemon_v6 == NULL)
     {
-      LM_E(("Runtime Error (unable to start http services (IP v6) in port %d)", port));
+      LM_E(("Fatal Error (unable to start http services (IP v6) in port %d)", port));
       return 1;
     }
   }
