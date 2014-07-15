@@ -586,7 +586,6 @@ static int connectionTreat
 {
   ConnectionInfo*        ciP         = (ConnectionInfo*) *con_cls;
   size_t                 dataLen     = *upload_data_size;
-  static int             transaction = 0;
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (ciP == NULL)
@@ -612,9 +611,8 @@ static int connectionTreat
     //
     // Transaction
     //
-    ++transaction;
-    transactionIdSet(transaction);
-    LM_I(("Starting transaction from %s:%d", ip, port));
+    transactionIdSet();
+    LM_I(("Starting transaction to %s:%d", ip, port));
 
 
     //

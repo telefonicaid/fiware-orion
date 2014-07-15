@@ -116,10 +116,12 @@ HttpStatusCode mongoSubscribeContext
     /* Insert document in database */
     BSONObj subDoc = sub.obj();
     LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), subDoc.toString().c_str()));
-    try {
+    try
+    {
         mongoSemTake(__FUNCTION__, "insert into SubscribeContextCollection");
         connection->insert(getSubscribeContextCollectionName(tenant).c_str(), subDoc);
         mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection");
+        LM_I(("Successful operation in database (insert %s)", subDoc.toString().c_str()));
     }
     catch (const DBException &e)
     {

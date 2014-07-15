@@ -93,8 +93,8 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
     /* The first argument to true is to use autoreconnect */
     connection = new DBClientConnection(true);
 
-    bool connected = false;
-    int  retries   = RECONNECT_RETRIES;
+    bool connected     = false;
+    int  retries       = RECONNECT_RETRIES;
 
     for (int tryNo = 0; tryNo < retries; ++tryNo)
     {
@@ -118,6 +118,8 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
       LM_E(("Database Error (connection failed, after %d retries: '%s')", retries, err.c_str()));
       return false;
     }
+
+    LM_I(("Successful connection to database"));
 
     /* Authentication is different depending if multiservice is used or not. In the case of not
      * using multiservice, we authenticate in the single-service database. In the case of using
@@ -411,10 +413,12 @@ void recoverOntimeIntervalThreads(std::string tenant) {
          * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
          * exception ourselves
          */
-        if (cursor.get() == NULL) {
+        if (cursor.get() == NULL)
+        {
             throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection");
+        LM_I(("Successful operation in database (%s)", query.toString().c_str()));
     }
     catch (const DBException &e)
     {
@@ -870,6 +874,7 @@ bool entitiesQuery
         }
 
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
+        LM_I(("Successful operation in database (%s)", query.toString().c_str()));
     }
     catch (const DBException& e)
     {
@@ -1186,6 +1191,7 @@ bool registrationsQuery
 
         cursor = connection->query(getRegistrationsCollectionName(tenant).c_str(), query, limit, offset);
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection");
+        LM_I(("Successful operation in database (%s)", query.toString().c_str()));
     }
     catch (const DBException& e)
     {
@@ -1194,6 +1200,7 @@ bool registrationsQuery
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
 
+        LM_E(("Database Error (%s)", err->c_str()));
         return false;
     }
     catch (...)
@@ -1203,6 +1210,7 @@ bool registrationsQuery
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
 
+        LM_E(("Database Error (%s)", err->c_str()));
         return false;
     }
 
@@ -1457,6 +1465,7 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
     {
         connection->update(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), query, update);
         mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
+        LM_I(("Successful operation in database (%s)", query.toString().c_str()));
     }
     catch (const DBException &e)
     {
@@ -1501,7 +1510,6 @@ bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, st
     if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant))
     {
        ncar.contextRegistrationResponseVector.release();
-       LM_E(("Database Error (%s)", err.c_str()));
        return false;
     }
 

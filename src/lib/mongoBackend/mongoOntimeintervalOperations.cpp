@@ -50,10 +50,12 @@ HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, Context
     /* Search for the document */
     LM_T(LmtMongo, ("findOne() in '%s' collection by _id '%s'", getSubscribeContextCollectionName(tenant).c_str(), subId.c_str()));
     BSONObj sub;
-    try {
+    try
+    {
         mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
         sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(subId)));
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
+        LM_I(("Successful operation in database (findOne _id: %s)", subId.c_str()));
     }
     catch (const DBException &e)
     {
@@ -170,6 +172,7 @@ HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::str
     {
         connection->update(getSubscribeContextCollectionName(tenant).c_str(), query, update);
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection");
+        LM_I(("Successful operation in database (update: %s, query %s)", update.toString().c_str(), query.toString().c_str()));
     }
     catch (const DBException &e)
     {
@@ -181,7 +184,7 @@ HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::str
     {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
         *err = "Generic Exception";
-        LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), "Generic Exception"));
+        LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), err->c_str()));
     }
 
     reqSemGive(__FUNCTION__, "update subscription notifications");

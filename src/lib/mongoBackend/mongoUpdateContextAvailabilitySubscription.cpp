@@ -55,8 +55,10 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
       mongoSemTake(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection");
       sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), BSON("_id" << id));
       mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection");
+      LM_I(("Successful operation in database (findOne _id: %s)", id.toString().c_str()));
   }
-  catch( const AssertionException &e ) {
+  catch (const AssertionException &e)
+  {
       /* This happens when OID format is wrong */
       // FIXME: this checking should be done at parsing stage, without progressing to
       // mongoBackend. By the moment we can live this here, but we should remove in the future
@@ -65,9 +67,11 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
       reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo assertion exception)");
 
       responseP->errorCode.fill(SccContextElementNotFound);
+      LM_E(("Bad Input (invalid OID format)"));
       return SccOk;
   }
-  catch( const DBException &e ) {
+  catch (const DBException &e)
+  {
       mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (mongo db exception)");
       reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)");
 
@@ -75,9 +79,11 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                 " - findOne() _id: " + requestP->subscriptionId.get() +
                                 " - exception: " + e.what());
+      LM_E(("Database Error (%s)", responseP->errorCode.details.c_str()));
       return SccOk;
   }
-  catch(...) {
+  catch (...)
+  {
       mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (mongo generic exception)");
       reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo generic exception)");
 
@@ -85,10 +91,12 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
                                 std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                 " - findOne() _id: " + requestP->subscriptionId.get() +
                                 " - exception: " + "generic");
+      LM_E(("Database Error (%s)", responseP->errorCode.details.c_str()));
       return SccOk;
   }
 
-  if (sub.isEmpty()) {
+  if (sub.isEmpty())
+  {
      responseP->errorCode.fill(SccContextElementNotFound);
      reqSemGive(__FUNCTION__, "ngsi9 update subscription request (no subscriptions found)");
      return SccOk;
@@ -160,12 +168,15 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
   LM_T(LmtMongo, ("update() in '%s' collection _id '%s': %s}", getSubscribeContextAvailabilityCollectionName(tenant).c_str(),
                   requestP->subscriptionId.get().c_str(),
                   update.toString().c_str()));
-  try {
+  try
+  {
       mongoSemTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
       connection->update(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), BSON("_id" << OID(requestP->subscriptionId.get())), update);
       mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
+      LM_I(("Successful operation in database (update _id: %s)", requestP->subscriptionId.get().c_str()));
   }
-  catch( const DBException &e ) {
+  catch (const DBException &e)
+  {
       mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo db exception)");
       reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)");
 
@@ -175,9 +186,11 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
                                 " - update() doc: " + update.toString() +
                                 " - exception: " + e.what());
 
+      LM_E(("Database Error (%s)", responseP->errorCode.details.c_str()));
       return SccOk;
   }
-  catch(...) {
+  catch (...)
+  {
       mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo generic exception)");
       reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo generic exception)");
 
@@ -186,6 +199,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
                                 " - update() _id: " + requestP->subscriptionId.get().c_str() +
                                 " - update() doc: " + update.toString() +
                                 " - exception: " + "generic");
+      LM_E(("Database Error (%s)", responseP->errorCode.details.c_str()));
       return SccOk;
   }
 
@@ -194,7 +208,8 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
 
   /* Duration is an optional parameter, it is only added in the case they
    * was used for update */
-  if (!requestP->duration.isEmpty()) {      
+  if (!requestP->duration.isEmpty())
+  {
       responseP->duration = requestP->duration;
   }
 

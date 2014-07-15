@@ -39,12 +39,14 @@ extern int semInit(int shared = 0, int takenInitially = 1);
 */
 extern int reqSemTake(const char* who, const char* what);
 extern int mongoSemTake(const char* who, const char* what);
+extern int transSemTake(const char* who, const char* what);
 
 /* ****************************************************************************
 *
 * semGive -
 */
-int reqSemGive(const char* who, const char* what = NULL);
-int mongoSemGive(const char* who, const char* what = NULL);
+extern int reqSemGive(const char* who, const char* what = NULL);
+extern int mongoSemGive(const char* who, const char* what = NULL);
+extern int transSemGive(const char* who, const char* what = NULL);
 
 #endif  // SRC_LIB_COMMON_SEM_H_

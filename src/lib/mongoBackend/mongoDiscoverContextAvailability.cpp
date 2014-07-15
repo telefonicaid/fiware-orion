@@ -112,21 +112,24 @@ static bool associationsQuery
             throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
         mongoSemGive(__FUNCTION__, "query in AssociationsCollection");
+        LM_I(("Successful operation in database (%s)", query.toString().c_str()));
     }
-    catch( const DBException &e ) {
-
+    catch (const DBException &e)
+    {
         mongoSemGive(__FUNCTION__, "query in AssociationsCollection (DBException)");
         *err = std::string("collection: ") + getAssociationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
+        LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), err->c_str()));
         return false;
     }
-    catch(...) {
-
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "query in AssociationsCollection (Generic Exception)");
         *err = std::string("collection: ") + getAssociationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
+        LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), err->c_str()));
         return false;
     }
 
@@ -192,7 +195,6 @@ static HttpStatusCode associationsDiscoverContextAvailability
     if (!associationsQuery(&requestP->entityIdVector, &requestP->attributeList, scope, &mdV, &err, tenant, offset, limit, details))
     {
         responseP->errorCode.fill(SccReceiverInternalError, std::string("Database error: ") + err);
-        LM_E(("Database Error (%s)", err.c_str()));
         return SccOk;
     }
 
@@ -228,7 +230,6 @@ static HttpStatusCode associationsDiscoverContextAvailability
         if (!registrationsQuery(enV, attrL, &crrV, &err, tenant))
         {
             responseP->errorCode.fill(SccReceiverInternalError, err);
-            LM_E(("Database Error (%s)", responseP->errorCode.details.c_str()));
             return SccOk;
         }
 
