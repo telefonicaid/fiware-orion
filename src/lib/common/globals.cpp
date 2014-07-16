@@ -63,14 +63,21 @@ static struct timeval  logStartTime;
 * logging library 'liblm'.
 *
 */
-void transactionIdSet(int& transaction)
+void transactionIdSet(void)
 {
+  static int transaction = 0;
+
+  transSemTake("transactionIdSet", "changing the transaction id");
+  ++transaction;
+
   if (transaction < 0)
   {
     logStartTime.tv_usec += 1;
     transaction = 1;
   }
+
   snprintf(transactionId, sizeof(transactionId), "%lu-%03d-%011d", logStartTime.tv_sec, (int) logStartTime.tv_usec / 1000, transaction);
+  transSemGive("transactionIdSet", "changing the transaction id");
 }
 
 

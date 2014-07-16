@@ -134,6 +134,6 @@ extern int64_t parse8601(const std::string& s);
 * logging library 'liblm'.
 *
 */
-extern void transactionIdSet(int& transaction);
+extern void transactionIdSet(void);
 
 #endif  // SRC_LIB_COMMON_GLOBALS_H_

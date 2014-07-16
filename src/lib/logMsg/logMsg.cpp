@@ -72,7 +72,7 @@ char*        progName;               /* needed for messages (and by lmLib) */
 char         progNameV[512];         /* where to store progName            */
 
 
-__thread char   transactionId[64];
+__thread char   transactionId[64] = "N/A";
 
 static sem_t sem;
 
