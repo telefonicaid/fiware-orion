@@ -119,20 +119,18 @@ void* startOnIntervalThread(void* p)
 
     while (true)
     {
-        /* Thread wakes up */
-        LM_T(LmtNotifier, ("ONTIMEINTERVAL thread wakes up (%s)", params->subId.c_str()));
-
-        /* New transactionId for each notification */
+        // New transactionId for each notification
         transactionIdSet();
 
-        /* Do the work (we put this in a function due to error conditions would produce an
-         * early interruption of the process) */
+        LM_T(LmtNotifier, ("ONTIMEINTERVAL thread wakes up (%s)", params->subId.c_str()));
+
+        // Do the work (we put this in a function as error conditions would produce an
+        // early interruption of the process)
         doNotification(params, params->tenant);
 
-        /* Sleeps for interval */
+        // Sleeps for interval
         sleep(params->interval);
     }
 
-    /* This line is useless, but the compiler complaints if I don't use a "return" statement... */
     return NULL;
 }

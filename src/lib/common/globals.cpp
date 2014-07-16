@@ -75,9 +75,9 @@ void transactionIdSet(void)
     logStartTime.tv_usec += 1;
     transaction = 1;
   }
-  transSemGive("transactionIdSet", "changing the transaction id");
 
   snprintf(transactionId, sizeof(transactionId), "%lu-%03d-%011d", logStartTime.tv_sec, (int) logStartTime.tv_usec / 1000, transaction);
+  transSemGive("transactionIdSet", "changing the transaction id");
 }
 
 
