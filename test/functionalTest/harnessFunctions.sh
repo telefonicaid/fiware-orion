@@ -212,7 +212,7 @@ function brokerStop
   fi
 
   if [ "$VALGRIND" == "" ]; then
-    kill $(cat $pidFile) 2> /dev/null
+    kill $(cat $pidFile 2> /dev/null) 2> /dev/null
     if [ -f /tmp/orion_${port}.pid ]
     then
       rm -f /tmp/orion_${port}.pid 2> /dev/null
