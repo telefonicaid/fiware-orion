@@ -48,11 +48,11 @@
 #include "common/Timer.h"
 #include "common/compileInfo.h"
 
-#include "contextBroker/version.h"
 
 #include "common/string.h"
 
 #include "proxyCoap/CoapController.h"
+#include "proxyCoap/version.h"
 
 /* ****************************************************************************
 *
@@ -66,8 +66,8 @@ char            dbName[64];
 char            user[64];
 char            pwd[64];
 char            pidPath[256];
-char            fwdHost[64];
-int             fwdPort;
+char            cbHost[64];
+int             cbPort;
 bool            ngsi9Only;
 bool            harakiri;
 bool            useOnlyIPv4;
@@ -89,8 +89,8 @@ PaArgument paArgs[] =
   { "-localIp",      bindAddress,   "LOCALIP",         PaString, PaOpt, _i "0.0.0.0",   PaNL,   PaNL,  "IP to receive new connections"             },
   { "-port",         &port,         "PORT",            PaInt,    PaOpt, 5683,           PaNL,   PaNL,  "port to receive new connections"           },
 
-  { "-fwdHost",      fwdHost,       "FWD_HOST",        PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "host for forwarding CoAP requests"         },
-  { "-fwdPort",      &fwdPort,      "FWD_PORT",        PaInt,    PaOpt, 1026,              0,  65000,  "HTTP port for forwarding CoAP requests"    },
+  { "-cbHost",       cbHost,         "FWD_HOST",       PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "host for forwarding CoAP requests"         },
+  { "-cbPort",       &cbPort,        "FWD_PORT",       PaInt,    PaOpt, 1026,              0,  65000,  "HTTP port for forwarding CoAP requests"    },
 
   { "-ipv4",         &useOnlyIPv4,  "USEIPV4",         PaBool,   PaOpt, false,          false,  true,  "use ip v4 only"                            },
   { "-ipv6",         &useOnlyIPv6,  "USEIPV6",         PaBool,   PaOpt, false,          false,  true,  "use ip v6 only"                            },
@@ -118,12 +118,12 @@ void sigHandler(int sigNo)
 
 const char* description =
    "\n"
-   "Orion context broker version details:\n"
-   "  version:            " ORION_VERSION   "\n"
-   "  git hash:           " GIT_HASH        "\n"
-   "  compile time:       " COMPILE_TIME    "\n"
-   "  compiled by:        " COMPILED_BY     "\n"
-   "  compiled in:        " COMPILED_IN     "\n";
+   "proxyCoap version details:\n"
+   "  version:            " PROXYCOAP_VERSION"\n"
+   "  git hash:           " GIT_HASH         "\n"
+   "  compile time:       " COMPILE_TIME     "\n"
+   "  compiled by:        " COMPILED_BY      "\n"
+   "  compiled in:        " COMPILED_IN      "\n";
 
 
 
@@ -195,13 +195,13 @@ int main(int argC, char* argV[])
   paConfig("man shortdescription",          (void*) "Options:");
   paConfig("man description",               (void*) description);
   paConfig("man author",                    (void*) "Telefonica I+D");
-  paConfig("man exitstatus",                (void*) "The orion broker is a daemon. If it exits, something is wrong ...");
-  paConfig("man version",                   (void*) ORION_VERSION);
+  paConfig("man exitstatus",                (void*) "proxyCoap is a daemon. If it exits, something is wrong ...");
+  paConfig("man version",                   (void*) PROXYCOAP_VERSION);
   paConfig("log to screen",                 (void*) true);
   paConfig("log to file",                   (void*) true);
   paConfig("log file line format",          (void*) "TYPE:DATE:EXEC-AUX/FILE[LINE] FUNC: TEXT");
   paConfig("screen line format",            (void*) "TYPE@TIME  FUNC[LINE]: TEXT");
-  paConfig("builtin prefix",                (void*) "ORION_");
+  paConfig("builtin prefix",                (void*) "PROXYCOAP_");
   paConfig("usage and exit on any warning", (void*) true);
 
   paParse(paArgs, argC, (char**) argV, 1, false);
@@ -209,7 +209,7 @@ int main(int argC, char* argV[])
   if (fg == false)
     daemonize();
 
-  boost::thread *coapServerThread = new boost::thread(boost::bind(&CoapController::serve, new CoapController(bindAddress, fwdPort, port)));
+  boost::thread *coapServerThread = new boost::thread(boost::bind(&CoapController::serve, new CoapController(bindAddress, cbPort, port)));
   coapServerThread->get_id(); // to prevent 'warning: unused'
 
   while (1)

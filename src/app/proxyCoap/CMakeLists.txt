@@ -35,21 +35,6 @@ SET (HEADERS
 )
 
 SET (STATIC_LIBS
-    common
-    mongoBackend
-    ngsiNotify
-    serviceRoutines
-    convenienceMap
-    mongoBackend
-    rest
-    jsonParse
-    xmlParse
-    convenience
-    ngsi9
-    ngsi10
-    ngsi
-    parse
-    common
     lm
     pa
 )
@@ -70,22 +55,12 @@ link_directories("/usr/lib64/")
 # Executable declaration
 # ------------------------------------------------------------
 ADD_EXECUTABLE(proxyCoap ${SOURCES} ${HEADERS})
-
-IF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS"))
-  MESSAGE("Ubuntu DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
-ELSEIF(${DISTRO} STREQUAL "openSUSE_13.1")
-  MESSAGE("openSUSE DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto)
-ELSEIF(${DISTRO} STREQUAL "CentOS_6.3")
-  MESSAGE("CentOS DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt)
-ELSEIF(${DISTRO} STREQUAL "Fedora_20")
+IF(${DISTRO} STREQUAL "Fedora_20")
   MESSAGE("Fedora DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl -lboost_thread -lboost_filesystem -lboost_system -lpthread)
+  TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl -lboost_thread)
 ELSE()
   MESSAGE("Other DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt)
+  TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl -lboost_thread-mt)
 ENDIF()
 
 # target_link_libraries (proxyCoap cantcoap curl)

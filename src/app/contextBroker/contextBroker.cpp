@@ -178,7 +178,6 @@ char            httpsCertFile[1024];
 bool            https;
 char            mtenant[32];
 char            rush[256];
-int             coapPort;
 
 
 #define PIDPATH _i "/tmp/contextBroker.pid"
@@ -212,7 +211,6 @@ PaArgument paArgs[] =
   { "-rush",         rush,          "RUSH",            PaString, PaOpt, _i "",          PaNL,   PaNL,  "rush host (IP:port)"                         },
   { "-multiservice", mtenant,       "MULTI_SERVICE",   PaString, PaOpt, _i "off",       PaNL,   PaNL,  "service multi tenancy mode (off|url|header)" },
 
-  { "-coapport",     &coapPort,     "COAP_PORT",       PaInt,    PaOpt, 5683,           PaNL,   PaNL,  "port to receive CoAP datagrams"           },
 
   PA_END_OF_ARGS
 };
@@ -1264,13 +1262,13 @@ int main(int argC, char* argV[])
     LM_V(("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_V(("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, coapPort, mtenant, rushHost, rushPort, httpsPrivateServerKey, httpsCertificate);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, httpsPrivateServerKey, httpsCertificate);
 
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
-    restInit(rsP, ipVersion, bindAddress, port, coapPort, mtenant, rushHost, rushPort);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort);
 
   while (1)
     sleep(10);

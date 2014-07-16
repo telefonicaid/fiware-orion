@@ -23,7 +23,7 @@
 * Author: TID Developer
 */
 
-#include "restCoap/HttpMessage.h"
+#include "proxyCoap/HttpMessage.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"

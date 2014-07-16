@@ -1,5 +1,6 @@
-#ifndef HTTP_PROXY_H
-#define HTTP_PROXY_H
+#ifndef PROXYCOAP_VERSION_H
+#define PROXYCOAP_VERSION_H
+
 /*
 *
 * Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
@@ -24,17 +25,9 @@
 *
 * Author: TID Developer
 */
-#include "cantcoap.h"
-#include "proxyCoap/HttpMessage.h"
 
-struct MemoryStruct {
-  char*   memory;
-  size_t  size;
-};
 
-static const int  COAP_URI_BUFFER_SIZE = 255;
-static const int  COAP_BUFFER_SIZE     = 1024;
 
-extern std::string  sendHttpRequest(const char* host, unsigned short port, CoapPDU* request);
+#define PROXYCOAP_VERSION "0.0.1-beta"
 
-#endif // HTTP_PROXY_H
+#endif

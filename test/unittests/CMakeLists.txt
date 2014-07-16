@@ -268,7 +268,6 @@ SET (STATIC_LIBS
     serviceRoutines
     convenienceMap
     rest
-    restCoap
     ngsi9
     ngsi10
     ngsi

@@ -234,7 +234,7 @@ function proxyCoapStart()
 {
   extraParams=$*
 
-  proxyCoap $extraParams -fwdPort $BROKER_PORT
+  proxyCoap $extraParams -cbPort $BROKER_PORT
 
   # Test to see whether we have a proxy running. If not raise an error
   running_proxyCoap=$(ps -fe | grep proxyCoap | wc -l)

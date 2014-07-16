@@ -3,7 +3,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/time.h>
-#define __USE_POSIX 1
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
@@ -17,9 +16,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "restCoap/HttpProxy.h"
-#include "restCoap/HttpMessage.h"
-#include "restCoap/coap.h"
+#include "proxyCoap/HttpProxy.h"
+#include "proxyCoap/HttpMessage.h"
 
 CoapController::CoapController(const char *_host, unsigned short _httpPort, unsigned short _coapPort)
 {
@@ -90,7 +88,7 @@ int CoapController::callback(CoapPDU* request, int sockfd, struct sockaddr_stora
     return 1;
   }
 
-  // Parse HTTM response
+  // Parse HTTP response
   boost::scoped_ptr<HttpMessage> hm(new HttpMessage(httpResponse));
 
   // If CoAP message is too big, must send error to requester
