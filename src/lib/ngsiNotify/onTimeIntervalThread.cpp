@@ -83,15 +83,19 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
                 ncr.originator.set("localhost");
                 ncr.subscriptionId.set(params->subId);
 
+                // New transactionId for each notification
+                transactionIdSet();
                 LM_I(("Starting transaction to %s", csi.url.c_str()));
                 params->notifier->sendNotifyContextRequest(&ncr, csi.url, tenant, csi.format);
-                LM_I(("Transaction ended (%s:%d)", csi.url.c_str()));
-
                 ncr.contextElementResponseVector.release();
+                HttpStatusCode s = mongoUpdateCsubNewNotification(params->subId, &err, tenant);
+                LM_I(("Transaction ended (%s:%d)", csi.url.c_str()));
+                strncpy(transactionId, "N/A", sizeof(transactionId));
+
 
                 /* Update database fields due to new notification */
                 // FIXME P7: mongoUpdateCsubNewNotification ALWAYS returns SccOk !!!
-                if (mongoUpdateCsubNewNotification(params->subId, &err, tenant) != SccOk)
+                if (s != SccOk)
                 {
                   csi.release();
                   return;
@@ -119,9 +123,7 @@ void* startOnIntervalThread(void* p)
 
     while (true)
     {
-        // New transactionId for each notification
-        transactionIdSet();
-
+        strncpy(transactionId, "N/A", sizeof(transactionId));
         LM_T(LmtNotifier, ("ONTIMEINTERVAL thread wakes up (%s)", params->subId.c_str()));
 
         // Do the work (we put this in a function as error conditions would produce an

@@ -1201,7 +1201,7 @@ int main(int argC, char* argV[])
   paConfig("man version",                   (void*) ORION_VERSION);
   paConfig("log to screen",                 (void*) true);
   paConfig("log to file",                   (void*) true);
-  paConfig("log file line format",          (void*) "time=DATE | lvl=TYPE | trans=TRANS_ID | file=FILE | lineNo=LINE | function=FUNC | comp=Orion | msg=TEXT");
+  paConfig("log file line format",          (void*) "time=DATE | lvl=TYPE | trans=TRANS_ID | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT");
   paConfig("screen line format",            (void*) "TYPE@TIME  FILE[LINE]: TEXT");
   paConfig("builtin prefix",                (void*) "ORION_");
   paConfig("usage and exit on any warning", (void*) true);
