@@ -45,5 +45,4 @@ Usage: proxyCoap  [option '-U' (extended usage)]
                   [option '-ipv4' (use ip v4 only)]
                   [option '-ipv6' (use ip v6 only)]
 
-  
 --TEARDOWN--
