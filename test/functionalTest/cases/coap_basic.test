@@ -26,6 +26,7 @@ Coap Basic interaction
 
 dbInit CB
 brokerStart CB
+proxyCoapStart
 --SHELL--
 echo "+++++++ Create entity +++++++++"
 url="/ngsi10/contextEntities/Room1"
@@ -143,4 +144,5 @@ v:1 t:0 tkl:0 c:1 id:REGEX(\d+)
     }
 }
 --TEARDOWN--
+proxyCoapStop
 brokerStop CB

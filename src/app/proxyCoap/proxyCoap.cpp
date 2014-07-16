@@ -90,7 +90,7 @@ PaArgument paArgs[] =
   { "-port",         &port,         "PORT",            PaInt,    PaOpt, 5683,           PaNL,   PaNL,  "port to receive new connections"           },
 
   { "-fwdHost",      fwdHost,       "FWD_HOST",        PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "host for forwarding CoAP requests"         },
-  { "-fwdPort",      &fwdPort,      "FWD_PORT",        PaInt,    PaOpt, 1026,              0,  65000,  "HTTP port for forwarding CoAP requests" },
+  { "-fwdPort",      &fwdPort,      "FWD_PORT",        PaInt,    PaOpt, 1026,              0,  65000,  "HTTP port for forwarding CoAP requests"    },
 
   { "-ipv4",         &useOnlyIPv4,  "USEIPV4",         PaBool,   PaOpt, false,          false,  true,  "use ip v4 only"                            },
   { "-ipv6",         &useOnlyIPv6,  "USEIPV6",         PaBool,   PaOpt, false,          false,  true,  "use ip v6 only"                            },

@@ -228,6 +228,55 @@ function brokerStop
 
 # ------------------------------------------------------------------------------
 #
+# proxyCoapStart
+#
+function proxyCoapStart()
+{
+  extraParams=$*
+
+  proxyCoap $extraParams -fwdPort $BROKER_PORT
+
+  # Test to see whether we have a proxy running. If not raise an error
+  running_proxyCoap=$(ps -fe | grep proxyCoap | wc -l)
+  if [ $running_proxyCoap -ne 2 ]; then
+    echo "Unable to start proxyCoap"
+    exit 1
+  fi
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# proxyCoapStop
+#
+function proxyCoapStop
+{
+  port=$COAP_PORT
+
+  # Test to see if we have a proxy running if so kill it!
+  running_proxyCoap=$(ps -fe | grep proxyCoap | wc -l)
+  if [ $running_proxyCoap -ne 1 ]; then
+    kill $(ps -fe | grep proxyCoap | awk '{print $2}') 2> /dev/null
+    # Wait some time so the proxy can finish properly
+    sleep 1
+    running_proxyCoap=$(ps -fe | grep proxyCoap | wc -l)
+    if [ $running_proxyCoap -ne 1 ]; then
+      # If the proxy refuses to stop politely, kill the process by brute force
+      kill -9 $(ps -fe | grep proxyCoap | awk '{print $2}') 2> /dev/null
+      sleep 1
+      running_proxyCoap=$(ps -fe | grep proxyCoap | wc -l)
+      if [ $running_proxyCoap -ne 1 ]; then
+        echo "Existing proxyCoap is immortal, can not be killed!"
+        exit 1
+      fi
+    fi
+  fi
+}
+
+
+# ------------------------------------------------------------------------------
+#
 # accumulatorStop - 
 #
 function accumulatorStop()
@@ -557,7 +606,7 @@ function coapCurl()
   #
   _method=""
   _host="0.0.0.0"
-  _port=$COAP_PORT # default for coap
+  _port=$COAP_PORT
   _url=""
   _payload=""
   _inFormat=""
@@ -711,6 +760,8 @@ export -f localBrokerStop
 export -f localBrokerStart
 export -f brokerStop
 export -f localBrokerStop
+export -f proxyCoapStart
+export -f proxyCoapStop
 export -f accumulatorStart
 export -f accumulatorStop
 export -f orionCurl
