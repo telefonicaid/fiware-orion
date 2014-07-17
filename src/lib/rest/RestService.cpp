@@ -250,7 +250,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     compV.clear();
 
     if (response == "DIE")
-      orionExitFunction(1, "Received a 'DIE' request");
+      orionExitFunction(0, "Received a 'DIE' request on REST interface");
 
 
     restReply(ciP, response);

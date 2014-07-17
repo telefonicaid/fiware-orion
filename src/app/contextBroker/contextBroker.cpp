@@ -971,7 +971,8 @@ void sigHandler(int sigNo)
   {
   case SIGINT:
   case SIGTERM:
-    LM_X(1, ("Fatal Error (received signal %d)", sigNo));
+    LM_I(("Orion context broker exiting due to receiving a signal"));
+    exit(0);
     break;
   }
 }
@@ -982,7 +983,11 @@ void sigHandler(int sigNo)
 */
 void orionExit(int code, const std::string& reason)
 {
-  LM_E(("Fatal Error (reason: %s)", reason.c_str()));
+  if (code == 0)
+    LM_I(("Orion context broker exits in an ordered manner (%s)", reason.c_str()));
+  else
+    LM_E(("Fatal Error (reason: %s)", reason.c_str()));
+
   exit(code);
 }
 
@@ -1205,9 +1210,11 @@ int main(int argC, char* argV[])
   paConfig("screen line format",            (void*) "TYPE@TIME  FILE[LINE]: TEXT");
   paConfig("builtin prefix",                (void*) "ORION_");
   paConfig("usage and exit on any warning", (void*) true);
+  paConfig("no preamble",                   NULL);
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+  LM_I(("Orion Context Broker is running"));
 
   std::string multitenant = mtenant;
   if ((multitenant != "off") && (multitenant != "header") && (multitenant != "url"))
