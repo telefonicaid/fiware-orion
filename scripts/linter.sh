@@ -35,7 +35,8 @@ function usage()
 
   echo "$sfile [-u (usage)]"
   echo "$empty [-v (verbose)]"
-  echo "$empty [ <directory or file> ]"
+  echo "$empty [-d <directory>]"
+  echo "$empty [-f <file>]"
 
   exit $1
 }
@@ -44,7 +45,7 @@ function usage()
 
 # -----------------------------------------------------------------------------
 #
-# vMsg
+# vMsg - 
 #
 function vMsg()
 {
@@ -52,6 +53,17 @@ function vMsg()
   then
     echo $ME: $*
   fi
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
+# mMsg - 
+#
+function mMsg()
+{
+  echo $ME: $*
 }
 
 
@@ -77,6 +89,8 @@ do
     echo
     usage 1
   }
+  fi
+
   shift
 done
 
@@ -94,11 +108,13 @@ fi
 
 
 ME=$(basename $0)
-vMsg "$ME: lint on $dirList $fileList"
+vMsg "lint on $dirList $fileList"
 
 
+mMsg "Running lint"
 
-scripts/cpplint.py $dirList $fileList 2> LINT
+scripts/cpplint.py src/app/contextBroker/*.cpp src/app/contextBroker/*.h src/lib/*/*.cpp src/lib/*/*.h 2> LINT
+
 grep -v 'should almost always be at the end of the previous line' LINT  > LINT2
 grep -v 'Lines should very rarely be longer than 100 characters'  LINT2 > LINT
 rm LINT2
