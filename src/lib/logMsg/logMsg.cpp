@@ -72,6 +72,7 @@ char*        progName;               /* needed for messages (and by lmLib) */
 char         progNameV[512];         /* where to store progName            */
 
 
+
 __thread char   transactionId[64] = "N/A";
 
 static sem_t sem;
@@ -296,6 +297,7 @@ bool  lmAssertAtExit               = false;
 LmxFp lmxFp                        = NULL;
 bool  lmNoTracesToFileIfHookActive = false;
 bool  lmSilent                     = false;
+bool  lmPreamble                   = true;
 
 
 
@@ -1594,15 +1596,18 @@ LmStatus lmFdRegister(int fd, const char* format, const char* timeFormat, const 
     
     if ((fd >= 0) && (strcmp(info, "stdout") != 0))
     {
-      strftime(dt, 256, "%A %d %h %H:%M:%S %Y", &tmP);
-      snprintf(startMsg, sizeof(startMsg),
-               "%s log\n-----------------\nStarted %s\nCleared at ...\n",
-               progName, dt);
+      if (lmPreamble == true)
+      {
+        strftime(dt, 256, "%A %d %h %H:%M:%S %Y", &tmP);
+        snprintf(startMsg, sizeof(startMsg),
+                 "%s log\n-----------------\nStarted %s\nCleared at ...\n",
+                 progName, dt);
 
-      sz = strlen(startMsg);
-
-      if (write(fd, startMsg, sz) != sz)
-        return LmsWrite;
+        sz = strlen(startMsg);
+        
+        if (write(fd, startMsg, sz) != sz)
+          return LmsWrite;
+      }
     }
 
     fds[index].fd    = fd;
