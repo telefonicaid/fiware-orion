@@ -1,4 +1,5 @@
-o Fix:  errors in JSON rendering for '/statistics' and '/version' fixed (Issue #428)
+o Fix:  errors in JSON rendering for '/statistics' and '/version' fixed (Issue #428).
 o Fix:  using same location attribute in UPDATE fails (issue http://stackoverflow.com/questions/24431177/ge-orion-context-broker-when-we-make-an-update-of-the-entity-does-not-allow-us)
-o Mod:  the name of the log file has been changed from contextBrokerLog to contextBroker.log
+o Mod:  the name of the log file has been changed from contextBrokerLog to contextBroker.log.
 o Fix:  the timestamps in the log file were in GMT - now they have been changed to local time.
+o Mod:  complete new layout of the logfile, to allow for alarms and transactions (Issue #435) .
