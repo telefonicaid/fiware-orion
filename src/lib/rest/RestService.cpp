@@ -62,7 +62,7 @@ std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService
     result = jsonTreat(ciP->payload, ciP, parseDataP, service->request, service->payloadWord, jsonPP);
   else
   {
-    LM_E(("Bad inFormat: %d", (int) ciP->inFormat));
+    LM_W(("Bad Input (payload mime-type is neither JSON nor XML)"));
     return "Bad inFormat";
   }
 
@@ -95,7 +95,7 @@ static std::string tenantCheck(const std::string& tenant)
       (strcasecmp(ctenant, "leak")        == 0) ||
       (strcasecmp(ctenant, "exit")        == 0))
   {
-    LM_E(("tenant name coincides with Orion reserved name: '%s'", tenant.c_str()));
+    LM_W(("Bad Input (tenant name coincides with Orion reserved name: '%s')", tenant.c_str()));
     return "tenant name coincides with Orion reserved name";
   }
 
@@ -103,7 +103,7 @@ static std::string tenantCheck(const std::string& tenant)
 
   if (strlen(name) > 20)
   {
-    LM_E(("bad length - a tenant name can be max 20 characters long (length: %d)", strlen(name)));
+    LM_W(("Bad Input (a tenant name can be max 20 characters long. Length: %d)", strlen(name)));
     return "bad length - a tenant name can be max 20 characters long";
   }
 
@@ -111,7 +111,7 @@ static std::string tenantCheck(const std::string& tenant)
   {
     if ((!isalnum(*name)) && (*name != '_'))
     {
-      LM_E(("offending character: %c", *name));
+      LM_W(("Bad Input (bad character in tenant name - only underscore and alphanumeric characters are allowed. Offending character: %c)", *name));
       return "bad character in tenant name - only underscore and alphanumeric characters are allowed";
     }
 
@@ -221,7 +221,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       OrionError   error(SccBadRequest, "tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)");
       std::string  response = error.render(ciP->outFormat, "");
 
-      LM_E(("tenant name error: %s", result.c_str()));
+      LM_W(("Bad Input (%s)", error.details.c_str()));
       restReply(ciP, response);
 
       if (reqP != NULL)
@@ -250,14 +250,14 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     compV.clear();
 
     if (response == "DIE")
-      orionExitFunction(1, "Received a 'DIE' request");
+      orionExitFunction(0, "Received a 'DIE' request on REST interface");
 
 
     restReply(ciP, response);
     return response;
   }
 
-  LM_E(("Service '%s' not recognized", ciP->url.c_str()));
+  LM_W(("Bad Input (service '%s' not recognized)", ciP->url.c_str()));
   ciP->httpStatusCode = SccBadRequest;
   std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("Service not recognized: ") + ciP->url);
   restReply(ciP, answer);

@@ -344,5 +344,5 @@ else
   # Waiting for valgrind to terminate (sleep 10)
   sleep 10
 fi
-mv /tmp/contextBrokerLog /tmp/contextBrokerLog.recoverthreads
+mv /tmp/contextBroker.log /tmp/contextBroker.log.recoverthreads
 kill $(curl localhost:${LISTENER_PORT}/pid -s -S)

@@ -76,7 +76,6 @@ std::string leakTreat(ConnectionInfo* ciP, int components, std::vector<std::stri
       // No Cleanup for valgrind, and just in case another malloc
       mongoDisconnect();
       std::string pwd = strdup("Leak test done");
-      LM_F(("strdupped 15 bytes"));
       OrionError orionError(SccOk, "Leak test; " + pwd);
       return orionError.render(ciP->outFormat, "");
    }

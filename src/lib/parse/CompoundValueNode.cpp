@@ -280,7 +280,7 @@ void CompoundValueNode::check(void)
       if (childV[ix]->name != childV[0]->name)
       {
         rootP->error = std::string("bad tag-name of vector item: '") + childV[ix]->name + "' (should be '" + childV[0]->name + "')";
-        LM_E((rootP->error.c_str()));
+        LM_W(("Bad Input (%s)", rootP->error.c_str()));
         return;
       }
     }
@@ -297,7 +297,7 @@ void CompoundValueNode::check(void)
         if (childV[ix]->name == childV[ix2]->name)
         {
           rootP->error = std::string("duplicated tag-name: '") + childV[ix]->name + "' in '" + path + "'";
-          LM_E((rootP->error.c_str()));
+          LM_W(("Bad Input (%s)", rootP->error.c_str()));
           return;
         }
       }

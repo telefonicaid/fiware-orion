@@ -58,8 +58,9 @@ HttpStatusCode mongoQueryContext
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
     /* FIXME: restriction not supported for the moment */
-    if (!requestP->restriction.attributeExpression.isEmpty()) {
-        LM_W(("Restriction found but not supported at mongo backend"));
+    if (!requestP->restriction.attributeExpression.isEmpty())
+    {
+      LM_W(("Bad Input (restriction found, but restrictions are not supported by mongo backend)"));
     }
 
     std::string err;
@@ -84,7 +85,6 @@ HttpStatusCode mongoQueryContext
     if (!ok)
     {
         responseP->errorCode.fill(SccReceiverInternalError, err);
-        LM_E((responseP->errorCode.details.c_str()));
     }
     else if (responseP->contextElementResponseVector.size() == 0)
     {

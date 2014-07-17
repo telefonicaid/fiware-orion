@@ -303,7 +303,7 @@ static int sourceEntityId(xml_node<>* node, ParseData* parseDataP)
   if (es != "OK")
   {
     parseDataP->errorString = es;
-    LM_W(("Error parsing entity: %s", es.c_str()));
+    LM_W(("Bad Input (error parsing entity: %s)", es.c_str()));
   }
 
   return 0;
@@ -410,7 +410,8 @@ static int entityIdList(xml_node<>* node, ParseData* parseDataP)
    if (parseDataP->rcr.crP->entityIdVectorPresent == true)
    {
      parseDataP->errorString = "Got an entityIdList when one was present already";
-     LM_RE(1, ("Got an entityIdList when one was present already!!!"));
+     LM_W(("Bad Input (more than one list of entityId)"));
+     return 1;
    }
 
    parseDataP->rcr.crP->entityIdVectorPresent = true;

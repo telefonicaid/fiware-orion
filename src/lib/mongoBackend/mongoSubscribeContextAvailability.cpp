@@ -95,30 +95,36 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
 
     /* Insert document in database */
     BSONObj subDoc = sub.obj();
-    try {
+    try
+    {
         LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextAvailabilityCollectionName(tenant).c_str(), subDoc.toString().c_str()));
 
         mongoSemTake(__FUNCTION__, "insert into SubscribeContextAvailabilityCollection");
         connection->insert(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), subDoc);
         mongoSemGive(__FUNCTION__, "insert into SubscribeContextAvailabilityCollection");
+        LM_I(("Database Operation Successful (insert %s)", subDoc.toString().c_str()));
     }
-    catch( const DBException &e ) {
+    catch (const DBException &e)
+    {
         mongoSemGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (mongo db exception)");
         reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo db exception)");
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                   " - insert(): " + subDoc.toString() +
                                   " - exception: " + e.what());
-        LM_RE(SccOk, ("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
+        LM_E(("Database Error (%s)", responseP->errorCode.reasonPhrase.c_str()));
+        return SccOk;
     }
-    catch(...) {
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (mongo generic exception)");
         reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo generic exception)");
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                   " - insert(): " + subDoc.toString() +
                                   " - exception: " + "generic");
-        LM_RE(SccOk, ("Database error '%s'", responseP->errorCode.reasonPhrase.c_str()));
+        LM_E(("Database Error (%s)", responseP->errorCode.reasonPhrase.c_str()));
+        return SccOk;
     }
 
     /* Send notifications for matching context registrations */

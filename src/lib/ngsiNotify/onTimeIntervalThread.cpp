@@ -51,8 +51,10 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
      * OnIntervalThreadParams coming for the csubs document at thread creation time
      * from mongoBackend, we always needs that to get fresh lastNotification */
     ContextSubscriptionInfo csi;
-    if (mongoGetContextSubscriptionInfo(params->subId, &csi, &err, tenant) != SccOk) {
-        LM_RVE(("error invoking mongoGetContextSubscriptionInfo: '%s'", err.c_str()));
+    if (mongoGetContextSubscriptionInfo(params->subId, &csi, &err, tenant) != SccOk)
+    {
+      LM_E(("Database Error (error invoking mongoGetContextSubscriptionInfo"));
+      return;
     }
 
     int current = getCurrentTime();
@@ -65,10 +67,13 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
 
             /* Query database for data */
             NotifyContextRequest ncr;
-            if (mongoGetContextElementResponses(csi.entityIdVector, csi.attributeList, &(ncr.contextElementResponseVector), &err, tenant) != SccOk) {
-                csi.release();
-                ncr.contextElementResponseVector.release();
-                LM_RVE(("error invoking mongoGetContextElementResponses: '%s'", err.c_str()));
+            // FIXME P7: mongoGetContextElementResponses ALWAYS returns SccOk !!!
+            if (mongoGetContextElementResponses(csi.entityIdVector, csi.attributeList, &(ncr.contextElementResponseVector), &err, tenant) != SccOk)
+            {
+              csi.release();
+              ncr.contextElementResponseVector.release();
+              LM_E(("Database Error (error invoking mongoGetContextElementResponses"));
+              return;
             }
 
             if (ncr.contextElementResponseVector.size() > 0) {
@@ -78,14 +83,22 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
                 ncr.originator.set("localhost");
                 ncr.subscriptionId.set(params->subId);
 
+                // New transactionId for each notification
+                transactionIdSet();
+                LM_I(("Starting transaction to %s", csi.url.c_str()));
                 params->notifier->sendNotifyContextRequest(&ncr, csi.url, tenant, csi.format);
-
                 ncr.contextElementResponseVector.release();
+                HttpStatusCode s = mongoUpdateCsubNewNotification(params->subId, &err, tenant);
+                LM_I(("Transaction ended (%s:%d)", csi.url.c_str()));
+                strncpy(transactionId, "N/A", sizeof(transactionId));
+
 
                 /* Update database fields due to new notification */
-                if (mongoUpdateCsubNewNotification(params->subId, &err, tenant) != SccOk) {
-                    csi.release();
-                    LM_RVE(("error invoking mongoUpdateCsubNewNotification: '%s'", err.c_str()));
+                // FIXME P7: mongoUpdateCsubNewNotification ALWAYS returns SccOk !!!
+                if (s != SccOk)
+                {
+                  csi.release();
+                  return;
                 }
             }
             else {
@@ -98,29 +111,28 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
     }
 
     csi.release();
-
 }
 
 /* ****************************************************************************
 *
 * startOnIntervalThread -
 */
-void* startOnIntervalThread(void* p) {
-
+void* startOnIntervalThread(void* p)
+{
     OnIntervalThreadParams* params = (OnIntervalThreadParams*) p;
 
-    while(true) {
-        /* Thread wakes up */
+    while (true)
+    {
+        strncpy(transactionId, "N/A", sizeof(transactionId));
         LM_T(LmtNotifier, ("ONTIMEINTERVAL thread wakes up (%s)", params->subId.c_str()));
 
-        /* Do the work (we put this in a function due to error conditions would produce an
-         * early interruption of the process) */
+        // Do the work (we put this in a function as error conditions would produce an
+        // early interruption of the process)
         doNotification(params, params->tenant);
 
-        /* Sleeps for interval */
+        // Sleeps for interval
         sleep(params->interval);
     }
 
-    /* This line is useless, but the compiler complaints if I don't use a "return" statement... */
-    return 0;
+    return NULL;
 }

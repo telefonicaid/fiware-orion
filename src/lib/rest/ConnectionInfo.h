@@ -65,6 +65,8 @@ public:
     verb                   = NOVERB;
     tenant                 = "";
     servicePath            = "";
+    ip                     = "";
+    port                   = 0;
 
     memset(payloadWord, 0, sizeof(payloadWord));
   }
@@ -114,6 +116,8 @@ public:
   std::string                answer;
   int                        callNo;
   ParseData*                 parseDataP;
+  unsigned short             port;
+  std::string                ip;
 
   std::map<std::string, std::string>   uriParam;
 

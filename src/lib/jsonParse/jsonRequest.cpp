@@ -118,12 +118,12 @@ static JsonRequest* jsonRequestGet(RequestType request, std::string method)
     if ((request == jsonRequest[ix].type) && (jsonRequest[ix].method == method))
     {
       if (jsonRequest[ix].parseVector != NULL)
-        LM_V2(("Found jsonRequest of type %d, method '%s' - index %d (%s)", request, method.c_str(), ix, jsonRequest[ix].parseVector[0].path.c_str()));
+        LM_T(LmtHttpRequest, ("Found jsonRequest of type %d, method '%s' - index %d (%s)", request, method.c_str(), ix, jsonRequest[ix].parseVector[0].path.c_str()));
       return &jsonRequest[ix];
     }
   }
 
-  LM_E(("No request found for RequestType '%s', method '%s'", requestType(request), method.c_str()));
+  LM_W(("Bad Input (no request found for RequestType '%s', method '%s')", requestType(request), method.c_str()));
   return NULL;
 }
 
@@ -146,7 +146,8 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
     std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", requestType(request), SccBadRequest,
                                                std::string("Sorry, no request treating object found for RequestType '") + requestType(request) + "'");
 
-    LM_RE(errorReply, ("Sorry, no request treating object found for RequestType %d (%s)", request, requestType(request)));
+    LM_W(("Bad Input (no request treating object found for RequestType %d (%s))", request, requestType(request)));
+    return errorReply;
   }
 
   if (reqPP != NULL)
@@ -163,19 +164,19 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
   catch (std::exception &e)
   {
     std::string errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, std::string("JSON Parse Error: ") + e.what());
-    LM_E(("JSON Parse Error: '%s'", e.what()));
-    LM_RE(errorReply, (res.c_str()));
+    LM_W(("Bad Input (JSON Parse Error: %s)", e.what()));
+    return errorReply;
   }
   catch (...)
   {
     std::string errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, std::string("JSON Generic Error"));
-    LM_E(("JSON Generic Error during jsonParse"));
-    LM_RE(errorReply, (res.c_str()));
+    LM_W(("Bad Input (JSON parse generic error)"));
+    return errorReply;
   }
 
   if (res != "OK")
   {
-    LM_E(("JSON parse error: %s", res.c_str()));
+    LM_W(("Bad Input (JSON parse error: %s)", res.c_str()));
     ciP->httpStatusCode = SccBadRequest;
 
     std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", payloadWord, ciP->httpStatusCode, res);

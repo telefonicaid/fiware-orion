@@ -83,7 +83,6 @@
 #include "common/Timer.h"
 #include "common/compileInfo.h"
 
-#include "serviceRoutines/logVerboseTreat.h"
 #include "serviceRoutines/logTraceTreat.h"
 
 #include "ngsi/ParseData.h"
@@ -448,11 +447,7 @@ RestService restServiceMTenant[] =
   { "DELETE", Ngsi10SubscriptionsConvOp,                   4, { "*", "ngsi10", "contextSubscriptions", "*"                    }, "",                                             deleteSubscriptionConvOp                  },
   { "*",      Ngsi10SubscriptionsConvOp,                   4, { "*", "ngsi10", "contextSubscriptions", "*"                    }, "",                                             badVerbPutDeleteOnly                      },
 
-  // log request
-  { "GET",    LogRequest,                                  2, { "log", "verbose"                                              }, "",                                             logVerboseTreat                           },
-  { "PUT",    LogRequest,                                  3, { "log", "verbose", "*"                                         }, "",                                             logVerboseTreat                           },
-  { "DELETE", LogRequest,                                  2, { "log", "verbose"                                              }, "",                                             logVerboseTreat                           },
-  { "*",      LogRequest,                                  3, { "log", "verbose", "*"                                         }, "",                                             badVerbGetPutDeleteOnly                   },
+  // log requests
 
   // The documentation (Installation and Admin Guide) says /log/trace ...
   { "GET",    LogRequest,                                  2, { "log", "trace"                                                }, "",                                             logTraceTreat                             },
@@ -607,11 +602,6 @@ RestService restServiceV[] =
   { "*",      Ngsi10SubscriptionsConvOp,                   3, { "ngsi10", "contextSubscriptions", "*"                         }, "",                                             badVerbPutDeleteOnly                      },
 
   // log request
-  { "GET",    LogRequest,                                  2, { "log", "verbose"                                              }, "",                                             logVerboseTreat                           },
-  { "PUT",    LogRequest,                                  3, { "log", "verbose", "*"                                         }, "",                                             logVerboseTreat                           },
-  { "DELETE", LogRequest,                                  2, { "log", "verbose"                                              }, "",                                             logVerboseTreat                           },
-  { "*",      LogRequest,                                  3, { "log", "verbose", "*"                                         }, "",                                             badVerbGetPutDeleteOnly                   },
-
   { "GET",    LogRequest,                                  2, { "log", "trace"                                                }, "",                                             logTraceTreat                             },
   { "PUT",    LogRequest,                                  3, { "log", "trace", "*"                                           }, "",                                             logTraceTreat                             },
   { "DELETE", LogRequest,                                  2, { "log", "trace"                                                }, "",                                             logTraceTreat                             },
@@ -710,10 +700,6 @@ RestService restServiceNgsi9[] =
 
 
   // log request
-  { "GET",    LogRequest,                                  2, { "log", "verbose"                                              }, "",                                             logVerboseTreat                           },
-  { "PUT",    LogRequest,                                  3, { "log", "verbose", "*"                                         }, "",                                             logVerboseTreat                           },
-  { "DELETE", LogRequest,                                  2, { "log", "verbose"                                              }, "",                                             logVerboseTreat                           },
-  { "*",      LogRequest,                                  3, { "log", "verbose", "*"                                         }, "",                                             badVerbGetPutDeleteOnly                   },
 
   // The documentation (Installation and Admin Guide) says /log/trace ...
   { "GET",    LogRequest,                                  2, { "log", "trace"                                                }, "",                                             logTraceTreat                             },
@@ -861,11 +847,6 @@ RestService restServiceNgsi9MTenant[] =
 
 
   // log request
-  { "GET",    LogRequest,                                  2, { "log", "verbose"                                              }, "",                                             logVerboseTreat                           },
-  { "PUT",    LogRequest,                                  3, { "log", "verbose", "*"                                         }, "",                                             logVerboseTreat                           },
-  { "DELETE", LogRequest,                                  2, { "log", "verbose"                                              }, "",                                             logVerboseTreat                           },
-  { "*",      LogRequest,                                  3, { "log", "verbose", "*"                                         }, "",                                             badVerbGetPutDeleteOnly                   },
-
   { "GET",    LogRequest,                                  2, { "log", "trace"                                                }, "",                                             logTraceTreat                             },
   { "PUT",    LogRequest,                                  3, { "log", "trace", "*"                                           }, "",                                             logTraceTreat                             },
   { "DELETE", LogRequest,                                  2, { "log", "trace"                                                }, "",                                             logTraceTreat                             },
@@ -919,7 +900,10 @@ int pidFile(void)
   int    nb;
 
   if (fd == -1)
-    LM_RE(-1, ("Error opening pid file '%s': %s", pidPath, strerror(errno)));
+  {
+    LM_E(("PID File (open '%s': %s", pidPath, strerror(errno)));
+    return -1;
+  }
 
   pid = getpid();
 
@@ -927,7 +911,10 @@ int pidFile(void)
   sz = strlen(buffer);
   nb = write(fd, buffer, sz);
   if (nb != sz)
-    LM_RE(-2, ("written %d bytes and not %d to pid file '%s': %s", nb, sz, pidPath, strerror(errno)));
+  {
+    LM_E(("PID File (written %d bytes and not %d to '%s': %s)", nb, sz, pidPath, strerror(errno)));
+    return -2;
+  }
 
   return 0;
 }
@@ -949,7 +936,7 @@ void daemonize(void)
   
   pid = fork();
   if (pid == -1)
-    LM_X(1, ("fork: %s", strerror(errno)));
+    LM_X(1, ("Fatal Error (fork: %s)", strerror(errno)));
 
   // Exiting father process
   if (pid > 0)
@@ -961,12 +948,12 @@ void daemonize(void)
   // Removing the controlling terminal
   sid = setsid();
   if (sid == -1)
-    LM_X(1, ("setsid: %s", strerror(errno)));
+    LM_X(1, ("Fatal Error (setsid: %s)", strerror(errno)));
 
   // Change current working directory.
   // This prevents the current directory from being locked; hence not being able to remove it.
   if (chdir("/") == -1)
-    LM_X(1, ("chdir: %s", strerror(errno)));
+    LM_X(1, ("Fatal Error (chdir: %s)", strerror(errno)));
 
   // We have to call this after a fork, see: http://api.mongodb.org/cplusplus/2.2.2/classmongo_1_1_o_i_d.html
   OID::justForked();
@@ -978,13 +965,14 @@ void daemonize(void)
 */
 void sigHandler(int sigNo)
 {
-  LM_F(("In sigHandler - caught signal %d", sigNo));
+  LM_I(("Signal Handler (caught signal %d)", sigNo));
 
   switch (sigNo)
   {
   case SIGINT:
   case SIGTERM:
-    LM_X(1, ("Received signal %d", sigNo));
+    LM_I(("Orion context broker exiting due to receiving a signal"));
+    exit(0);
     break;
   }
 }
@@ -995,7 +983,11 @@ void sigHandler(int sigNo)
 */
 void orionExit(int code, const std::string& reason)
 {
-  LM_E((reason.c_str()));
+  if (code == 0)
+    LM_I(("Orion context broker exits in an ordered manner (%s)", reason.c_str()));
+  else
+    LM_E(("Fatal Error (reason: %s)", reason.c_str()));
+
   exit(code);
 }
 
@@ -1006,7 +998,7 @@ void orionExit(int code, const std::string& reason)
 void exitFunc(void)
 {
   if (unlink(pidPath) != 0)
-    LM_E(("unlink(%s): %s", pidPath, strerror(errno)));
+    LM_T(LmtSoftError, ("error removing PID file '%s': %s", pidPath, strerror(errno)));
 }
 
 const char* description =
@@ -1043,7 +1035,7 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
     }
   }
   else
-    LM_F(("Running in NGSI9 only mode"));
+    LM_I(("Running in NGSI9 only mode"));
 }
 
 /* ****************************************************************************
@@ -1055,12 +1047,12 @@ static void mongoInit(const char* dbHost, std::string dbName, const char* user, 
    std::string multitenant = mtenant;
 
    if (!mongoConnect(dbHost, dbName.c_str(), user, pwd, multitenant != "off"))
-    LM_X(1, ("MongoDB error"));
+    LM_X(1, ("Fatal Error (MongoDB error)"));
 
   if (user[0] != 0) 
-    LM_F(("Connected to mongo at %s:%s as user '%s'", dbHost, dbName.c_str(), user));
+    LM_I(("Connected to mongo at %s:%s as user '%s'", dbHost, dbName.c_str(), user));
   else
-    LM_F(("Connected to mongo at %s:%s", dbHost, dbName.c_str()));
+    LM_I(("Connected to mongo at %s:%s", dbHost, dbName.c_str()));
 
   setDbPrefix(dbName);
   setEntitiesCollectionName("entities");
@@ -1098,27 +1090,39 @@ static int loadFile(char* path, char* out, int outSize)
   int          fd = open(path, O_RDONLY);
 
   if (fd == -1)
-    LM_RE(-1, ("error opening '%s': %s", path, strerror(errno)));
+  {
+    LM_E(("HTTPS Error (error opening '%s': %s)", path, strerror(errno)));
+    return -1;
+  }
 
   if (stat(path, &statBuf) != 0)
   {
     close(fd);
-    LM_RE(-1, ("error 'stating' '%s': %s", path, strerror(errno)));
+    LM_E(("HTTPS Error (error 'stating' '%s': %s)", path, strerror(errno)));
+    return -1;
   }
 
   if (statBuf.st_size > outSize)
   {
     close(fd);
-    LM_RE(-1, ("file '%s' is TOO BIG - max size %d bytes", path, outSize));
+    LM_E(("HTTPS Error (file '%s' is TOO BIG (%d) - max size is %d bytes)", path, outSize));
+    return -1;
   }
 
   nb = read(fd, out, statBuf.st_size);
   close(fd);
 
   if (nb == -1)
-    LM_RE(-1, ("error reading from '%s': %s", path, strerror(errno)));
+  {
+    LM_E(("HTTPS Error (reading from '%s': %s)", path, strerror(errno)));
+    return -1;
+  }
+
   if (nb != statBuf.st_size)
-    LM_RE(-1, ("bad size read from '%s': %d, wanted %d", path, nb, statBuf.st_size));
+  {
+    LM_E(("HTTPS Error (invalid size read from '%s': %d, wanted %d)", path, nb, statBuf.st_size));
+    return -1;
+  }
 
   return 0;
 }
@@ -1137,9 +1141,10 @@ static int loadFile(char* path, char* out, int outSize)
 static void rushParse(char* rush, std::string* rushHostP, unsigned short* rushPortP)
 {
   char* colon = strchr(rush, ':');
+  char* copy  = strdup(rush);
 
   if (colon == NULL)
-    LM_X(1, ("Bad syntax of '-rush' value: '%s' (wanted: 'host:port')"));
+    LM_X(1, ("Fatal Error (Bad syntax of '-rush' value: '%s' - expected syntax: 'host:port')", rush));
 
   *colon = 0;
   ++colon;
@@ -1148,7 +1153,9 @@ static void rushParse(char* rush, std::string* rushHostP, unsigned short* rushPo
   *rushPortP = atoi(colon);
 
   if ((*rushHostP == "") || (*rushPortP == 0))
-    LM_X(1, ("Bad syntax of '-rush' value: '%s' (wanted: 'host:port')"));
+    LM_X(1, ("Fatal Error (bad syntax of '-rush' value: '%s' - expected syntax: 'host:port')", copy));
+
+  free(copy);
 }
 
 
@@ -1159,6 +1166,8 @@ static void rushParse(char* rush, std::string* rushHostP, unsigned short* rushPo
 */
 int main(int argC, char* argV[])
 {
+  strncpy(transactionId, "N/A", sizeof(transactionId));
+
   unsigned short rushPort = 0;
   std::string    rushHost = "";
 
@@ -1183,6 +1192,11 @@ int main(int argC, char* argV[])
   paConfig("remove builtin", "-version");
   paConfig("remove builtin", "-h");
   paConfig("remove builtin", "-help");
+  paConfig("remove builtin", "-v");
+  paConfig("remove builtin", "-vv");
+  paConfig("remove builtin", "-vvv");
+  paConfig("remove builtin", "-vvvv");
+  paConfig("remove builtin", "-vvvvv");
 
   paConfig("man synopsis",                  (void*) "[options]");
   paConfig("man shortdescription",          (void*) "Options:");
@@ -1192,26 +1206,29 @@ int main(int argC, char* argV[])
   paConfig("man version",                   (void*) ORION_VERSION);
   paConfig("log to screen",                 (void*) true);
   paConfig("log to file",                   (void*) true);
-  paConfig("log file line format",          (void*) "TYPE:DATE:EXEC-AUX/FILE[LINE] FUNC: TEXT");
-  paConfig("screen line format",            (void*) "TYPE@TIME  FUNC[LINE]: TEXT");
+  paConfig("log file line format",          (void*) "time=DATE | lvl=TYPE | trans=TRANS_ID | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT");
+  paConfig("screen line format",            (void*) "TYPE@TIME  FILE[LINE]: TEXT");
   paConfig("builtin prefix",                (void*) "ORION_");
   paConfig("usage and exit on any warning", (void*) true);
+  paConfig("no preamble",                   NULL);
 
   paParse(paArgs, argC, (char**) argV, 1, false);
+  lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+  LM_I(("Orion Context Broker is running"));
 
   std::string multitenant = mtenant;
   if ((multitenant != "off") && (multitenant != "header") && (multitenant != "url"))
-    LM_X(1, ("Bad value for -multiservice. Allowed values: 'off', 'header' and 'url'"));
+    LM_X(1, ("Fatal Error (bad value for -multiservice ['%s']. Allowed values: 'off', 'header' and 'url')", mtenant));
 
   if (useOnlyIPv6 && useOnlyIPv4)
-    LM_X(1, ("-ipv4 and -ipv6 can not be activated at the same time. They are incompatible"));
+    LM_X(1, ("Fatal Error (-ipv4 and -ipv6 can not be activated at the same time. They are incompatible)"));
 
   if (https)
   {
     if (httpsKeyFile[0] == 0)
-      LM_X(1, ("when option '-https' is used, option '-key' is mandatory"));
+      LM_X(1, ("Fatal Error (when option '-https' is used, option '-key' is mandatory)"));
     if (httpsCertFile[0] == 0)
-      LM_X(1, ("when option '-https' is used, option '-cert' is mandatory"));
+      LM_X(1, ("Fatal Error (when option '-https' is used, option '-cert' is mandatory)"));
   }  
 
   if (fg == false)
@@ -1224,9 +1241,9 @@ int main(int argC, char* argV[])
   //
   char* x = (char*) malloc(100000);
   sprintf(x, "A hundred thousand bytes lost here");
-  LM_V(("x: '%s'", x));
+  LM_M(("x: '%s'", x));
   x = (char*) "LOST";
-  LM_V(("x: '%s'", x));
+  LM_M(("x: '%s'", x));
 #endif
 
   RestService* rsP = restServiceV;
@@ -1255,12 +1272,12 @@ int main(int argC, char* argV[])
     char* httpsCertificate      = (char*) malloc(2048);
     
     if (loadFile(httpsKeyFile, httpsPrivateServerKey, 2048) != 0)
-      LM_X(1, ("Error loading private server key from '%s'", httpsKeyFile));
+      LM_X(1, ("Fatal Error (loading private server key from '%s')", httpsKeyFile));
     if (loadFile(httpsCertFile, httpsCertificate, 2048) != 0)
-      LM_X(1, ("Error loading certificate from '%s'", httpsCertFile));
+      LM_X(1, ("Fatal Error (loading certificate from '%s')", httpsCertFile));
 
-    LM_V(("httpsKeyFile:  '%s'", httpsKeyFile));
-    LM_V(("httpsCertFile: '%s'", httpsCertFile));
+    LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
+    LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
     restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, httpsPrivateServerKey, httpsCertificate);
 

@@ -127,7 +127,7 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
   {
     ciP->httpStatusCode = SccBadRequest;
     ciP->answer = std::string("compound value error: ") + status;
-    LM_W(("ERROR: '%s'", ciP->answer.c_str()));
+    LM_W(("Bad Input (%s)", ciP->answer.c_str()));
   }
 
   // Give the root pointer of this Compound to the active ContextAttribute

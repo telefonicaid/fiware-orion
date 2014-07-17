@@ -40,6 +40,16 @@
 
 /* ****************************************************************************
 *
+* lmlib variables
+* These variables are non-static in logMsg.cpp but not declared 'extern' in logMsg.cpp
+* Thus, global variables in lmlib, but only meant for libpa. 
+*/
+extern bool lmPreamble;
+
+
+
+/* ****************************************************************************
+*
 * Configurable variables
 *
 * PROBLEM
@@ -476,6 +486,8 @@ int paConfig(const char* item, const void* value, const void* value2)
 		paExitOnUsage = (bool) val;
 	else if (strcmp(item, "print errors") == 0)
 		paPrintErrorsOnStderr = (bool) val;
+	else if (strcmp(item, "no preamble") == 0)
+		lmPreamble = false;
 	else if (strcmp(item, "prefix") == 0)
 	{
 		if (paPrefix != NULL)

@@ -93,8 +93,8 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
     /* The first argument to true is to use autoreconnect */
     connection = new DBClientConnection(true);
 
-    bool connected = false;
-    int  retries   = RECONNECT_RETRIES;
+    bool connected     = false;
+    int  retries       = RECONNECT_RETRIES;
 
     for (int tryNo = 0; tryNo < retries; ++tryNo)
     {
@@ -105,9 +105,9 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
       }
 
       if (tryNo == 0)
-        LM_W(("Cannot connect to mongo - doing %d retries with a %d microsecond interval", retries, RECONNECT_DELAY));
+        LM_E(("Database Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
       else
-        LM_VVVVV(("Try %d connecting to mongo failed", tryNo));
+        LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
 
       usleep(RECONNECT_DELAY * 1000); // usleep accepts microseconds
     }
@@ -115,8 +115,11 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
     if (connected == false)
     {
       mongoSemGive(__FUNCTION__, "connecting to mongo failed");
-      LM_RE(false, ("MongoDB connection failed, after %d retries: '%s'", retries, err.c_str()));
+      LM_E(("Database Error (connection failed, after %d retries: '%s')", retries, err.c_str()));
+      return false;
     }
+
+    LM_I(("Successful connection to database"));
 
     /* Authentication is different depending if multiservice is used or not. In the case of not
      * using multiservice, we authenticate in the single-service database. In the case of using
@@ -125,17 +128,21 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
      * access to any database */
     if (multitenant) {
         if (strlen(username) != 0 && strlen(passwd) != 0) {
-            if (!connection->auth("admin", std::string(username), std::string(passwd), err)) {
+            if (!connection->auth("admin", std::string(username), std::string(passwd), err))
+            {
                 mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
-                LM_RE(false, ("Auth error (db=admin, username=%s, pswd=%s): %s", username, passwd, err.c_str()));
+                LM_E(("Database Authentication Error (db=admin, username=%s, pswd=%s): %s", username, passwd, err.c_str()));
+                return false;
             }
         }
     }
     else {
         if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0) {
-            if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err)) {
+            if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err))
+            {
                 mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
-                LM_RE(false, ("Auth error (db=%s, username=%s, pswd=%s): %s", db, username, passwd, err.c_str()));
+                LM_E(("Database Authentication Error (db=%s, username=%s, pswd=%s): %s", db, username, passwd, err.c_str()));
+                return false;
             }
         }
     }
@@ -145,9 +152,11 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
     std::string extra;
     connection->runCommand("admin", BSON("buildinfo" << 1), result);
     std::string versionString = std::string(result.getStringField("version"));
-    if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra)) {
+    if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
+    {
         mongoSemGive(__FUNCTION__, "wrong mongo version format");
-        LM_RE(false, ("wrong mongo version format: <%s>", versionString.c_str()));
+        LM_E(("Database Error (invalid version format: %s)", versionString.c_str()));
+        return false;
     }
     LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)", versionString.c_str(), mongoVersionMayor, mongoVersionMinor, extra.c_str()));
 
@@ -404,18 +413,24 @@ void recoverOntimeIntervalThreads(std::string tenant) {
          * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
          * exception ourselves
          */
-        if (cursor.get() == NULL) {
+        if (cursor.get() == NULL)
+        {
             throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection");
+        LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
-    catch( const DBException &e ) {
+    catch (const DBException &e)
+    {
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongo db exception)");
-        LM_RVE(("Mongo DBException: %s", e.what()));
+        LM_E(("Database Error (DBException: %s)", e.what()));
+        return;
     }
-    catch (...) {
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongo generic exception)");
-        LM_RVE(("Caugth Mongo Generic Exception"));
+        LM_E(("Database Error (generic exception)"));
+        return;
     }
 
     /* For each one of the subscriptions found, create threads */
@@ -450,7 +465,7 @@ bool includedEntity(EntityId en, EntityIdVector* entityIdV) {
         if (isTrue(en2->isPattern)) {
             regex_t regex;
             if (regcomp(&regex, en2->id.c_str(), 0) != 0) {
-                LM_E(("error compiling regex: '%s'", en2->id.c_str()));
+                LM_W(("Bad Input (error compiling regex: '%s')", en2->id.c_str()));
                 continue;
             }
             if (regexec(&regex, en.id.c_str(), 0, NULL, 0) == 0) {
@@ -607,7 +622,10 @@ static void fillQueryServicePath(BSONObjBuilder& bo, const std::vector<std::stri
 static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
 {
   if ((e.type() != String) && (e.type() != Object) && (e.type() != Array))
-    LM_RVE(("unknown BSON type"));
+  {
+    LM_T(LmtSoftError, ("unknown BSON type"));
+    return;
+  }
 
   orion::CompoundValueNode* child = new orion::CompoundValueNode(orion::CompoundValueNode::Object);
   child->name = e.fieldName();
@@ -626,6 +644,7 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
   case Array:
     compoundVectorResponse(child, e);
     break;
+
   default:
     /* We need the default clause to avoid 'enumeration value X not handled in switch' errors due to -Werror=switch at compilation time */
     break;
@@ -679,11 +698,12 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
             geoScopes++;
         }
 
-        if (geoScopes == 1) {
-
-            if (!mongoLocationCapable()) {
-                LM_W(("location scope was found but your MongoDB version doesn't support it. Please upgrade MongoDB server to 2.4 or newer"));
-                return false;
+        if (geoScopes == 1)
+        {
+            if (!mongoLocationCapable())
+            {
+              LM_W(("Bad Input (location scope was found but your MongoDB version doesn't support it. Please upgrade MongoDB server to 2.4 or newer)"));
+              return false;
             }
 
             // FIXME P2: current version only support one geolocation scope. If the client includes several ones,
@@ -691,12 +711,14 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
             bool inverted = false;
 
             BSONObj geoWithin;
-            if (sco->areaType== orion::CircleType) {
+            if (sco->areaType == orion::CircleType)
+            {
                 double radians = sco->circle.radius() / EARTH_RADIUS_METERS;
                 geoWithin = BSON("$centerSphere" << BSON_ARRAY(BSON_ARRAY( sco->circle.center.latitude() << sco->circle.center.longitude()) << radians ));
                 inverted = sco->circle.inverted();
             }
-            else if (sco->areaType== orion::PolygonType) {
+            else if (sco->areaType== orion::PolygonType)
+            {
                 BSONArrayBuilder vertex;
                 double x0 = 0;
                 double y0 = 0;
@@ -717,8 +739,10 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
 
                 inverted = sco->polygon.inverted();
             }
-            else {
-                LM_RE(false, ("unknown area type"));
+            else
+            {
+                LM_W(("Bad Input (unknown area type)"));
+                return false;
             }
 
             if (inverted) {
@@ -731,10 +755,10 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
     }
 
     if (geoScopes > 1) {
-        LM_W(("current version supports only one area scope: %d were found, the first one was used", geoScopes));
+        LM_W(("Bad Input (current version supports only one area scope: %d were found, the first one is used)", geoScopes));
     }
-    return (geoScopes > 0);
 
+    return (geoScopes > 0);
 }
 
 /* ****************************************************************************
@@ -850,6 +874,7 @@ bool entitiesQuery
         }
 
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
+        LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException& e)
     {
@@ -858,7 +883,8 @@ bool entitiesQuery
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
 
-        LM_RE(false,(err->c_str()));
+        LM_E(("Database Error (%s)", err->c_str()));
+        return false;
     }
     catch (...)
     {
@@ -867,7 +893,8 @@ bool entitiesQuery
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
 
-        LM_RE(false, (err->c_str()));
+        LM_E(("Database Error (%s)", err->c_str()));
+        return false;
     }
 
     /* Process query result */
@@ -926,9 +953,10 @@ bool entitiesQuery
                     caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);
                     compoundVectorResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
                 }
-                else {
-                    LM_E(("unknown BSON type"));
-                    continue;
+                else
+                {
+                  LM_T(LmtSoftError, ("unknown BSON type"));
+                  continue;
                 }
 
                 /* Setting ID (if found) */
@@ -962,7 +990,6 @@ bool entitiesQuery
 
                 cer->contextElement.contextAttributeVector.push_back(caP);
             }
-
         }
 
         cer->statusCode.fill(SccOk);
@@ -1164,6 +1191,7 @@ bool registrationsQuery
 
         cursor = connection->query(getRegistrationsCollectionName(tenant).c_str(), query, limit, offset);
         mongoSemGive(__FUNCTION__, "query in RegistrationsCollection");
+        LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException& e)
     {
@@ -1172,6 +1200,7 @@ bool registrationsQuery
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
 
+        LM_E(("Database Error (%s)", err->c_str()));
         return false;
     }
     catch (...)
@@ -1181,6 +1210,7 @@ bool registrationsQuery
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
 
+        LM_E(("Database Error (%s)", err->c_str()));
         return false;
     }
 
@@ -1298,9 +1328,10 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
     // FIXME P10: we are using an empty service path vector until service paths get implemented for subscriptions
     std::vector<std::string> servicePathV;
     Restriction res;    
-    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant, servicePathV)) {
+    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant, servicePathV))
+    {
         ncr.contextElementResponseVector.release();
-        LM_RE(false, (err.c_str()));
+        return false;
     }
 
     if (ncr.contextElementResponseVector.size() > 0) {
@@ -1317,10 +1348,11 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
             AttributeList emptyList;
             // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
             // FIXME P10: we are using an empty service path vector until serive paths get implemented for subscriptions
-            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false, tenant, servicePathV)) {
+            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false, tenant, servicePathV))
+            {
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
-                LM_RE(false, (err.c_str()));
+                return false;
             }
 
             if (isCondValueInContextElementResponse(condValues, &allCerV)) {
@@ -1351,7 +1383,6 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
 void processOntimeIntervalCondition(std::string subId, int interval, std::string tenant) {
 
     getNotifier()->createIntervalThread(subId, interval, tenant);
-
 }
 
 /* ****************************************************************************
@@ -1422,26 +1453,33 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
     DBClientConnection* connection = getMongoConnection();
 
     /* Update the document */
-    try {
-        BSONObj query = BSON("_id" << OID(subId));
-        BSONObj update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CASUB_COUNT << 1));
-        LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextAvailabilityCollectionName(tenant).c_str(),
-                        query.toString().c_str(),
-                        update.toString().c_str()));
+    BSONObj query = BSON("_id" << OID(subId));
+    BSONObj update = BSON("$set" << BSON(CASUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CASUB_COUNT << 1));
+    LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextAvailabilityCollectionName(tenant).c_str(),
+                    query.toString().c_str(),
+                    update.toString().c_str()));
 
-        mongoSemTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
+    mongoSemTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
+
+    try
+    {
         connection->update(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), query, update);
         mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
+        LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
-    catch( const DBException &e ) {
+    catch (const DBException &e)
+    {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo db exception)");
         *err = e.what();
-        LM_RE(SccOk, ("Database error '%s'", err->c_str()));
+        LM_E(("Database Error ('update[%s:%s] in %s', '%s')", query.toString().c_str(), update.toString().c_str(), getSubscribeContextAvailabilityCollectionName(tenant).c_str(), e.what()));
+        return SccOk;
     }
-    catch(...) {
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo generic exception)");
         *err = "Database error - exception thrown";
-        LM_RE(SccOk, ("Database error - exception thrown"));
+        LM_E(("Database Error ('update[%s:%s] in %s', '%s')", query.toString().c_str(), update.toString().c_str(), getSubscribeContextAvailabilityCollectionName(tenant).c_str(), "generic exception"));
+        return SccOk;
     }
 
     return SccOk;
@@ -1469,9 +1507,10 @@ bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, st
     std::string err;
     NotifyContextAvailabilityRequest ncar;
 
-    if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant)) {
+    if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant))
+    {
        ncar.contextRegistrationResponseVector.release();
-       LM_RE(false, (err.c_str()));
+       return false;
     }
 
     if (ncar.contextRegistrationResponseVector.size() > 0) {
@@ -1483,8 +1522,9 @@ bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, st
         ncar.contextRegistrationResponseVector.release();
 
         /* Update database fields due to new notification */
-        if (mongoUpdateCasubNewNotification(subId, &err, tenant) != SccOk) {
-            LM_RE(false, ("error invoking mongoUpdateCasubNewNotification: '%s'", err.c_str()));
+        if (mongoUpdateCasubNewNotification(subId, &err, tenant) != SccOk)
+        {
+          return false;
         }
 
         return true;

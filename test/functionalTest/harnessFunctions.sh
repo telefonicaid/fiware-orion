@@ -95,7 +95,7 @@ function localBrokerStart()
   if [ "$role" == "CB" ]
   then
     port=$BROKER_PORT
-    CB_START_CMD="contextBroker -vvvvv -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME} -t $traceLevels $IPvOption $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME} -t $traceLevels $IPvOption $extraParams"
   elif [ "$role" == "CM" ]
   then
     mkdir -p /tmp/configManager

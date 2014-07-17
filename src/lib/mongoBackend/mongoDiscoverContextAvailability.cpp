@@ -112,21 +112,24 @@ static bool associationsQuery
             throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
         mongoSemGive(__FUNCTION__, "query in AssociationsCollection");
+        LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
-    catch( const DBException &e ) {
-
+    catch (const DBException &e)
+    {
         mongoSemGive(__FUNCTION__, "query in AssociationsCollection (DBException)");
         *err = std::string("collection: ") + getAssociationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
+        LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), err->c_str()));
         return false;
     }
-    catch(...) {
-
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "query in AssociationsCollection (Generic Exception)");
         *err = std::string("collection: ") + getAssociationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
+        LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), err->c_str()));
         return false;
     }
 
@@ -180,17 +183,19 @@ static HttpStatusCode associationsDiscoverContextAvailability
   bool                                  details
 )
 {
-    if (scope == SCOPE_VALUE_ASSOC_ALL) {
-        LM_W(("%s scope not supported", SCOPE_VALUE_ASSOC_ALL));
+    if (scope == SCOPE_VALUE_ASSOC_ALL)
+    {
+        LM_W(("Bad Input (%s scope not supported)", SCOPE_VALUE_ASSOC_ALL));
         responseP->errorCode.fill(SccNotImplemented, std::string("Not supported scope: '") + SCOPE_VALUE_ASSOC_ALL + "'");
         return SccOk;
     }
 
     MetadataVector mdV;
     std::string err;
-    if (!associationsQuery(&requestP->entityIdVector, &requestP->attributeList, scope, &mdV, &err, tenant, offset, limit, details)) {
+    if (!associationsQuery(&requestP->entityIdVector, &requestP->attributeList, scope, &mdV, &err, tenant, offset, limit, details))
+    {
         responseP->errorCode.fill(SccReceiverInternalError, std::string("Database error: ") + err);
-        LM_RE(SccOk,(responseP->errorCode.details.c_str()));
+        return SccOk;
     }
 
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
@@ -222,9 +227,10 @@ static HttpStatusCode associationsDiscoverContextAvailability
         }
 
         ContextRegistrationResponseVector crrV;
-        if (!registrationsQuery(enV, attrL, &crrV, &err, tenant)) {
+        if (!registrationsQuery(enV, attrL, &crrV, &err, tenant))
+        {
             responseP->errorCode.fill(SccReceiverInternalError, err);
-            LM_RE(SccOk,(responseP->errorCode.details.c_str()));
+            return SccOk;
         }
 
         /* Accumulate in responseP */
@@ -263,7 +269,8 @@ static HttpStatusCode conventionalDiscoverContextAvailability
     if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err, tenant, offset, limit, details, &count))
     {
         responseP->errorCode.fill(SccReceiverInternalError, err);
-        LM_RE(SccOk,(responseP->errorCode.details.c_str()));
+        LM_E(("Database Error (%s)", responseP->errorCode.details.c_str()));
+        return SccOk;
     }
 
     if (responseP->responseVector.size() == 0)
@@ -331,10 +338,13 @@ HttpStatusCode mongoDiscoverContextAvailability
    * differently depending on the scope. Although OperationScope is a list in NGSI, we only support one
    * scope at the same time */
   int nScopes = requestP->restriction.scopeVector.size();
-  if (nScopes > 0) {
-    if (nScopes > 1) {
-      LM_W(("Using %d scopes: only the first one will be used", nScopes));
+  if (nScopes > 0)
+  {
+    if (nScopes > 1)
+    {
+      LM_W(("Bad Input (%d scopes: only the first one is used)", nScopes));
     }
+
     std::string scopeType  = requestP->restriction.scopeVector.get(0)->type;
     std::string scopeValue = requestP->restriction.scopeVector.get(0)->value;
 
@@ -343,8 +353,9 @@ HttpStatusCode mongoDiscoverContextAvailability
       reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request (association)");
       return ms;
     }
-    else {
-      LM_W(("Unsupported scope (%s, %s), doing conventional discoverContextAvailability", scopeType.c_str(), scopeValue.c_str()));
+    else
+    {
+      LM_W(("Bad Input (unsupported scope [%s, %s], doing conventional discoverContextAvailability)", scopeType.c_str(), scopeValue.c_str()));
     }
   }
 

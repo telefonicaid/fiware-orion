@@ -57,9 +57,6 @@ int socketHttpConnect(const std::string& host, unsigned short port)
   struct addrinfo*    peer;
   char                port_str[10];
 
-
-  LM_VVV(("Generic Connect to: '%s'  port: '%d'", host.c_str(), port));
-
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_protocol = 0;
@@ -67,36 +64,41 @@ int socketHttpConnect(const std::string& host, unsigned short port)
   if (ipVersionUsed == IPV4) 
   {
     hints.ai_family = AF_INET;
-    LM_VVV(("Allow IPv4 only"));
+    LM_T(LmtIpVersion, ("Allow IPv4 only"));
   }
   else if (ipVersionUsed == IPV6)
   {
     hints.ai_family = AF_INET6;
-    LM_VVV(("Allow  IPv6 only"));
+    LM_T(LmtIpVersion, ("Allow  IPv6 only"));
   }
   else 
   {
     hints.ai_family = AF_UNSPEC;
-    LM_VVV(("Allow IPv4 or IPv6"));
+    LM_T(LmtIpVersion, ("Allow IPv4 or IPv6"));
   }
 
   snprintf(port_str, sizeof(port_str), "%d" , (int) port);
 
-  if (getaddrinfo(host.c_str(), port_str, &hints, &peer) != 0) {
-    LM_RE(-1, ("getaddrinfo('%s'): %s", host.c_str(), strerror(errno)));
+  if (getaddrinfo(host.c_str(), port_str, &hints, &peer) != 0)
+  {
+    LM_E(("Notification failure for %s:%d (getaddrinfo: %s)", host.c_str(), port, strerror(errno)));
+    return -1;
   }
 
-  if ((fd = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol)) == -1) {
-    LM_RE(-1, ("socket: %s", strerror(errno)));
+  if ((fd = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol)) == -1)
+  {
+    LM_E(("Notification failure for %s:%d (socket: %s)", host.c_str(), port, strerror(errno)));
+    return -1;
   }
 
   if (connect(fd, peer->ai_addr, peer->ai_addrlen) == -1)
   {
     freeaddrinfo(peer);
     close(fd);
-    LM_E(("connect(%s, %d): %s", host.c_str(), port, strerror(errno)));
+    LM_E(("Notification failure for %s:%d (connect: %s)", host.c_str(), port, strerror(errno)));
     return -1;
   }
+
   freeaddrinfo(peer);
   return fd;
 }
@@ -150,12 +152,41 @@ std::string sendHttpSocket
   ++callNo;
 
   // Preconditions check
-  if (port == 0)        LM_RE("error", ("port is ZERO"));
-  if (ip.empty())       LM_RE("error", ("ip is empty"));
-  if (verb.empty())     LM_RE("error", ("verb is empty"));
-  if (resource.empty()) LM_RE("error", ("resource is empty"));
-  if ((content_type.empty()) && (!content.empty())) LM_RE("error", ("Content-Type is empty but there is actual content"));
-  if ((!content_type.empty()) && (content.empty())) LM_RE("error", ("there is actual content but Content-Type is empty"));
+  if (port == 0)
+  {
+    LM_E(("Runtime Error (port is ZERO)"));
+    return "error";
+  }
+
+  if (ip.empty())
+  {
+    LM_E(("Runtime Error (ip is empty)"));
+    return "error";
+  }
+
+  if (verb.empty())
+  {
+    LM_E(("Runtime Error (verb is empty)"));
+    return "error";
+  }
+
+  if (resource.empty())
+  {
+    LM_E(("Runtime Error (resource is empty)"));
+    return "error";
+  }
+
+  if ((content_type.empty()) && (!content.empty()))
+  {
+    LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
+    return "error";
+  }
+
+  if ((!content_type.empty()) && (content.empty()))
+  {
+    LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
+    return "error";
+  }
 
   //
   // Rush
@@ -226,15 +257,21 @@ std::string sendHttpSocket
      *    + 1, for the \0 by the trailing character in C strings
      */
     int neededSize = content.length() + strlen(preContent) + 3;
-    if (neededSize > MAX_DYN_MSG_SIZE) {
-        LM_RE("error", ("HTTP request to send is too large: %d bytes", content.length() + strlen(preContent)));
+    if (neededSize > MAX_DYN_MSG_SIZE)
+    {
+      LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", content.length() + strlen(preContent)));
+      return "error";
     }
-    else if (neededSize > MAX_STA_MSG_SIZE) {
+    else if (neededSize > MAX_STA_MSG_SIZE)
+    {
         msgDynamic = (char*) calloc(sizeof(char), neededSize);
-        if (msgDynamic == NULL) {
-            LM_RE("error", ("dynamic memory allocation failure"));
+        if (msgDynamic == NULL)
+        {
+          LM_E(("Runtime Error (dynamic memory allocation failure)"));
+          return "error";
         }
-        msg = msgDynamic;
+
+        msg  = msgDynamic;
         what = (char*) "dynamic";
     }
 
@@ -255,7 +292,10 @@ std::string sendHttpSocket
   int fd = socketHttpConnect(ip, port); // Connecting to HTTP server
 
   if (fd == -1)
-    LM_RE("error", ("Unable to connect to HTTP server at %s:%d", ip.c_str(), port));
+  {
+    LM_E(("Runtime Error (unable to connect to HTTP server at %s:%d)", ip.c_str(), port));
+    return "error";
+  }
 
   int nb;
   int sz = strlen(msg);
@@ -263,22 +303,36 @@ std::string sendHttpSocket
   LM_T(LmtClientOutputPayload, ("Sending message %lu to HTTP server: sending %s message of %d bytes to HTTP server", callNo, what, sz));
   LM_T(LmtClientOutputPayloadDump, ("Sending to HTTP server payload:\n%s", msg));
   nb = send(fd, msg, sz, 0);
-  if (msgDynamic != NULL) {
-      free (msgDynamic);
+  if (msgDynamic != NULL)
+  {
+      free(msgDynamic);
   }
 
   if (nb == -1)
-    LM_RE("error", ("error sending to HTTP server: %s", strerror(errno)));
+  {
+    LM_E(("Notification failure for %s:%d (send: %s)", _ip.c_str(), port, strerror(errno)));
+    return "error";
+  }
   else if (nb != sz)
-     LM_E(("error sending to HTTP server. Sent %d bytes of %d", nb, sz));
+  {
+    LM_E(("Notification failure for %s:%d (not entire message sent)", _ip.c_str(), port));
+    return "error";
+  }
 
-  if (waitForResponse) {
-      nb = recv(fd,&buffer,TAM_BUF-1,0);
+  if (waitForResponse)
+  {
+      nb = recv(fd, &buffer, TAM_BUF - 1, 0);
 
       if (nb == -1)
-        LM_RE("error", ("error recv from HTTP server: %s", strerror(errno)));
+      {
+        LM_T(LmtSoftError, ("error recv from HTTP server: %s", strerror(errno)));
+        return "error";
+      }
       else if ( nb >= TAM_BUF)
-         LM_RE("error", ("recv from HTTP server too long"));
+      {
+        LM_T(LmtSoftError, ("recv from HTTP server too long"));
+        return "error";
+      }
       else
       {
           memcpy(response, buffer, nb);
@@ -288,7 +342,8 @@ std::string sendHttpSocket
       if (strlen(response) > 0)
           result = response;
   }
-  else {
+  else
+  {
      LM_T(LmtClientInputPayload, ("not waiting for response"));
      result = "";
   }

@@ -52,6 +52,8 @@ typedef enum TraceLevels
   LmtUriParams,
   LmtServicePath,
   LmtPagination,
+  LmtHttps,
+  LmtIpVersion,
 
   /* Parser (40-59) */
   LmtParse    = 40,
@@ -101,15 +103,18 @@ typedef enum TraceLevels
   LmtPartialPayload,
   LmtClientOutputPayloadDump,
 
-  /* Semaphores (200-201) */
+  /* Semaphores (200-202) */
   LmtReqSem = 200,
   LmtMongoSem,
+  LmtTransSem,
 
   /* Others (>=210) */
   LmtCm = 210,
   LmtIotaXmlReg,
   LmtIotaXmlObs,
-  LmtRush
+  LmtRush,
+  LmtSoftError,
+  LmtNotImplemented
 } TraceLevels;
 
 

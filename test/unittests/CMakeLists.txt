@@ -87,7 +87,6 @@ SET (SOURCES
     serviceRoutines/postIndividualContextEntityAttribute_test.cpp
     serviceRoutines/postIndividualContextEntityAttributes_test.cpp
     serviceRoutines/logTraceTreat_test.cpp
-    serviceRoutines/logVerboseTreat_test.cpp
     serviceRoutines/postRegisterContext_test.cpp
     serviceRoutines/postSubscribeContext_test.cpp
     serviceRoutines/postSubscribeContextAvailability_test.cpp

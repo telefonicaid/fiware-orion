@@ -86,18 +86,24 @@ static void registerContextForward(ConnectionInfo* ciP, ParseData* parseDataP, R
     std::string response = fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, payload);
 
     if (response == "error")
-       LM_RVE(("fordwardRegisterContext failed"));
+    {
+      LM_E(("Runtime Error (fordwarding of RegisterContext failed)"));
+      return;
+    }
 
     ParseData    responseData;
     XmlRequest*  reqP = NULL;
     const char*  payloadStart = strstr(response.c_str(), "<registerContextResponse>");
 
     if (payloadStart == NULL)
-      LM_RVE(("<registerContextResponse> not found in fordwardRegisterContext response '%s'", response.c_str()));
+    {
+      LM_E(("Runtime Error (<registerContextResponse> not found in fordwardRegisterContext response '%s')", response.c_str()));
+      return;
+    }
 
     std::string  s = xmlTreat(payloadStart, ciP, &responseData, RegisterResponse, "", &reqP);
     if (s != "OK")
-      LM_E(("Error parsing registerContextResponse: %s", s.c_str()));
+      LM_W(("Bad Input (error parsing registerContextResponse: %s)", s.c_str()));
     else
     {
       std::string fwdRegId = responseData.rcrs.res.registrationId.get();

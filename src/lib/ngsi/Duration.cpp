@@ -60,7 +60,7 @@ std::string Duration::check(RequestType requestType, Format format, const std::s
   if (parse() == -1)
   {
     valid = false;
-    LM_E(("syntax error in duration string"));
+    LM_W(("Bad Input (syntax error in duration string)"));
     return "syntax error in duration string";
   }
 

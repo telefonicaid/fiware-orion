@@ -72,6 +72,9 @@ char*        progName;               /* needed for messages (and by lmLib) */
 char         progNameV[512];         /* where to store progName            */
 
 
+
+__thread char   transactionId[64] = "N/A";
+
 static sem_t sem;
 
 static void semInit(void)
@@ -153,9 +156,9 @@ static void semGive(void)
 #define SUB              1
 #define TRACE_LEVELS     256
 #define FDS_MAX          2
-#define LINE_MAX         (16 * 1024)
+#define LINE_MAX         (32 * 1024)
 #define TEXT_MAX         512
-#define FORMAT_LEN       512
+#define FORMAT_LEN       1024
 #define FORMAT_DEF       "TYPE:DATE:TID:EXEC/FILE[LINE] FUNC: TEXT"
 #define DEF1             "TYPE:EXEC/FUNC: TEXT"
 #define TIME_FORMAT_DEF  "%A %d %h %H:%M:%S %Y"
@@ -294,6 +297,7 @@ bool  lmAssertAtExit               = false;
 LmxFp lmxFp                        = NULL;
 bool  lmNoTracesToFileIfHookActive = false;
 bool  lmSilent                     = false;
+bool  lmPreamble                   = true;
 
 
 
@@ -571,11 +575,7 @@ static void traceFix(char* levelFormat, unsigned int way)
 */
 static char* dateGet(int index, char* line, int lineSize)
 {
-    char       line_tmp[80];
     time_t     secondsNow = time(NULL);
-    struct tm  tmP;
-
-    struct timeb timebuffer;
 
     if (strcmp(fds[index].timeFormat, "UNIX") == 0)
     {
@@ -601,17 +601,23 @@ static char* dateGet(int index, char* line, int lineSize)
         days  = tm;
 
         if (days != 0)
-            snprintf(line, lineSize, "%d days %02d:%02d:%02d",
-                 days, hours, mins, secs);
+            snprintf(line, lineSize, "%d days %02d:%02d:%02d", days, hours, mins, secs);
         else
             snprintf(line, lineSize, "%02d:%02d:%02d", hours, mins, secs);
     }
     else
     {
-        ftime(&timebuffer);
-        lm::gmtime_r(&secondsNow, &tmP);
-        strftime(line_tmp, 80, fds[index].timeFormat, &tmP);
-        snprintf(line, lineSize, "%s(%.3d)", line_tmp, timebuffer.millitm);
+      struct timeb timebuffer;
+      struct tm    tm;
+      char         line_tmp[80];
+      char         timeZone[20];
+
+      ftime(&timebuffer);
+      localtime_r(&secondsNow, &tm);
+      strftime(line_tmp, 80, fds[index].timeFormat, &tm);
+      strftime(timeZone, sizeof(timeZone), "%Z", &tm);
+
+      snprintf(line, lineSize, "%s.%.3d%s", line_tmp, timebuffer.millitm, timeZone);
     }
     
     return line;
@@ -734,6 +740,35 @@ do                                                \
 
 /* ****************************************************************************
 *
+* longTypeName - 
+*/
+const char* longTypeName(char type)
+{
+  switch (type)
+  {
+  case 'W':  return "WARNING";
+  case 'E':  return "ERROR";
+  case 'P':  return "ERROR";
+  case 'X':  return "FATAL";
+  case 'T':  return "DEBUG";
+  case 'D':  return "DEBUG";
+  case 'V':  return "DEBUG";
+  case '2':  return "DEBUG";
+  case '3':  return "DEBUG";
+  case '4':  return "DEBUG";
+  case '5':  return "DEBUG";
+  case 'M':  return "DEBUG";
+  case 'F':  return "DEBUG";
+  case 'I':  return "INFO";
+  }
+
+  return "N/A";
+}
+
+
+
+/* ****************************************************************************
+*
 * lmLineFix - 
 */
 static char* lmLineFix
@@ -748,11 +783,11 @@ static char* lmLineFix
     int          tLev
 )
 {
-    char   xin[256];
-    int    fLen;
-    int    fi     = 0;
-    Fds*   fdP    = &fds[index];
-    char*  format = fdP->format;
+    char         xin[256];
+    int          fLen;
+    int          fi     = 0;
+    Fds*         fdP    = &fds[index];
+    char*        format = fdP->format;
 
     memset(line, 0, lineLen);
 
@@ -763,7 +798,7 @@ static char* lmLineFix
 
         tid = syscall(SYS_gettid);
         if (strncmp(&format[fi], "TYPE", 4) == 0)
-            CHAR_ADD((type == 'P')? 'E' : type, 4);
+            STRING_ADD(longTypeName(type), 4);
         else if (strncmp(&format[fi], "PID", 3) == 0)
             INT_ADD((int) getpid(), 3);
         else if (strncmp(&format[fi], "DATE", 4) == 0)
@@ -772,6 +807,8 @@ static char* lmLineFix
             STRING_ADD(timeGet(index, xin, sizeof(xin)), 4);
         else if (strncmp(&format[fi], "TID", 3) == 0)
             INT_ADD((int) tid, 3);
+        else if (strncmp(&format[fi], "TRANS_ID", 8) == 0)
+            STRING_ADD(transactionId, 8);
         else if (strncmp(&format[fi], "EXEC", 4) == 0)
             STRING_ADD(progName, 4);
         else if (strncmp(&format[fi], "AUX", 3) == 0)
@@ -791,12 +828,7 @@ static char* lmLineFix
     }
 
     if ((type == 'T') && (fdP->traceShow == true))
-        snprintf(xin, sizeof(xin), "%s%d%s\n",
-                   fdP->tMarkStart, tLev, fdP->tMarkEnd);
-#if 0
-    else if (type == 'P') /* type 'P' => tLev == errno */
-        snprintf(xin, sizeof(xin), ": %s\n", strerror(tLev)); 
-#endif
+        snprintf(xin, sizeof(xin), "%s%d%s\n", fdP->tMarkStart, tLev, fdP->tMarkEnd);
     else if (type == 'x') /* type 'x' => */
         snprintf(xin, sizeof(xin), ": %s\n", strerror(errno));
     else
@@ -1564,15 +1596,18 @@ LmStatus lmFdRegister(int fd, const char* format, const char* timeFormat, const 
     
     if ((fd >= 0) && (strcmp(info, "stdout") != 0))
     {
-      strftime(dt, 256, "%A %d %h %H:%M:%S %Y", &tmP);
-      snprintf(startMsg, sizeof(startMsg),
-               "%s log\n-----------------\nStarted %s\nCleared at ...\n",
-               progName, dt);
+      if (lmPreamble == true)
+      {
+        strftime(dt, 256, "%A %d %h %H:%M:%S %Y", &tmP);
+        snprintf(startMsg, sizeof(startMsg),
+                 "%s log\n-----------------\nStarted %s\nCleared at ...\n",
+                 progName, dt);
 
-      sz = strlen(startMsg);
-
-      if (write(fd, startMsg, sz) != sz)
-        return LmsWrite;
+        sz = strlen(startMsg);
+        
+        if (write(fd, startMsg, sz) != sz)
+          return LmsWrite;
+      }
     }
 
     fds[index].fd    = fd;
@@ -1654,7 +1689,7 @@ LmStatus lmPathRegister(const char* path, const char* format, const char* timeFo
         {
             leaf_path = progName;
         }
-        snprintf(fileName, sizeof(fileName), "%s/%sLog", path, leaf_path);
+        snprintf(fileName, sizeof(fileName), "%s/%s.log", path, leaf_path);
     }
     else
     {
@@ -1719,13 +1754,22 @@ LmStatus lmPathRegister(const char* path, const char* format, const char* timeFo
 *
 * lmOut - 
 */
-LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* fName,
-               int tLev, const char* stre , bool use_hook )
+LmStatus lmOut
+(
+  char*        text,
+  char         type,
+  const char*  file,
+  int          lineNo,
+  const char*  fName,
+  int          tLev,
+  const char*  stre,
+  bool         use_hook
+)
 {
     int   i;
     char* line = (char*) calloc(1, LINE_MAX);
     int   sz;
-    char  format[FORMAT_LEN + 1];
+    char* format = (char*) calloc(1, FORMAT_LEN + 1);
     char* tmP;
 
     tmP = strrchr((char*) file, '/');
@@ -1736,6 +1780,7 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
     {
         lmAddMsgBuf(text, type, file, lineNo, fName, tLev, (char*) stre);
         free(line);
+        free(format);        
         return LmsOk;
     } 
 
@@ -1784,9 +1829,9 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
         }
         else
         {
-            /* Danger: 'format' might be too short ... */
-            if (lmLineFix(i, format, sizeof(format), type, file, lineNo, fName, tLev) == NULL)
-               continue;
+          /* Danger: 'format' might be too short ... */
+          if (lmLineFix(i, format, FORMAT_LEN, type, file, lineNo, fName, tLev) == NULL)
+            continue;
 
             if ((strlen(format) + strlen(text) + strlen(line)) > LINE_MAX)
               snprintf(line, LINE_MAX, "%s[%d]: %s\n%c", file, lineNo, "LM ERROR: LINE TOO LONG", 0);
@@ -1841,6 +1886,7 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
 
         /* exit here, just in case */
         free(line);
+        free(format);        
         exit(tLev);
     }
     
@@ -1860,6 +1906,7 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
                 if ((s = lmClear(i, keepLines, lastLines)) != LmsOk)
                 {
                     free(line);
+                    free(format);        
                     semGive();
                     return s;
                 }
@@ -1868,6 +1915,7 @@ LmStatus lmOut(char* text, char type, const char* file, int lineNo, const char* 
     }
 
     free(line);
+    free(format);        
     semGive();
     return LmsOk;
 }
@@ -2674,14 +2722,15 @@ int lmSdGet(void)
 
 struct logMsg 
 {
-    char msg[256];
-    char type;
-    char file[256];
-    int  line;
-    char func[256];
-    int  tLev;
-    char stre[256];
-    struct logMsg* next;
+  char msg[256];
+  char type;
+  char file[256];
+  int  line;
+  char func[256];
+  int  tLev;
+  char stre[256];
+  char transactionId[64];
+  struct logMsg* next;
 };
 
 
@@ -2744,16 +2793,16 @@ void lmAddMsgBuf(char* text, char type, const char* file, int line, const char* 
 */
 void lmPrintMsgBuf()
 {
+  struct logMsg *logP;
 
-    struct logMsg *logP;
-
-    while (logMsgs) 
-    {
-        logP = logMsgs;
-        lmOut(logP->msg, logP->type, logP->file, logP->line, (char*) logP->func, logP->tLev, logP->stre);
-        logMsgs = logP->next;
-        ::free(logP);
-    }
+  while (logMsgs) 
+  {
+    logP = logMsgs;
+    strncpy(transactionId, logP->transactionId, sizeof(transactionId));
+    lmOut(logP->msg, logP->type, logP->file, logP->line, (char*) logP->func, logP->tLev, logP->stre, false);
+    logMsgs = logP->next;
+    ::free(logP);
+  }
 }
 
 

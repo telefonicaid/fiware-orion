@@ -215,7 +215,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 
 
   if ((strcasecmp(key.c_str(), "connection") == 0) && (headerP->connection != "") && (headerP->connection != "close"))
-     LM_W(("connection '%s' - currently not supported, sorry ...", headerP->connection.c_str()));
+    LM_T(LmtRest, ("connection '%s' - currently not supported, sorry ...", headerP->connection.c_str()));
 
   /* Note that the strategy to "fix" the Content-Type is to replace the ";" with 0
    * to "deactivate" this part of the string in the checking done at connectionTreat() */
@@ -331,7 +331,8 @@ static Format wantedOutputSupported(const std::string& acceptList, std::string* 
   else if (json == true)
     return JSON;
 
-  LM_RE(NOFORMAT, ("No valid 'Accept-format' found"));
+  LM_W(("Bad Input (no valid 'Accept-format' found)"));
+  return NOFORMAT;
 }
 
 
@@ -583,17 +584,50 @@ static int connectionTreat
    void**           con_cls
 )
 {
-  ConnectionInfo* ciP      = (ConnectionInfo*) *con_cls;
-  size_t          dataLen  = *upload_data_size;
+  ConnectionInfo*        ciP         = (ConnectionInfo*) *con_cls;
+  size_t                 dataLen     = *upload_data_size;
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (ciP == NULL)
   {
-    if ((ciP = new ConnectionInfo(url, method, version, connection)) == NULL)
-      LM_RE(MHD_NO, ("Error allocating ConnectionInfo"));
-        
-    *con_cls = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
+    //
+    // IP Address and port of caller
+    //
+    char            ip[32];
+    unsigned short  port = 0;
 
+    const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
+    if (mciP != NULL)
+    {
+      port = (mciP->client_addr->sa_data[0] << 8) + mciP->client_addr->sa_data[1];
+      snprintf(ip, sizeof(ip), "%d.%d.%d.%d", mciP->client_addr->sa_data[2]  & 0xFF, mciP->client_addr->sa_data[3]  & 0xFF, mciP->client_addr->sa_data[4] & 0xFF, mciP->client_addr->sa_data[5] & 0xFF);
+    }
+    else
+    {
+      port = 0;
+      snprintf(ip, sizeof(ip), "IP unknown");
+    }
+
+    //
+    // Transaction
+    //
+    transactionIdSet();
+    LM_I(("Starting transaction from %s:%d%s", ip, port, url));
+
+
+    //
+    // ConnectionInfo
+    //
+    if ((ciP = new ConnectionInfo(url, method, version, connection)) == NULL)
+    {
+      LM_E(("Runtime Error (error allocating ConnectionInfo)"));
+      return MHD_NO;
+    }
+
+    *con_cls = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
+    ciP->port = port;
+    ciP->ip   = ip;
+    
     //
     // URI parameters
     // 
@@ -605,7 +639,7 @@ static int connectionTreat
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
     if (ciP->httpStatusCode != SccOk)
     {
-      LM_W(("Error in URI parameters"));
+      LM_W(("Bad Input (error in URI parameters)"));
       restReply(ciP, ciP->answer);
       return MHD_YES;
     }
@@ -622,18 +656,18 @@ static int connectionTreat
     ciP->servicePath = ciP->httpHeaders.servicePath;
     if (servicePathSplit(ciP) != 0)
     {
-      LM_W(("Error in ServicerPath header"));
+      LM_W(("Bad Input (error in ServicePath http-header)"));
       restReply(ciP, ciP->answer);
     }
 
     if (contentTypeCheck(ciP) != 0)
     {
-      LM_W(("Error in Content-Type"));
+      LM_W(("Bad Input (invalid mime-type in Content-Type http-header)"));
       restReply(ciP, ciP->answer);
     }
     else if (outFormatCheck(ciP) != 0)
     {
-      LM_W(("Bad Accepted Out-Format (in Accept header)"));
+      LM_W(("Bad Input (invalid mime-type in Accept http-header)"));
       restReply(ciP, ciP->answer);
     }
     else
@@ -708,6 +742,9 @@ static int connectionTreat
   else
     serveFunction(ciP);
 
+  LM_I(("Transaction ended (%s:%d)", ciP->ip.c_str(), ciP->port));
+  strncpy(transactionId, "N/A", sizeof(transactionId));
+
   return MHD_YES;
 }
 
@@ -720,20 +757,27 @@ static int connectionTreat
 static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
   if (port == 0)
-     LM_RE(1, ("Please call restInit before starting the REST service"));
+  {
+    // This is a BUG
+    LM_E(("Fatal Error (port cannot be 0)"));
+    return 1;
+  }
 
   if ((ipVersion == IPV4) || (ipVersion == IPDUAL)) 
   { 
     memset(&sad, 0, sizeof(sad));
     if (inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr)) != 1)
-      LM_RE(2, ("V4 inet_pton fail for %s", bindIp));
+    {
+      LM_E(("Fatal Error (V4 inet_pton fail for %s)", bindIp));
+      return 2;
+    }
 
     sad.sin_family = AF_INET;
     sad.sin_port   = htons(port);
 
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
-      // LM_V(("Starting HTTPS daemon on IPv4 %s port %d", bindIp, port));
+      // LM_T(LmtMhd, ("Starting HTTPS daemon on IPv4 %s port %d", bindIp, port));
       mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_SSL, // MHD_USE_SELECT_INTERNALLY
                                    htons(port),
                                    NULL,
@@ -748,7 +792,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     }
     else
     {
-      LM_V(("Starting HTTP daemon on IPv4 %s port %d", bindIp, port));
+      LM_T(LmtMhd, ("Starting HTTP daemon on IPv4 %s port %d", bindIp, port));
       mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY
                                    htons(port),
                                    NULL,
@@ -761,21 +805,27 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     }
 
     if (mhdDaemon == NULL)
-      LM_RE(3, ("MHD_start_daemon failed"));
+    {
+      LM_E(("Fatal Error (unable to start http services in port %d)", port));
+      return 3;
+    }
   }  
 
   if ((ipVersion == IPV6) || (ipVersion == IPDUAL))
   { 
     memset(&sad_v6, 0, sizeof(sad_v6));
     if (inet_pton(AF_INET6, bindIPv6, &(sad_v6.sin6_addr.s6_addr)) != 1)
-      LM_RE(1, ("V6 inet_pton fail for %s", bindIPv6));
+    {
+      LM_E(("Fatal Error (V6 inet_pton fail for %s)", bindIPv6));
+      return 1;
+    }
 
     sad_v6.sin6_family = AF_INET6;
     sad_v6.sin6_port = htons(port);
 
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
-      LM_V(("Starting HTTPS daemon on IPv6 %s port %d", bindIPv6, port));
+      LM_T(LmtMhd, ("Starting HTTPS daemon on IPv6 %s port %d", bindIPv6, port));
       mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6 | MHD_USE_SSL,
                                       htons(port),
                                       NULL,
@@ -790,7 +840,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     }
     else
     {
-      LM_V(("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
+      LM_T(LmtMhd, ("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
       mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6,
                                       htons(port),
                                       NULL,
@@ -803,7 +853,10 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     }
 
     if (mhdDaemon_v6 == NULL)
-      LM_RE(1, ("MHD_start_daemon_v6 failed"));
+    {
+      LM_E(("Fatal Error (unable to start http services (IP v6) in port %d)", port));
+      return 1;
+    }
   }
 
   return 0;

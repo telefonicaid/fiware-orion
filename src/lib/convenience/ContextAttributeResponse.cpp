@@ -69,7 +69,7 @@ std::string ContextAttributeResponse::check(RequestType requestType, Format form
    }
    else if ((res = contextAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
    {
-     LM_E(("contextAttributeVector::check flags an error: '%s'", res.c_str()));
+     LM_W(("Bad Input (contextAttributeVector: '%s')", res.c_str()));
      statusCode.fill(SccBadRequest, res);
 
      //
