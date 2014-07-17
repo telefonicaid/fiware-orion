@@ -41,7 +41,7 @@
 /* ****************************************************************************
 *
 * lmlib variables
-* These variables are non-statis in logMsg.cpp but not declared 'extern' in logMsg.cpp
+* These variables are non-static in logMsg.cpp but not declared 'extern' in logMsg.cpp
 * Thus, global variables in lmlib, but only meant for libpa. 
 */
 extern bool lmPreamble;
