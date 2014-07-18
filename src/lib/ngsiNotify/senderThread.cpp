@@ -34,6 +34,8 @@ void* startSenderThread(void* p)
 {
     SenderThreadParams* params = (SenderThreadParams*) p;
 
+    strncpy(transactionId, params->transactionId, sizeof(transactionId));
+
     LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', path='%s', content-type: %s", 
                        params->ip.c_str(),
                        params->port,

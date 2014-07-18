@@ -28,7 +28,8 @@
 
 #define NOTIFICATION_WAIT_MODE false
 
-typedef struct SenderThreadParams {
+typedef struct SenderThreadParams
+{
     std::string    ip;
     unsigned short port;
     std::string    protocol;
@@ -37,6 +38,7 @@ typedef struct SenderThreadParams {
     std::string    resource;
     std::string    content_type;
     std::string    content;
+    char           transactionId[64];
 } SenderThreadParams;
 
 /* ****************************************************************************

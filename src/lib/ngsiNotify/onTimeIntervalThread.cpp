@@ -76,15 +76,16 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
               return;
             }
 
-            if (ncr.contextElementResponseVector.size() > 0) {
+            if (ncr.contextElementResponseVector.size() > 0)
+            {
+                // New transactionId for each notification
+                transactionIdSet();
 
                 /* Complete NotifyContextRequest */
                 // FIXME: implement a proper originator string
                 ncr.originator.set("localhost");
                 ncr.subscriptionId.set(params->subId);
 
-                // New transactionId for each notification
-                transactionIdSet();
                 LM_I(("Starting transaction to %s", csi.url.c_str()));
                 params->notifier->sendNotifyContextRequest(&ncr, csi.url, tenant, csi.format);
                 ncr.contextElementResponseVector.release();

@@ -325,17 +325,18 @@ std::string sendHttpSocket
 
       if (nb == -1)
       {
-        LM_T(LmtSoftError, ("error recv from HTTP server: %s", strerror(errno)));
+        LM_E(("Notification failure for %s:%d (error receiving ACK from HTTP server: %s)", _ip.c_str(), port, strerror(errno)));
         return "error";
       }
       else if ( nb >= TAM_BUF)
       {
-        LM_T(LmtSoftError, ("recv from HTTP server too long"));
+        LM_E(("Notification failure for %s:%d (message size of HTTP server reply is too big: %d (max allowed %d)) ", _ip.c_str(), port, nb, TAM_BUF));
         return "error";
       }
       else
       {
           memcpy(response, buffer, nb);
+          LM_I(("Notification Sucessfully Sent"));
           LM_T(LmtClientInputPayload, ("Received from HTTP server:\n%s", response));
       }
 
@@ -345,6 +346,7 @@ std::string sendHttpSocket
   else
   {
      LM_T(LmtClientInputPayload, ("not waiting for response"));
+     LM_I(("Notification Sucessfully Sent"));
      result = "";
   }
 
