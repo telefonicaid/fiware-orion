@@ -44,7 +44,6 @@ function usage()
   echo "$sfile [-u (usage)]"
   echo "$empty [-v (verbose)]"
   echo "$empty [-d <directory>]"
-  echo "$empty [-f <file>]"
 
   exit $1
 }
@@ -80,15 +79,15 @@ function mMsg()
 #
 # Argument parsing
 #
-verbose=off
-dirList=""
-fileList=""
+export verbose=off
+export dir=""
 
 vMsg "parsing options"
 while [ "$#" != 0 ]
 do
   if   [ "$1" == "-u" ];            then usage 0;
   elif [ "$1" == "-v" ];            then verbose=on;
+  elif [ "$1" == "-d" ];            then dir=$2; shift
   else
   {
     echo $0: bad parameter/option: "'"${1}"'";
@@ -103,6 +102,26 @@ done
 
 
 #
+# Check input
+#
+if [ "$dir" != "" ]
+then
+  if [ "$dir" == "." ]
+  then
+    dir="";
+  else
+    ls $dir/*.cpp > /dev/null 2>&1
+    if [ "$?" != 0 ]
+    then
+      mMsg bad directory \'$dir\'
+      exit 1
+    fi
+  fi
+fi
+
+
+
+#
 # Environment vars
 #
 if [ "$LINTER_VERBOSE" == "1" ]
@@ -111,16 +130,25 @@ then
 fi
 
 
-
-vMsg "Running lint"
-scripts/cpplint.py src/app/contextBroker/*.cpp src/app/contextBroker/*.h src/lib/*/*.cpp src/lib/*/*.h 2> LINT
+if [ "$dir" == "" ]
+then
+  mMsg "Running lint on entire project"
+  scripts/cpplint.py src/app/contextBroker/*.cpp src/app/contextBroker/*.h src/lib/*/*.cpp src/lib/*/*.h 2> LINT
+  lines=$(wc -l src/app/contextBroker/*.cpp src/app/contextBroker/*.h src/lib/*/*.cpp src/lib/*/*.h | grep -v src/ | awk '{ print $1 }')
+  filesCpp=$(find src -name "*.cpp" | wc -l)
+  filesH=$(find src -name "*.h" | wc -l)
+else
+  mMsg "Running lint on $dir"
+  scripts/cpplint.py $dir/*.cpp $dir/*.h 2> LINT
+  lines=$(wc -l $dir/*.cpp $dir/*.h | grep -v src/ | awk '{ print $1 }')
+  filesCpp=$(find $dir -name "*.cpp" | wc -l)
+  filesH=$(find $dir -name "*.h" | wc -l)
+fi
 
 errors=$(grep "Total errors found" LINT | awk -F:\  '{ print $2 }')
-lines=$(wc -l src/app/contextBroker/*.cpp src/app/contextBroker/*.h src/lib/*/*.cpp src/lib/*/*.h | grep -v src/ | awk '{ print $1 }')
 
 typeset -i files
-filesCpp=$(find src -name "*.cpp" | wc -l)
-filesH=$(find src -name "*.h" | wc -l)
+
 files=$filesCpp+$filesH
 percentage=$(echo "scale=2; $errors*100/$lines" | bc)
 echo $errors errors in $lines lines of source code in $files files \($percentage%\ style-guide-incompatibilities\)
