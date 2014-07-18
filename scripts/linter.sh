@@ -205,30 +205,27 @@ cat[48]="LAST"
 typeset -i ix
 ix=0
 
+echo > LINT_ERRORS
 while [ "${cat[$ix]}" != "LAST" ]
 do
   errors=$(grep "${cat[$ix]}" LINT | wc -l)
-  if [ "$errors" != "" ] && [ "$errors" != 0 ]
+  if [ "$errors" != "" ] && [ "$errors" != "0" ]
   then
-    echo $errors errors of category \'${cat[$ix]}\'
+    typeset -i errs=$errors
+    printf "%04d errors of category '%s'\n" $errs "${cat[$ix]}" >> LINT_ERRORS
   fi
 
   ix=$ix+1
 done
+sort LINT_ERRORS
 
 
-
-echo
-echo
-echo
 
 # -----------------------------------------------------------------------------
 #
 # Now let's see if we have any new lint errors
 #
-echo "New lint errors:"
-echo "-----------------------------------------------------"
-grep -v "already included at" LINT | 
+lintErrors=$(grep -v "already included at" LINT | 
 grep -v "Found C system header after C++ system header" |
 grep -v "Lines should be <= 120 characters long" |
 grep -v "Lines should very rarely be longer than 150 characters" |
@@ -276,6 +273,15 @@ grep -v "Missing spaces around =" |
 grep -v "Mismatching spaces inside ()" |
 grep -v 'Closing ) should be moved to the previous line' |
 grep -v 'Extra space before )' |
-grep -v 'Total errors found'
+grep -v 'Total errors found')
 
-echo "-----------------------------------------------------"
+if [ "$lintErrors" != "" ]
+then
+  echo
+  echo
+  echo
+  echo "New lint errors:"
+  echo "-----------------------------------------------------"
+  echo $lintErrors
+  echo "-----------------------------------------------------"
+fi
