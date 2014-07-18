@@ -74,8 +74,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     if (!parseUrl(url, host, port, path, protocol))
     {
       LM_W(("Bad Input (sending NotifyContextRequest: malformed URL: '%s')", url.c_str()));
-      LM_I(("Transaction ended"));
-      strncpy(transactionId, "N/A", sizeof(transactionId));
+      LM_TRANSACTION_END();
       return;
     }
 

@@ -155,48 +155,42 @@ std::string sendHttpSocket
   if (port == 0)
   {
     LM_E(("Runtime Error (port is ZERO)"));
-    LM_I(("Transaction ended"));
-    strncpy(transactionId, "N/A", sizeof(transactionId));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if (ip.empty())
   {
     LM_E(("Runtime Error (ip is empty)"));
-    LM_I(("Transaction ended"));
-    strncpy(transactionId, "N/A", sizeof(transactionId));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if (verb.empty())
   {
     LM_E(("Runtime Error (verb is empty)"));
-    LM_I(("Transaction ended"));
-    strncpy(transactionId, "N/A", sizeof(transactionId));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if (resource.empty())
   {
     LM_E(("Runtime Error (resource is empty)"));
-    LM_I(("Transaction ended"));
-    strncpy(transactionId, "N/A", sizeof(transactionId));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if ((content_type.empty()) && (!content.empty()))
   {
     LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
-    LM_I(("Transaction ended"));
-    strncpy(transactionId, "N/A", sizeof(transactionId));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if ((!content_type.empty()) && (content.empty()))
   {
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
-    LM_I(("Transaction ended"));
-    strncpy(transactionId, "N/A", sizeof(transactionId));
+    LM_TRANSACTION_END();
     return "error";
   }
 
@@ -272,8 +266,7 @@ std::string sendHttpSocket
     if (neededSize > MAX_DYN_MSG_SIZE)
     {
       LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", content.length() + strlen(preContent)));
-      LM_I(("Transaction ended"));
-      strncpy(transactionId, "N/A", sizeof(transactionId));
+      LM_TRANSACTION_END();
       return "error";
     }
     else if (neededSize > MAX_STA_MSG_SIZE)
@@ -282,8 +275,7 @@ std::string sendHttpSocket
         if (msgDynamic == NULL)
         {
           LM_E(("Runtime Error (dynamic memory allocation failure)"));
-          LM_I(("Transaction ended"));
-          strncpy(transactionId, "N/A", sizeof(transactionId));
+          LM_TRANSACTION_END();
           return "error";
         }
 
@@ -309,8 +301,7 @@ std::string sendHttpSocket
 
   if (fd == -1)
   {
-    LM_I(("Transaction ended"));
-    strncpy(transactionId, "N/A", sizeof(transactionId));
+    LM_TRANSACTION_END();
     return "error";
   }
 
@@ -328,15 +319,13 @@ std::string sendHttpSocket
   if (nb == -1)
   {
     LM_W(("Notification failure for %s:%d (send: %s)", _ip.c_str(), port, strerror(errno)));
-    LM_I(("Transaction ended"));
-    strncpy(transactionId, "N/A", sizeof(transactionId));
+    LM_TRANSACTION_END();
     return "error";
   }
   else if (nb != sz)
   {
     LM_W(("Notification failure for %s:%d (not entire message sent)", _ip.c_str(), port));
-    LM_I(("Transaction ended"));
-    strncpy(transactionId, "N/A", sizeof(transactionId));
+    LM_TRANSACTION_END();
     return "error";
   }
 
@@ -347,15 +336,13 @@ std::string sendHttpSocket
       if (nb == -1)
       {
         LM_W(("Notification failure for %s:%d (error receiving ACK from HTTP server: %s)", _ip.c_str(), port, strerror(errno)));
-        LM_I(("Transaction ended"));
-        strncpy(transactionId, "N/A", sizeof(transactionId));
+        LM_TRANSACTION_END();
         return "error";
       }
       else if ( nb >= TAM_BUF)
       {
         LM_W(("Notification failure for %s:%d (message size of HTTP server reply is too big: %d (max allowed %d)) ", _ip.c_str(), port, nb, TAM_BUF));
-        LM_I(("Transaction ended"));
-        strncpy(transactionId, "N/A", sizeof(transactionId));
+        LM_TRANSACTION_END();
         return "error";
       }
       else
@@ -363,8 +350,7 @@ std::string sendHttpSocket
           memcpy(response, buffer, nb);
           LM_I(("Notification Successfully Sent"));
           LM_T(LmtClientInputPayload, ("Received from HTTP server:\n%s", response));
-          LM_I(("Transaction ended"));
-          strncpy(transactionId, "N/A", sizeof(transactionId));
+          LM_TRANSACTION_END();
       }
 
       if (strlen(response) > 0)
@@ -374,8 +360,7 @@ std::string sendHttpSocket
   {
      LM_T(LmtClientInputPayload, ("not waiting for response"));
      LM_I(("Notification Successfully Sent"));
-     LM_I(("Transaction ended"));
-     strncpy(transactionId, "N/A", sizeof(transactionId));
+     LM_TRANSACTION_END();
      result = "";
   }
 

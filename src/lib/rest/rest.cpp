@@ -611,8 +611,7 @@ static int connectionTreat
     //
     // Transaction
     //
-    transactionIdSet();
-    LM_I(("Starting transaction from %s:%d%s", ip, port, url));
+    LM_TRANSACTION_START(ip, port, url);
 
 
     //
@@ -742,8 +741,7 @@ static int connectionTreat
   else
     serveFunction(ciP);
 
-  LM_I(("Transaction ended"));
-  strncpy(transactionId, "N/A", sizeof(transactionId));
+  LM_TRANSACTION_END();
 
   return MHD_YES;
 }

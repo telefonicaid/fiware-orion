@@ -79,14 +79,13 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
             if (ncr.contextElementResponseVector.size() > 0)
             {
                 // New transactionId for each notification
-                transactionIdSet();
+                LM_TRANSACTION_START2(csi.url.c_str());
 
                 /* Complete NotifyContextRequest */
                 // FIXME: implement a proper originator string
                 ncr.originator.set("localhost");
                 ncr.subscriptionId.set(params->subId);
 
-                LM_I(("Starting transaction to %s", csi.url.c_str()));
                 // Update database fields due to new notification
                 HttpStatusCode s = mongoUpdateCsubNewNotification(params->subId, &err, tenant);
                 if (s == SccOk)
@@ -95,8 +94,7 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
                 }
                 else
                 {
-                  LM_I(("Transaction ended"));
-                  strncpy(transactionId, "N/A", sizeof(transactionId));
+                  LM_TRANSACTION_END();
                 }
 
                 ncr.contextElementResponseVector.release();

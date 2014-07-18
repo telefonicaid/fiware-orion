@@ -1668,4 +1668,55 @@ extern void lmCleanProgName(void);
 */
 extern int lmLogLinesGet(void);
 
+
+
+/* ****************************************************************************
+*
+* LM_TRANSACTION_RESET - 
+*/
+#define LM_TRANSACTION_RESET()                            \
+do                                                        \
+{                                                         \
+  strncpy(transactionId, "N/A", sizeof(transactionId));   \
+} while (0)
+
+
+
+/* ****************************************************************************
+*
+* LM_TRANSACTION_START - 
+*/
+#define LM_TRANSACTION_START(ip, port, path)                    \
+do                                                              \
+{                                                               \
+  transactionIdSet();                                           \
+  LM_I(("Starting transaction from %s:%d%s", ip, port, path));  \
+} while (0)
+
+
+
+/* ****************************************************************************
+*
+* LM_TRANSACTION_START2 - 
+*/
+#define LM_TRANSACTION_START2(url)                              \
+do                                                              \
+{                                                               \
+  transactionIdSet();                                           \
+  LM_I(("Starting transaction from %s", url));                  \
+} while (0)
+
+
+
+/* ****************************************************************************
+*
+* LM_TRANSACTION_END - 
+*/
+#define LM_TRANSACTION_END()                              \
+do                                                        \
+{                                                         \
+  LM_I(("Transaction ended"));                            \
+  LM_TRANSACTION_RESET();                                 \
+} while (0)
+
 #endif
