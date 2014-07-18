@@ -336,7 +336,7 @@ std::string sendHttpSocket
       else
       {
           memcpy(response, buffer, nb);
-          LM_I(("Notification Sucessfully Sent"));
+          LM_I(("Notification Successfully Sent"));
           LM_T(LmtClientInputPayload, ("Received from HTTP server:\n%s", response));
       }
 
@@ -346,7 +346,7 @@ std::string sendHttpSocket
   else
   {
      LM_T(LmtClientInputPayload, ("not waiting for response"));
-     LM_I(("Notification Sucessfully Sent"));
+     LM_I(("Notification Successfully Sent"));
      result = "";
   }
 
