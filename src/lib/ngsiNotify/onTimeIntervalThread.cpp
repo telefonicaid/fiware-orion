@@ -93,6 +93,11 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
                 {
                   params->notifier->sendNotifyContextRequest(&ncr, csi.url, tenant, csi.format);
                 }
+                else
+                {
+                  LM_I(("Transaction ended"));
+                  strncpy(transactionId, "N/A", sizeof(transactionId));
+                }
 
                 ncr.contextElementResponseVector.release();
                 csi.release();
