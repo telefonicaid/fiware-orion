@@ -192,6 +192,9 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
 
   LM_T(LmtParseCheck, ("Calling check for JSON parsed tree (%s)", ciP->payloadWord));
   res = reqP->check(parseDataP, ciP);
+  if (res != "OK")
+    LM_W(("Bad Input (%s: %s)", reqP->keyword.c_str(), res.c_str()));
+
   reqP->present(parseDataP);
 
   return res;

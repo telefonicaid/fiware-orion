@@ -756,11 +756,11 @@ static int connectionTreat
 */
 static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
+  bool mhdStartError = true;
+
   if (port == 0)
   {
-    // This is a BUG
-    LM_E(("Fatal Error (port cannot be 0)"));
-    return 1;
+    LM_X(1, ("Fatal Error (please call restInit before starting the REST service)"));
   }
 
   if ((ipVersion == IPV4) || (ipVersion == IPDUAL)) 
@@ -768,8 +768,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     memset(&sad, 0, sizeof(sad));
     if (inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr)) != 1)
     {
-      LM_E(("Fatal Error (V4 inet_pton fail for %s)", bindIp));
-      return 2;
+      LM_X(2, ("Fatal Error (V4 inet_pton fail for %s)", bindIp));
     }
 
     sad.sin_family = AF_INET;
@@ -804,10 +803,9 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_END);
     }
 
-    if (mhdDaemon == NULL)
+    if (mhdDaemon != NULL)
     {
-      LM_E(("Fatal Error (unable to start http services in port %d)", port));
-      return 3;
+      mhdStartError = false;
     }
   }  
 
@@ -816,8 +814,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     memset(&sad_v6, 0, sizeof(sad_v6));
     if (inet_pton(AF_INET6, bindIPv6, &(sad_v6.sin6_addr.s6_addr)) != 1)
     {
-      LM_E(("Fatal Error (V6 inet_pton fail for %s)", bindIPv6));
-      return 1;
+      LM_X(4, ("Fatal Error (V6 inet_pton fail for %s)", bindIPv6));
     }
 
     sad_v6.sin6_family = AF_INET6;
@@ -852,11 +849,16 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       MHD_OPTION_END);
     }
 
-    if (mhdDaemon_v6 == NULL)
+    if (mhdDaemon_v6 != NULL)
     {
-      LM_E(("Fatal Error (unable to start http services (IP v6) in port %d)", port));
-      return 1;
+      mhdStartError = false;
     }
+  }
+
+
+  if (mhdStartError == true)
+  {
+    LM_X(5, ("Fatal Error (error starting REST interface)"));
   }
 
   return 0;

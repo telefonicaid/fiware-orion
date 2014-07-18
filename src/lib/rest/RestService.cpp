@@ -139,6 +139,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   {
     OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
     std::string response = error.render(ciP->outFormat, "");
+    LM_W(("Bad Input (The Orion Context Broker is a REST service, not a 'web page')"));
     restReply(ciP, response);
     return std::string("Empty URL");
   }
@@ -250,8 +251,9 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     compV.clear();
 
     if (response == "DIE")
+    {
       orionExitFunction(0, "Received a 'DIE' request on REST interface");
-
+    }
 
     restReply(ciP, response);
     return response;
