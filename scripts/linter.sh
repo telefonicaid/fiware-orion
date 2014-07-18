@@ -123,3 +123,42 @@ echo $errors errors in $lines lines of source code in $files files \($percentage
 # #endif line should be
 # Weird number of spaces at line-start
 # Blank line at the end of a code block
+# Include the directory when naming
+# Do not use namespace using-directives
+# Is this a non-const reference
+# At least two spaces is best between code and comments
+# Labels should always be indented at least one space
+# Tab found; better to use spaces
+# Add #include
+# Blank line at the start of a code block
+# More than one command on the same line
+# You don't need a ; after a }
+# Single-argument constructors should be marked explicit
+# Streams are highly discouraged
+# Do not leave a blank line after
+# Else clause should never be on same line as else
+# Do not leave a blank line after
+# Almost always, snprintf is better than strcpy
+# Missing space after ,
+# Extra space before ( in function call
+# All parameters should be named in a function
+# No copyright message found
+# Found C system header after other header
+# Should have a space between // and comment
+# If an else has a brace on one side, it should have it on both
+# Almost always, snprintf is better than strcat
+# Using sizeof(type).  Use sizeof(varname) instead if possible
+# Missing space before {
+# Found C++ system header after other header
+# Consider using getpwuid_r(...) instead of getpwuid
+# Line contains only semicolon
+# sscanf can be ok, but is slow and can overflow buffers
+# Missing space before (
+# Extra space after ( in function call
+# If you can, use sizeof
+# Missing spaces around =
+# Mismatching spaces inside ()
+
+
+
+
