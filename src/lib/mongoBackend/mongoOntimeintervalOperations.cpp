@@ -177,14 +177,22 @@ HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::str
     catch (const DBException &e)
     {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
+        reqSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
         *err = e.what();
         LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), err->c_str()));
+        LM_I(("Transaction ended"));
+        strncpy(transactionId, "N/A", sizeof(transactionId));
+        return SccReceiverInternalError;
     }
     catch (...)
     {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
+        reqSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
         *err = "Generic Exception";
         LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), err->c_str()));
+        LM_I(("Transaction ended"));
+        strncpy(transactionId, "N/A", sizeof(transactionId));
+        return SccReceiverInternalError;
     }
 
     reqSemGive(__FUNCTION__, "update subscription notifications");

@@ -742,7 +742,7 @@ static int connectionTreat
   else
     serveFunction(ciP);
 
-  LM_I(("Transaction ended (%s:%d)", ciP->ip.c_str(), ciP->port));
+  LM_I(("Transaction ended"));
   strncpy(transactionId, "N/A", sizeof(transactionId));
 
   return MHD_YES;

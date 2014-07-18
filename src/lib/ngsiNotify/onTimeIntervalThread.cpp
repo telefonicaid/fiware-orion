@@ -87,20 +87,15 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
                 ncr.subscriptionId.set(params->subId);
 
                 LM_I(("Starting transaction to %s", csi.url.c_str()));
-                params->notifier->sendNotifyContextRequest(&ncr, csi.url, tenant, csi.format);
-                ncr.contextElementResponseVector.release();
+                // Update database fields due to new notification
                 HttpStatusCode s = mongoUpdateCsubNewNotification(params->subId, &err, tenant);
-                LM_I(("Transaction ended (%s:%d)", csi.url.c_str()));
-                strncpy(transactionId, "N/A", sizeof(transactionId));
-
-
-                /* Update database fields due to new notification */
-                // FIXME P7: mongoUpdateCsubNewNotification ALWAYS returns SccOk !!!
-                if (s != SccOk)
+                if (s == SccOk)
                 {
-                  csi.release();
-                  return;
+                  params->notifier->sendNotifyContextRequest(&ncr, csi.url, tenant, csi.format);
                 }
+
+                ncr.contextElementResponseVector.release();
+                csi.release();
             }
             else {
                 LM_T(LmtNotifier, ("notification not sent due to empty context elements response vector)"));
