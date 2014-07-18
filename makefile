@@ -280,6 +280,9 @@ clean:
 lint:
 	@scripts/linter.sh
 
+vlint:
+	@LINTER_VERBOSE=1 scripts/linter.sh
+
 lint_changed:
 	git diff --name-only | grep "\.cpp\|\.h" | xargs scripts/cpplint.py
 
