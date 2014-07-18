@@ -81,8 +81,6 @@ while [ "$#" != 0 ]
 do
   if   [ "$1" == "-u" ];            then usage 0;
   elif [ "$1" == "-v" ];            then verbose=on;
-  elif [ "$1" == "-d" ];            then dirList=$dirList+$2; shift;
-  elif [ "$1" == "-f" ];            then fileList=$fileList+$2; shift;
   else
   {
     echo $0: bad parameter/option: "'"${1}"'";
@@ -96,26 +94,32 @@ done
 
 
 
-# ------------------------------------------------------------------------------
-#
-# Check arguments
-#
-if [ "$dirList" == "" ] && [ "$fileList" == "" ]
-then
-  dirList="src/app/contextBroker/*.cpp src/app/contextBroker/*.h src/lib/*/*.cpp src/lib/*/*.h"
-fi
-
-
-
 ME=$(basename $0)
-vMsg "lint on $dirList $fileList"
 
-
-mMsg "Running lint"
-
+vMsg "Running lint"
 scripts/cpplint.py src/app/contextBroker/*.cpp src/app/contextBroker/*.h src/lib/*/*.cpp src/lib/*/*.h 2> LINT
 
-grep -v 'should almost always be at the end of the previous line' LINT  > LINT2
-grep -v 'Lines should very rarely be longer than 100 characters'  LINT2 > LINT
-rm LINT2
-cat LINT
+errors=$(grep "Total errors found" LINT | awk -F:\  '{ print $2 }')
+lines=$(wc -l src/app/contextBroker/*.cpp src/app/contextBroker/*.h src/lib/*/*.cpp src/lib/*/*.h | grep -v src/ | awk '{ print $1 }')
+
+typeset -i files
+filesCpp=$(find src -name "*.cpp" | wc -l)
+filesH=$(find src -name "*.h" | wc -l)
+files=$filesCpp+$filesH
+percentage=$(echo "scale=2; $errors*100/$lines" | bc)
+echo $errors errors in $lines lines of source code in $files files \($percentage%\ style-guide-incompatibilities\)
+
+
+#
+# Categories:
+# already included at 
+# Found C system header after C++ system header
+# Lines should be <= 120 characters long
+# Lines should very rarely be longer than 150 characters
+# Line ends in whitespace
+# Never use sprintf
+# Use int16/int64/etc
+# #ifndef header guard has wrong style
+# #endif line should be
+# Weird number of spaces at line-start
+# Blank line at the end of a code block
