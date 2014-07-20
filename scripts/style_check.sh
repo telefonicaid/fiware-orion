@@ -124,7 +124,7 @@ fi
 #
 # Environment vars
 #
-if [ "$LINTER_VERBOSE" == "1" ]
+if [ "$VERBOSE" == "1" ]
 then
   verbose=on
 fi
@@ -132,13 +132,13 @@ fi
 
 if [ "$dir" == "" ]
 then
-  vMsg "Running lint on entire project"
+  vMsg "Running TID/google style-guide check on entire project"
   scripts/cpplint.py src/app/contextBroker/*.cpp src/app/contextBroker/*.h src/lib/*/*.cpp src/lib/*/*.h 2> LINT
   lines=$(wc -l src/app/contextBroker/*.cpp src/app/contextBroker/*.h src/lib/*/*.cpp src/lib/*/*.h | grep -v src/ | awk '{ print $1 }')
   filesCpp=$(find src -name "*.cpp" | wc -l)
   filesH=$(find src -name "*.h" | wc -l)
 else
-  vMsg "Running lint on $dir"
+  vMsg "Running TID/google style-guide check on $dir"
   scripts/cpplint.py $dir/*.cpp $dir/*.h 2> LINT
   lines=$(wc -l $dir/*.cpp $dir/*.h | grep -v src/ | awk '{ print $1 }')
   filesCpp=$(find $dir -name "*.cpp" | wc -l)
@@ -323,7 +323,7 @@ then
   echo
   echo
   echo
-  echo "New lint errors:"
+  echo "New style-guide errors:"
   echo "-----------------------------------------------------"
   echo $lintErrors
   echo "-----------------------------------------------------"
