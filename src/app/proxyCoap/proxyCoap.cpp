@@ -61,23 +61,10 @@
 bool            fg;
 char            bindAddress[MAX_LEN_IP];
 int             port;
-char            dbHost[64];
-char            dbName[64];
-char            user[64];
-char            pwd[64];
-char            pidPath[256];
 char            cbHost[64];
 int             cbPort;
-bool            ngsi9Only;
-bool            harakiri;
 bool            useOnlyIPv4;
 bool            useOnlyIPv6;
-char            httpsKeyFile[1024];
-char            httpsCertFile[1024];
-bool            https;
-char            mtenant[32];
-char            rush[256];
-int             coapPort;
 
 /* ****************************************************************************
 *
