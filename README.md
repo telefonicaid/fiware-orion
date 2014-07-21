@@ -92,10 +92,10 @@ git clone https://github.com/staropram/cantcoap
 cd cantcoap
 git checkout 749e22376664dd3adae17492090e58882d3b28a7
 make
-sudo cp cantcoap.h /usr/include
-sudo cp dbg.h /usr/include
-sudo cp nethelper.h /usr/include
-sudo cp libcantcoap.a /usr/lib
+sudo cp cantcoap.h /usr/local/include
+sudo cp dbg.h /usr/local/include
+sudo cp nethelper.h /usr/local/include
+sudo cp libcantcoap.a /usr/local/lib
 ```
 
 * Get the code (alternatively you can download it using a zipped version or a different URL pattern):
@@ -152,7 +152,7 @@ tar xvzf libcoap-4.1.1.tar.gz
 cd libcoap-4.1.1
 ./configure
 make
-sudo cp examples/coap-client /usr/bin
+sudo cp examples/coap-client /usr/local/bin
 ```
 
 * Run valgrind tests (it takes some time, please be patient):
