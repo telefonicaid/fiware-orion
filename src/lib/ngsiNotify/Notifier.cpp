@@ -74,6 +74,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     if (!parseUrl(url, host, port, path, protocol))
     {
       LM_W(("Bad Input (sending NotifyContextRequest: malformed URL: '%s')", url.c_str()));
+      LM_TRANSACTION_END();
       return;
     }
 
@@ -96,6 +97,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     params->resource      = path;
     params->content_type  = content_type;
     params->content       = payload;
+    strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
     int ret = pthread_create(&tid, NULL, startSenderThread, params);
     if (ret != 0)
@@ -151,6 +153,7 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     params->resource     = path;   
     params->content_type = content_type;
     params->content      = payload;
+    strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
     int ret = pthread_create(&tid, NULL, startSenderThread, params);
     if (ret != 0)

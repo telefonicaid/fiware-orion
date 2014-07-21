@@ -643,7 +643,7 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
     ms = mongoUpdateCsubNewNotification(subId, &err);
 
     /* Check results */
-    EXPECT_EQ(SccOk, ms);
+    EXPECT_EQ(SccReceiverInternalError, ms);
     EXPECT_EQ("boom!!", err);
 
     /* Check that database is as expected (untouched) */

@@ -81,13 +81,13 @@ int socketHttpConnect(const std::string& host, unsigned short port)
 
   if (getaddrinfo(host.c_str(), port_str, &hints, &peer) != 0)
   {
-    LM_E(("Notification failure for %s:%d (getaddrinfo: %s)", host.c_str(), port, strerror(errno)));
+    LM_W(("Notification failure for %s:%d (getaddrinfo: %s)", host.c_str(), port, strerror(errno)));
     return -1;
   }
 
   if ((fd = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol)) == -1)
   {
-    LM_E(("Notification failure for %s:%d (socket: %s)", host.c_str(), port, strerror(errno)));
+    LM_W(("Notification failure for %s:%d (socket: %s)", host.c_str(), port, strerror(errno)));
     return -1;
   }
 
@@ -95,7 +95,7 @@ int socketHttpConnect(const std::string& host, unsigned short port)
   {
     freeaddrinfo(peer);
     close(fd);
-    LM_E(("Notification failure for %s:%d (connect: %s)", host.c_str(), port, strerror(errno)));
+    LM_W(("Notification failure for %s:%d (connect: %s)", host.c_str(), port, strerror(errno)));
     return -1;
   }
 
@@ -155,36 +155,42 @@ std::string sendHttpSocket
   if (port == 0)
   {
     LM_E(("Runtime Error (port is ZERO)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if (ip.empty())
   {
     LM_E(("Runtime Error (ip is empty)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if (verb.empty())
   {
     LM_E(("Runtime Error (verb is empty)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if (resource.empty())
   {
     LM_E(("Runtime Error (resource is empty)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if ((content_type.empty()) && (!content.empty()))
   {
     LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if ((!content_type.empty()) && (content.empty()))
   {
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
@@ -260,6 +266,7 @@ std::string sendHttpSocket
     if (neededSize > MAX_DYN_MSG_SIZE)
     {
       LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", content.length() + strlen(preContent)));
+      LM_TRANSACTION_END();
       return "error";
     }
     else if (neededSize > MAX_STA_MSG_SIZE)
@@ -268,6 +275,7 @@ std::string sendHttpSocket
         if (msgDynamic == NULL)
         {
           LM_E(("Runtime Error (dynamic memory allocation failure)"));
+          LM_TRANSACTION_END();
           return "error";
         }
 
@@ -293,7 +301,7 @@ std::string sendHttpSocket
 
   if (fd == -1)
   {
-    LM_E(("Runtime Error (unable to connect to HTTP server at %s:%d)", ip.c_str(), port));
+    LM_TRANSACTION_END();
     return "error";
   }
 
@@ -310,12 +318,14 @@ std::string sendHttpSocket
 
   if (nb == -1)
   {
-    LM_E(("Notification failure for %s:%d (send: %s)", _ip.c_str(), port, strerror(errno)));
+    LM_W(("Notification failure for %s:%d (send: %s)", _ip.c_str(), port, strerror(errno)));
+    LM_TRANSACTION_END();
     return "error";
   }
   else if (nb != sz)
   {
-    LM_E(("Notification failure for %s:%d (not entire message sent)", _ip.c_str(), port));
+    LM_W(("Notification failure for %s:%d (not entire message sent)", _ip.c_str(), port));
+    LM_TRANSACTION_END();
     return "error";
   }
 
@@ -325,18 +335,22 @@ std::string sendHttpSocket
 
       if (nb == -1)
       {
-        LM_T(LmtSoftError, ("error recv from HTTP server: %s", strerror(errno)));
+        LM_W(("Notification failure for %s:%d (error receiving ACK from HTTP server: %s)", _ip.c_str(), port, strerror(errno)));
+        LM_TRANSACTION_END();
         return "error";
       }
       else if ( nb >= TAM_BUF)
       {
-        LM_T(LmtSoftError, ("recv from HTTP server too long"));
+        LM_W(("Notification failure for %s:%d (message size of HTTP server reply is too big: %d (max allowed %d)) ", _ip.c_str(), port, nb, TAM_BUF));
+        LM_TRANSACTION_END();
         return "error";
       }
       else
       {
           memcpy(response, buffer, nb);
+          LM_I(("Notification Successfully Sent"));
           LM_T(LmtClientInputPayload, ("Received from HTTP server:\n%s", response));
+          LM_TRANSACTION_END();
       }
 
       if (strlen(response) > 0)
@@ -345,6 +359,8 @@ std::string sendHttpSocket
   else
   {
      LM_T(LmtClientInputPayload, ("not waiting for response"));
+     LM_I(("Notification Successfully Sent"));
+     LM_TRANSACTION_END();
      result = "";
   }
 
