@@ -179,7 +179,6 @@ char            mtenant[32];
 char            rush[256];
 
 
-
 #define PIDPATH _i "/tmp/contextBroker.pid"
 /* ****************************************************************************
 *
@@ -210,6 +209,7 @@ PaArgument paArgs[] =
 
   { "-rush",         rush,          "RUSH",            PaString, PaOpt, _i "",          PaNL,   PaNL,  "rush host (IP:port)"                         },
   { "-multiservice", mtenant,       "MULTI_SERVICE",   PaString, PaOpt, _i "off",       PaNL,   PaNL,  "service multi tenancy mode (off|url|header)" },
+
 
   PA_END_OF_ARGS
 };
