@@ -188,6 +188,36 @@ make rpm
 
 * The generated RPMs are placed in directory ~/rpmbuild/RPMS/x86_64
 
+To install experimental CoAP support do the following:
+
+* Install cantcoap (with dependencies)
+```
+sudo yum install clang CUnit-devel
+
+git clone https://github.com/staropram/cantcoap
+cd cantcoap
+make
+sudo cp cantcoap.h /usr/include
+sudo cp dbg.h /usr/include
+sudo cp nethelper.h /usr/include
+sudo cp libcantcoap.a /usr/lib
+```
+
+* Libcurl
+```
+sudo yum install libcurl-devel
+```
+
+* Libcoap
+```
+wget http://sourceforge.net/projects/libcoap/files/coap-18/libcoap-4.1.1.tar.gz/download
+tar xvzf libcoap-4.1.1.tar.gz
+cd libcoap-4.1.1
+./configure
+make
+sudo cp examples/coap-client /usr/bin
+```
+
 ### Debian 7 (unofficial)
 
 To be polished.
