@@ -121,7 +121,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
   if (value == "")
   {
     reqDataP->errorString = "Empty attribute name";
-    LM_W(("Empty attribute name"));
+    LM_W(("Bad Input (empty attribute name)"));
   }
 
   reqDataP->qcr.res.attributeList.push_back(value);
@@ -168,7 +168,7 @@ static std::string attributeExpression(const std::string& path, const std::strin
   if (value == "")
   {
     reqDataP->errorString = "Empty attribute expression";
-    LM_W(("Empty attribute expression"));
+    LM_W(("Bad Input (empty attribute expression"));
   }
 
   return "OK";

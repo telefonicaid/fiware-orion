@@ -50,22 +50,28 @@ HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, Context
     /* Search for the document */
     LM_T(LmtMongo, ("findOne() in '%s' collection by _id '%s'", getSubscribeContextCollectionName(tenant).c_str(), subId.c_str()));
     BSONObj sub;
-    try {
+    try
+    {
         mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
         sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(subId)));
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
+        LM_I(("Database Operation Successful (findOne _id: %s)", subId.c_str()));
     }
-    catch( const DBException &e ) {
+    catch (const DBException &e)
+    {
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo db exception)");
         reqSemGive(__FUNCTION__, "get info on subscriptions (mongo db exception)");
         *err = e.what();
-        LM_RE(SccOk, ("Database error '%s'", err->c_str()));
+        LM_E(("Database Error ('findOne id=%s, coll=%s', '%s')", subId.c_str(), getSubscribeContextCollectionName(tenant).c_str(), e.what()));
+        return SccOk;
     }
-    catch(...) {
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo generic exception)");
         reqSemGive(__FUNCTION__, "get info on subscriptions (mongo generic exception)");
         *err = "Database error: received generic exception";
-        LM_RE(SccOk, ("Database error '%s'", "received generic exception"));
+        LM_E(("Database Error ('indOne id=%s, coll=%s', '%s')", subId.c_str(), getSubscribeContextCollectionName(tenant).c_str(), "generic exception"));
+        return SccOk;
     }
 
     LM_T(LmtMongo, ("retrieved subscription: %s", sub.toString().c_str()));
@@ -128,10 +134,11 @@ HttpStatusCode mongoGetContextElementResponses(const EntityIdVector& enV, const 
     // FIXME P10: we are using an empty service path vector until service paths get implemented for subscriptions
     std::vector<std::string> servicePath;
     Restriction res;
-    if (!entitiesQuery(enV, attrL, res, cerV, err, true, tenant, servicePath)) {
+    if (!entitiesQuery(enV, attrL, res, cerV, err, true, tenant, servicePath))
+    {
         reqSemGive(__FUNCTION__, "get context-element responses (no entities found)");
         cerV->release();
-        LM_RE(SccOk, ((*err).c_str()));
+        return SccOk;
     }
 
     reqSemGive(__FUNCTION__, "get context-element responses");
@@ -152,28 +159,36 @@ HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::str
     DBClientConnection* connection = getMongoConnection();
 
     /* Update the document */
-    try {
-        BSONObj query = BSON("_id" << OID(subId));
-        BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CSUB_COUNT << 1));
-        LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextCollectionName(tenant).c_str(),
-                        query.toString().c_str(),
-                        update.toString().c_str()));
+    BSONObj query  = BSON("_id" << OID(subId));
+    BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CSUB_COUNT << 1));
 
-        mongoSemTake(__FUNCTION__, "update in SubscribeContextCollection");
+    LM_T(LmtMongo, ("update() in '%s' collection: (%s,%s)", getSubscribeContextCollectionName(tenant).c_str(),
+                    query.toString().c_str(),
+                    update.toString().c_str()));
+
+    mongoSemTake(__FUNCTION__, "update in SubscribeContextCollection");
+
+    try
+    {
         connection->update(getSubscribeContextCollectionName(tenant).c_str(), query, update);
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection");
+        LM_I(("Database Operation Successful (update: %s, query %s)", update.toString().c_str(), query.toString().c_str()));
     }
-    catch( const DBException &e ) {
+    catch (const DBException &e)
+    {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
-        reqSemGive(__FUNCTION__, "update subscription notifications (mongo db exception)");
+        reqSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
         *err = e.what();
-        LM_E(("Database error '%s'", err->c_str()));
+        LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), err->c_str()));
+        return SccReceiverInternalError;
     }
-    catch(...) {
+    catch (...)
+    {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
-        reqSemGive(__FUNCTION__, "update subscription notifications (mongo generic exception)");
+        reqSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
         *err = "Generic Exception";
-        LM_E(("Database error: '%s'", err->c_str()));
+        LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), err->c_str()));
+        return SccReceiverInternalError;
     }
 
     reqSemGive(__FUNCTION__, "update subscription notifications");

@@ -45,7 +45,8 @@ void mongoSetFwdRegId(const std::string& regId, const std::string& fwdRegId, con
 
     DBClientConnection* connection = getMongoConnection();
 
-    try {
+    try
+    {
         BSONObj updateQuery = BSON("$set" << BSON(REG_FWS_REGID << fwdRegId));
         LM_T(LmtMongo, ("update() in '%s' collection doc _id '%s': %s",
                         getRegistrationsCollectionName(tenant).c_str(),
@@ -54,18 +55,21 @@ void mongoSetFwdRegId(const std::string& regId, const std::string& fwdRegId, con
         mongoSemTake(__FUNCTION__, "update in RegistrationsCollection");
         connection->update(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << OID(regId)), updateQuery);
         mongoSemGive(__FUNCTION__, "update in RegistrationsCollection");
+        LM_I(("Database Operation Successful (update _id: %s, query: %s)", regId.c_str(), updateQuery.toString().c_str()));
     }
-    catch( const DBException &e ) {
+    catch (const DBException &e)
+    {
         // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
         mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (mongo db exception)");
-        LM_E(("Database error '%s'", e.what()));
+        LM_E(("Database Error ('update tenant=%s, id=%s', '%s')", tenant.c_str(), regId.c_str(), e.what()));
     }
-    catch(...) {
+    catch (...)
+    {
         // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
         mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (mongo generic exception)");
-        LM_E(("Database error: '%s'", "generic exception"));
+        LM_E(("Database Error ('update tenant=%s, id=%s', '%s')", tenant.c_str(), regId.c_str(), "generic exception"));
     }
 
     reqSemGive(__FUNCTION__, "Mongo Set Forward RegId");
@@ -85,7 +89,8 @@ std::string mongoGetFwdRegId(const std::string& regId, const std::string& tenant
 
     DBClientConnection* connection = getMongoConnection();
 
-    try {
+    try
+    {
         LM_T(LmtMongo, ("findOne() in '%s' collection doc _id '%s'", getRegistrationsCollectionName(tenant).c_str(), regId.c_str()));
         BSONObj doc;
 
@@ -95,18 +100,21 @@ std::string mongoGetFwdRegId(const std::string& regId, const std::string& tenant
 
         LM_T(LmtMongo, ("reg doc: '%s'", doc.toString().c_str()));
         retVal = STR_FIELD(doc, REG_FWS_REGID);
+        LM_I(("Database Operation Successful (findOne _id: %s)", regId.c_str()));
     }
-    catch( const DBException &e ) {
+    catch (const DBException &e)
+    {
         // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
         mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection (mongo db exception)");
-        LM_E(("Database error '%s'", e.what()));
+        LM_E(("Database Error ('findOne tenant=%s, id=%s', '%s')", tenant.c_str(), regId.c_str(), e.what()));
     }
-    catch(...) {
+    catch (...)
+    {
         // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
         mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection (mongo generic exception)");
-        LM_E(("Database error: 'generic exception'"));
+        LM_E(("Database Error ('findOne tenant=%s, id=%s', 'generic exception')", tenant.c_str(), regId.c_str()));
     }
 
     reqSemGive(__FUNCTION__, "Mongo Get Forward RegId");

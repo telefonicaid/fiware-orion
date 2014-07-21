@@ -45,7 +45,7 @@ std::string badVerbGetPostDeleteOnly(ConnectionInfo* ciP, int components, std::v
   ciP->httpHeaderValue.push_back("GET, POST, DELETE");
   ciP->httpStatusCode = SccBadVerb;
 
-  LM_W(("bad verb for url '%s', method '%s'", ciP->url.c_str(), ciP->method.c_str()));
+  LM_W(("Bad Input (bad verb for url '%s', method '%s')", ciP->url.c_str(), ciP->method.c_str()));
 
   return "";
 }

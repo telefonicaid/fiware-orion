@@ -34,7 +34,7 @@
 #include <errno.h>              /* errno                                     */
 #include <string.h>             /* strerror                                  */
 #include <stdarg.h>             /* ellipses                                  */
-#include <stdlib.h>				/* free()									 */
+#include <stdlib.h>             /* free()                                    */
 #include <time.h>
 
 
@@ -45,6 +45,8 @@
 */
 extern int    inSigHandler;
 extern char*  progName;
+
+extern __thread char   transactionId[64];
 
 
 
@@ -332,7 +334,7 @@ do {                                                                            
                                                                                  \
     if ((text = lmTextGet s) != NULL)                                            \
     {                                                                            \
-      lmOut(text, 'V', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL,false); \
+      lmOut(text, 'V', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL, false);\
       ::free(text);                                                              \
     }                                                                            \
   }                                                                              \
@@ -353,7 +355,7 @@ do {                                                                            
 do {                                                                             \
   if ((char* text = lmTextGet s) != NULL)                                        \
   {                                                                              \
-    lmOut(text, 'M', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL , false); \
+    lmOut(text, 'M', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL, false);  \
     ::free(text);                                                                \
   }                                                                              \
 } while (0)
@@ -366,7 +368,7 @@ do {                                                                            
 do {                                                                           \
   if ((char* text = lmTextGet s) != NULL)                                      \
   {                                                                            \
-    lmOut(text, 'W', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL,false); \
+    lmOut(text, 'W', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL, false);\
     ::free(text);                                                              \
   }                                                                            \
 } while (0)
@@ -387,6 +389,26 @@ do {                                                                      \
   if ((!lmSilent) && (text = lmTextGet s) != NULL)                        \
   {                                                                       \
     lmOut(text, 'M', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
+    ::free(text);                                                         \
+  }                                                                       \
+} while (0)
+#endif
+
+
+#ifdef LM_NO_I
+#define LM_I(s)
+#else
+/* ****************************************************************************
+*
+* LM_I - log message
+*/
+#define LM_I(s)                                                           \
+do {                                                                      \
+  char* text;                                                             \
+                                                                          \
+  if ((!lmSilent) && (text = lmTextGet s) != NULL)                        \
+  {                                                                       \
+    lmOut(text, 'I', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL);  \
     ::free(text);                                                         \
   }                                                                       \
 } while (0)
@@ -418,7 +440,7 @@ do {                                                                      \
 #else
 /* ****************************************************************************
 *
-* LM_C - log message with timestamp
+* LM_S - log message with timestamp
 */
 #define LM_S(s)                                                          \
 do {                                                                     \
@@ -499,7 +521,7 @@ do {                                                                           \
                                                                                \
   if ((text = lmTextGet s) != NULL)                                            \
   {                                                                            \
-    lmOut(text, 'E', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL,false); \
+    lmOut(text, 'E', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL, false);\
     ::free(text);                                                              \
   }                                                                            \
 } while (0)
@@ -1204,6 +1226,7 @@ extern bool lmAssertAtExit;
 extern bool lmNoTracesToFileIfHookActive;
 extern bool lmSilent;
 
+extern __thread char   transactionId[64];
 
 
 /* ****************************************************************************
@@ -1644,5 +1667,56 @@ extern void lmCleanProgName(void);
 * lmLogLinesGet - 
 */
 extern int lmLogLinesGet(void);
+
+
+
+/* ****************************************************************************
+*
+* LM_TRANSACTION_RESET - 
+*/
+#define LM_TRANSACTION_RESET()                            \
+do                                                        \
+{                                                         \
+  strncpy(transactionId, "N/A", sizeof(transactionId));   \
+} while (0)
+
+
+
+/* ****************************************************************************
+*
+* LM_TRANSACTION_START - 
+*/
+#define LM_TRANSACTION_START(ip, port, path)                    \
+do                                                              \
+{                                                               \
+  transactionIdSet();                                           \
+  LM_I(("Starting transaction from %s:%d%s", ip, port, path));  \
+} while (0)
+
+
+
+/* ****************************************************************************
+*
+* LM_TRANSACTION_START_URL - 
+*/
+#define LM_TRANSACTION_START_URL(url)                           \
+do                                                              \
+{                                                               \
+  transactionIdSet();                                           \
+  LM_I(("Starting transaction from %s", url));                  \
+} while (0)
+
+
+
+/* ****************************************************************************
+*
+* LM_TRANSACTION_END - 
+*/
+#define LM_TRANSACTION_END()                              \
+do                                                        \
+{                                                         \
+  LM_I(("Transaction ended"));                            \
+  LM_TRANSACTION_RESET();                                 \
+} while (0)
 
 #endif

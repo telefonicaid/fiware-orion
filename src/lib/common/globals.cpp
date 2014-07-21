@@ -40,10 +40,45 @@
 *
 * Globals
 */
-static Timer*     timer             = NULL;
-int               startTime         = -1;
-int               statisticsTime    = -1;
-OrionExitFunction orionExitFunction = NULL;
+static Timer*          timer             = NULL;
+int                    startTime         = -1;
+int                    statisticsTime    = -1;
+OrionExitFunction      orionExitFunction = NULL;
+static struct timeval  logStartTime;
+
+
+
+/* ****************************************************************************
+*
+* transactionIdSet - set the transaction ID
+*
+* To ensure a unique identifier of the transaction, the startTime down to milliseconds
+* of the broker is used as prefix (to almost guarantee its uniqueness among brokers)
+* Furthermore, a running number is appended for the transaction.
+* A 32 bit signed number is used, so its max value is 0x7FFFFFFF (2,147,483,647).
+*
+* If the running number overflows, a millisecond is added to the start time.
+*
+* The whole thing is stored in the thread variable 'transactionId', supported by the
+* logging library 'liblm'.
+*
+*/
+void transactionIdSet(void)
+{
+  static int transaction = 0;
+
+  transSemTake("transactionIdSet", "changing the transaction id");
+  ++transaction;
+
+  if (transaction < 0)
+  {
+    logStartTime.tv_usec += 1;
+    transaction = 1;
+  }
+
+  snprintf(transactionId, sizeof(transactionId), "%lu-%03d-%011d", logStartTime.tv_sec, (int) logStartTime.tv_usec / 1000, transaction);
+  transSemGive("transactionIdSet", "changing the transaction id");
+}
 
 
 
@@ -65,9 +100,18 @@ void orionInit(OrionExitFunction exitFunction, const char* version)
   /* Set timer object (singleton) */
   setTimer(new Timer());
 
-  /* Set start time */
-  startTime      = getCurrentTime();
+  // startTime for log library
+  if (gettimeofday(&logStartTime, NULL) != 0)
+  {
+    fprintf(stderr, "gettimeofday: %s\n", strerror(errno));
+    orionExitFunction(1, "gettimeofday error");
+  }
+
+  /* Set start time and statisticsTime used by REST interface */
+  startTime      = logStartTime.tv_sec;
   statisticsTime = startTime;
+
+  strncpy(transactionId, "N/A", sizeof(transactionId));
 }
 
 
@@ -123,7 +167,7 @@ int getCurrentTime(void)
 {
   if (getTimer() == NULL)
   {
-    LM_E(("getTimer() == NULL - calling exit function for library user"));
+    LM_T(LmtSoftError, ("getTimer() == NULL - calling exit function for library user"));
     orionExitFunction(1, "getTimer() == NULL");
     return -1;
   }
@@ -161,7 +205,7 @@ int64_t toSeconds(int value, char what, bool dayPart)
   }
 
   if (result == -1)
-    LM_E(("ERROR in duration string!"));
+    LM_W(("Bad Input (ERROR in duration string)"));
 
   return result;
 }
@@ -219,7 +263,8 @@ int64_t parse8601(const std::string& s)
       if ((value == 0) && (*start != '0'))
       {
         free(toFree);
-        LM_RE(-1, ("parse error for '%s'", start));
+        LM_W(("Bad Input (parse error for duration '%s')", start));
+        return -1;
       }
 
       accumulated += toSeconds(value, what, dayPart);

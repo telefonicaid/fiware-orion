@@ -150,7 +150,10 @@ static std::string duration(const std::string& path, const std::string& value, P
   reqDataP->scar.res.duration.set(value);
 
   if ((s = reqDataP->scar.res.duration.check(SubscribeContextAvailability, JSON, "", "", 0)) != "OK")
-     LM_RE(s, ("error parsing duration '%s': %s", reqDataP->scar.res.duration.get().c_str(), s.c_str()));
+  {
+    LM_W(("Bad Input (error parsing duration '%s': %s)", reqDataP->scar.res.duration.get().c_str(), s.c_str()));
+    return s;
+  }
 
   return "OK";
 }

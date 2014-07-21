@@ -109,7 +109,7 @@ std::string RegistrationId::render(RequestType requestType, Format format, const
      if (requestType == RegisterResponse) // registrationId is MANDATORY for RegisterContextResponse
      {
        string = "000000000000000000000000";
-       LM_W(("No registrationId - setting it to all zeroes"));
+       LM_I(("No registrationId - setting the registrationId to 24 zeroes"));
      }
      else
        return "";

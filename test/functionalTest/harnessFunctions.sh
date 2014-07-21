@@ -95,7 +95,7 @@ function localBrokerStart()
   if [ "$role" == "CB" ]
   then
     port=$BROKER_PORT
-    CB_START_CMD="contextBroker -vvvvv -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME} -t $traceLevels $IPvOption $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME} -t $traceLevels $IPvOption $extraParams"
   elif [ "$role" == "CM" ]
   then
     mkdir -p /tmp/configManager
@@ -212,7 +212,7 @@ function brokerStop
   fi
 
   if [ "$VALGRIND" == "" ]; then
-    kill $(cat $pidFile) 2> /dev/null
+    kill $(cat $pidFile 2> /dev/null) 2> /dev/null
     if [ -f /tmp/orion_${port}.pid ]
     then
       rm -f /tmp/orion_${port}.pid 2> /dev/null

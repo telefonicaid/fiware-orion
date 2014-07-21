@@ -48,11 +48,12 @@
 *
 * ~Notifier -
 */
-Notifier::~Notifier (void) {
-    // FIXME: This destructor is needed to avoid warning message. 
-    // Compilation fails when a warning occurs, and it is enabled 
-    // compilation option -Werror "warnings being treated as errors" 
-    LM_W(("not implemented Notifier destructor"));
+Notifier::~Notifier (void)
+{
+  // FIXME: This destructor is needed to avoid warning message. 
+  // Compilation fails when a warning occurs, and it is enabled 
+  // compilation option -Werror "warnings being treated as errors" 
+  LM_T(LmtNotImplemented, ("Notifier destructor is not implemented"));
 }
 
 /* ****************************************************************************
@@ -70,8 +71,11 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     std::string  path;
     std::string  protocol;
     
-    if (!parseUrl(url, host, port, path, protocol)) {
-        LM_RVE(("Sending NotifyContextRequest: malformed URL: '%s'", url.c_str()));
+    if (!parseUrl(url, host, port, path, protocol))
+    {
+      LM_W(("Bad Input (sending NotifyContextRequest: malformed URL: '%s')", url.c_str()));
+      LM_TRANSACTION_END();
+      return;
     }
 
     /* Set Content-Type depending on the format */
@@ -93,10 +97,13 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     params->resource      = path;
     params->content_type  = content_type;
     params->content       = payload;
+    strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
     int ret = pthread_create(&tid, NULL, startSenderThread, params);
-    if (ret != 0) {
-        LM_RVE(("error creating thread: %d", ret));
+    if (ret != 0)
+    {
+      LM_E(("Runtime Error (error creating thread: %d)", ret));
+      return;
     }
     pthread_detach(tid);
 #endif
@@ -121,8 +128,10 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     int          port;
     std::string  path;
     std::string  protocol;
-    if (!parseUrl(url, host, port, path, protocol)) {
-        LM_RVE(("Sending NotifyContextAvailabilityRequest: malformed URL: '%s'", url.c_str()));
+    if (!parseUrl(url, host, port, path, protocol))
+    {
+      LM_W(("Bad Input (sending NotifyContextAvailabilityRequest: malformed URL: '%s')", url.c_str()));
+      return;
     }
 
     /* Set Content-Type depending on the format */
@@ -144,10 +153,13 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     params->resource     = path;   
     params->content_type = content_type;
     params->content      = payload;
+    strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
 
     int ret = pthread_create(&tid, NULL, startSenderThread, params);
-    if (ret != 0) {
-        LM_RVE(("error creating thread: %d", ret));
+    if (ret != 0)
+    {
+      LM_E(("Runtime Error (error creating thread: %d)", ret));
+      return;
     }
     pthread_detach(tid);
 #endif
@@ -169,8 +181,10 @@ void Notifier::createIntervalThread(const std::string& subId, int interval, cons
     td.params->notifier = this;
 
     int ret = pthread_create(&(td.tid), NULL, startOnIntervalThread, td.params);
-    if (ret != 0) {
-        LM_RVE(("error creating thread: %d", ret));
+    if (ret != 0)
+    {
+      LM_E(("Runtime Error (error creating thread: %d)", ret));
+      return;
     }
 
     pthread_detach(td.tid);
@@ -200,8 +214,10 @@ void Notifier::destroyOntimeIntervalThreads(const std::string& subId) {
 
         /* Destroy thread */        
         int ret = pthread_cancel(td.tid);
-        if (ret != 0) {
-            LM_RVE(("error canceling thread %lu: %d", (unsigned long) td.tid, ret));
+        if (ret != 0)
+        {
+          LM_E(("Runtime Error (error canceling thread %lu: %d)", (unsigned long) td.tid, ret));
+          return;
         }
 
         /* Note that we do the cancelation in parallel, storing the thread ID. This
@@ -222,17 +238,21 @@ void Notifier::destroyOntimeIntervalThreads(const std::string& subId) {
 
         /* pthread_join in blocking */
         int ret = pthread_join(canceled[ix], &res);
-        if (ret != 0) {
-            LM_RVE(("error joining thread %lu: %d", (unsigned long) canceled[ix], ret));
+        if (ret != 0)
+        {
+          LM_E(("Runtime Error (error joining thread %lu: %d)", (unsigned long) canceled[ix], ret));
+          return;
         }
 
-        if (res == PTHREAD_CANCELED) {
+        if (res == PTHREAD_CANCELED)
+        {
             LM_T(LmtNotifier, ("canceled thread: %lu", (unsigned long) canceled[ix]));
         }
-        else {
-            LM_RVE(("unexpected error: thread can not be canceled!"));
+        else
+        {
+          LM_E(("Runtime Error (unexpected error: thread can not be canceled)"));
+          return;
         }
-
     }
 
     canceled.clear();

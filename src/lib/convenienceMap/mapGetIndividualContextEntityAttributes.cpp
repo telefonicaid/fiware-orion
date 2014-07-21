@@ -57,7 +57,8 @@ HttpStatusCode mapGetIndividualContextEntityAttributes(const std::string& entity
    {
      // Here I fill in statusCode for the response
      response->statusCode.fill(SccContextElementNotFound, std::string("Entity id: '") + entityId + "'");
-     LM_RE(ms, ("entityId '%s' not found", entityId.c_str()));
+     LM_W(("Bad Input (entityId '%s' not found)", entityId.c_str()));
+     return ms;
    }
 
    std::vector<ContextAttribute*> attrV = qcResponse.contextElementResponseVector.get(0)->contextElement.contextAttributeVector.vec;

@@ -51,7 +51,7 @@ static std::string duration(const std::string& path, const std::string& value, P
 
   // The failure is postponed until the 'check' step to not miss the subscriptionId
   if ((s = parseDataP->ucsr.res.duration.check(UpdateContextSubscription, JSON, "", "", 0)) != "OK")
-     LM_E(("error parsing duration '%s': %s", parseDataP->ucsr.res.duration.get().c_str(), s.c_str()));
+    LM_W(("Bad Input (error parsing duration '%s': %s)", parseDataP->ucsr.res.duration.get().c_str(), s.c_str()));
 
   return "OK";
 }

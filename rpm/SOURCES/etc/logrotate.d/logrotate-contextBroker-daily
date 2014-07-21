@@ -18,7 +18,7 @@
 # For those usages not covered by this license please contact with
 # fermin at tid dot es 
 
-/var/log/contextBroker/contextBrokerLog 
+/var/log/contextBroker/contextBroker.log 
 {
       daily
       rotate 7

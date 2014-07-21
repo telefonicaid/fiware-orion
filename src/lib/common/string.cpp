@@ -245,7 +245,6 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     // IPv6
     host = auxIp;
     port = atoi(auxPort.c_str());
-    LM_VVV(("Parsed IPv6: '%s' and port: '%d'", host.c_str(), port));
   }
   else
   {

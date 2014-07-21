@@ -43,6 +43,7 @@ std::string badRequest(ConnectionInfo* ciP, int components, std::vector<std::str
 {
   std::string answer;
 
+  LM_W(("Bad Input (service '%s' not found)", ciP->url.c_str()));
   answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("service '") + ciP->url + "' not found");
 
   return answer;

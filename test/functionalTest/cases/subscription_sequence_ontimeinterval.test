@@ -371,5 +371,5 @@ TIMES: REGEX((0, 2, 4, 5, 9, 13, 14, 24, 34, 35, 37, 39, 53, 65, 67, 69|0, 2, 4,
 brokerStop CB
 accumulatorStop
 
-mv /tmp/contextBrokerLog /tmp/contextBrokerLog.oti
+mv /tmp/contextBroker.log /tmp/contextBroker.log.oti
 
