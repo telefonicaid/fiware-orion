@@ -194,12 +194,13 @@ make rpm
 
 To install experimental CoAP support do the following:
 
-* Install cantcoap (with dependencies)
+* Install cantcoap (with dependencies). Note that we are using a particular snapshoot of the code (corresponding arround July 21st, 2014) given that cantcoap repository doesn't provide any releasing mechanism.
 ```
 sudo yum install clang CUnit-devel
 
 git clone https://github.com/staropram/cantcoap
 cd cantcoap
+git checkout 749e22376664dd3adae17492090e58882d3b28a7
 make
 sudo cp cantcoap.h /usr/include
 sudo cp dbg.h /usr/include
