@@ -83,10 +83,10 @@ function finish()
 {
   if [ "$mayorErrors" != "0" ]
   then
-    mMsg "found $totalErrors errors ($mayorErrors mayor, $minorErrors minor errors) in $lines lines of source code in $files files \($percentage%\ style-guide-incompatibilities\)"
+    mMsg "found $totalErrors errors ($mayorErrors mayor, $minorErrors minor errors) in $lines lines of source code in $files files ($percentage% style-guide-incompatibilities)"
     exit 1
   else
-    mMsg "found no mayor errors ($minorErrors minor errors) in $lines lines of source code in $files files \($percentage%\ style-guide-incompatibilities\)"
+    mMsg "found no mayor errors ($minorErrors minor errors) in $lines lines of source code in $files files ($percentage% style-guide-incompatibilities)"
     exit 0
   fi
 }
