@@ -38,6 +38,10 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * Mongo Driver: 2.2.3 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
+* cantcoap (for CoAP support)
+* libcoap: 4.1.1 (for CoAP support)
+* libcurl (for CoAP support)
+
 
 We assume that EPEL6 repository is configured in yum, given that many RPM packages are installed from there
 (check the procedure at http://fedoraproject.org/wiki/EPEL#How_can_I_use_these_extra_packages.3F):
