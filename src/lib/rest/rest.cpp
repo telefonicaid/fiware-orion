@@ -45,7 +45,6 @@
 #include <netdb.h>
 
 
-
 /* ****************************************************************************
 *
 * IP - 
@@ -350,7 +349,7 @@ static void serve(ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* requestCompleted - 
+* requestCompleted -
 */
 static void requestCompleted
 (
@@ -368,7 +367,6 @@ static void requestCompleted
   delete(ciP);
   *con_cls = NULL;
 }
-
 
 
 /* ****************************************************************************
@@ -747,7 +745,6 @@ static int connectionTreat
 }
 
 
-
 /* ****************************************************************************
 *
 * restStart - 
@@ -761,7 +758,8 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     LM_X(1, ("Fatal Error (please call restInit before starting the REST service)"));
   }
 
-  if ((ipVersion == IPV4) || (ipVersion == IPDUAL)) 
+
+  if ((ipVersion == IPV4) || (ipVersion == IPDUAL))
   { 
     memset(&sad, 0, sizeof(sad));
     if (inet_pton(AF_INET, bindIp, &(sad.sin_addr.s_addr)) != 1)
@@ -786,6 +784,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_END);
+
     }
     else
     {
@@ -799,6 +798,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_END);
+
     }
 
     if (mhdDaemon != NULL)
@@ -873,8 +873,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 *           See Issue #256
 */
 void restInit
-(
-  RestService*        _restServiceV,
+(RestService*        _restServiceV,
   IpVersion           _ipVersion,
   const char*         _bindAddress,
   unsigned short      _port,

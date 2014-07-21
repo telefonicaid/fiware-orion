@@ -52,6 +52,7 @@ typedef enum TraceLevels
   LmtUriParams,
   LmtServicePath,
   LmtPagination,
+  LmtCoap,
   LmtHttps,
   LmtIpVersion,
 
