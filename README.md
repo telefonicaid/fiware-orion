@@ -148,6 +148,7 @@ sudo yum install python python-flask python-jinja2 curl libxml2 nc mongodb valgr
 * Install COAP client (an example application included in the libcoap sources).
 ```
 wget http://sourceforge.net/projects/libcoap/files/coap-18/libcoap-4.1.1.tar.gz/download
+mv download libcoap-4.1.1.tar.gz
 tar xvzf libcoap-4.1.1.tar.gz
 cd libcoap-4.1.1
 ./configure
