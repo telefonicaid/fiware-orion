@@ -77,6 +77,24 @@ function mMsg()
 
 # ------------------------------------------------------------------------------
 #
+# finish - 
+#
+function finish()
+{
+  if [ "$mayorErrors" != "0" ]
+  then
+    mMsg "found $totalErrors errors ($mayorErrors mayor, $minorErrors minor errors) in $lines lines of source code in $files files \($percentage%\ style-guide-incompatibilities\)"
+    exit 1
+  else
+    mMsg "found no mayor errors ($minorErrors minor errors) in $lines lines of source code in $files files \($percentage%\ style-guide-incompatibilities\)"
+    exit 0
+  fi
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
 # Argument parsing
 #
 export verbose=off
@@ -145,13 +163,12 @@ else
   filesH=$(find $dir -name "*.h" | wc -l)
 fi
 
-errors=$(grep "Total errors found" LINT | awk -F:\  '{ print $2 }')
+totalErrors=$(grep "Total errors found" LINT | awk -F:\  '{ print $2 }')
 
 typeset -i files
 
 files=$filesCpp+$filesH
-percentage=$(echo "scale=2; $errors*100/$lines" | bc)
-echo $errors errors in $lines lines of source code in $files files \($percentage%\ style-guide-incompatibilities\)
+percentage=$(echo "scale=2; $totalErrors*100/$lines" | bc)
 
 
 
@@ -169,54 +186,54 @@ fi
 #
 declare -A cat
 
-sev[0]=FATAL;  cat[0]='already included at'
-sev[1]=FATAL;  cat[1]='Found C system header after C++ system header'
-sev[2]=OK;     cat[2]='Lines should be <= 120 characters long'
-sev[3]=OK;     cat[3]='Lines should very rarely be longer than 150 characters'
-sev[4]=FATAL;  cat[4]='Line ends in whitespace'
-sev[5]=FATAL;  cat[5]='Never use sprintf'
-sev[6]=FATAL;  cat[6]='Use int16/int64/etc'
-sev[7]=FATAL;  cat[7]='#ifndef header guard has wrong style'
-sev[8]=FATAL;  cat[8]='#endif line should be'
-sev[9]=FATAL;  cat[9]='Weird number of spaces at line-start'
-sev[10]=FATAL; cat[10]='Blank line at the end of a code block'
-sev[11]=FATAL; cat[11]='Include the directory when naming'
-sev[12]=FATAL; cat[12]='Do not use namespace using-directives'
-sev[13]=FATAL; cat[13]='Is this a non-const reference'
-sev[14]=FATAL; cat[14]='At least two spaces is best between code and comments'
-sev[15]=FATAL; cat[15]='Labels should always be indented at least one space'
-sev[16]=FATAL; cat[16]='Tab found; better to use spaces'
-sev[17]=FATAL; cat[17]='Add #include'
-sev[18]=FATAL; cat[18]='Blank line at the start of a code block'
-sev[19]=OK;    cat[19]='More than one command on the same line'
-sev[20]=FATAL; cat[20]="You don't need a ; after a }"
-sev[21]=FATAL; cat[21]='Single-argument constructors should be marked explicit'
-sev[22]=FATAL; cat[22]='Streams are highly discouraged'
-sev[23]=FATAL; cat[23]='Do not leave a blank line after'
-sev[24]=FATAL; cat[24]='Else clause should never be on same line as else'
-sev[25]=FATAL; cat[25]='Do not leave a blank line after'
-sev[26]=FATAL; cat[26]='Almost always, snprintf is better than strcpy'
-sev[27]=FATAL; cat[27]='Missing space after ,'
-sev[28]=FATAL; cat[28]='Extra space before ( in function call'
-sev[29]=FATAL; cat[29]='All parameters should be named in a function'
-sev[30]=FATAL; cat[30]='No copyright message found'
-sev[31]=FATAL; cat[31]='Found C system header after other header'
-sev[32]=FATAL; cat[32]='Should have a space between // and comment'
-sev[33]=FATAL; cat[33]='If an else has a brace on one side, it should have it on both'
-sev[34]=FATAL; cat[34]='Almost always, snprintf is better than strcat'
-sev[35]=FATAL; cat[35]='Using sizeof(type).  Use sizeof(varname) instead if possible'
-sev[36]=FATAL; cat[36]='Missing space before {'
-sev[37]=FATAL; cat[37]='Found C++ system header after other header'
-sev[38]=FATAL; cat[38]='Consider using getpwuid_r(...) instead of getpwuid'
-sev[39]=FATAL; cat[39]='Line contains only semicolon'
-sev[40]=FATAL; cat[40]='sscanf can be ok, but is slow and can overflow buffers'
-sev[41]=FATAL; cat[41]='Missing space before ('
-sev[42]=FATAL; cat[42]='Extra space after ( in function call'
-sev[43]=FATAL; cat[43]='If you can, use sizeof'
-sev[44]=FATAL; cat[44]='Missing spaces around ='
-sev[45]=FATAL; cat[45]='Mismatching spaces inside ()'
-sev[46]=FATAL; cat[46]='Closing ) should be moved to the previous line'
-sev[47]=FATAL; cat[47]='Extra space before )'
+sev[0]=MAYOR;  cat[0]='already included at'
+sev[1]=MAYOR;  cat[1]='Found C system header after C++ system header'
+sev[2]=MINOR;  cat[2]='Lines should be <= 120 characters long'
+sev[3]=MINOR;  cat[3]='Lines should very rarely be longer than 150 characters'
+sev[4]=MAYOR;  cat[4]='Line ends in whitespace'
+sev[5]=MAYOR;  cat[5]='Never use sprintf'
+sev[6]=MAYOR;  cat[6]='Use int16/int64/etc'
+sev[7]=MAYOR;  cat[7]='#ifndef header guard has wrong style'
+sev[8]=MAYOR;  cat[8]='#endif line should be'
+sev[9]=MAYOR;  cat[9]='Weird number of spaces at line-start'
+sev[10]=MAYOR; cat[10]='Blank line at the end of a code block'
+sev[11]=MAYOR; cat[11]='Include the directory when naming'
+sev[12]=MAYOR; cat[12]='Do not use namespace using-directives'
+sev[13]=MAYOR; cat[13]='Is this a non-const reference'
+sev[14]=MAYOR; cat[14]='At least two spaces is best between code and comments'
+sev[15]=MAYOR; cat[15]='Labels should always be indented at least one space'
+sev[16]=MAYOR; cat[16]='Tab found; better to use spaces'
+sev[17]=MAYOR; cat[17]='Add #include'
+sev[18]=MAYOR; cat[18]='Blank line at the start of a code block'
+sev[19]=MINOR; cat[19]='More than one command on the same line'
+sev[20]=MAYOR; cat[20]="You don't need a ; after a }"
+sev[21]=MAYOR; cat[21]='Single-argument constructors should be marked explicit'
+sev[22]=MAYOR; cat[22]='Streams are highly discouraged'
+sev[23]=MAYOR; cat[23]='THIS LINE IS UNUSED'
+sev[24]=MAYOR; cat[24]='Else clause should never be on same line as else'
+sev[25]=MAYOR; cat[25]='Do not leave a blank line after "public:"'
+sev[26]=MAYOR; cat[26]='Almost always, snprintf is better than strcpy'
+sev[27]=MAYOR; cat[27]='Missing space after ,'
+sev[28]=MAYOR; cat[28]='Extra space before ( in function call'
+sev[29]=MAYOR; cat[29]='All parameters should be named in a function'
+sev[30]=MAYOR; cat[30]='No copyright message found'
+sev[31]=MAYOR; cat[31]='Found C system header after other header'
+sev[32]=MAYOR; cat[32]='Should have a space between // and comment'
+sev[33]=MAYOR; cat[33]='If an else has a brace on one side, it should have it on both'
+sev[34]=MAYOR; cat[34]='Almost always, snprintf is better than strcat'
+sev[35]=MAYOR; cat[35]='Using sizeof(type).  Use sizeof(varname) instead if possible'
+sev[36]=MAYOR; cat[36]='Missing space before {'
+sev[37]=MAYOR; cat[37]='Found C++ system header after other header'
+sev[38]=MAYOR; cat[38]='Consider using getpwuid_r(...) instead of getpwuid'
+sev[39]=MAYOR; cat[39]='Line contains only semicolon'
+sev[40]=MAYOR; cat[40]='sscanf can be ok, but is slow and can overflow buffers'
+sev[41]=MAYOR; cat[41]='Missing space before ('
+sev[42]=MAYOR; cat[42]='Extra space after ( in function call'
+sev[43]=MAYOR; cat[43]='If you can, use sizeof'
+sev[44]=MAYOR; cat[44]='Missing spaces around ='
+sev[45]=MAYOR; cat[45]='Mismatching spaces inside ()'
+sev[46]=MAYOR; cat[46]='Closing ) should be moved to the previous line'
+sev[47]=MAYOR; cat[47]='Extra space before )'
 sev[48]=NONE;  cat[48]="LAST"
 
 
@@ -226,7 +243,10 @@ sev[48]=NONE;  cat[48]="LAST"
 #
 typeset -i ix
 ix=0
-fatal=no
+typeset -i minorErrors
+typeset -i mayorErrors
+minorErrors=0
+mayorErrors=0
 
 echo > LINT_ERRORS
 while [ "${cat[$ix]}" != "LAST" ]
@@ -236,9 +256,11 @@ do
   then
     typeset -i errs=$errors
     printf "%04d errors of category '%s'\n" $errs "${cat[$ix]}" >> LINT_ERRORS
-    if [ ${sev[$ix]} == FATAL ]
+    if [ ${sev[$ix]} == MAYOR ]
     then
-      fatal=yes
+      mayorErrors=$mayorErrors+$errors
+    else
+      minorErrors=$minorErrors+errors
     fi
   fi
 
@@ -251,11 +273,7 @@ done
 #
 if [ "$verbose" = "off" ]
 then
-  if [ "$fatal" == yes ]
-  then
-    vMsg fatal errors found
-    exit 1
-  fi
+  finish
 fi
 
 
@@ -321,8 +339,6 @@ grep -v 'Total errors found')
 if [ "$lintErrors" != "" ]
 then
   echo
-  echo
-  echo
   echo "New style-guide errors:"
   echo "-----------------------------------------------------"
   echo $lintErrors
@@ -331,10 +347,5 @@ fi
 
 
 
-if [ "$fatal" == yes ]
-then
-  vMsg fatal errors found
-  exit 1
-fi
-
+finish
 exit 0
