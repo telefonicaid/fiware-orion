@@ -79,7 +79,7 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
             if (ncr.contextElementResponseVector.size() > 0)
             {
                 // New transactionId for each notification
-                LM_TRANSACTION_START2(csi.url.c_str());
+                LM_TRANSACTION_START_URL(csi.url.c_str());
 
                 /* Complete NotifyContextRequest */
                 // FIXME: implement a proper originator string

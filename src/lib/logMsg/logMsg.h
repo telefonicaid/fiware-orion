@@ -1697,9 +1697,9 @@ do                                                              \
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_START2 - 
+* LM_TRANSACTION_START_URL - 
 */
-#define LM_TRANSACTION_START2(url)                              \
+#define LM_TRANSACTION_START_URL(url)                           \
 do                                                              \
 {                                                               \
   transactionIdSet();                                           \
