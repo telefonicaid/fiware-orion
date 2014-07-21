@@ -35,13 +35,11 @@ The Orion Context Broker uses the following libraries as build dependencies:
 
 * boost: 1.41 (the one that comes in EPEL6 repository)
 * libmicrohttpd: 0.9.22 (the one that comes in EPEL6 repository)
+* libcurl: 7.26 (for CoAP support)
 * Mongo Driver: 2.2.3 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
 * cantcoap (for CoAP support)
-* libcoap: 4.1.1 (for CoAP support)
-* libcurl: 7.26 (for CoAP support)
-
 
 We assume that EPEL6 repository is configured in yum, given that many RPM packages are installed from there
 (check the procedure at http://fedoraproject.org/wiki/EPEL#How_can_I_use_these_extra_packages.3F):
@@ -58,7 +56,7 @@ sudo yum install make cmake gcc-c++ scons
 * Install the required libraries (except the mongo driver and gmock, described in following steps).
 
 ```
-sudo yum install libmicrohttpd-devel boost-devel
+sudo yum install libmicrohttpd-devel boost-devel libcurl-devel
 ```
 
 * Install the Mongo Driver from source (reference procedure http://docs.mongodb.org/ecosystem/tutorial/getting-started-with-cpp-driver/):
@@ -84,6 +82,20 @@ cd gmock-1.5.0
 make
 sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
 sudo ldconfig      # just in case... it doesn't hurt :)
+```
+
+* Install cantcoap (with dependencies). Note that we are using a particular snapshoot of the code (corresponding arround July 21st, 2014) given that cantcoap repository doesn't provide any releasing mechanism.
+```
+sudo yum install clang CUnit-devel
+
+git clone https://github.com/staropram/cantcoap
+cd cantcoap
+git checkout 749e22376664dd3adae17492090e58882d3b28a7
+make
+sudo cp cantcoap.h /usr/include
+sudo cp dbg.h /usr/include
+sudo cp nethelper.h /usr/include
+sudo cp libcantcoap.a /usr/lib
 ```
 
 * Get the code (alternatively you can download it using a zipped version or a different URL pattern):
@@ -131,6 +143,16 @@ following the following procedure (optional):
 
 ```
 sudo yum install python python-flask python-jinja2 curl libxml2 nc mongodb valgrind libxslt 
+```
+
+* Install COAP client (an example application included in the libcoap sources).
+```
+wget http://sourceforge.net/projects/libcoap/files/coap-18/libcoap-4.1.1.tar.gz/download
+tar xvzf libcoap-4.1.1.tar.gz
+cd libcoap-4.1.1
+./configure
+make
+sudo cp examples/coap-client /usr/bin
 ```
 
 * Run valgrind tests (it takes some time, please be patient):
@@ -191,37 +213,6 @@ make rpm
 ```
 
 * The generated RPMs are placed in directory ~/rpmbuild/RPMS/x86_64
-
-To install experimental CoAP support do the following:
-
-* Install cantcoap (with dependencies). Note that we are using a particular snapshoot of the code (corresponding arround July 21st, 2014) given that cantcoap repository doesn't provide any releasing mechanism.
-```
-sudo yum install clang CUnit-devel
-
-git clone https://github.com/staropram/cantcoap
-cd cantcoap
-git checkout 749e22376664dd3adae17492090e58882d3b28a7
-make
-sudo cp cantcoap.h /usr/include
-sudo cp dbg.h /usr/include
-sudo cp nethelper.h /usr/include
-sudo cp libcantcoap.a /usr/lib
-```
-
-* Libcurl
-```
-sudo yum install libcurl-devel
-```
-
-* Libcoap
-```
-wget http://sourceforge.net/projects/libcoap/files/coap-18/libcoap-4.1.1.tar.gz/download
-tar xvzf libcoap-4.1.1.tar.gz
-cd libcoap-4.1.1
-./configure
-make
-sudo cp examples/coap-client /usr/bin
-```
 
 ### Debian 7 (unofficial)
 
