@@ -201,10 +201,9 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     // Tenant to connectionInfo
     if (serviceV[ix].compV[0] == "*")
     {
-      char* tenant = strdup(compV[0].c_str());
+      char tenant[128];
       LM_T(LmtTenant, ("URL tenant: '%s'", compV[0].c_str()));
-      ciP->tenantFromUrl = strToLower(tenant);
-      free(tenant);
+      ciP->tenantFromUrl = strToLower(tenant, compV[0].c_str(), sizeof(tenant));
     }
 
     if (multitenant == "url")

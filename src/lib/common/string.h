@@ -94,6 +94,6 @@ extern double atoF(const char* string, std::string* errorMsg);
 *
 * strToLower - 
 */
-extern const char* strToLower(char* s);
+extern char* strToLower(char* to, const char* from, int toSize);
 
 #endif  // SRC_LIB_COMMON_STRING_H_

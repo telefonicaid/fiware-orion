@@ -646,9 +646,8 @@ static int connectionTreat
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
     
-    char* tenant = strdup(ciP->httpHeaders.tenant.c_str());
-    ciP->tenantFromHttpHeader = strToLower(tenant);
-    free(tenant);
+    char tenant[128];
+    ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
     LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));
     ciP->outFormat            = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
