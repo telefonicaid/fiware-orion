@@ -277,8 +277,11 @@ clean:
 	rm -rf BUILD_COVERAGE
 	rm -rf BUILD_UNITTEST
 
-lint_all:
-	scripts/linter.sh
+style_check:
+	@scripts/style_check.sh
+
+style_check_v:
+	@VERBOSE=1 scripts/style_check.sh
 
 lint_changed:
 	git diff --name-only | grep "\.cpp\|\.h" | xargs scripts/cpplint.py
