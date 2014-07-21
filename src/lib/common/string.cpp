@@ -551,3 +551,29 @@ double atoF(const char* string, std::string* errorMsg)
 
   return atof(string);
 }
+
+
+
+/* ****************************************************************************
+*
+* strToLower - 
+*/
+const char* strToLower(char* sIn)
+{
+  return sIn;
+#if 0
+  char* s = (char*) sIn;
+
+  if (s == NULL)
+    return NULL;
+
+  while (s != NULL)
+  {
+    if ((*s >= 'A') && (*s <= 'Z'))
+      *s = tolower(*s);
+    ++s;
+  }
+
+  return sIn;
+#endif
+}

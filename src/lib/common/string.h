@@ -90,4 +90,10 @@ bool versionParse(const std::string& version, int& mayor, int& minor, std::strin
 */
 extern double atoF(const char* string, std::string* errorMsg);
 
+/* ****************************************************************************
+*
+* strToLower - 
+*/
+extern const char* strToLower(char* s);
+
 #endif  // SRC_LIB_COMMON_STRING_H_
