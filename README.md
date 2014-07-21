@@ -40,7 +40,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
 * cantcoap (for CoAP support)
 * libcoap: 4.1.1 (for CoAP support)
-* libcurl (for CoAP support)
+* libcurl: 7.26 (for CoAP support)
 
 
 We assume that EPEL6 repository is configured in yum, given that many RPM packages are installed from there
