@@ -58,7 +58,7 @@
 *
 * PAYLOAD_SIZE - 
 */
-#define PAYLOAD_SIZE       (64 * 1024 * 1024)
+#define PAYLOAD_SIZE       (2 * 1024 * 1024)
 #define PAYLOAD_MAX_SIZE   (1 * 1024 * 1024)
 #define STATIC_BUFFER_SIZE (32 * 1024)
 
@@ -836,7 +836,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     }
     else
     {
-      LM_T(LmtMhd, ("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
+      // LM_T(LmtMhd, ("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
       mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6,
                                       htons(port),
                                       NULL,
