@@ -24,6 +24,8 @@
 */
 #define F_OK 0
 
+#include <semaphore.h>          /* sem_init, sem_wait, sem_post              */
+#include <errno.h>
 #include <sys/types.h>          /* types needed for other includes           */
 #include <stdio.h>              /*                                           */
 #include <unistd.h>             /* getpid, write, ...                        */
@@ -32,7 +34,6 @@
 #include <string.h>             /* strncat, strdup, memset                   */
 #include <stdarg.h>             /* va_start, va_arg, va_end                  */
 #include <stdlib.h>             /* atoi                                      */
-#include <semaphore.h>          /* sem_init, sem_wait, sem_post              */
 
 #if !defined(__APPLE__)
 #include <malloc.h>             /* free                                      */
@@ -1789,7 +1790,7 @@ LmStatus lmOut
     POINTER_CHECK(format);
     POINTER_CHECK(text);
     
-    memset(format, 0, sizeof(format));
+    memset(format, 0, FORMAT_LEN + 1);
 
     semTake();
 

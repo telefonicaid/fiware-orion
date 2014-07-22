@@ -56,7 +56,7 @@ include_directories("${RAPIDXML_INCLUDE}")
 # ------------------------------------------------------------
 link_directories("/usr/local/lib/")
 link_directories("/usr/lib64/")
-
+link_directories("/usr/lib/x86_64-linux-gnu")
 
 
 # Executable declaration
@@ -65,19 +65,22 @@ link_directories("/usr/lib64/")
 ADD_EXECUTABLE(contextBroker ${SOURCES} ${HEADERS})
 
 IF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS"))
-  MESSAGE("Ubuntu DISTRO: '${DISTRO}'")
+  MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_13.10")
+  MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
 ELSEIF(${DISTRO} STREQUAL "openSUSE_13.1")
-  MESSAGE("openSUSE DISTRO: '${DISTRO}'")
+  MESSAGE("contextBroker: openSUSE DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto)
 ELSEIF(${DISTRO} STREQUAL "CentOS_6.3")
-  MESSAGE("CentOS DISTRO: '${DISTRO}'")
+  MESSAGE("contextBroker: CentOS DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt)
 ELSEIF(${DISTRO} STREQUAL "Fedora_20")
-  MESSAGE("Fedora DISTRO: '${DISTRO}'")
+  MESSAGE("contextBroker: Fedora DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread)
 ELSE()
-  MESSAGE("Other DISTRO: '${DISTRO}'")
+  MESSAGE("contextBroker: Other DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt)
 ENDIF()
 
