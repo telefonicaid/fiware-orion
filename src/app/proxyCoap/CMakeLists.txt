@@ -50,16 +50,21 @@ include_directories("${RAPIDXML_INCLUDE}")
 # ------------------------------------------------------------
 link_directories("/usr/local/lib/")
 link_directories("/usr/lib64/")
+link_directories("/usr/lib/x86_64-linux-gnu")
 
 
 # Executable declaration
 # ------------------------------------------------------------
 ADD_EXECUTABLE(proxyCoap ${SOURCES} ${HEADERS})
+
 IF(${DISTRO} STREQUAL "Fedora_20")
-  MESSAGE("Fedora DISTRO: '${DISTRO}'")
+  MESSAGE("proxyCoap: Fedora DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl -lboost_thread)
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_13.10")
+  MESSAGE("proxyCoap: Ubuntu DISTRO: '${DISTRO}'")
+  TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl boost_thread boost_system pthread)
 ELSE()
-  MESSAGE("Other DISTRO: '${DISTRO}'")
+  MESSAGE("proxyCoap: Other DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl -lboost_thread-mt)
 ENDIF()
 

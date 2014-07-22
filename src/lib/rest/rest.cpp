@@ -644,7 +644,8 @@ static int connectionTreat
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
     
-    ciP->tenantFromHttpHeader = ciP->httpHeaders.tenant;
+    char tenant[128];
+    ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
     LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));
     ciP->outFormat            = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
@@ -820,7 +821,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
-      LM_T(LmtMhd, ("Starting HTTPS daemon on IPv6 %s port %d", bindIPv6, port));
+      // LM_T(LmtMhd, ("Starting HTTPS daemon on IPv6 %s port %d", bindIPv6, port));
       mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6 | MHD_USE_SSL,
                                       htons(port),
                                       NULL,
@@ -835,7 +836,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
     }
     else
     {
-      LM_T(LmtMhd, ("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
+      // LM_T(LmtMhd, ("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
       mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6,
                                       htons(port),
                                       NULL,

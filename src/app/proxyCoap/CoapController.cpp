@@ -19,6 +19,8 @@
 #include "proxyCoap/HttpProxy.h"
 #include "proxyCoap/HttpMessage.h"
 
+#define PORT_STRING_SIZE 6
+
 CoapController::CoapController(const char *_host, unsigned short _httpPort, unsigned short _coapPort)
 {
   // Read host and port values
@@ -26,8 +28,8 @@ CoapController::CoapController(const char *_host, unsigned short _httpPort, unsi
   coapPort    = _coapPort;
   host.assign(_host);
 
-  char* portString = new char[6];
-  snprintf(portString, sizeof(portString), "%d", _coapPort);
+  char* portString = new char[PORT_STRING_SIZE];
+  snprintf(portString, PORT_STRING_SIZE, "%d", _coapPort);
   coapPortStr.assign(portString);
 }
 

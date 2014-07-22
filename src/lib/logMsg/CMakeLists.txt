@@ -36,8 +36,8 @@ SET (SOURCES
 # -----------------------------------------------------------------
 include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
+
 # Library declaration
 # -----------------------------------------------------------------
-
-ADD_LIBRARY(lm STATIC ${SOURCES} ${HEADERS} )
+ADD_LIBRARY(lm STATIC ${SOURCES} ${HEADERS})
 SET (LIBLM ${PROJECT_BINARY_DIR}/src/logMsg/liblm.a CACHE INTERNAL "")

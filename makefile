@@ -303,7 +303,7 @@ unit_test: build_unit_test
         fi
 	@echo '------------------------------- unit_test ended ---------------------------------'
 
-functional_test: install
+functional_test: install_debug
 	./test/functionalTest/testHarness.sh
 
 functional_test_debug: install_debug

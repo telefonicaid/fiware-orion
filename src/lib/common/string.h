@@ -92,6 +92,12 @@ extern double atoF(const char* string, std::string* errorMsg);
 
 /* ****************************************************************************
 *
+* strToLower - 
+*/
+extern char* strToLower(char* to, const char* from, int toSize);
+
+/* ****************************************************************************
+*
 * strReplace - 
 */
 extern void strReplace(char* to, const char* from, const char* newString, const char* oldString);

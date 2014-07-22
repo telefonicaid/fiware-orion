@@ -23,7 +23,12 @@
 * Author: Ken Zangelin
 */
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <curl/curl.h>
 #include <string>
+
+#include "logMsg/logMsg.h"
 
 #include "common/globals.h"
 #include "common/string.h"
@@ -76,6 +81,7 @@ StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const 
 }
 
 
+extern char* curl_escape(const char*, int);
 /* ****************************************************************************
 *
 * StatusCode::render - 
@@ -86,11 +92,11 @@ std::string StatusCode::render(Format format, const std::string& indent, bool co
 
   if (strstr(details.c_str(), "\"") != NULL)
   {
-    char* s2    = (char*) malloc(details.length() * 2 + 1);
+    char* s2    = (char*) calloc(1, details.length() * 2 + 1);
 
     strReplace(s2, details.c_str(), "\"", "\\\"");
     details = s2;
-    free s2;
+    free(s2);
   }
 
   if (code == SccNone)

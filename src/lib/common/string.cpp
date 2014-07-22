@@ -490,6 +490,7 @@ bool versionParse(const std::string& version, int& mayor, int& minor, std::strin
 }
 
 
+
 /* ****************************************************************************
 *
 * atoF - 
@@ -556,9 +557,39 @@ double atoF(const char* string, std::string* errorMsg)
 
 /* ****************************************************************************
 *
+* strToLower - 
+*/
+char* strToLower(char* to, const char* from, int toSize)
+{
+  int fromSize = strlen(from);
+
+  if (toSize < fromSize + 1)
+  {
+    LM_E(("Runtime Error (cannot copy %d bytes into a buffer of %d bytes)", fromSize + 1, toSize));
+    fromSize = toSize;
+  }
+
+  int ix;
+  for (ix = 0; ix < fromSize; ix++)
+  {
+    if ((from[ix] >= 'A') && (from[ix] <= 'Z'))
+      to[ix] = from[ix] + ('a' - 'A');
+    else
+      to[ix] = from[ix];
+  }
+
+  to[ix] = 0;
+
+  return to;
+}
+
+
+
+/* ****************************************************************************
+*
 * strReplace - 
 */
-void strReplace(char* to, const char* from, const char* newString, const char* oldString)
+void strReplace(char* to, const char* from, const char* oldString, const char* newString)
 {
   int toIx   = 0;
   int fromIx = 0;
@@ -580,4 +611,7 @@ void strReplace(char* to, const char* from, const char* newString, const char* o
       fromIx += 1;
     }
   }
+
+  to[toIx] = 0;
 }
+
