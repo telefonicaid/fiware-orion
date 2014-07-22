@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <curl/curl.h>
 #include <string>
 
 #include "logMsg/logMsg.h"
@@ -81,7 +80,7 @@ StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const 
 }
 
 
-extern char* curl_escape(const char*, int);
+
 /* ****************************************************************************
 *
 * StatusCode::render - 
