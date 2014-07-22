@@ -45,6 +45,7 @@
 #include "common/string.h"
 #include "rest/rest.h"
 
+#include <curl/curl.h>
 
 /* ****************************************************************************
 *
@@ -104,6 +105,283 @@ int socketHttpConnect(const std::string& host, unsigned short port)
 }
 
 
+struct MemoryStruct {
+  char*   memory;
+  size_t  size;
+};
+
+
+/* ****************************************************************************
+*
+* writeMemoryCallback -
+*/
+size_t writeMemoryCallback(void* contents, size_t size, size_t nmemb, void* userp)
+{
+  size_t realsize = size * nmemb;
+  MemoryStruct* mem = (MemoryStruct *) userp;
+
+  mem->memory = (char*) realloc(mem->memory, mem->size + realsize + 1);
+  if (mem->memory == NULL)
+  {
+    LM_W(("Not enough memory (realloc returned NULL)\n"));
+    return 0;
+  }
+
+  memcpy(&(mem->memory[mem->size]), contents, realsize);
+  mem->size += realsize;
+  mem->memory[mem->size] = 0;
+
+  return realsize;
+}
+
+
+/* ****************************************************************************
+*
+* sendHttpRequest -
+*/
+//std::string sendHttpRequest(const char* host, unsigned short port)
+std::string sendHttpSocket
+(
+   const std::string&     _ip,
+   unsigned short         port,
+   const std::string&     protocol,
+   const std::string&     verb,
+   const std::string&     tenant,
+   const std::string&     resource,
+   const std::string&     content_type,
+   const std::string&     content,
+   bool                   useRush,
+   bool                   waitForResponse
+)
+{
+  char                       buffer[TAM_BUF];
+  char                       response[TAM_BUF];
+  char                       preContent[TAM_BUF];
+  char                       portAsString[16];
+  char                       msgStatic[MAX_STA_MSG_SIZE];
+  char*                      what               = (char*) "static";
+  char*                      msgDynamic         = NULL;
+  char*                      msg                = msgStatic;   // by default, use the static buffer
+  std::string                rushHeaderIP       = "";
+  unsigned short             rushHeaderPort     = 0;
+  std::string                rushHttpHeaders    = "";
+  static unsigned long long  callNo             = 0;
+  std::string                result;
+  std::string                ip                 = _ip;
+  std::string                url;
+
+  CURL*                      curl               = curl_easy_init();
+  struct curl_slist*         headers            = NULL;
+  MemoryStruct*              httpResponse       = NULL;
+  CURLcode                   res;
+  size_t                     size;
+
+  //char*         url                      = NULL;
+  //int           recvURILen               = 0;
+  //char          uriBuffer[URI_BUF];
+
+  ++callNo;
+
+  // Preconditions check
+  if (port == 0)
+  {
+    LM_E(("Runtime Error (port is ZERO)"));
+    LM_TRANSACTION_END();
+    return "error";
+  }
+
+  if (ip.empty())
+  {
+    LM_E(("Runtime Error (ip is empty)"));
+    LM_TRANSACTION_END();
+    return "error";
+  }
+
+  if (verb.empty())
+  {
+    LM_E(("Runtime Error (verb is empty)"));
+    LM_TRANSACTION_END();
+    return "error";
+  }
+
+  if (resource.empty())
+  {
+    LM_E(("Runtime Error (resource is empty)"));
+    LM_TRANSACTION_END();
+    return "error";
+  }
+
+  if ((content_type.empty()) && (!content.empty()))
+  {
+    LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
+    LM_TRANSACTION_END();
+    return "error";
+  }
+
+  if ((!content_type.empty()) && (content.empty()))
+  {
+    LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
+    LM_TRANSACTION_END();
+    return "error";
+  }
+
+  if (!curl)
+  {
+    LM_E(("Runtime Error (could not init libcurl)"));
+    LM_TRANSACTION_END();
+    return "error";
+  }
+
+  //
+  // Rush
+  // Every call to sendHttpSocket specifies whether RUSH should be used or not.
+  // But, this depends also on how the broker was started, so here the 'useRush'
+  // parameter is cancelled in case the broker was started without rush.
+  //
+  // If rush is to be used, the IP/port is stored in rushHeaderIP/rushHeaderPort and
+  // after that, the host and port of rush is set as ip/port for the message, that is
+  // now sent to rush instead of to its final destination.
+  // Also, a few HTTP headers for rush must be setup.
+  //
+  if (useRush)
+  {
+    if ((rushPort == 0) || (rushHost == ""))
+      useRush = false;
+    else
+    {
+      rushHeaderIP   = ip;
+      rushHeaderPort = port;
+      ip             = rushHost;
+      port           = rushPort;
+
+      sprintf(portAsString, "%d", (int) rushHeaderPort);
+      rushHttpHeaders = "X-relayer-host: " + rushHeaderIP + ":" + portAsString + "\n";
+      if (protocol == "https:")
+        rushHttpHeaders += "X-relayer-protocol: https\n";
+    }
+  }
+
+  // Buffers clear
+  memset(buffer, 0, TAM_BUF);
+  memset(response, 0, TAM_BUF);
+  memset(msg, 0, MAX_STA_MSG_SIZE);
+
+
+  // USER AGENT
+  size = sizeof(versionGet()) + 18;
+  char* userAgentHeader = new char[size];
+  snprintf(userAgentHeader, size, "User-Agent: orion/%s", versionGet());
+  headers = curl_slist_append(headers, userAgentHeader);
+
+  // HOST
+  size = sizeof(ip.size() + 13;
+  char* hostHeader = new char[size];
+  snprintf(hostHeader, size, "Host: %s:%d", ip.c_str(), (int) port);
+  headers = curl_slist_append(headers, hostHeader);
+
+  // ACCEPT
+  headers = curl_slist_append(headers, "Accept: application/xml, application/json");
+
+  // Rush
+  headers = curl_slist_append(headers, rushHttpHeaders.c_str());
+
+  // Prepare URL
+  url = ip + resource;
+
+  // --- Prepare CURL handle with obtained options
+  curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+  curl_easy_setopt(curl, CURLOPT_PORT, port);
+  curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L); // Allow redirection (?)
+  curl_easy_setopt(curl, CURLOPT_HEADER, 1); // Activate include the header in the body output
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); // Put headers in place
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) httpResponse); // Custom data for response handling
+
+  // ------------------------------------------------------------------------------------------------------
+
+  // Allocate to hold HTTP response
+  httpResponse = new MemoryStruct;
+  httpResponse->memory = (char*) malloc(1); // will grow as needed
+  httpResponse->size = 0; // no data at this point
+
+  // --- Set HTTP verb
+  std::string httpVerb = "";
+
+  // TODO: get verb
+  curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, httpVerb.c_str());
+  //LM_T(LmtCoap, ("Got an HTTP %s", httpVerb.c_str()));
+
+
+  // --- Prepare headers
+
+
+  std::string string = "bla";
+  // TODO add all headers here
+  headers = curl_slist_append(headers, string.c_str());
+  // Set Expect
+  headers = curl_slist_append(headers, "Expect: ");
+
+
+  // Set Content-length
+  std::stringstream contentLengthStringStream;
+  contentLengthStringStream << 123;
+  std::string finalString = "Content-length: " + contentLengthStringStream.str();
+  headers = curl_slist_append(headers, finalString.c_str());
+  //LM_T(LmtCoap, ("Got: '%s'", finalString.c_str()));
+
+  // --- Set contents
+  //char* payload = (char*) request->getPayloadCopy();
+  char* payload = (char*) 0;
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
+
+
+
+  // --- Prepare URL
+  //request->getURI(uriBuffer, URI_BUF, &recvURILen);
+
+//    url = new char[strlen(host) + recvURILen + 1];
+//    strcpy(url, host);
+//    if (recvURILen > 0)
+//      strncat(url, uriBuffer, recvURILen);
+//    url[strlen(host) + recvURILen] = '\0';
+//    LM_T(LmtCoap, ("URL: '%s'", url));
+
+  // --- Prepare CURL handle with obtained options
+  curl_easy_setopt(curl, CURLOPT_URL, url);
+  curl_easy_setopt(curl, CURLOPT_PORT, port);
+  curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L); // Allow redirection (?)
+  curl_easy_setopt(curl, CURLOPT_HEADER, 1); // Activate include the header in the body output
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); // Put headers in place
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) httpResponse); // Custom data for response handling
+
+
+  // --- Do HTTP Request
+  res = curl_easy_perform(curl);
+  if (res != CURLE_OK)
+  {
+    LM_W(("curl_easy_perform() failed: %s\n", curl_easy_strerror(res)));
+
+    // --- Cleanup curl environment
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    delete url;
+
+    return "";
+  }
+
+  // --- Cleanup curl environment
+  curl_slist_free_all(headers);
+  curl_easy_cleanup(curl);
+  delete url;
+
+
+  std::string ret;
+  ret.assign(httpResponse->memory, httpResponse->size);
+  return ret;
+}
+
+
 /* ****************************************************************************
 *
 * sendHttpSocket -
@@ -113,15 +391,15 @@ int socketHttpConnect(const std::string& host, unsigned short port)
 *
 * FIXME: I don't like too much "reusing" natural output to return "error" in the
 * case of error. I think it would be smarter to use "std::string* error" in the
-* arguments or (even better) and exception. To be solved in the future in a hardening
+* arguments or (even better) an exception. To be solved in the future in a hardening
 * period.
 *
-* Note, we are using an hybrid approach, consisting in an static thread-local buffer of
-* small size that cope with the most of notifications to avoid expensive
+* Note, we are using a hybrid approach, consisting in an static thread-local buffer of
+* small size that copes with most notifications to avoid expensive
 * calloc/free syscalls if the notification payload is not very large.
 *
 */
-std::string sendHttpSocket
+std::string sendHttpSocket_old
 (
    const std::string&     _ip,
    unsigned short         port,
@@ -203,7 +481,7 @@ std::string sendHttpSocket
   // If rush is to be used, the IP/port is stored in rushHeaderIP/rushHeaderPort and
   // after that, the host and port of rush is set as ip/port for the message, that is
   // now sent to rush instead of to its final destination.
-  // Also, a few HTTP headers for rush nust be setup.
+  // Also, a few HTTP headers for rush must be setup.
   //
   if (useRush)
   {
