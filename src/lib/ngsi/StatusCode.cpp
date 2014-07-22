@@ -82,7 +82,16 @@ StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const 
 */
 std::string StatusCode::render(Format format, const std::string& indent, bool comma, bool showTag)
 {
-  std::string out  = "";
+  std::string  out  = "";
+
+  if (strstr(details.c_str(), "\"") != NULL)
+  {
+    char* s2    = (char*) malloc(details.length() * 2 + 1);
+
+    strReplace(s2, details.c_str(), "\"", "\\\"");
+    details = s2;
+    free s2;
+  }
 
   if (code == SccNone)
   {

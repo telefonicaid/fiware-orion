@@ -551,3 +551,33 @@ double atoF(const char* string, std::string* errorMsg)
 
   return atof(string);
 }
+
+
+
+/* ****************************************************************************
+*
+* strReplace - 
+*/
+void strReplace(char* to, const char* from, const char* newString, const char* oldString)
+{
+  int toIx   = 0;
+  int fromIx = 0;
+  int oldLen = strlen(oldString);
+  int newLen = strlen(newString);
+
+  while (from[fromIx] != 0)
+  {
+    if (strncmp(&from[fromIx], oldString, oldLen) == 0)
+    {
+      strcat(to, newString);
+      toIx   += newLen;
+      fromIx += oldLen;
+    }
+    else
+    {
+      to[toIx] = from[fromIx];
+      toIx   += 1;
+      fromIx += 1;
+    }
+  }
+}
