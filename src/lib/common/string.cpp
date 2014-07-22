@@ -551,3 +551,33 @@ double atoF(const char* string, std::string* errorMsg)
 
   return atof(string);
 }
+
+
+
+/* ****************************************************************************
+*
+* strToLower - 
+*/
+char* strToLower(char* to, const char* from, int toSize)
+{
+  int fromSize = strlen(from);
+
+  if (toSize < fromSize + 1)
+  {
+    LM_E(("Runtime Error (cannot copy %d bytes into a buffer of %d bytes)", fromSize + 1, toSize));
+    fromSize = toSize;
+  }
+
+  int ix;
+  for (ix = 0; ix < fromSize; ix++)
+  {
+    if ((from[ix] >= 'A') && (from[ix] <= 'Z'))
+      to[ix] = from[ix] + ('a' - 'A');
+    else
+      to[ix] = from[ix];
+  }
+
+  to[ix] = 0;
+
+  return to;
+}
