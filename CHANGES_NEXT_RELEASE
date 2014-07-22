@@ -1,5 +1,6 @@
 o Fix:  errors in JSON rendering for '/statistics' and '/version' fixed (Issue #428).
 o Fix:  using same location attribute in UPDATE fails (issue http://stackoverflow.com/questions/24431177/ge-orion-context-broker-when-we-make-an-update-of-the-entity-does-not-allow-us)
+o Fix:  Context Broker no crashed anymore due to different tenant names but equal in insensitve case (workaround in Issue #431).
 o Logging modifications (Issue #428):
    o The name of the log file has been changed from contextBrokerLog to contextBroker.log
    o Changed the log line format to use a key-value approach
