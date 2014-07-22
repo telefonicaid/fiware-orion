@@ -58,7 +58,7 @@
 *
 * PAYLOAD_SIZE - 
 */
-#define PAYLOAD_SIZE       (2 * 1024 * 1024)
+#define PAYLOAD_SIZE       (64 * 1024 * 1024)
 #define PAYLOAD_MAX_SIZE   (1 * 1024 * 1024)
 #define STATIC_BUFFER_SIZE (32 * 1024)
 
