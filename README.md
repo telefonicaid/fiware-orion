@@ -49,27 +49,14 @@ commands that require root privilege):
 
 * Install the needed building tools (compiler, etc.).
 
-For CentOS/RedHat:
 ```
 sudo yum install make cmake gcc-c++ scons
 ```
 
-For Ubuntu (not confirmed - make and g++ should be installed in base):
-```
-sudo aptitude install cmake scons
-```
-
-
 * Install the required libraries (except the mongo driver and gmock, described in following steps).
 
-For CentOS/RedHat:
 ```
 sudo yum install libmicrohttpd-devel boost-devel libcurl-devel
-```
-
-For Ubuntu:
-```
-sudo aptitude install libmicrohttpd-devel libboost1.49-all-dev libcurl-dev
 ```
 
 * Install the Mongo Driver from source (reference procedure http://docs.mongodb.org/ecosystem/tutorial/getting-started-with-cpp-driver/):
