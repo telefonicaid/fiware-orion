@@ -237,8 +237,9 @@ function proxyCoapStart()
   proxyCoap $extraParams -cbPort $BROKER_PORT
 
   # Test to see whether we have a proxy running. If not raise an error
-  running_proxyCoap=$(ps -fe | grep proxyCoap | wc -l)
-  if [ $running_proxyCoap -ne 2 ]; then
+  running_proxyCoap=$(ps -fe | grep ' proxyCoap' | grep "cbPort $BROKER_PORT" | wc -l)
+  if [ "$running_proxyCoap" == "" ]
+  then
     echo "Unable to start proxyCoap"
     exit 1
   fi
