@@ -196,10 +196,13 @@ int main(int argC, char* argV[])
   if (fg == false)
     daemonize();
 
-  boost::thread *coapServerThread = new boost::thread(boost::bind(&CoapController::serve, new CoapController(bindAddress, cbPort, port)));
-  coapServerThread->get_id(); // to prevent 'warning: unused'
+  CoapController* cc = new CoapController(bindAddress, cbPort, port);
+  cc->serve();
 
-  while (1)
-    sleep(10);
+//  boost::thread *coapServerThread = new boost::thread(boost::bind(&CoapController::serve, new CoapController(bindAddress, cbPort, port)));
+//  coapServerThread->get_id(); // to prevent 'warning: unused'
+
+//  while (1)
+//    sleep(10);
 }
 
