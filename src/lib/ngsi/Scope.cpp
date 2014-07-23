@@ -103,6 +103,14 @@ std::string Scope::check(RequestType requestType, Format format, const std::stri
         return "Missing latitude for circle center";
       else if (circle.center.longitudeString() == "")
         return "Missing longitude for circle center";
+
+      float latitude = atof(circle.center.latitudeString().c_str());
+      if ((latitude > 90) || (latitude < -90))
+        return "invalid value for latitude";
+
+      float longitude = atof(circle.center.longitudeString().c_str());
+      if ((longitude > 180) || (longitude < -180))
+        return "invalid value for longitude";
     }
     else if (areaType == orion::PolygonType)
     {
@@ -120,6 +128,14 @@ std::string Scope::check(RequestType requestType, Format format, const std::stri
           return std::string("missing latitude value for polygon vertex");
         if (polygon.vertexList[ix]->longitudeString() == "")
           return std::string("missing longitude value for polygon vertex");
+
+        float latitude = atof(polygon.vertexList[ix]->latitudeString().c_str());
+        if ((latitude > 90) || (latitude < -90))
+          return "invalid value for latitude";
+
+        float longitude = atof(polygon.vertexList[ix]->longitudeString().c_str());
+        if ((longitude > 180) || (longitude < -180))
+          return "invalid value for longitude";
       }
     }
   }

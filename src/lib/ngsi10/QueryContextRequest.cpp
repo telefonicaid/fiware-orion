@@ -24,6 +24,7 @@
 */
 #include <string>
 
+#include "logMsg/logMsg.h"
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/Request.h"
@@ -87,6 +88,7 @@ std::string QueryContextRequest::check(RequestType requestType, Format format, c
            ((res = attributeList.check(QueryContext, format, indent, predetectedError, 0))          != "OK") ||
            ((res = restriction.check(QueryContext, format, indent, predetectedError, restrictions)) != "OK"))
   {
+    LM_W(("Bad Input (%s)", res.c_str()));
     response.errorCode.fill(SccBadRequest, res);
   }
   else
