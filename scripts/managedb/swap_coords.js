@@ -32,7 +32,8 @@ procedure in the case you have geo-tagged information in your Orion database.
 
 Usage: mongo <db> swap_coords.js
 
-where <db> is the name of the database in which you want to perform the operation.
+where <db> is the name of the database in which you want to perform the operation (typically
+"orion" or "orion_something" if you use -multiservice option).
 
 The script prints to standard output the entities being processed.
 
