@@ -105,7 +105,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
       }
 
       if (tryNo == 0)
-        LM_E(("Database Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
+        LM_E(("Database Connection Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
       else
         LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
 
@@ -155,7 +155,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
     if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
     {
         mongoSemGive(__FUNCTION__, "wrong mongo version format");
-        LM_E(("Database Error (invalid version format: %s)", versionString.c_str()));
+        LM_E(("Database Version Error (invalid version format: %s)", versionString.c_str()));
         return false;
     }
     LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)", versionString.c_str(), mongoVersionMayor, mongoVersionMinor, extra.c_str()));
