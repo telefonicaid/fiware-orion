@@ -490,6 +490,7 @@ bool versionParse(const std::string& version, int& mayor, int& minor, std::strin
 }
 
 
+
 /* ****************************************************************************
 *
 * atoF - 
@@ -581,3 +582,36 @@ char* strToLower(char* to, const char* from, int toSize)
 
   return to;
 }
+
+
+
+/* ****************************************************************************
+*
+* strReplace - 
+*/
+void strReplace(char* to, const char* from, const char* oldString, const char* newString)
+{
+  int toIx   = 0;
+  int fromIx = 0;
+  int oldLen = strlen(oldString);
+  int newLen = strlen(newString);
+
+  while (from[fromIx] != 0)
+  {
+    if (strncmp(&from[fromIx], oldString, oldLen) == 0)
+    {
+      strcat(to, newString);
+      toIx   += newLen;
+      fromIx += oldLen;
+    }
+    else
+    {
+      to[toIx] = from[fromIx];
+      toIx   += 1;
+      fromIx += 1;
+    }
+  }
+
+  to[toIx] = 0;
+}
+
