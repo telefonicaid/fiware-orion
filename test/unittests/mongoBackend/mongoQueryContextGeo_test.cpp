@@ -180,7 +180,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     sc.areaType = orion::CircleType;
     sc.circle.center.latitudeSet("40.418889");
     sc.circle.center.longitudeSet("-3.691944");
-    sc.circle.radiusSet("14000");
+    sc.circle.radiusSet("13600");
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -205,7 +205,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("40.418889, -3.691944", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("-3.691944, 40.418889", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -226,7 +226,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("40.316667, -3.75", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("-3.75, 40.316667", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -301,7 +301,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("40.418889, -3.691944", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("-3.691944, 40.418889", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -322,7 +322,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("40.533333, -3.633333", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("-3.633333, 40.533333", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -343,7 +343,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("40.316667, -3.75", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("-3.75, 40.316667", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -393,7 +393,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
     sc.areaType = orion::CircleType;
     sc.circle.center.latitudeSet("40.418889");
     sc.circle.center.longitudeSet("-3.691944");
-    sc.circle.radiusSet("14000");
+    sc.circle.radiusSet("13600");
     sc.circle.invertedSet("true");
     req.restriction.scopeVector.push_back(&sc);
 
@@ -404,8 +404,8 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_STREQ("", res.errorCode.reasonPhrase.c_str());
+    EXPECT_STREQ("", res.errorCode.details.c_str());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     int i;
@@ -419,7 +419,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("40.533333, -3.633333", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("-3.633333, 40.533333", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -496,7 +496,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn1)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("3, 2", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("2, 3", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -619,7 +619,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn2)
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
     EXPECT_EQ("WSG84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
-    EXPECT_EQ("7, 4", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("4, 7", RES_CER_ATTR(i, 0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
     EXPECT_EQ("attr_C", RES_CER_ATTR(i, 1)->value);
@@ -691,7 +691,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn3)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("3, 2", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("2, 3", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -769,7 +769,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut1)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("3, 2", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("2, 3", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -867,7 +867,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut2)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);    
-    EXPECT_EQ("7, 4", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("4, 7", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);

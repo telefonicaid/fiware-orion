@@ -40,7 +40,7 @@ payload='{
     {
       "name": "location",
       "type": "coords",
-      "value": "40.418889, -3.691944",
+      "value": "-3.691944, 40.418889",
       "metadatas": [
         {
           "name": "location",
@@ -70,7 +70,7 @@ payload='{
     {
       "name": "location",
       "type": "coords",
-      "value": "40.533333, -3.633333",
+      "value": "-3.633333, 40.533333",
       "metadatas": [
         {
           "name": "location",
@@ -101,7 +101,7 @@ payload='{
     {
       "name": "location",
       "type": "coords",
-      "value": "40.316667, -3.75",
+      "value": "-3.75, 40.316667",
       "metadatas": [
         {
           "name": "location",
@@ -118,8 +118,8 @@ payload='{
 orionCurl --url "$url" --payload "$payload" --json
 
 
-echo "4: ++++++++++ Madrid in 14 kms ++++++++++"
-# Query inside 14 kms radius from Madrid center
+echo "4: ++++++++++ Madrid in 13.5 kms ++++++++++"
+# Query inside 13.5 kms radius from Madrid center
 url="/NGSI10/queryContext"
 payload='{
     "entities": [
@@ -137,7 +137,7 @@ payload='{
                   "circle": {
                     "centerLatitude": "40.418889",
                     "centerLongitude": "-3.691944",
-                    "radius": "14000"
+                    "radius": "13500"
                   }
                 }
             }
@@ -174,8 +174,8 @@ payload='{
 }'
 orionCurl --url "$url" --payload "$payload" --json
 
-echo "6: ++++++++++++ Madrid out 14 kms ++++++++"
-# Query in 14 kms radius outside Madrid center
+echo "6: ++++++++++++ Madrid out 13.5 kms ++++++++"
+# Query in 13.5 kms radius outside Madrid center
 url="/NGSI10/queryContext"
 payload='{
   "entities": [
@@ -193,7 +193,7 @@ payload='{
         "circle": {
           "centerLatitude": "40.418889",
           "centerLongitude": "-3.691944",
-          "radius": "14000",
+          "radius": "13500",
           "inverted": "true"
         }
       }
@@ -311,7 +311,7 @@ Date: REGEX(.*)
         }
     ]
 }
-4: ++++++++++ Madrid in 14 kms ++++++++++
+4: ++++++++++ Madrid in 13.5 kms ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1157
 Content-Type: application/json
@@ -332,7 +332,7 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
-                        "value": "40.418889, -3.691944"
+                        "value": "-3.691944, 40.418889"
                     }
                 ],
                 "id": "Madrid",
@@ -357,7 +357,7 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
-                        "value": "40.316667, -3.75"
+                        "value": "-3.75, 40.316667"
                     }
                 ],
                 "id": "Leganes",
@@ -392,7 +392,7 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
-                        "value": "40.418889, -3.691944"
+                        "value": "-3.691944, 40.418889"
                     }
                 ],
                 "id": "Madrid",
@@ -417,7 +417,7 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
-                        "value": "40.533333, -3.633333"
+                        "value": "-3.633333, 40.533333"
                     }
                 ],
                 "id": "Alcobendas",
@@ -442,7 +442,7 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
-                        "value": "40.316667, -3.75"
+                        "value": "-3.75, 40.316667"
                     }
                 ],
                 "id": "Leganes",
@@ -456,7 +456,7 @@ Date: REGEX(.*)
         }
     ]
 }
-6: ++++++++++++ Madrid out 14 kms ++++++++
+6: ++++++++++++ Madrid out 13.5 kms ++++++++
 HTTP/1.1 200 OK
 Content-Length: 600
 Content-Type: application/json
@@ -477,7 +477,7 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
-                        "value": "40.533333, -3.633333"
+                        "value": "-3.633333, 40.533333"
                     }
                 ],
                 "id": "Alcobendas",
