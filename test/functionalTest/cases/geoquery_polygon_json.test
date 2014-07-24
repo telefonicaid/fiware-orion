@@ -28,7 +28,7 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "0: +++++++++ Prepare entities +++++++++++"
+echo "1: +++++++++ Point A +++++++++++"
 url="/NGSI10/updateContext"
 payload='{
   "contextElements": [
@@ -50,7 +50,20 @@ payload='{
       ]
     }
     ]
-  },
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+sleep 1.1
+echo
+echo
+
+
+echo "2: +++++++++ Point B +++++++++++"
+url="/NGSI10/updateContext"
+payload='{
+  "contextElements": [
   {
     "type": "Point",
     "isPattern": "false",
@@ -69,7 +82,20 @@ payload='{
       ]
     }
     ]
-  },
+  }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url "$url" --payload "$payload" --json
+sleep 1.1
+echo
+echo
+
+
+echo "3: +++++++++ Point C +++++++++++"
+url="/NGSI10/updateContext"
+payload='{
+  "contextElements": [
   {
     "type": "Point",
     "isPattern": "false",
@@ -93,8 +119,12 @@ payload='{
   "updateAction": "APPEND"
 }'
 orionCurl --url "$url" --payload "$payload" --json
+sleep 1.1
+echo
+echo
 
-echo "1: ++++++++++ Rectangle in: A, B ++++++++++"
+
+echo "4: ++++++++++ Rectangle in: A, B ++++++++++"
 url="/NGSI10/queryContext"
 payload='{
   "entities": [
@@ -135,8 +165,11 @@ payload='{
   }
 }'
 orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
 
-echo "2: ++++++++++ Rectangle in: B, C ++++++++++"
+
+echo "5: ++++++++++ Rectangle in: B, C ++++++++++"
 url="/NGSI10/queryContext"
 payload='{
   "entities": [
@@ -177,8 +210,11 @@ payload='{
   }
 }'
 orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
 
-echo "3: ++++++++++ Triangle in: A ++++++++++"
+
+echo "6: ++++++++++ Triangle in: A ++++++++++"
 url="/NGSI10/queryContext"
 payload='{
   "entities": [
@@ -215,8 +251,11 @@ payload='{
   }
 }'
 orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
 
-echo "4: ++++++++++ Rectangle out: A ++++++++++"
+
+echo "7: ++++++++++ Rectangle out: A ++++++++++"
 url="/NGSI10/queryContext"
 payload='{
   "entities": [
@@ -258,8 +297,11 @@ payload='{
   }
 }'
 orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
 
-echo "5: ++++++++++ Triangle out: B, C ++++++++++"
+
+echo "8: ++++++++++ Triangle out: B, C ++++++++++"
 url="/NGSI10/queryContext"
 payload='{
   "entities": [
@@ -297,11 +339,14 @@ payload='{
   }
 }'
 orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
 
 --REGEXPECT--
-0: +++++++++ Prepare entities +++++++++++
+1: +++++++++ Point A +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1652
+Content-Length: 572
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -331,7 +376,19 @@ Date: REGEX(.*)
                 "code": "200",
                 "reasonPhrase": "OK"
             }
-        },
+        }
+    ]
+}
+
+
+2: +++++++++ Point B +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 572
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
         {
             "contextElement": {
                 "attributes": [
@@ -356,7 +413,19 @@ Date: REGEX(.*)
                 "code": "200",
                 "reasonPhrase": "OK"
             }
-        },
+        }
+    ]
+}
+
+
+3: +++++++++ Point C +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 572
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
         {
             "contextElement": {
                 "attributes": [
@@ -384,7 +453,9 @@ Date: REGEX(.*)
         }
     ]
 }
-1: ++++++++++ Rectangle in: A, B ++++++++++
+
+
+4: ++++++++++ Rectangle in: A, B ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1120
 Content-Type: application/json
@@ -444,137 +515,9 @@ Date: REGEX(.*)
         }
     ]
 }
-2: ++++++++++ Rectangle in: B, C ++++++++++
-HTTP/1.1 200 OK
-Content-Length: 1120
-Content-Type: application/json
-Date: REGEX(.*)
 
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WSG84"
-                            }
-                        ],
-                        "name": "location",
-                        "type": "coords",
-                        "value": "5, 5"
-                    }
-                ],
-                "id": "B",
-                "isPattern": "false",
-                "type": "Point"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        },
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WSG84"
-                            }
-                        ],
-                        "name": "location",
-                        "type": "coords",
-                        "value": "7, 4"
-                    }
-                ],
-                "id": "C",
-                "isPattern": "false",
-                "type": "Point"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-3: ++++++++++ Triangle in: A ++++++++++
-HTTP/1.1 200 OK
-Content-Length: 576
-Content-Type: application/json
-Date: REGEX(.*)
 
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WSG84"
-                            }
-                        ],
-                        "name": "location",
-                        "type": "coords",
-                        "value": "3, 2"
-                    }
-                ],
-                "id": "A",
-                "isPattern": "false",
-                "type": "Point"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-4: ++++++++++ Rectangle out: A ++++++++++
-HTTP/1.1 200 OK
-Content-Length: 576
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WSG84"
-                            }
-                        ],
-                        "name": "location",
-                        "type": "coords",
-                        "value": "3, 2"
-                    }
-                ],
-                "id": "A",
-                "isPattern": "false",
-                "type": "Point"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-5: ++++++++++ Triangle out: B, C ++++++++++
+5: ++++++++++ Rectangle in: B, C ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1120
 Content-Type: application/json
@@ -634,5 +577,143 @@ Date: REGEX(.*)
         }
     ]
 }
+
+
+6: ++++++++++ Triangle in: A ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 576
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "3, 2"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+7: ++++++++++ Rectangle out: A ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 576
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "3, 2"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+8: ++++++++++ Triangle out: B, C ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1120
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "7, 4"
+                    }
+                ],
+                "id": "C",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
 --TEARDOWN--
 brokerStop CB
