@@ -28,7 +28,7 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "0: +++++++++ Prepare entities +++++++++++"
+echo "1: +++++++++ Point A +++++++++++"
 url="/NGSI10/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
@@ -52,6 +52,20 @@ payload='<?xml version="1.0"?>
         </contextAttribute>
       </contextAttributeList>
     </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+sleep 1.1
+echo
+echo
+
+
+echo "2: +++++++++ Point B +++++++++++"
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
     <contextElement>
       <entityId type="Point" isPattern="false">
         <id>B</id>
@@ -71,6 +85,20 @@ payload='<?xml version="1.0"?>
         </contextAttribute>
       </contextAttributeList>
     </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+sleep 1.1
+echo
+echo
+
+
+echo "3: +++++++++ Point C +++++++++++"
+url="/NGSI10/updateContext"
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
     <contextElement>
       <entityId type="Point" isPattern="false">
         <id>C</id>
@@ -94,15 +122,19 @@ payload='<?xml version="1.0"?>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
 orionCurl --url "$url" --payload "$payload"
+sleep 1.1
+echo
+echo
 
-echo "1: ++++++++++ Rectangle in: A, B ++++++++++"
+
+echo "4: ++++++++++ Rectangle in: A, B ++++++++++"
 url="/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
-        <entityId type="Point" isPattern="true">
-          <id>.*</id>
-        </entityId>
+    <entityId type="Point" isPattern="true">
+      <id>.*</id>
+    </entityId>
   </entityIdList>
   <attributeList>
   </attributeList>
@@ -137,15 +169,18 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </restriction>
 </queryContextRequest>'
 orionCurl --url "$url" --payload "$payload"
+echo
+echo
 
-echo "2: ++++++++++ Rectangle in: B, C ++++++++++"
+
+echo "5: ++++++++++ Rectangle in: B, C ++++++++++"
 url="/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
-        <entityId type="Point" isPattern="true">
-          <id>.*</id>
-        </entityId>
+    <entityId type="Point" isPattern="true">
+      <id>.*</id>
+    </entityId>
   </entityIdList>
   <attributeList>
   </attributeList>
@@ -180,15 +215,18 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </restriction>
 </queryContextRequest>'
 orionCurl --url "$url" --payload "$payload"
+echo
+echo
 
-echo "3: ++++++++++ Triangle in: A ++++++++++"
+
+echo "6: ++++++++++ Triangle in: A ++++++++++"
 url="/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
-        <entityId type="Point" isPattern="true">
-          <id>.*</id>
-        </entityId>
+    <entityId type="Point" isPattern="true">
+      <id>.*</id>
+    </entityId>
   </entityIdList>
   <attributeList>
   </attributeList>
@@ -219,15 +257,18 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </restriction>
 </queryContextRequest>'
 orionCurl --url "$url" --payload "$payload"
+echo
+echo
 
-echo "4: ++++++++++ Rectangle out: A ++++++++++"
+
+echo "7: ++++++++++ Rectangle out: A ++++++++++"
 url="/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
-        <entityId type="Point" isPattern="true">
-          <id>.*</id>
-        </entityId>
+    <entityId type="Point" isPattern="true">
+      <id>.*</id>
+    </entityId>
   </entityIdList>
   <attributeList>
   </attributeList>
@@ -263,15 +304,18 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </restriction>
 </queryContextRequest>'
 orionCurl --url "$url" --payload "$payload"
+echo
+echo
 
-echo "5: ++++++++++ Triangle out: B, C ++++++++++"
+
+echo "8: ++++++++++ Triangle out: B, C ++++++++++"
 url="/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
-        <entityId type="Point" isPattern="true">
-          <id>.*</id>
-        </entityId>
+    <entityId type="Point" isPattern="true">
+      <id>.*</id>
+    </entityId>
   </entityIdList>
   <attributeList>
   </attributeList>
@@ -303,11 +347,14 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </restriction>
 </queryContextRequest>'
 orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
 
 --REGEXPECT--
-0: +++++++++ Prepare entities +++++++++++
+1: +++++++++ Point A +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 2360
+Content-Length: 852
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -339,6 +386,19 @@ Date: REGEX(.*)
         <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+2: +++++++++ Point B +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 852
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
     <contextElementResponse>
       <contextElement>
         <entityId type="Point" isPattern="false">
@@ -364,6 +424,19 @@ Date: REGEX(.*)
         <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+3: +++++++++ Point C +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 852
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
     <contextElementResponse>
       <contextElement>
         <entityId type="Point" isPattern="false">
@@ -391,7 +464,9 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-1: ++++++++++ Rectangle in: A, B ++++++++++
+
+
+4: ++++++++++ Rectangle in: A, B ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1612
 Content-Type: application/xml
@@ -452,140 +527,9 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </queryContextResponse>
-2: ++++++++++ Rectangle in: B, C ++++++++++
-HTTP/1.1 200 OK
-Content-Length: 1612
-Content-Type: application/xml
-Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Point" isPattern="false">
-          <id>B</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>location</name>
-            <type>coords</type>
-            <contextValue>5, 5</contextValue>
-            <metadata>
-              <contextMetadata>
-                <name>location</name>
-                <type>string</type>
-                <value>WSG84</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Point" isPattern="false">
-          <id>C</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>location</name>
-            <type>coords</type>
-            <contextValue>7, 4</contextValue>
-            <metadata>
-              <contextMetadata>
-                <name>location</name>
-                <type>string</type>
-                <value>WSG84</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
-3: ++++++++++ Triangle in: A ++++++++++
-HTTP/1.1 200 OK
-Content-Length: 854
-Content-Type: application/xml
-Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Point" isPattern="false">
-          <id>A</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>location</name>
-            <type>coords</type>
-            <contextValue>3, 2</contextValue>
-            <metadata>
-              <contextMetadata>
-                <name>location</name>
-                <type>string</type>
-                <value>WSG84</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
-4: ++++++++++ Rectangle out: A ++++++++++
-HTTP/1.1 200 OK
-Content-Length: 854
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Point" isPattern="false">
-          <id>A</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>location</name>
-            <type>coords</type>
-            <contextValue>3, 2</contextValue>
-            <metadata>
-              <contextMetadata>
-                <name>location</name>
-                <type>string</type>
-                <value>WSG84</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
-5: ++++++++++ Triangle out: B, C ++++++++++
+5: ++++++++++ Rectangle in: B, C ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1612
 Content-Type: application/xml
@@ -646,5 +590,146 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </queryContextResponse>
+
+
+6: ++++++++++ Triangle in: A ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 854
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Point" isPattern="false">
+          <id>A</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>3, 2</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+7: ++++++++++ Rectangle out: A ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 854
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Point" isPattern="false">
+          <id>A</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>3, 2</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+8: ++++++++++ Triangle out: B, C ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1612
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Point" isPattern="false">
+          <id>B</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>5, 5</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Point" isPattern="false">
+          <id>C</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>7, 4</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
 --TEARDOWN--
 brokerStop CB
