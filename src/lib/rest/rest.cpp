@@ -773,9 +773,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
-      // LM_T(LmtMhd, ("Starting HTTPS daemon on IPv4 %s port %d", bindIp, port));
-      // FIXME P9:  Issue 458
-      //            if the above commented LM_T is uncommented, MHD stops receiving iny incoming requests.
+      LM_T(LmtMhd, ("Starting HTTPS daemon on IPv4 %s port %d", bindIp, port));
       mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_SSL, // MHD_USE_SELECT_INTERNALLY
                                    htons(port),
                                    NULL,
@@ -783,9 +781,9 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    connectionTreat,                     NULL,
                                    MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
                                    MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
-                                   MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
+                                   MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_END);
 
     }
@@ -797,9 +795,9 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    NULL,
                                    NULL,
                                    connectionTreat,                     NULL,
-                                   MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
+                                   MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_END);
 
     }
@@ -823,9 +821,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
-      // LM_T(LmtMhd, ("Starting HTTPS daemon on IPv6 %s port %d", bindIPv6, port));
-      // FIXME P9:  Issue 458
-      //            if the above commented LM_T is uncommented, MHD stops receiving iny incoming requests.
+      LM_T(LmtMhd, ("Starting HTTPS daemon on IPv6 %s port %d", bindIPv6, port));
       mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6 | MHD_USE_SSL,
                                       htons(port),
                                       NULL,
@@ -833,24 +829,22 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       connectionTreat,                     NULL,
                                       MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
                                       MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
-                                      MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
+                                      MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_END);
     }
     else
     {
-      // LM_T(LmtMhd, ("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
-      // FIXME P9:  Issue 458
-      //            if the above commented LM_T is uncommented, MHD stops receiving iny incoming requests.
+      LM_T(LmtMhd, ("Starting HTTP daemon on IPv6 %s port %d", bindIPv6, port));
       mhdDaemon_v6 = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_IPv6,
                                       htons(port),
                                       NULL,
                                       NULL,
                                       connectionTreat,                     NULL,
-                                      MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
+                                      MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_END);
     }
 
