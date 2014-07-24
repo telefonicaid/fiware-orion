@@ -11,3 +11,5 @@ o Logging modifications (Issue #428):
    o Stopped using LM_RE, LM_V* and _LM_RVE and removed tho CLI options -v, -vv, -vvv, -vvvv, -vvvvv
    o Added an LM_I for when thr broker starts and another when it exits (in a controlled manner).
 o Fix: double-quotes in output payload have been escaped (Issue #456)
+o Fix: Added tests to make sure that latitude and longitude are within range
+       (-90 <= latitude <=90)  and (-180 <= longitude <= 180) (Issue #461)
