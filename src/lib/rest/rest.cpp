@@ -752,7 +752,8 @@ static int connectionTreat
 */
 static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
-  bool mhdStartError = true;
+  bool   mhdStartError = true;
+  size_t memoryLimit   = 2 * PAYLOAD_SIZE;
 
   if (port == 0)
   {
@@ -781,7 +782,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    connectionTreat,                     NULL,
                                    MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
                                    MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
-                                   MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
+                                   MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_END);
@@ -795,7 +796,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    NULL,
                                    NULL,
                                    connectionTreat,                     NULL,
-                                   MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
+                                   MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
                                    MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_END);
@@ -829,7 +830,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       connectionTreat,                     NULL,
                                       MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
                                       MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
-                                      MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
+                                      MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_END);
@@ -842,7 +843,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       NULL,
                                       NULL,
                                       connectionTreat,                     NULL,
-                                      MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
+                                      MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
                                       MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_END);
