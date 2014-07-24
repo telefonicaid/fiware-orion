@@ -91,45 +91,107 @@ std::string Scope::check(RequestType requestType, Format format, const std::stri
     if (areaType == orion::CircleType)
     {
       if (circle.radiusString() == "0")
+      {
+        LM_W(("Bad Input (radius zero for a circle area)"));
         return "Radius zero for a circle area";
+      }
       else if (circle.radiusString() == "")
+      {
+        LM_W(("Bad Input (missing radius for circle area)"));
         return "Missing radius for circle area";
+      }
       else if (circle.invertedString() != "")
       {
         if (!isTrue(circle.invertedString()) && !isFalse(circle.invertedString()))
+        {
+          LM_W(("Bad Input (bad value for circle/inverted: '%s')", circle.invertedString().c_str()));
           return "bad value for circle/inverted: '" + circle.invertedString() + "'";
+        }
       }
       else if (circle.center.latitudeString() == "")
+      {
+        LM_W(("Bad Input (missing latitude for circle center)"));
         return "Missing latitude for circle center";
+      }
       else if (circle.center.longitudeString() == "")
+      {
+        LM_W(("Bad Input (missing longitude for circle center)"));
         return "Missing longitude for circle center";
+      }
+
+      float latitude = atof(circle.center.latitudeString().c_str());
+      if ((latitude > 90) || (latitude < -90))
+      {
+        LM_W(("Bad Input (invalid value for latitude (%s))", circle.center.latitudeString().c_str()));
+        return "invalid value for latitude";
+      }
+
+      float longitude = atof(circle.center.longitudeString().c_str());
+      if ((longitude > 180) || (longitude < -180))
+      {
+        LM_W(("Bad Input (invalid value for longitude: '%s')", circle.center.longitudeString().c_str()));
+        return "invalid value for longitude";
+      }
     }
     else if (areaType == orion::PolygonType)
     {
       if (polygon.vertexList.size() < 3)
+      {
+        LM_W(("Bad Input (too few vertices for a polygon (%d is less than three))", polygon.vertexList.size()));
         return "too few vertices for a polygon";
+      }
       else if (polygon.invertedString() != "")
       {
         if (!isTrue(polygon.invertedString()) && !isFalse(polygon.invertedString()))
+        {
+          LM_W(("Bad Input (bad value for polygon/inverted: '%s')", polygon.invertedString().c_str()));
           return "bad value for polygon/inverted: '" + polygon.invertedString() + "'";
+        }
       }
 
       for (unsigned int ix = 0; ix < polygon.vertexList.size(); ++ix)
       {
         if (polygon.vertexList[ix]->latitudeString() == "")
+        {
+          LM_W(("Bad Input (missing latitude value for polygon vertex)"));
           return std::string("missing latitude value for polygon vertex");
+        }
+
         if (polygon.vertexList[ix]->longitudeString() == "")
+        {
+          LM_W(("Bad Input (missing longitude value for polygon vertex)"));
           return std::string("missing longitude value for polygon vertex");
+        }
+
+        float latitude = atof(polygon.vertexList[ix]->latitudeString().c_str());
+        if ((latitude > 90) || (latitude < -90))
+        {
+          LM_W(("Bad Input (invalid value for latitude: '%s')", polygon.vertexList[ix]->latitudeString().c_str()));
+          return "invalid value for latitude";
+        }
+
+        float longitude = atof(polygon.vertexList[ix]->longitudeString().c_str());
+        if ((longitude > 180) || (longitude < -180))
+        {
+          LM_W(("Bad Input (invalid value for longitude: '%s')", polygon.vertexList[ix]->longitudeString().c_str()));
+          return "invalid value for longitude";
+        }
       }
     }
   }
   else
   {
     if (type == "")
+    {
+      LM_W(("Bad Input (empty type in restriction scope)"));
       return "Empty type in restriction scope";
+    }
 
     if (value == "")
+    {
+      LM_W(("Bad Input (empty value in restriction scope)"));
       return "Empty value in restriction scope";
+    }
   }
 
   return "OK";

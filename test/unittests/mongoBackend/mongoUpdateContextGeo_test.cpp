@@ -77,7 +77,7 @@ static void prepareDatabase(void) {
                         BSON("name" << "A1" << "type" << "TA1" << "value" << "-5, 2") <<
                         BSON("name" << "A2" << "type" << "TA2" << "value" << "noloc")
                         ) <<
-                     "location" << BSON("attrName" << "A1" << "coords" << BSON_ARRAY(-5.0 << 2.0))
+                     "location" << BSON("attrName" << "A1" << "coords" << BSON_ARRAY(2.0 << -5.0))
                     );
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
@@ -205,8 +205,8 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
-    EXPECT_EQ(-5, coordX(ent));
-    EXPECT_EQ(2, coordY(ent));
+    EXPECT_EQ(2, coordX(ent));
+    EXPECT_EQ(-5, coordY(ent));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -237,8 +237,8 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     EXPECT_EQ(1360232700, a3.getIntField("creDate"));
     EXPECT_EQ(1360232700, a3.getIntField("modDate"));
     EXPECT_STREQ("A3", ent.getObjectField("location").getStringField("attrName"));
-    EXPECT_EQ(4, coordX(ent));
-    EXPECT_EQ(-5, coordY(ent));
+    EXPECT_EQ(-5, coordX(ent));
+    EXPECT_EQ(4, coordY(ent));
 
     /* Release connection */
     mongoDisconnect();
@@ -331,8 +331,8 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
-    EXPECT_EQ(-5, coordX(ent));
-    EXPECT_EQ(2, coordY(ent));
+    EXPECT_EQ(2, coordX(ent));
+    EXPECT_EQ(-5, coordY(ent));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -354,8 +354,8 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     EXPECT_EQ(1360232700, a5.getIntField("creDate"));
     EXPECT_EQ(1360232700, a5.getIntField("modDate"));
     EXPECT_STREQ("A5", ent.getObjectField("location").getStringField("attrName"));
-    EXPECT_EQ(8, coordX(ent));
-    EXPECT_EQ(-9, coordY(ent));
+    EXPECT_EQ(-9, coordX(ent));
+    EXPECT_EQ(8, coordY(ent));
 
     /* Release connection */
     mongoDisconnect();
@@ -442,8 +442,8 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
-    EXPECT_EQ(2, coordX(ent));
-    EXPECT_EQ(-4, coordY(ent));
+    EXPECT_EQ(-4, coordX(ent));
+    EXPECT_EQ(2, coordY(ent));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -658,8 +658,8 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
-    EXPECT_EQ(-5, coordX(ent));
-    EXPECT_EQ(2, coordY(ent));
+    EXPECT_EQ(2, coordX(ent));
+    EXPECT_EQ(-5, coordY(ent));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -766,8 +766,8 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
-    EXPECT_EQ(-5, coordX(ent));
-    EXPECT_EQ(2, coordY(ent));
+    EXPECT_EQ(2, coordX(ent));
+    EXPECT_EQ(-5, coordY(ent));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -874,8 +874,8 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
-    EXPECT_EQ(-5, coordX(ent));
-    EXPECT_EQ(2, coordY(ent));
+    EXPECT_EQ(2, coordX(ent));
+    EXPECT_EQ(-5, coordY(ent));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -983,8 +983,8 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
-    EXPECT_EQ(-5, coordX(ent));
-    EXPECT_EQ(2, coordY(ent));
+    EXPECT_EQ(2, coordX(ent));
+    EXPECT_EQ(-5, coordY(ent));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -1091,8 +1091,8 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
-    EXPECT_EQ(-5, coordX(ent));
-    EXPECT_EQ(2, coordY(ent));
+    EXPECT_EQ(2, coordX(ent));
+    EXPECT_EQ(-5, coordY(ent));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -1199,8 +1199,8 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
-    EXPECT_EQ(-5, coordX(ent));
-    EXPECT_EQ(2, coordY(ent));
+    EXPECT_EQ(2, coordX(ent));
+    EXPECT_EQ(-5, coordY(ent));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -1302,8 +1302,8 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
-    EXPECT_EQ(-5, coordX(ent));
-    EXPECT_EQ(2, coordY(ent));
+    EXPECT_EQ(2, coordX(ent));
+    EXPECT_EQ(-5, coordY(ent));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -1410,8 +1410,8 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
-    EXPECT_EQ(-5, coordX(ent));
-    EXPECT_EQ(2, coordY(ent));
+    EXPECT_EQ(2, coordX(ent));
+    EXPECT_EQ(-5, coordY(ent));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -1519,8 +1519,8 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
-    EXPECT_EQ(-5, coordX(ent));
-    EXPECT_EQ(2, coordY(ent));
+    EXPECT_EQ(2, coordX(ent));
+    EXPECT_EQ(-5, coordY(ent));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));

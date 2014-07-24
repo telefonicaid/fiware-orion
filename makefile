@@ -303,8 +303,7 @@ unit_test: build_unit_test
         fi
 	@echo '------------------------------- unit_test ended ---------------------------------'
 
-# FIXME P9: Issue #458 (functional tests don't work in Ubuntu 13.10. Problem with MHD)
-functional_test: install_debug
+functional_test: install
 	./test/functionalTest/testHarness.sh
 
 functional_test_debug: install_debug

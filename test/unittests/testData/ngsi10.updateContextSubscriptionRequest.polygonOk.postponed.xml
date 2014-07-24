@@ -19,11 +19,11 @@
               </vertex>
               <vertex>
                 <longitude>110</longitude>
-                <latitude>120</latitude>
+                <latitude>90</latitude>
               </vertex>
               <vertex>
-                <longitude>210</longitude>
-                <latitude>220</latitude>
+                <longitude>120</longitude>
+                <latitude>60</latitude>
               </vertex>
             </vertexList>
           </polygon>

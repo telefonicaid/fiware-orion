@@ -346,6 +346,7 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   char* comma;
   char* number1;
   char* number2;
+  bool  ret = true;
 
   cP = wsStrip(cP);
 
@@ -371,8 +372,8 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   if (err.length() > 0)
   {
     latitude = oldLatitude;
-    free(initial);
-    return false;
+    LM_W(("Bad Input (bad latitude value in coordinate string '%s')", initial));
+    ret = false;
   }
   else
   {
@@ -382,13 +383,24 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
       /* Rollback latitude */
       latitude = oldLatitude;
       longitude = oldLongitude;
-      free(initial);
-      return false;
+      LM_W(("Bad Input (bad longitude value in coordinate string '%s')", initial));
+      ret = false;
     }
   }
 
+  if ((latitude > 90) || (latitude < -90))
+  {
+    LM_W(("Bad Input (bad value for latitude '%s')", initial));
+    ret = false;
+  }
+  else if ((longitude > 180) || (longitude < -180))
+  {
+    LM_W(("Bad Input (bad value for longitude '%s')", initial));
+    ret = false;
+  }
+
   free(initial);
-  return true;
+  return ret;
 }
 
 
