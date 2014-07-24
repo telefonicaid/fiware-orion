@@ -40,7 +40,7 @@ payload='{
     {
       "name": "location",
       "type": "coords",
-      "value": "-3.691944, 40.418889",
+      "value": "40.418889, -3.691944",
       "metadatas": [
         {
           "name": "location",
@@ -70,7 +70,7 @@ payload='{
     {
       "name": "location",
       "type": "coords",
-      "value": "-3.633333, 40.533333",
+      "value": "40.533333, -3.633333",
       "metadatas": [
         {
           "name": "location",
@@ -101,7 +101,7 @@ payload='{
     {
       "name": "location",
       "type": "coords",
-      "value": "-3.75, 40.316667",
+      "value": "40.316667, -3.75",
       "metadatas": [
         {
           "name": "location",
@@ -332,7 +332,7 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
-                        "value": "-3.691944, 40.418889"
+                        "value": "40.418889, -3.691944"
                     }
                 ],
                 "id": "Madrid",
@@ -357,7 +357,7 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
-                        "value": "-3.75, 40.316667"
+                        "value": "40.316667, -3.75"
                     }
                 ],
                 "id": "Leganes",
@@ -392,7 +392,7 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
-                        "value": "-3.691944, 40.418889"
+                        "value": "40.418889, -3.691944"
                     }
                 ],
                 "id": "Madrid",
@@ -417,7 +417,7 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
-                        "value": "-3.633333, 40.533333"
+                        "value": "40.533333, -3.633333"
                     }
                 ],
                 "id": "Alcobendas",
@@ -442,7 +442,7 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
-                        "value": "-3.75, 40.316667"
+                        "value": "40.316667, -3.75"
                     }
                 ],
                 "id": "Leganes",
@@ -477,7 +477,7 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
-                        "value": "-3.633333, 40.533333"
+                        "value": "40.533333, -3.633333"
                     }
                 ],
                 "id": "Alcobendas",

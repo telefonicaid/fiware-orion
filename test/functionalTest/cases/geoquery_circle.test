@@ -41,7 +41,7 @@ payload='<?xml version="1.0"?>
         <contextAttribute>
           <name>location</name>
           <type>coords</type>
-          <contextValue>-3.691944, 40.418889</contextValue>
+          <contextValue>40.418889, -3.691944</contextValue>
           <metadata>
             <contextMetadata>
               <name>location</name>
@@ -73,7 +73,7 @@ payload='<?xml version="1.0"?>
         <contextAttribute>
           <name>location</name>
           <type>coords</type>
-          <contextValue>-3.633333, 40.533333</contextValue>
+          <contextValue>40.533333, -3.633333</contextValue>
           <metadata>
             <contextMetadata>
               <name>location</name>
@@ -105,7 +105,7 @@ payload='<?xml version="1.0"?>
         <contextAttribute>
           <name>location</name>
           <type>coords</type>
-          <contextValue>-3.75, 40.316667</contextValue>
+          <contextValue>40.316667, -3.75</contextValue>
           <metadata>
             <contextMetadata>
               <name>location</name>
@@ -345,7 +345,7 @@ Date: REGEX(.*)
           <contextAttribute>
             <name>location</name>
             <type>coords</type>
-            <contextValue>-3.691944, 40.418889</contextValue>
+            <contextValue>40.418889, -3.691944</contextValue>
             <metadata>
               <contextMetadata>
                 <name>location</name>
@@ -370,7 +370,7 @@ Date: REGEX(.*)
           <contextAttribute>
             <name>location</name>
             <type>coords</type>
-            <contextValue>-3.75, 40.316667</contextValue>
+            <contextValue>40.316667, -3.75</contextValue>
             <metadata>
               <contextMetadata>
                 <name>location</name>
@@ -407,7 +407,7 @@ Date: REGEX(.*)
           <contextAttribute>
             <name>location</name>
             <type>coords</type>
-            <contextValue>-3.691944, 40.418889</contextValue>
+            <contextValue>40.418889, -3.691944</contextValue>
             <metadata>
               <contextMetadata>
                 <name>location</name>
@@ -432,7 +432,7 @@ Date: REGEX(.*)
           <contextAttribute>
             <name>location</name>
             <type>coords</type>
-            <contextValue>-3.633333, 40.533333</contextValue>
+            <contextValue>40.533333, -3.633333</contextValue>
             <metadata>
               <contextMetadata>
                 <name>location</name>
@@ -457,7 +457,7 @@ Date: REGEX(.*)
           <contextAttribute>
             <name>location</name>
             <type>coords</type>
-            <contextValue>-3.75, 40.316667</contextValue>
+            <contextValue>40.316667, -3.75</contextValue>
             <metadata>
               <contextMetadata>
                 <name>location</name>
@@ -494,7 +494,7 @@ Date: REGEX(.*)
           <contextAttribute>
             <name>location</name>
             <type>coords</type>
-            <contextValue>-3.633333, 40.533333</contextValue>
+            <contextValue>40.533333, -3.633333</contextValue>
             <metadata>
               <contextMetadata>
                 <name>location</name>
