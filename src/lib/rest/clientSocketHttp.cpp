@@ -154,31 +154,19 @@ std::string sendHttpSocket
    bool                   waitForResponse
 )
 {
-  char                       buffer[TAM_BUF];
-  char                       response[TAM_BUF];
-  char                       preContent[TAM_BUF];
-  char                       portAsString[16];
-  char                       msgStatic[MAX_STA_MSG_SIZE];
-  char*                      what               = (char*) "static";
-  char*                      msgDynamic         = NULL;
-  char*                      msg                = msgStatic;   // by default, use the static buffer
-  std::string                rushHeaderIP       = "";
+  char                       portAsString[16];  std::string                rushHeaderIP       = "";
   unsigned short             rushHeaderPort     = 0;
-  std::string                rushHttpHeaders    = "";
+  std::string                headerRushHttp    = "";
   static unsigned long long  callNo             = 0;
   std::string                result;
   std::string                ip                 = _ip;
-  std::string                url;
 
   CURL*                      curl               = curl_easy_init();
+  CURLM*                     multiHandle        = NULL;
   struct curl_slist*         headers            = NULL;
   MemoryStruct*              httpResponse       = NULL;
   CURLcode                   res;
   size_t                     size;
-
-  //char*         url                      = NULL;
-  //int           recvURILen               = 0;
-  //char          uriBuffer[URI_BUF];
 
   ++callNo;
 
@@ -232,6 +220,11 @@ std::string sendHttpSocket
     return "error";
   }
 
+  // Allocate to hold HTTP response
+  httpResponse = new MemoryStruct;
+  httpResponse->memory = (char*) malloc(1); // will grow as needed
+  httpResponse->size = 0; // no data at this point
+
   //
   // Rush
   // Every call to sendHttpSocket specifies whether RUSH should be used or not.
@@ -255,130 +248,106 @@ std::string sendHttpSocket
       port           = rushPort;
 
       sprintf(portAsString, "%d", (int) rushHeaderPort);
-      rushHttpHeaders = "X-relayer-host: " + rushHeaderIP + ":" + portAsString + "\n";
+      headerRushHttp = "X-relayer-host: " + rushHeaderIP + ":" + portAsString;
+      headers = curl_slist_append(headers, headerRushHttp.c_str());
+
       if (protocol == "https:")
-        rushHttpHeaders += "X-relayer-protocol: https\n";
+      {
+        headerRushHttp = "X-relayer-protocol: https";
+        headers = curl_slist_append(headers, headerRushHttp.c_str());
+      }
+
     }
   }
 
-  // Buffers clear
-  memset(buffer, 0, TAM_BUF);
-  memset(response, 0, TAM_BUF);
-  memset(msg, 0, MAX_STA_MSG_SIZE);
-
-
-  // USER AGENT
+  // User agent
   size = sizeof(versionGet()) + 18;
-  char* userAgentHeader = new char[size];
-  snprintf(userAgentHeader, size, "User-Agent: orion/%s", versionGet());
-  headers = curl_slist_append(headers, userAgentHeader);
+  char* headerUserAgent = new char[size];
+  snprintf(headerUserAgent, size, "User-Agent: orion/%s", versionGet());
+  headers = curl_slist_append(headers, headerUserAgent);
 
-  // HOST
-  size = sizeof(ip.size() + 13;
-  char* hostHeader = new char[size];
-  snprintf(hostHeader, size, "Host: %s:%d", ip.c_str(), (int) port);
-  headers = curl_slist_append(headers, hostHeader);
+  // Host
+  size = sizeof(ip.size()) + 13;
+  char* headerHost = new char[size];
+  snprintf(headerHost, size, "Host: %s:%d", ip.c_str(), (int) port);
+  headers = curl_slist_append(headers, headerHost);
 
-  // ACCEPT
-  headers = curl_slist_append(headers, "Accept: application/xml, application/json");
-
-  // Rush
-  headers = curl_slist_append(headers, rushHttpHeaders.c_str());
-
-  // Prepare URL
-  url = ip + resource;
-
-  // --- Prepare CURL handle with obtained options
-  curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-  curl_easy_setopt(curl, CURLOPT_PORT, port);
-  curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L); // Allow redirection (?)
-  curl_easy_setopt(curl, CURLOPT_HEADER, 1); // Activate include the header in the body output
-  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); // Put headers in place
-  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
-  curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) httpResponse); // Custom data for response handling
-
-  // ------------------------------------------------------------------------------------------------------
-
-  // Allocate to hold HTTP response
-  httpResponse = new MemoryStruct;
-  httpResponse->memory = (char*) malloc(1); // will grow as needed
-  httpResponse->size = 0; // no data at this point
-
-  // --- Set HTTP verb
-  std::string httpVerb = "";
-
-  // TODO: get verb
-  curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, httpVerb.c_str());
-  //LM_T(LmtCoap, ("Got an HTTP %s", httpVerb.c_str()));
-
-
-  // --- Prepare headers
-
-
-  std::string string = "bla";
-  // TODO add all headers here
-  headers = curl_slist_append(headers, string.c_str());
-  // Set Expect
-  headers = curl_slist_append(headers, "Expect: ");
-
-
-  // Set Content-length
-  std::stringstream contentLengthStringStream;
-  contentLengthStringStream << 123;
-  std::string finalString = "Content-length: " + contentLengthStringStream.str();
-  headers = curl_slist_append(headers, finalString.c_str());
-  //LM_T(LmtCoap, ("Got: '%s'", finalString.c_str()));
-
-  // --- Set contents
-  //char* payload = (char*) request->getPayloadCopy();
-  char* payload = (char*) 0;
-  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
-
-
-
-  // --- Prepare URL
-  //request->getURI(uriBuffer, URI_BUF, &recvURILen);
-
-//    url = new char[strlen(host) + recvURILen + 1];
-//    strcpy(url, host);
-//    if (recvURILen > 0)
-//      strncat(url, uriBuffer, recvURILen);
-//    url[strlen(host) + recvURILen] = '\0';
-//    LM_T(LmtCoap, ("URL: '%s'", url));
-
-  // --- Prepare CURL handle with obtained options
-  curl_easy_setopt(curl, CURLOPT_URL, url);
-  curl_easy_setopt(curl, CURLOPT_PORT, port);
-  curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L); // Allow redirection (?)
-  curl_easy_setopt(curl, CURLOPT_HEADER, 1); // Activate include the header in the body output
-  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); // Put headers in place
-  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
-  curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) httpResponse); // Custom data for response handling
-
-
-  // --- Do HTTP Request
-  res = curl_easy_perform(curl);
-  if (res != CURLE_OK)
+  // Tenant
+  if (tenant != "")
   {
-    LM_W(("curl_easy_perform() failed: %s\n", curl_easy_strerror(res)));
-
-    // --- Cleanup curl environment
-    curl_slist_free_all(headers);
-    curl_easy_cleanup(curl);
-    delete url;
-
-    return "";
+    headers = curl_slist_append(headers, ("fiware-service: " + tenant).c_str());
   }
 
-  // --- Cleanup curl environment
+  // Accept
+  headers = curl_slist_append(headers, "Accept: application/xml, application/json");
+
+  // Content-length
+  std::stringstream contentLengthStringStream;
+  contentLengthStringStream << content.size();
+  std::string headerContentLength = "Content-length: " + contentLengthStringStream.str();
+  headers = curl_slist_append(headers, headerContentLength.c_str());
+
+  // Content-type
+  headers = curl_slist_append(headers, ("Content-type: " + content_type).c_str());
+
+  // Contents
+  const char* payload = content.c_str();
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
+
+  // Prepare CURL handle with obtained options
+  curl_easy_setopt(curl, CURLOPT_URL, (ip + "/" + resource).c_str());
+  curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, verb.c_str()); // Set HTTP verb
+  curl_easy_setopt(curl, CURLOPT_PORT, port);
+  curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L); // Allow redirection (?)
+  curl_easy_setopt(curl, CURLOPT_HEADER, 1); // Activate include the header in the body output
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); // Put headers in place
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) httpResponse); // Custom data for response handling
+
+  // Set Expect ?
+  //headers = curl_slist_append(headers, "Expect: ");
+
+
+  if (waitForResponse)
+  {
+    // Synchronous HTTP request
+    res = curl_easy_perform(curl);
+
+    if (res != CURLE_OK)
+    {
+      LM_W(("curl_easy_perform() failed: %s\n", curl_easy_strerror(res)));
+      result = "";
+    }
+    else
+    {
+      // The Response is here
+      result.assign(httpResponse->memory, httpResponse->size);
+    }
+  }
+  else
+  {
+    int runningHandles;
+
+    multiHandle = curl_multi_init();
+    curl_multi_add_handle(multiHandle, curl);
+
+    // Asynchronous HTTP request
+    curl_multi_perform(multiHandle, &runningHandles);
+
+    // No response
+    result = "";
+
+    curl_multi_cleanup(multiHandle);
+  }
+
+  // Cleanup curl environment
   curl_slist_free_all(headers);
   curl_easy_cleanup(curl);
-  delete url;
 
+  free(httpResponse->memory);
+  delete httpResponse;
 
-  std::string ret;
-  ret.assign(httpResponse->memory, httpResponse->size);
-  return ret;
+  return result;
 }
 
 
@@ -399,7 +368,7 @@ std::string sendHttpSocket
 * calloc/free syscalls if the notification payload is not very large.
 *
 */
-std::string sendHttpSocket_old
+std::string sendHttpSocket2
 (
    const std::string&     _ip,
    unsigned short         port,
