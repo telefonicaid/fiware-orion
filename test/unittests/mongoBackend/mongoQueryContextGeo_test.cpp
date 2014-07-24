@@ -74,7 +74,7 @@ static void prepareDatabase(void) {
                         BSON("name" << "pos" << "type" << "location" << "value" << "2, 3") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_A")
                         ) <<
-                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(2.0 << 3.0))
+                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(3.0 << 2.0))
                     );
 
   BSONObj B = BSON("_id" << BSON("id" << "B" << "type" << "Point") <<
@@ -90,7 +90,7 @@ static void prepareDatabase(void) {
                         BSON("name" << "pos" << "type" << "location" << "value" << "4, 7") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_C")
                         ) <<
-                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(4.0 << 7.0))
+                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(7.0 << 4.0))
                     );
 
   // Entity D hasn't a location attribute (i.e. no location field). This entity will be never returned
@@ -104,7 +104,7 @@ static void prepareDatabase(void) {
 
   BSONObj city1 = BSON("_id" << BSON("id" << "Madrid" << "type" << "City") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << "-3.691944, 40.418889") <<
+                        BSON("name" << "pos" << "type" << "location" << "value" << "40.418889, -3.691944") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_Mad")
                         ) <<
                      "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.691944 << 40.418889))
@@ -112,7 +112,7 @@ static void prepareDatabase(void) {
 
   BSONObj city2 = BSON("_id" << BSON("id" << "Alcobendas" << "type" << "City") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << "-3.633333, 40.533333") <<
+                        BSON("name" << "pos" << "type" << "location" << "value" << "40.533333, -3.633333") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_Alc")
                         ) <<
                      "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.633333 << 40.533333))
@@ -120,7 +120,7 @@ static void prepareDatabase(void) {
 
   BSONObj city3 = BSON("_id" << BSON("id" << "Leganes" << "type" << "City") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << "-3.75, 40.316667") <<
+                        BSON("name" << "pos" << "type" << "location" << "value" << "40.316667, -3.75") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_Leg")
                         ) <<
                      "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.75 << 40.316667))
@@ -205,7 +205,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("-3.691944, 40.418889", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("40.418889, -3.691944", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -226,7 +226,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("-3.75, 40.316667", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("40.316667, -3.75", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -301,7 +301,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("-3.691944, 40.418889", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("40.418889, -3.691944", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -322,7 +322,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("-3.633333, 40.533333", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("40.533333, -3.633333", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -343,7 +343,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("-3.75, 40.316667", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("40.316667, -3.75", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -419,7 +419,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("-3.633333, 40.533333", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("40.533333, -3.633333", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
