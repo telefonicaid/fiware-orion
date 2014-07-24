@@ -162,7 +162,7 @@ std::string sendHttpSocket
   std::string                ip                 = _ip;
 
   CURL*                      curl               = curl_easy_init();
-  CURLM*                     multiHandle        = NULL;
+  CURLM*                     multiHandle        = curl_multi_init();
   struct curl_slist*         headers            = NULL;
   MemoryStruct*              httpResponse       = NULL;
   CURLcode                   res;
@@ -281,6 +281,9 @@ std::string sendHttpSocket
   // Accept
   headers = curl_slist_append(headers, "Accept: application/xml, application/json");
 
+  // Expect
+  headers = curl_slist_append(headers, "Expect: ");
+
   // Content-length
   std::stringstream contentLengthStringStream;
   contentLengthStringStream << content.size();
@@ -294,8 +297,11 @@ std::string sendHttpSocket
   const char* payload = content.c_str();
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
 
+  std::string url;
+  url = ip + (resource.at(0) == '/'? "" : "/") + resource;
+
   // Prepare CURL handle with obtained options
-  curl_easy_setopt(curl, CURLOPT_URL, (ip + "/" + resource).c_str());
+  curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, verb.c_str()); // Set HTTP verb
   curl_easy_setopt(curl, CURLOPT_PORT, port);
   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L); // Allow redirection (?)
@@ -308,8 +314,8 @@ std::string sendHttpSocket
   //headers = curl_slist_append(headers, "Expect: ");
 
 
-  if (waitForResponse)
-  {
+//  if (waitForResponse)
+//  {
     // Synchronous HTTP request
     res = curl_easy_perform(curl);
 
@@ -323,26 +329,25 @@ std::string sendHttpSocket
       // The Response is here
       result.assign(httpResponse->memory, httpResponse->size);
     }
-  }
-  else
-  {
-    int runningHandles;
+//  }
+//  else
+//  {
+//    int runningHandles;
 
-    multiHandle = curl_multi_init();
-    curl_multi_add_handle(multiHandle, curl);
+//    //multiHandle = curl_multi_init();
+//    curl_multi_add_handle(multiHandle, curl);
 
-    // Asynchronous HTTP request
-    curl_multi_perform(multiHandle, &runningHandles);
+//    // Asynchronous HTTP request
+//    curl_multi_perform(multiHandle, &runningHandles);
 
-    // No response
-    result = "";
-
-    curl_multi_cleanup(multiHandle);
-  }
+//    // No response
+//    result = "";
+//  }
 
   // Cleanup curl environment
   curl_slist_free_all(headers);
   curl_easy_cleanup(curl);
+  curl_multi_cleanup(multiHandle);
 
   free(httpResponse->memory);
   delete httpResponse;
