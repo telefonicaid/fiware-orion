@@ -330,7 +330,7 @@ Date: REGEX(.*)
 
 Accumulated data:
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 739
+Content-Length: 738
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -360,10 +360,9 @@ Content-Type: application/xml
     </contextElementResponse>
   </contextResponseList>
 </notifyContextRequest>
-
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 739
+Content-Length: 738
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -393,10 +392,9 @@ Content-Type: application/xml
     </contextElementResponse>
   </contextResponseList>
 </notifyContextRequest>
-
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 740
+Content-Length: 739
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -426,10 +424,9 @@ Content-Type: application/xml
     </contextElementResponse>
   </contextResponseList>
 </notifyContextRequest>
-
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 740
+Content-Length: 739
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -459,7 +456,6 @@ Content-Type: application/xml
     </contextElementResponse>
   </contextResponseList>
 </notifyContextRequest>
-
 =======================================
 --TEARDOWN--
 brokerStop CB

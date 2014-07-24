@@ -250,7 +250,7 @@ Date: REGEX(.*)
 5. Dump accumulator t_01
 +++++++++++++++++++++++++
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 725
+Content-Length: 724
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -281,14 +281,13 @@ Content-Type: application/xml
     </contextElementResponse>
   </contextResponseList>
 </notifyContextRequest>
-
 =======================================
 
 
 6. Dump accumulator t_02
 +++++++++++++++++++++++++
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 725
+Content-Length: 724
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -319,7 +318,6 @@ Content-Type: application/xml
     </contextElementResponse>
   </contextResponseList>
 </notifyContextRequest>
-
 =======================================
 
 --TEARDOWN--

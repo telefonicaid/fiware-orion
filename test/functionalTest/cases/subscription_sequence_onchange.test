@@ -587,7 +587,7 @@ Date: REGEX(.*)
 Accumulated data:
 =================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 738
+Content-Length: 737
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -617,10 +617,9 @@ Content-Type: application/xml
     </contextElementResponse>
   </contextResponseList>
 </notifyContextRequest>
-
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 912
+Content-Length: 911
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -655,10 +654,9 @@ Content-Type: application/xml
     </contextElementResponse>
   </contextResponseList>
 </notifyContextRequest>
-
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 912
+Content-Length: 911
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -693,10 +691,9 @@ Content-Type: application/xml
     </contextElementResponse>
   </contextResponseList>
 </notifyContextRequest>
-
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 911
+Content-Length: 910
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -731,7 +728,6 @@ Content-Type: application/xml
     </contextElementResponse>
   </contextResponseList>
 </notifyContextRequest>
-
 =======================================
 
 --TEARDOWN--

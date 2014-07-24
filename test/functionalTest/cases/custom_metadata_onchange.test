@@ -450,7 +450,7 @@ Date: REGEX(.*)
 
 === Get accumulated data (4 messages)
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 798
+Content-Length: 797
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -492,10 +492,9 @@ Content-Type: application/json
     }
   ]
 }
-
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 798
+Content-Length: 797
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -537,10 +536,9 @@ Content-Type: application/json
     }
   ]
 }
-
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 798
+Content-Length: 797
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -582,10 +580,9 @@ Content-Type: application/json
     }
   ]
 }
-
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 800
+Content-Length: 799
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -627,7 +624,6 @@ Content-Type: application/json
     }
   ]
 }
-
 =======================================
 
 --TEARDOWN--

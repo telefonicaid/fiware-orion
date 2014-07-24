@@ -333,7 +333,7 @@ Date: REGEX(.*)
 </unsubscribeContextResponse>
 8: ++++++++++++++++++++
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 739
+Content-Length: 738
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -363,7 +363,7 @@ Content-Type: application/xml
     </contextElementResponse>
   </contextResponseList>
 </notifyContextRequest>
-
+=======================================
 NUMBER: 16
 TIMES: REGEX((0, 2, 4, 5, 9, 13, 14, 24, 34, 35, 37, 39, 53, 65, 67, 69|0, 2, 4, 5, 9, 13, 14, 24, 34, 35, 37, 39, 51, 63, 67, 69))
 
