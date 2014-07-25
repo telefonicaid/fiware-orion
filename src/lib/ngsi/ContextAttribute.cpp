@@ -193,6 +193,7 @@ std::string ContextAttribute::check(RequestType requestType, Format format, cons
     return "OK";
   }
 
+#if 0
   // For ngsi10 updateContextRequest, the check of empty context attribute values is made by
   // the mongoBackend layer, thus is skipped here.
   // The reason is that in a later stage we have more info to return to the caller in case of errors
@@ -201,7 +202,7 @@ std::string ContextAttribute::check(RequestType requestType, Format format, cons
     if (value == "")
       return "missing attribute value";
   }
-  
+#endif  
 
   return "OK";
 }

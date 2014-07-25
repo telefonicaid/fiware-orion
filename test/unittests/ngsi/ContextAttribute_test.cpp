@@ -50,7 +50,7 @@ TEST(ContextAttribute, checkOne)
   ca.value = "";
 
   res     = ca.check(RegisterContext, XML, "", "", 0);
-  EXPECT_TRUE(res == "missing attribute value");
+  EXPECT_TRUE(res == "OK");
   
   ca.value = "Algun valor cualquiera";
   res     = ca.check(RegisterContext, XML, "", "", 0);
