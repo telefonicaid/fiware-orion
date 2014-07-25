@@ -131,7 +131,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
             if (!connection->auth("admin", std::string(username), std::string(passwd), err))
             {
                 mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
-                LM_E(("Database Startup Error (authentication: db=admin, username=%s, pswd=%s): %s", username, passwd, err.c_str()));
+                LM_E(("Database Startup Error (authentication: db='admin', username='%s', password='*****': %s)", username, err.c_str()));
                 return false;
             }
         }
@@ -141,7 +141,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
             if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err))
             {
                 mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
-                LM_E(("Database Startup Error (authentication: db=%s, username=%s, pswd=%s): %s", db, username, passwd, err.c_str()));
+                LM_E(("Database Startup Error (authentication: db='%s', username='%s', password='*****': %s)", db, username, err.c_str()));
                 return false;
             }
         }
