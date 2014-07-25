@@ -47,69 +47,23 @@
 
 #include <curl/curl.h>
 
-/* ****************************************************************************
+/*
+* See [1] for a discussion on how curl_multi is to be used. Libcurl does not seem
+* to provide a way to do asynchronous HTTP transactions in the way we intended
+* with the previous version of sendHttpSocket. To enable the old behavior of asynchronous
+* HTTP requests uncomment the following #define line.
 *
-* socketHttpConnect -
+* [1] http://stackoverflow.com/questions/24288513/how-to-do-curl-multi-perform-asynchronously-in-c
 */
-int socketHttpConnect(const std::string& host, unsigned short port)
-{
-  int                 fd;
-  struct addrinfo     hints;
-  struct addrinfo*    peer;
-  char                port_str[10];
 
-  memset(&hints, 0, sizeof(struct addrinfo));
-  hints.ai_socktype = SOCK_STREAM;
-  hints.ai_protocol = 0;
+//#define USE_OLD_SENDHTTPSOCKET
 
-  if (ipVersionUsed == IPV4) 
-  {
-    hints.ai_family = AF_INET;
-    LM_T(LmtIpVersion, ("Allow IPv4 only"));
-  }
-  else if (ipVersionUsed == IPV6)
-  {
-    hints.ai_family = AF_INET6;
-    LM_T(LmtIpVersion, ("Allow  IPv6 only"));
-  }
-  else 
-  {
-    hints.ai_family = AF_UNSPEC;
-    LM_T(LmtIpVersion, ("Allow IPv4 or IPv6"));
-  }
-
-  snprintf(port_str, sizeof(port_str), "%d" , (int) port);
-
-  if (getaddrinfo(host.c_str(), port_str, &hints, &peer) != 0)
-  {
-    LM_W(("Notification failure for %s:%d (getaddrinfo: %s)", host.c_str(), port, strerror(errno)));
-    return -1;
-  }
-
-  if ((fd = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol)) == -1)
-  {
-    LM_W(("Notification failure for %s:%d (socket: %s)", host.c_str(), port, strerror(errno)));
-    return -1;
-  }
-
-  if (connect(fd, peer->ai_addr, peer->ai_addrlen) == -1)
-  {
-    freeaddrinfo(peer);
-    close(fd);
-    LM_W(("Notification failure for %s:%d (connect: %s)", host.c_str(), port, strerror(errno)));
-    return -1;
-  }
-
-  freeaddrinfo(peer);
-  return fd;
-}
-
+#ifndef USE_OLD_SENDHTTPSOCKET
 
 struct MemoryStruct {
   char*   memory;
   size_t  size;
 };
-
 
 /* ****************************************************************************
 *
@@ -139,7 +93,6 @@ size_t writeMemoryCallback(void* contents, size_t size, size_t nmemb, void* user
 *
 * sendHttpRequest -
 */
-//std::string sendHttpRequest(const char* host, unsigned short port)
 std::string sendHttpSocket
 (
    const std::string&     _ip,
@@ -162,7 +115,6 @@ std::string sendHttpSocket
   std::string                ip                 = _ip;
 
   CURL*                      curl               = curl_easy_init();
-  CURLM*                     multiHandle        = curl_multi_init();
   struct curl_slist*         headers            = NULL;
   MemoryStruct*              httpResponse       = NULL;
   CURLcode                   res;
@@ -310,44 +262,23 @@ std::string sendHttpSocket
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) httpResponse); // Custom data for response handling
 
-  // Set Expect ?
-  //headers = curl_slist_append(headers, "Expect: ");
+  // Synchronous HTTP request
+  res = curl_easy_perform(curl);
 
-
-//  if (waitForResponse)
-//  {
-    // Synchronous HTTP request
-    res = curl_easy_perform(curl);
-
-    if (res != CURLE_OK)
-    {
-      LM_W(("curl_easy_perform() failed: %s\n", curl_easy_strerror(res)));
-      result = "";
-    }
-    else
-    {
-      // The Response is here
-      result.assign(httpResponse->memory, httpResponse->size);
-    }
-//  }
-//  else
-//  {
-//    int runningHandles;
-
-//    //multiHandle = curl_multi_init();
-//    curl_multi_add_handle(multiHandle, curl);
-
-//    // Asynchronous HTTP request
-//    curl_multi_perform(multiHandle, &runningHandles);
-
-//    // No response
-//    result = "";
-//  }
+  if (res != CURLE_OK)
+  {
+    LM_W(("curl_easy_perform() failed: %s\n", curl_easy_strerror(res)));
+    result = "";
+  }
+  else
+  {
+    // The Response is here
+    result.assign(httpResponse->memory, httpResponse->size);
+  }
 
   // Cleanup curl environment
   curl_slist_free_all(headers);
   curl_easy_cleanup(curl);
-  curl_multi_cleanup(multiHandle);
 
   free(httpResponse->memory);
   delete httpResponse;
@@ -355,6 +286,70 @@ std::string sendHttpSocket
   return result;
 }
 
+#else // Old functionality()
+
+/* ****************************************************************************
+*
+* socketHttpConnect -
+*/
+int socketHttpConnect(const std::string& host, unsigned short port)
+{
+  int                 fd;
+  struct addrinfo     hints;
+  struct addrinfo*    peer;
+  char                port_str[10];
+
+  memset(&hints, 0, sizeof(struct addrinfo));
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_protocol = 0;
+
+  if (ipVersionUsed == IPV4)
+  {
+    hints.ai_family = AF_INET;
+    LM_T(LmtIpVersion, ("Allow IPv4 only"));
+  }
+  else if (ipVersionUsed == IPV6)
+  {
+    hints.ai_family = AF_INET6;
+    LM_T(LmtIpVersion, ("Allow  IPv6 only"));
+  }
+  else
+  {
+    hints.ai_family = AF_UNSPEC;
+    LM_T(LmtIpVersion, ("Allow IPv4 or IPv6"));
+  }
+
+  snprintf(port_str, sizeof(port_str), "%d" , (int) port);
+
+  if (getaddrinfo(host.c_str(), port_str, &hints, &peer) != 0)
+  {
+    LM_W(("Notification failure for %s:%d (getaddrinfo: %s)", host.c_str(), port, strerror(errno)));
+    return -1;
+  }
+
+  if ((fd = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol)) == -1)
+  {
+    LM_W(("Notification failure for %s:%d (socket: %s)", host.c_str(), port, strerror(errno)));
+    return -1;
+  }
+
+  if (connect(fd, peer->ai_addr, peer->ai_addrlen) == -1)
+  {
+    freeaddrinfo(peer);
+    close(fd);
+    LM_W(("Notification failure for %s:%d (connect: %s)", host.c_str(), port, strerror(errno)));
+    return -1;
+  }
+
+  freeaddrinfo(peer);
+  return fd;
+}
+
+
+struct MemoryStruct {
+  char*   memory;
+  size_t  size;
+};
 
 /* ****************************************************************************
 *
@@ -619,3 +614,5 @@ std::string sendHttpSocket2
   close(fd);
   return result;
 }
+
+#endif
