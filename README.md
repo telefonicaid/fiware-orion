@@ -107,7 +107,7 @@ sudo make install  # installation puts .h files in /usr/local/include and librar
 sudo ldconfig      # just in case... it doesn't hurt :)
 ```
 
-* (Optional proxyCoap) Install cantcoap (with dependencies). Note that we are using a particular snapshoot of the code (corresponding arround July 21st, 2014) given that cantcoap repository doesn't provide any releasing mechanism.
+* (Optional proxyCoap) Install cantcoap (with dependencies). Note that we are using a particular snapshot of the code (corresponding to around July 21st, 2014) given that cantcoap repository doesn't provide any releasing mechanism.
 ```
 sudo yum install clang CUnit-devel
 
