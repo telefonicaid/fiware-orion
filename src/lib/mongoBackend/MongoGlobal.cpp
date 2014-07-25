@@ -105,7 +105,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
       }
 
       if (tryNo == 0)
-        LM_E(("Database Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
+        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
       else
         LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
 
@@ -131,7 +131,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
             if (!connection->auth("admin", std::string(username), std::string(passwd), err))
             {
                 mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
-                LM_E(("Database Authentication Error (db=admin, username=%s, pswd=%s): %s", username, passwd, err.c_str()));
+                LM_E(("Database Startup Error (authentication: db=admin, username=%s, pswd=%s): %s", username, passwd, err.c_str()));
                 return false;
             }
         }
@@ -141,7 +141,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
             if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err))
             {
                 mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
-                LM_E(("Database Authentication Error (db=%s, username=%s, pswd=%s): %s", db, username, passwd, err.c_str()));
+                LM_E(("Database Startup Error (authentication: db=%s, username=%s, pswd=%s): %s", db, username, passwd, err.c_str()));
                 return false;
             }
         }
@@ -155,7 +155,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
     if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
     {
         mongoSemGive(__FUNCTION__, "wrong mongo version format");
-        LM_E(("Database Error (invalid version format: %s)", versionString.c_str()));
+        LM_E(("Database Startup Error (invalid version format: %s)", versionString.c_str()));
         return false;
     }
     LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)", versionString.c_str(), mongoVersionMayor, mongoVersionMinor, extra.c_str()));

@@ -1287,6 +1287,8 @@ int main(int argC, char* argV[])
   else
     restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort);
 
+  LM_I(("Startup completed"));
+
   while (1)
     sleep(10);
 }
