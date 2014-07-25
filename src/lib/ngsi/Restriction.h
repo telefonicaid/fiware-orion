@@ -40,7 +40,7 @@
 */
 typedef struct Restriction
 {
-  AttributeExpression  attributeExpression;   // Mandatory
+  AttributeExpression  attributeExpression;   // Optional (FI-WARE changes - MANDATORY in OMA spec)
   ScopeVector          scopeVector;           // Optional
 
   std::string   render(Format format, const std::string& indent, int restrictions = 1, bool comma = false);

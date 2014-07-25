@@ -49,10 +49,17 @@ std::string Restriction::check(RequestType requestType, Format format, const std
     return "OK";
   }
 
+  if ((scopeVector.size() == 0) && (attributeExpression.isEmpty()))
+  {
+    LM_W(("Bad Input (empty restriction)"));
+    return "empty restriction";
+  }
+
   if (((res = scopeVector.check(requestType, format, indent, predetectedError,  counter)) != "OK") ||
       ((res = attributeExpression.check(requestType, format, indent, predetectedError,  counter)) != "OK"))
   {
     LM_T(LmtRestriction, ("Restriction::check returns '%s'", res.c_str()));
+    LM_W(("Bad Input (%s)", res.c_str()));
     return res;
   }
 

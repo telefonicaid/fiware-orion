@@ -40,12 +40,16 @@ TEST(Restriction, check)
 {
   Restriction  restriction;
   std::string  checked;
-  std::string  expected1 = "OK";
+  std::string  expected0 = "OK";
+  std::string  expected1 = "empty restriction";
   std::string  expected2 = "Empty type in restriction scope";
   std::string  expected3 = "OK";
   Scope*       scopeP    = new Scope("", "Value");
 
   checked = restriction.check(RegisterContext, XML, "", "", 0);
+  EXPECT_EQ(expected0, checked);
+
+  checked = restriction.check(RegisterContext, XML, "", "", 1);
   EXPECT_EQ(expected1, checked);
 
   restriction.scopeVector.push_back(scopeP);
