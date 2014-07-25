@@ -41,7 +41,7 @@ typedef struct ContextAttribute
 {
   std::string     name;            // Mandatory
   std::string     type;            // Optional
-  std::string     value;           // Mandatory
+  std::string     value;           // Optional (FI-WARE changes - MANDATORY in OMA spec)
   MetadataVector  metadataVector;  // Optional
 
   std::string                typeFromXmlAttribute;
