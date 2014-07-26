@@ -1,5 +1,5 @@
-#ifndef LM_TIME_H_
-#define LM_TIME_H_
+#ifndef SRC_LIB_LOGMSG_TIME_H_
+#define SRC_LIB_LOGMSG_TIME_H_
 
 /*
 *
@@ -26,16 +26,17 @@
 * Author: developer
 */
 
-#include <stdio.h>             /* sprintf */
-#include <string>				// std::string
+#include <stdio.h>              // sprintf
 #include <sys/time.h>           // struct timeval
+#include <ctime>
+#include <string>               // std::string
 #include <sstream>              // std::ostringstream
-#include <ctime>    
 
 
-namespace lm {
-    struct tm *gmtime_r (time_t *t, tm *tp);
+
+namespace lm
+{
+  struct tm *gmtime_r(time_t *t, tm *tp);
 }
 
-#endif
-
+#endif  // SRC_LIB_LOGMSG_TIME_H_
