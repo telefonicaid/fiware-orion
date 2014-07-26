@@ -26,21 +26,22 @@
 #include <stdio.h>              /* sscanf                                    */
 #include <stdlib.h>             /* atoi                                      */
 #include <string.h>             /* strtoul, strncmp                          */
+#include <string>               /* std::string                               */
 
-#include "baStd.h"              /* Own interface                             */
+#include "parseArgs/baStd.h"    /* Own interface                             */
 
 
 
 /* ****************************************************************************
 *
-* IntType - 
+* IntType -
 */
 typedef enum IntType
 {
-    Bin,
-    Oct,
-    Dec,
-    Hex
+  Bin,
+  Oct,
+  Dec,
+  Hex
 } IntType;
 
 
@@ -49,90 +50,110 @@ typedef enum IntType
 *
 * baStoi - string to integer
 */
-long baStoi(char* string, int* baseP, char* errorText)
+int64_t baStoi(char* string, int* baseP, char* errorText)
 {
-    char                last;
-    long                multiplicator = 1;
-    int                 sign          = 1;
-    long                value;
-    int                 base;
-    char*               validchars = (char*) "Q";
+  char     last;
+  int64_t  multiplicator = 1;
+  int      sign          = 1;
+  int64_t  value;
+  int      base;
+  char*    validchars = (char*) "Q";
 
-    if ((string == NULL) || (string[0] == 0))
-        return 0;
+  if ((string == NULL) || (string[0] == 0))
+  {
+    return 0;
+  }
 
-    if (*string == '-')
-    {
-        ++string;
-        sign = -1;
-    }
+  if (*string == '-')
+  {
+    ++string;
+    sign = -1;
+  }
 
-    last = string[strlen(string) - 1]; 
-    if (last == 'k')
-        multiplicator = 1024;
-    else if (last == 'M')
-        multiplicator = 1024 * 1024;
-    else if (last == 'G')
-        multiplicator = 1024 * 1024 * 1024;
+  last = string[strlen(string) - 1];
+  if (last == 'k')
+  {
+    multiplicator = 1024;
+  }
+  else if (last == 'M')
+  {
+    multiplicator = 1024 * 1024;
+  }
+  else if (last == 'G')
+  {
+    multiplicator = 1024 * 1024 * 1024;
+  }
+
 #ifdef __LP64__
-    else if (last == 'T')
-        multiplicator = (long) 1024 * 1024 * 1024 * 1024;
-    else if (last == 'P')
-        multiplicator = (long) 1024 * 1024 * 1024 * 1024 * 1024;
+  else if (last == 'T')
+  {
+    multiplicator = (int64_t) 1024 * 1024 * 1024 * 1024;
+  }
+  else if (last == 'P')
+  {
+    multiplicator = (int64_t) 1024 * 1024 * 1024 * 1024 * 1024;
+  }
 #endif
 
-    if (multiplicator != 1)
-        string[strlen(string) - 1] = 0;
+  if (multiplicator != 1)
+  {
+    string[strlen(string) - 1] = 0;
+  }
 
-	if (strncmp(string, "0x", 2) == 0)
+  if (strncmp(string, "0x", 2) == 0)
+  {
+    base        = 16;
+    string      = &string[2];
+    validchars  = (char*) "0123456789abcdfeABCDEF";
+  }
+  else if (strncmp(string, "H'", 2) == 0)
+  {
+    base        = 16;
+    string      = &string[2];
+    validchars  = (char*) "0123456789abcdfeABCDEF";
+  }
+  else if (strncmp(string, "H", 1) == 0)
+  {
+    base        = 16;
+    string      = &string[1];
+    validchars  = (char*) "0123456789abcdfeABCDEF";
+  }
+  else if (strncmp(string, "0", 1) == 0)
+  {
+    base        = 8;
+    string      = &string[1];
+    validchars  = (char*) "01234567";
+  }
+  else if (strncmp(string, "B", 1) == 0)
+  {
+    base        = 2;
+    string      = &string[1];
+    validchars  = (char*) "01";
+  }
+  else
+  {
+    base        = 10;
+    validchars  = (char*) "0123456789";
+  }
+
+  if (baseP)
+  {
+    *baseP = base;
+  }
+
+  if (strspn(string, validchars) != strlen(string))
+  {
+    if (errorText)
     {
-        base        = 16;
-        string      = &string[2];
-        validchars  = (char*) "0123456789abcdfeABCDEF";
-    }
-	else if (strncmp(string, "H'", 2) == 0)
-    {
-        base        = 16;
-        string      = &string[2];
-        validchars  = (char*) "0123456789abcdfeABCDEF";
-    }
-    else if (strncmp(string, "H", 1) == 0)
-	{
-        base        = 16;
-        string      = &string[1];
-        validchars  = (char*) "0123456789abcdfeABCDEF";
-    }
-	else if (strncmp(string, "0", 1) == 0)
-	{
-        base        = 8;
-        string      = &string[1];
-        validchars  = (char*) "01234567";
-    }
-	else if (strncmp(string, "B", 1) == 0)
-	{
-        base        = 2;
-        string      = &string[1];
-        validchars  = (char*) "01";
-    }
-    else
-    {
-        base        = 10;
-        validchars  = (char*) "0123456789";
+      sprintf(errorText, "bad string in integer conversion: '%s'", string);
     }
 
-    if (baseP)
-        *baseP = base;
+    return -1;
+  }
 
-    if (strspn(string, validchars) != strlen(string))
-    {
-        if (errorText)
-            sprintf(errorText, "bad string in integer conversion: '%s'", string);
-        return -1;
-    }
+  value = strtoull(string, NULL, base);
 
-    value = strtoull(string, NULL, base);
-
-    return sign * multiplicator * value;
+  return sign * multiplicator * value;
 }
 
 
@@ -143,11 +164,11 @@ long baStoi(char* string, int* baseP, char* errorText)
 */
 float baStof(char* string)
 {
-	float f;
+  float f;
 
-	sscanf(string, "%f", &f);
+  sscanf(string, "%f", &f);
 
-	return f;
+  return f;
 }
 
 
@@ -158,11 +179,11 @@ float baStof(char* string)
 */
 double baStod(char* string)
 {
-	double f;
+  double f;
 
-	sscanf(string, "%lf", &f);
+  sscanf(string, "%lf", &f);
 
-	return f;
+  return f;
 }
 
 
@@ -173,17 +194,18 @@ double baStod(char* string)
 */
 bool baWs(char c)
 {
-	switch (c)
-	{
-	case ' ':
-	case '\t':
-	case '\n':
-		return true;
-		break;
-	default:
-		return false;
-		break;
-	}
+  switch (c)
+  {
+  case ' ':
+  case '\t':
+  case '\n':
+    return true;
+    break;
+
+  default:
+    return false;
+    break;
+  }
 }
 
 
@@ -194,93 +216,112 @@ bool baWs(char c)
 */
 int baWsNoOf(char* string)
 {
-	int no = 0;
+  int no = 0;
 
-	while (*string != 0)
-	{
-		if (baWs(*string) == true)
-			++no;
-		++string;
-	}
-	return no;
+  while (*string != 0)
+  {
+    if (baWs(*string) == true)
+      ++no;
+
+    ++string;
+  }
+
+  return no;
 }
 
 
 
 /* ****************************************************************************
 *
-* baWsStrip - 
+* baWsStrip -
 */
 char* baWsStrip(char* s)
 {
-	char* str;
-	char* tmP;
-	char* toFree;
+  char* str;
+  char* tmP;
+  char* toFree;
 
-	if ((s == NULL) || (s[0] == 0))
-		return s;
+  if ((s == NULL) || (s[0] == 0))
+  {
+    return s;
+  }
 
-	str = strdup(s);
-	if (str == NULL)
-	{
-		s[0] = 0;
-		return s;
-	}
+  str = strdup(s);
+  if (str == NULL)
+  {
+    s[0] = 0;
+    return s;
+  }
 
-	toFree = str;
-	while ((*str == ' ') || (*str == '\t'))
-		++str;
+  toFree = str;
+  while ((*str == ' ') || (*str == '\t'))
+  {
+    ++str;
+  }
 
-	tmP = &str[strlen(str) - 1];
+  tmP = &str[strlen(str) - 1];
 
-	while ((tmP > str) && ((*tmP == ' ') || (*tmP == '\t')))
-		--tmP;
-	++tmP;
-	*tmP = 0;
+  while ((tmP > str) && ((*tmP == ' ') || (*tmP == '\t')))
+  {
+    --tmP;
+  }
+  ++tmP;
+  *tmP = 0;
 
-	if (str[0] != 0)
-		strcpy(s, str);
-	else
-		s[0] = 0;
+  if (str[0] != 0)
+  {
+    strcpy(s, str);
+  }
+  else
+  {
+    s[0] = 0;
+  }
 
-	free(toFree);
+  free(toFree);
 
-	return s;
+  return s;
 }
 
 
 
 /* ****************************************************************************
 *
-* baWsOnly - 
+* baWsOnly -
 */
 bool baWsOnly(char* str)
 {
-	while (*str != 0)
-	{
-		if (baWs(*str) == false)
-			return false;
-		++str;
-	}
+  while (*str != 0)
+  {
+    if (baWs(*str) == false)
+    {
+      return false;
+    }
 
-	return true;
+    ++str;
+  }
+
+  return true;
 }
 
 
 
 /* ****************************************************************************
 *
-* baCharCount - 
+* baCharCount -
 */
 int baCharCount(char* line, char c)
 {
-	int noOf = 0;
-	while (*line != 0)
-	{
-		if (*line == c)
-			++noOf;
-		++line;
-	}
+  int noOf = 0;
 
-	return noOf;
+  while (*line != 0)
+  {
+    if (*line == c)
+    {
+      ++noOf;
+    }
+
+    ++line;
+  }
+
+  return noOf;
 }
