@@ -50,7 +50,7 @@ typedef enum IntType
 *
 * baStoi - string to integer
 */
-int64_t baStoi(char* string, int* baseP, char* errorText)
+int64_t baStoi(char* string, int* baseP, char* errorText, int errorTextLen)
 {
   char     last;
   int64_t  multiplicator = 1;
@@ -145,7 +145,7 @@ int64_t baStoi(char* string, int* baseP, char* errorText)
   {
     if (errorText)
     {
-      sprintf(errorText, "bad string in integer conversion: '%s'", string);
+      snprintf(errorText, errorTextLen, "bad string in integer conversion: '%s'", string);
     }
 
     return -1;
@@ -270,7 +270,8 @@ char* baWsStrip(char* s)
 
   if (str[0] != 0)
   {
-    strcpy(s, str);
+    // strlen(str) is OK as 'str' is a copy of 's' and 'str' doesn't grow
+    snprintf(s, strlen(str), "%s", str);
   }
   else
   {
