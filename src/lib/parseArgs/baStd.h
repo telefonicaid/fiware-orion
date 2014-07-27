@@ -72,7 +72,7 @@
 *
 * baStoi - string to integer
 */
-extern long baStoi(char* string, int* baseP = (int*) 0, char* errorText = (char*) 0);
+extern long baStoi(char* string, int* baseP = (int*) 0, char* errorText = (char*) 0, int errorTextLen = 0);
 
 
 
