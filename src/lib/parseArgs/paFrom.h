@@ -1,5 +1,5 @@
-#ifndef PA_FROM_H
-#define PA_FROM_H
+#ifndef SRC_LIB_PARSEARGS_PAFROM_H_
+#define SRC_LIB_PARSEARGS_PAFROM_H_
 
 /*
 *
@@ -25,9 +25,8 @@
 *
 * Author: Ken Zangelin
 */
-#include "baStd.h"              /* BA standard header file                   */
-
-#include "parseArgs/parseArgs.h"          /* PaArgument                                */
+#include "parseArgs/baStd.h"         /* BA standard header file              */
+#include "parseArgs/parseArgs.h"     /* PaArgument                           */
 
 
 
@@ -45,4 +44,4 @@ extern char* paFromName(PaiArgument* aP, char* out, int outLen);
 */
 extern char* paFrom(PaiArgument* paList, const char* option);
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PAFROM_H_

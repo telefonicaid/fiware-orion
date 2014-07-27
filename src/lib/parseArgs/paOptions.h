@@ -1,5 +1,5 @@
-#ifndef PA_OPTIONS_H
-#define PA_OPTIONS_H
+#ifndef SRC_LIB_PARSEARGS_PAOPTIONS_H_
+#define SRC_LIB_PARSEARGS_PAOPTIONS_H_
 
 /*
 *
@@ -35,4 +35,4 @@
 */
 extern int paOptionsNoOf(PaiArgument* paList);
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PAOPTIONS_H_

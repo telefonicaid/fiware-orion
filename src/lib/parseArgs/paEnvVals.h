@@ -1,5 +1,5 @@
-#ifndef PA_ENV_VALS_H
-#define PA_ENV_VALS_H
+#ifndef SRC_LIB_PARSEARGS_PAENVVALS_H_
+#define SRC_LIB_PARSEARGS_PAENVVALS_H_
 
 /*
 *
@@ -43,4 +43,4 @@ extern char* paEnvName(PaiArgument* aP, char* out, int outLen);
 */
 extern int paEnvVals(PaiArgument* paList);
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PAENVVALS_H_

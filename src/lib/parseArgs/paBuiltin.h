@@ -1,5 +1,5 @@
-#ifndef PA_BUILTIN_H
-#define PA_BUILTIN_H
+#ifndef SRC_LIB_PARSEARGS_PABUILTIN_H_
+#define SRC_LIB_PARSEARGS_PABUILTIN_H_
 
 /*
 *
@@ -93,4 +93,4 @@ extern PaiArgument* paBuiltinLookup(char* option);
 */
 extern int paBuiltinRemove(char* name);
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PABUILTIN_H_

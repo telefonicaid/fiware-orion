@@ -27,6 +27,7 @@
 #include <memory.h>                       /* memset                          */
 #include <unistd.h>                       /* getpid                          */
 #include <stdlib.h>                       /* exit                            */
+#include <string>                         /* std::string                     */
 
 #include "parseArgs/baStd.h"              /* BA standard header file         */
 #include "logMsg/logMsg.h"                /* lmVerbose, lmDebug, ...         */
@@ -75,287 +76,341 @@ int          paBuiltins = -1;
 
 /* ****************************************************************************
 *
-* optionNameDuplicated - 
+* optionNameDuplicated -
 */
 static bool optionNameDuplicated(char* name, int start)
 {
-	int ix;
-	int opts    = paOptionsNoOf(paiList);
-	int matches = 0;
+  int ix;
+  int opts    = paOptionsNoOf(paiList);
+  int matches = 0;
 
-	if (name == NULL)
-		return false;
-	if (name[0] == 0)
-		return false;
+  if (name == NULL)
+  {
+    return false;
+  }
 
-	for (ix = start; ix < opts; ix++)
-	{
-		PaiArgument* aP;
+  if (name[0] == 0)
+  {
+    return false;
+  }
 
-		if ((aP = paIxLookup(paiList, ix)) == NULL)
-			break;
+  for (ix = start; ix < opts; ix++)
+  {
+    PaiArgument* aP;
 
-		if (aP->option == NULL)
-			continue;
+    if ((aP = paIxLookup(paiList, ix)) == NULL)
+    {
+      break;
+    }
 
-		if (aP->removed == true)
-			continue;
+    if (aP->option == NULL)
+    {
+      continue;
+    }
 
-		if (aP->option[0] == 0)
-			continue;
+    if (aP->removed == true)
+    {
+      continue;
+    }
 
-		if (strcmp(aP->option, " ") == 0)
-			continue;
+    if (aP->option[0] == 0)
+    {
+      continue;
+    }
 
-		if (strcmp(name, aP->option) == 0)
-			++matches;
-	}
-	
-	if (matches <= 1)
-		return false;
+    if (strcmp(aP->option, " ") == 0)
+    {
+      continue;
+    }
 
-	return true;
+    if (strcmp(name, aP->option) == 0)
+    {
+      ++matches;
+    }
+  }
+
+  if (matches <= 1)
+  {
+    return false;
+  }
+
+  return true;
 }
 
 
 
 /* ****************************************************************************
 *
-* envNameDuplicated - 
+* envNameDuplicated -
 */
 static bool envNameDuplicated(char* name, int start)
 {
-	int   ix;
-	int   opts    = paOptionsNoOf(paiList);
-	int   matches = 0;
-	
-	if (name == NULL)
-		return false;
-	if (name[0] == 0)
-		return false;
+  int   ix;
+  int   opts    = paOptionsNoOf(paiList);
+  int   matches = 0;
 
-	for (ix = start; ix < opts; ix++)
-	{
-		PaiArgument*  aP;
-		char          envVarName[128];
+  if (name == NULL)
+  {
+    return false;
+  }
 
-		if ((aP = paIxLookup(paiList, ix)) == NULL)
-			break;
+  if (name[0] == 0)
+  {
+    return false;
+  }
 
-		if (aP->removed == true)
-			continue;
+  for (ix = start; ix < opts; ix++)
+  {
+    PaiArgument*  aP;
+    char          envVarName[128];
 
-		if (aP->envName == NULL)
-			continue;
+    if ((aP = paIxLookup(paiList, ix)) == NULL)
+    {
+      break;
+    }
 
-		paEnvName(aP, envVarName, sizeof(envVarName));
+    if (aP->removed == true)
+    {
+      continue;
+    }
 
-		if (strcmp(name, envVarName) == 0)
-			++matches;
-	}
-	
-	if (matches <= 1)
-		return false;
-	return true;
+    if (aP->envName == NULL)
+    {
+      continue;
+    }
+
+    paEnvName(aP, envVarName, sizeof(envVarName));
+
+    if (strcmp(name, envVarName) == 0)
+    {
+      ++matches;
+    }
+  }
+
+  if (matches <= 1)
+  {
+    return false;
+  }
+
+  return true;
 }
 
 
 
 /* ****************************************************************************
 *
-* paArgInit - 
+* paArgInit -
 */
 static int paArgInit(PaArgument* paList)
 {
-	PaiArgument* aP;
-	int          parNo = 0;
-	int          ix    = 0;
-	int          args  = 0;
+  PaiArgument* aP;
+  int          parNo = 0;
+  int          ix    = 0;
+  int          args  = 0;
 
-	while (paList[ix].type != PaLastArg)
-	{
-        ++args;
-		++ix;
-	}
+  while (paList[ix].type != PaLastArg)
+  {
+    ++args;
+    ++ix;
+  }
 
-	paiList = (PaiArgument*) calloc(args + 1, sizeof(PaiArgument));
-	if (paiList == NULL)
-	{
-		PA_E(("Error allocating room for %d options", args));
-		exit(1);
-	}
+  paiList = (PaiArgument*) calloc(args + 1, sizeof(PaiArgument));
+  if (paiList == NULL)
+  {
+    PA_E(("Error allocating room for %d options", args));
+    exit(1);
+  }
 
-    PA_M(("Allocated room for %d args (plus one)", args));
-	for (ix = 0; ix < args + 1; ix++)
+  PA_M(("Allocated room for %d args (plus one)", args));
+  for (ix = 0; ix < args + 1; ix++)
+  {
+    PA_M(("Copying arg %d", ix));
+    memcpy(&paiList[ix], &paList[ix], sizeof(paList[ix]));
+    paiList[ix].isBuiltin = false;
+  }
+
+  paIterateInit();
+  while ((aP = paIterateNext(paiList)) != NULL)
+  {
+    char envVarName[128];
+
+    /* Set argument to be unused */
+    aP->used        = 0;
+    aP->hasDefault  = true;
+    aP->hasMinLimit = true;
+    aP->hasMaxLimit = true;
+    aP->aux         = 0;
+
+    /* Set the value to come from nowhere */
+    aP->from = PafUnchanged;
+
+    if ((aP->option != NULL) && (aP->option[0] == 0))
     {
-		PA_M(("Copying arg %d", ix));
-        memcpy(&paiList[ix], &paList[ix], sizeof(paList[ix]));
-		paiList[ix].isBuiltin = false;
+      aP->option = NULL;
     }
 
-	paIterateInit();
-	while ((aP = paIterateNext(paiList)) != NULL)
-	{
-		char envVarName[128];
-
-		/* Set argument to be unused */
-		aP->used        = 0;
-		aP->hasDefault  = true;
-		aP->hasMinLimit = true;
-		aP->hasMaxLimit = true;
-		aP->aux         = 0;
-
-		/* Set the value to come from nowhere */
-		aP->from = PafUnchanged;
-
-		if ((aP->option != NULL) && (aP->option[0] == 0))
-			aP->option = NULL;
-
-		if ((aP->envName != NULL) && (aP->envName[0] == 0))
-			aP->envName = NULL;
+    if ((aP->envName != NULL) && (aP->envName[0] == 0))
+    {
+      aP->envName = NULL;
+    }
 
 
-		if ((aP->envName != NULL) && ((aP->envName[0] == ' ') || (aP->envName[0] == '\t')))
-		{
-			char w[512];
+    if ((aP->envName != NULL) && ((aP->envName[0] == ' ') || (aP->envName[0] == '\t')))
+    {
+      char w[512];
 
-			strcpy(w, "found an item with var name starting with whitespace - forbidden");
-			PA_WARNING(PasVarNameWs, w);
-			continue;
-		}
+      snprintf(w, sizeof(w), "%s", "found an item with var name starting with whitespace - forbidden");
+      PA_WARNING(PasVarNameWs, w);
+      continue;
+    }
 
-		/* Set the name of the argument */
-		if (aP->option == NULL) 
-		{
-			if (aP->envName == NULL)
-			{
-				sprintf(aP->name, "parameter %d", ++parNo);
-				aP->what = PawParameter;
-			}
-			else
-			{
-				char envVarName[128];
+    /* Set the name of the argument */
+    if (aP->option == NULL)
+    {
+      if (aP->envName == NULL)
+      {
+        snprintf(aP->name, sizeof(aP->name), "parameter %d", ++parNo);
+        aP->what = PawParameter;
+      }
+      else
+      {
+        char envVarName[128];
 
-				sprintf(aP->name, "variable/parameter %s", paEnvName(aP, envVarName, sizeof(envVarName)));
-				aP->what = PawVariable;
-			}
-		}
-		else if ((aP->option[0] == ' ') && (aP->option[1] == 0))
-		{
-			++parNo;
+        snprintf(aP->name, sizeof(aP->name), "variable/parameter %s", paEnvName(aP, envVarName, sizeof(envVarName)));
+        aP->what = PawVariable;
+      }
+    }
+    else if ((aP->option[0] == ' ') && (aP->option[1] == 0))
+    {
+      ++parNo;
 
-			if (aP->envName == NULL)
-			{
-				sprintf(aP->name, "parameter %d", parNo);
-				aP->what = PawParameter;
-			}
-			else
-			{
-				char envVarName[128];
+      if (aP->envName == NULL)
+      {
+        snprintf(aP->name, sizeof(aP->name), "parameter %d", parNo);
+        aP->what = PawParameter;
+      }
+      else
+      {
+        char envVarName[128];
 
-				sprintf(aP->name, "parameter %s", paEnvName(aP, envVarName, sizeof(envVarName)));
-				aP->what = PawVariable | PawParameter;
-			}
-		}
-		else
-		{
-			if (aP->envName == NULL)
-			{
-				sprintf(aP->name, "option '%s'", aP->option);
-				aP->what = PawOption;
-			}
-			else
-			{
-				sprintf(aP->name, "option '%s'", aP->option);
-				aP->what = PawOption | PawVariable;
-			}
-		}
+        snprintf(aP->name, sizeof(aP->name), "parameter %s", paEnvName(aP, envVarName, sizeof(envVarName)));
+        aP->what = PawVariable | PawParameter;
+      }
+    }
+    else
+    {
+      if (aP->envName == NULL)
+      {
+        snprintf(aP->name, sizeof(aP->name), "option '%s'", aP->option);
+        aP->what = PawOption;
+      }
+      else
+      {
+        snprintf(aP->name, sizeof(aP->name), "option '%s'", aP->option);
+        aP->what = PawOption | PawVariable;
+      }
+    }
 
-		if (optionNameDuplicated((char*) aP->option, ix) == true)
-		{
-			char w[512];
+    if (optionNameDuplicated((char*) aP->option, ix) == true)
+    {
+      char w[512];
 
-			sprintf(w, "%s (%s) duplicated in source code", aP->name, aP->description);
-			PA_WARNING(PasOptionNameDuplicated, w);
-			aP->removed = true;
-		}		  
+      snprintf(w, sizeof(w), "%s (%s) duplicated in source code", aP->name, aP->description);
+      PA_WARNING(PasOptionNameDuplicated, w);
+      aP->removed = true;
+    }
 
-		paEnvName(aP, envVarName, sizeof(envVarName));
-		
-		if (envNameDuplicated(envVarName, ix) == true)
-		{
-			char w[512];
-			
-			sprintf(w, "Env var '%s' (%s) duplicated in source code", envVarName, aP->description);
-			PA_WARNING(PasEnvNameDuplicated, w);
-			aP->removed = true;
-		}		  
+    paEnvName(aP, envVarName, sizeof(envVarName));
 
-		++ix;
-	}
+    if (envNameDuplicated(envVarName, ix) == true)
+    {
+      char w[512];
 
-	return 0;
+      snprintf(w, sizeof(w), "Env var '%s' (%s) duplicated in source code", envVarName, aP->description);
+      PA_WARNING(PasEnvNameDuplicated, w);
+      aP->removed = true;
+    }
+
+    ++ix;
+  }
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* paProgNameSet - 
+* paProgNameSet -
 */
 static char* paProgNameSet(char* pn, int levels, bool pid, const char* extra = NULL)
 {
-	char*        start;
-	static char  pName[128];
+  char*        start;
+  static char  pName[128];
 
-	if (pn == NULL)
-		return NULL;
+  if (pn == NULL)
+  {
+    return NULL;
+  }
 
-	if (levels < 1)
-		levels = 1;
+  if (levels < 1)
+  {
+    levels = 1;
+  }
 
-	start = &pn[strlen(pn) - 1];
-	while (start > pn)
-	{
-		if (*start == '/')
-			levels--;
-		if (levels == 0)
-			break;
-		--start;
-	}
+  start = &pn[strlen(pn) - 1];
+  while (start > pn)
+  {
+    if (*start == '/')
+    {
+      levels--;
+    }
 
-	if (*start == '/')
-		++start;
+    if (levels == 0)
+    {
+      break;
+    }
 
-	strncpy(pName, start, sizeof(pName));
+    --start;
+  }
 
-    if (paUsageProgName == NULL)
-        paUsageProgName = strdup(pName);
+  if (*start == '/')
+  {
+    ++start;
+  }
 
-	if (pid == true)
-	{
-		char  pid[8];
-		strncat(pName, "_", sizeof(pName) - 1);
-		sprintf(pid, "%d", (int) getpid());
-		strncat(pName, pid, sizeof(pName) - 1);
-	}
+  strncpy(pName, start, sizeof(pName));
 
-    if (extra != NULL)
-        strncat(pName, extra, sizeof(pName) - 1);
+  if (paUsageProgName == NULL)
+    paUsageProgName = strdup(pName);
 
-	return pName;
+  if (pid == true)
+  {
+    char  pid[8];
+
+    strncat(pName, "_", sizeof(pName) - 1);
+    snprintf(pid, sizeof(pid), "%d", (int) getpid());
+    strncat(pName, pid, sizeof(pName) - 1);
+  }
+
+  if (extra != NULL)
+  {
+    strncat(pName, extra, sizeof(pName) - 1);
+  }
+
+  return pName;
 }
 
 
 /* ****************************************************************************
 *
-* RETURN_ERROR - 
+* RETURN_ERROR -
 */
 #define RETURN_ERROR(s)              \
 do                                   \
 {                                    \
-	PA_WARNING(PasSetup, (char*) s); \
-	return -1;                       \
+  PA_WARNING(PasSetup, (char*) s);   \
+  return -1;                         \
 } while (0)
 
 
@@ -367,199 +422,227 @@ do                                   \
 */
 int paParse
 (
-	PaArgument*  paList,
-	int          argC,
-	char*        argV[],
-	int          level,
-	bool         pid,
-    const char*  extra
+  PaArgument*  paList,
+  int          argC,
+  char*        argV[],
+  int          level,
+  bool         pid,
+  const char*  extra
 )
 {
-	char*  progNameCopy;
-	int    ix;
-	int    s;
-	FILE*  fP;
+  char*  progNameCopy;
+  int    ix;
+  int    s;
+  FILE*  fP;
 
-    if (extra != NULL)
-        paExtraLogSuffix = strdup(extra);
+  if (extra != NULL)
+  {
+    paExtraLogSuffix = strdup(extra);
+  }
 
-	memset(paResultString, 0, sizeof(paResultString));
+  memset(paResultString, 0, sizeof(paResultString));
 
-	/* **************************************************** */
-	/* Creating flat command line string paCommandLine      */
-	/*                                                      */
-	if (argC > 1)
-	{
-		strncpy(paCommandLine, argV[1], sizeof(paCommandLine));
-		for (ix = 2; ix < argC; ix++)
-		{
-			strncat(paCommandLine, " ", sizeof(paCommandLine) - 1);
-			strncat(paCommandLine, argV[ix], sizeof(paCommandLine) - 1);
-		}
-	}
-
-
-	/* ********************************************************* */
-	/* Calling paConfig just to make sure paConfigInit is called */
-	/*                                                           */
-	paConfig("make sure paConfigInit is called", 0);
+  /* **************************************************** */
+  /* Creating flat command line string paCommandLine      */
+  /*                                                      */
+  if (argC > 1)
+  {
+    strncpy(paCommandLine, argV[1], sizeof(paCommandLine));
+    for (ix = 2; ix < argC; ix++)
+    {
+      strncat(paCommandLine, " ",      sizeof(paCommandLine) - 1);
+      strncat(paCommandLine, argV[ix], sizeof(paCommandLine) - 1);
+    }
+  }
 
 
-
-	/* *************************** */
-	/* Setting up the program name */
-	/*                             */
-	if (paProgName == NULL) /* hasn't been set with paConfig */
-	{
-		progNameCopy = strdup(argV[0]);
-		progName     = strdup(paProgNameSet(argV[0], level, pid, extra));
-		paProgName   = strdup(progName);
-	}
-	else
-	{
-		progNameCopy = strdup(paProgName);
-		progName     = strdup(paProgName);
-	}
+  /* ********************************************************* */
+  /* Calling paConfig just to make sure paConfigInit is called */
+  /*                                                           */
+  paConfig("make sure paConfigInit is called", 0);
 
 
-	/* ************************************************* */
-	/* The rcFileName must not have any '/' in its name. */
-	/* it should be called (by default) .<progname>rc    */
-	/* So, first we must get a progName without '/' ...  */
-	/*                                                   */
-	if (paRcFileName == NULL)
-	{
-		char rName[128];
 
-		sprintf(rName, ".%src", paProgNameSet(progNameCopy, 1, false));
-		paRcFileName = strdup(rName);
-	}
-	free(progNameCopy);
+  /* *************************** */
+  /* Setting up the program name */
+  /*                             */
+  if (paProgName == NULL) /* hasn't been set with paConfig */
+  {
+    progNameCopy = strdup(argV[0]);
+    progName     = strdup(paProgNameSet(argV[0], level, pid, extra));
+    paProgName   = strdup(progName);
+  }
+  else
+  {
+    progNameCopy = strdup(paProgName);
+    progName     = strdup(paProgName);
+  }
 
 
-	/* ****************************************************** */
-	/* Initializing all subsystems                            */
-	/*                                                        */
-	if ((s = paArgInit(paList)) == -1)
-		RETURN_ERROR("paArgInit error");
+  /* ************************************************* */
+  /* The rcFileName must not have any '/' in its name. */
+  /* it should be called (by default) .<progname>rc    */
+  /* So, first we must get a progName without '/' ...  */
+  /*                                                   */
+  if (paRcFileName == NULL)
+  {
+    char rName[128];
 
-	if ((s != -2) && ((s = paConfigActions(true)) == -1))
-		RETURN_ERROR("paConfigActions");
+    snprintf(rName, sizeof(rName), ".%src", paProgNameSet(progNameCopy, 1, false));
+    paRcFileName = strdup(rName);
+  }
+  free(progNameCopy);
 
-	if ((s != -2) && ((s = paDefaultValues(paiList)) == -1))
-		RETURN_ERROR("paDefaultValues");
+
+  /* ****************************************************** */
+  /* Initializing all subsystems                            */
+  /*                                                        */
+  if ((s = paArgInit(paList)) == -1)
+  {
+    RETURN_ERROR("paArgInit error");
+  }
+
+  if ((s != -2) && ((s = paConfigActions(true)) == -1))
+  {
+    RETURN_ERROR("paConfigActions");
+  }
+
+  if ((s != -2) && ((s = paDefaultValues(paiList)) == -1))
+    RETURN_ERROR("paDefaultValues");
 
 #if 0
-	// Orion doesn't use paRcFileParse ...
-	if ((s != -2) && ((s = paRcFileParse()) == -1))
-		RETURN_ERROR("paRcFileParse");
+  // Orion doesn't use paRcFileParse ...
+  if ((s != -2) && ((s = paRcFileParse()) == -1))
+    RETURN_ERROR("paRcFileParse");
 #endif
 
-	if ((s != -2) && ((s = paEnvVals(paiList)) == -1))
-		RETURN_ERROR("paEnvVals");
+  if ((s != -2) && ((s = paEnvVals(paiList)) == -1))
+  {
+    RETURN_ERROR("paEnvVals");
+  }
 
-	if ((s != -2) && ((s = paOptionsParse(paiList, argV, argC)) == -1))
-		RETURN_ERROR("paOptionsParse");
+  if ((s != -2) && ((s = paOptionsParse(paiList, argV, argC)) == -1))
+  {
+    RETURN_ERROR("paOptionsParse");
+  }
 
-	if (paLogSetup() == -1)
-		RETURN_ERROR("paLogSetup error");
+  if (paLogSetup() == -1)
+  {
+    RETURN_ERROR("paLogSetup error");
+  }
 
-	if ((s != -2) && ((s = paLimitCheck(paiList)) == -1))
-		RETURN_ERROR("paLimitCheck");
+  if ((s != -2) && ((s = paLimitCheck(paiList)) == -1))
+  {
+    RETURN_ERROR("paLimitCheck");
+  }
 
-	if ((s != -2) && ((s = paConfigActions(false)) == -1))
-		RETURN_ERROR("paConfigActions");
+  if ((s != -2) && ((s = paConfigActions(false)) == -1))
+  {
+    RETURN_ERROR("paConfigActions");
+  }
 
 
-	fP = NULL;
-	if (paMsgsToStdout)
-		fP = stdout;
-	if (paMsgsToStderr)
-		fP = stderr;
+  fP = NULL;
+  if (paMsgsToStdout)
+  {
+    fP = stdout;
+  }
 
-	if (paResultString[0] != 0)
-	{
-		if (fP != NULL)
-			fprintf(fP, "%s\n", paResultString);
-	}
-	else if (paWarnings > 0)
-	{
-		int ix;
+  if (paMsgsToStderr)
+  {
+    fP = stderr;
+  }
 
-		if (fP != NULL)
-		{
-			// fprintf(fP, "\nEntire command line: '%s'\n\n", paCommandLine);
+  if (paResultString[0] != 0)
+  {
+    if (fP != NULL)
+    {
+      fprintf(fP, "%s\n", paResultString);
+    }
+  }
+  else if (paWarnings > 0)
+  {
+    int ix;
 
-			// fprintf(fP, "--- %s warnings ---\n", progName);
-			for (ix = 0; ix < paWarnings; ix++)
-			//	fprintf(fP, "Severity % 2d: %s\n\n", paWarning[ix].severity, paWarning[ix].string);
-				fprintf(fP, "%s\n\n", paWarning[ix].string);
+    if (fP != NULL)
+    {
+      // fprintf(fP, "\nEntire command line: '%s'\n\n", paCommandLine);
 
-			if (paUsageOnAnyWarning)
-			  paUsage();
-			if (paResultString[0] != 0)
-			  fprintf(fP, "%s\n", paResultString);
+      for (ix = 0; ix < paWarnings; ix++)
+      {
+        fprintf(fP, "%s\n\n", paWarning[ix].string);
+      }
 
-			exit(1);
-		}
-		else
-		{
-			char s[64000];
+      if (paUsageOnAnyWarning)
+      {
+        paUsage();
+      }
 
-			sprintf(paResultString, "\nEntire command line options: '%s'\n\n", paCommandLine);
-			
-			sprintf(s, "--- %s warnings ---\n", progName);
-			strncat(paResultString, s, sizeof(paResultString) - 1);
+      if (paResultString[0] != 0)
+      {
+        fprintf(fP, "%s\n", paResultString);
+      }
 
-			for (ix = 0; ix < paWarnings; ix++)
-			{
-				sprintf(s, "Severity % 2d: %s\n\n", paWarning[ix].severity, paWarning[ix].string);
-				strncat(paResultString, s, sizeof(paResultString) - 1);
-			}
+      exit(1);
+    }
+    else
+    {
+      char s[64000];
 
-			strncat(paResultString, "\n\n", sizeof(paResultString) - 1);
+      snprintf(paResultString, sizeof(paResultString), "\nEntire command line options: '%s'\n\n", paCommandLine);
 
-			if (paUsageOnAnyWarning)
-			{
-			  printf("paUsageOnAnyWarning == true (2)\n");
-			  paUsage();
-			}
-		}
-	}
+      snprintf(s, sizeof(s), "--- %s warnings ---\n", progName);
+      strncat(paResultString, s, sizeof(paResultString) - 1);
+
+      for (ix = 0; ix < paWarnings; ix++)
+      {
+        snprintf(s, sizeof(s), "Severity % 2d: %s\n\n", paWarning[ix].severity, paWarning[ix].string);
+        strncat(paResultString, s, sizeof(paResultString) - 1);
+      }
+
+      strncat(paResultString, "\n\n", sizeof(paResultString) - 1);
+
+      if (paUsageOnAnyWarning)
+      {
+        printf("paUsageOnAnyWarning == true (2)\n");
+        paUsage();
+      }
+    }
+  }
 
   free(paiList);
   free(paRcFileName);
   free(paUsageProgName);
 
-	return 0;
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* paTypeName - 
+* paTypeName -
 */
 const char* paTypeName(PaType type)
 {
-    switch (type)
-    {
-    case PaBoolean:       return "Boolean";
-    case PaString:        return "String";
-    case PaShort:         return "Short";
-    case PaShortU:        return "UShort";
-    case PaChar:          return "Char";
-    case PaUChar:         return "UChar";
-    case PaInt:           return "Int";
-    case PaUInt:          return "UInt";
-    case PaLong:          return "Long";
-    case PaULong:         return "ULong";
-    case PaFloat:         return "Float";
-    case PaDouble:        return "Double";
-    case PaIList:         return "IList";
-    case PaSList:         return "SList";
-    case PaLastArg:       return "Not A Type";
-    }
+  switch (type)
+  {
+  case PaBoolean:       return "Boolean";
+  case PaString:        return "String";
+  case PaShort:         return "Short";
+  case PaShortU:        return "UShort";
+  case PaChar:          return "Char";
+  case PaUChar:         return "UChar";
+  case PaInt:           return "Int";
+  case PaUInt:          return "UInt";
+  case PaLong:          return "Long";
+  case PaULong:         return "ULong";
+  case PaFloat:         return "Float";
+  case PaDouble:        return "Double";
+  case PaIList:         return "IList";
+  case PaSList:         return "SList";
+  case PaLastArg:       return "Not A Type";
+  }
 
-    return "Unknown Type";
+  return "Unknown Type";
 }

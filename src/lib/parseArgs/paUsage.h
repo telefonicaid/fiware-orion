@@ -1,5 +1,5 @@
-#ifndef PA_USAGE_H
-#define PA_USAGE_H
+#ifndef SRC_LIB_PARSEARGS_PAUSAGE_H_
+#define SRC_LIB_PARSEARGS_PAUSAGE_H_
 
 /*
 *
@@ -61,4 +61,4 @@ void paExtendedUsage(void);
 */
 void paHelp(void);
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PAUSAGE_H_

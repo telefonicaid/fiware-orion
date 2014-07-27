@@ -1,5 +1,5 @@
-#ifndef PA_LOG_SETUP_H
-#define PA_LOG_SETUP_H
+#ifndef SRC_LIB_PARSEARGS_PALOGSETUP_H_
+#define SRC_LIB_PARSEARGS_PALOGSETUP_H_
 
 /*
 *
@@ -34,4 +34,4 @@
 */
 extern int paLogSetup(void);
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PALOGSETUP_H_

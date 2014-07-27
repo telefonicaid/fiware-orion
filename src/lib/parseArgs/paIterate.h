@@ -1,5 +1,5 @@
-#ifndef PA_ITERATE_H
-#define PA_ITERATE_H
+#ifndef SRC_LIB_PARSEARGS_PAITERATE_H_
+#define SRC_LIB_PARSEARGS_PAITERATE_H_
 
 /*
 *
@@ -59,4 +59,4 @@ extern int paNoOfOptions(PaArgument* paList);
 */
 extern PaArgument* paOptionLookupByIx(PaArgument* paList, int ix);
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PAITERATE_H_

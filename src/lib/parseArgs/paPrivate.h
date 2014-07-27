@@ -1,5 +1,5 @@
-#ifndef PA_PRIVATE_H
-#define PA_PRIVATE_H
+#ifndef SRC_LIB_PARSEARGS_PAPRIVATE_H_
+#define SRC_LIB_PARSEARGS_PAPRIVATE_H_
 
 /*
 *
@@ -25,7 +25,9 @@
 *
 * Author: Ken Zangelin
 */
-#include "baStd.h"                   /* BaBoolean                            */
+#include <string>
+
+#include "parseArgs/baStd.h"         /* BaBoolean                            */
 #include "parseArgs/parseArgs.h"     /* PaArgument                           */
 
 
@@ -46,10 +48,10 @@
 */
 typedef enum PaWhat
 {
-   PawOption    = (1 << 0),
-   PawParameter = (1 << 1),
-   PawVariable  = (1 << 2),
-   PawBuiltin   = (1 << 3)
+  PawOption    = (1 << 0),
+  PawParameter = (1 << 1),
+  PawVariable  = (1 << 2),
+  PawBuiltin   = (1 << 3)
 } PaWhat;
 
 
@@ -60,17 +62,17 @@ typedef enum PaWhat
 */
 typedef union PaTypeUnion
 {
-   char                c;
-   unsigned char       uc;
-   short               s;
-   unsigned short      us;
-   int                 i;
-   unsigned int        ui;
-   long long           l;
-   unsigned long long  ul;
-   char*               string;
-   unsigned char*      ustring;
-   bool                boolean;
+  char                c;
+  uint8_t             uc;
+  int16_t             s;
+  uint16_t            us;
+  int32_t             i;
+  uint32_t            ui;
+  int64_t             l;
+  uint64_t            ul;
+  char*               string;
+  unsigned char*      ustring;
+  bool                boolean;
 } PaTypeUnion;
 
 
@@ -104,4 +106,4 @@ extern PaiArgument paBuiltin[];
 */
 extern int stoi(char* string);
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PAPRIVATE_H_

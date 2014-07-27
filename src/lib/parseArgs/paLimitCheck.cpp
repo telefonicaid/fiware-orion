@@ -173,7 +173,7 @@ static int limits(PaiArgument* paList, PaiArgument* aP)
     if ((lower && (i64Val < aP->min)) || (upper && (i64Val > aP->max)))
     {
       snprintf(valS, sizeof(valS), "%ld", i64Val);
-      snprintf(w, sizeof(w), "%lld <= %ld <= %lld (%s)",
+      snprintf(w, sizeof(w), "%ld <= %ld <= %ld (%s)",
                aP->min,
                i64Val,
                aP->max,
@@ -187,7 +187,7 @@ static int limits(PaiArgument* paList, PaiArgument* aP)
     if ((lower && (uiVal < (uint64_t) aP->min)) || (upper && (uiVal > (uint64_t) aP->max)))
     {
       snprintf(valS, sizeof(valS), "%lu", ui64Val);
-      snprintf(w, sizeof(w), "%llu <= %lu <= %llu (%s)",
+      snprintf(w, sizeof(w), "%lu <= %lu <= %lu (%s)",
                aP->min,
                ui64Val,
                aP->max,
