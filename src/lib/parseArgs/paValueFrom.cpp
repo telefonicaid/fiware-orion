@@ -48,7 +48,7 @@ PaFrom paValueFrom(char* oName)
 		if (aP->option == NULL)
 			continue;
 
-		paEnvName(aP, envVarName);
+		paEnvName(aP, envVarName, sizeof(envVarName));
 
 		if (aP->option && (strcmp(oName, aP->option) == 0))
 			return aP->from;

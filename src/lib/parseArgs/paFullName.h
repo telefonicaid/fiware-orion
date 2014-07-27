@@ -25,7 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "parseArgs/parseArgs.h"          /* PaArgument                                */
+#include "parseArgs/parseArgs.h"  /* PaArgument                              */
 
 
 
@@ -33,6 +33,6 @@
 *
 * paFullName - fill in name and description in string string
 */
-extern char* paFullName(char* string, PaiArgument* aP);
+extern char* paFullName(PaiArgument* aP, char* string, int stringLen);
 
 #endif

@@ -61,14 +61,14 @@
 *
 * REQUIRE - error handling for option requiring value
 */
-#define REQUIRE(aP)                                                       \
-do                                                                        \
-{                                                                         \
-	char e[80];                                                           \
-	char w[512];                                                          \
-                                                                          \
-	sprintf(w, "%s requires %s", paFullName(e, aP), require(aP->type));   \
-	PA_WARNING(PasMissingValue, w);                                       \
+#define REQUIRE(aP)                                                              \
+do                                                                               \
+{                                                                                \
+	char e[80];                                                                    \
+	char w[512];                                                                   \
+                                                                                 \
+	sprintf(w, "%s requires %s", paFullName(aP, e, sizeof(e)), require(aP->type)); \
+	PA_WARNING(PasMissingValue, w);                                                \
 } while (0)
 
 
@@ -409,12 +409,11 @@ int paOptionsParse(PaiArgument* paList, char* argV[], int argC)
 		}
 		else if (aP->varP == (void*) &paLogDir)
 		{
-            if (valueP != NULL)
-            {
-
-               strcpy(paLogDir, (char*) valueP);
-               printf("log directory: '%s'\n", paLogDir);
-            }
+      if (valueP != NULL)
+      {
+        strcpy(paLogDir, (char*) valueP);
+        printf("log directory: '%s'\n", paLogDir);
+      }
 		}
 		else if (aP->varP == (void*) &paEUsageVar)
 			extendedUsage = true;
@@ -437,15 +436,12 @@ int paOptionsParse(PaiArgument* paList, char* argV[], int argC)
 
 		aP->from = PafArgument;
 
-
 		if (aP->type == PaBoolean)
 		{
 			if (strlen(argV[argNo]) != strlen(aP->option))
 			{
 				char tmp[128];
-				sprintf(w, "boolean option '%s' doesn't take parameters",
-						paFullName(e, aP));
-				/* PA_WARNING(PasValueToBooleanOption, w); */
+				sprintf(w, "boolean option '%s' doesn't take parameters", paFullName(aP, e, sizeof(e)));
 				sprintf(tmp, "%c%s", argV[argNo][0], &argV[argNo][2]);
 				LM_W(("Changing arg %d from '%s' to '%s'", argNo, argV[argNo], tmp));
 				strcpy(argV[argNo], tmp);
@@ -465,7 +461,7 @@ int paOptionsParse(PaiArgument* paList, char* argV[], int argC)
 			break;
 		}
 
-		paFullName(o, aP);
+		paFullName(aP, o, sizeof(o));
 
 		switch (aP->type)
 		{

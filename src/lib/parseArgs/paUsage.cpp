@@ -240,10 +240,10 @@ void paUsage(void)
 	spacePad = (char*) strdup(progName);
 	memset(spacePad, 0x20202020, strlen(spacePad));  /* replace progName */
 
-    if (paUsageProgName != NULL)
-        sprintf(s, "Usage: %s ", paUsageProgName);
-    else
-        sprintf(s, "Usage: %s ", progName);
+  if (paUsageProgName != NULL)
+    sprintf(s, "Usage: %s ", paUsageProgName);
+  else
+    sprintf(s, "Usage: %s ", progName);
 
 	strncat(paResultString, s, sizeof(paResultString) - 1);
 
@@ -281,9 +281,9 @@ void paUsage(void)
 		}
 
 		if (PA_IS_OPTION(aP) && (aP->sort == PaOpt))
-			sprintf(xName, "[%s]", paFullName(string, aP));
+			sprintf(xName, "[%s]", paFullName(aP, string, sizeof(string)));
 		else if (PA_IS_OPTION(aP) && (aP->sort == PaReq))
-			sprintf(xName, "%s", paFullName(string, aP));
+			sprintf(xName, "%s", paFullName(aP, string, sizeof(string)));
 		else if (PA_IS_PARAMETER(aP) && (aP->sort == PaOpt))
 			sprintf(xName, "[parameter: %s]", aP->description);
 		else if (PA_IS_PARAMETER(aP) && (aP->sort == PaReq))
@@ -344,9 +344,9 @@ void paExtendedUsage(void)
 		/* 1. Option Name */
 		memset(name, 0, sizeof(name));
 		if (PA_IS_OPTION(aP) && (aP->sort == PaOpt))
-			sprintf(name, "[%s]", paFullName(string, aP));
+			sprintf(name, "[%s]", paFullName(aP, string, sizeof(string)));
 		else if (PA_IS_OPTION(aP) && (aP->sort == PaReq))
-			sprintf(name, "%s", paFullName(string, aP));
+			sprintf(name, "%s", paFullName(aP, string, sizeof(string)));
 		else if (PA_IS_PARAMETER(aP) && (aP->sort == PaOpt))
 			sprintf(name, "(%s)", aP->description);
 		else if (PA_IS_PARAMETER(aP) && (aP->sort == PaReq))
@@ -358,7 +358,7 @@ void paExtendedUsage(void)
 		memset(name, 0, sizeof(name));
 		if (PA_IS_VARIABLE(aP))
 		{
-			paEnvName(aP, name);
+			paEnvName(aP, name, sizeof(name));
 			varNameMaxLen = MAX(strlen(name), (unsigned int) varNameMaxLen);
 		}
 		
@@ -411,9 +411,9 @@ void paExtendedUsage(void)
 
 		/* 1. Option Name */
 		if (PA_IS_OPTION(aP) && (aP->sort == PaOpt))
-			sprintf(optName, "[%s]", paFullName(string, aP));
+			sprintf(optName, "[%s]", paFullName(aP, string, sizeof(string)));
 		else if (PA_IS_OPTION(aP) && (aP->sort == PaReq))
-			sprintf(optName, "%s", paFullName(string, aP));
+			sprintf(optName, "%s", paFullName(aP, string, sizeof(string)));
 		else if (PA_IS_PARAMETER(aP) && (aP->sort == PaOpt))
 			sprintf(optName, "(%s)", aP->description);
 		else if (PA_IS_PARAMETER(aP) && (aP->sort == PaReq))
@@ -424,7 +424,7 @@ void paExtendedUsage(void)
 	
 		/* 2. variable name */
 		if (PA_IS_VARIABLE(aP))
-			paEnvName(aP, varName);
+			paEnvName(aP, varName, sizeof(varName));
 		else
 			strcpy(varName, " ");
 
@@ -452,7 +452,7 @@ void paExtendedUsage(void)
 				sprintf(vals, "%s <= %s <= %s",
 						minVal, valWithDef, maxVal);
 
-			sprintf(from, "  (%s)", paFromName(aP, fromN));
+			sprintf(from, "  (%s)", paFromName(aP, fromN, sizeof(fromN)));
 		}
 		else
 		{

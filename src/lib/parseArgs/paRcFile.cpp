@@ -230,7 +230,7 @@ int paRcFileParse(void)
 		paIterateInit();
 		while ((aP = paIterateNext(paiList)) != NULL)
 		{
-			paEnvName(aP, envVarName);
+			paEnvName(aP, envVarName, sizeof(envVarName));
 
 			if (strcmp(var, envVarName) == 0)
 			{

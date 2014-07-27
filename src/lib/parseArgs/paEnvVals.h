@@ -33,7 +33,7 @@
 *
 * paEnvName - get real name of variable (environment or RC-file variable)
 */
-extern char* paEnvName(PaiArgument* aP, char* out);
+extern char* paEnvName(PaiArgument* aP, char* out, int outLen);
 
 
 

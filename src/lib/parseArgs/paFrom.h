@@ -35,7 +35,7 @@
 *
 * paFromName - 
 */
-extern char* paFromName(PaiArgument* aP, char* out);
+extern char* paFromName(PaiArgument* aP, char* out, int outLen);
 
 
 

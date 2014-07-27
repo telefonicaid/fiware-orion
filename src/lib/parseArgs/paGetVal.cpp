@@ -22,16 +22,16 @@
 *
 * Author: developer
 */
+#include <stdio.h>                /* stderr, stdout, ...                     */
+#include <stdlib.h>               /* strtol, atoi                            */
+#include <string>                 /* std::string                             */
 
-#include <stdio.h>              /* stderr, stdout, ...                       */
-#include <stdlib.h>             /* strtol, atoi                              */
+#include "parseArgs/baStd.h"      /* BA standard header file                 */
+#include "logMsg/logMsg.h"        /* lmVerbose, lmDebug, ...                 */
 
-#include "baStd.h"              /* BA standard header file                   */
-#include "logMsg/logMsg.h"             /* lmVerbose, lmDebug, ...                   */
-
-#include "parseArgs/parseArgs.h"          /* progName                                  */
-#include "paWarning.h"          /* paWarningAdd                              */
-#include "paGetVal.h"           /* Own interface                             */
+#include "parseArgs/parseArgs.h"  /* progName                                */
+#include "parseArgs/paWarning.h"  /* paWarningAdd                            */
+#include "parseArgs/paGetVal.h"   /* Own interface                           */
 
 
 
@@ -41,21 +41,21 @@
 */
 void* paGetVal(char* string, int* error)
 {
-	long      value;
-	int       type;
-    char      errorText[256];
+  int64_t   value;
+  int       type;
+  char      errorText[256];
 
-    errorText[0] = 0;
+  errorText[0] = 0;
 
-	*error = PaOk;
+  *error = PaOk;
 
-    value = baStoi(string, &type, errorText);
-    if (errorText[0] != 0)
-	{
-		PA_WARNING(PasBadValue, errorText);
-		*error = type;
-		return NULL;
-	}
-	
-    return (void*) value;
+  value = baStoi(string, &type, errorText);
+  if (errorText[0] != 0)
+  {
+    PA_WARNING(PasBadValue, errorText);
+    *error = type;
+    return NULL;
+  }
+
+  return (void*) value;
 }
