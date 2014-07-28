@@ -72,7 +72,7 @@ std::string logTraceTreat(ConnectionInfo* ciP, int components, std::vector<std::
   else if ((components == 2) && (ciP->method == "GET"))
   {
     char tLevels[256];
-    lmTraceGet(tLevels);
+    lmTraceGet(tLevels, sizeof(tLevels));
     out = orionReply(ciP, "tracelevels", tLevels);
   }
   else if ((components == 3) && (ciP->method == "PUT"))

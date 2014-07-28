@@ -86,7 +86,6 @@ int main(int argC, char* argV[])
   for (int cIx = 0; cIx < 10; ++cIx)
     pthread_create(&pid[cIx], NULL, child, &cIx);
 
-  
   for (int cIx = 0; cIx < 10; ++cIx)
     pthread_join(pid[cIx], NULL);
 
@@ -97,7 +96,7 @@ int main(int argC, char* argV[])
   // Actually, 4 lines is the header, so the total should be 1004 lines
   //
   int lines = lmLogLinesGet();
-  
+
   if (lines == 10004)
     printf("OK\n");
   else

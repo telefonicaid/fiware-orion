@@ -22,7 +22,7 @@
 *
 * Author: Ken Zangelin
 */
-#include "traceLevels.h"         // Own interface
+#include "logMsg/traceLevels.h"         // Own interface
 
 
 

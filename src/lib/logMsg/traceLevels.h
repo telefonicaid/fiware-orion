@@ -1,5 +1,5 @@
-#ifndef TRACE_LEVELS_H
-#define TRACE_LEVELS_H
+#ifndef SRC_LIB_LOGMSG_TRACELEVELS_H_
+#define SRC_LIB_LOGMSG_TRACELEVELS_H_
 
 /*
 *
@@ -100,7 +100,7 @@ typedef enum TraceLevels
   LmtServiceInputPayload = 180,
   LmtServiceOutPayload,
   LmtClientInputPayload,
-  LmtClientOutputPayload = 183, // Very important for harness test notification_different_sizes
+  LmtClientOutputPayload = 183,  // Very important for harness test notification_different_sizes
   LmtPartialPayload,
   LmtClientOutputPayloadDump,
 
@@ -126,4 +126,4 @@ typedef enum TraceLevels
 */
 extern char* traceLevelName(TraceLevels level);
 
-#endif
+#endif  // SRC_LIB_LOGMSG_TRACELEVELS_H_
