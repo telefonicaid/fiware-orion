@@ -55,7 +55,6 @@
 *
 * [1] http://stackoverflow.com/questions/24288513/how-to-do-curl-multi-perform-asynchronously-in-c
 */
-
 //#define USE_OLD_SENDHTTPSOCKET
 
 #ifndef USE_OLD_SENDHTTPSOCKET
@@ -345,12 +344,6 @@ int socketHttpConnect(const std::string& host, unsigned short port)
   freeaddrinfo(peer);
   return fd;
 }
-
-
-struct MemoryStruct {
-  char*   memory;
-  size_t  size;
-};
 
 /* ****************************************************************************
 *
