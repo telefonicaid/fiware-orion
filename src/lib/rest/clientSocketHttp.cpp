@@ -76,7 +76,7 @@ size_t writeMemoryCallback(void* contents, size_t size, size_t nmemb, void* user
   mem->memory = (char*) realloc(mem->memory, mem->size + realsize + 1);
   if (mem->memory == NULL)
   {
-    LM_W(("Not enough memory (realloc returned NULL)\n"));
+    LM_E(("Runtime Error (out of memory)"));
     return 0;
   }
 
@@ -214,6 +214,10 @@ std::string sendHttpSocket
 
     }
   }
+  else
+  {
+    sprintf(portAsString, "%d", (int) port);
+  }
 
   // User agent
   size = sizeof(versionGet()) + 18; // from "User-Agent: orion/"
@@ -291,6 +295,7 @@ std::string sendHttpSocket
   else
   {
     // The Response is here
+    LM_I(("Notification Successfully Sent"));
     result.assign(httpResponse->memory, httpResponse->size);
   }
 
