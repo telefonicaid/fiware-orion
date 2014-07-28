@@ -22,25 +22,24 @@
 *
 * Author: developer
 */
+#include <stdio.h>                    /* stderr, stdout, ...                 */
+#include <cstdlib>                    /* C++ free(.)                         */
 
-#include <stdio.h>              /* stderr, stdout, ...                       */
-#include <cstdlib>				/* C++ free(.)								 */
+#include "parseArgs/baStd.h"          /* BA standard header file             */
+#include "logMsg/logMsg.h"            /* lmVerbose, lmDebug, ...             */
 
-#include "baStd.h"              /* BA standard header file                   */
-#include "logMsg/logMsg.h"      /* lmVerbose, lmDebug, ...                   */
-
-#include "paPrivate.h"          /* PaTypeUnion, config variables, ...        */
-#include "paBuiltin.h"          /* paLogDir                                  */
-#include "paTraceLevels.h"      /* LmtPaEnvVal, ...                          */
-#include "parseArgs/paConfig.h" /* paConfigActions                           */
-#include "paWarning.h"          /* paWaringInit, paWarningAdd                */
-#include "paLogSetup.h"         /* Own interface                             */
+#include "parseArgs/paPrivate.h"      /* PaTypeUnion, config variables, ...  */
+#include "parseArgs/paBuiltin.h"      /* paLogDir                            */
+#include "parseArgs/paTraceLevels.h"  /* LmtPaEnvVal, ...                    */
+#include "parseArgs/paConfig.h"       /* paConfigActions                     */
+#include "parseArgs/paWarning.h"      /* paWaringInit, paWarningAdd          */
+#include "parseArgs/paLogSetup.h"     /* Own interface                       */
 
 
 
 /* ****************************************************************************
 *
-* 
+*
 */
 int  lmFd   = -1;
 int  lmSd   = -1;
@@ -49,11 +48,11 @@ int  lmSd   = -1;
 
 /* ****************************************************************************
 *
-* paLmFdGet
+* paLmFdGet -
 */
 int paLmFdGet(void)
 {
-	return lmFd;
+  return lmFd;
 }
 
 
@@ -64,7 +63,7 @@ int paLmFdGet(void)
 */
 int paLmSdGet(void)
 {
-	return lmSd;
+  return lmSd;
 }
 
 
@@ -76,76 +75,77 @@ int paLmSdGet(void)
 extern char* paExtraLogSuffix;
 int paLogSetup(void)
 {
-	LmStatus    s = LmsOk;
-	char        w[512];
+  LmStatus    s = LmsOk;
+  char        w[512];
 
-	if (paLogToFile == true)
-	{
-        // printf("paLogDir == '%s'\n", paLogDir);
-        if (paLogDir[0] != 0)
-        {
-           // printf("Using paLogDir '%s'", paLogDir);
-           s = lmPathRegister(paLogDir, paLogFileLineFormat, paLogFileTimeFormat, &lmFd, paLogAppend);
-        }
-        else
-        {
-           // printf("Using paLogFilePath: '%s'\n", paLogFilePath);
-           s = lmPathRegister(paLogFilePath, paLogFileLineFormat, paLogFileTimeFormat, &lmFd, paLogAppend);
-        }
+  if (paLogToFile == true)
+  {
+    // printf("paLogDir == '%s'\n", paLogDir);
+    if (paLogDir[0] != 0)
+    {
+      // printf("Using paLogDir '%s'", paLogDir);
+      s = lmPathRegister(paLogDir, paLogFileLineFormat, paLogFileTimeFormat, &lmFd, paLogAppend);
+    }
+    else
+    {
+      // printf("Using paLogFilePath: '%s'\n", paLogFilePath);
+      s = lmPathRegister(paLogFilePath, paLogFileLineFormat, paLogFileTimeFormat, &lmFd, paLogAppend);
+    }
 
-		if (s != LmsOk)
-		{
-			sprintf(w, "lmPathRegister: %s", lmStrerror(s));
-			PA_WARNING(PasLogFile, w);
-			return -2;
-		}
-	}
+    if (s != LmsOk)
+    {
+      snprintf(w, sizeof(w), "lmPathRegister: %s", lmStrerror(s));
+      PA_WARNING(PasLogFile, w);
+      return -2;
+    }
+  }
 
-	if (paLogToScreen)
-	{
-		int fd = 1;
+  if (paLogToScreen)
+  {
+    int fd = 1;
 
-		if (paLogScreenToStderr)
-			fd = 2;
+    if (paLogScreenToStderr)
+    {
+      fd = 2;
+    }
 
-		s = lmFdRegister(fd, paLogScreenLineFormat, paLogScreenTimeFormat, "stdout", &lmSd);
-		if (s != LmsOk)
-		{
-			sprintf(w, "lmFdRegister: %s", lmStrerror(s));
-			PA_WARNING(PasLogFile, w);
-			return -3;
-		}
-	}
+    s = lmFdRegister(fd, paLogScreenLineFormat, paLogScreenTimeFormat, "stdout", &lmSd);
+    if (s != LmsOk)
+    {
+      snprintf(w, sizeof(w), "lmFdRegister: %s", lmStrerror(s));
+      PA_WARNING(PasLogFile, w);
+      return -3;
+    }
+  }
 
-	if (paLogToFile || paLogToScreen || lmNoTracesToFileIfHookActive)
-	{
-		if ((s = lmInit()) != LmsOk)
-		{
-			sprintf(w, "lmInit: %s", lmStrerror(s));
-			PA_WARNING(PasLogFile, w);
-			return -4;
-		}
+  if (paLogToFile || paLogToScreen || lmNoTracesToFileIfHookActive)
+  {
+    if ((s = lmInit()) != LmsOk)
+    {
+      snprintf(w, sizeof(w), "lmInit: %s", lmStrerror(s));
+      PA_WARNING(PasLogFile, w);
+      return -4;
+    }
 
-		lmToDo     = false;
-		lmVerbose  = false;
-		lmVerbose2 = false;
-		lmVerbose3 = false;
-		lmVerbose4 = false;
-		lmVerbose5 = false;
-		lmDebug    = false;
-		/* lmBug     = false; */
-		lmReads    = false;
-		lmWrites   = false;
-		lmSilent   = false;
+    lmToDo     = false;
+    lmVerbose  = false;
+    lmVerbose2 = false;
+    lmVerbose3 = false;
+    lmVerbose4 = false;
+    lmVerbose5 = false;
+    lmDebug    = false;
+    lmReads    = false;
+    lmWrites   = false;
+    lmSilent   = false;
+    /* lmBug     = false; */
 
-		lmTraceSet((char*) "");
+    lmTraceSet((char*) "");
 
-		if (paLogToScreen && paLogScreenOnlyErrors)
-			lmOnlyErrors(lmSd);
-	}
+    if (paLogToScreen && paLogScreenOnlyErrors)
+    {
+      lmOnlyErrors(lmSd);
+    }
+  }
 
-	return 0;
+  return 0;
 }
-
-
-

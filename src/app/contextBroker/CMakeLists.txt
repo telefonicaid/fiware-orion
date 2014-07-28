@@ -58,6 +58,10 @@ link_directories("/usr/local/lib/")
 link_directories("/usr/lib64/")
 link_directories("/usr/lib/x86_64-linux-gnu")
 
+# FIXME P4: Issue #476: remove or keep?
+link_directories("/opt/lib/")
+
+
 
 # Executable declaration
 # ------------------------------------------------------------
@@ -70,6 +74,10 @@ IF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_L
 ELSEIF(${DISTRO} STREQUAL "Ubuntu_13.10")
   MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS")
+  # FIXME P4: Issue #476: remove or keep?
+  MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread53 -lboost_filesystem53 -lboost_system53 -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
 ELSEIF(${DISTRO} STREQUAL "openSUSE_13.1")
   MESSAGE("contextBroker: openSUSE DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto)

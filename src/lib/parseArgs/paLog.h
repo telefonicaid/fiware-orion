@@ -1,5 +1,5 @@
-#ifndef PA_LOG_H
-#define PA_LOG_H
+#ifndef SRC_LIB_PARSEARGS_PALOG_H_
+#define SRC_LIB_PARSEARGS_PALOG_H_
 
 /*
 *
@@ -83,4 +83,4 @@ do {                                                                \
 #  define PA_P(s)
 #endif
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PALOG_H_

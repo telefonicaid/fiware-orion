@@ -1,5 +1,5 @@
-#ifndef PA_DEFAULT_VALUES_H
-#define PA_DEFAULT_VALUES_H
+#ifndef SRC_LIB_PARSEARGS_PADEFAULTVALUES_H_
+#define SRC_LIB_PARSEARGS_PADEFAULTVALUES_H_
 
 /*
 *
@@ -35,5 +35,4 @@
 */
 extern int paDefaultValues(PaiArgument* paiList);
 
-#endif
-
+#endif  // SRC_LIB_PARSEARGS_PADEFAULTVALUES_H_

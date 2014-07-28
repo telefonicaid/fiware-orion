@@ -1,5 +1,5 @@
-#ifndef PA_IX_LOOKUP_H
-#define PA_IX_LOOKUP_H
+#ifndef SRC_LIB_PARSEARGS_PAIXLOOKUP_H_
+#define SRC_LIB_PARSEARGS_PAIXLOOKUP_H_
 
 /*
 *
@@ -35,4 +35,4 @@
 */
 extern PaiArgument* paIxLookup(PaiArgument* paList, int ix);
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PAIXLOOKUP_H_

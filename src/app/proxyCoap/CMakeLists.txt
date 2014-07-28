@@ -52,6 +52,10 @@ link_directories("/usr/local/lib/")
 link_directories("/usr/lib64/")
 link_directories("/usr/lib/x86_64-linux-gnu")
 
+# FIXME P4: Issue #476: remove or keep?
+link_directories("/opt/lib/")
+
+
 
 # Executable declaration
 # ------------------------------------------------------------
@@ -63,6 +67,10 @@ IF(${DISTRO} STREQUAL "Fedora_20")
 ELSEIF(${DISTRO} STREQUAL "Ubuntu_13.10")
   MESSAGE("proxyCoap: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl boost_thread boost_system pthread)
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS")
+  # FIXME P4: Issue #476: remove or keep?
+  MESSAGE("proxyCoap: Ubuntu DISTRO: '${DISTRO}'")
+  TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl boost_thread53 boost_system53 pthread)
 ELSE()
   MESSAGE("proxyCoap: Other DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl -lboost_thread-mt)

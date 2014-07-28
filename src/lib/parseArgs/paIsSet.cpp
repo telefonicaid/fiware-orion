@@ -25,7 +25,7 @@
 
 #include <string.h>             /* strcmp                                    */
 
-#include "paIsSet.h"            /* Own interface                             */
+#include "parseArgs/paIsSet.h"  /* Own interface                             */
 
 
 
@@ -35,15 +35,17 @@
 */
 bool paIsSet(int argC, char* argV[], const char* option)
 {
-	int i;
-	
-	for (i = 1; i < argC; i++)
-	{
-		if (strcmp(argV[i], option) == 0)
-			return true;
-	}
+  int i;
 
-	return false;	
+  for (i = 1; i < argC; i++)
+  {
+    if (strcmp(argV[i], option) == 0)
+    {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 
@@ -54,13 +56,15 @@ bool paIsSet(int argC, char* argV[], const char* option)
 */
 const char* paIsSetSoGet(int argC, char* argV[], const char* option)
 {
-	int i;
-	
-	for (i = 1; i < argC; i++)
-	{
-		if (strcmp(argV[i], option) == 0)
-			return argV[i + 1];
-	}
+  int i;
 
-	return NULL;	
+  for (i = 1; i < argC; i++)
+  {
+    if (strcmp(argV[i], option) == 0)
+    {
+      return argV[i + 1];
+    }
+  }
+
+  return NULL;
 }

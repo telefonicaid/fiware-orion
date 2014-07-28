@@ -22,11 +22,11 @@
 *
 * Author: developer
 */
+#include <stdio.h>                 /* sprintf                                */
+#include <string>                  /* std::string                            */
 
-#include <stdio.h>              /* sprintf                                   */
-
-#include "parseArgs/parseArgs.h"          /* PaArgument                                */
-#include "paFullName.h"         /* Own interface                             */
+#include "parseArgs/parseArgs.h"   /* PaArgument                             */
+#include "parseArgs/paFullName.h"  /* Own interface                          */
 
 
 
@@ -34,14 +34,20 @@
 *
 * paFullName - fill in name and description in string string
 */
-char* paFullName(char* string, PaiArgument* aP)
+char* paFullName(PaiArgument* aP, char* string, int stringLen)
 {
-	if ((aP->option == NULL) || (aP->option[0] == 0))
-		sprintf(string, "variable %s", aP->description);
-	else if (aP->type == PaBoolean)
-		sprintf(string, "%s (%s)", aP->name, aP->description);
-	else
-		sprintf(string, "%s <%s>", aP->name, aP->description);
+  if ((aP->option == NULL) || (aP->option[0] == 0))
+  {
+    snprintf(string, stringLen, "variable %s", aP->description);
+  }
+  else if (aP->type == PaBoolean)
+  {
+    snprintf(string, stringLen, "%s (%s)", aP->name, aP->description);
+  }
+  else
+  {
+    snprintf(string, stringLen, "%s <%s>", aP->name, aP->description);
+  }
 
-	return string;
+  return string;
 }
