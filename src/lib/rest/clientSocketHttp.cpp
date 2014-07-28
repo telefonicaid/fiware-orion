@@ -107,7 +107,8 @@ std::string sendHttpSocket
    bool                   waitForResponse
 )
 {
-  char                       portAsString[16];  std::string                rushHeaderIP       = "";
+  char                       portAsString[16];
+  std::string                rushHeaderIP       = "";
   unsigned short             rushHeaderPort     = 0;
   std::string                headerRushHttp    = "";
   static unsigned long long  callNo             = 0;
