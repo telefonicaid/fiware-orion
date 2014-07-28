@@ -34,27 +34,33 @@
 
 /* ****************************************************************************
 *
-* paValueFrom - 
+* paValueFrom -
 */
 PaFrom paValueFrom(char* oName)
 {
-	PaiArgument* aP;
+  PaiArgument* aP;
 
-	paIterateInit();
-	while ((aP = paIterateNext(paiList)) != NULL)
-	{
-		char envVarName[64];
+  paIterateInit();
+  while ((aP = paIterateNext(paiList)) != NULL)
+  {
+    char envVarName[64];
 
-		if (aP->option == NULL)
-			continue;
+    if (aP->option == NULL)
+    {
+      continue;
+    }
 
-		paEnvName(aP, envVarName);
+    paEnvName(aP, envVarName, sizeof(envVarName));
 
-		if (aP->option && (strcmp(oName, aP->option) == 0))
-			return aP->from;
-		else if (aP->envName && (strcmp(oName, envVarName) == 0))
-			return aP->from;
-	}  
+    if (aP->option && (strcmp(oName, aP->option) == 0))
+    {
+      return aP->from;
+    }
+    else if (aP->envName && (strcmp(oName, envVarName) == 0))
+    {
+      return aP->from;
+    }
+  }
 
-	return PafError;
+  return PafError;
 }

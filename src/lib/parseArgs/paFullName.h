@@ -1,5 +1,5 @@
-#ifndef PA_FULL_NAME_H
-#define PA_FULL_NAME_H
+#ifndef SRC_LIB_PARSEARGS_PAFULLNAME_H_
+#define SRC_LIB_PARSEARGS_PAFULLNAME_H_
 
 /*
 *
@@ -25,7 +25,9 @@
 *
 * Author: Ken Zangelin
 */
-#include "parseArgs/parseArgs.h"          /* PaArgument                                */
+#include <string>
+
+#include "parseArgs/parseArgs.h"  /* PaArgument                              */
 
 
 
@@ -33,6 +35,6 @@
 *
 * paFullName - fill in name and description in string string
 */
-extern char* paFullName(char* string, PaiArgument* aP);
+extern char* paFullName(PaiArgument* aP, char* string, int stringLen);
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PAFULLNAME_H_

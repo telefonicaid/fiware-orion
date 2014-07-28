@@ -1,5 +1,5 @@
-#ifndef PA_LIMIT_CHECK_H
-#define PA_LIMIT_CHECK_H
+#ifndef SRC_LIB_PARSEARGS_PALIMITCHECK_H_
+#define SRC_LIB_PARSEARGS_PALIMITCHECK_H_
 
 /*
 *
@@ -35,5 +35,4 @@
 */
 extern int paLimitCheck(PaiArgument* paList);
 
-#endif
-
+#endif  // SRC_LIB_PARSEARGS_PALIMITCHECK_H_

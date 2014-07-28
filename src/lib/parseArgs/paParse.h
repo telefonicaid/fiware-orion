@@ -1,5 +1,5 @@
-#ifndef PA_PARSE_H
-#define PA_PARSE_H
+#ifndef SRC_LIB_PARSEARGS_PAPARSE_H_
+#define SRC_LIB_PARSEARGS_PAPARSE_H_
 
 /*
 *
@@ -28,4 +28,4 @@
 extern char          progNameV[512];
 extern const char*   paTypeName(PaType type);
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PAPARSE_H_

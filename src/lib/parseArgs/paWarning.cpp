@@ -22,22 +22,23 @@
 *
 * Author: Ken Zangelin
 */
-#include <stdlib.h>               /* free, ...                                  */
-#include <string.h>               /* strdup, ...                                */
+#include <stdlib.h>                   /* free, ...                           */
+#include <string.h>                   /* strdup, ...                         */
+#include <string>                     /* std::string                         */
 
-#include "baStd.h"                /* BA_VEC_SIZE, ...                          */
-#include "logMsg/logMsg.h"        /* lmTraceSet                                */
+#include "parseArgs/baStd.h"          /* BA_VEC_SIZE, ...                    */
+#include "logMsg/logMsg.h"            /* lmTraceSet                          */
 
-#include "paPrivate.h"            /* PaTypeUnion, config variables, ...        */
-#include "paTraceLevels.h"        /* LmtPaDefaultValues, ...                   */
-#include "parseArgs/parseArgs.h"  /* paWarnings, paWarning                     */
-#include "paWarning.h"            /* Own interface                             */
+#include "parseArgs/paPrivate.h"      /* PaTypeUnion, config variables, ...  */
+#include "parseArgs/paTraceLevels.h"  /* LmtPaDefaultValues, ...             */
+#include "parseArgs/parseArgs.h"      /* paWarnings, paWarning               */
+#include "parseArgs/paWarning.h"      /* Own interface                       */
 
 
 
 /* ****************************************************************************
 *
-* paWarning - 
+* paWarning -
 */
 PaWarning  paWarning[100];
 int        paWarnings = 0;
@@ -46,42 +47,46 @@ int        paWarnings = 0;
 
 /* ****************************************************************************
 *
-* paWarningInit - 
+* paWarningInit -
 */
 void paWarningInit(void)
 {
-	int ix;
+  int ix;
 
-	for (ix = 0; ix < (int) BA_VEC_SIZE(paWarning); ix++)
-	{
-		paWarning[ix].string = NULL;
-		paWarning[ix].severity = PasNone;
-	}
+  for (ix = 0; ix < (int) BA_VEC_SIZE(paWarning); ix++)
+  {
+    paWarning[ix].string = NULL;
+    paWarning[ix].severity = PasNone;
+  }
 
-	paWarnings = 0;
+  paWarnings = 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* paWarningAdd - 
+* paWarningAdd -
 */
 void paWarningAdd(PaSeverity severity, char* txt)
 {
-	static int ix    = 0;
+  static int ix = 0;
 
-	if (ix >= (int) BA_VEC_SIZE(paWarning))
-		ix = 0;
+  if (ix >= (int) BA_VEC_SIZE(paWarning))
+  {
+    ix = 0;
+  }
 
-	if (paWarning[ix].string != NULL)
-		free(paWarning[ix].string);
+  if (paWarning[ix].string != NULL)
+  {
+    free(paWarning[ix].string);
+  }
 
-	paWarning[ix].string   = strdup(txt);
-	paWarning[ix].severity = severity;
+  paWarning[ix].string   = strdup(txt);
+  paWarning[ix].severity = severity;
 
-	// LM_W((paWarning[ix].string));
-	++ix;
+  // LM_W((paWarning[ix].string));
+  ++ix;
 
-	++paWarnings;
+  ++paWarnings;
 }

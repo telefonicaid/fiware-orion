@@ -1,5 +1,5 @@
-#ifndef PA_OPTIONS_PARSE_H
-#define PA_OPTIONS_PARSE_H
+#ifndef SRC_LIB_PARSEARGS_PAOPTIONSPARSE_H_
+#define SRC_LIB_PARSEARGS_PAOPTIONSPARSE_H_
 
 /*
 *
@@ -35,4 +35,4 @@
 */
 extern int paOptionsParse(PaiArgument* paList, char* argV[], int argC);
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PAOPTIONSPARSE_H_

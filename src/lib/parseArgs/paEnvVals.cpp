@@ -51,7 +51,7 @@ extern int builtins;
 *
 * paEnvName - get real name of variable (environment or RC-file variable)
 */
-char* paEnvName(PaiArgument* aP, char* out)
+char* paEnvName(PaiArgument* aP, char* out, int outLen)
 {
   bool isbuiltin = ((aP->what & PawBuiltin) == PawBuiltin);
 
@@ -65,19 +65,19 @@ char* paEnvName(PaiArgument* aP, char* out)
   }
   else if (aP->envName[0] == '!')
   {
-    strcpy(out, &aP->envName[1]);
+    snprintf(out, outLen, "%s", &aP->envName[1]);
   }
   else if (isbuiltin && (paBuiltinPrefix != NULL) && (paBuiltinPrefix[0] != 0))
   {
-    sprintf(out, "%s%s", paBuiltinPrefix, aP->envName);
+    snprintf(out, outLen, "%s%s", paBuiltinPrefix, aP->envName);
   }
   else if (!isbuiltin && (paPrefix != NULL) && (paPrefix[0] != 0))
   {
-    sprintf(out, "%s%s", paPrefix, aP->envName);
+    snprintf(out, outLen, "%s%s", paPrefix, aP->envName);
   }
   else
   {
-    sprintf(out, "%s", aP->envName);
+    snprintf(out, outLen, "%s", aP->envName);
   }
 
   return out;
@@ -108,7 +108,7 @@ int paEnvVals(PaiArgument* paList)
       continue;
     }
 
-    paEnvName(aP, envVarName);
+    paEnvName(aP, envVarName, sizeof(envVarName));
 
     LM_T(LmtPaEnvVal, ("looking for '%s'", envVarName));
 
@@ -125,17 +125,25 @@ int paEnvVals(PaiArgument* paList)
         break;
 
       case PaBoolean:
-        if ((strcmp(val, "TRUE") == 0) ||  (strcmp(val, "ON")  == 0) || (strcmp(val, "1") == 0) || (strcmp(val, "yes") == 0))
+        if ((strcmp(val, "TRUE") == 0) ||
+            (strcmp(val, "ON")   == 0) ||
+            (strcmp(val, "1")    == 0) ||
+            (strcmp(val, "yes")  == 0)
+          )
         {
           *((bool*) (int64_t) aP->varP) = true;
         }
-        else if ((strcmp(val, "FALSE") == 0) || (strcmp(val, "OFF") == 0) || (strcmp(val, "0") == 0) || (strcmp(val, "no") == 0))
+        else if ((strcmp(val, "FALSE") == 0) ||
+                 (strcmp(val, "OFF")   == 0) ||
+                 (strcmp(val, "0")     == 0) ||
+                 (strcmp(val, "no")    == 0)
+          )
         {
           *((bool*) (int64_t) aP->varP) = false;
         }
         else
         {
-          sprintf(w, "bad value '%s' for boolean variable %s", val, envVarName);
+          snprintf(w, sizeof(w), "bad value '%s' for boolean variable %s", val, envVarName);
           PA_WARNING(PasNoSuchBooleanValue, w);
         }
         break;
@@ -162,28 +170,28 @@ int paEnvVals(PaiArgument* paList)
 
       case PaShort:
       case PaShortU:
-        *((int16_t*) (long) aP->varP) = baStoi(val);
-        LM_T(LmtPaEnvVal, ("got value %d for %s", *((short*) aP->varP), envVarName));
+        *((int16_t*) (int64_t) aP->varP) = baStoi(val);
+        LM_T(LmtPaEnvVal, ("got value %d for %s", *((int16_t*) aP->varP), envVarName));
         break;
 
       case PaFloat:
-        *((float*) (long) aP->varP) = baStof(val);
+        *((float*) (int64_t) aP->varP) = baStof(val);
         LM_T(LmtPaEnvVal, ("got value %f for %s", *((float*) aP->varP), envVarName));
         break;
 
       case PaDouble:
-        *((double*) (long) aP->varP) = baStod(val);
+        *((double*) (int64_t) aP->varP) = baStod(val);
         LM_T(LmtPaEnvVal, ("got value %f for %s", *((double*) aP->varP), envVarName));
         break;
 
       case PaChar:
       case PaCharU:
-        *((char*) (long) aP->varP) = baStoi(val);
+        *((char*) (int64_t) aP->varP) = baStoi(val);
         LM_T(LmtPaEnvVal, ("got value %d for %s", *((char*) aP->varP), envVarName));
         break;
 
       default:
-        sprintf(w, "bad type %d for variable %s", aP->type, envVarName);
+        snprintf(w, sizeof(w), "bad type %d for variable %s", aP->type, envVarName);
         PA_WARNING(PasNoSuchType, w);
         return -1;
       }

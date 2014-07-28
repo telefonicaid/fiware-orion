@@ -1,5 +1,5 @@
-#ifndef PA_GET_VAL_H
-#define PA_GET_VAL_H
+#ifndef SRC_LIB_PARSEARGS_PAGETVAL_H_
+#define SRC_LIB_PARSEARGS_PAGETVAL_H_
 
 /*
 *
@@ -25,6 +25,7 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
 
 
 
@@ -34,13 +35,13 @@
 */
 typedef enum PaGetVal
 {
-	PaError = -1,
-	PaOk    = 0,
-	PaHex,
-	PaOct,
-	PaDec,
-	PaDef,
-	PaNotOk
+  PaError = -1,
+  PaOk    = 0,
+  PaHex,
+  PaOct,
+  PaDec,
+  PaDef,
+  PaNotOk
 } PaGetVal;
 
 
@@ -51,4 +52,4 @@ typedef enum PaGetVal
 */
 extern void* paGetVal(char* string, int* error);
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PAGETVAL_H_
