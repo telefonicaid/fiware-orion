@@ -26,7 +26,6 @@
 #include <string>
 
 #include "logMsg/logMsg.h"
-
 #include "common/Format.h"
 #include "common/tag.h"
 
@@ -36,25 +35,42 @@
 *
 * startTag -  
 */
-std::string startTag(const std::string& indent, const std::string& tagName, Format format, bool showTag, bool isToplevel)
+std::string startTag
+(
+  const std::string&  indent,
+  const std::string&  tagName,
+  Format              format,
+  bool                showTag,
+  bool                isToplevel
+)
 {
   if (format == XML)
-     return indent + "<" + tagName + ">\n";
+  {
+    return indent + "<" + tagName + ">\n";
+  }
   else if (format == JSON)
   {
     if (isToplevel)
     {
       if (showTag == false)
+      {
         return indent + "{\n" + indent + "  {\n";
+      }
       else
+      {
         return indent + "{\n" + indent + "  " + "\"" + tagName + "\" : {\n";
+      }
     }
     else
     {
       if (showTag == false)
+      {
         return indent + "{\n";
+      }
       else
+      {
         return indent + "\"" + tagName + "\" : {\n";
+      }
     }
   }
 
@@ -81,20 +97,30 @@ std::string startTag
   if (format == XML)
   {
     if (isCompoundVector)
+    {
       return indent + "<" + xmlTag + " type=\"vector\">\n";
+    }
 
     return indent + "<" + xmlTag + ">\n";
   }
   else if (format == JSON)
   {
     if (isVector && showTag)
+    {
        return indent + "\"" + jsonTag + "\" : [\n";
+    }
     else if (isVector && !showTag)
-       return indent + "[\n";
+    {
+      return indent + "[\n";
+    }
     else if (!isVector && showTag)
-       return indent + "\"" + jsonTag + "\" : {\n";
+    {
+      return indent + "\"" + jsonTag + "\" : {\n";
+    }
     else if (!isVector && !showTag)
-       return indent + "{\n";
+    {
+      return indent + "{\n";
+    }
   }
 
   return "Format not supported";
@@ -128,7 +154,7 @@ std::string endTag
   }
 
   std::string out = indent;
-    
+
   out += isVector?    "]"  : "}";
   out += comma?       ","  : "";
   out += nl?          "\n" : "";
@@ -155,25 +181,39 @@ std::string valueTag
 )
 {
   if (format == XML)
+  {
     return indent + "<" + tagName + ">" + value + "</" + tagName + ">" + "\n";
+  }
 
   if (showComma == true)
   {
     if (isAssociation == true)
+    {
       return indent + "\"" + tagName + "\" : " + value + ",\n";
+    }
     else if (isVectorElement == true)
+    {
       return indent + "\"" + value + "\",\n";
+    }
     else
+    {
       return indent + "\"" + tagName + "\" : \"" + value + "\",\n";
+    }
   }
   else
   {
     if (isAssociation == true)
+    {
       return indent + "\"" + tagName + "\" : " + value + "\n";
+    }
     else if (isVectorElement == true)
+    {
       return indent + "\"" + value + "\"\n";
+    }
     else
+    {
       return indent + "\"" + tagName + "\" : \"" + value + "\"\n";
+    }
   }
 }
 
@@ -197,12 +237,18 @@ std::string valueTag
   snprintf(val, sizeof(val), "%d", value);
 
   if (format == XML)
+  {
     return indent + "<" + tagName + ">" + val + "</" + tagName + ">" + "\n";
+  }
 
   if (showComma == true)
+  {
     return indent + "\"" + tagName + "\" : \"" + val + "\",\n";
+  }
   else
+  {
     return indent + "\"" + tagName + "\" : \"" + val + "\"\n";
+  }
 }
 
 
@@ -223,20 +269,30 @@ std::string valueTag
 )
 {
   if (format == XML)
+  {
     return indent + "<" + xmlTag + ">" + value + "</" + xmlTag + ">" + "\n";
+  }
 
   if (jsonTag == "")
   {
     if (showComma == true)
+    {
       return indent + "\"" + value + "\",\n";
+    }
     else
+    {
       return indent + "\"" + value + "\"\n";
+    }
   }
   else
   {
     if (showComma == true)
+    {
       return indent + "\"" + jsonTag + "\" : \"" + value + "\",\n";
+    }
     else
+    {
       return indent + "\"" + jsonTag + "\" : \"" + value + "\"\n";
+    }
   }
 }

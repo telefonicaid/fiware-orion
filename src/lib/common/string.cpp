@@ -601,7 +601,7 @@ char* strToLower(char* to, const char* from, int toSize)
 *
 * strReplace - 
 */
-void strReplace(char* to, const char* from, const char* oldString, const char* newString)
+void strReplace(char* to, int toLen, const char* from, const char* oldString, const char* newString)
 {
   int toIx   = 0;
   int fromIx = 0;
@@ -612,7 +612,7 @@ void strReplace(char* to, const char* from, const char* oldString, const char* n
   {
     if (strncmp(&from[fromIx], oldString, oldLen) == 0)
     {
-      strcat(to, newString);
+      snprintf(to, toLen, "%s", newString);
       toIx   += newLen;
       fromIx += oldLen;
     }
