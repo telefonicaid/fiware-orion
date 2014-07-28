@@ -119,6 +119,7 @@ std::string sendHttpSocket
   MemoryStruct*              httpResponse       = NULL;
   CURLcode                   res;
   size_t                     size;
+  int                        outgoingMsgSize       = 0;
 
   ++callNo;
 
@@ -202,48 +203,65 @@ std::string sendHttpSocket
       sprintf(portAsString, "%d", (int) rushHeaderPort);
       headerRushHttp = "X-relayer-host: " + rushHeaderIP + ":" + portAsString;
       headers = curl_slist_append(headers, headerRushHttp.c_str());
+      outgoingMsgSize += headerRushHttp.size();
 
       if (protocol == "https:")
       {
         headerRushHttp = "X-relayer-protocol: https";
         headers = curl_slist_append(headers, headerRushHttp.c_str());
+        outgoingMsgSize += headerRushHttp.size();
       }
 
     }
   }
 
   // User agent
-  size = sizeof(versionGet()) + 18;
+  size = sizeof(versionGet()) + 18; // from "User-Agent: orion/"
   char* headerUserAgent = new char[size];
   snprintf(headerUserAgent, size, "User-Agent: orion/%s", versionGet());
   headers = curl_slist_append(headers, headerUserAgent);
+  outgoingMsgSize += size;
 
   // Host
-  size = sizeof(ip.size()) + 13;
+  size = sizeof(ip.size()) + 13; // from "Host: :"
   char* headerHost = new char[size];
   snprintf(headerHost, size, "Host: %s:%d", ip.c_str(), (int) port);
   headers = curl_slist_append(headers, headerHost);
+  outgoingMsgSize += size;
 
   // Tenant
   if (tenant != "")
   {
     headers = curl_slist_append(headers, ("fiware-service: " + tenant).c_str());
+    outgoingMsgSize += tenant.size() + 16; // "fiware-service: "
   }
 
   // Accept
   headers = curl_slist_append(headers, "Accept: application/xml, application/json");
+  outgoingMsgSize += 41; // from "Accept: application/xml, application/json"
 
   // Expect
   headers = curl_slist_append(headers, "Expect: ");
+  outgoingMsgSize += 8; // from "Expect: "
 
   // Content-length
   std::stringstream contentLengthStringStream;
   contentLengthStringStream << content.size();
   std::string headerContentLength = "Content-length: " + contentLengthStringStream.str();
   headers = curl_slist_append(headers, headerContentLength.c_str());
+  outgoingMsgSize += contentLengthStringStream.str().size() + 16; // from "Content-length: "
 
   // Content-type
   headers = curl_slist_append(headers, ("Content-type: " + content_type).c_str());
+  outgoingMsgSize += content_type.size() + 14; // from "Content-type: "
+
+  // Check if total outgoing message size is too big
+  if (outgoingMsgSize > MAX_DYN_MSG_SIZE)
+  {
+    LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", outgoingMsgSize));
+    LM_TRANSACTION_END();
+    return "error";
+  }
 
   // Contents
   const char* payload = content.c_str();
