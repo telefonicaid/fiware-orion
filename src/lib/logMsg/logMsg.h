@@ -1,5 +1,5 @@
-#ifndef LOG_MSG_H
-#define LOG_MSG_H
+#ifndef SRC_LIB_LOGMSG_LOGMSG_H_
+#define SRC_LIB_LOGMSG_LOGMSG_H_
 
 /*
 *
@@ -36,6 +36,7 @@
 #include <stdarg.h>             /* ellipses                                  */
 #include <stdlib.h>             /* free()                                    */
 #include <time.h>
+#include <stdint.h>             /* int64, ...                                */
 
 
 
@@ -43,46 +44,45 @@
 *
 * globals
 */
-extern int    inSigHandler;
-extern char*  progName;
-
+extern int             inSigHandler;
+extern char*           progName;
 extern __thread char   transactionId[64];
 
 
 
 /* ****************************************************************************
 *
-* LmStatus - 
+* LmStatus -
 */
 typedef enum LmStatus
 {
-   LmsOk = 0,
+  LmsOk = 0,
 
-   LmsInitNotDone,
-   LmsInitAlreadyDone,
-   LmsNull,
-   LmsFdNotFound,
-   LmsFdInvalid,
-   LmsFdOccupied,
-   
-   LmsMalloc,
-   LmsOpen,
-   LmsFopen,
-   LmsLseek,
-   LmsFseek,
-   LmsWrite,
-   LmsFgets,
-   
-   LmsNoFiles,
-   LmsProgNameLevels,
-   LmsLineTooLong,
-   LmsStringTooLong,
-   LmsBadFormat,
-   LmsBadSize,
-   LmsBadParams,
-   LmsPrognameNotSet,
-   LmsPrognameError,
-   LmsClearNotAllowed
+  LmsInitNotDone,
+  LmsInitAlreadyDone,
+  LmsNull,
+  LmsFdNotFound,
+  LmsFdInvalid,
+  LmsFdOccupied,
+
+  LmsMalloc,
+  LmsOpen,
+  LmsFopen,
+  LmsLseek,
+  LmsFseek,
+  LmsWrite,
+  LmsFgets,
+
+  LmsNoFiles,
+  LmsProgNameLevels,
+  LmsLineTooLong,
+  LmsStringTooLong,
+  LmsBadFormat,
+  LmsBadSize,
+  LmsBadParams,
+  LmsPrognameNotSet,
+  LmsPrognameError,
+  LmsClearNotAllowed
 } LmStatus;
 
 
@@ -93,9 +93,9 @@ typedef enum LmStatus
 */
 typedef enum LmFormat
 {
-   LmfByte = 1,
-   LmfWord = 2,
-   LmfLong = 4
+  LmfByte = 1,
+  LmfWord = 2,
+  LmfLong = 4
 } LmFormat;
 
 
@@ -114,7 +114,7 @@ typedef void (*LmErrorFp)(void* input, char* logLine, char* stre);
 *
 * LmWriteFp - alternative write function type
 */
-typedef void (*LmWriteFp)(char*);
+typedef void (*LmWriteFp)(char* callback);
 
 
 
@@ -122,7 +122,20 @@ typedef void (*LmWriteFp)(char*);
 *
 * LmOutHook - type for function pointer for lmOut hook
 */
-typedef void (*LmOutHook)(void* vP, char* text, char type, time_t secondsNow, int timezone, int dst, const char* file, int lineNo, const char* fName, int tLev, const char* stre);
+typedef void (*LmOutHook)
+(
+  void*        vP,
+  char*        text,
+  char         type,
+  time_t       secondsNow,
+  int          timezone,
+  int          dst,
+  const char*  file,
+  int          lineNo,
+  const char*  fName,
+  int          tLev,
+  const char*  stre
+);
 
 
 
@@ -140,26 +153,26 @@ typedef int (*LmxFp)(int, char*);
 */
 typedef enum LmTraceLevel
 {
-   LmtIn = 0,
-   LmtFrom,
-   LmtEntry,
-   LmtExit,
-   LmtLine,
+  LmtIn = 0,
+  LmtFrom,
+  LmtEntry,
+  LmtExit,
+  LmtLine,
 
-   /* For listLib */
-   LmtListCreate,
-   LmtListInit,
-   LmtListInsert,
-   LmtListItemCreate,
-   
-   LmtUserStart
+  /* For listLib */
+  LmtListCreate,
+  LmtListInit,
+  LmtListInsert,
+  LmtListItemCreate,
+
+  LmtUserStart
 } LmTraceLevel;
 
 
 
 /* ****************************************************************************
 *
-* LmTracelevelName - 
+* LmTracelevelName -
 */
 typedef char* (*LmTracelevelName)(int level);
 
@@ -168,23 +181,22 @@ typedef char* (*LmTracelevelName)(int level);
 #define _LM_MAGIC (('z' << 24) | ('u' << 16) | ('k' << 8) | 'a')
 /* ****************************************************************************
 *
-* LogHeader - 
+* LogHeader -
 */
 typedef struct LogHeader
 {
-    int magic;     // LOG_MAGIC: "zuka" (akuz in little-endian ...)
-    int dataLen;   // Length of data part of message
-    
-    bool checkMagicNumber()
-    {
-        return magic == _LM_MAGIC;
-    }
-    
-    void setMagicNumber()
-    {
-        magic = _LM_MAGIC;
-    }
+  int magic;     // LOG_MAGIC: "zuka" (akuz in little-endian ...)
+  int dataLen;   // Length of data part of message
 
+  bool checkMagicNumber(void)
+  {
+    return magic == _LM_MAGIC;
+  }
+
+  void setMagicNumber(void)
+  {
+    magic = _LM_MAGIC;
+  }
 } LogHeader;
 
 
@@ -195,15 +207,17 @@ typedef struct LogHeader
 */
 typedef struct LogData
 {
-    int    lineNo;      // Line number in file
-    char   traceLevel;  // Tracelevel, in case of 'LM_T'
-    char   type;        // type of message 'M', 'E', 'W', ...
-    struct timeval tv;  // time since 1970
-    int    timezone;    // The timezone
-    int    dst;         // Type of Daylight Saving Time
-    pid_t  pid;         // pid of the process
-    pid_t  tid;         // Identifier of the thread
+  int             lineNo;      // Line number in file
+  char            traceLevel;  // Tracelevel, in case of 'LM_T'
+  char            type;        // type of message 'M', 'E', 'W', ...
+  struct timeval  tv;          // time since 1970
+  int             timezone;    // The timezone
+  int             dst;         // Type of Daylight Saving Time
+  pid_t           pid;         // pid of the process
+  pid_t           tid;         // Identifier of the thread
 } LogData;
+
+
 
 /* ****************************************************************************
 *
@@ -211,50 +225,51 @@ typedef struct LogData
 */
 typedef struct LogMsg
 {
-    LogHeader header;        // header ...
-    LogData   data;          // Integer part of log message
-    
+  LogHeader  header;  // header ...
+  LogData    data;    // Integer part of log message
 } LogMsg;
 
 
 
 /* ****************************************************************************
 *
-* 
+*
 */
 #ifdef LM_OFF
- #define LM_NO_V
- #define LM_NO_M
- #define LM_NO_H
- #define LM_NO_W
- #define LM_NO_E
- #define LM_NO_P
- #define LM_NO_X
- #define LM_NO_XP
- #ifdef LM_ON
-   #undef LM_ON
- #endif
-
+  #define LM_NO_V
+  #define LM_NO_M
+  #define LM_NO_H
+  #define LM_NO_W
+  #define LM_NO_E
+  #define LM_NO_P
+  #define LM_NO_X
+  #define LM_NO_XP
+  #ifdef LM_ON
+    #undef LM_ON
+  #endif
 #endif
 
 #ifdef LM_NO_V
-#define LM_V(s)
-#define LM_VV(s)
-#define LM_VVV(s)
-#define LM_VVVV(s)
-#define LM_VVVVV(s)
-#define LM_V2(s)
-#define LM_V3(s)
-#define LM_V4(s)
-#define LM_V5(s)
-#define LM_LV(s)
+  #define LM_V(s)
+  #define LM_VV(s)
+  #define LM_VVV(s)
+  #define LM_VVVV(s)
+  #define LM_VVVVV(s)
+  #define LM_V2(s)
+  #define LM_V3(s)
+  #define LM_V4(s)
+  #define LM_V5(s)
+  #define LM_LV(s)
+
 #else
+
 /* ****************************************************************************
 *
 * LM_V - log verbose message
 */
 #define LM_V(s)                                                            \
-do {                                                                       \
+do                                                                         \
+{                                                                          \
   if ((!lmSilent) && lmOk('V', 0) == LmsOk)                                \
   {                                                                        \
     char* text;                                                            \
@@ -268,7 +283,8 @@ do {                                                                       \
 } while (0)
 
 #define LM_V2(s)                                                           \
-do {                                                                       \
+do                                                                         \
+{                                                                          \
   if ((!lmSilent) && lmOk('2', 0) == LmsOk)                                \
   {                                                                        \
     char* text;                                                            \
@@ -283,7 +299,8 @@ do {                                                                       \
 
 
 #define LM_V3(s)                                                           \
-do {                                                                       \
+do                                                                         \
+{                                                                          \
   if ((!lmSilent) && lmOk('3', 0) == LmsOk)                                \
   {                                                                        \
     char* text;                                                            \
@@ -298,7 +315,8 @@ do {                                                                       \
 
 
 #define LM_V4(s)                                                           \
-do {                                                                       \
+do                                                                         \
+{                                                                          \
   if ((!lmSilent) && lmOk('4', 0) == LmsOk)                                \
   {                                                                        \
     char* text;                                                            \
@@ -313,7 +331,8 @@ do {                                                                       \
 
 
 #define LM_V5(s)                                                           \
-do {                                                                       \
+do                                                                         \
+{                                                                          \
   if ((!lmSilent) && lmOk('5', 0) == LmsOk)                                \
   {                                                                        \
     char* text;                                                            \
@@ -327,7 +346,8 @@ do {                                                                       \
 } while (0)
 
 #define LM_LV(s)                                                                 \
-do {                                                                             \
+do                                                                               \
+{                                                                                \
   if ((!lmSilent) && lmOk('V', 0) == LmsOk)                                      \
   {                                                                              \
     char* text;                                                                  \
@@ -352,7 +372,8 @@ do {                                                                            
 * LM_LM - log message ( only local ) // No hook function
 */
 #define LM_LM(s)                                                                 \
-do {                                                                             \
+do                                                                               \
+{                                                                                \
   if ((char* text = lmTextGet s) != NULL)                                        \
   {                                                                              \
     lmOut(text, 'M', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL, false);  \
@@ -365,7 +386,8 @@ do {                                                                            
 * LM_LW - log warning message ( only local ) // No hook function
 */
 #define LM_LW(s)                                                               \
-do {                                                                           \
+do                                                                             \
+{                                                                              \
   if ((char* text = lmTextGet s) != NULL)                                      \
   {                                                                            \
     lmOut(text, 'W', __FILE__, __LINE__, (char*) __FUNCTION__, 0, NULL, false);\
@@ -383,7 +405,8 @@ do {                                                                           \
 * LM_M - log message
 */
 #define LM_M(s)                                                           \
-do {                                                                      \
+do                                                                        \
+{                                                                         \
   char* text;                                                             \
                                                                           \
   if ((!lmSilent) && (text = lmTextGet s) != NULL)                        \
@@ -403,7 +426,8 @@ do {                                                                      \
 * LM_I - log message
 */
 #define LM_I(s)                                                           \
-do {                                                                      \
+do                                                                        \
+{                                                                         \
   char* text;                                                             \
                                                                           \
   if ((!lmSilent) && (text = lmTextGet s) != NULL)                        \
@@ -423,7 +447,8 @@ do {                                                                      \
 * LM_H - "hidden" log message
 */
 #define LM_H(s)                                                           \
-do {                                                                      \
+do                                                                        \
+{                                                                         \
   char* text;                                                             \
                                                                           \
   if ((!lmSilent) && (text = lmTextGet s) != NULL)                        \
@@ -443,7 +468,8 @@ do {                                                                      \
 * LM_S - log message with timestamp
 */
 #define LM_S(s)                                                          \
-do {                                                                     \
+do                                                                       \
+{                                                                        \
   char* text;                                                            \
                                                                          \
   if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
@@ -463,7 +489,8 @@ do {                                                                     \
 * LM_F - log message
 */
 #define LM_F(s)                                                        \
-do {                                                                   \
+do                                                                     \
+{                                                                      \
   char* text;                                                          \
                                                                        \
   if ((text = lmTextGet s) != NULL)                                    \
@@ -483,7 +510,8 @@ do {                                                                   \
 * LM_W - log warning message
 */
 #define LM_W(s)                                                          \
-do {                                                                     \
+do                                                                       \
+{                                                                        \
   char* text;                                                            \
                                                                          \
   if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
@@ -505,7 +533,8 @@ do {                                                                     \
 */
 
 #define LM_E(s)                                                           \
-do {                                                                      \
+do                                                                        \
+{                                                                         \
   char* text;                                                             \
                                                                           \
   if ((text = lmTextGet s) != NULL)                                       \
@@ -516,7 +545,8 @@ do {                                                                      \
 } while (0)
 
 #define LM_LE(s)                                                               \
-do {                                                                           \
+do                                                                             \
+{                                                                              \
   char* text;                                                                  \
                                                                                \
   if ((text = lmTextGet s) != NULL)                                            \
@@ -537,11 +567,12 @@ do {                                                                           \
 * LM_P - log perror message
 */
 #define LM_P(s)                                                          \
-do {                                                                     \
+do                                                                       \
+{                                                                        \
   char* text;                                                            \
   char  stre[128];                                                       \
                                                                          \
-  strcpy(stre, strerror(errno));                                         \
+  snprintf(stre, sizeof(stre), "%s", strerror(errno));                   \
   if ((text = lmTextGet s) != NULL)                                      \
   {                                                                      \
     lmOut(text, 'P', __FILE__, __LINE__, (char*) __FUNCTION__, 0, stre); \
@@ -561,7 +592,8 @@ do {                                                                     \
 * LMS_V - log verbose message
 */
 #define LMS_V(s)                                                                  \
-do {                                                                              \
+do                                                                                \
+{                                                                                 \
   if (lmOk('V', 0) == LmsOk)                                                      \
   {                                                                               \
     char* text;                                                                   \
@@ -584,7 +616,8 @@ do {                                                                            
 * LMS_M - log message
 */
 #define LMS_M(s)                                                               \
-do {                                                                           \
+do                                                                             \
+{                                                                              \
   char* text;                                                                  \
                                                                                \
   if ((text = lmTextGet s) != NULL)                                            \
@@ -604,7 +637,8 @@ do {                                                                           \
 * LMS_F - log message
 */
 #define LMS_F(s)                                                      \
-do {                                                                  \
+do                                                                    \
+{                                                                     \
   char* text;                                                         \
                                                                       \
   if ((text = lmTextGet s) != NULL)                                   \
@@ -624,7 +658,8 @@ do {                                                                  \
 * LMS_W - log warning message
 */
 #define LMS_W(s)                                                               \
-do {                                                                           \
+do                                                                             \
+{                                                                              \
   char* text;                                                                  \
                                                                                \
   if ((text = lmTextGet s) != NULL)                                            \
@@ -645,7 +680,8 @@ do {                                                                           \
 * LMS_E - log error message
 */
 #define LMS_E(s)                                                               \
-do {                                                                           \
+do                                                                             \
+{                                                                              \
   char* text;                                                                  \
                                                                                \
   if ((text = lmTextGet s) != NULL)                                            \
@@ -664,11 +700,12 @@ do {                                                                           \
 * LMS_P - log perror message
 */
 #define LMS_P(s)                                                               \
-do {                                                                           \
+do                                                                             \
+{                                                                              \
   char* text;                                                                  \
   char  stre[128];                                                             \
                                                                                \
-  strcpy(stre, strerror(errno));                                               \
+  snprintf(stre, sizeof(stre), "%s", strerror(errno));                         \
   if ((text = lmTextGet s) != NULL)                                            \
   {                                                                            \
     lmAddMsgBuf(text, 'P', __FILE__, __LINE__, (char*) __FUNCTION__, 0, stre); \
@@ -683,7 +720,8 @@ do {                                                                           \
 * LMS_T - log trace message
 */
 #define LMS_T(tLev, s)                                                              \
-do {                                                                                \
+do                                                                                  \
+{                                                                                   \
   if (lmOk('T', tLev) == LmsOk)                                                     \
   {                                                                                 \
     char* text;                                                                     \
@@ -702,7 +740,8 @@ do {                                                                            
 * LM_RE - log error message and return with code
 */
 #define LM_RE(code, s)           \
-do {                             \
+do                               \
+{                                \
   LM_E(s);                       \
   if (1 == 1) return code;       \
 } while (0)
@@ -714,7 +753,8 @@ do {                             \
 * LM_RP - log perror message and return with code
 */
 #define LM_RP(code, s)           \
-do {                             \
+do                               \
+{                                \
   LM_P(s);                       \
   if (1 == 1) return code;       \
 } while (0)
@@ -726,7 +766,8 @@ do {                             \
 * LM_RVE - log error message and return with void
 */
 #define LM_RVE(s)           \
-do {                        \
+do                          \
+{                           \
   LM_E(s);                  \
   if (1 == 1) return;       \
 } while (0)
@@ -738,7 +779,8 @@ do {                        \
 * LM_RVP - log perror message and return with void
 */
 #define LM_RVP(s)           \
-do {                        \
+do                          \
+{                           \
   LM_P(s);                  \
   if (1 == 1) return;       \
 } while (0)
@@ -753,7 +795,8 @@ do {                        \
 * LM_X - log error message and exit with code
 */
 #define LM_X(c, s)                                                       \
-do {                                                                     \
+do                                                                       \
+{                                                                        \
   char* text;                                                            \
                                                                          \
   if ((text = lmTextGet s) != NULL)                                      \
@@ -764,7 +807,8 @@ do {                                                                     \
 } while (0)
 
 #define LM_LX(c, s)                                                             \
-do {                                                                            \
+do                                                                              \
+{                                                                               \
   char* text;                                                                   \
                                                                                 \
   if ((text = lmTextGet s) != NULL)                                             \
@@ -786,14 +830,15 @@ do {                                                                            
 * LM_XP - log perror message and exit with code
 */
 #define LM_XP(c, s)                                                      \
-do {                                                                     \
+do                                                                       \
+{                                                                        \
   char* text;                                                            \
   char  stre[128];                                                       \
                                                                          \
-  strcpy(stre, strerror(errno));                                         \
+  snprintf(stre, sizeof(stre), "%s", strerror(errno));                   \
   if ((text = lmTextGet s) != NULL)                                      \
   {                                                                      \
-    lmOut(text, 'x', __FILE__, __LINE__, __FUNCTION__, c, stre);	       \
+    lmOut(text, 'x', __FILE__, __LINE__, __FUNCTION__, c, stre);         \
     ::free(text);                                                        \
   }                                                                      \
 } while (0)
@@ -826,7 +871,8 @@ do {                                                                     \
 * LM_TODO - log todo message
 */
 #define LM_TODO(s)                                                         \
-do {                                                                       \
+do                                                                         \
+{                                                                          \
   if ((!lmSilent) && (lmOk('t', 0) == LmsOk))                              \
   {                                                                        \
     char* text;                                                            \
@@ -846,7 +892,8 @@ do {                                                                       \
 * LM_DOUBT - log doubt message
 */
 #define LM_DOUBT(s)                                                      \
-do {                                                                     \
+do                                                                       \
+{                                                                        \
   char* text;                                                            \
                                                                          \
   if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
@@ -863,7 +910,8 @@ do {                                                                     \
 * LM_FIX - log fix message
 */
 #define LM_FIX(s)                                                        \
-do {                                                                     \
+do                                                                       \
+{                                                                        \
   char* text;                                                            \
                                                                          \
   if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
@@ -880,7 +928,8 @@ do {                                                                     \
 * LM_BUG - log bug message
 */
 #define LM_BUG(s)                                                        \
-do {                                                                     \
+do                                                                       \
+{                                                                        \
   char* text;                                                            \
                                                                          \
   if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
@@ -897,7 +946,8 @@ do {                                                                     \
 * LM_T - log trace message
 */
 #define LM_T(tLev, s)                                                         \
-do {                                                                          \
+do                                                                            \
+{                                                                             \
   if ((!lmSilent) && lmOk('T', tLev) == LmsOk)                                \
   {                                                                           \
     char* text;                                                               \
@@ -911,7 +961,8 @@ do {                                                                          \
 } while (0)
 
 #define LM_LT(tLev, s)                                                               \
-do {                                                                                 \
+do                                                                                   \
+{                                                                                    \
   if ((!lmSilent) && lmOk('T', tLev) == LmsOk)                                       \
   {                                                                                  \
     char* text;                                                                      \
@@ -931,7 +982,8 @@ do {                                                                            
 * LM_D - log debug message
 */
 #define LM_D(s)                                                            \
-do {                                                                       \
+do                                                                         \
+{                                                                          \
   char* text;                                                              \
                                                                            \
   if ((!lmSilent) && lmOk('D', 0) == LmsOk)                                \
@@ -951,7 +1003,8 @@ do {                                                                       \
 * LM_RAW - log raw message
 */
 #define LM_RAW(s)                                                     \
-do {                                                                  \
+do                                                                    \
+{                                                                     \
   char* text;                                                         \
                                                                       \
   if ((!lmSilent) && (text = lmTextGet s) != NULL)                    \
@@ -967,24 +1020,21 @@ do {                                                                  \
 *
 * LM_LINE - line number trace macro
 */
-#define LM_LINE() \
-   LM_T(LmtLine, ("line %d", __LINE__))
+#define LM_LINE()  LM_T(LmtLine, ("line %d", __LINE__))
 
 
 /* ****************************************************************************
 *
 * LM_MLINE - line number trace macro
 */
-#define LM_MLINE() \
-   LM_M(("line %d", __LINE__))
+#define LM_MLINE()   LM_M(("line %d", __LINE__))
 
 
 /* ****************************************************************************
 *
 * LM_IN - in function trace macro
 */
-#define LM_IN(s) \
-   LM_T(LmtIn, s)
+#define LM_IN(s)   LM_T(LmtIn, s)
 
 
 
@@ -992,8 +1042,7 @@ do {                                                                  \
 *
 * LM_FROM - from function trace macro
 */
-#define LM_FROM(s) \
-   LM_T(LmtFrom, s)
+#define LM_FROM(s)   LM_T(LmtFrom, s)
 
 
 
@@ -1001,8 +1050,7 @@ do {                                                                  \
 *
 * LM_ENTRY - in function trace macro
 */
-#define LM_ENTRY() \
-   LM_T(LmtEntry, ("Entering function %s", (char*) __FUNCTION__))
+#define LM_ENTRY()   LM_T(LmtEntry, ("Entering function %s", (char*) __FUNCTION__))
 
 
 
@@ -1010,8 +1058,7 @@ do {                                                                  \
 *
 * LM_EXIT - exit function trace macro
 */
-#define LM_EXIT() \
-   LM_T(LmtExit, ("Leaving function %s", (char*) __FUNCTION__))
+#define LM_EXIT()   LM_T(LmtExit, ("Leaving function %s", (char*) __FUNCTION__))
 
 
 
@@ -1020,7 +1067,7 @@ do {                                                                  \
 * LM_READS - read buffer presentation
 */
 #define LM_READS(_from, _desc, _buf, _sz, _form)  \
-   lmBufferPresent((char*) _from, (char*) _desc, _buf, _sz, _form, 'r')
+  lmBufferPresent((char*) _from, (char*) _desc, _buf, _sz, _form, 'r')
 
 
 
@@ -1030,7 +1077,7 @@ do {                                                                  \
 * LM_BUF - buffer presentation
 */
 #define LM_BUF(_desc, _buf, _sz, _form)  \
-   lmBufferPresent(NULL, _desc, _buf, _sz, _form, 'b')
+  lmBufferPresent(NULL, _desc, _buf, _sz, _form, 'b')
 
 
 
@@ -1040,7 +1087,7 @@ do {                                                                  \
 * LM_WRITES - written buffer presentation
 */
 #define LM_WRITES(_to, _desc, _buf, _sz, _form)  \
-   lmBufferPresent((char*) _to, (char*) _desc, (char*) _buf, _sz, _form, 'w')
+  lmBufferPresent((char*) _to, (char*) _desc, (char*) _buf, _sz, _form, 'w')
 
 #endif
 
@@ -1051,7 +1098,8 @@ do {                                                                  \
 * LMX_E - 
 */
 #define LMX_E(xCode, s)                                                  \
-do {                                                                     \
+do                                                                       \
+{                                                                        \
   char* text;                                                            \
                                                                          \
   if ((text = lmTextGet s) != NULL)                                      \
@@ -1070,7 +1118,8 @@ do {                                                                     \
 * LMX_RE - 
 */
 #define LMX_RE(xCode, rCode, s)                                          \
-do {                                                                     \
+do                                                                       \
+{                                                                        \
   char* text;                                                            \
                                                                          \
   if ((text = lmTextGet s) != NULL)                                      \
@@ -1090,7 +1139,8 @@ do {                                                                     \
 * LMX_X - log error message and exit with code
 */
 #define LMX_X(xCode, eCode, s)                                               \
-do {                                                                         \
+do                                                                           \
+{                                                                            \
   char* text;                                                                \
                                                                              \
   if ((text = lmTextGet s) != NULL)                                          \
@@ -1108,7 +1158,8 @@ do {                                                                         \
 * LMX_W - log warning message
 */
 #define LMX_W(xCode, s)                                                  \
-do {                                                                     \
+do                                                                       \
+{                                                                        \
   char* text;                                                            \
                                                                          \
   if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
@@ -1126,7 +1177,8 @@ do {                                                                     \
 * LMX_M - log message
 */
 #define LMX_M(xCode, s)                                                  \
-do {                                                                     \
+do                                                                       \
+{                                                                        \
   char* text;                                                            \
                                                                          \
   if ((!lmSilent) && (text = lmTextGet s) != NULL)                       \
@@ -1145,7 +1197,8 @@ do {                                                                     \
 * LMX_V - log verbose message
 */
 #define LMX_V(xCode, s)                                                    \
-do {                                                                       \
+do                                                                         \
+{                                                                          \
   char* text;                                                              \
                                                                            \
   if ((!lmSilent) && lmOk('V', 0) == LmsOk)                                \
@@ -1166,7 +1219,8 @@ do {                                                                       \
 * LMX_D - log message
 */
 #define LMX_D(xCode, s)                                                    \
-do {                                                                       \
+do                                                                         \
+{                                                                          \
   char* text;                                                              \
                                                                            \
   if ((!lmSilent) && lmOk('D', 0) == LmsOk)                                \
@@ -1187,7 +1241,8 @@ do {                                                                       \
 * LMX_T - log trace message
 */
 #define LMX_T(xCode, tLev, s)                                                 \
-do {                                                                          \
+do                                                                            \
+{                                                                             \
   char* text;                                                                 \
                                                                               \
   if ((!lmSilent) && lmOk('T', tLev) == LmsOk)                                \
@@ -1297,7 +1352,7 @@ extern LmStatus lmTraceSub(const char* levelFormat);
 *
 * lmTraceGet - 
 */
-extern char* lmTraceGet(char* levelString);
+extern char* lmTraceGet(char* levelString, int levelStringSize);
 extern char* lmTraceGet(char* levelString, int levelStringSize, char* traceV);
 
 
@@ -1372,11 +1427,11 @@ extern LmStatus lmOk(char type, int tLev);
 */
 extern LmStatus lmFdRegister
 (
-	int          fd,
-	const char*  format,
-	const char*  timeFormat,
-	const char*  info,
-	int*         indexP
+  int          fd,
+  const char*  format,
+  const char*  timeFormat,
+  const char*  info,
+  int*         indexP
 );
 
 
@@ -1395,11 +1450,11 @@ extern void lmFdUnregister(int fd);
 */
 extern LmStatus lmPathRegister
 (
-   const char* path,
-   const char* format,
-   const char* timeFormat,
-   int*        indexP,
-   bool        appendToLogFile = false
+  const char*  path,
+  const char*  format,
+  const char*  timeFormat,
+  int*         indexP,
+  bool         appendToLogFile = false
 );
 
 
@@ -1467,7 +1522,7 @@ int lmBufferPresent
   char*       to,
   char*       description,
   void*       bufP,
-  int         size, 
+  int         size,
   LmFormat    format,
   int         type
 );
@@ -1484,7 +1539,7 @@ LmStatus lmWriteFunction(int i, LmWriteFp fp);
 
 /* ****************************************************************************
 *
-* lmClear - 
+* lmClear -
 */
 extern LmStatus lmClear(int index, int keepLines, int lastLines);
 
@@ -1492,7 +1547,7 @@ extern LmStatus lmClear(int index, int keepLines, int lastLines);
 
 /* ****************************************************************************
 *
-* lmDoClear - 
+* lmDoClear -
 */
 extern LmStatus lmDoClear(void);
 
@@ -1500,7 +1555,7 @@ extern LmStatus lmDoClear(void);
 
 /* ****************************************************************************
 *
-* lmDontClear - 
+* lmDontClear -
 */
 extern LmStatus lmDontClear(void);
 
@@ -1508,7 +1563,7 @@ extern LmStatus lmDontClear(void);
 
 /* ****************************************************************************
 *
-* lmClearAt - 
+* lmClearAt -
 */
 LmStatus lmClearAt(int atLines, int keepLines, int lastLines);
 
@@ -1516,7 +1571,7 @@ LmStatus lmClearAt(int atLines, int keepLines, int lastLines);
 
 /* ****************************************************************************
 *
-* lmClearGet - 
+* lmClearGet -
 */
 extern void lmClearGet
 (
@@ -1531,7 +1586,7 @@ extern void lmClearGet
 
 /* ****************************************************************************
 *
-* lmExitForced - 
+* lmExitForced -
 */
 extern void lmExitForced(int code);
 
@@ -1547,7 +1602,7 @@ extern LmStatus lmxFunction(LmxFp fp);
 
 /* ****************************************************************************
 *
-* lmReopen - 
+* lmReopen -
 */
 extern LmStatus lmReopen(int index);
 
@@ -1563,7 +1618,7 @@ extern LmStatus lmOnlyErrors(int index);
 
 /* ****************************************************************************
 *
-* lmTraceLevel - 
+* lmTraceLevel -
 */
 extern const char* lmTraceLevel(int level);
 
@@ -1571,7 +1626,7 @@ extern const char* lmTraceLevel(int level);
 
 /* ****************************************************************************
 *
-* lmTraceNameCbSet - 
+* lmTraceNameCbSet -
 */
 extern void lmTraceNameCbSet(LmTracelevelName cb);
 
@@ -1579,7 +1634,7 @@ extern void lmTraceNameCbSet(LmTracelevelName cb);
 
 /* ****************************************************************************
 *
-* lmTraceIsSet - 
+* lmTraceIsSet -
 */
 extern bool lmTraceIsSet(int level);
 
@@ -1595,7 +1650,7 @@ extern void lmTraceLevelSet(unsigned int level, bool onOff);
 
 /* ****************************************************************************
 *
-* lmSdGet - 
+* lmSdGet -
 */
 int lmSdGet(void);
 
@@ -1603,7 +1658,7 @@ int lmSdGet(void);
 
 /* ****************************************************************************
 *
-* lmAddMsgBuf - 
+* lmAddMsgBuf -
 */
 void lmAddMsgBuf(char* text, char type, const char* file, int line, const char* func, int tLev, const char *stre);
 
@@ -1611,7 +1666,7 @@ void lmAddMsgBuf(char* text, char type, const char* file, int line, const char* 
 
 /* ****************************************************************************
 *
-* lmPrintMsgBuf - 
+* lmPrintMsgBuf -
 */
 void lmPrintMsgBuf();
 
@@ -1627,7 +1682,7 @@ extern void lmWarningFunctionDebug(char* info, char* file, int line);
 
 /* ****************************************************************************
 *
-* lmFirstDiskFileDescriptor - 
+* lmFirstDiskFileDescriptor -
 */
 extern int lmFirstDiskFileDescriptor(void);
 
@@ -1635,28 +1690,34 @@ extern int lmFirstDiskFileDescriptor(void);
 
 /* ****************************************************************************
 *
-* lmLogLineGet - 
+* lmLogLineGet -
 */
-extern long lmLogLineGet
+extern int64_t lmLogLineGet
 (
-  char*   typeP,
-  char*   dateP,
-  int*    msP,
-  char*   progNameP,
-  char*   fileNameP,
-  int*    lineNoP,
-  int*    pidP,
-  int*    tidP,
-  char*   funcNameP,
-  char*   messageP,
-  long    offset,
-  char**  lineP
+  char*     typeP,
+  char*     dateP,
+  int       dateLen,
+  int*      msP,
+  char*     progNameP,
+  int       progNameLen,
+  char*     fileNameP,
+  int       fileNameLen,
+  int*      lineNoP,
+  int*      pidP,
+  int*      tidP,
+  char*     funcNameP,
+  int       funcNameLen,
+  char*     messageP,
+  int       messageLen,
+  int64_t   offset,
+  char**    allP
 );
+
 
 
 /* ****************************************************************************
 *
-* lmCleanProgName - 
+* lmCleanProgName -
 */
 extern void lmCleanProgName(void);
 
@@ -1664,7 +1725,7 @@ extern void lmCleanProgName(void);
 
 /* ****************************************************************************
 *
-* lmLogLinesGet - 
+* lmLogLinesGet -
 */
 extern int lmLogLinesGet(void);
 
@@ -1672,7 +1733,7 @@ extern int lmLogLinesGet(void);
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_RESET - 
+* LM_TRANSACTION_RESET -
 */
 #define LM_TRANSACTION_RESET()                            \
 do                                                        \
@@ -1684,7 +1745,7 @@ do                                                        \
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_START - 
+* LM_TRANSACTION_START -
 */
 #define LM_TRANSACTION_START(ip, port, path)                    \
 do                                                              \
@@ -1697,7 +1758,7 @@ do                                                              \
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_START_URL - 
+* LM_TRANSACTION_START_URL -
 */
 #define LM_TRANSACTION_START_URL(url)                           \
 do                                                              \
@@ -1710,7 +1771,7 @@ do                                                              \
 
 /* ****************************************************************************
 *
-* LM_TRANSACTION_END - 
+* LM_TRANSACTION_END -
 */
 #define LM_TRANSACTION_END()                              \
 do                                                        \
@@ -1719,4 +1780,4 @@ do                                                        \
   LM_TRANSACTION_RESET();                                 \
 } while (0)
 
-#endif
+#endif  // SRC_LIB_LOGMSG_LOGMSG_H_
