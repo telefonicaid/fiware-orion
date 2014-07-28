@@ -268,7 +268,7 @@ std::string sendHttpSocket
 
   if (res != CURLE_OK)
   {
-    LM_W(("curl_easy_perform() failed: %s\n", curl_easy_strerror(res)));
+    LM_W(("Notification failure for %s:%s (curl_easy_perform failed: %s)", ip.c_str(), portAsString, curl_easy_strerror(res)));
     result = "";
   }
   else
@@ -369,7 +369,7 @@ struct MemoryStruct {
 * calloc/free syscalls if the notification payload is not very large.
 *
 */
-std::string sendHttpSocket2
+std::string sendHttpSocket
 (
    const std::string&     _ip,
    unsigned short         port,
