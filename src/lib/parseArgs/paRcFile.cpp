@@ -148,7 +148,7 @@ static int dirFind(char* dir, int dirLen)
   if (paGenericRcDir != NULL)
   {
     LM_T(LmtPaRcFile, ("checking dir '%s'", paGenericRcDir));
-    snprintf(dir, dirLen, paGenericRcDir);
+    snprintf(dir, dirLen, "%s", paGenericRcDir);
     snprintf(path, sizeof(path), "%s/%s", dir, paRcFileName);
 
     if (access(path, R_OK) == 0)

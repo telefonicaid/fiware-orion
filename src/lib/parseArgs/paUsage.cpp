@@ -145,87 +145,87 @@ static void getApVals
 
   case PaString:
     // printf("Calling 'escape' four times\n");
-    snprintf(defVal,  sizeof(defVal),  "'%s'", (defP->i != PaNoDef)? escape(out, (char*) aP->def) : "no default");
-    snprintf(minVal,  sizeof(minVal),  "'%s'", (minP->i != PaNoLim)? escape(out, (char*) aP->min)  : "no min limit");
-    snprintf(maxVal,  sizeof(maxVal),  "'%s'", (maxP->i != PaNoLim)? escape(out, (char*) aP->max)  : "no max limit");
-    snprintf(realVal, sizeof(realVal), "'%s'", (aP->varP != NULL)?   escape(out, (char*) aP->varP) : "no value");
+    snprintf(defVal,  defValLen,  "'%s'", (defP->i != PaNoDef)? escape(out, (char*) aP->def) : "no default");
+    snprintf(minVal,  minValLen,  "'%s'", (minP->i != PaNoLim)? escape(out, (char*) aP->min)  : "no min limit");
+    snprintf(maxVal,  maxValLen,  "'%s'", (maxP->i != PaNoLim)? escape(out, (char*) aP->max)  : "no max limit");
+    snprintf(realVal, realValLen, "'%s'", (aP->varP != NULL)?   escape(out, (char*) aP->varP) : "no value");
     break;
 
   case PaBoolean:
-    snprintf(defVal,  sizeof(defVal),  "%s", BA_FT(aP->def));
-    snprintf(realVal, sizeof(realVal), "%s", BA_FT(*((bool*) aP->varP)));
+    snprintf(defVal,  defValLen,  "%s", BA_FT(aP->def));
+    snprintf(realVal, realValLen, "%s", BA_FT(*((bool*) aP->varP)));
     aP->hasMinLimit = false;
     aP->hasMaxLimit = false;
     break;
 
   case PaInt:
-    snprintf(defVal,  sizeof(defVal),  "%d", (int) (aP->def & 0xFFFFFFFF));
-    snprintf(minVal,  sizeof(minVal),  "%d", (int) (aP->min & 0xFFFFFFFF));
-    snprintf(maxVal,  sizeof(maxVal),  "%d", (int) (aP->max & 0xFFFFFFFF));
-    snprintf(realVal, sizeof(realVal), "%d", *((int*) aP->varP));
+    snprintf(defVal,  defValLen,  "%d", (int) (aP->def & 0xFFFFFFFF));
+    snprintf(minVal,  minValLen,  "%d", (int) (aP->min & 0xFFFFFFFF));
+    snprintf(maxVal,  maxValLen,  "%d", (int) (aP->max & 0xFFFFFFFF));
+    snprintf(realVal, realValLen, "%d", *((int*) aP->varP));
     break;
 
   case PaInt64:
-    snprintf(defVal,  sizeof(defVal),  "%ld", aP->def);
-    snprintf(minVal,  sizeof(minVal),  "%ld", aP->min);
-    snprintf(maxVal,  sizeof(maxVal),  "%ld", aP->max);
-    snprintf(realVal, sizeof(realVal), "%ld", *((int64_t*) aP->varP));
+    snprintf(defVal,  defValLen,  "%ld", aP->def);
+    snprintf(minVal,  minValLen,  "%ld", aP->min);
+    snprintf(maxVal,  maxValLen,  "%ld", aP->max);
+    snprintf(realVal, realValLen, "%ld", *((int64_t*) aP->varP));
     break;
 
   case PaIntU:
-    snprintf(defVal,  sizeof(defVal),  "%u", (int) (aP->def & 0xFFFFFFFF));
-    snprintf(minVal,  sizeof(minVal),  "%u", (int) (aP->min & 0xFFFFFFFF));
-    snprintf(maxVal,  sizeof(maxVal),  "%u", (int) (aP->max & 0xFFFFFFFF));
-    snprintf(realVal, sizeof(realVal), "%u", *((uint32_t*) aP->varP));
+    snprintf(defVal,  defValLen,  "%u", (int) (aP->def & 0xFFFFFFFF));
+    snprintf(minVal,  minValLen,  "%u", (int) (aP->min & 0xFFFFFFFF));
+    snprintf(maxVal,  maxValLen,  "%u", (int) (aP->max & 0xFFFFFFFF));
+    snprintf(realVal, realValLen, "%u", *((uint32_t*) aP->varP));
     break;
 
   case PaIntU64:
-    snprintf(defVal,  sizeof(defVal),  "%lu", aP->def);
-    snprintf(minVal,  sizeof(minVal),  "%lu", aP->min);
-    snprintf(maxVal,  sizeof(maxVal),  "%lu", aP->max);
-    snprintf(realVal, sizeof(realVal), "%lu", *((uint64_t*) aP->varP));
+    snprintf(defVal,  defValLen,  "%lu", aP->def);
+    snprintf(minVal,  minValLen,  "%lu", aP->min);
+    snprintf(maxVal,  maxValLen,  "%lu", aP->max);
+    snprintf(realVal, realValLen, "%lu", *((uint64_t*) aP->varP));
     break;
 
   case PaShort:
-    snprintf(defVal,  sizeof(defVal),  "%d", (int16_t) (aP->def & 0xFFFF));
-    snprintf(minVal,  sizeof(minVal),  "%d", (int16_t) (aP->min & 0xFFFF));
-    snprintf(maxVal,  sizeof(maxVal),  "%d", (int16_t) (aP->max & 0xFFFF));
-    snprintf(realVal, sizeof(realVal), "%d", (*((int16_t*) aP->varP) & 0xFFFF));
+    snprintf(defVal,  defValLen,  "%d", (int16_t) (aP->def & 0xFFFF));
+    snprintf(minVal,  minValLen,  "%d", (int16_t) (aP->min & 0xFFFF));
+    snprintf(maxVal,  maxValLen,  "%d", (int16_t) (aP->max & 0xFFFF));
+    snprintf(realVal, realValLen, "%d", (*((int16_t*) aP->varP) & 0xFFFF));
     break;
 
   case PaShortU:
-    snprintf(defVal,  sizeof(defVal),  "%u", (int) (aP->def & 0xFFFF));
-    snprintf(minVal,  sizeof(minVal),  "%u", (int) (aP->min & 0xFFFF));
-    snprintf(maxVal,  sizeof(maxVal),  "%u", (int) (aP->max & 0xFFFF));
-    snprintf(realVal, sizeof(realVal), "%u", (*((uint16_t*) aP->varP) & 0xFFFF));
+    snprintf(defVal,  defValLen,  "%u", (int) (aP->def & 0xFFFF));
+    snprintf(minVal,  minValLen,  "%u", (int) (aP->min & 0xFFFF));
+    snprintf(maxVal,  maxValLen,  "%u", (int) (aP->max & 0xFFFF));
+    snprintf(realVal, realValLen, "%u", (*((uint16_t*) aP->varP) & 0xFFFF));
     break;
 
   case PaChar:
-    snprintf(defVal,  sizeof(defVal),  "%d", (int) (aP->def & 0xFF));
-    snprintf(minVal,  sizeof(minVal),  "%d", (int) (aP->min & 0xFF));
-    snprintf(maxVal,  sizeof(maxVal),  "%d", (int) (aP->max & 0xFF));
-    snprintf(realVal, sizeof(realVal), "%d", (*((char*) aP->varP) & 0xFF));
+    snprintf(defVal,  defValLen,  "%d", (int) (aP->def & 0xFF));
+    snprintf(minVal,  minValLen,  "%d", (int) (aP->min & 0xFF));
+    snprintf(maxVal,  maxValLen,  "%d", (int) (aP->max & 0xFF));
+    snprintf(realVal, realValLen, "%d", (*((char*) aP->varP) & 0xFF));
     break;
 
   case PaCharU:
-    snprintf(defVal,  sizeof(defVal),  "%u", (int) (aP->def & 0xFF));
-    snprintf(minVal,  sizeof(minVal),  "%u", (int) (aP->min & 0xFF));
-    snprintf(maxVal,  sizeof(maxVal),  "%u", (int) (aP->max & 0xFF));
-    snprintf(realVal, sizeof(realVal), "%u", (*((uint8_t*) aP->varP) & 0xFF));
+    snprintf(defVal,  defValLen,  "%u", (int) (aP->def & 0xFF));
+    snprintf(minVal,  minValLen,  "%u", (int) (aP->min & 0xFF));
+    snprintf(maxVal,  maxValLen,  "%u", (int) (aP->max & 0xFF));
+    snprintf(realVal, realValLen, "%u", (*((uint8_t*) aP->varP) & 0xFF));
     break;
 
   case PaFloat:
-    snprintf(defVal,  sizeof(defVal),  "%f", (float) aP->def);
-    snprintf(minVal,  sizeof(minVal),  "%f", (float) aP->min);
-    snprintf(maxVal,  sizeof(maxVal),  "%f", (float) aP->max);
-    snprintf(realVal, sizeof(realVal), "%f", (*((float*) aP->varP)));
+    snprintf(defVal,  defValLen,  "%f", (float) aP->def);
+    snprintf(minVal,  minValLen,  "%f", (float) aP->min);
+    snprintf(maxVal,  maxValLen,  "%f", (float) aP->max);
+    snprintf(realVal, realValLen, "%f", (*((float*) aP->varP)));
     break;
 
   case PaDouble:
-    snprintf(defVal,  sizeof(defVal),  "%f", (double) aP->def);
-    snprintf(minVal,  sizeof(minVal),  "%f", (double) aP->min);
-    snprintf(maxVal,  sizeof(maxVal),  "%f", (double) aP->max);
-    snprintf(realVal, sizeof(realVal), "%f", (*((double*) aP->varP)));
+    snprintf(defVal,  defValLen,  "%f", (double) aP->def);
+    snprintf(minVal,  minValLen,  "%f", (double) aP->min);
+    snprintf(maxVal,  maxValLen,  "%f", (double) aP->max);
+    snprintf(realVal, realValLen, "%f", (*((double*) aP->varP)));
     break;
   }
 
