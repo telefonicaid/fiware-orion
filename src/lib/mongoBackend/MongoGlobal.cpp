@@ -105,7 +105,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
       }
 
       if (tryNo == 0)
-        LM_E(("Database Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
+        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
       else
         LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
 
@@ -131,7 +131,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
             if (!connection->auth("admin", std::string(username), std::string(passwd), err))
             {
                 mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
-                LM_E(("Database Authentication Error (db=admin, username=%s, pswd=%s): %s", username, passwd, err.c_str()));
+                LM_E(("Database Startup Error (authentication: db='admin', username='%s', password='*****': %s)", username, err.c_str()));
                 return false;
             }
         }
@@ -141,7 +141,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
             if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err))
             {
                 mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
-                LM_E(("Database Authentication Error (db=%s, username=%s, pswd=%s): %s", db, username, passwd, err.c_str()));
+                LM_E(("Database Startup Error (authentication: db='%s', username='%s', password='*****': %s)", db, username, err.c_str()));
                 return false;
             }
         }
@@ -155,7 +155,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
     if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
     {
         mongoSemGive(__FUNCTION__, "wrong mongo version format");
-        LM_E(("Database Error (invalid version format: %s)", versionString.c_str()));
+        LM_E(("Database Startup Error (invalid version format: %s)", versionString.c_str()));
         return false;
     }
     LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)", versionString.c_str(), mongoVersionMayor, mongoVersionMinor, extra.c_str()));
@@ -714,25 +714,29 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
             if (sco->areaType == orion::CircleType)
             {
                 double radians = sco->circle.radius() / EARTH_RADIUS_METERS;
-                geoWithin = BSON("$centerSphere" << BSON_ARRAY(BSON_ARRAY( sco->circle.center.latitude() << sco->circle.center.longitude()) << radians ));
+                geoWithin = BSON("$centerSphere" << BSON_ARRAY(BSON_ARRAY(sco->circle.center.longitude() << sco->circle.center.latitude()) << radians ));
                 inverted = sco->circle.inverted();
             }
             else if (sco->areaType== orion::PolygonType)
             {
                 BSONArrayBuilder vertex;
-                double x0 = 0;
-                double y0 = 0;
-                for (unsigned int jx = 0; jx < sco->polygon.vertexList.size() ; ++jx) {
-                    double x = sco->polygon.vertexList[jx]->latitude();
-                    double y = sco->polygon.vertexList[jx]->longitude();
-                    if (jx == 0) {
-                        x0 = x;
-                        y0 = y;
+                double lat0 = 0;
+                double lon0 = 0;
+
+                for (unsigned int jx = 0; jx < sco->polygon.vertexList.size() ; ++jx)
+                {
+                    double lat = sco->polygon.vertexList[jx]->latitude();
+                    double lon = sco->polygon.vertexList[jx]->longitude();
+
+                    if (jx == 0)
+                    {
+                        lat0 = lat;
+                        lon0 = lon;
                     }
-                    vertex.append(BSON_ARRAY(x << y));
+                    vertex.append(BSON_ARRAY(lon << lat));
                 }
                 /* MongoDB query API needs to "close" the polygon with the same point that the initial point */
-                vertex.append(BSON_ARRAY(x0 << y0));
+                vertex.append(BSON_ARRAY(lon0 << lat0));
 
                 /* Note that MongoDB query API uses an ugly "double array" structure for coordinates */
                 geoWithin = BSON("$geometry" << BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(vertex.arr())));

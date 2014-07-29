@@ -1,5 +1,5 @@
-#ifndef PA_CONFIG_H
-#define PA_CONFIG_H
+#ifndef SRC_LIB_PARSEARGS_PACONFIG_H_
+#define SRC_LIB_PARSEARGS_PACONFIG_H_
 
 /*
 *
@@ -25,16 +25,17 @@
 *
 * Author: Ken Zangelin
 */
-#include "baStd.h"              /* bool, ...                            */
+#include "parseArgs/baStd.h"      /* bool, ...                              */
+#include "parseArgs/parseArgs.h"  /* Where we have the ext decl of paConfig */
 
-#include "parseArgs/parseArgs.h"          /* Where we have the ext decl of paConfig    */
+
 
 #ifndef DEFAULT_VERSION
-    #define DEFAULT_VERSION "alpha"
+#  define DEFAULT_VERSION "alpha"
 #endif
 
 #ifndef DEFAULT_AUTHOR
-    #define DEFAULT_AUTHOR "Telefonica I+D"
+#  define DEFAULT_AUTHOR "Telefonica I+D"
 #endif
 
 #ifndef DEFAULT_COPYRIGHT
@@ -49,6 +50,7 @@
                               "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero\n" \
                               "General Public License for more details."
 #endif
+
 
 
 /* ****************************************************************************
@@ -141,4 +143,4 @@ extern int paConfigActions(bool preTreat);
 */
 extern void paConfigCleanup(void);
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PACONFIG_H_

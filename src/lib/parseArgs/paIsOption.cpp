@@ -22,18 +22,18 @@
 *
 * Author: developer
 */
+#include <string.h>                   /* strncmp                             */
+#include <string>                     /* std::string                         */
+#include <cstdlib>                    /* C++ free                            */
 
-#include <string.h>             /* strncmp                                   */
+#include "parseArgs/baStd.h"          /* BA standard header file             */
+#include "logMsg/logMsg.h"            /* LM_T                                */
 
-#include "baStd.h"              /* BA standard header file                   */
-#include "logMsg/logMsg.h"             /* LM_T                                      */
-
-#include "parseArgs/parseArgs.h"          /* PaArgument, ...                           */
-#include "paTraceLevels.h"      /* LmtXXX                                    */
-#include "paBuiltin.h"          /* paBuiltin, paBuiltinNoOf                  */
-#include "paIterate.h"          /* paIterateInit, paIterateNext              */
-#include "paIsOption.h"         /* Own interface                             */
-#include <cstdlib>				/* C++ free(.)								 */
+#include "parseArgs/parseArgs.h"      /* PaArgument, ...                     */
+#include "parseArgs/paTraceLevels.h"  /* LmtXXX                              */
+#include "parseArgs/paBuiltin.h"      /* paBuiltin, paBuiltinNoOf            */
+#include "parseArgs/paIterate.h"      /* paIterateInit, paIterateNext        */
+#include "parseArgs/paIsOption.h"     /* Own interface                       */
 
 
 
@@ -43,28 +43,27 @@
 */
 bool paIsOption(PaiArgument* paList, char* string)
 {
-	int          len;
-	PaiArgument* aP;
+  int           len;
+  PaiArgument*  aP;
 
-	LM_ENTRY();
-	paIterateInit();
-	while ((aP = paIterateNext(paList)) != NULL)
-	{
-		if ((aP->option == NULL) || (aP->option[0] == 0))
-			continue;
+  LM_ENTRY();
+  paIterateInit();
+  while ((aP = paIterateNext(paList)) != NULL)
+  {
+    if ((aP->option == NULL) || (aP->option[0] == 0))
+    {
+      continue;
+    }
 
-		len = MAX(strlen(aP->option), strlen(string));
+    len = MAX(strlen(aP->option), strlen(string));
 
-		if (strncmp(aP->option, string, len) == 0)
-		{
-			LM_EXIT();
-			return true;
-		}
-	}
+    if (strncmp(aP->option, string, len) == 0)
+    {
+      LM_EXIT();
+      return true;
+    }
+  }
 
-	LM_EXIT();
-	return false;
+  LM_EXIT();
+  return false;
 }
-
-
-

@@ -288,6 +288,10 @@ include_directories("${RAPIDXML_INCLUDE}")
 # ------------------------------------------------------------
 link_directories("/usr/local/lib/")
 link_directories("/usr/lib64/")
+link_directories("/usr/lib/x86_64-linux-gnu")
+
+# FIXME P4: Issue #476: remove or keep?
+link_directories("/opt/lib/")
 
 
 # flags
@@ -301,16 +305,23 @@ add_definitions(-DUNIT_TEST)
 ADD_EXECUTABLE(unitTest ${SOURCES} ${HEADERS})
 
 IF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS"))
-  MESSAGE("Ubuntu DISTRO: '${DISTRO}'")
+  MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_13.10")
+  MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS")
+  # FIXME P4: Issue #476: remove or keep?
+  MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread53 -lboost_filesystem53 -lboost_system53 -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
 ELSEIF(${DISTRO} STREQUAL "openSUSE_12.3")
-  MESSAGE("openSUSE DISTRO: '${DISTRO}'")
+  MESSAGE("unitTest: openSUSE DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto)
 ELSEIF(${DISTRO} STREQUAL "CentOS_6.3")
-  MESSAGE("CentOS DISTRO: '${DISTRO}'")
+  MESSAGE("unitTest: CentOS DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt)
 ELSE()
-  MESSAGE("Other DISTRO: '${DISTRO}'")
+  MESSAGE("unitTest: Other DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt)
 ENDIF()
 

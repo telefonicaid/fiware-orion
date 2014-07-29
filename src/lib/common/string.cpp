@@ -346,6 +346,7 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   char* comma;
   char* number1;
   char* number2;
+  bool  ret = true;
 
   cP = wsStrip(cP);
 
@@ -371,8 +372,8 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   if (err.length() > 0)
   {
     latitude = oldLatitude;
-    free(initial);
-    return false;
+    LM_W(("Bad Input (bad latitude value in coordinate string '%s')", initial));
+    ret = false;
   }
   else
   {
@@ -382,13 +383,24 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
       /* Rollback latitude */
       latitude = oldLatitude;
       longitude = oldLongitude;
-      free(initial);
-      return false;
+      LM_W(("Bad Input (bad longitude value in coordinate string '%s')", initial));
+      ret = false;
     }
   }
 
+  if ((latitude > 90) || (latitude < -90))
+  {
+    LM_W(("Bad Input (bad value for latitude '%s')", initial));
+    ret = false;
+  }
+  else if ((longitude > 180) || (longitude < -180))
+  {
+    LM_W(("Bad Input (bad value for longitude '%s')", initial));
+    ret = false;
+  }
+
   free(initial);
-  return true;
+  return ret;
 }
 
 
@@ -490,6 +502,7 @@ bool versionParse(const std::string& version, int& mayor, int& minor, std::strin
 }
 
 
+
 /* ****************************************************************************
 *
 * atoF - 
@@ -551,3 +564,66 @@ double atoF(const char* string, std::string* errorMsg)
 
   return atof(string);
 }
+
+
+
+/* ****************************************************************************
+*
+* strToLower - 
+*/
+char* strToLower(char* to, const char* from, int toSize)
+{
+  int fromSize = strlen(from);
+
+  if (toSize < fromSize + 1)
+  {
+    LM_E(("Runtime Error (cannot copy %d bytes into a buffer of %d bytes)", fromSize + 1, toSize));
+    fromSize = toSize;
+  }
+
+  int ix;
+  for (ix = 0; ix < fromSize; ix++)
+  {
+    if ((from[ix] >= 'A') && (from[ix] <= 'Z'))
+      to[ix] = from[ix] + ('a' - 'A');
+    else
+      to[ix] = from[ix];
+  }
+
+  to[ix] = 0;
+
+  return to;
+}
+
+
+
+/* ****************************************************************************
+*
+* strReplace - 
+*/
+void strReplace(char* to, const char* from, const char* oldString, const char* newString)
+{
+  int toIx   = 0;
+  int fromIx = 0;
+  int oldLen = strlen(oldString);
+  int newLen = strlen(newString);
+
+  while (from[fromIx] != 0)
+  {
+    if (strncmp(&from[fromIx], oldString, oldLen) == 0)
+    {
+      strcat(to, newString);
+      toIx   += newLen;
+      fromIx += oldLen;
+    }
+    else
+    {
+      to[toIx] = from[fromIx];
+      toIx   += 1;
+      fromIx += 1;
+    }
+  }
+
+  to[toIx] = 0;
+}
+

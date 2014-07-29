@@ -1,5 +1,5 @@
-#ifndef PA_TRACE_LEVELS_H
-#define PA_TRACE_LEVELS_H
+#ifndef SRC_LIB_PARSEARGS_PATRACELEVELS_H_
+#define SRC_LIB_PARSEARGS_PATRACELEVELS_H_
 
 /*
 *
@@ -34,19 +34,19 @@
 */
 enum PaTraceLevels
 {
-   LmtPaSetup          = 0,
-   LmtPaConfigAction,
-   LmtPaDefVal,
-   LmtPaEnvVal,
-   LmtPaRcFileVal,
-   LmtPaComLineVal,
-   LmtPaApVals,
-   LmtPaLimits,
-   LmtPaUsage,
-   LmtPaRcFile,
-   LmtPaSList,
-   LmtPaIList,
-   LmtHelp
+  LmtPaSetup          = 0,
+  LmtPaConfigAction,
+  LmtPaDefVal,
+  LmtPaEnvVal,
+  LmtPaRcFileVal,
+  LmtPaComLineVal,
+  LmtPaApVals,
+  LmtPaLimits,
+  LmtPaUsage,
+  LmtPaRcFile,
+  LmtPaSList,
+  LmtPaIList,
+  LmtHelp
 };
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PATRACELEVELS_H_

@@ -71,7 +71,7 @@ static void prepareDatabase(void) {
 
   BSONObj A = BSON("_id" << BSON("id" << "A" << "type" << "Point") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << "3, 2") <<
+                        BSON("name" << "pos" << "type" << "location" << "value" << "2, 3") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_A")
                         ) <<
                      "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(3.0 << 2.0))
@@ -87,7 +87,7 @@ static void prepareDatabase(void) {
 
   BSONObj C = BSON("_id" << BSON("id" << "C" << "type" << "Point") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << "7, 4") <<
+                        BSON("name" << "pos" << "type" << "location" << "value" << "4, 7") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_C")
                         ) <<
                      "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(7.0 << 4.0))
@@ -97,7 +97,7 @@ static void prepareDatabase(void) {
   // when a geoscope is defined
   BSONObj D = BSON("_id" << BSON("id" << "D" << "type" << "Point") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << "7, 4") <<
+                        BSON("name" << "pos" << "type" << "location" << "value" << "4, 7") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_C")
                         )
                     );
@@ -107,7 +107,7 @@ static void prepareDatabase(void) {
                         BSON("name" << "pos" << "type" << "location" << "value" << "40.418889, -3.691944") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_Mad")
                         ) <<
-                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(40.418889 << -3.691944))
+                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.691944 << 40.418889))
                     );
 
   BSONObj city2 = BSON("_id" << BSON("id" << "Alcobendas" << "type" << "City") <<
@@ -115,7 +115,7 @@ static void prepareDatabase(void) {
                         BSON("name" << "pos" << "type" << "location" << "value" << "40.533333, -3.633333") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_Alc")
                         ) <<
-                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(40.533333 << -3.633333))
+                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.633333 << 40.533333))
                     );
 
   BSONObj city3 = BSON("_id" << BSON("id" << "Leganes" << "type" << "City") <<
@@ -123,7 +123,7 @@ static void prepareDatabase(void) {
                         BSON("name" << "pos" << "type" << "location" << "value" << "40.316667, -3.75") <<
                         BSON("name" << "foo" << "type" << "string" << "value" << "attr_Leg")
                         ) <<
-                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(40.316667 << -3.75))
+                     "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.75 << 40.316667))
                     );
 
   connection->insert(ENTITIES_COLL, A);
@@ -133,7 +133,6 @@ static void prepareDatabase(void) {
   connection->insert(ENTITIES_COLL, city1);
   connection->insert(ENTITIES_COLL, city2);
   connection->insert(ENTITIES_COLL, city3);
-
 }
 
 
@@ -181,7 +180,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     sc.areaType = orion::CircleType;
     sc.circle.center.latitudeSet("40.418889");
     sc.circle.center.longitudeSet("-3.691944");
-    sc.circle.radiusSet("14000");
+    sc.circle.radiusSet("13600");
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
@@ -394,7 +393,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
     sc.areaType = orion::CircleType;
     sc.circle.center.latitudeSet("40.418889");
     sc.circle.center.longitudeSet("-3.691944");
-    sc.circle.radiusSet("14000");
+    sc.circle.radiusSet("13600");
     sc.circle.invertedSet("true");
     req.restriction.scopeVector.push_back(&sc);
 
@@ -405,8 +404,8 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_STREQ("", res.errorCode.reasonPhrase.c_str());
+    EXPECT_STREQ("", res.errorCode.details.c_str());
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     int i;
@@ -497,7 +496,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn1)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("3, 2", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("2, 3", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -620,7 +619,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn2)
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
     EXPECT_EQ("WSG84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
-    EXPECT_EQ("7, 4", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("4, 7", RES_CER_ATTR(i, 0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
     EXPECT_EQ("attr_C", RES_CER_ATTR(i, 1)->value);
@@ -692,7 +691,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn3)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("3, 2", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("2, 3", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -770,7 +769,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut1)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);
-    EXPECT_EQ("3, 2", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("2, 3", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
@@ -868,7 +867,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut2)
     ASSERT_EQ(2, RES_CER(i).contextAttributeVector.size());
     EXPECT_EQ("pos", RES_CER_ATTR(i, 0)->name);
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->type);    
-    EXPECT_EQ("7, 4", RES_CER_ATTR(i, 0)->value);
+    EXPECT_EQ("4, 7", RES_CER_ATTR(i, 0)->value);
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);

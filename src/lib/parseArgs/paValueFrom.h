@@ -1,5 +1,5 @@
-#ifndef PA_VALUE_FROM
-#define PA_VALUE_FROM
+#ifndef SRC_LIB_PARSEARGS_PAVALUEFROM_H_
+#define SRC_LIB_PARSEARGS_PAVALUEFROM_H_
 
 /*
 *
@@ -34,4 +34,4 @@
 */
 extern PaFrom paValueFrom(char* oName);
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PAVALUEFROM_H_

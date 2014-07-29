@@ -1,5 +1,5 @@
-#ifndef PA_RC_FILE_H
-#define PA_RC_FILE_H
+#ifndef SRC_LIB_PARSEARGS_PARCFILE_H_
+#define SRC_LIB_PARSEARGS_PARCFILE_H_
 
 /*
 *
@@ -34,4 +34,4 @@
 */
 extern int paRcFileParse(void);
 
-#endif
+#endif  // SRC_LIB_PARSEARGS_PARCFILE_H_

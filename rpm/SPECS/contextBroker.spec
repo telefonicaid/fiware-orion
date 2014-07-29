@@ -93,14 +93,10 @@ rm -rf $RPM_BUILD_ROOT
 rm -rf %{_builddir}
 
 %build
-#FIXME There is an open issue with "make release" malfunction. Until get fixed, we will build in debug mode
-#make release DESTDIR=$RPM_BUILD_ROOT BUILD_ARCH=%{build_arch}
-make debug DESTDIR=$RPM_BUILD_ROOT BUILD_ARCH=%{build_arch}
+make release DESTDIR=$RPM_BUILD_ROOT BUILD_ARCH=%{build_arch}
 
 %install
-#FIXME There is an open issue with "make release" malfunction. Until get fixed, we will build in debug mode
-#make install DESTDIR=$RPM_BUILD_ROOT
-make install_debug DESTDIR=$RPM_BUILD_ROOT
+make install DESTDIR=$RPM_BUILD_ROOT
 cp -R %{_sourcedir}/etc $RPM_BUILD_ROOT
 
 # rpmbuild seems to do the strip step automatically. However, this would fail after chmod, so we "manually" do

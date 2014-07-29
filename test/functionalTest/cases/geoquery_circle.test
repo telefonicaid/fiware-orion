@@ -122,8 +122,8 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "${payload}"
 echo
 
-echo "4: ++++++++++ Madrid in 14 kms ++++++++++"
-# Query inside 14 kms radius from Madrid center
+echo "4: ++++++++++ Madrid in 13.5 kms ++++++++++"
+# Query inside 13.5 kms radius from Madrid center
 url=/NGSI10/queryContext
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
@@ -142,7 +142,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
           <circle>
             <centerLatitude>40.418889</centerLatitude>
             <centerLongitude>-3.691944</centerLongitude>
-            <radius>14000</radius>
+            <radius>13500</radius>
           </circle>
         </scopeValue>
       </operationScope>
@@ -184,8 +184,8 @@ orionCurl --url "$url" --payload "${payload}"
 echo
 
 
-echo "6: ++++++++++++ Madrid out 14 kms ++++++++"
-# Query in 14 kms radius outside Madrid center
+echo "6: ++++++++++++ Madrid out 13.5 kms ++++++++"
+# Query in 13.5 kms radius outside Madrid center
 url=/NGSI10/queryContext
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
@@ -204,7 +204,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
           <circle>
             <centerLatitude>40.418889</centerLatitude>
             <centerLongitude>-3.691944</centerLongitude>
-            <radius>14000</radius>
+            <radius>13500</radius>
             <inverted>true</inverted>
           </circle>
         </scopeValue>
@@ -327,7 +327,7 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 
-4: ++++++++++ Madrid in 14 kms ++++++++++
+4: ++++++++++ Madrid in 13.5 kms ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 1649
 Content-Type: application/xml
@@ -476,7 +476,7 @@ Date: REGEX(.*)
   </contextResponseList>
 </queryContextResponse>
 
-6: ++++++++++++ Madrid out 14 kms ++++++++
+6: ++++++++++++ Madrid out 13.5 kms ++++++++
 HTTP/1.1 200 OK
 Content-Length: 878
 Content-Type: application/xml

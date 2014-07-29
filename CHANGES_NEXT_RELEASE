@@ -1,5 +1,6 @@
 o Fix:  errors in JSON rendering for '/statistics' and '/version' fixed (Issue #428).
 o Fix:  using same location attribute in UPDATE fails (issue http://stackoverflow.com/questions/24431177/ge-orion-context-broker-when-we-make-an-update-of-the-entity-does-not-allow-us)
+o Fix:  Context Broker no crashed anymore due to different tenant names but equal in insensitve case (workaround in Issue #431).
 o Logging modifications (Issue #428):
    o The name of the log file has been changed from contextBrokerLog to contextBroker.log
    o Changed the log line format to use a key-value approach
@@ -10,3 +11,7 @@ o Logging modifications (Issue #428):
    o Stopped using LM_RE, LM_V* and _LM_RVE and removed tho CLI options -v, -vv, -vvv, -vvvv, -vvvvv
    o Added an LM_I for when thr broker starts and another when it exits (in a controlled manner).
 o The broker now uses libcurl for outgoing HTTP communications.
+o Fix: double-quotes in output payload have been escaped (Issue #456)
+o Fix: Added tests to make sure that latitude and longitude are within range
+       (-90 <= latitude <=90)  and (-180 <= longitude <= 180) and properly stored in database (Issue #461)
+o Fix: RPM binary complied in release mode (previous versions used debug)

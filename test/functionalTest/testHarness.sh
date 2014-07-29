@@ -96,17 +96,23 @@ function vMsg()
 function exitFunction()
 {
   exitCode=$1
-  testFile=$2
-  errorString=$3
-  errorFile=$4
-  forced=$5
+  errorText=$2
+  testFile=$3
+  errorString=$4
+  errorFile=$5
+  forced=$6
 
-  echo -n "(ERROR $exitCode) "
+  echo -n "(ERROR $exitCode - $errorText) "
 
   if [ "$stopOnError" == "on" ] || [ "$forced" == "DIE" ]
   then
     echo $ME/$NAME: $errorString
-    cat $errorFile 2> /dev/null
+
+    if [ "$errorFile" != "" ] && [ -f "$errorFile" ]
+    then
+      cat $errorFile 2> /dev/null
+    fi
+
     exit $exitCode
   fi
 
@@ -290,7 +296,7 @@ fi
 #
 if [ ! -d "$dir" ]
 then
-  exitFunction 1 "HARNESS" "$dir is not a directory" "" DIE
+  exitFunction 1 "$dir is not a directory" "HARNESS" "$dir" "" DIE
 fi
 cd $dir
 
@@ -373,7 +379,7 @@ function fileCreation()
   NAME=$(sed -n '/--NAME--/,/^--/p' $path | grep -v "^--")
   if [ "$NAME" == "" ]
   then
-    exitFunction 2 "$path" "($path): --NAME-- part is missing" "" DIE
+    exitFunction 2 "--NAME-- part is missing" "$path" "($path)" "" DIE
     exit 2 # Just in case
   fi
 
@@ -386,7 +392,7 @@ function fileCreation()
     vMsg "Creating $TEST_SHELL_INIT at $PWD"
     sed -n '/--SHELL-INIT--/,/^--/p' $path  | grep -v "^--" > $TEST_SHELL_INIT
   else
-    exitFunction 3 $path "($path): --SHELL-INIT-- part is missing" "" DIE
+    exitFunction 3 "--SHELL-INIT-- part is missing" $path "($path)" "" DIE
   fi
 
   #
@@ -398,7 +404,7 @@ function fileCreation()
     vMsg "Creating $TEST_SHELL at $PWD"
     sed -n '/--SHELL--/,/^--/p' $path  | grep -v "^--" > $TEST_SHELL
   else
-    exitFunction 4 $path "($path): --SHELL-- part is missing" "" DIE
+    exitFunction 4 "--SHELL-- part is missing" $path "($path)" "" DIE
   fi
 
   #
@@ -410,7 +416,7 @@ function fileCreation()
     vMsg "Creating $TEST_REGEXPECT at $PWD"
     sed -n '/--REGEXPECT--/,/^--/p' $path  | grep -v "^--" > $TEST_REGEXPECT
   else
-    exitFunction 5 $path "($path): --REGEXPECT-- part is missing" "" DIE
+    exitFunction 5 "--REGEXPECT-- part is missing" $path "($path)" "" DIE
   fi
 
   #
@@ -422,7 +428,7 @@ function fileCreation()
     vMsg "Creating $TEST_TEARDOWN at $PWD"
     sed -n '/--TEARDOWN--/,/^--/p' $path  | grep -v "^--" > $TEST_TEARDOWN
   else
-    exitFunction 6 $path "($path): --TEARDOWN-- part is missing" "" DIE
+    exitFunction 6 "--TEARDOWN-- part is missing" $path "($path)" "" DIE
   fi
 }
 
@@ -462,7 +468,7 @@ function partExecute()
   #
   if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
   then
-    exitFunction 7 $path "($path): $what produced output on stderr" $dirname/$filename.$what.stderr "$forcedDie"
+    exitFunction 7 "$what: output on stderr" $path "($path): $what produced output on stderr" $dirname/$filename.$what.stderr "$forcedDie"
     return 2
   fi
 
@@ -472,7 +478,7 @@ function partExecute()
   #
   if [ "$exitCode" != "0" ]
   then
-    exitFunction 8 $path "($path): $what exited with code $exitCode" $dirname/$filename.$what.stderr "$forcedDie"
+    exitFunction 8 $path "$what exited with code $exitCode" "($path)" $dirname/$filename.$what.stderr "$forcedDie"
     return 1
   fi
 
@@ -487,7 +493,7 @@ function partExecute()
     exitCode=$?
     if [ "$exitCode" != "0" ]
     then
-      exitFunction 9 $path "($path) output not as expected" $dirname/$filename.diff
+      exitFunction 9 ".out and .regexpect differ" $path "($path) output not as expected" $dirname/$filename.diff
       if [ "$CB_DIFF_TOOL" != "" ]
       then
         endDate=$(date)
@@ -534,6 +540,7 @@ function runTest()
   fileCleanup $filename removeAll
   if [ "$toBeStopped" == "yes" ]
   then
+    echo toBeStopped == yes
     return
   fi
 
@@ -555,14 +562,14 @@ function runTest()
 
   if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
   then
-    exitFunction 10 $path "($path): SHELL-INIT produced output on stderr" $dirname/$filename.shellInit.stderr
-    return 2
+    exitFunction 10 "SHELL-INIT produced output on stderr" $path "($path)" $dirname/$filename.shellInit.stderr
+    return
   fi
 
   if [ "$exitCode" != "0" ]
   then
-    exitFunction 11 $path "($path): SHELL-INIT exited with code $exitCode" "" DIE
-    return 1
+    exitFunction 11 "SHELL-INIT exited with code $exitCode" $path "($path)" "" DIE
+    return
   fi
 
   # 4. Run the SHELL part (which also compares - FIXME P2: comparison should be moved to separate function)
@@ -600,7 +607,7 @@ do
   start=$(date --date="$startDate" +%s)
   endDate=""
   runTest $testFile
-
+  
   if [ "$endDate" == "" ]  # Could have been set in 'partExecute'
   then
     endDate=$(date)

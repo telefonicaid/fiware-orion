@@ -644,7 +644,8 @@ static int connectionTreat
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
     
-    ciP->tenantFromHttpHeader = ciP->httpHeaders.tenant;
+    char tenant[128];
+    ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
     LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));
     ciP->outFormat            = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
@@ -751,7 +752,8 @@ static int connectionTreat
 */
 static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const char* httpsCertificate = NULL)
 {
-  bool mhdStartError = true;
+  bool   mhdStartError = true;
+  size_t memoryLimit   = 2 * PAYLOAD_SIZE;
 
   if (port == 0)
   {
@@ -772,7 +774,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 
     if ((httpsKey != NULL) && (httpsCertificate != NULL))
     {
-      // LM_T(LmtMhd, ("Starting HTTPS daemon on IPv4 %s port %d", bindIp, port));
+      LM_T(LmtMhd, ("Starting HTTPS daemon on IPv4 %s port %d", bindIp, port));
       mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_SSL, // MHD_USE_SELECT_INTERNALLY
                                    htons(port),
                                    NULL,
@@ -780,23 +782,23 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                    connectionTreat,                     NULL,
                                    MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
                                    MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
-                                   MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
-                                   MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
+                                   MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
+                                   MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_END);
 
     }
     else
     {
       LM_T(LmtMhd, ("Starting HTTP daemon on IPv4 %s port %d", bindIp, port));
-      mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY
+      mhdDaemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION, // MHD_USE_SELECT_INTERNALLY | MHD_USE_DEBUG
                                    htons(port),
                                    NULL,
                                    NULL,
                                    connectionTreat,                     NULL,
-                                   MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
-                                   MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
+                                   MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
                                    MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad,
+                                   MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                    MHD_OPTION_END);
 
     }
@@ -828,9 +830,9 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       connectionTreat,                     NULL,
                                       MHD_OPTION_HTTPS_MEM_KEY,            httpsKey,
                                       MHD_OPTION_HTTPS_MEM_CERT,           httpsCertificate,
-                                      MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
-                                      MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
+                                      MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
+                                      MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_END);
     }
     else
@@ -841,9 +843,9 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
                                       NULL,
                                       NULL,
                                       connectionTreat,                     NULL,
-                                      MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
-                                      MHD_OPTION_CONNECTION_MEMORY_LIMIT,  2 * PAYLOAD_SIZE,
+                                      MHD_OPTION_CONNECTION_MEMORY_LIMIT,  memoryLimit,
                                       MHD_OPTION_SOCK_ADDR,                (struct sockaddr*) &sad_v6,
+                                      MHD_OPTION_NOTIFY_COMPLETED,         requestCompleted, NULL,
                                       MHD_OPTION_END);
     }
 

@@ -1211,6 +1211,7 @@ int main(int argC, char* argV[])
   paConfig("builtin prefix",                (void*) "ORION_");
   paConfig("usage and exit on any warning", (void*) true);
   paConfig("no preamble",                   NULL);
+  paConfig("log file time format",          (void*) "%Y-%m-%dT%H:%M:%S");
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
@@ -1286,6 +1287,8 @@ int main(int argC, char* argV[])
   }
   else
     restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort);
+
+  LM_I(("Startup completed"));
 
   while (1)
     sleep(10);
