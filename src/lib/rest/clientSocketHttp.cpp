@@ -250,6 +250,7 @@ std::string sendHttpSocket
   std::string headerContentLength = "Content-length: " + contentLengthStringStream.str();
   headers = curl_slist_append(headers, headerContentLength.c_str());
   outgoingMsgSize += contentLengthStringStream.str().size() + 16; // from "Content-length: "
+  outgoingMsgSize += content.size();
 
   // Content-type
   headers = curl_slist_append(headers, ("Content-type: " + content_type).c_str());
@@ -266,7 +267,6 @@ std::string sendHttpSocket
   // Contents
   const char* payload = content.c_str();
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
-
 
   // Set up URL
   std::string url;
@@ -286,7 +286,7 @@ std::string sendHttpSocket
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) httpResponse); // Custom data for response handling
 
   // Synchronous HTTP request
-  LM_T(LmtClientOutputPayload, ("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server %s", callNo, outgoingMsgSize, url.c_str()));
+  LM_T(LmtClientOutputPayload, ("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
   res = curl_easy_perform(curl);
 
   if (res != CURLE_OK)

@@ -145,7 +145,15 @@ echo
 
 echo "4: ++++++++++++++++++++"
 echo "** Notifications sent:"
-curl localhost:9997/number -s -S 2> /dev/null
+curl localhost:$LISTENER_PORT/number -s -S 2> /dev/null
+
+# The log has to show exactly 1 case of static buffer usage
+#echo "** Static buffer usages:"
+#grep "to HTTP server: sending static message of" /tmp/contextBroker.log | wc -l
+
+# The log has to show exactly 2 cases of dynamic buffer usage
+#echo "** Dynamic buffer usages:"
+#grep "to HTTP server: sending dynamic message of" /tmp/contextBroker.log | wc -l
 
 # The log has to show exactly 1 error about notification too large
 echo "** Too large errors:"
@@ -218,9 +226,9 @@ Date: REGEX(.*)
 ** Too large errors:
 1
 ** Notification sizes:
-Sending message 1 to HTTP server: sending message of 19879 bytes to HTTP server
-Sending message 2 to HTTP server: sending message of 21879 bytes to HTTP server
-Sending message 3 to HTTP server: sending message of 8100881 bytes to HTTP server
+ Sending message 1 to HTTP server: sending message of 19856 bytes to HTTP server
+ Sending message 2 to HTTP server: sending message of 21856 bytes to HTTP server
+ Sending message 3 to HTTP server: sending message of 8100858 bytes to HTTP server
 --TEARDOWN--
 cp /tmp/contextBroker.log /tmp/contextBroker.log.notification_different_sizes
 brokerStop CB
