@@ -274,6 +274,7 @@ SET (STATIC_LIBS
     lm
     pa
     pthread
+    curl
 )
 
 # Include directories

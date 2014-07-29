@@ -108,7 +108,7 @@ std::string sendHttpSocket
 {
   char                       portAsString[16];
   std::string                rushHeaderIP       = "";
-  unsigned short             rushHeaderPort     = 0;
+  //unsigned short             rushHeaderPort     = 0;
   std::string                headerRushHttp    = "";
   static unsigned long long  callNo             = 0;
   std::string                result;
@@ -192,12 +192,12 @@ std::string sendHttpSocket
   if ((rushPort == 0) || (rushHost == ""))
     useRush = false;
 
-  snprintf(portAsString, sizeof(portAsString), "%d", useRush? rushHeaderPort : port);
+  snprintf(portAsString, sizeof(portAsString), "%d", useRush? rushPort : port);
 
   if (useRush)
   {
     rushHeaderIP   = ip;
-    rushHeaderPort = port;
+    //rushHeaderPort = port;
     ip             = rushHost;
     port           = rushPort;
 
@@ -265,8 +265,16 @@ std::string sendHttpSocket
   const char* payload = content.c_str();
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
 
+
+  // Set up URL
   std::string url;
-  url = ip + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+  if (ipVersionUsed == IPV4)
+    url = ip;
+  else
+    url = "[" + ip + "]";
+  url = url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+
+  LM_W(("URL: %s", url.c_str()));
 
   // Prepare CURL handle with obtained options
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -278,6 +286,7 @@ std::string sendHttpSocket
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) httpResponse); // Custom data for response handling
 
   // Synchronous HTTP request
+  LM_T(LmtClientOutputPayload, ("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
   res = curl_easy_perform(curl);
 
   if (res != CURLE_OK)

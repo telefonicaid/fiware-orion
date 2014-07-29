@@ -144,6 +144,17 @@ echo
 
 
 echo "4: ++++++++++++++++++++"
+echo "** Notifications sent:"
+curl localhost:9997/number -s -S 2> /dev/null
+
+# The log has to show exactly 1 error about notification too large
+echo "** Too large errors:"
+grep "HTTP request to send is too large" /tmp/contextBroker.log | wc -l
+
+# Notification sizes. Note that if don't use the cut, some character in the log line prologue
+# breaks the test harness: @, :, [, ], ~, /, (, ), etc.
+echo "** Notification sizes:"
+grep "to HTTP server" /tmp/contextBroker.log | grep "Sending message" | awk -F\| '{ print $6 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }'
 
 --REGEXPECT--
 HTTP/1.1 200 OK
@@ -202,6 +213,14 @@ Date: REGEX(.*)
 </subscribeContextResponse>
 
 4: ++++++++++++++++++++
+** Notifications sent:
+3
+** Too large errors:
+1
+** Notification sizes:
+Sending message 1 to HTTP server: sending message of 19879 bytes to HTTP server
+Sending message 2 to HTTP server: sending message of 21879 bytes to HTTP server
+Sending message 3 to HTTP server: sending message of 8100881 bytes to HTTP server
 --TEARDOWN--
 cp /tmp/contextBroker.log /tmp/contextBroker.log.notification_different_sizes
 brokerStop CB
