@@ -256,7 +256,6 @@ std::string sendHttpSocket
     // Cleanup curl environment
     curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
-    curl_global_cleanup();
 
     free(httpResponse->memory);
     delete httpResponse;
@@ -306,7 +305,6 @@ std::string sendHttpSocket
   // Cleanup curl environment
   curl_slist_free_all(headers);
   curl_easy_cleanup(curl);
-  curl_global_cleanup();
 
   free(httpResponse->memory);
   delete httpResponse;
