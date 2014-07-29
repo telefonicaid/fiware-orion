@@ -115,6 +115,8 @@ std::string sendHttpSocket
   std::string                result;
   std::string                ip                 = _ip;
 
+  curl_global_init(CURL_GLOBAL_NOTHING);
+
   CURL*                      curl               = curl_easy_init();
   struct curl_slist*         headers            = NULL;
   MemoryStruct*              httpResponse       = NULL;
@@ -127,6 +129,9 @@ std::string sendHttpSocket
   // Preconditions check
   if (port == 0)
   {
+    curl_global_cleanup();
+    curl_easy_cleanup(curl);
+
     LM_E(("Runtime Error (port is ZERO)"));
     LM_TRANSACTION_END();
     return "error";
@@ -134,6 +139,9 @@ std::string sendHttpSocket
 
   if (ip.empty())
   {
+    curl_global_cleanup();
+    curl_easy_cleanup(curl);
+
     LM_E(("Runtime Error (ip is empty)"));
     LM_TRANSACTION_END();
     return "error";
@@ -141,6 +149,9 @@ std::string sendHttpSocket
 
   if (verb.empty())
   {
+    curl_global_cleanup();
+    curl_easy_cleanup(curl);
+
     LM_E(("Runtime Error (verb is empty)"));
     LM_TRANSACTION_END();
     return "error";
@@ -148,6 +159,9 @@ std::string sendHttpSocket
 
   if (resource.empty())
   {
+    curl_global_cleanup();
+    curl_easy_cleanup(curl);
+
     LM_E(("Runtime Error (resource is empty)"));
     LM_TRANSACTION_END();
     return "error";
@@ -155,6 +169,9 @@ std::string sendHttpSocket
 
   if ((content_type.empty()) && (!content.empty()))
   {
+    curl_global_cleanup();
+    curl_easy_cleanup(curl);
+
     LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
     LM_TRANSACTION_END();
     return "error";
@@ -162,6 +179,9 @@ std::string sendHttpSocket
 
   if ((!content_type.empty()) && (content.empty()))
   {
+    curl_global_cleanup();
+    curl_easy_cleanup(curl);
+
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
     LM_TRANSACTION_END();
     return "error";
@@ -169,6 +189,8 @@ std::string sendHttpSocket
 
   if (!curl)
   {
+    curl_global_cleanup();
+
     LM_E(("Runtime Error (could not init libcurl)"));
     LM_TRANSACTION_END();
     return "error";
@@ -262,6 +284,12 @@ std::string sendHttpSocket
     LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", outgoingMsgSize));
     LM_TRANSACTION_END();
 
+    // Cleanup curl environment
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+
+    free(httpResponse->memory);
     delete httpResponse;
     delete headerHost;
     delete headerUserAgent;
@@ -311,6 +339,7 @@ std::string sendHttpSocket
   // Cleanup curl environment
   curl_slist_free_all(headers);
   curl_easy_cleanup(curl);
+  curl_global_cleanup();
 
   free(httpResponse->memory);
   delete httpResponse;
