@@ -79,7 +79,7 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
             if (ncr.contextElementResponseVector.size() > 0)
             {
                 // New transactionId for each notification
-                LM_TRANSACTION_START_URL(csi.url.c_str());
+                LM_TRANSACTION_START_URL(csi.url.c_str());  // OnTimeInterval Notification Starts
 
                 /* Complete NotifyContextRequest */
                 // FIXME: implement a proper originator string
@@ -92,15 +92,14 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
                 {
                   params->notifier->sendNotifyContextRequest(&ncr, csi.url, tenant, csi.format);
                 }
-                else
-                {
-                  LM_TRANSACTION_END();
-                }
 
                 ncr.contextElementResponseVector.release();
                 csi.release();
+
+                LM_TRANSACTION_END();   // OnTimeInterval Notification ends here
             }
-            else {
+            else
+            {
                 LM_T(LmtNotifier, ("notification not sent due to empty context elements response vector)"));
             }
         }
