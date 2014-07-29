@@ -139,7 +139,7 @@ Date: REGEX(.*)
 3. Accumulator dump
 +++++++++++++++++++
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 718
+Content-Length: 717
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -170,7 +170,6 @@ Content-Type: application/xml
     </contextElementResponse>
   </contextResponseList>
 </notifyContextRequest>
-
 =======================================
 --TEARDOWN--
 brokerStop CB

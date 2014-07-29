@@ -439,7 +439,7 @@ Date: REGEX(.*)
 6. Dump the accumulator and find 4 notifications
 ================================================
 POST http://127.0.0.1:9997/notify
-Content-Length: 721
+Content-Length: 720
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:9997
 Accept: application/xml, application/json
@@ -469,10 +469,9 @@ Content-Type: application/xml
     </contextElementResponse>
   </contextResponseList>
 </notifyContextRequest>
-
 =======================================
 POST http://127.0.0.1:9997/notify
-Content-Length: 467
+Content-Length: 466
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:9997
 Accept: application/xml, application/json
@@ -502,10 +501,9 @@ Content-Type: application/json
     }
   ]
 }
-
 =======================================
 POST http://127.0.0.1:9997/notify
-Content-Length: 721
+Content-Length: 720
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:9997
 Accept: application/xml, application/json
@@ -535,10 +533,9 @@ Content-Type: application/xml
     </contextElementResponse>
   </contextResponseList>
 </notifyContextRequest>
-
 =======================================
 POST http://127.0.0.1:9997/notify
-Content-Length: 467
+Content-Length: 466
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:9997
 Accept: application/xml, application/json
@@ -568,7 +565,6 @@ Content-Type: application/json
     }
   ]
 }
-
 =======================================
 --TEARDOWN--
 brokerStop CB
