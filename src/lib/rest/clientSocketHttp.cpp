@@ -270,10 +270,10 @@ std::string sendHttpSocket
 
   // Set up URL
   std::string url;
-  if (ipVersionUsed == IPV4)
-    url = ip;
-  else
+  if (isIPv6(ip))
     url = "[" + ip + "]";
+  else
+    url = ip;
   url = url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
 
   // Prepare CURL handle with obtained options
