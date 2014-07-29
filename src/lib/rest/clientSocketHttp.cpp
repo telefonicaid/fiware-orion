@@ -299,6 +299,8 @@ std::string sendHttpSocket
     result.assign(httpResponse->memory, httpResponse->size);
   }
 
+  LM_TRANSACTION_END();
+
   // Cleanup curl environment
   curl_slist_free_all(headers);
   curl_easy_cleanup(curl);

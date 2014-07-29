@@ -35,7 +35,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 
 * boost: 1.41 (the one that comes in EPEL6 repository)
 * libmicrohttpd: 0.9.22 (the one that comes in EPEL6 repository)
-* libcurl: 7.19.7 (for proxyCoap)
+* libcurl: 7.19.7
 * Mongo Driver: 2.2.3 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
