@@ -107,9 +107,10 @@ std::string sendHttpSocket
 )
 {
   char                       portAsString[16];
+  char                       rushHeaderPortAsString[16];
+  unsigned short             rushHeaderPort     = 0;
   std::string                rushHeaderIP       = "";
-  //unsigned short             rushHeaderPort     = 0;
-  std::string                headerRushHttp    = "";
+  std::string                headerRushHttp     = "";
   static unsigned long long  callNo             = 0;
   std::string                result;
   std::string                ip                 = _ip;
@@ -192,16 +193,15 @@ std::string sendHttpSocket
   if ((rushPort == 0) || (rushHost == ""))
     useRush = false;
 
-  snprintf(portAsString, sizeof(portAsString), "%d", useRush? rushPort : port);
-
   if (useRush)
   {
     rushHeaderIP   = ip;
-    //rushHeaderPort = port;
+    rushHeaderPort = port;
     ip             = rushHost;
     port           = rushPort;
 
-    headerRushHttp = "X-relayer-host: " + rushHeaderIP + ":" + portAsString;
+    snprintf(rushHeaderPortAsString, sizeof(rushHeaderPortAsString), "%d", rushHeaderPort);
+    headerRushHttp = "X-relayer-host: " + rushHeaderIP + ":" + rushHeaderPortAsString;
     headers = curl_slist_append(headers, headerRushHttp.c_str());
     outgoingMsgSize += headerRushHttp.size();
 
@@ -212,6 +212,8 @@ std::string sendHttpSocket
       outgoingMsgSize += headerRushHttp.size();
     }
   }
+
+  snprintf(portAsString, sizeof(portAsString), "%d", port);
 
   // User agent
   size = sizeof(versionGet()) + 18; // from "User-Agent: orion/"
@@ -274,8 +276,6 @@ std::string sendHttpSocket
     url = "[" + ip + "]";
   url = url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
 
-  LM_W(("URL: %s", url.c_str()));
-
   // Prepare CURL handle with obtained options
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, verb.c_str()); // Set HTTP verb
@@ -286,7 +286,7 @@ std::string sendHttpSocket
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) httpResponse); // Custom data for response handling
 
   // Synchronous HTTP request
-  LM_T(LmtClientOutputPayload, ("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
+  LM_T(LmtClientOutputPayload, ("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server %s", callNo, outgoingMsgSize, url.c_str()));
   res = curl_easy_perform(curl);
 
   if (res != CURLE_OK)
