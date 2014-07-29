@@ -261,6 +261,11 @@ std::string sendHttpSocket
   {
     LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", outgoingMsgSize));
     LM_TRANSACTION_END();
+
+    delete httpResponse;
+    delete headerHost;
+    delete headerUserAgent;
+
     return "error";
   }
 
@@ -309,6 +314,8 @@ std::string sendHttpSocket
 
   free(httpResponse->memory);
   delete httpResponse;
+  delete headerHost;
+  delete headerUserAgent;
 
   return result;
 }
