@@ -245,10 +245,8 @@ std::string valueTag
   {
     return indent + "\"" + tagName + "\" : \"" + val + "\",\n";
   }
-  else
-  {
-    return indent + "\"" + tagName + "\" : \"" + val + "\"\n";
-  }
+
+  return indent + "\"" + tagName + "\" : \"" + val + "\"\n";
 }
 
 
@@ -284,15 +282,11 @@ std::string valueTag
       return indent + "\"" + value + "\"\n";
     }
   }
-  else
+
+  if (showComma == true)
   {
-    if (showComma == true)
-    {
-      return indent + "\"" + jsonTag + "\" : \"" + value + "\",\n";
-    }
-    else
-    {
-      return indent + "\"" + jsonTag + "\" : \"" + value + "\"\n";
-    }
+    return indent + "\"" + jsonTag + "\" : \"" + value + "\",\n";
   }
+
+  return indent + "\"" + jsonTag + "\" : \"" + value + "\"\n";
 }
