@@ -35,8 +35,8 @@ Packager:   Fermín Galán <fermin@tid.es>
 URL:        http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-context-broker
 Source:     %{name}-%{broker_version}.tar.gz
 BuildRoot: /var/tmp/%{name}-buildroot
-Requires:  libstdc++, boost-thread, boost-filesystem, libmicrohttpd, logrotate
-Buildrequires: gcc, cmake, gcc-c++, libmicrohttpd-devel, boost-devel
+Requires:  libstdc++, boost-thread, boost-filesystem, libmicrohttpd, libcurl, logrotate
+Buildrequires: gcc, cmake, gcc-c++, libmicrohttpd-devel, libcurl-devel, boost-devel
 Requires(pre): shadow-utils
 
 %description
