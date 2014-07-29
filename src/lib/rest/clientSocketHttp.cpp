@@ -22,16 +22,7 @@
 *
 * Author: developer
 */
-#include <string>
-#include <vector>
-
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-#include "ConnectionInfo.h"
-#include "clientSocketHttp.h"
-#include "serviceRoutines/versionTreat.h"
-#include <iostream>
-
+#include <unistd.h>                             // close()
 #include <sys/types.h>                          // system types ...
 #include <sys/socket.h>                         // socket, bind, listen
 #include <sys/un.h>                             // sockaddr_un
@@ -39,13 +30,21 @@
 #include <netdb.h>                              // gethostbyname
 #include <arpa/inet.h>                          // inet_ntoa
 #include <netinet/tcp.h>                        // TCP_NODELAY
+#include <curl/curl.h>
+
 #include <string>
-#include <unistd.h>                             // close()
+#include <vector>
+#include <iostream>
 
 #include "common/string.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/clientSocketHttp.h"
 #include "rest/rest.h"
+#include "serviceRoutines/versionTreat.h"
 
-#include <curl/curl.h>
+
 
 /*
 * See [1] for a discussion on how curl_multi is to be used. Libcurl does not seem
@@ -114,87 +113,58 @@ std::string sendHttpSocket
   static unsigned long long  callNo             = 0;
   std::string                result;
   std::string                ip                 = _ip;
-
-  curl_global_init(CURL_GLOBAL_NOTHING);
-
-  CURL*                      curl               = curl_easy_init();
   struct curl_slist*         headers            = NULL;
   MemoryStruct*              httpResponse       = NULL;
   CURLcode                   res;
   size_t                     size;
   int                        outgoingMsgSize       = 0;
+  CURL*                      curl;
 
   ++callNo;
 
   // Preconditions check
   if (port == 0)
   {
-    curl_global_cleanup();
-    curl_easy_cleanup(curl);
-
     LM_E(("Runtime Error (port is ZERO)"));
-    LM_TRANSACTION_END();
     return "error";
   }
 
   if (ip.empty())
   {
-    curl_global_cleanup();
-    curl_easy_cleanup(curl);
-
     LM_E(("Runtime Error (ip is empty)"));
-    LM_TRANSACTION_END();
     return "error";
   }
 
   if (verb.empty())
   {
-    curl_global_cleanup();
-    curl_easy_cleanup(curl);
-
     LM_E(("Runtime Error (verb is empty)"));
-    LM_TRANSACTION_END();
     return "error";
   }
 
   if (resource.empty())
   {
-    curl_global_cleanup();
-    curl_easy_cleanup(curl);
-
     LM_E(("Runtime Error (resource is empty)"));
-    LM_TRANSACTION_END();
     return "error";
   }
 
   if ((content_type.empty()) && (!content.empty()))
   {
-    curl_global_cleanup();
-    curl_easy_cleanup(curl);
-
     LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
-    LM_TRANSACTION_END();
     return "error";
   }
 
   if ((!content_type.empty()) && (content.empty()))
   {
-    curl_global_cleanup();
-    curl_easy_cleanup(curl);
-
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
-    LM_TRANSACTION_END();
     return "error";
   }
 
-  if (!curl)
+  if ((curl = curl_easy_init()) == NULL)
   {
-    curl_global_cleanup();
-
     LM_E(("Runtime Error (could not init libcurl)"));
-    LM_TRANSACTION_END();
     return "error";
   }
+
 
   // Allocate to hold HTTP response
   httpResponse = new MemoryStruct;
@@ -282,7 +252,6 @@ std::string sendHttpSocket
   if (outgoingMsgSize > MAX_DYN_MSG_SIZE)
   {
     LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", outgoingMsgSize));
-    LM_TRANSACTION_END();
 
     // Cleanup curl environment
     curl_slist_free_all(headers);
@@ -333,8 +302,6 @@ std::string sendHttpSocket
     LM_I(("Notification Successfully Sent"));
     result.assign(httpResponse->memory, httpResponse->size);
   }
-
-  LM_TRANSACTION_END();
 
   // Cleanup curl environment
   curl_slist_free_all(headers);
@@ -459,42 +426,36 @@ std::string sendHttpSocket
   if (port == 0)
   {
     LM_E(("Runtime Error (port is ZERO)"));
-    LM_TRANSACTION_END();
     return "error";
   }
 
   if (ip.empty())
   {
     LM_E(("Runtime Error (ip is empty)"));
-    LM_TRANSACTION_END();
     return "error";
   }
 
   if (verb.empty())
   {
     LM_E(("Runtime Error (verb is empty)"));
-    LM_TRANSACTION_END();
     return "error";
   }
 
   if (resource.empty())
   {
     LM_E(("Runtime Error (resource is empty)"));
-    LM_TRANSACTION_END();
     return "error";
   }
 
   if ((content_type.empty()) && (!content.empty()))
   {
     LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
-    LM_TRANSACTION_END();
     return "error";
   }
 
   if ((!content_type.empty()) && (content.empty()))
   {
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
-    LM_TRANSACTION_END();
     return "error";
   }
 
@@ -570,7 +531,6 @@ std::string sendHttpSocket
     if (neededSize > MAX_DYN_MSG_SIZE)
     {
       LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", content.length() + strlen(preContent)));
-      LM_TRANSACTION_END();
       return "error";
     }
     else if (neededSize > MAX_STA_MSG_SIZE)
@@ -579,7 +539,6 @@ std::string sendHttpSocket
         if (msgDynamic == NULL)
         {
           LM_E(("Runtime Error (dynamic memory allocation failure)"));
-          LM_TRANSACTION_END();
           return "error";
         }
 
@@ -605,7 +564,6 @@ std::string sendHttpSocket
 
   if (fd == -1)
   {
-    LM_TRANSACTION_END();
     return "error";
   }
 
@@ -623,13 +581,11 @@ std::string sendHttpSocket
   if (nb == -1)
   {
     LM_W(("Notification failure for %s:%d (send: %s)", _ip.c_str(), port, strerror(errno)));
-    LM_TRANSACTION_END();
     return "error";
   }
   else if (nb != sz)
   {
     LM_W(("Notification failure for %s:%d (not entire message sent)", _ip.c_str(), port));
-    LM_TRANSACTION_END();
     return "error";
   }
 
@@ -640,13 +596,11 @@ std::string sendHttpSocket
       if (nb == -1)
       {
         LM_W(("Notification failure for %s:%d (error receiving ACK from HTTP server: %s)", _ip.c_str(), port, strerror(errno)));
-        LM_TRANSACTION_END();
         return "error";
       }
       else if ( nb >= TAM_BUF)
       {
         LM_W(("Notification failure for %s:%d (message size of HTTP server reply is too big: %d (max allowed %d)) ", _ip.c_str(), port, nb, TAM_BUF));
-        LM_TRANSACTION_END();
         return "error";
       }
       else
@@ -654,7 +608,6 @@ std::string sendHttpSocket
           memcpy(response, buffer, nb);
           LM_I(("Notification Successfully Sent"));
           LM_T(LmtClientInputPayload, ("Received from HTTP server:\n%s", response));
-          LM_TRANSACTION_END();
       }
 
       if (strlen(response) > 0)
@@ -664,7 +617,6 @@ std::string sendHttpSocket
   {
      LM_T(LmtClientInputPayload, ("not waiting for response"));
      LM_I(("Notification Successfully Sent"));
-     LM_TRANSACTION_END();
      result = "";
   }
 
