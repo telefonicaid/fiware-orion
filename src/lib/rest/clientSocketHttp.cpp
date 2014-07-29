@@ -22,16 +22,7 @@
 *
 * Author: developer
 */
-#include <string>
-#include <vector>
-
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-#include "ConnectionInfo.h"
-#include "clientSocketHttp.h"
-#include "serviceRoutines/versionTreat.h"
-#include <iostream>
-
+#include <unistd.h>                             // close()
 #include <sys/types.h>                          // system types ...
 #include <sys/socket.h>                         // socket, bind, listen
 #include <sys/un.h>                             // sockaddr_un
@@ -39,13 +30,21 @@
 #include <netdb.h>                              // gethostbyname
 #include <arpa/inet.h>                          // inet_ntoa
 #include <netinet/tcp.h>                        // TCP_NODELAY
+#include <curl/curl.h>
+
 #include <string>
-#include <unistd.h>                             // close()
+#include <vector>
+#include <iostream>
 
 #include "common/string.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/clientSocketHttp.h"
 #include "rest/rest.h"
+#include "serviceRoutines/versionTreat.h"
 
-#include <curl/curl.h>
+
 
 /*
 * See [1] for a discussion on how curl_multi is to be used. Libcurl does not seem
@@ -114,13 +113,12 @@ std::string sendHttpSocket
   static unsigned long long  callNo             = 0;
   std::string                result;
   std::string                ip                 = _ip;
-
-  CURL*                      curl               = curl_easy_init();
   struct curl_slist*         headers            = NULL;
   MemoryStruct*              httpResponse       = NULL;
   CURLcode                   res;
   size_t                     size;
   int                        outgoingMsgSize       = 0;
+  CURL*                      curl;
 
   ++callNo;
 
@@ -161,11 +159,12 @@ std::string sendHttpSocket
     return "error";
   }
 
-  if (!curl)
+  if ((curl = curl_easy_init()) == NULL)
   {
     LM_E(("Runtime Error (could not init libcurl)"));
     return "error";
   }
+
 
   // Allocate to hold HTTP response
   httpResponse = new MemoryStruct;
@@ -253,6 +252,16 @@ std::string sendHttpSocket
   if (outgoingMsgSize > MAX_DYN_MSG_SIZE)
   {
     LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", outgoingMsgSize));
+
+    // Cleanup curl environment
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+
+    free(httpResponse->memory);
+    delete httpResponse;
+    delete headerHost;
+    delete headerUserAgent;
+
     return "error";
   }
 
@@ -299,6 +308,8 @@ std::string sendHttpSocket
 
   free(httpResponse->memory);
   delete httpResponse;
+  delete headerHost;
+  delete headerUserAgent;
 
   return result;
 }
