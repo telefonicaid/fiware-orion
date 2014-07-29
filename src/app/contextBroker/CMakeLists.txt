@@ -44,6 +44,7 @@ SET (STATIC_LIBS
     common
     lm
     pa
+    curl
 )
 
 # Include directories

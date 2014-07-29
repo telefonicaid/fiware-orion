@@ -270,7 +270,7 @@ Date: REGEX(.*)
 </unsubscribeContextAvailabilityResponse>
 7: ++++++++++++++++++++
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 1472
+Content-Length: 1471
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -315,10 +315,9 @@ Content-Type: application/xml
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
 </notifyContextAvailabilityRequest>
-
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 839
+Content-Length: 838
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -346,10 +345,9 @@ Content-Type: application/xml
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
 </notifyContextAvailabilityRequest>
-
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 1464
+Content-Length: 1463
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -394,10 +392,9 @@ Content-Type: application/xml
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
 </notifyContextAvailabilityRequest>
-
 =======================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Content-Length: 835
+Content-Length: 834
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -425,7 +422,6 @@ Content-Type: application/xml
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
 </notifyContextAvailabilityRequest>
-
 =======================================
 --TEARDOWN--
 brokerStop CB

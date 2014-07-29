@@ -45,6 +45,275 @@
 #include "common/string.h"
 #include "rest/rest.h"
 
+#include <curl/curl.h>
+
+/*
+* See [1] for a discussion on how curl_multi is to be used. Libcurl does not seem
+* to provide a way to do asynchronous HTTP transactions in the way we intended
+* with the previous version of sendHttpSocket. To enable the old behavior of asynchronous
+* HTTP requests uncomment the following #define line.
+*
+* [1] http://stackoverflow.com/questions/24288513/how-to-do-curl-multi-perform-asynchronously-in-c
+*/
+//#define USE_OLD_SENDHTTPSOCKET
+
+#ifndef USE_OLD_SENDHTTPSOCKET
+
+struct MemoryStruct {
+  char*   memory;
+  size_t  size;
+};
+
+/* ****************************************************************************
+*
+* writeMemoryCallback -
+*/
+size_t writeMemoryCallback(void* contents, size_t size, size_t nmemb, void* userp)
+{
+  size_t realsize = size * nmemb;
+  MemoryStruct* mem = (MemoryStruct *) userp;
+
+  mem->memory = (char*) realloc(mem->memory, mem->size + realsize + 1);
+  if (mem->memory == NULL)
+  {
+    LM_E(("Runtime Error (out of memory)"));
+    return 0;
+  }
+
+  memcpy(&(mem->memory[mem->size]), contents, realsize);
+  mem->size += realsize;
+  mem->memory[mem->size] = 0;
+
+  return realsize;
+}
+
+
+/* ****************************************************************************
+*
+* sendHttpRequest -
+*/
+std::string sendHttpSocket
+(
+   const std::string&     _ip,
+   unsigned short         port,
+   const std::string&     protocol,
+   const std::string&     verb,
+   const std::string&     tenant,
+   const std::string&     resource,
+   const std::string&     content_type,
+   const std::string&     content,
+   bool                   useRush,
+   bool                   waitForResponse
+)
+{
+  char                       portAsString[16];
+  char                       rushHeaderPortAsString[16];
+  unsigned short             rushHeaderPort     = 0;
+  std::string                rushHeaderIP       = "";
+  std::string                headerRushHttp     = "";
+  static unsigned long long  callNo             = 0;
+  std::string                result;
+  std::string                ip                 = _ip;
+
+  CURL*                      curl               = curl_easy_init();
+  struct curl_slist*         headers            = NULL;
+  MemoryStruct*              httpResponse       = NULL;
+  CURLcode                   res;
+  size_t                     size;
+  int                        outgoingMsgSize       = 0;
+
+  ++callNo;
+
+  // Preconditions check
+  if (port == 0)
+  {
+    LM_E(("Runtime Error (port is ZERO)"));
+    LM_TRANSACTION_END();
+    return "error";
+  }
+
+  if (ip.empty())
+  {
+    LM_E(("Runtime Error (ip is empty)"));
+    LM_TRANSACTION_END();
+    return "error";
+  }
+
+  if (verb.empty())
+  {
+    LM_E(("Runtime Error (verb is empty)"));
+    LM_TRANSACTION_END();
+    return "error";
+  }
+
+  if (resource.empty())
+  {
+    LM_E(("Runtime Error (resource is empty)"));
+    LM_TRANSACTION_END();
+    return "error";
+  }
+
+  if ((content_type.empty()) && (!content.empty()))
+  {
+    LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
+    LM_TRANSACTION_END();
+    return "error";
+  }
+
+  if ((!content_type.empty()) && (content.empty()))
+  {
+    LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
+    LM_TRANSACTION_END();
+    return "error";
+  }
+
+  if (!curl)
+  {
+    LM_E(("Runtime Error (could not init libcurl)"));
+    LM_TRANSACTION_END();
+    return "error";
+  }
+
+  // Allocate to hold HTTP response
+  httpResponse = new MemoryStruct;
+  httpResponse->memory = (char*) malloc(1); // will grow as needed
+  httpResponse->size = 0; // no data at this point
+
+  //
+  // Rush
+  // Every call to sendHttpSocket specifies whether RUSH should be used or not.
+  // But, this depends also on how the broker was started, so here the 'useRush'
+  // parameter is cancelled in case the broker was started without rush.
+  //
+  // If rush is to be used, the IP/port is stored in rushHeaderIP/rushHeaderPort and
+  // after that, the host and port of rush is set as ip/port for the message, that is
+  // now sent to rush instead of to its final destination.
+  // Also, a few HTTP headers for rush must be setup.
+  //
+  if ((rushPort == 0) || (rushHost == ""))
+    useRush = false;
+
+  if (useRush)
+  {
+    rushHeaderIP   = ip;
+    rushHeaderPort = port;
+    ip             = rushHost;
+    port           = rushPort;
+
+    snprintf(rushHeaderPortAsString, sizeof(rushHeaderPortAsString), "%d", rushHeaderPort);
+    headerRushHttp = "X-relayer-host: " + rushHeaderIP + ":" + rushHeaderPortAsString;
+    headers = curl_slist_append(headers, headerRushHttp.c_str());
+    outgoingMsgSize += headerRushHttp.size();
+
+    if (protocol == "https:")
+    {
+      headerRushHttp = "X-relayer-protocol: https";
+      headers = curl_slist_append(headers, headerRushHttp.c_str());
+      outgoingMsgSize += headerRushHttp.size();
+    }
+  }
+
+  snprintf(portAsString, sizeof(portAsString), "%d", port);
+
+  // User agent
+  size = sizeof(versionGet()) + 18; // from "User-Agent: orion/"
+  char* headerUserAgent = new char[size];
+  snprintf(headerUserAgent, size, "User-Agent: orion/%s", versionGet());
+  headers = curl_slist_append(headers, headerUserAgent);
+  outgoingMsgSize += size;
+
+  // Host
+  size = sizeof(ip.size()) + 13; // from "Host: :"
+  char* headerHost = new char[size];
+  snprintf(headerHost, size, "Host: %s:%d", ip.c_str(), (int) port);
+  headers = curl_slist_append(headers, headerHost);
+  outgoingMsgSize += size;
+
+  // Tenant
+  if (tenant != "")
+  {
+    headers = curl_slist_append(headers, ("fiware-service: " + tenant).c_str());
+    outgoingMsgSize += tenant.size() + 16; // "fiware-service: "
+  }
+
+  // Accept
+  headers = curl_slist_append(headers, "Accept: application/xml, application/json");
+  outgoingMsgSize += 41; // from "Accept: application/xml, application/json"
+
+  // Expect
+  headers = curl_slist_append(headers, "Expect: ");
+  outgoingMsgSize += 8; // from "Expect: "
+
+  // Content-length
+  std::stringstream contentLengthStringStream;
+  contentLengthStringStream << content.size();
+  std::string headerContentLength = "Content-length: " + contentLengthStringStream.str();
+  headers = curl_slist_append(headers, headerContentLength.c_str());
+  outgoingMsgSize += contentLengthStringStream.str().size() + 16; // from "Content-length: "
+  outgoingMsgSize += content.size();
+
+  // Content-type
+  headers = curl_slist_append(headers, ("Content-type: " + content_type).c_str());
+  outgoingMsgSize += content_type.size() + 14; // from "Content-type: "
+
+  // Check if total outgoing message size is too big
+  if (outgoingMsgSize > MAX_DYN_MSG_SIZE)
+  {
+    LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", outgoingMsgSize));
+    LM_TRANSACTION_END();
+    return "error";
+  }
+
+  // Contents
+  const char* payload = content.c_str();
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
+
+  // Set up URL
+  std::string url;
+  if (isIPv6(ip))
+    url = "[" + ip + "]";
+  else
+    url = ip;
+  url = url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+
+  // Prepare CURL handle with obtained options
+  curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+  curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, verb.c_str()); // Set HTTP verb
+  curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L); // Allow redirection (?)
+  curl_easy_setopt(curl, CURLOPT_HEADER, 1); // Activate include the header in the body output
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); // Put headers in place
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) httpResponse); // Custom data for response handling
+
+  // Synchronous HTTP request
+  LM_T(LmtClientOutputPayload, ("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
+  res = curl_easy_perform(curl);
+
+  if (res != CURLE_OK)
+  {
+    LM_W(("Notification failure for %s:%s (curl_easy_perform failed: %s)", ip.c_str(), portAsString, curl_easy_strerror(res)));
+    result = "";
+  }
+  else
+  {
+    // The Response is here
+    LM_I(("Notification Successfully Sent"));
+    result.assign(httpResponse->memory, httpResponse->size);
+  }
+
+  LM_TRANSACTION_END();
+
+  // Cleanup curl environment
+  curl_slist_free_all(headers);
+  curl_easy_cleanup(curl);
+
+  free(httpResponse->memory);
+  delete httpResponse;
+
+  return result;
+}
+
+#else // Old functionality()
 
 /* ****************************************************************************
 *
@@ -61,7 +330,7 @@ int socketHttpConnect(const std::string& host, unsigned short port)
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_protocol = 0;
 
-  if (ipVersionUsed == IPV4) 
+  if (ipVersionUsed == IPV4)
   {
     hints.ai_family = AF_INET;
     LM_T(LmtIpVersion, ("Allow IPv4 only"));
@@ -71,7 +340,7 @@ int socketHttpConnect(const std::string& host, unsigned short port)
     hints.ai_family = AF_INET6;
     LM_T(LmtIpVersion, ("Allow  IPv6 only"));
   }
-  else 
+  else
   {
     hints.ai_family = AF_UNSPEC;
     LM_T(LmtIpVersion, ("Allow IPv4 or IPv6"));
@@ -103,7 +372,6 @@ int socketHttpConnect(const std::string& host, unsigned short port)
   return fd;
 }
 
-
 /* ****************************************************************************
 *
 * sendHttpSocket -
@@ -113,11 +381,11 @@ int socketHttpConnect(const std::string& host, unsigned short port)
 *
 * FIXME: I don't like too much "reusing" natural output to return "error" in the
 * case of error. I think it would be smarter to use "std::string* error" in the
-* arguments or (even better) and exception. To be solved in the future in a hardening
+* arguments or (even better) an exception. To be solved in the future in a hardening
 * period.
 *
-* Note, we are using an hybrid approach, consisting in an static thread-local buffer of
-* small size that cope with the most of notifications to avoid expensive
+* Note, we are using a hybrid approach, consisting in an static thread-local buffer of
+* small size that copes with most notifications to avoid expensive
 * calloc/free syscalls if the notification payload is not very large.
 *
 */
@@ -203,7 +471,7 @@ std::string sendHttpSocket
   // If rush is to be used, the IP/port is stored in rushHeaderIP/rushHeaderPort and
   // after that, the host and port of rush is set as ip/port for the message, that is
   // now sent to rush instead of to its final destination.
-  // Also, a few HTTP headers for rush nust be setup.
+  // Also, a few HTTP headers for rush must be setup.
   //
   if (useRush)
   {
@@ -367,3 +635,5 @@ std::string sendHttpSocket
   close(fd);
   return result;
 }
+
+#endif
