@@ -189,34 +189,28 @@ std::string sendHttpSocket
   // now sent to rush instead of to its final destination.
   // Also, a few HTTP headers for rush must be setup.
   //
+  if ((rushPort == 0) || (rushHost == ""))
+    useRush = false;
+
+  snprintf(portAsString, sizeof(portAsString), "%d", useRush? rushHeaderPort : port);
+
   if (useRush)
   {
-    if ((rushPort == 0) || (rushHost == ""))
-      useRush = false;
-    else
-    {
-      rushHeaderIP   = ip;
-      rushHeaderPort = port;
-      ip             = rushHost;
-      port           = rushPort;
+    rushHeaderIP   = ip;
+    rushHeaderPort = port;
+    ip             = rushHost;
+    port           = rushPort;
 
-      sprintf(portAsString, "%d", (int) rushHeaderPort);
-      headerRushHttp = "X-relayer-host: " + rushHeaderIP + ":" + portAsString;
+    headerRushHttp = "X-relayer-host: " + rushHeaderIP + ":" + portAsString;
+    headers = curl_slist_append(headers, headerRushHttp.c_str());
+    outgoingMsgSize += headerRushHttp.size();
+
+    if (protocol == "https:")
+    {
+      headerRushHttp = "X-relayer-protocol: https";
       headers = curl_slist_append(headers, headerRushHttp.c_str());
       outgoingMsgSize += headerRushHttp.size();
-
-      if (protocol == "https:")
-      {
-        headerRushHttp = "X-relayer-protocol: https";
-        headers = curl_slist_append(headers, headerRushHttp.c_str());
-        outgoingMsgSize += headerRushHttp.size();
-      }
-
     }
-  }
-  else
-  {
-    sprintf(portAsString, "%d", (int) port);
   }
 
   // User agent
@@ -272,12 +266,11 @@ std::string sendHttpSocket
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
 
   std::string url;
-  url = ip + (resource.at(0) == '/'? "" : "/") + resource;
+  url = ip + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
 
   // Prepare CURL handle with obtained options
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, verb.c_str()); // Set HTTP verb
-  curl_easy_setopt(curl, CURLOPT_PORT, port);
   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L); // Allow redirection (?)
   curl_easy_setopt(curl, CURLOPT_HEADER, 1); // Activate include the header in the body output
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); // Put headers in place
