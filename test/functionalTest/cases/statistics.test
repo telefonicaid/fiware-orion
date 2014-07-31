@@ -64,10 +64,10 @@ Date: REGEX(.*)
 
 {
     "orion": {
-        "jsonRequests": "1",
-        "measuring_interval_in_secs": "REGEX(1|2)",
-        "statisticsRequests": "2",
-        "uptime_in_secs": "REGEX(1|2)",
+        "jsonRequests": "1", 
+        "measuring_interval_in_secs": "REGEX(1|2)", 
+        "statisticsRequests": "2", 
+        "uptime_in_secs": "REGEX(1|2)", 
         "xmlRequests": "1"
     }
 }

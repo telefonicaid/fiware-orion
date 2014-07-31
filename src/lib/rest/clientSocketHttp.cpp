@@ -46,7 +46,18 @@
 
 
 
-/*
+/* ****************************************************************************
+*
+* HTTP header maximum lengths
+*/
+#define CURL_VERSION_MAX_LENGTH             128
+#define HTTP_HEADER_USER_AGENT_MAX_LENGTH   256
+#define HTTP_HEADER_HOST_MAX_LENGTH         256
+
+
+
+/* **************************************************************************** 
+*
 * See [1] for a discussion on how curl_multi is to be used. Libcurl does not seem
 * to provide a way to do asynchronous HTTP transactions in the way we intended
 * with the previous version of sendHttpSocket. To enable the old behavior of asynchronous
@@ -55,13 +66,15 @@
 * [1] http://stackoverflow.com/questions/24288513/how-to-do-curl-multi-perform-asynchronously-in-c
 */
 //#define USE_OLD_SENDHTTPSOCKET
-
 #ifndef USE_OLD_SENDHTTPSOCKET
 
-struct MemoryStruct {
+struct MemoryStruct
+{
   char*   memory;
   size_t  size;
 };
+
+
 
 /* ****************************************************************************
 *
@@ -87,6 +100,24 @@ size_t writeMemoryCallback(void* contents, size_t size, size_t nmemb, void* user
 }
 
 
+
+/* ****************************************************************************
+*
+* curlVersionGet - 
+*/
+static char* curlVersionGet(char* buf, int bufLen)
+{
+  curl_version_info_data* idP;
+
+  idP = curl_version_info(CURLVERSION_NOW);
+
+  snprintf(buf, bufLen, "%s", idP->version);
+
+  return buf;
+}
+
+
+
 /* ****************************************************************************
 *
 * sendHttpRequest -
@@ -106,17 +137,12 @@ std::string sendHttpSocket
 )
 {
   char                       portAsString[16];
-  char                       rushHeaderPortAsString[16];
-  unsigned short             rushHeaderPort     = 0;
-  std::string                rushHeaderIP       = "";
-  std::string                headerRushHttp     = "";
   static unsigned long long  callNo             = 0;
   std::string                result;
   std::string                ip                 = _ip;
   struct curl_slist*         headers            = NULL;
   MemoryStruct*              httpResponse       = NULL;
   CURLcode                   res;
-  size_t                     size;
   int                        outgoingMsgSize       = 0;
   CURL*                      curl;
 
@@ -187,6 +213,11 @@ std::string sendHttpSocket
 
   if (useRush)
   {
+    char         rushHeaderPortAsString[16];
+    uint16_t     rushHeaderPort     = 0;
+    std::string  rushHeaderIP       = "";
+    std::string  headerRushHttp     = "";
+
     rushHeaderIP   = ip;
     rushHeaderPort = port;
     ip             = rushHost;
@@ -194,12 +225,14 @@ std::string sendHttpSocket
 
     snprintf(rushHeaderPortAsString, sizeof(rushHeaderPortAsString), "%d", rushHeaderPort);
     headerRushHttp = "X-relayer-host: " + rushHeaderIP + ":" + rushHeaderPortAsString;
+    LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerRushHttp.c_str()));
     headers = curl_slist_append(headers, headerRushHttp.c_str());
     outgoingMsgSize += headerRushHttp.size();
 
     if (protocol == "https:")
     {
       headerRushHttp = "X-relayer-protocol: https";
+      LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerRushHttp.c_str()));
       headers = curl_slist_append(headers, headerRushHttp.c_str());
       outgoingMsgSize += headerRushHttp.size();
     }
@@ -207,46 +240,51 @@ std::string sendHttpSocket
 
   snprintf(portAsString, sizeof(portAsString), "%d", port);
 
-  // User agent
-  size = sizeof(versionGet()) + 18; // from "User-Agent: orion/"
-  char* headerUserAgent = new char[size];
-  snprintf(headerUserAgent, size, "User-Agent: orion/%s", versionGet());
+  // ----- User Agent
+  char cvBuf[CURL_VERSION_MAX_LENGTH];
+  char headerUserAgent[HTTP_HEADER_USER_AGENT_MAX_LENGTH];
+
+  snprintf(headerUserAgent, sizeof(headerUserAgent), "User-Agent: orion/%s libcurl/%s", versionGet(), curlVersionGet(cvBuf, sizeof(cvBuf)));
+  LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerUserAgent));
   headers = curl_slist_append(headers, headerUserAgent);
-  outgoingMsgSize += size;
+  outgoingMsgSize += strlen(headerUserAgent) + 1;
 
-  // Host
-  size = sizeof(ip.size()) + 13; // from "Host: :"
-  char* headerHost = new char[size];
-  snprintf(headerHost, size, "Host: %s:%d", ip.c_str(), (int) port);
+  // ----- Host
+  char headerHost[HTTP_HEADER_HOST_MAX_LENGTH];
+
+  snprintf(headerHost, sizeof(headerHost), "Host: %s:%d", ip.c_str(), (int) port);
+  LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerHost));
   headers = curl_slist_append(headers, headerHost);
-  outgoingMsgSize += size;
+  outgoingMsgSize += strlen(headerHost) + 1;
 
-  // Tenant
+  // ----- Tenant
   if (tenant != "")
   {
     headers = curl_slist_append(headers, ("fiware-service: " + tenant).c_str());
     outgoingMsgSize += tenant.size() + 16; // "fiware-service: "
   }
 
-  // Accept
+  // ----- Accept
   headers = curl_slist_append(headers, "Accept: application/xml, application/json");
   outgoingMsgSize += 41; // from "Accept: application/xml, application/json"
 
-  // Expect
+  // ----- Expect
   headers = curl_slist_append(headers, "Expect: ");
   outgoingMsgSize += 8; // from "Expect: "
 
-  // Content-length
+  // ----- Content-length
   std::stringstream contentLengthStringStream;
   contentLengthStringStream << content.size();
   std::string headerContentLength = "Content-length: " + contentLengthStringStream.str();
+  LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerContentLength.c_str()));
   headers = curl_slist_append(headers, headerContentLength.c_str());
   outgoingMsgSize += contentLengthStringStream.str().size() + 16; // from "Content-length: "
   outgoingMsgSize += content.size();
 
-  // Content-type
+  // ----- Content-type
   headers = curl_slist_append(headers, ("Content-type: " + content_type).c_str());
   outgoingMsgSize += content_type.size() + 14; // from "Content-type: "
+
 
   // Check if total outgoing message size is too big
   if (outgoingMsgSize > MAX_DYN_MSG_SIZE)
@@ -259,8 +297,6 @@ std::string sendHttpSocket
 
     free(httpResponse->memory);
     delete httpResponse;
-    delete headerHost;
-    delete headerUserAgent;
 
     return "error";
   }
@@ -308,8 +344,6 @@ std::string sendHttpSocket
 
   free(httpResponse->memory);
   delete httpResponse;
-  delete headerHost;
-  delete headerUserAgent;
 
   return result;
 }
@@ -372,6 +406,8 @@ int socketHttpConnect(const std::string& host, unsigned short port)
   freeaddrinfo(peer);
   return fd;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -493,12 +529,13 @@ std::string sendHttpSocket
   memset(response, 0, TAM_BUF);
   memset(msg, 0, MAX_STA_MSG_SIZE);
 
+  char cvBuf[128];
   snprintf(preContent, sizeof(preContent),
            "%s %s HTTP/1.1\n"
-           "User-Agent: orion/%s\n"
+           "User-Agent: orion/%s libcurl/%s\n"
            "Host: %s:%d\n"
            "Accept: application/xml, application/json\n%s",
-           verb.c_str(), resource.c_str(), versionGet(), ip.c_str(), (int) port, rushHttpHeaders.c_str());
+           verb.c_str(), resource.c_str(), versionGet(), curlVersionGet(cvBuf, sizeof(cvBuf)), ip.c_str(), (int) port, rushHttpHeaders.c_str());
 
   LM_T(LmtRush, ("'PRE' HTTP headers:\n--------------\n%s\n-------------", preContent));
 
