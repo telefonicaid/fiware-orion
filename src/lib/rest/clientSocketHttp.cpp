@@ -46,7 +46,18 @@
 
 
 
-/*
+/* ****************************************************************************
+*
+* HTTP header maximum lengths
+*/
+#define CURL_VERSION_MAX_LENGTH             128
+#define HTTP_HEADER_USER_AGENT_MAX_LENGTH   256
+#define HTTP_HEADER_HOST_MAX_LENGTH         256
+
+
+
+/* **************************************************************************** 
+*
 * See [1] for a discussion on how curl_multi is to be used. Libcurl does not seem
 * to provide a way to do asynchronous HTTP transactions in the way we intended
 * with the previous version of sendHttpSocket. To enable the old behavior of asynchronous
@@ -55,7 +66,6 @@
 * [1] http://stackoverflow.com/questions/24288513/how-to-do-curl-multi-perform-asynchronously-in-c
 */
 //#define USE_OLD_SENDHTTPSOCKET
-
 #ifndef USE_OLD_SENDHTTPSOCKET
 
 struct MemoryStruct
@@ -230,10 +240,9 @@ std::string sendHttpSocket
 
   snprintf(portAsString, sizeof(portAsString), "%d", port);
 
-
   // ----- User Agent
-  char cvBuf[128];
-  char headerUserAgent[256];
+  char cvBuf[CURL_VERSION_MAX_LENGTH];
+  char headerUserAgent[HTTP_HEADER_USER_AGENT_MAX_LENGTH];
 
   snprintf(headerUserAgent, sizeof(headerUserAgent), "User-Agent: orion/%s libcurl/%s", versionGet(), curlVersionGet(cvBuf, sizeof(cvBuf)));
   LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerUserAgent));
@@ -241,7 +250,7 @@ std::string sendHttpSocket
   outgoingMsgSize += strlen(headerUserAgent) + 1;
 
   // ----- Host
-  char headerHost[256];
+  char headerHost[HTTP_HEADER_HOST_MAX_LENGTH];
 
   snprintf(headerHost, sizeof(headerHost), "Host: %s:%d", ip.c_str(), (int) port);
   LM_T(LmtHttpHeaders, ("HTTP-HEADERS: '%s'", headerHost));
