@@ -314,7 +314,7 @@ function printTestLinePrefix()
 
 function printNotImplementedString()
 {
-  echo " NOT IMPLEMENTED - skipped"
+  echo "NOT IMPLEMENTED - skipped"
   echo                                    >> /tmp/valgrindTestSuiteLog
   echo "$1 not implemented - skipped"     >> /tmp/valgrindTestSuiteLog
   echo                                    >> /tmp/valgrindTestSuiteLog
@@ -372,7 +372,7 @@ function failedTest()
 {
   if [ "$3" != "0" ]
   then
-    echo " FAILED (lost: $3). Check $1 for clues"
+    echo "FAILED (lost: $3). Check $1 for clues"
   fi
 
   testFailures=$testFailures+1
@@ -449,9 +449,9 @@ then
     testNo=$testNo+1
     printTestLinePrefix
 
-    init="$testNoString $vtest ................................................................................................................... "
+    init="$testNoString $vtest ............................................................................................................................."
     init=${init:0:100}
-    echo -n $init
+    echo -n $init" "
 
     typeset -i lines
     lines=$(wc -l $vtest | awk '{ print $1 }')
@@ -473,7 +473,7 @@ then
       brokerStart
       if [ "$result" != "0" ]
       then
-        echo " context broker didn't start! check $NAME.out"
+        echo "context broker didn't start! check $NAME.out"
         continue
       fi
 
@@ -487,7 +487,7 @@ then
 
       if [ "$vTestResult" != 0 ]
       then
-        echo " (HARNESS FAILURE) Test ended with error code $vTestResult"
+        echo "(HARNESS FAILURE) Test ended with error code $vTestResult"
         mv /tmp/contextBroker.log                $vtest.contextBroker.log
         mv /tmp/valgrindTestLog.stderr           $vtest.valgrindTestSuite.stderr
         mv /tmp/valgrindTestLog.stdout           $vtest.valgrindTestSuite.stdout
@@ -510,7 +510,7 @@ then
       failedTest "test/valgrind/$vtest.*" $vtest $lost
     elif [ "$vTestResult" == 0 ]
     then
-      echo " " $okString
+      echo $okString
       rm -f $vtest.out
     fi
 
@@ -545,7 +545,9 @@ then
 
     testNo=$testNo+1
     printTestLinePrefix
-    echo -n $testNoString $htest ...
+    init="$testNoString $htest ............................................................................................................................."
+    init=${init:0:100}
+    echo -n $init" "
 
     # In the case of harness test, we check that the test is implemented checking
     # that the word VALGRIND_READY apears in the .test file (usually, in a commented line)
@@ -599,7 +601,7 @@ then
     then
       failedTest "test/functionalTest/cases/$htest.valgrind.*" $htest $lost
     else
-      echo " " $okString
+      echo $okString
     fi
 
   done
