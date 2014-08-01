@@ -25,8 +25,8 @@
 *
 * Author: Ken Zangelin
 */
-
 #include <string>
+
 
 
 /* ****************************************************************************
@@ -50,11 +50,14 @@ typedef enum Format
 */
 extern const char* formatToString(Format format);
 
+
+
 /* ****************************************************************************
 *
 * stringToFormat
 */
 extern Format stringToFormat(const std::string& s);
+
 
 
 /* ****************************************************************************

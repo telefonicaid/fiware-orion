@@ -31,64 +31,64 @@
 *
 * Statistic counters for NGSI REST requests
 */
-int noOfJsonRequests                         = -1;
-int noOfXmlRequests                          = -1;
-int noOfRegistrations                        = -1;
-int noOfRegistrationErrors                   = -1;
-int noOfRegistrationUpdates                  = -1;
-int noOfRegistrationUpdateErrors             = -1;
-int noOfDiscoveries                          = -1;
-int noOfDiscoveryErrors                      = -1;
-int noOfAvailabilitySubscriptions            = -1;
-int noOfAvailabilitySubscriptionErrors       = -1;
-int noOfAvailabilityUnsubscriptions          = -1;
-int noOfAvailabilityUnsubscriptionErrors     = -1;
-int noOfAvailabilitySubscriptionUpdates      = -1;
-int noOfAvailabilitySubscriptionUpdateErrors = -1;
-int noOfAvailabilityNotificationsReceived    = -1;
-int noOfAvailabilityNotificationsSent        = -1;
+int noOfJsonRequests                                     = -1;
+int noOfXmlRequests                                      = -1;
+int noOfRegistrations                                    = -1;
+int noOfRegistrationErrors                               = -1;
+int noOfRegistrationUpdates                              = -1;
+int noOfRegistrationUpdateErrors                         = -1;
+int noOfDiscoveries                                      = -1;
+int noOfDiscoveryErrors                                  = -1;
+int noOfAvailabilitySubscriptions                        = -1;
+int noOfAvailabilitySubscriptionErrors                   = -1;
+int noOfAvailabilityUnsubscriptions                      = -1;
+int noOfAvailabilityUnsubscriptionErrors                 = -1;
+int noOfAvailabilitySubscriptionUpdates                  = -1;
+int noOfAvailabilitySubscriptionUpdateErrors             = -1;
+int noOfAvailabilityNotificationsReceived                = -1;
+int noOfAvailabilityNotificationsSent                    = -1;
 
-int noOfQueries                              = -1;
-int noOfQueryErrors                          = -1;
-int noOfUpdates                              = -1;
-int noOfUpdateErrors                         = -1;
-int noOfSubscriptions                        = -1;
-int noOfSubscriptionErrors                   = -1;
-int noOfSubscriptionUpdates                  = -1;
-int noOfSubscriptionUpdateErrors             = -1;
-int noOfUnsubscriptions                      = -1;
-int noOfUnsubscriptionErrors                 = -1;
-int noOfNotificationsReceived                = -1;
-int noOfNotificationsSent                    = -1;
+int noOfQueries                                          = -1;
+int noOfQueryErrors                                      = -1;
+int noOfUpdates                                          = -1;
+int noOfUpdateErrors                                     = -1;
+int noOfSubscriptions                                    = -1;
+int noOfSubscriptionErrors                               = -1;
+int noOfSubscriptionUpdates                              = -1;
+int noOfSubscriptionUpdateErrors                         = -1;
+int noOfUnsubscriptions                                  = -1;
+int noOfUnsubscriptionErrors                             = -1;
+int noOfNotificationsReceived                            = -1;
+int noOfNotificationsSent                                = -1;
 
-int noOfContextEntitiesByEntityId            = -1;
-int noOfContextEntityAttributes              = -1;
-int noOfEntityByIdAttributeByName            = -1;
-int noOfContextEntityTypes                   = -1;
-int noOfContextEntityTypeAttributeContainer  = -1;
-int noOfContextEntityTypeAttribute           = -1;
-int noOfNgsi9SubscriptionsConvOp             = -1;
+int noOfContextEntitiesByEntityId                        = -1;
+int noOfContextEntityAttributes                          = -1;
+int noOfEntityByIdAttributeByName                        = -1;
+int noOfContextEntityTypes                               = -1;
+int noOfContextEntityTypeAttributeContainer              = -1;
+int noOfContextEntityTypeAttribute                       = -1;
+int noOfNgsi9SubscriptionsConvOp                         = -1;
 
-int noOfIndividualContextEntity                     = -1;
-int noOfIndividualContextEntityAttributes           = -1;
-int noOfIndividualContextEntityAttribute            = -1;
-int noOfAttributeValueInstance                      = -1;
-int noOfNgsi10ContextEntityTypes                    = -1;
-int noOfNgsi10ContextEntityTypesAttributeContainer  = -1;
-int noOfNgsi10ContextEntityTypesAttribute           = -1;
-int noOfNgsi10SubscriptionsConvOp                   = -1;
+int noOfIndividualContextEntity                          = -1;
+int noOfIndividualContextEntityAttributes                = -1;
+int noOfIndividualContextEntityAttribute                 = -1;
+int noOfAttributeValueInstance                           = -1;
+int noOfNgsi10ContextEntityTypes                         = -1;
+int noOfNgsi10ContextEntityTypesAttributeContainer       = -1;
+int noOfNgsi10ContextEntityTypesAttribute                = -1;
+int noOfNgsi10SubscriptionsConvOp                        = -1;
 
-int noOfUpdateContextElement                 = -1;
-int noOfAppendContextElement                 = -1;
-int noOfUpdateContextAttribute               = -1;
+int noOfUpdateContextElement                             = -1;
+int noOfAppendContextElement                             = -1;
+int noOfUpdateContextAttribute                           = -1;
 
-int noOfLogRequests                          = -1;
-int noOfVersionRequests                      = -1;
-int noOfExitRequests                         = -1;
-int noOfLeakRequests                         = -1;
-int noOfStatisticsRequests                   = -1;
-int noOfInvalidRequests                      = -1;
-int noOfRegisterResponses                    = -1;
+int noOfLogRequests                                      = -1;
+int noOfVersionRequests                                  = -1;
+int noOfExitRequests                                     = -1;
+int noOfLeakRequests                                     = -1;
+int noOfStatisticsRequests                               = -1;
+int noOfInvalidRequests                                  = -1;
+int noOfRegisterResponses                                = -1;
 
 int noOfRtSubscribeContextAvailabilityResponse           = -1;
 int noOfRtUpdateContextAvailabilitySubscriptionResponse  = -1;
@@ -106,53 +106,61 @@ int noOfRtSubscribeError                                 = -1;
 */
 void statisticsUpdate(RequestType request, Format inFormat)
 {
-  if (inFormat == XML)     ++noOfXmlRequests;
-  if (inFormat == JSON)    ++noOfJsonRequests;
+  if (inFormat == XML)
+  {
+     ++noOfXmlRequests;
+  }
+
+  if (inFormat == JSON)
+  {
+    ++noOfJsonRequests;
+  }
+
 
   switch (request)
   {
-  case RegisterContext:                            ++noOfRegistrations; break;
-  case DiscoverContextAvailability:                ++noOfDiscoveries; break;
-  case SubscribeContextAvailability:               ++noOfAvailabilitySubscriptions; break;
-  case UpdateContextAvailabilitySubscription:      ++noOfAvailabilitySubscriptionUpdates; break;
-  case UnsubscribeContextAvailability:             ++noOfAvailabilityUnsubscriptions; break;
-  case NotifyContextAvailability:                  ++noOfAvailabilityNotificationsReceived; break;
+  case RegisterContext:                                  ++noOfRegistrations; break;
+  case DiscoverContextAvailability:                      ++noOfDiscoveries; break;
+  case SubscribeContextAvailability:                     ++noOfAvailabilitySubscriptions; break;
+  case UpdateContextAvailabilitySubscription:            ++noOfAvailabilitySubscriptionUpdates; break;
+  case UnsubscribeContextAvailability:                   ++noOfAvailabilityUnsubscriptions; break;
+  case NotifyContextAvailability:                        ++noOfAvailabilityNotificationsReceived; break;
 
-  case QueryContext:                               ++noOfQueries; break;
-  case SubscribeContext:                           ++noOfSubscriptions; break;
-  case UpdateContextSubscription:                  ++noOfSubscriptionUpdates; break;
-  case UnsubscribeContext:                         ++noOfUnsubscriptions; break;
-  case NotifyContext:                              ++noOfNotificationsReceived; break;
-  case UpdateContext:                              ++noOfUpdates; break;
+  case QueryContext:                                     ++noOfQueries; break;
+  case SubscribeContext:                                 ++noOfSubscriptions; break;
+  case UpdateContextSubscription:                        ++noOfSubscriptionUpdates; break;
+  case UnsubscribeContext:                               ++noOfUnsubscriptions; break;
+  case NotifyContext:                                    ++noOfNotificationsReceived; break;
+  case UpdateContext:                                    ++noOfUpdates; break;
 
-  case ContextEntitiesByEntityId:                  ++noOfContextEntitiesByEntityId; break;
-  case ContextEntityAttributes:                    ++noOfContextEntityAttributes; break;
-  case EntityByIdAttributeByName:                  ++noOfEntityByIdAttributeByName; break;
-  case ContextEntityTypes:                         ++noOfContextEntityTypes; break;
-  case ContextEntityTypeAttributeContainer:        ++noOfContextEntityTypeAttributeContainer; break;
-  case ContextEntityTypeAttribute:                 ++noOfContextEntityTypeAttribute; break;
-  case IndividualContextEntity:                    ++noOfIndividualContextEntity; break;
-  case IndividualContextEntityAttributes:          ++noOfIndividualContextEntityAttributes; break;
-  case AttributeValueInstance:                     ++noOfAttributeValueInstance; break;
-  case IndividualContextEntityAttribute:           ++noOfIndividualContextEntityAttribute; break;
-  case Ngsi9SubscriptionsConvOp:                   ++noOfNgsi9SubscriptionsConvOp; break;
+  case ContextEntitiesByEntityId:                        ++noOfContextEntitiesByEntityId; break;
+  case ContextEntityAttributes:                          ++noOfContextEntityAttributes; break;
+  case EntityByIdAttributeByName:                        ++noOfEntityByIdAttributeByName; break;
+  case ContextEntityTypes:                               ++noOfContextEntityTypes; break;
+  case ContextEntityTypeAttributeContainer:              ++noOfContextEntityTypeAttributeContainer; break;
+  case ContextEntityTypeAttribute:                       ++noOfContextEntityTypeAttribute; break;
+  case IndividualContextEntity:                          ++noOfIndividualContextEntity; break;
+  case IndividualContextEntityAttributes:                ++noOfIndividualContextEntityAttributes; break;
+  case AttributeValueInstance:                           ++noOfAttributeValueInstance; break;
+  case IndividualContextEntityAttribute:                 ++noOfIndividualContextEntityAttribute; break;
+  case Ngsi9SubscriptionsConvOp:                         ++noOfNgsi9SubscriptionsConvOp; break;
 
-  case UpdateContextElement:                       ++noOfUpdateContextElement; break;
-  case AppendContextElement:                       ++noOfAppendContextElement; break;
-  case UpdateContextAttribute:                     ++noOfUpdateContextAttribute; break;
-  case Ngsi10ContextEntityTypes:                   ++noOfNgsi10ContextEntityTypes; break;
-  case Ngsi10ContextEntityTypesAttributeContainer: ++noOfNgsi10ContextEntityTypesAttributeContainer; break;
-  case Ngsi10ContextEntityTypesAttribute:          ++noOfNgsi10ContextEntityTypesAttribute; break;
-  case Ngsi10SubscriptionsConvOp:                  ++noOfNgsi10SubscriptionsConvOp; break;
+  case UpdateContextElement:                             ++noOfUpdateContextElement; break;
+  case AppendContextElement:                             ++noOfAppendContextElement; break;
+  case UpdateContextAttribute:                           ++noOfUpdateContextAttribute; break;
+  case Ngsi10ContextEntityTypes:                         ++noOfNgsi10ContextEntityTypes; break;
+  case Ngsi10ContextEntityTypesAttributeContainer:       ++noOfNgsi10ContextEntityTypesAttributeContainer; break;
+  case Ngsi10ContextEntityTypesAttribute:                ++noOfNgsi10ContextEntityTypesAttribute; break;
+  case Ngsi10SubscriptionsConvOp:                        ++noOfNgsi10SubscriptionsConvOp; break;
 
-  case LogRequest:                                 ++noOfLogRequests; break;
-  case VersionRequest:                             ++noOfVersionRequests; break;
-  case ExitRequest:                                ++noOfExitRequests; break;
-  case LeakRequest:                                ++noOfLeakRequests; break;
-  case StatisticsRequest:                          ++noOfStatisticsRequests; break;
+  case LogRequest:                                       ++noOfLogRequests; break;
+  case VersionRequest:                                   ++noOfVersionRequests; break;
+  case ExitRequest:                                      ++noOfExitRequests; break;
+  case LeakRequest:                                      ++noOfLeakRequests; break;
+  case StatisticsRequest:                                ++noOfStatisticsRequests; break;
 
-  case InvalidRequest:                             ++noOfInvalidRequests; break;
-  case RegisterResponse:                           ++noOfRegisterResponses; break;
+  case InvalidRequest:                                   ++noOfInvalidRequests; break;
+  case RegisterResponse:                                 ++noOfRegisterResponses; break;
 
   case RtSubscribeContextAvailabilityResponse:           ++noOfRtSubscribeContextAvailabilityResponse; break;
   case RtUpdateContextAvailabilitySubscriptionResponse:  ++noOfRtUpdateContextAvailabilitySubscriptionResponse; break;

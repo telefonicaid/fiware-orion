@@ -28,13 +28,19 @@
 #include <string>
 #include <vector>
 
+#include "common/string.h"
+#include "common/wsStrip.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "common/string.h"
-#include "common/wsStrip.h"
 
-#define DEFAULT_HTTP_PORT 80
+
+/* ****************************************************************************
+*
+* DEFAULT_HTTP_PORT - 
+*/
+#define DEFAULT_HTTP_PORT  80
+
 
 
 /* ****************************************************************************
@@ -46,59 +52,71 @@ static bool checkGroupIPv6(std::string in)
   // Can receive for example:
   // :, 2001:, db8:, 0DB8:
 
-  if (in.empty()) return false;
+  if (in.empty())
+  {
+    return false;
+  }
 
-  if (in == ":") return true;
+  if (in == ":")
+  {
+    return true;
+  }
 
-  if (in.length() > 5) return false;
+  if (in.length() > 5)
+  {
+    return false;
+  }
 
-  bool resu = true;
   for (uint i = 0; i < in.length() - 1 ; i++)
   {
     if (isxdigit(in[i]) == false)
     {
-      resu = false;
-      break;
+      return false;
     }
   }
-  return resu;
+
+  return true;
 }
+
 
 
 /* ****************************************************************************
 *
 * isIPv6 -
+*
+* An IP v6 has between two and seven character ":"
+*   o ::
+*   o 2001:0db8:85a3:08d3:1319:8a2e:0370:7334
+*
 */
 bool isIPv6(const std::string& in)
 {
-  // An IP v6 have between two and seven character ":"
-  //  ::
-  //  2001:0db8:85a3:08d3:1319:8a2e:0370:7334
-
-  size_t pos;
+  size_t      pos;
   std::string partip;
   std::string resu;
   std::string staux = in;
-  int cont = 0;
+  int         cont  = 0;
 
   pos = staux.find(":");
   while (pos != std::string::npos)
   {
     cont++;
     partip = staux.substr(0, pos+1);
-    resu += partip;
+    resu  += partip;
 
     if (checkGroupIPv6(partip) == false)
+    {
       return false;
+    }
 
     partip = staux.substr(pos+1);
-    staux = partip;
-
-    pos = staux.find(":");
+    staux  = partip;
+    pos    = staux.find(":");
   }
 
   return ((cont > 1) && (cont < 8));
 }
+
 
 
 /* ****************************************************************************
@@ -107,31 +125,33 @@ bool isIPv6(const std::string& in)
 */
 bool getIPv6Port(const std::string& in, std::string& outIp, std::string& outPort)
 {
-  size_t pos;
-  std::string partip;
-  std::string resu;
-  std::string staux = in;
+  size_t       pos;
+  std::string  partip;
+  std::string  res;
+  std::string  staux = in;
 
   // Split IP and port
   pos = staux.find(":");
   while (pos != std::string::npos)
   {
-    partip = staux.substr(0, pos+1);
-    resu += partip;
-    partip = staux.substr(pos+1);
-    staux = partip;
-    pos = staux.find(":");
+    partip  = staux.substr(0, pos+1);
+    res    += partip;
+    partip  = staux.substr(pos+1);
+    staux   = partip;
+    pos     = staux.find(":");
   }
 
-
-  if (resu.empty())
+  if (res.empty())
+  {
     return false;
+  }
 
-  outIp = resu.substr(0, resu.length() - 1);
+  outIp   = res.substr(0, res.length() - 1);
   outPort = staux;
 
-  return isIPv6(resu);
+  return isIPv6(res);
 }
+
 
 
 /* ****************************************************************************
@@ -142,13 +162,14 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
 {
   char* s          = strdup(in.c_str());
   char* toFree     = s;
-  char* start;
   int   components = 1;
-
+  char* start;
 
   // 1. Skip leading delimiters
   while (*s == delimiter)
+  {
     ++s;
+  }
   start = s;
 
 
@@ -184,9 +205,9 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
   // 5. free s
   free(toFree);
 
-
   return components;
 }
+
 
 
 /* ****************************************************************************
@@ -200,7 +221,8 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
 bool parseUrl(const std::string& url, std::string& host, int& port, std::string& path, std::string& protocol)
 {
   /* Sanity check */
-  if (url == "") {
+  if (url == "")
+  {
     return false;
   }
 
@@ -218,15 +240,20 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
    *   1  23             4  5     coponentes
    */
 
-  if ((components < 3) || (components == 3 && urlTokens[2].length() == 0)) {
+  if ((components < 3) || (components == 3 && urlTokens[2].length() == 0))
+  {
     return false;
   }
 
   path = "";
-  /* Note that components could be 3, in which case we don't enter in the for. This is
-   * the case of URL without '/' like eg. "http://www.google.com" */
+  //
+  // Note that components could be 3, in which case we don't enter in the for. This is
+  // the case of URL without '/' like eg. "http://www.google.com"
+  //
   for (int ix = 3; ix < components; ++ix)
+  {
     path += "/" + urlTokens[ix];
+  }
 
   if (path == "")
   {
@@ -262,18 +289,25 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
 
     /* Sanity check */
     if (components > 2)
+    {
       return false;
+    }
 
     host = hostTokens[0];
 
     if (components == 2)
+    {
       port = atoi(hostTokens[1].c_str());
+    }
     else
+    {
       port = DEFAULT_HTTP_PORT;
+    }
   }
 
   return true;
 }
+
 
 
 /* ****************************************************************************
@@ -293,25 +327,25 @@ char* i2s(int i, char* placeholder, int placeholderSize)
 */
 std::string parsedUptime(int uptime)
 {
-  char s[50];
-
-  int seconds;
-  int minutes;
-  int hours;
-  int days;
+  char  s[50];
+  int   seconds;
+  int   minutes;
+  int   hours;
+  int   days;
 
   minutes = uptime / 60;
   seconds = uptime % 60;
 
-  hours = minutes / 60;
+  hours   = minutes / 60;
   minutes = minutes % 60;
 
-  days = hours / 24;
-  hours = hours % 24;
+  days    = hours / 24;
+  hours   = hours % 24;
 
   snprintf(s, sizeof(s), "%d d, %d h, %d m, %d s", days, hours, minutes, seconds);
   return std::string(s);
 }
+
 
 
 /* ****************************************************************************
@@ -321,12 +355,16 @@ std::string parsedUptime(int uptime)
 bool onlyWs(const char* s)
 {
   if (*s == 0)
+  {
     return true;
+  }
 
   while (*s != 0)
   {
     if ((*s != ' ') && (*s != '\t') && (*s != '\n'))
+    {
       return false;
+    }
 
     ++s;
   }
@@ -335,20 +373,21 @@ bool onlyWs(const char* s)
 }
 
 
+
 /* ****************************************************************************
 *
 * string2coords - 
 */
 bool string2coords(const std::string& s, double& latitude, double& longitude)
 {
-  char* initial = strdup(s.c_str());
-  char* cP      = initial;
-  char* comma;
-  char* number1;
-  char* number2;
-  bool  ret = true;
+  char*  initial = strdup(s.c_str());
+  char*  cP      = initial;
+  char*  comma;
+  char*  number1;
+  char*  number2;
+  bool   ret = true;
 
-  cP = wsStrip(cP);
+  cP    = wsStrip(cP);
 
   comma = strchr(cP, ',');
   if (comma == NULL)
@@ -365,10 +404,12 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   number1 = wsStrip(number1);
   number2 = wsStrip(number2);
 
-  std::string err;
-  double oldLatitude = latitude;
-  double oldLongitude = longitude;
-  latitude = atoF(number1, &err);
+  std::string  err;
+  double       oldLatitude  = latitude;
+  double       oldLongitude = longitude;
+
+  latitude                  = atoF(number1, &err);
+
   if (err.length() > 0)
   {
     latitude = oldLatitude;
@@ -378,6 +419,7 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
   else
   {
     longitude = atoF(number2, &err);
+
     if (err.length() > 0)
     {
       /* Rollback latitude */
@@ -404,6 +446,7 @@ bool string2coords(const std::string& s, double& latitude, double& longitude)
 }
 
 
+
 /* ****************************************************************************
 *
 * coords2string - 
@@ -420,15 +463,16 @@ void coords2string(std::string* s, double latitude, double longitude, int decima
 }
 
 
+
 /* ****************************************************************************
 *
 * versionParse -
 */
 bool versionParse(const std::string& version, int& mayor, int& minor, std::string& bugFix)
 {
-  char* copy = strdup(version.c_str());
-  char* s    = wsStrip(copy);
-  char* dotP;
+  char*  copy = strdup(version.c_str());
+  char*  s    = wsStrip(copy);
+  char*  dotP;
 
 
   //
@@ -585,9 +629,13 @@ char* strToLower(char* to, const char* from, int toSize)
   for (ix = 0; ix < fromSize; ix++)
   {
     if ((from[ix] >= 'A') && (from[ix] <= 'Z'))
+    {
       to[ix] = from[ix] + ('a' - 'A');
+    }
     else
+    {
       to[ix] = from[ix];
+    }
   }
 
   to[ix] = 0;
@@ -601,7 +649,7 @@ char* strToLower(char* to, const char* from, int toSize)
 *
 * strReplace - 
 */
-void strReplace(char* to, const char* from, const char* oldString, const char* newString)
+void strReplace(char* to, int toLen, const char* from, const char* oldString, const char* newString)
 {
   int toIx   = 0;
   int fromIx = 0;
@@ -612,7 +660,7 @@ void strReplace(char* to, const char* from, const char* oldString, const char* n
   {
     if (strncmp(&from[fromIx], oldString, oldLen) == 0)
     {
-      strcat(to, newString);
+      snprintf(to, toLen, "%s", newString);
       toIx   += newLen;
       fromIx += oldLen;
     }
@@ -626,4 +674,3 @@ void strReplace(char* to, const char* from, const char* oldString, const char* n
 
   to[toIx] = 0;
 }
-

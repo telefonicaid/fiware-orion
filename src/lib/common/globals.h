@@ -85,11 +85,15 @@ extern void orionInit(OrionExitFunction exitFunction, const char* version);
 extern bool isTrue(const std::string& s);
 extern bool isFalse(const std::string& s);
 
+
+
 /*****************************************************************************
 *
 * getTimer -
 */
 extern Timer* getTimer(void);
+
+
 
 /*****************************************************************************
 *
@@ -97,17 +101,23 @@ extern Timer* getTimer(void);
 */
 extern void setTimer(Timer* t);
 
+
+
 /* ****************************************************************************
 *
 * getCurrentTime - 
 */ 
 extern int getCurrentTime(void);
 
+
+
 /* ****************************************************************************
 *
 * toSeconds -
 */
 extern int64_t toSeconds(int value, char what, bool dayPart);
+
+
 
 /*****************************************************************************
 *

@@ -46,13 +46,13 @@ extern std::string startTag
 
 extern std::string startTag
 (
-    const std::string&  indent,
-    const std::string&  xmlTag,
-    const std::string&  jsonTag,
-    Format       format,
-    bool         isVector         = false,
-    bool         showTag          = true,
-    bool         isCompoundVector = false
+  const std::string&  indent,
+  const std::string&  xmlTag,
+  const std::string&  jsonTag,
+  Format              format,
+  bool                isVector         = false,
+  bool                showTag          = true,
+  bool                isCompoundVector = false
 );
 
 
