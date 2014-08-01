@@ -60,6 +60,8 @@ std::string ContextRegistration::render(Format format, const std::string& indent
   // All, except providingApplication of course :-)
   //
   out += startTag(indent, tag, format, isInVector == false);
+  //out += startTag(indent, tag, tag, format, isInVector, false);
+  //out += startTag(indent, tag, tag, format, false, false);
   out += entityIdVector.render(format, indent + "  ", true);
   out += contextRegistrationAttributeVector.render(format, indent + "  ", true);
   out += registrationMetadataVector.render(format, indent + "  ", true);

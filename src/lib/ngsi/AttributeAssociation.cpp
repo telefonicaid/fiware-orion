@@ -42,9 +42,9 @@ std::string AttributeAssociation::render(Format format, const std::string& inden
   std::string  tag                     = "attributeAssociation";
   bool         targetAttributeRendered = target != "";
 
-  out += startTag(indent, tag, format);
-  out += valueTag(indent + "  ", "sourceAttribute", source, format, targetAttributeRendered);
-  out += valueTag(indent + "  ", "targetAttribute", target, format, false);
+  out += startTag(indent, tag, format, false);
+  out += valueTag(indent + "  ", "source", source, format, targetAttributeRendered);
+  out += valueTag(indent + "  ", "target", target, format, false);
   out += endTag(indent, tag, format, comma);
 
   return out;
