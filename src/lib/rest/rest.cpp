@@ -366,6 +366,8 @@ static void requestCompleted
 
   delete(ciP);
   *con_cls = NULL;
+
+  LM_TRANSACTION_END();  // Incoming REST request ends
 }
 
 
@@ -606,10 +608,6 @@ static int connectionTreat
       snprintf(ip, sizeof(ip), "IP unknown");
     }
 
-    //
-    // Transaction
-    //
-    LM_TRANSACTION_START(ip, port, url);
 
 
     //
@@ -625,6 +623,13 @@ static int connectionTreat
     ciP->port = port;
     ciP->ip   = ip;
     
+    //
+    // Transaction starts here
+    //
+    LM_TRANSACTION_START(ip, port, url);  // Incoming REST request starts
+
+
+
     //
     // URI parameters
     // 
@@ -740,8 +745,6 @@ static int connectionTreat
   else
     serveFunction(ciP);
 
-  LM_TRANSACTION_END();
-
   return MHD_YES;
 }
 
@@ -759,7 +762,6 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
   {
     LM_X(1, ("Fatal Error (please call restInit before starting the REST service)"));
   }
-
 
   if ((ipVersion == IPV4) || (ipVersion == IPDUAL))
   { 

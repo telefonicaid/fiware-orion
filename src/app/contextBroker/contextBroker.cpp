@@ -62,6 +62,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <signal.h>
+#include <curl/curl.h>
 
 #include "mongoBackend/MongoGlobal.h"
 
@@ -997,6 +998,8 @@ void orionExit(int code, const std::string& reason)
 */
 void exitFunc(void)
 {
+  curl_global_cleanup();
+
   if (unlink(pidPath) != 0)
     LM_T(LmtSoftError, ("error removing PID file '%s': %s", pidPath, strerror(errno)));
 }
@@ -1260,6 +1263,7 @@ int main(int argC, char* argV[])
   orionInit(orionExit, ORION_VERSION);
   mongoInit(dbHost, dbName, user, pwd);
   contextBrokerInit(ngsi9Only, dbName, multitenant != "off");
+  curl_global_init(CURL_GLOBAL_NOTHING);
 
   if (rush[0] != 0)
   {

@@ -215,7 +215,7 @@ Date: REGEX(.*)
 4: ++++++++++++++++++++
 POST http://127.0.0.1:9997/notify
 Content-Length: 1286
-User-Agent: orion/0.14.0-
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.* libcurl/\d+\.\d+\.\d+)
 Host: 127.0.0.1:9997
 Accept: application/xml, application/json
 Content-Type: application/xml
@@ -265,7 +265,7 @@ Content-Type: application/xml
 =======================================
 POST http://127.0.0.1:9997/notify
 Content-Length: 1286
-User-Agent: orion/0.14.0-
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.* libcurl/\d+\.\d+\.\d+)
 Host: 127.0.0.1:9997
 Accept: application/xml, application/json
 Content-Type: application/xml
@@ -315,7 +315,7 @@ Content-Type: application/xml
 =======================================
 POST http://127.0.0.1:9997/notify
 Content-Length: 1286
-User-Agent: orion/0.14.0-
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.* libcurl/\d+\.\d+\.\d+)
 Host: 127.0.0.1:9997
 Accept: application/xml, application/json
 Content-Type: application/xml
@@ -365,7 +365,7 @@ Content-Type: application/xml
 =======================================
 POST http://127.0.0.1:9997/notify
 Content-Length: 1286
-User-Agent: orion/0.14.0-
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.* libcurl/\d+\.\d+\.\d+)
 Host: 127.0.0.1:9997
 Accept: application/xml, application/json
 Content-Type: application/xml
@@ -415,7 +415,7 @@ Content-Type: application/xml
 =======================================
 POST http://127.0.0.1:9997/notify
 Content-Length: 1286
-User-Agent: orion/0.14.0-
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.* libcurl/\d+\.\d+\.\d+)
 Host: 127.0.0.1:9997
 Accept: application/xml, application/json
 Content-Type: application/xml
@@ -465,7 +465,7 @@ Content-Type: application/xml
 =======================================
 POST http://127.0.0.1:9997/notify
 Content-Length: 1286
-User-Agent: orion/0.14.0-
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.* libcurl/\d+\.\d+\.\d+)
 Host: 127.0.0.1:9997
 Accept: application/xml, application/json
 Content-Type: application/xml

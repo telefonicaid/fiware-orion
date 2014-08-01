@@ -35,8 +35,8 @@ Packager:   Fermín Galán <fermin@tid.es>
 URL:        http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-context-broker
 Source:     %{name}-%{broker_version}.tar.gz
 BuildRoot: /var/tmp/%{name}-buildroot
-Requires:  libstdc++, boost-thread, boost-filesystem, libmicrohttpd, logrotate
-Buildrequires: gcc, cmake, gcc-c++, libmicrohttpd-devel, boost-devel
+Requires:  libstdc++, boost-thread, boost-filesystem, libmicrohttpd, libcurl, logrotate
+Buildrequires: gcc, cmake, gcc-c++, libmicrohttpd-devel, libcurl-devel, boost-devel
 Requires(pre): shadow-utils
 
 %description
@@ -179,6 +179,26 @@ rm -rf  /usr/share/contextBroker
 
 
 %changelog
+* Fri Aug 01 2014 Fermin Galan <fermin@tid.es> 0.14.1-1 (FIWARE-3.5.1-1)
+- Fix:  errors in JSON rendering for '/statistics' and '/version' fixed (Issue #428).
+- Fix:  using same location attribute in UPDATE fails (issue http://stackoverflow.com/questions/24431177/ge-orion-context-broker-when-we-make-an-update-of-the-entity-does-not-allow-us)
+- Fix:  Context Broker no crashed anymore due to different tenant names but equal in insensitve case (workaround in Issue #431).
+- Logging modifications (Issue #428):
+   o The name of the log file has been changed from contextBrokerLog to contextBroker.log
+   o Changed the log line format to use a key-value approach
+   o Added LM_I, for transactions. Each time a new transaction is initiated, an LM_I is issued.
+     Upon terminating each transaction, another LM_I is issued to reflect this.
+   o All log lines contain the id of the current transaction, or N/A if no transaction is in progress
+   o Changed the time reference to localtime (previously GMT was used)
+   o Stopped using LM_RE, LM_V* and _LM_RVE and removed tho CLI options -v, -vv, -vvv, -vvvv, -vvvvv
+   o Added an LM_I for when thr broker starts and another when it exits (in a controlled manner).
+- The broker now uses libcurl for outgoing HTTP communications.
+- Fix: double-quotes in output payload have been escaped (Issue #456)
+- Fix: Added tests to make sure that latitude and longitude are within range
+       (-90 <= latitude <=90)  and (-180 <= longitude <= 180) and properly stored in database (Issue #461)
+- Fix: RPM binary complied in release mode (previous versions used debug)
+- Add: file to disable prelinking automatically along with RPM
+
 * Fri Jun 27 2014 Fermin Galan <fermin@tid.es> 0.14.0-1 (FIWARE-3.4.3-1)
 - Add: Pagination, using URI parameters 'offset' and 'limit' (and 'details' for extra details) (issue #395)
 - Add: ServicePath support for specifying to which service path entities belong in NGSI10 queryContext and updateContext operations (issue #392)
