@@ -98,16 +98,16 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
           "type": "Association",
           "value": {
             "source": {
+              "id": "sensor1",
               "type": "TemperatureSensor",
-              "isPattern": "false",
-              "id": "sensor1"
+              "isPattern": "false"
             },
             "target": {
+              "id": "house1",
               "type": "House",
-              "isPattern": "false",
-              "id": "house1"
+              "isPattern": "false"
             },
-            "attributes": [
+            "associations": [
               {
                 "source": "measurement",
                 "target": "temperature"
@@ -129,7 +129,7 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
               "isPattern": "false",
               "id": "house2"
             },
-            "attributes": [
+            "associations": [
               {
                 "source": "measurement",
                 "target": "temperature"
@@ -141,8 +141,8 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
       "providingApplication": "http://192.168.100.1:70/application"
     }
   ],
-  "duration": "PT1M",
-  "registrationId": "123456789012345678901234"
+  "duration": "PT1H",
+  "registrationId": ""
 }'
 # ********************************************************************************
 echo "++++++ Query an association"
@@ -247,59 +247,64 @@ Date: REGEX(.*)
 }
 ++++++ Query an association
 HTTP/1.1 200 OK
-Content-Length: 1870
+Content-Length: 1344
 Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<discoverContextAvailabilityResponse>
-  <contextRegistrationResponseList>
-    <contextRegistrationResponse>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="TemperatureSensor" isPattern="false">
-            <id>Sensor1</id>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>measurement</name>
-            <type/>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://myHomeGateway22.org</providingApplication>
-      </contextRegistration>
-    </contextRegistrationResponse>
-    <contextRegistrationResponse>
-      <contextRegistration>
-        <registrationMetadata>
-          <contextMetadata>
-            <name>association1</name>
-            <type>Association</type>
-            <value>
-              <entityAssociation>
-                <sourceEntityId type="TemperatureSensor" isPattern="false">
-                  <id>Sensor1</id>
-                </sourceEntityId>
-                <targetEntityId type="House" isPattern="false">
-                  <id>House1</id>
-                </targetEntityId>
-              </entityAssociation>
-              <attributeAssociationList>
-                <attributeAssociation>
-                  <sourceAttribute>measurement</sourceAttribute>
-                  <targetAttribute>temperature</targetAttribute>
-                </attributeAssociation>
-              </attributeAssociationList>
-            </value>
-          </contextMetadata>
-        </registrationMetadata>
-        <providingApplication>http://www.fi-ware.eu/NGSI/association</providingApplication>
-      </contextRegistration>
-    </contextRegistrationResponse>
-  </contextRegistrationResponseList>
-</discoverContextAvailabilityResponse>
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "measurement",
+                        "type": ""
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "sensor1",
+                        "isPattern": "false",
+                        "type": "TemperatureSensor"
+                    }
+                ],
+                "providingApplication": "http://myHomeGateway22.org"
+            }
+        },
+        {
+            "contextRegistration": {
+                "metadatas": [
+                    {
+                        "name": "association1",
+                        "type": "Association",
+                        "value": {
+                            "attributeAssociations": [
+                                {
+                                    "source": "measurement",
+                                    "target": "temperature"
+                                }
+                            ],
+                            "entities": {
+                                "source": {
+                                    "id": "sensor1",
+                                    "isPattern": "false",
+                                    "type": "TemperatureSensor"
+                                },
+                                "target": {
+                                    "id": "house1",
+                                    "isPattern": "false",
+                                    "type": "House"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "providingApplication": "http://www.fi-ware.eu/NGSI/association"
+            }
+        }
+    ]
+}
 ++++++ Query an association for a non existing entity
 HTTP/1.1 200 OK
 Content-Length: 171
