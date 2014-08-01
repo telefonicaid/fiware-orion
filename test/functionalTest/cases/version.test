@@ -29,7 +29,7 @@ broker version
 contextBroker --version
 
 --REGEXPECT--
-0.14.0-next
+0.14.1
 Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 Orion Context Broker is free software: you can redistribute it and/or
 modify it under the terms of the GNU Affero General Public License as
