@@ -36,6 +36,8 @@
 #include "mongoBackend/MongoGlobal.h"         // For orionInit()
 #include "ngsiNotify/onTimeIntervalThread.h"  // For orionInit()
 
+
+
 /* ****************************************************************************
 *
 * Globals
@@ -76,7 +78,9 @@ void transactionIdSet(void)
     transaction = 1;
   }
 
-  snprintf(transactionId, sizeof(transactionId), "%lu-%03d-%011d", logStartTime.tv_sec, (int) logStartTime.tv_usec / 1000, transaction);
+  snprintf(transactionId, sizeof(transactionId), "%lu-%03d-%011d",
+           logStartTime.tv_sec, (int) logStartTime.tv_usec / 1000, transaction);
+
   transSemGive("transactionIdSet", "changing the transaction id");
 }
 
@@ -94,10 +98,10 @@ void orionInit(OrionExitFunction exitFunction, const char* version)
   // The function to call on fatal error
   orionExitFunction = exitFunction;
 
-  /* Initialize the semaphore used by mongoBackend */
+  // Initialize the semaphore used by mongoBackend
   semInit();
 
-  /* Set timer object (singleton) */
+  // Set timer object (singleton)
   setTimer(new Timer());
 
   // startTime for log library
@@ -107,7 +111,7 @@ void orionInit(OrionExitFunction exitFunction, const char* version)
     orionExitFunction(1, "gettimeofday error");
   }
 
-  /* Set start time and statisticsTime used by REST interface */
+  // Set start time and statisticsTime used by REST interface
   startTime      = logStartTime.tv_sec;
   statisticsTime = startTime;
 
@@ -123,7 +127,9 @@ void orionInit(OrionExitFunction exitFunction, const char* version)
 bool isTrue(const std::string& s)
 {
   if ((s == "true") || (s == "1"))
+  {
     return true;
+  }
 
   return false;
 }
@@ -137,27 +143,36 @@ bool isTrue(const std::string& s)
 bool isFalse(const std::string& s)
 {
   if ((s == "false") || (s == "0"))
+  {
     return true;
+  }
 
   return false;
 }
+
 
 
 /*****************************************************************************
 *
 * getTimer -
 */
-Timer* getTimer(void) {
-    return timer;
+Timer* getTimer(void)
+{
+  return timer;
 }
+
+
 
 /*****************************************************************************
 *
 * setTimer -
 */
-void setTimer(Timer* t) {
-    timer = t;
+void setTimer(Timer* t)
+{
+  timer = t;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -175,6 +190,8 @@ int getCurrentTime(void)
   return getTimer()->getCurrentTime();
 }
 
+
+
 /* ****************************************************************************
 *
 * toSeconds -
@@ -186,29 +203,47 @@ int64_t toSeconds(int value, char what, bool dayPart)
   if (dayPart == true)
   {
     if (what == 'Y')
+    {
       result = 365L * 24 * 3600 * value;
+    }
     else if (what == 'M')
+    {
       result = 30L * 24 * 3600 * value;
+    }
     else if (what == 'W')
+    {
       result = 7L * 24 * 3600 * value;
+    }
     else if (what == 'D')
+    {
       result = 24L * 3600 * value;
+    }
   }
   else
   {
     if (what == 'H')
+    {
       result = 3600L * value;
+    }
     else if (what == 'M')
+    {
       result = 60L * value;
+    }
     else if (what == 'S')
+    {
       result = value;
+    }
   }
 
   if (result == -1)
+  {
     LM_W(("Bad Input (ERROR in duration string)"));
+  }
 
   return result;
 }
+
+
 
 /*****************************************************************************
 *
@@ -220,7 +255,9 @@ int64_t toSeconds(int value, char what, bool dayPart)
 int64_t parse8601(const std::string& s)
 {
   if (s == "")
+  {
     return -1;
+  }
 
   char*      duration    = strdup(s.c_str());
   char*      toFree      = duration;
@@ -302,7 +339,9 @@ int64_t parse8601(const std::string& s)
   free(toFree);
 
   if (digitsPending == true)
+  {
     return -1;
+  }
 
   return accumulated;
 }

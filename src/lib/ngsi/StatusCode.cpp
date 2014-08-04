@@ -91,9 +91,10 @@ std::string StatusCode::render(Format format, const std::string& indent, bool co
 
   if (strstr(details.c_str(), "\"") != NULL)
   {
-    char* s2    = (char*) calloc(1, details.length() * 2 + 1);
+    int    len = details.length() * 2;
+    char*  s2    = (char*) calloc(1, len + 1);
 
-    strReplace(s2, details.c_str(), "\"", "\\\"");
+    strReplace(s2, len, details.c_str(), "\"", "\\\"");
     details = s2;
     free(s2);
   }

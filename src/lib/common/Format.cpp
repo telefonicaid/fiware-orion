@@ -27,7 +27,6 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-
 #include "common/Format.h"
 #include "common/wsStrip.h"
 
@@ -51,6 +50,8 @@ const char* formatToString(Format format)
   return "Unknown format";
 }
 
+
+
 /* ****************************************************************************
 *
 * stringToFormat
@@ -58,12 +59,18 @@ const char* formatToString(Format format)
 Format stringToFormat(const std::string& s)
 {
   if (s == "XML")
+  {
     return XML;
+  }
   else if (s == "JSON")
+  {
     return JSON;
-  else
-    return NOFORMAT;
+  }
+
+  return NOFORMAT;
 }
+
+
 
 /* ****************************************************************************
 *
