@@ -36,9 +36,11 @@
 *
 * Globals -
 */
-static sem_t reqSem;
-static sem_t mongoSem;
-static sem_t transSem;
+static sem_t  reqSem;
+static sem_t  mongoSem;
+static sem_t  transSem;
+
+
 
 /* ****************************************************************************
 *
@@ -75,6 +77,8 @@ int semInit(int shared, int takenInitially)
   return 0;
 }
 
+
+
 /* ****************************************************************************
 *
 * reqSemTake -
@@ -89,6 +93,8 @@ int reqSemTake(const char* who, const char* what)
 
   return r;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -105,6 +111,8 @@ int mongoSemTake(const char* who, const char* what)
   return r;
 }
 
+
+
 /* ****************************************************************************
 *
 * transSemTake -
@@ -120,6 +128,8 @@ int transSemTake(const char* who, const char* what)
   return r;
 }
 
+
+
 /* ****************************************************************************
 *
 * reqSemGive -
@@ -127,12 +137,18 @@ int transSemTake(const char* who, const char* what)
 int reqSemGive(const char* who, const char* what)
 {
   if (what != NULL)
+  {
     LM_T(LmtReqSem, ("%s gives the 'req' semaphore for '%s'", who, what));
+  }
   else
+  {
     LM_T(LmtReqSem, ("%s gives the 'req' semaphore", who));
+  }
 
   return sem_post(&reqSem);
 }
+
+
 
 /* ****************************************************************************
 *
@@ -141,12 +157,18 @@ int reqSemGive(const char* who, const char* what)
 int mongoSemGive(const char* who, const char* what)
 {
   if (what != NULL)
+  {
     LM_T(LmtMongoSem, ("%s gives the 'mongo' semaphore for '%s'", who, what));
+  }
   else
+  {
     LM_T(LmtMongoSem, ("%s gives the 'mongo' semaphore", who));
+  }
 
   return sem_post(&mongoSem);
 }
+
+
 
 /* ****************************************************************************
 *
@@ -155,9 +177,13 @@ int mongoSemGive(const char* who, const char* what)
 int transSemGive(const char* who, const char* what)
 {
   if (what != NULL)
+  {
     LM_T(LmtTransSem, ("%s gives the 'trans' semaphore for '%s'", who, what));
+  }
   else
+  {
     LM_T(LmtTransSem, ("%s gives the 'trans' semaphore", who));
+  }
 
   return sem_post(&transSem);
 }
