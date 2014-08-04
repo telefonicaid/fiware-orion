@@ -29,11 +29,14 @@
 #include <vector>
 
 
+
 /* ****************************************************************************
 *
 * isIPv6 -
 */
 extern bool isIPv6(const std::string& in);
+
+
 
 /* ****************************************************************************
 *
@@ -41,12 +44,23 @@ extern bool isIPv6(const std::string& in);
 */
 extern int stringSplit(const std::string& in, char delimiter, std::vector<std::string>& outV);
 
+
+
 /* ****************************************************************************
 *
 * parseUrl -
 *
 */
-extern bool parseUrl(const std::string& url, std::string& host, int& port, std::string& path, std::string& protocol);
+extern bool parseUrl
+(
+  const std::string&  url,
+  std::string&        host,
+  int&                port,
+  std::string&        path,
+  std::string&        protocol
+);
+
+
 
 /* ****************************************************************************
 *
@@ -54,11 +68,15 @@ extern bool parseUrl(const std::string& url, std::string& host, int& port, std::
 */
 extern char* i2s(int i, char* placeholder, int placeholderSize);
 
+
+
 /* ****************************************************************************
 *
 * parsedUptime
 */
 extern std::string parsedUptime(int uptime);
+
+
 
 /* ****************************************************************************
 *
@@ -66,23 +84,43 @@ extern std::string parsedUptime(int uptime);
 */
 extern bool onlyWs(const char* s);
 
+
+
 /* ****************************************************************************
 *
 * string2coords - 
 */
 extern bool string2coords(const std::string& s, double& latitude, double& longitude);
 
+
+
 /* ****************************************************************************
 *
 * coords2string - 
 */
-extern void coords2string(std::string* s, double latitude, double longitude, int decimals = 6);
+extern void coords2string
+(
+  std::string*  s,
+  double        latitude,
+  double        longitude,
+  int           decimals = 6
+);
+
+
 
 /* ****************************************************************************
 *
 * versionParse -
 */
-bool versionParse(const std::string& version, int& mayor, int& minor, std::string& extra);
+bool versionParse
+(
+  const std::string&  version,
+  int&                mayor,
+  int&                minor,
+  std::string&        extra
+);
+
+
 
 /* ****************************************************************************
 *
@@ -90,16 +128,27 @@ bool versionParse(const std::string& version, int& mayor, int& minor, std::strin
 */
 extern double atoF(const char* string, std::string* errorMsg);
 
+
+
 /* ****************************************************************************
 *
 * strToLower - 
 */
 extern char* strToLower(char* to, const char* from, int toSize);
 
+
+
 /* ****************************************************************************
 *
 * strReplace - 
 */
-extern void strReplace(char* to, const char* from, const char* newString, const char* oldString);
+extern void strReplace
+(
+  char*       to,
+  int         toLen,
+  const char* from,
+  const char* newString,
+  const char* oldString
+);
 
 #endif  // SRC_LIB_COMMON_STRING_H_

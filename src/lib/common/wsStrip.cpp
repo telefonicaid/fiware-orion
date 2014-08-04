@@ -36,10 +36,14 @@ char* wsStrip(char* s)
 {
   // 1. beginning
   while ((*s == ' ') || (*s == '\t') || (*s == '\n'))
+  {
     ++s;
+  }
 
   if (*s == 0)
+  {
     return s;
+  }
 
   // 2. end
   char* end = &s[strlen(s) - 1];
