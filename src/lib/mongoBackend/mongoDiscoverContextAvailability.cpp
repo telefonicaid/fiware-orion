@@ -190,6 +190,17 @@ static HttpStatusCode associationsDiscoverContextAvailability
         return SccOk;
     }
 
+    // Note that in http://forge.fi-ware.org/plugins/mediawiki/wiki/fiware/index.php/NGSI_association it states:
+    // "In case an Association instance contains no AttributeAssociationList field, it represents the entity
+    // association between the given source entity <sourceEntityId> and the given target entity <targetEntityId>"
+    //
+    // In Orion this association of entities is NOT supported at the moment.
+    if (requestP->attributeList.size() == 0)
+    {
+      responseP->errorCode.fill(SccContextElementNotFound, "Attribute list may not be empty");
+      LM_RE(SccOk, (responseP->errorCode.details.c_str()));
+    }
+
     MetadataVector mdV;
     std::string err;
     if (!associationsQuery(&requestP->entityIdVector, &requestP->attributeList, scope, &mdV, &err, tenant, offset, limit, details))
@@ -237,6 +248,40 @@ static HttpStatusCode associationsDiscoverContextAvailability
         for (unsigned int jx = 0; jx < crrV.size(); ++jx) {
             responseP->responseVector.push_back(crrV.get(jx));
         }
+    }
+
+    if (responseP->responseVector.size() == 0)
+    {
+      //
+      // FIXME P10: Two problems with associations discovered during Integration Meeting in Madrid 2014
+      //
+      // The two problems are (both discoveries with associations):
+      // 1. When nothing is found the response lacks the ErrorCode but it has that 'default' response
+      // 2. When the discovery has an empty attributeList, nothing is found
+      //
+      // It works just fine when something is found and the request contains a valid non-empty attributeList.
+      //
+      // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      //
+      // We need a harness test to take care of the following situations:
+      //
+      // 1. Association found, but no entity responds to the association
+      // 2. Association found and all ok, but the discovery has an empty AttributeList
+      // 3. Association found and the discovery has a 'correct' AttributeList
+      // 4. Association not found
+      //
+      // Point 3. is already covered, and perhaps point 4 also, but the other two
+      // I don't think have any harness test.
+      //
+      // Actually, there are 12 combinations here (2*2*3):
+      // 1. Association FOUND / NOT FOUND
+      // 2. Responding entity FOUND /NOT FOUND
+      // 3. AttributeList NOT THERE / THERE WITH OK ATTR / THERE WITH 'BAD' ATTR
+      //
+      //
+      // Finally, here are the two lines that I needed for 'nothing found' but that breaks 'something found'
+      responseP->errorCode.fill(SccContextElementNotFound, "Could not query association with combination of entity/attribute");
+      LM_RE(SccOk, (responseP->errorCode.details.c_str()));
     }
 
     /* Set association metadata as final ContextRegistrationResponse*/
