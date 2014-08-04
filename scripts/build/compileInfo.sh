@@ -34,9 +34,6 @@ else
     hash=nogitversion
 fi
 
-src/lib/common//compileInfo.h:0:  No copyright message found.  You should have a line: "Copyright [year] <Copyright Owner>"  [legal/copyright] [5]
-src/lib/common//compileInfo.h:1:  #ifndef header guard has wrong style, please use: SRC_LIB_COMMON_COMPILEINFO_H_  [build/header_guard] [5]
-src/lib/common//compileInfo.h:9:  #endif line should be "#endif  // SRC_LIB_COMMON_COMPILEINFO_H_"  [build/header_guard] [5]
 
 TMP_FILE=$(mktemp /tmp/compileInfo.h.XXXX)
 
