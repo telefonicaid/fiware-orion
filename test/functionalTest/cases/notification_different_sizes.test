@@ -233,10 +233,19 @@ Date: REGEX(.*)
 ** Too large errors:
 1
 ** Notification sizes:
- Sending message 1 to HTTP server: sending message of 19870 bytes to HTTP server
- Sending message 2 to HTTP server: sending message of 21870 bytes to HTTP server
- Sending message 3 to HTTP server: sending message of 8100872 bytes to HTTP server
+ Sending message 1 to HTTP server: sending message of REGEX((19869|19870|19871|19872|19873|19874|19875)) bytes to HTTP server
+ Sending message 2 to HTTP server: sending message of REGEX((21869|21870|21871|21872|21873|21874|21875)) bytes to HTTP server
+ Sending message 3 to HTTP server: sending message of REGEX((8100871|8100872|8100873|8100874|8100875|8100876|8100877)) bytes to HTTP server
 --TEARDOWN--
+#
+# NOTE: the six different sizes above is to cover for different sizes in the version string
+#
+#       19869|19870|19871|19872|19873|19874|19875:
+#
+#       19869:   d.d.d
+#       19870:   d.dd.d
+#       19875:   d.dd.d-next
+
 cp /tmp/contextBroker.log /tmp/contextBroker.log.notification_different_sizes
 brokerStop CB
 accumulatorStop
