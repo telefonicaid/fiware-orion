@@ -42,6 +42,11 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
           "type": "House",
           "isPattern": "false",
           "id": "house2"
+        },
+        {
+          "type": "House",
+          "isPattern": "false",
+          "id": "house3"
         }
       ],
       "attributes": [
@@ -72,6 +77,11 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
           "type": "TemperatureSensor",
           "isPattern": "false",
           "id": "sensor2"
+        },
+        {
+          "type": "TemperatureSensor",
+          "isPattern": "false",
+          "id": "sensor3"
         }
       ],
       "attributes": [
@@ -145,7 +155,30 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
   "registrationId": ""
 }'
 # ********************************************************************************
-echo "++++++ Query an association"
+echo "++++++ Query an non existing association for an existing entity"
+
+orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
+  "entities": [
+    {
+      "type": "House",
+      "isPattern": "false",
+      "id": "house3"
+    }
+  ],
+  "attributes": [
+    "temperature"
+  ],
+  "restriction": {
+    "scopes": [
+      {
+        "type" : "IncludeAssociations",
+        "value" : "SOURCES"
+      }
+    ]
+  }
+}'
+# ********************************************************************************
+echo "++++++ Query association OK"
 
 orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
   "entities": [
@@ -213,6 +246,46 @@ orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
     ]
   }
 }'
+# ********************************************************************************
+echo "++++++ Query an association with empty attribute list"
+
+orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
+  "entities": [
+    {
+      "type": "House",
+      "isPattern": "false",
+      "id": "house1"
+    }
+  ],
+  "attributes": [ ],
+  "restriction": {
+    "scopes": [
+      {
+        "type" : "IncludeAssociations",
+        "value" : "SOURCES"
+      }
+    ]
+  }
+}'
+echo "++++++ Query an association with no attribute list"
+
+orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
+  "entities": [
+    {
+      "type": "House",
+      "isPattern": "false",
+      "id": "house1"
+    }
+  ],
+  "restriction": {
+    "scopes": [
+      {
+        "type" : "IncludeAssociations",
+        "value" : "SOURCES"
+      }
+    ]
+  }
+}'
 
 --REGEXPECT--
 ++++++ Register new entities - HOUSES
@@ -245,7 +318,20 @@ Date: REGEX(.*)
     "duration": "PT1H",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
-++++++ Query an association
+++++++ Query an non existing association for an existing entity
+HTTP/1.1 200 OK
+Content-Length: 178
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404", 
+        "details": "Could not query association with combination of entity/attribute", 
+        "reasonPhrase": "No context element found"
+    }
+}
+++++++ Query association OK
 HTTP/1.1 200 OK
 Content-Length: 1344
 Content-Type: application/json
@@ -307,33 +393,55 @@ Date: REGEX(.*)
 }
 ++++++ Query an association for a non existing entity
 HTTP/1.1 200 OK
-Content-Length: 171
+Content-Length: 178
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "contextRegistrationResponses": [
-        {
-            "contextRegistration": {
-                "providingApplication": "http://www.fi-ware.eu/NGSI/association"
-            }
-        }
-    ]
+    "errorCode": {
+        "code": "404", 
+        "details": "Could not query association with combination of entity/attribute", 
+        "reasonPhrase": "No context element found"
+    }
 }
 ++++++ Query an association for a non existing attribute
 HTTP/1.1 200 OK
-Content-Length: 171
+Content-Length: 178
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "contextRegistrationResponses": [
-        {
-            "contextRegistration": {
-                "providingApplication": "http://www.fi-ware.eu/NGSI/association"
-            }
-        }
-    ]
+    "errorCode": {
+        "code": "404", 
+        "details": "Could not query association with combination of entity/attribute", 
+        "reasonPhrase": "No context element found"
+    }
+}
+++++++ Query an association with empty attribute list
+HTTP/1.1 200 OK
+Content-Length: 145
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404", 
+        "details": "Attribute list may not be empty", 
+        "reasonPhrase": "No context element found"
+    }
+}
+++++++ Query an association with no attribute list
+HTTP/1.1 200 OK
+Content-Length: 145
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404", 
+        "details": "Attribute list may not be empty", 
+        "reasonPhrase": "No context element found"
+    }
 }
 --TEARDOWN--
 brokerStop CB
