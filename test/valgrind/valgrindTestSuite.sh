@@ -76,8 +76,8 @@ function fileCleanup()
   rm -f $vtest.valgrindTestSuite.stderr
   rm -f $vtest.valgrindTestSuite.stdout
   rm -f $vtest.configManager.log
-  rm -f $vtest.accumulator_9997
-  rm -f $vtest.accumulator_9977
+  rm -f $vtest.accumulator_$LISTENER_PORT
+  rm -f $vtest.accumulator_$LISTENER2_PORT
 }
 
 
@@ -492,8 +492,8 @@ then
         mv /tmp/valgrindTestLog.stderr           $vtest.valgrindTestSuite.stderr
         mv /tmp/valgrindTestLog.stdout           $vtest.valgrindTestSuite.stdout
         mv /tmp/configManager/contextBroker.log  $vtest.configManager.log
-        mv /tmp/accumulator_9997                 $vtest.accumulator_9997 
-        mv /tmp/accumulator_9977                 $vtest.accumulator_9977
+        mv /tmp/accumulator_$LISTENER_PORT       $vtest.accumulator_$LISTENER_PORT
+        mv /tmp/accumulator_$LISTENER2_PORT      $vtest.accumulator_$LISTENER2_PORT
 
         failedTest "test/valgrind/$vtest.*" $vtest 0
       else
