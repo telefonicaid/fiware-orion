@@ -66,6 +66,24 @@ function vMsg()
 
 # -----------------------------------------------------------------------------
 #
+# fileCleanup
+#
+function fileCleanup()
+{
+  vtest=$1
+
+  rm -f $vtest.contextBroker.log
+  rm -f $vtest.valgrindTestSuite.stderr
+  rm -f $vtest.valgrindTestSuite.stdout
+  rm -f $vtest.configManager.log
+  rm -f $vtest.accumulator_$LISTENER_PORT
+  rm -f $vtest.accumulator_$LISTENER2_PORT
+}
+
+
+
+# -----------------------------------------------------------------------------
+#
 # Init file already sourced?
 #
 if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
@@ -296,7 +314,7 @@ function printTestLinePrefix()
 
 function printNotImplementedString()
 {
-  echo " NOT IMPLEMENTED - skipped"
+  echo "NOT IMPLEMENTED - skipped"
   echo                                    >> /tmp/valgrindTestSuiteLog
   echo "$1 not implemented - skipped"     >> /tmp/valgrindTestSuiteLog
   echo                                    >> /tmp/valgrindTestSuiteLog
@@ -354,7 +372,7 @@ function failedTest()
 {
   if [ "$3" != "0" ]
   then
-    echo " FAILED (lost: $3). Check $1 for clues"
+    echo "FAILED (lost: $3). Check $1 for clues"
   fi
 
   testFailures=$testFailures+1
@@ -407,10 +425,13 @@ noOfTests=0
 setNumberOfTests
 
 declare -A failedTests
+declare -A harnessErrorV
+typeset -i harnessErrors
 typeset -i testNo
 typeset -i testFailures
 testNo=0;
 testFailures=0
+harnessErrors=0
 
 
 if [ "$runPure" -eq "1" ] || [ "$leakTest" == "on" ]
@@ -427,7 +448,10 @@ then
   do
     testNo=$testNo+1
     printTestLinePrefix
-    echo -n $testNoString $vtest ...
+
+    init="$testNoString $vtest ............................................................................................................................."
+    init=${init:0:100}
+    echo -n $init" "
 
     typeset -i lines
     lines=$(wc -l $vtest | awk '{ print $1 }')
@@ -445,15 +469,17 @@ then
 
     if [ "$dryrun" == "off" ]
     then
+      fileCleanup $vtest
       brokerStart
       if [ "$result" != "0" ]
       then
-        echo " context broker didn't start! check test/valgrind/$vtest.out"
+        echo "context broker didn't start! check $NAME.out"
         continue
       fi
 
       vMsg Executing $vtest
-      command ./$vtest >> /tmp/valgrindTestSuiteLog 2> /tmp/valgrindTestSuiteLog.stderr    
+      command ./$vtest > /tmp/valgrindTestLog.stdout 2> /tmp/valgrindTestLog.stderr    
+      cat /tmp/valgrindTestLog.stdout >> /tmp/valgrindTestSuiteLog
       vTestResult=$?
       vMsg vTestResult=$vTestResult
 
@@ -461,9 +487,18 @@ then
 
       if [ "$vTestResult" != 0 ]
       then
-        echo " FAILURE! Test ended with error code $vTestResult"
+        echo "(HARNESS FAILURE) Test ended with error code $vTestResult"
+        mv /tmp/contextBroker.log                $vtest.contextBroker.log
+        mv /tmp/valgrindTestLog.stderr           $vtest.valgrindTestSuite.stderr
+        mv /tmp/valgrindTestLog.stdout           $vtest.valgrindTestSuite.stdout
+        mv /tmp/configManager/contextBroker.log  $vtest.configManager.log
+        mv /tmp/accumulator_$LISTENER_PORT       $vtest.accumulator_$LISTENER_PORT
+        mv /tmp/accumulator_$LISTENER2_PORT      $vtest.accumulator_$LISTENER2_PORT
+
         failedTest "test/valgrind/$vtest.*" $vtest 0
       else
+        fileCleanup $vtest
+
         typeset -i headEndLine1
         typeset -i headEndLine2
         processResult ${NAME}.out
@@ -475,7 +510,8 @@ then
       failedTest "test/valgrind/$vtest.*" $vtest $lost
     elif [ "$vTestResult" == 0 ]
     then
-      echo " " $okString
+      echo $okString
+      rm -f $vtest.out
     fi
 
     echo >> /tmp/valgrindTestSuiteLog
@@ -509,7 +545,9 @@ then
 
     testNo=$testNo+1
     printTestLinePrefix
-    echo -n $testNoString $htest ...
+    init="$testNoString $htest ............................................................................................................................."
+    init=${init:0:100}
+    echo -n $init" "
 
     # In the case of harness test, we check that the test is implemented checking
     # that the word VALGRIND_READY apears in the .test file (usually, in a commented line)
@@ -534,9 +572,12 @@ then
       status=$?
       if [ "$status" != "0" ]
       then
-        mv /tmp/testHarness /tmp/testHarness.$file
-        echo -n " FAILURE! functional test ended with error code $status. "
-        # FIXME P4: NO EXIT here - sometimes harness tests fail under valgrind ...
+        mv /tmp/testHarness         test/functionalTest/cases/$directory/$htest.harness.out
+        cp /tmp/contextBroker.log   test/functionalTest/cases/$directory/$htest.contextBroker.log
+        echo -n " FAILURE! functional test ended with error code $status"
+        harnessErrorV[$harnessErrors]="$file"
+        harnessErrors=$harnessErrors+1
+        # No exit here - sometimes harness tests fail under valgrind ...
       fi
 
       if [ ! -f /tmp/valgrind.out ]
@@ -560,7 +601,7 @@ then
     then
       failedTest "test/functionalTest/cases/$htest.valgrind.*" $htest $lost
     else
-      echo " " $okString
+      echo $okString
     fi
 
   done
@@ -582,6 +623,24 @@ then
 
   echo "---------------------------------------"
   exit 1
+fi
+
+
+if [ "${harnessErrorV[1]}" != "" ]
+then
+  echo
+  echo
+  echo "$harnessErrors harness tests failed:"
+  typeset -i ix
+  ix=0
+
+  while [ $ix -ne $harnessErrors ]
+  do
+    ix=$ix+1
+    echo "  " ${harnessErrorV[$ix]}
+  done
+
+  echo "---------------------------------------"
 fi
 
 

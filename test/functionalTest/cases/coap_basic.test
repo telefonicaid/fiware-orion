@@ -33,8 +33,8 @@ url="/ngsi10/contextEntities/Room1"
 payload='{
     "attributes": [
         {
-            "name": "temperature",
-            "type": "centigrade",
+            "name": "temperature", 
+            "type": "centigrade", 
             "value": "30"
         }
     ]
@@ -49,8 +49,8 @@ url="/ngsi10/contextEntities/Room1"
 payload='{
     "attributes": [
         {
-            "name": "temperature",
-            "type": "centigrade",
+            "name": "temperature", 
+            "type": "centigrade", 
             "value": "29"
         }
     ]
@@ -69,13 +69,13 @@ v:1 t:0 tkl:0 c:2 id:REGEX(\d+)
         {
             "attributes": [
                 {
-                    "name": "temperature",
-                    "type": "centigrade",
+                    "name": "temperature", 
+                    "type": "centigrade", 
                     "value": ""
                 }
-            ],
+            ], 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
         }
@@ -88,17 +88,17 @@ v:1 t:0 tkl:0 c:1 id:REGEX(\d+)
     "contextElement": {
         "attributes": [
             {
-                "name": "temperature",
-                "type": "centigrade",
+                "name": "temperature", 
+                "type": "centigrade", 
                 "value": "30"
             }
-        ],
-        "id": "Room1",
-        "isPattern": "false",
+        ], 
+        "id": "Room1", 
+        "isPattern": "false", 
         "type": ""
     },
     "statusCode": {
-        "code": "200",
+        "code": "200", 
         "reasonPhrase": "OK"
     }
 }
@@ -110,13 +110,13 @@ v:1 t:0 tkl:0 c:3 id:REGEX(\d+)
         {
             "attributes": [
                 {
-                    "name": "temperature",
-                    "type": "centigrade",
+                    "name": "temperature", 
+                    "type": "centigrade", 
                     "value": ""
                 }
-            ],
+            ], 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
         }
@@ -129,17 +129,17 @@ v:1 t:0 tkl:0 c:1 id:REGEX(\d+)
     "contextElement": {
         "attributes": [
             {
-                "name": "temperature",
-                "type": "centigrade",
+                "name": "temperature", 
+                "type": "centigrade", 
                 "value": "29"
             }
-        ],
-        "id": "Room1",
-        "isPattern": "false",
+        ], 
+        "id": "Room1", 
+        "isPattern": "false", 
         "type": ""
     },
     "statusCode": {
-        "code": "200",
+        "code": "200", 
         "reasonPhrase": "OK"
     }
 }
