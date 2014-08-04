@@ -618,6 +618,10 @@ function runTest()
     # 6. Remove output files
     vMsg "Remove output files: fileCleanup $filename $keep"
     fileCleanup $filename $keep $path
+  else
+    file=$(basename $path .test)
+    cp /tmp/contextBroker.log $file.contextBroker.log
+
   fi
 }
 
