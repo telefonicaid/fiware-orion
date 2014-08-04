@@ -1,2 +1,2 @@
-o ADD: support for associations in JSON.
-o FIX: Associations now return error messages when appropiate.
+o ADD: support for associations in JSON (Issue #334).
+o FIX: Associations now return error messages when appropiate (Issue #334).
