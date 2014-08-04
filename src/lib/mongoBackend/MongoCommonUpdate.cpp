@@ -737,7 +737,7 @@ static bool deleteAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
 */
 static bool addTriggeredSubscriptions(std::string entityId, std::string entityType, std::string attr, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* Build query */
     std::string entIdQ       = CSUB_ENTITIES   "." CSUB_ENTITY_ID;
@@ -855,7 +855,7 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
 */
 static bool processSubscriptions(const EntityId* enP, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* For each one of the subscriptions in the map, send notification */
     for (std::map<string, BSONObj*>::iterator it = subs->begin(); it != subs->end(); ++it) {
@@ -1222,7 +1222,7 @@ static bool processContextAttributeVector (ContextElement*               ceP,
 */
 static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::string* errDetail, std::string tenant, const std::vector<std::string>& servicePathV) {
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName(tenant).c_str()));
 
@@ -1358,7 +1358,7 @@ static bool removeEntity
     const std::string    idString          = "_id." ENT_ENTITY_ID;
     const std::string    typeString        = "_id." ENT_ENTITY_TYPE;
     const std::string    servicePathString = "_id." ENT_SERVICE_PATH;
-    DBClientConnection*  connection        = getMongoConnection();
+    DBClientBase*  connection        = getMongoConnection();
     BSONObjBuilder       bob;
     BSONObj              query;
 
@@ -1420,7 +1420,7 @@ static bool removeEntity
 */
 void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, const std::string& action, const std::string& tenant, const std::vector<std::string>& servicePathV) {
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* Getting the entity in the request (helpful in other places) */
     EntityId* enP = &ceP->entityId;

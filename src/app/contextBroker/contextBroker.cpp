@@ -1049,7 +1049,7 @@ static void mongoInit(const char* dbHost, std::string dbName, const char* user, 
 {
    std::string multitenant = mtenant;
 
-   if (!mongoConnect(dbHost, dbName.c_str(), user, pwd, multitenant != "off"))
+   if (!mongoConnect(dbHost, dbName.c_str(), NULL, user, pwd, multitenant != "off"))
     LM_X(1, ("Fatal Error (MongoDB error)"));
 
   if (user[0] != 0) 

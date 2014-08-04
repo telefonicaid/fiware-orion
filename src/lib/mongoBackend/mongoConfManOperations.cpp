@@ -43,7 +43,7 @@ void mongoSetFwdRegId(const std::string& regId, const std::string& fwdRegId, con
 
     LM_T(LmtMongo, ("Mongo Set Forward RegId"));
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     try
     {
@@ -87,7 +87,7 @@ std::string mongoGetFwdRegId(const std::string& regId, const std::string& tenant
 
     LM_T(LmtMongo, ("Mongo Get Forward RegId"));
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     try
     {

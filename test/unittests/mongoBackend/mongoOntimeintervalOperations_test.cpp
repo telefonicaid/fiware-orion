@@ -70,7 +70,7 @@ static void prepareDatabase(void) {
     /* Set database */
     setupDatabase();
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* We create the following entities:
      *
@@ -560,7 +560,7 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_ok)
     EXPECT_EQ(SccOk, ms);
 
     /* Check that database is as expected */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub1 = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     BSONObj sub2 = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(1360232700, sub1.getIntField("lastNotification"));
@@ -600,7 +600,7 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_fail)
     EXPECT_EQ(SccOk, ms);
 
     /* Check that database is as expected (untouched) */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub1 = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     BSONObj sub2 = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(20000000, sub1.getIntField("lastNotification"));
@@ -652,7 +652,7 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
     // Sleeping a little to "give mongod time to process its input".
     usleep(1000);
     mongoConnect("localhost");
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub1 = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     BSONObj sub2 = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(20000000, sub1.getIntField("lastNotification"));

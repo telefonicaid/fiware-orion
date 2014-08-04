@@ -62,7 +62,8 @@ using std::auto_ptr;
 *
 * Globals
 */
-static DBClientConnection*  connection;
+//static DBClientConnection*  connection;
+static DBClientBase*        connection;
 static int                  mongoVersionMayor = -1;
 static int                  mongoVersionMinor = -1;
 static std::string          dbPrefix;
@@ -84,32 +85,44 @@ static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElem
 *
 * mongoConnect -
 */
-bool mongoConnect(const char* host, const char* db, const char* username, const char* passwd, bool multitenant) {
+bool mongoConnect(const char* host, const char* db, const char* rplSet, const char* username, const char* passwd, bool multitenant) {
 
     std::string err;
 
     mongoSemTake(__FUNCTION__, "connecting to mongo");
 
-    /* The first argument to true is to use autoreconnect */
-    connection = new DBClientConnection(true);
-
     bool connected     = false;
     int  retries       = RECONNECT_RETRIES;
 
-    for (int tryNo = 0; tryNo < retries; ++tryNo)
+    if (rplSet == NULL)
     {
-      if (connection->connect(host, err))
+      /* The first argument to true is to use autoreconnect */
+      connection = new DBClientConnection(true);
+
+      /* Not sure of to generalize the following code, given that DBClientBase class hasn't the connect() method (surprisingly) */
+      for (int tryNo = 0; tryNo < retries; ++tryNo)
       {
-        connected = true;
-        break;
+          if ( ((DBClientConnection*)connection)->connect(host, err))
+        {
+          connected = true;
+          break;
+        }
+
+        if (tryNo == 0)
+          LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
+        else
+          LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
+
+        usleep(RECONNECT_DELAY * 1000); // usleep accepts microseconds
       }
 
-      if (tryNo == 0)
-        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
-      else
-        LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
-
-      usleep(RECONNECT_DELAY * 1000); // usleep accepts microseconds
+    }
+    else
+    {
+      LM_T(LmtMongo, ("Using replica set %s", rplSet));
+      // autoReconnect is always on for DBClientReplicaSet connections.
+      //DBClientReplicaSet connection(rplSet,hosts,0);
+      //TBD
     }
 
     if (connected == false)
@@ -173,7 +186,7 @@ bool mongoConnect(const char* host, const char* db, const char* username, const 
 */
 bool mongoConnect(const char* host) {
 
-    return mongoConnect(host, "", "", "", false);
+    return mongoConnect(host, "", NULL, "", "", false);
 }
 
 /* ****************************************************************************
@@ -232,7 +245,7 @@ void setNotifier(Notifier* n) {
 * I would prefer to have per-collection methods, to have a better encapsulation, but
 * the Mongo C++ API doesn't seem to work that way
 */
-DBClientConnection* getMongoConnection(void) {
+DBClientBase* getMongoConnection(void) {
     return connection;
 }
 
@@ -401,7 +414,7 @@ void recoverOntimeIntervalThreads(std::string tenant) {
     std::string condType= CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
     BSONObj query = BSON(condType << ON_TIMEINTERVAL_CONDITION);
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     auto_ptr<DBClientCursor> cursor;
     try {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), query.toString().c_str()));
@@ -796,7 +809,7 @@ bool entitiesQuery
   long long*                       countP
 )
 {
-    DBClientConnection* connection = getMongoConnection();    
+    DBClientBase* connection = getMongoConnection();
 
     /* Query structure is as follows
      *
@@ -1117,7 +1130,7 @@ bool registrationsQuery
   long long*                          countP
 )
 {
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* Build query based on arguments */
     // FIXME P2: this implementation need to be refactored for cleanup
@@ -1454,7 +1467,7 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
 
     LM_T(LmtMongo, ("Update NGSI9 Subscription New Notification"));
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* Update the document */
     BSONObj query = BSON("_id" << OID(subId));

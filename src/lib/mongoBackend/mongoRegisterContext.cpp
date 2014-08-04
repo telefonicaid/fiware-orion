@@ -50,7 +50,7 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
 
     LM_T(LmtMongo, ("Register Context Request"));
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* Check if new registration */
     if (requestP->registrationId.isEmpty()) {

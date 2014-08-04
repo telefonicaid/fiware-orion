@@ -41,7 +41,7 @@ using namespace mongo;
 void setupDatabase(void) {
 
     mongoConnect("localhost");
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     connection->dropCollection(REGISTRATIONS_COLL);
     connection->dropCollection(ENTITIES_COLL);
