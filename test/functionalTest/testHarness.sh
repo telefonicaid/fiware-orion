@@ -223,6 +223,9 @@ then
     #
     dirPart=$(dirname $dirOrFile)
     filePath=$(basename $dirOrFile)
+    xdir=$(basename $dirPart);
+    vMsg "dirPart: $dirPart"
+    vMsg "filePath: $filePath"
 
     if [ "$dirPart" != "." ]
     then
@@ -314,6 +317,12 @@ fileList=$(find . -name "$testFilter" | sort | sed 's/^.\///')
 typeset -i noOfTests
 typeset -i testNo
 
+
+
+# ------------------------------------------------------------------------------
+#
+# Count total number of tests (for progressing info in messages)
+#
 for i in $fileList
 do
   noOfTests=$noOfTests+1
@@ -329,9 +338,18 @@ function fileCleanup()
 {
   filename=$1
   keepOutputFiles=$2
+  path=$3
+  dir=$(dirname $path)
+
+  vMsg "---------------------------------------------------------"
+  vMsg "In fileCleanup for $filename in $dir"
+  vMsg "---------------------------------------------------------"
 
   if [ "$keepOutputFiles" != "on" ]
   then
+    olddir=$PWD
+    cd $dir
+
     rm $filename.name               2> /dev/null
     rm $filename.shellInit          2> /dev/null
     rm $filename.shellInit.*        2> /dev/null
@@ -344,6 +362,8 @@ function fileCleanup()
     rm $filename.out                2> /dev/null
     rm $filename.regexpect          2> /dev/null
     rm $filename.diff               2> /dev/null
+
+    cd $olddir
   fi
 }
 
@@ -469,7 +489,8 @@ function partExecute()
   if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
   then
     exitFunction 7 "$what: output on stderr" $path "($path): $what produced output on stderr" $dirname/$filename.$what.stderr "$forcedDie"
-    return 2
+    partExecuteResult=7
+    return
   fi
 
 
@@ -479,7 +500,8 @@ function partExecute()
   if [ "$exitCode" != "0" ]
   then
     exitFunction 8 $path "$what exited with code $exitCode" "($path)" $dirname/$filename.$what.stderr "$forcedDie"
-    return 1
+    partExecuteResult=8
+    return
   fi
 
 
@@ -499,8 +521,12 @@ function partExecute()
         endDate=$(date)
         $CB_DIFF_TOOL $dirname/$filename.regexpect $dirname/$filename.out
       fi
+      partExecuteResult=9
+      return
     fi
   fi
+
+  partExecuteResult=0
 }
 
 
@@ -527,7 +553,8 @@ function runTest()
   path=$1
   dirname=$(dirname $path)
   filename=$(basename $path .test)
-  
+  dir=""
+
   if [ "$dirname" != "." ] && [ "$dirname" != "" ]
   then
     path=$dirname/$filename.test
@@ -537,7 +564,7 @@ function runTest()
   vMsg running test $path
 
   # 1. Remove old output files
-  fileCleanup $filename removeAll
+  fileCleanup $filename removeAll $path
   if [ "$toBeStopped" == "yes" ]
   then
     echo toBeStopped == yes
@@ -574,6 +601,7 @@ function runTest()
 
   # 4. Run the SHELL part (which also compares - FIXME P2: comparison should be moved to separate function)
   partExecute shell $path "DontDie - only for SHELL-INIT"
+  shellResult=$partExecuteResult
   if [ "$toBeStopped" == "yes" ]
   then
     return
@@ -581,10 +609,20 @@ function runTest()
 
   # 5. Run the TEARDOWN part
   partExecute teardown $path "DIE"
+  teardownResult=$partExecuteResult
+  vMsg "teardownResult: $teardownResult"
+  vMsg "shellResult: $shellResult"
 
-  # 6. Remove output files
-  vMsg "Remove output files: fileCleanup $filename $keep"
-  fileCleanup $filename $keep
+  if [ "$shellResult" == "0" ] && [ "$teardownResult" == "0" ]
+  then
+    # 6. Remove output files
+    vMsg "Remove output files: fileCleanup $filename $keep"
+    fileCleanup $filename $keep $path
+  else
+    file=$(basename $path .test)
+    cp /tmp/contextBroker.log $file.contextBroker.log
+
+  fi
 }
 
 # ------------------------------------------------------------------------------
@@ -597,7 +635,9 @@ for testFile in $fileList
 do
   if [ "$verbose" == "off" ]
   then
-    printf "%03d/%d: %s ... " "$testNo" "$noOfTests" "$testFile"
+    init=$testFile" ..................................................................................."
+    init=${init:0:80}
+    printf "%03d/%d: %s " "$testNo" "$noOfTests" "$init"
   else
     printf "Running test %03d/%d: %s\n" "$testNo" "$noOfTests" "$testFile"
   fi
@@ -618,7 +658,13 @@ do
   secs=$end-$start
   if [ "$showDuration" == "on" ]
   then
-    echo $secs seconds
+    if [ $secs -lt 10 ]
+    then
+      xsecs=0$secs
+    else
+      xsecs=$secs
+    fi
+    echo $xsecs seconds
   else
     echo "SUCCESS"
   fi
