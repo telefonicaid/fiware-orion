@@ -1,0 +1,2 @@
+o ADD: support for associations in JSON.
+o FIX: Associations now return error messages when appropiate.
