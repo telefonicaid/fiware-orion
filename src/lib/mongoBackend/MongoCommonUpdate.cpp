@@ -1358,7 +1358,7 @@ static bool removeEntity
     const std::string    idString          = "_id." ENT_ENTITY_ID;
     const std::string    typeString        = "_id." ENT_ENTITY_TYPE;
     const std::string    servicePathString = "_id." ENT_SERVICE_PATH;
-    DBClientBase*  connection        = getMongoConnection();
+    DBClientBase*        connection        = getMongoConnection();
     BSONObjBuilder       bob;
     BSONObj              query;
 

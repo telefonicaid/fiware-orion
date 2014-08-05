@@ -272,7 +272,8 @@ void setNotifier(Notifier* n) {
 * I would prefer to have per-collection methods, to have a better encapsulation, but
 * the Mongo C++ API doesn't seem to work that way
 */
-DBClientBase* getMongoConnection(void) {
+DBClientBase* getMongoConnection(void)
+{
     return connection;
 }
 
