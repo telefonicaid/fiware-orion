@@ -94,7 +94,7 @@ bool mongoConnect(const char* host, const char* db, const char* rplSet, const ch
     bool connected     = false;
     int  retries       = RECONNECT_RETRIES;
 
-    if (rplSet == NULL)
+    if (strlen(rplSet) == 0)
     {
       /* The first argument to true is to use autoreconnect */
       connection = new DBClientConnection(true);
@@ -186,7 +186,7 @@ bool mongoConnect(const char* host, const char* db, const char* rplSet, const ch
 */
 bool mongoConnect(const char* host) {
 
-    return mongoConnect(host, "", NULL, "", "", false);
+    return mongoConnect(host, "", "", "", "", false);
 }
 
 /* ****************************************************************************
