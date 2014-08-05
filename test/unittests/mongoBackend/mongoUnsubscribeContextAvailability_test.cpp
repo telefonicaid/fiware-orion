@@ -69,7 +69,7 @@ static void prepareDatabase(void) {
     /* Set database */
     setupDatabase();
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
                         "expiration" << 10000000 <<
@@ -121,7 +121,7 @@ TEST(mongoUnsubscribeContextAvailability, subscriptionNotFound)
     EXPECT_EQ(0, res.statusCode.details.size());
 
     /* Check database (untouched) */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     ASSERT_EQ(2, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
 
     /* Release connection */
@@ -164,7 +164,7 @@ TEST(mongoUnsubscribeContextAvailability, unsubscribe)
     EXPECT_EQ(0, res.statusCode.details.size());
 
     /* Check database (one document, but not the deleted one) */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().str());
@@ -225,7 +225,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbFindOneFail)
     // Without this sleep, this tests fails around 50% of the times (in Ubuntu 13.04)
     usleep(1000);
     mongoConnect("localhost");
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     int                 count      = connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
     ASSERT_EQ(2, count);
@@ -290,7 +290,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbRemoveFail)
     // Without this sleep, this tests fails around 50% of the times (in Ubuntu 13.04)
     usleep(1000);
     mongoConnect("localhost");
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     ASSERT_EQ(2, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
 
     /* Release mocks */

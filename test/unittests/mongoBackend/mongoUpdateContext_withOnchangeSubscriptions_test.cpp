@@ -127,7 +127,7 @@ static void prepareDatabase(void) {
   /* Set database */
   setupDatabase();
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* We create the following entities:
    *
@@ -308,7 +308,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void) {
 
     prepareDatabase();
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* We create the following entities:
      *
@@ -429,7 +429,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -498,7 +498,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -563,7 +563,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -635,7 +635,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
@@ -711,7 +711,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
@@ -783,7 +783,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
@@ -852,7 +852,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -921,7 +921,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -986,7 +986,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -1053,7 +1053,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860005")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -1122,7 +1122,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860005")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -1187,7 +1187,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860005")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -1254,7 +1254,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -1321,7 +1321,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -1388,7 +1388,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -1442,7 +1442,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(20000000, sub.getIntField("lastNotification"));
 
@@ -1497,7 +1497,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(20000000, sub.getIntField("lastNotification"));
 
@@ -1551,7 +1551,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(20000000, sub.getIntField("lastNotification"));
 
@@ -1605,7 +1605,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(20000000, sub.getIntField("lastNotification"));
 
@@ -1674,7 +1674,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -1746,7 +1746,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -1813,7 +1813,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -1882,7 +1882,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -1953,7 +1953,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -2018,7 +2018,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -2086,7 +2086,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -2155,7 +2155,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -2220,7 +2220,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -2287,7 +2287,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -2354,7 +2354,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -2421,7 +2421,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -2475,7 +2475,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(30000000, sub.getIntField("lastNotification"));
 
@@ -2530,7 +2530,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(30000000, sub.getIntField("lastNotification"));
 
@@ -2584,7 +2584,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(30000000, sub.getIntField("lastNotification"));
 
@@ -2638,7 +2638,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(30000000, sub.getIntField("lastNotification"));
 
@@ -2707,7 +2707,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -2779,7 +2779,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -2846,7 +2846,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -2915,7 +2915,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -2986,7 +2986,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -3051,7 +3051,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
     EXPECT_EQ(SccOk, ms);
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
@@ -3128,7 +3128,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
     EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
     /* Check lastNotification */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(20000000, sub.getIntField("lastNotification"));
 

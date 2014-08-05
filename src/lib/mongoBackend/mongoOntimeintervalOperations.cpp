@@ -45,7 +45,7 @@ HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, Context
 
     LM_T(LmtMongo, ("Get Subscription Info operation"));
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* Search for the document */
     LM_T(LmtMongo, ("findOne() in '%s' collection by _id '%s'", getSubscribeContextCollectionName(tenant).c_str(), subId.c_str()));
@@ -156,7 +156,7 @@ HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::str
 
     LM_T(LmtMongo, ("Update NGI10 Subscription New Notification"));
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* Update the document */
     BSONObj query  = BSON("_id" << OID(subId));

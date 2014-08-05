@@ -45,7 +45,7 @@
 */
 static void prepareDatabase(std::string id, std::string type)
 {
-  static DBClientConnection* connection = NULL;
+  static DBClientBase* connection = NULL;
 
   if (connection == NULL)
     connection = getMongoConnection();

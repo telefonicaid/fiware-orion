@@ -65,22 +65,26 @@ if [[ -z "${BROKER_DATABASE_HOST}" ]] &&  [[ "${PARAM}" != "stop" ]]; then
 fi
 
 # Note that some parameters are not always included
-if [[ -z "${BROKER_DATABASE_USER}" ]]; then
-    BROKER_OPTS="-port ${BROKER_PORT}  \
-            -logDir ${BROKER_LOG_DIR}  \
-            -pidpath ${BROKER_PID_FILE}  \
-            -dbhost ${BROKER_DATABASE_HOST} \
-            -db ${BROKER_DATABASE_NAME} \
-            ${BROKER_EXTRA_OPS} "
-else
-    BROKER_OPTS="-port ${BROKER_PORT} \
-            -logDir ${BROKER_LOG_DIR} \
-            -pidpath ${BROKER_PID_FILE} \
-            -dbhost ${BROKER_DATABASE_HOST} \
-            -db ${BROKER_DATABASE_NAME} \
-            -dbuser ${BROKER_DATABASE_USER} \
-            -dbpwd ${BROKER_DATABASE_PASSWORD} \
-            ${BROKER_EXTRA_OPS}"
+
+# Mandatory parameters
+BROKER_OPTS="-port ${BROKER_PORT} \
+   -logDir ${BROKER_LOG_DIR} \
+   -pidpath ${BROKER_PID_FILE} \
+   -dbhost ${BROKER_DATABASE_HOST} \
+   -db ${BROKER_DATABASE_NAME} \
+   ${BROKER_EXTRA_OPS}"
+
+# Optional parameters
+if [[ ! -z "${BROKER_DATABASE_USER}" ]]; then
+   BROKER_OPTS="${BROKER_OPTS} -dbuser ${BROKER_DATABASE_USER}"
+fi
+
+if [[ ! -z "${BROKER_DATABASE_PASSWORD}" ]]; then
+   BROKER_OPTS="${BROKER_OPTS} -dbpwd ${BROKER_DATABASE_PASSWORD}"
+fi
+
+if [[ ! -z "${BROKER_DATABASE_RPLSET}" ]]; then
+    BROKER_OPTS="${BROKER_OPTS} -rplSet ${BROKER_DATABASE_RPLSET}"
 fi
 
 broker_start()

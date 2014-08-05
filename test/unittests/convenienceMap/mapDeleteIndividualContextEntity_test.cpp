@@ -48,7 +48,7 @@ static void prepareDatabase(std::string id, std::string type)
   /* Set database */
   setupDatabase();
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* We create one entity:
    *

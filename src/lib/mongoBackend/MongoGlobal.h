@@ -137,7 +137,7 @@ using namespace mongo;
 *
 * mongoConnect -
 */
-extern bool mongoConnect(const char* host, const char* db, const char* username, const char* passwd, bool multitenant);
+extern bool mongoConnect(const char* host, const char* db, const char* rplSet, const char* username, const char* passwd, bool multitenant);
 extern bool mongoConnect(const char* host);
 #ifdef UNIT_TEST
 extern bool mongoConnect(DBClientConnection* c);
@@ -168,7 +168,7 @@ extern void mongoDisconnect();
 * I would prefer to have per-collection methods, to have a better encapsulation, but
 * the Mongo C++ API seems not working that way
 */
-extern DBClientConnection* getMongoConnection(void);
+extern DBClientBase* getMongoConnection(void);
 
 /*****************************************************************************
 *
