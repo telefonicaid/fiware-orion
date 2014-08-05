@@ -99,7 +99,7 @@ bool mongoConnect(const char* host, const char* db, const char* rplSet, const ch
       /* The first argument to true is to use autoreconnect */
       connection = new DBClientConnection(true);
 
-      /* Not sure of to generalize the following code, given that DBClientBase class hasn't the connect() method (surprisingly) */
+      /* Not sure of to generalize the following code, given that DBClientBase class hasn't a common connect() method (surprisingly) */
       for (int tryNo = 0; tryNo < retries; ++tryNo)
       {
           if ( ((DBClientConnection*)connection)->connect(host, err))
@@ -121,8 +121,36 @@ bool mongoConnect(const char* host, const char* db, const char* rplSet, const ch
     {
       LM_T(LmtMongo, ("Using replica set %s", rplSet));
       // autoReconnect is always on for DBClientReplicaSet connections.
-      //DBClientReplicaSet connection(rplSet,hosts,0);
-      //TBD
+      std::vector<std::string>  hostTokens;
+      int components = stringSplit(host, ',', hostTokens);
+
+      std::vector<HostAndPort> rplSetHosts;
+      for (int ix = 0; ix < components; ix++)
+      {
+          LM_T(LmtMongo, ("rplSet host <%s>", hostTokens[ix].c_str()));
+          rplSetHosts.push_back(HostAndPort(hostTokens[ix]));
+      }
+
+      connection = new DBClientReplicaSet(rplSet, rplSetHosts, 0);
+
+      /* Not sure of to generalize the following code, given that DBClientBase class hasn't a common connect() method (surprisingly) */
+      for (int tryNo = 0; tryNo < retries; ++tryNo)
+      {
+          if ( ((DBClientReplicaSet*)connection)->connect())
+        {
+          connected = true;
+          break;
+        }
+
+        if (tryNo == 0)
+          LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
+        else
+          LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
+
+        usleep(RECONNECT_DELAY * 1000); // usleep accepts microseconds
+      }
+
+
     }
 
     if (connected == false)
