@@ -1,0 +1,1 @@
+- Add: support for MongoDB replica sets (using the -rplSet CLI parameter) (Issue #493)
