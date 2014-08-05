@@ -62,7 +62,6 @@ using std::auto_ptr;
 *
 * Globals
 */
-//static DBClientConnection*  connection;
 static DBClientBase*        connection;
 static int                  mongoVersionMayor = -1;
 static int                  mongoVersionMinor = -1;
