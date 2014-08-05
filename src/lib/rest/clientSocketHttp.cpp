@@ -148,46 +148,55 @@ std::string sendHttpSocket
 
   ++callNo;
 
+  LM_TRANSACTION_START("to", ip.c_str(), port, resource.c_str());
+
   // Preconditions check
   if (port == 0)
   {
     LM_E(("Runtime Error (port is ZERO)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if (ip.empty())
   {
     LM_E(("Runtime Error (ip is empty)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if (verb.empty())
   {
     LM_E(("Runtime Error (verb is empty)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if (resource.empty())
   {
     LM_E(("Runtime Error (resource is empty)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if ((content_type.empty()) && (!content.empty()))
   {
     LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if ((!content_type.empty()) && (content.empty()))
   {
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if ((curl = curl_easy_init()) == NULL)
   {
     LM_E(("Runtime Error (could not init libcurl)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
@@ -298,6 +307,7 @@ std::string sendHttpSocket
     free(httpResponse->memory);
     delete httpResponse;
 
+    LM_TRANSACTION_END();
     return "error";
   }
 
@@ -345,6 +355,7 @@ std::string sendHttpSocket
   free(httpResponse->memory);
   delete httpResponse;
 
+  LM_TRANSACTION_END();
   return result;
 }
 
