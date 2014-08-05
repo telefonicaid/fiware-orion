@@ -83,6 +83,10 @@ else
             ${BROKER_EXTRA_OPS}"
 fi
 
+if [[ ! -z "${BROKER_DATABASE_RPLSET}" ]]; then
+    BROKER_OPTS="${BROKER_OPTS} -rplSet ${BROKER_DATABASE_RPLSET}"
+fi
+
 broker_start()
 {
     printf "%-50s" "Starting ${NAME}..."
