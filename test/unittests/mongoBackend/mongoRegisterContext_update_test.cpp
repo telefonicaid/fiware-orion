@@ -78,7 +78,7 @@ static void prepareDatabase(void) {
   /* Set database */
   setupDatabase();
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* We create the following registrations:
    *
@@ -189,7 +189,7 @@ TEST(mongoRegisterContext_update, updateCase1)
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
    * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* registrations collection: */
   ASSERT_EQ(2, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -318,7 +318,7 @@ TEST(mongoRegisterContext_update, updateCase2)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(2, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -433,7 +433,7 @@ TEST(mongoRegisterContext_update, updateNotFound)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(2, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -570,7 +570,7 @@ TEST(mongoRegisterContext_update, updateWrongIdString)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(2, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -703,7 +703,7 @@ TEST(DISABLED_mongoRegisterContext_update, updateWrongIdNoHex)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(2, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -855,7 +855,7 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(2, connection->count(REGISTRATIONS_COLL, BSONObj()));

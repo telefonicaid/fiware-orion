@@ -170,7 +170,7 @@ static void prepareDatabase(void) {
     /* Set database */
     setupDatabase();
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* We create the following entities:
      *
@@ -357,7 +357,7 @@ static void prepareDatabasePatternTrue(void) {
     /* Set database */
     setupDatabase();
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* We create the following entities:
      *
@@ -629,7 +629,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
@@ -726,7 +726,7 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860005")));
@@ -810,7 +810,7 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860005")));
@@ -898,7 +898,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T1_C0)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
@@ -981,7 +981,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T1_C0_JSON)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
@@ -1064,7 +1064,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T1_C0)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -1154,7 +1154,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_C0)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
@@ -1245,7 +1245,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_C0)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -1333,7 +1333,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_C1)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
@@ -1418,7 +1418,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_C1)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -1507,7 +1507,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
@@ -1598,7 +1598,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CNbis)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
@@ -1687,7 +1687,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -1780,7 +1780,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CNbis)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -1878,7 +1878,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
@@ -1983,7 +1983,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CNbis)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
@@ -2085,7 +2085,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -2192,7 +2192,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CNbis)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -2286,7 +2286,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T1_C0)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
@@ -2376,7 +2376,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T1_C0)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
@@ -2471,7 +2471,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_C0)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
@@ -2566,7 +2566,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_C0)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
@@ -2658,7 +2658,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_C1)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
@@ -2747,7 +2747,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_C1)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
@@ -2840,7 +2840,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
@@ -2935,7 +2935,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CNbis)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
@@ -3027,7 +3027,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
@@ -3124,7 +3124,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CNbis)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
@@ -3226,7 +3226,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
@@ -3335,7 +3335,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CNbis)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
@@ -3441,7 +3441,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
@@ -3552,7 +3552,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CNbis)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
@@ -3671,7 +3671,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
@@ -3776,7 +3776,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1_JSON)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
@@ -3879,7 +3879,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -3984,7 +3984,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1_disjoint)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -4105,7 +4105,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860022")));
@@ -4226,7 +4226,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1_disjoint)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860022")));
@@ -4338,7 +4338,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -4450,7 +4450,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1_disjoint)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -4576,7 +4576,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860022")));
@@ -4702,7 +4702,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1_disjoint
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860022")));
@@ -4812,7 +4812,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
@@ -4926,7 +4926,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN_partial)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
@@ -5039,7 +5039,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CNbis)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
@@ -5146,7 +5146,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_disjoint)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -5260,7 +5260,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -5374,7 +5374,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial_disjoint)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -5486,7 +5486,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CNbis)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -5604,7 +5604,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
@@ -5729,7 +5729,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CNbis)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
@@ -5849,7 +5849,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -5974,7 +5974,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CNbis)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
@@ -6096,7 +6096,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_C1)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
@@ -6209,7 +6209,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_C1)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
@@ -6330,7 +6330,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
@@ -6453,7 +6453,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CNbis)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
@@ -6569,7 +6569,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
@@ -6688,7 +6688,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CNbis)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
@@ -6816,7 +6816,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
@@ -6951,7 +6951,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CNbis)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
@@ -7079,7 +7079,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
@@ -7212,7 +7212,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CNbis)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860004")));
@@ -7316,7 +7316,7 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(6, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));

@@ -46,7 +46,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
 
   LM_T(LmtMongo, ("Update Context Subscription"));
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* Look for document */
   BSONObj  sub;

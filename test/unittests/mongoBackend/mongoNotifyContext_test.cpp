@@ -69,7 +69,7 @@ static void prepareDatabase(void) {
   /* Set database */
   setupDatabase();
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* We create the following entities:
    *
@@ -211,7 +211,7 @@ TEST(mongoNotifyContextRequest, Ent1Attr1)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -372,7 +372,7 @@ TEST(mongoNotifyContextRequest, Ent1AttrN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -536,7 +536,7 @@ TEST(mongoNotifyContextRequest, EntNAttr1)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -704,7 +704,7 @@ TEST(mongoNotifyContextRequest, EntNAttrN)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -863,7 +863,7 @@ TEST(mongoNotifyContextRequest, createEntity)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;

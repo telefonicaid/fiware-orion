@@ -111,7 +111,7 @@ static void prepareDatabase(void) {
   /* Set database */
   setupDatabase();
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* We create the following registrations:
    *
@@ -232,7 +232,7 @@ static void prepareDatabasePatternTrue(void) {
   /* Set database */
   setupDatabase();
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* We create the following registrations:
    *
@@ -341,7 +341,7 @@ static void prepareDatabaseForPagination(void)
   /* Set database */
   setupDatabase();
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* We create the following registrations:
    *

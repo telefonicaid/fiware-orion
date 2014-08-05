@@ -131,7 +131,7 @@ static void prepareDatabase(void) {
   /* Set database */
   setupDatabase();
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* We create the following entities:
    *
@@ -205,7 +205,7 @@ static void prepareDatabasePatternTrue(void) {
   /* Set database */
   setupDatabase();
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* We create the following entities:
    *
@@ -277,7 +277,7 @@ static void prepareDatabaseWithAttributeIds(void) {
 
     /* Add some entities with metadata ID */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj en1 = BSON("_id" << BSON("id" << "E10" << "type" << "T") <<
                        "attrs" << BSON_ARRAY(
                           BSON("name" << "A1" << "type" << "TA1" << "value" << "A" << "id" << "ID1") <<
@@ -315,7 +315,7 @@ static void prepareDatabaseWithCustomMetadata(void) {
 
     /* Add some entities with metadata ID */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj en1 = BSON("_id" << BSON("id" << "E10" << "type" << "T") <<
                        "attrs" << BSON_ARRAY(
                           BSON("name" << "A1" << "type" << "TA1" << "value" << "A" <<
@@ -370,7 +370,7 @@ static void prepareDatabaseWithServicePath(const std::string modifier)
   /* Set database */
   setupDatabase();
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* We create the following entities:
    *
@@ -454,7 +454,7 @@ static void prepareDatabaseForPagination(void)
   /* Set database */
   setupDatabase();
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* We create the following entities:
    *

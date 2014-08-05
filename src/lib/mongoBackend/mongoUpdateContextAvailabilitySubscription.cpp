@@ -45,7 +45,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription(UpdateContextAvailabil
   LM_T(LmtMongo, ("Update Context Subscription"));
   reqSemTake(__FUNCTION__, "ngsi9 update subscription request");
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* Look for document */
   BSONObj  sub;

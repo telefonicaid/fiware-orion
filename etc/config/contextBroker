@@ -41,6 +41,13 @@ BROKER_PID_FILE=/var/log/contextBroker/contextBroker.pid
 BROKER_DATABASE_HOST=localhost
 BROKER_DATABASE_NAME=orion
 
+## Replica set configuration. Note that if you set this parameter, the BROKER_DATABASE_HOST
+## is interpreted as the list of host (or host:port) separated by commas to use as
+## replica set seed list (single element lists are also allowed). If BROKER_DATABASE_RPL_SET
+## parameter is unset, Orion CB assumes that the BROKER_DATABASE_HOST is an stand-alone
+## mongod instance
+#BROKER_DATABASE_RPLSET=orion_rs
+
 # Database authentication (not needed if MongoDB doesn't use --auth)
 #BROKER_DATABASE_USER=orion
 #BROKER_DATABASE_PASSWORD=orion

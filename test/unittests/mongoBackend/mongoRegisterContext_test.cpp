@@ -102,7 +102,7 @@ static void prepareDatabase(void) {
     /* Clean database */
     setupDatabase();
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
     BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
@@ -160,7 +160,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok)
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
    * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -238,7 +238,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_At0_Ok)
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
    * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -320,7 +320,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtN_Ok)
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
    * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -410,7 +410,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtNnt_Ok)
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
    * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -499,7 +499,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtN_Ok)
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
    * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -581,7 +581,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtNnt_Ok)
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
    * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -669,7 +669,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_At0_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -752,7 +752,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_At0_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -840,7 +840,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtN_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -936,7 +936,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtNnt_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -1032,7 +1032,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtN_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -1128,7 +1128,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtNnt_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -1221,7 +1221,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_At0_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -1313,7 +1313,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_At0_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -1413,7 +1413,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtN_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -1530,7 +1530,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtNnt_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -1647,7 +1647,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtN_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -1764,7 +1764,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtNnt_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -1877,7 +1877,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_At0_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -1980,7 +1980,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_At0_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -2091,7 +2091,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtN_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -2218,7 +2218,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtNnt_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -2345,7 +2345,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtN_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -2472,7 +2472,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtNnt_Ok)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -2789,7 +2789,7 @@ TEST(mongoRegisterContextRequest, defaultDuration)
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
    * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
@@ -2909,7 +2909,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     mongoConnect("localhost");
 
     /* check collection has not been touched */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     EXPECT_EQ(0, connection->count(REGISTRATIONS_COLL, BSONObj()));
     EXPECT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
@@ -2977,7 +2977,7 @@ TEST(mongoRegisterContextRequest, AssociationsOk)
     /* Check that associations collection at MongoDB is as expected. We don't check other collections
      * (other tests in this suite cover it extensively) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     ASSERT_EQ(1, connection->count(ASSOCIATIONS_COLL, BSONObj()));
     BSONObj asoc = connection->findOne(ASSOCIATIONS_COLL, BSONObj());
@@ -3066,7 +3066,7 @@ TEST(mongoRegisterContextRequest, AssociationsDbFail)
     mongoConnect("localhost");
 
     /* check collections have not been touched */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     EXPECT_EQ(0, connection->count(ASSOCIATIONS_COLL, BSONObj()));
     EXPECT_EQ(0, connection->count(REGISTRATIONS_COLL, BSONObj()));
 }

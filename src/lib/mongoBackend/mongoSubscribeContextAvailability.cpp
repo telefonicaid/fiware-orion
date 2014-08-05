@@ -47,7 +47,7 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
 
     LM_T(LmtMongo, ("Subscribe Context Availability Request"));
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* If expiration is not present, then use a default one */
     if (requestP->duration.isEmpty()) {
