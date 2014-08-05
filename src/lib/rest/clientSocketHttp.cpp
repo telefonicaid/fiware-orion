@@ -372,6 +372,8 @@ int socketHttpConnect(const std::string& host, unsigned short port)
   struct addrinfo*    peer;
   char                port_str[10];
 
+  LM_TRANSACTION_START("to", ip.c_str(), port, resource.c_str());
+
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_protocol = 0;
@@ -397,12 +399,14 @@ int socketHttpConnect(const std::string& host, unsigned short port)
   if (getaddrinfo(host.c_str(), port_str, &hints, &peer) != 0)
   {
     LM_W(("Notification failure for %s:%d (getaddrinfo: %s)", host.c_str(), port, strerror(errno)));
+    LM_TRANSACTION_END();
     return -1;
   }
 
   if ((fd = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol)) == -1)
   {
     LM_W(("Notification failure for %s:%d (socket: %s)", host.c_str(), port, strerror(errno)));
+    LM_TRANSACTION_END();
     return -1;
   }
 
@@ -411,10 +415,12 @@ int socketHttpConnect(const std::string& host, unsigned short port)
     freeaddrinfo(peer);
     close(fd);
     LM_W(("Notification failure for %s:%d (connect: %s)", host.c_str(), port, strerror(errno)));
+    LM_TRANSACTION_END();
     return -1;
   }
 
   freeaddrinfo(peer);
+  LM_TRANSACTION_END();
   return fd;
 }
 
