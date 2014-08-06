@@ -119,8 +119,7 @@ sudo cp libcantcoap.a /usr/local/lib
 
 ```
 sudo yum install git
-git clone git@github.com:telefonicaid/fiware-orion.git
-```
+git clone https://github.com/telefonicaid/fiware-orion
 
 * Build the source:
 
