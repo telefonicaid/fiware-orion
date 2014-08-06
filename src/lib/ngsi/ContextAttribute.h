@@ -64,6 +64,8 @@ typedef struct ContextAttribute
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  toString(void);
+
+  std::string  renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent, bool comma);
 } ContextAttribute;
 
 #endif

@@ -33,7 +33,6 @@
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/MetadataVector.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/ConnectionInfo.h"
 
 
 

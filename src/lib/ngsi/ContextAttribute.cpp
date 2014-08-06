@@ -134,6 +134,43 @@ std::string ContextAttribute::getLocation()
   return "";
 }
 
+
+
+/* ****************************************************************************
+*
+* renderAsJsonObject - 
+*/
+std::string ContextAttribute::renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent, bool comma)
+{
+  std::string  out                    = "";
+  std::string  jsonTag                = name;
+  bool         commaAfterContextValue = metadataVector.size() != 0;
+
+  out += startTag(indent, "", jsonTag, ciP->outFormat, false, true);
+  out += valueTag(indent + "  ", "type",         type,  ciP->outFormat, true);
+
+  if (compoundValueP == NULL)
+    out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"), value, ciP->outFormat, commaAfterContextValue);
+  else
+  {
+    bool isCompoundVector = false;
+
+    if ((compoundValueP != NULL) && (compoundValueP->type == orion::CompoundValueNode::Vector))
+      isCompoundVector = true;    
+
+    out += startTag(indent + "  ", "contextValue", "value", ciP->outFormat, isCompoundVector, true, isCompoundVector);
+    out += compoundValueP->render(ciP->outFormat, indent + "    ");
+    out += endTag(indent + "  ", "contextValue", ciP->outFormat, commaAfterContextValue, isCompoundVector);
+  }
+
+  out += metadataVector.render(ciP->outFormat, indent + "  ", false);
+  out += endTag(indent, "", ciP->outFormat, comma);
+
+  return out;
+}
+
+
+
 /* ****************************************************************************
 *
 * render - 
@@ -144,14 +181,12 @@ std::string ContextAttribute::render(ConnectionInfo* ciP, const std::string& ind
   std::string  xmlTag                 = "contextAttribute";
   std::string  jsonTag                = "attribute";
   bool         commaAfterContextValue = metadataVector.size() != 0;
-  bool         jsonObjectRender       = false;
 
   metadataVector.tagSet("metadata");
 
   if ((ciP->uriParam["attributesFormat"] == "object") && (ciP->outFormat == JSON))
   {
-    LM_M(("jsonObjectRender is ON"));
-    jsonObjectRender = true;
+    return renderAsJsonObject(ciP, indent, comma);
   }
 
 
