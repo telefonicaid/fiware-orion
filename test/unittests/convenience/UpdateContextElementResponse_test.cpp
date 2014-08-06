@@ -30,6 +30,7 @@
 #include "common/Format.h"
 #include "convenience/UpdateContextElementResponse.h"
 #include "convenience/ContextAttributeResponseVector.h"
+#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
@@ -46,13 +47,14 @@ TEST(UpdateContextElementResponse, render_xml)
   ContextAttribute                ca("caName", "caType", "caValue");
   std::string                     out;
   const char*                     outfile = "ngsi10.updateContextElementResponse.ok.postponed.xml";
+  ConnectionInfo                  ci(XML);
 
   // Just the normal case
   ucer.contextAttributeResponseVector.push_back(&car);
   car.contextAttributeVector.push_back(&ca);
   car.statusCode.fill(SccOk, "details");
 
-  out = ucer.render(UpdateContext, XML, "");
+  out = ucer.render(&ci, UpdateContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }
@@ -70,13 +72,14 @@ TEST(UpdateContextElementResponse, render_json)
   ContextAttribute                ca("caName", "caType", "caValue");
   std::string                     out;
   const char*                     outfile = "ngsi10.updateContextElementResponse.ok.valid.json";
+  ConnectionInfo                  ci(JSON);
 
   // Just the normal case
   ucer.contextAttributeResponseVector.push_back(&car);
   car.contextAttributeVector.push_back(&ca);
   car.statusCode.fill(SccOk, "details");
 
-  out = ucer.render(UpdateContext, JSON, "");
+  out = ucer.render(&ci, UpdateContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }
@@ -95,22 +98,23 @@ TEST(UpdateContextElementResponse, check_xml)
   std::string                   out;
   const char*                   outfile1 = "ngsi10.updateContextElementResponse.check1.postponed.xml";
   const char*                   outfile2 = "ngsi10.updateContextElementResponse.check2.postponed.xml";
+  ConnectionInfo                ci(XML);
 
   // 1. predetected error
-  out = ucer.check(IndividualContextEntity, XML, "", "PRE ERR", 0);
+  out = ucer.check(&ci, IndividualContextEntity, "", "PRE ERR", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 2. bad contextAttributeResponseVector
   car.contextAttributeVector.push_back(&ca);
   ucer.contextAttributeResponseVector.push_back(&car);
-  out = ucer.check(IndividualContextEntity, XML, "", "", 0);
+  out = ucer.check(&ci, IndividualContextEntity, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 3. OK
   ca.name = "NAME";
-  out = ucer.check(IndividualContextEntity, XML, "", "", 0);
+  out = ucer.check(&ci, IndividualContextEntity, "", "", 0);
   EXPECT_EQ("OK", out);
 }
 
@@ -128,21 +132,22 @@ TEST(UpdateContextElementResponse, check_json)
   std::string                   out;
   const char*                   outfile1 = "ngsi10.updateContextElementResponse.check1.valid.json";
   const char*                   outfile2 = "ngsi10.updateContextElementResponse.check2.valid.json";
+  ConnectionInfo                ci(JSON);
 
   // 1. predetected error
-  out = ucer.check(IndividualContextEntity, JSON, "", "PRE ERR", 0);
+  out = ucer.check(&ci, IndividualContextEntity, "", "PRE ERR", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 2. bad contextAttributeResponseVector
   car.contextAttributeVector.push_back(&ca);
   ucer.contextAttributeResponseVector.push_back(&car);
-  out = ucer.check(IndividualContextEntity, JSON, "", "", 0);
+  out = ucer.check(&ci, IndividualContextEntity, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // 3. OK
   ca.name = "NAME";
-  out = ucer.check(IndividualContextEntity, JSON, "", "", 0);
+  out = ucer.check(&ci, IndividualContextEntity, "", "", 0);
   EXPECT_EQ("OK", out);
 }

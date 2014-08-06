@@ -32,6 +32,7 @@
 #include "common/tag.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/Request.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -50,7 +51,7 @@ ContextAttributeVector::ContextAttributeVector()
 *
 * ContextAttributeVector::render - 
 */
-std::string ContextAttributeVector::render(RequestType request, Format format, const std::string& indent, bool comma)
+std::string ContextAttributeVector::render(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma)
 {
   std::string out      = "";
   std::string xmlTag   = "contextAttributeList";
@@ -60,16 +61,16 @@ std::string ContextAttributeVector::render(RequestType request, Format format, c
   {
      if (((request == IndividualContextEntityAttribute)
          || (request == AttributeValueInstance)
-         || (request == IndividualContextEntityAttributes)) && format == XML)
+         || (request == IndividualContextEntityAttributes)) && ciP->outFormat == XML)
       return indent + "<contextAttributeList></contextAttributeList>\n";
 
     return "";
   }
 
-  out += startTag(indent, xmlTag, jsonTag, format, true, true);
+  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
-  out += endTag(indent, xmlTag, format, comma, true);
+    out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1);
+  out += endTag(indent, xmlTag, ciP->outFormat, comma, true);
 
   return out;
 }

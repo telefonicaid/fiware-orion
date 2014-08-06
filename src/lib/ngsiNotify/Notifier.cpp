@@ -50,7 +50,7 @@
 */
 Notifier::~Notifier (void)
 {
-  // FIXME: This destructor is needed to avoid warning message. 
+  // FIXME: This destructor is needed to avoid warning message.
   // Compilation fails when a warning occurs, and it is enabled 
   // compilation option -Werror "warnings being treated as errors" 
   LM_T(LmtNotImplemented, ("Notifier destructor is not implemented"));
@@ -62,8 +62,10 @@ Notifier::~Notifier (void)
 */
 void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, Format format)
 {
-    /* Render NotifyContextRequest */
-    std::string payload = ncr->render(NotifyContext, format, "");
+    ConnectionInfo ci;
+
+    ci.outFormat = format;
+    std::string payload = ncr->render(&ci, NotifyContext, "");
 
     /* Parse URL */
     std::string  host;
