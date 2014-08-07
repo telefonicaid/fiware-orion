@@ -241,34 +241,6 @@ static HttpStatusCode associationsDiscoverContextAvailability
 
     if (responseP->responseVector.size() == 0)
     {
-      //
-      // FIXME P10: Two problems with associations discovered during Integration Meeting in Madrid 2014
-      //
-      // The two problems are (both discoveries with associations):
-      // 1. When nothing is found the response lacks the ErrorCode but it has that 'default' response
-      // 2. When the discovery has an empty attributeList, nothing is found
-      //
-      // It works just fine when something is found and the request contains a valid non-empty attributeList.
-      //
-      // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      //
-      // We need a harness test to take care of the following situations:
-      //
-      // 1. Association found, but no entity responds to the association
-      // 2. Association found and all ok, but the discovery has an empty AttributeList
-      // 3. Association found and the discovery has a 'correct' AttributeList
-      // 4. Association not found
-      //
-      // Point 3. is already covered, and perhaps point 4 also, but the other two
-      // I don't think have any harness test.
-      //
-      // Actually, there are 12 combinations here (2*2*3):
-      // 1. Association FOUND / NOT FOUND
-      // 2. Responding entity FOUND /NOT FOUND
-      // 3. AttributeList NOT THERE / THERE WITH OK ATTR / THERE WITH 'BAD' ATTR
-      //
-      //
-      // Finally, here are the two lines that I needed for 'nothing found' but that breaks 'something found'
       responseP->errorCode.fill(SccContextElementNotFound, "Could not query association with combination of entity/attribute");
       LM_RE(SccOk, (responseP->errorCode.details.c_str()));
     }
@@ -382,7 +354,8 @@ HttpStatusCode mongoDiscoverContextAvailability
     std::string scopeType  = requestP->restriction.scopeVector.get(0)->type;
     std::string scopeValue = requestP->restriction.scopeVector.get(0)->value;
 
-    if (scopeType == SCOPE_TYPE_ASSOC && requestP->attributeList.size() == 0) {
+    if (scopeType == SCOPE_TYPE_ASSOC && requestP->attributeList.size() == 0)
+    {
       HttpStatusCode hsCode = conventionalDiscoverContextAvailability(requestP, responseP, tenant, offset, limit, details);
       if (hsCode != SccOk)
       {

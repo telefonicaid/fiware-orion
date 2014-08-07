@@ -115,10 +115,14 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
   if (!isTrue(value) && !isFalse(value))
+  {
     return "invalid isPattern (boolean) value for entity: '" + value + "'";
+  }
 
   if (isTrue(value))
+  {
     return "isPattern set to true for a registration";
+  }
 
   reqDataP->rcr.entityIdP->isPattern = value;
 
@@ -179,7 +183,9 @@ static std::string craType(const std::string& path, const std::string& value, Pa
 static std::string craIsDomain(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   if (!isTrue(value) && !isFalse(value))
+  {
     return "invalid isDomain (boolean) value for context registration attribute: '" + value + "'";
+  }
 
   reqDataP->rcr.attributeP->isDomain = value;
   LM_T(LmtParse, ("Set 'isDomain' to '%s' for a contextRegistrationAttribute", reqDataP->rcr.attributeP->isDomain.c_str()));
@@ -409,10 +415,14 @@ static std::string sourceEntityIdIsPattern(const std::string& path, const std::s
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
   if (!isTrue(value) && !isFalse(value))
+  {
     return "invalid isPattern (boolean) value for entity: '" + value + "'";
+  }
 
   if (isTrue(value))
+  {
     return "isPattern set to true for a registration";
+  }
 
   reqDataP->rcr.registrationMetadataP->association.entityAssociation.source.isPattern = value;
 
@@ -475,10 +485,14 @@ static std::string targetEntityIdIsPattern(const std::string& path, const std::s
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
   if (!isTrue(value) && !isFalse(value))
+  {
     return "invalid isPattern (boolean) value for entity: '" + value + "'";
+  }
 
   if (isTrue(value))
+  {
     return "isPattern set to true for a registration";
+  }
 
   reqDataP->rcr.registrationMetadataP->association.entityAssociation.target.isPattern = value;
 
@@ -628,7 +642,9 @@ std::string jsonRcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 void jsonRcrPresent(ParseData* reqDataP)
 {
   if (!lmTraceIsSet(LmtDump))
+  {
     return;
+  }
 
   PRINTF("\n\n");
 
