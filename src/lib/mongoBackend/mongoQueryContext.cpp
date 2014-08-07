@@ -89,7 +89,7 @@ HttpStatusCode mongoQueryContext
     else if (responseP->contextElementResponseVector.size() == 0)
     {
 
-      // Check a pontetnail Context Provider in the registrations collection
+      // Check a pontential Context Provider in the registrations collection
       ContextRegistrationResponseVector crrV;
       std::string err;
       long long fakeCount;  // we don't use it, but we need it to match the registrationQuery() signature
@@ -103,11 +103,7 @@ HttpStatusCode mongoQueryContext
               std::string prApp = crrV.get(0)->contextRegistration.providingApplication.get();
               LM_T(LmtCtxProviders, ("context provide found: %s", prApp.c_str()));
               responseP->errorCode.fill(SccFound, prApp);
-              //crrV.release();
               return SccOk;
-          }
-          else {
-              //crrV.release();
           }
       }
       else

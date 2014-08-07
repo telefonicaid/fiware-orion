@@ -306,7 +306,7 @@ static void prepareDatabasePatternTrue(void) {
 * Discover:  E3 -no attrs
 * Result:    E3 - (A1, A2, A3) - http://cr1.com
 */
-TEST(mongoContextProvidersQueryRequet, noPatternAttrsAll)
+TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
 {
   HttpStatusCode        ms;
   QueryContextRequest   req;
@@ -345,7 +345,7 @@ TEST(mongoContextProvidersQueryRequet, noPatternAttrsAll)
 * Discover:  E1 - A4
 * Result:    E1 - A4 - http://cr2.com
 */
-TEST(mongoContextProvidersQueryRequet, noPatternAttrOneSingle)
+TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -396,7 +396,7 @@ TEST(mongoContextProvidersQueryRequet, noPatternAttrOneSingle)
 * This test also checks that discovering for type (E1) doesn't match with no-typed
 * entities (E1** - cr5 is not returned)
 */
-TEST(mongoContextProvidersQueryRequet, noPatternAttrOneMulti)
+TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -446,7 +446,7 @@ TEST(mongoContextProvidersQueryRequet, noPatternAttrOneMulti)
 * Discover:  E3 - (A1, A2)
 * Result:    E3 - (A1, A2) - http://cr1.com
 */
-TEST(mongoContextProvidersQueryRequet, noPatternAttrsSubset)
+TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -495,7 +495,7 @@ TEST(mongoContextProvidersQueryRequet, noPatternAttrsSubset)
 * Result:    E1 - (A1, A2, A3) - http://cr1.com
 *            E1 - (A1, A4)     - http://cr2.com
 */
-TEST(mongoContextProvidersQueryRequet, noPatternSeveralCREs)
+TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -542,7 +542,7 @@ TEST(mongoContextProvidersQueryRequet, noPatternSeveralCREs)
 * Result:    E2 - (A1, A2, A3) - http://cr1.com
 *            E2 - (A2, A3)     - http://cr3.com
 */
-TEST(mongoContextProvidersQueryRequet, noPatternSeveralRegistrations)
+TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -588,7 +588,7 @@ TEST(mongoContextProvidersQueryRequet, noPatternSeveralRegistrations)
 * Discover:  E4 - no attrs
 * Result:    none
 */
-TEST(mongoContextProvidersQueryRequet, noPatternNoEntity)
+TEST(mongoContextProvidersQueryRequest, noPatternNoEntity)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -634,7 +634,7 @@ TEST(mongoContextProvidersQueryRequet, noPatternNoEntity)
 * Discover:  E1 - A5
 * Result:    none
 */
-TEST(mongoContextProvidersQueryRequet, noPatternNoAttribute)
+TEST(mongoContextProvidersQueryRequest, noPatternNoAttribute)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -683,7 +683,7 @@ TEST(mongoContextProvidersQueryRequet, noPatternNoAttribute)
 *            E1       - (A1, A4)     - http://cr2.com
 *            E2       - (A2, A3)     - http://cr3.com
 */
-TEST(mongoContextProvidersQueryRequet, noPatternMultiEntity)
+TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -732,7 +732,7 @@ TEST(mongoContextProvidersQueryRequet, noPatternMultiEntity)
 * Result:    E1 - A3 - http://cr1.com
 *            E1 - A4 - http://cr2.com
 */
-TEST(mongoContextProvidersQueryRequet, noPatternMultiAttr)
+TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -783,7 +783,7 @@ TEST(mongoContextProvidersQueryRequet, noPatternMultiAttr)
 *            E1       - A4 - http://cr2.com
 *            E2       - A3 - http://cr3.com
 */
-TEST(mongoContextProvidersQueryRequet, noPatternMultiEntityAttrs)
+TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -841,7 +841,7 @@ TEST(mongoContextProvidersQueryRequet, noPatternMultiEntityAttrs)
 * which the returned CR has type (cr1, cr2, cr4) and the case in which it has no type (cr5).
 *
 */
-TEST(mongoContextProvidersQueryRequet, noPatternNoType)
+TEST(mongoContextProvidersQueryRequest, noPatternNoType)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -893,7 +893,7 @@ TEST(mongoContextProvidersQueryRequet, noPatternNoType)
 * entities (E3** - cr5 is not returned)
 *
 */
-TEST(mongoContextProvidersQueryRequet, pattern0Attr)
+TEST(mongoContextProvidersQueryRequest, pattern0Attr)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -939,7 +939,7 @@ TEST(mongoContextProvidersQueryRequet, pattern0Attr)
 * Discover:  E[1-3] - A4
 * Result:    E1 - A4 - http://cr2.com
 */
-TEST(mongoContextProvidersQueryRequet, pattern1AttrSingle)
+TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -987,7 +987,7 @@ TEST(mongoContextProvidersQueryRequet, pattern1AttrSingle)
 * Result:    (E1, E2) - A1 - http://cr1.com
 *            E1       - A1 - http://cr2.com
 */
-TEST(mongoContextProvidersQueryRequet, pattern1AttrMulti)
+TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -1036,7 +1036,7 @@ TEST(mongoContextProvidersQueryRequet, pattern1AttrMulti)
 *            E1      - A1        - http://cr2.com
 *            E2      - A2        - http://cr3.com
 */
-TEST(mongoContextProvidersQueryRequet, patternNAttr)
+TEST(mongoContextProvidersQueryRequest, patternNAttr)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -1084,7 +1084,7 @@ TEST(mongoContextProvidersQueryRequet, patternNAttr)
 * Discover:  R.* - none
 * Result:    none
 */
-TEST(mongoContextProvidersQueryRequet, patternFail)
+TEST(mongoContextProvidersQueryRequest, patternFail)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -1136,7 +1136,7 @@ TEST(mongoContextProvidersQueryRequet, patternFail)
 * which the returned CR has type (cr1, cr3, cr4) and the case in which it has no type (cr5).
 *
 */
-TEST(mongoContextProvidersQueryRequet, patternNoType)
+TEST(mongoContextProvidersQueryRequest, patternNoType)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
@@ -1185,7 +1185,7 @@ TEST(mongoContextProvidersQueryRequet, patternNoType)
 *            E1           - (A1 ,A4) - http://cr2.com
 *            E2           - (A2, A3) - http://cr3.com
 */
-TEST(mongoContextProvidersQueryRequet, mixPatternAndNotPattern)
+TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
 {
     HttpStatusCode        ms;
     QueryContextRequest   req;
