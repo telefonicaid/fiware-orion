@@ -190,7 +190,6 @@ static void prepareDatabase(void) {
 
 }
 
-#if 0
 /* ****************************************************************************
 *
 * prepareDatabasePatternTrue -
@@ -302,7 +301,6 @@ static void prepareDatabasePatternTrue(void) {
   connection->insert(REGISTRATIONS_COLL, reg3);
   connection->insert(REGISTRATIONS_COLL, reg4);
 }
-#endif
 
 /* ****************************************************************************
 *
@@ -353,7 +351,6 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsAll)
   utExit();
 }
 
-#if 0
 /* ****************************************************************************
 *
 * noPatternAttrOneSingle -
@@ -363,17 +360,20 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsAll)
 */
 TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en("E1", "T1");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A4");
+    ContextElement ce;
+    ce.entityId.fill("E1", "T1", "false");
+    ContextAttribute ca("A4", "TA4", "new_val");
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -382,16 +382,24 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr2.com", res.errorCode.details);
+    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+    ASSERT_EQ(1,res.contextElementResponseVector.size());
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
+    EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("http://cr2.com", RES_CER_STATUS(0).details);
+
 
     /* Release connection */
     mongoDisconnect();
@@ -414,15 +422,20 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
 */
 TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en("E1", "T1");
+    ContextElement ce;
+    ce.entityId.fill("E1", "T1", "false");
+    ContextAttribute ca("A1", "TA1", "new_val");
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -430,20 +443,24 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
 
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A1");
-
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+    ASSERT_EQ(1,res.contextElementResponseVector.size());
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
+    EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("http://cr1.com", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -464,18 +481,22 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
 */
 TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en("E3", "T3");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A1");
-    req.attributeList.push_back("A2");
+    ContextElement ce;
+    ce.entityId.fill("E3", "T3", "false");
+    ContextAttribute ca1("A1", "TA1", "new_val");
+    ContextAttribute ca2("A2", "TA2", "new_val");
+    ce.contextAttributeVector.push_back(&ca1);
+    ce.contextAttributeVector.push_back(&ca2);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -484,16 +505,23 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+    ASSERT_EQ(1,res.contextElementResponseVector.size());
+    EXPECT_EQ("E3", RES_CER(0).entityId.id);
+    EXPECT_EQ("T3", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
+    EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("http://cr1.com", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -513,16 +541,20 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
 */
 TEST(mongoContextProvidersUpdateRequest, noPatternSeveralCREs)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en("E1", "T1");
-    req.entityIdVector.push_back(&en);
+    /* Note that although is a bit weird having a updateContext without attributes to update,
+     * it is legal from the point of view of OMA spec */
+    ContextElement ce;
+    ce.entityId.fill("E1", "T1", "false");
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -531,16 +563,23 @@ TEST(mongoContextProvidersUpdateRequest, noPatternSeveralCREs)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+    ASSERT_EQ(1,res.contextElementResponseVector.size());
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
+    EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("http://cr1.com", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -560,16 +599,20 @@ TEST(mongoContextProvidersUpdateRequest, noPatternSeveralCREs)
 */
 TEST(mongoContextProvidersUpdateRequest, noPatternSeveralRegistrations)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en("E2", "T2");
-    req.entityIdVector.push_back(&en);
+    /* Note that although is a bit weird having a updateContext without attributes to update,
+     * it is legal from the point of view of OMA spec */
+    ContextElement ce;
+    ce.entityId.fill("E2", "T2", "false");
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -578,16 +621,23 @@ TEST(mongoContextProvidersUpdateRequest, noPatternSeveralRegistrations)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+    ASSERT_EQ(1,res.contextElementResponseVector.size());
+    EXPECT_EQ("E2", RES_CER(0).entityId.id);
+    EXPECT_EQ("T2", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
+    EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("http://cr1.com", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -606,16 +656,20 @@ TEST(mongoContextProvidersUpdateRequest, noPatternSeveralRegistrations)
 */
 TEST(mongoContextProvidersUpdateRequest, noPatternNoEntity)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en("E4", "T4");
-    req.entityIdVector.push_back(&en);
+    /* Note that although is a bit weird having a updateContext without attributes to update,
+     * it is legal from the point of view of OMA spec */
+    ContextElement ce;
+    ce.entityId.fill("E4", "T4", "false");
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -624,15 +678,23 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoEntity)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
+    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
-    EXPECT_EQ(0, res.contextElementResponseVector.size());
+
+    ASSERT_EQ(1,res.contextElementResponseVector.size());
+    EXPECT_EQ("E4", RES_CER(0).entityId.id);
+    EXPECT_EQ("T4", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
+    EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("E4", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -652,15 +714,20 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoEntity)
 */
 TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en("E1", "T1");
+    ContextElement ce;
+    ce.entityId.fill("E1", "T1", "false");
+    ContextAttribute ca("A5", "TA5", "new_val");
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -668,19 +735,24 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
             .WillByDefault(Return(1360232700));
     setTimer(timerMock);
 
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A5");
-
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
+    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
-    EXPECT_EQ(0,res.contextElementResponseVector.size());
+
+    ASSERT_EQ(1,res.contextElementResponseVector.size());
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
+    EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("E1", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -701,18 +773,22 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
 */
 TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en1("E1", "T1");
-    EntityId en2("E2", "T2");
-    req.entityIdVector.push_back(&en1);
-    req.entityIdVector.push_back(&en2);
+    /* Note that although is a bit weird having a updateContext without attributes to update,
+     * it is legal from the point of view of OMA spec */
+    ContextElement ce1, ce2;
+    ce1.entityId.fill("E1", "T1", "false");
+    ce2.entityId.fill("E2", "T2", "false");
+    req.contextElementVector.push_back(&ce1);
+    req.contextElementVector.push_back(&ce2);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -721,16 +797,33 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+    ASSERT_EQ(2,res.contextElementResponseVector.size());
+    /* Context element response #1 */
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
+    EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("http://cr1.com", RES_CER_STATUS(0).details);
+
+    /* Context element response #2 */
+    EXPECT_EQ("E2", RES_CER(1).entityId.id);
+    EXPECT_EQ("T2", RES_CER(1).entityId.type);
+    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+    ASSERT_EQ(0, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ(SccFound, RES_CER_STATUS(1).code);
+    EXPECT_EQ("Found", RES_CER_STATUS(1).reasonPhrase);
+    EXPECT_EQ("http://cr1.com", RES_CER_STATUS(1).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -750,19 +843,24 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
 */
 TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en("E1", "T1");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A3");
-    req.attributeList.push_back("A4");
-    req.attributeList.push_back("A5");
+    ContextElement ce;
+    ce.entityId.fill("E1", "T1", "false");
+    ContextAttribute ca1("A3", "TA3", "new_val");
+    ContextAttribute ca2("A4", "TA4", "new_val");
+    ContextAttribute ca3("A5", "TA5", "new_val");
+    ce.contextAttributeVector.push_back(&ca1);
+    ce.contextAttributeVector.push_back(&ca2);
+    ce.contextAttributeVector.push_back(&ca3);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -771,16 +869,23 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
+    EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("http://cr1.com", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -801,21 +906,32 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
 */
 TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en1("E1", "T1");
-    EntityId en2("E2", "T2");
-    req.entityIdVector.push_back(&en1);
-    req.entityIdVector.push_back(&en2);
-    req.attributeList.push_back("A3");
-    req.attributeList.push_back("A4");
-    req.attributeList.push_back("A5");
+    ContextElement ce1, ce2;
+    ce1.entityId.fill("E1", "T1", "false");
+    ce2.entityId.fill("E2", "T2", "false");
+    ContextAttribute ca1("A3", "TA3", "new_val");
+    ContextAttribute ca2("A4", "TA4", "new_val");
+    ContextAttribute ca3("A5", "TA5", "new_val");
+    ContextAttribute ca4("A3", "TA3", "new_val");
+    ContextAttribute ca5("A4", "TA4", "new_val");
+    ContextAttribute ca6("A5", "TA5", "new_val");
+    ce1.contextAttributeVector.push_back(&ca1);
+    ce1.contextAttributeVector.push_back(&ca2);
+    ce1.contextAttributeVector.push_back(&ca3);
+    ce2.contextAttributeVector.push_back(&ca4);
+    ce2.contextAttributeVector.push_back(&ca5);
+    ce2.contextAttributeVector.push_back(&ca6);
+    req.contextElementVector.push_back(&ce1);
+    req.contextElementVector.push_back(&ce2);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -824,16 +940,34 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+    ASSERT_EQ(2, res.contextElementResponseVector.size());
+    /* Context Element Response #1 */
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
+    EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("http://cr1.com", RES_CER_STATUS(0).details);
+
+    /* Context Element Response #2 */
+    EXPECT_EQ("E2", RES_CER(1).entityId.id);
+    EXPECT_EQ("T2", RES_CER(1).entityId.type);
+    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+    ASSERT_EQ(0, RES_CER(1).contextAttributeVector.size());
+    EXPECT_EQ(SccFound, RES_CER_STATUS(1).code);
+    EXPECT_EQ("Found", RES_CER_STATUS(1).reasonPhrase);
+    EXPECT_EQ("http://cr1.com", RES_CER_STATUS(1).details);
+
 
     /* Release connection */
     mongoDisconnect();
@@ -859,17 +993,20 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
 */
 TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabase();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en("E1", "", "false");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A1");
+    ContextElement ce;
+    ce.entityId.fill("E1", "", "false");
+    ContextAttribute ca("A1", "TA3", "new_val");
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -878,16 +1015,23 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
+    EXPECT_EQ(0, res.errorCode.details.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
+    EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("http://cr1.com", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -908,19 +1052,25 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
 * This test also checks that discovering for type (E[2-3]) doesn't match with no-typed
 * entities (E3** - cr5 is not returned)
 *
+* isPattern=true is not currently supported in updateContext, so this test it disabled: enable it once
+* this gets supported (may need some extra modification to work)
 */
-TEST(mongoContextProvidersUpdateRequest, pattern0Attr)
+TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern0Attr)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en("E[2-3]", "T", "true");
-    req.entityIdVector.push_back(&en);
+    /* Note that although is a bit weird having a updateContext without attributes to update,
+     * it is legal from the point of view of OMA spec */
+    ContextElement ce;
+    ce.entityId.fill("E[2-3]", "T", "true");
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -929,7 +1079,7 @@ TEST(mongoContextProvidersUpdateRequest, pattern0Attr)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -954,20 +1104,26 @@ TEST(mongoContextProvidersUpdateRequest, pattern0Attr)
 *
 * Discover:  E[1-3] - A4
 * Result:    E1 - A4 - http://cr2.com
+*
+* isPattern=true is not currently supported in updateContext, so this test it disabled: enable it once
+* this gets supported (may need some extra modification to work)
 */
-TEST(mongoContextProvidersUpdateRequest, pattern1AttrSingle)
+TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrSingle)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en("E[1-3]", "T", "true");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A4");
+    ContextElement ce;
+    ce.entityId.fill("E[1-3]", "T", "true");
+    ContextAttribute ca("A4", "TA4", "new_val");
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -976,7 +1132,7 @@ TEST(mongoContextProvidersUpdateRequest, pattern1AttrSingle)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1002,20 +1158,27 @@ TEST(mongoContextProvidersUpdateRequest, pattern1AttrSingle)
 * Discover:  E[1-2] - A1
 * Result:    (E1, E2) - A1 - http://cr1.com
 *            E1       - A1 - http://cr2.com
+*
+* isPattern=true is not currently supported in updateContext, so this test it disabled: enable it once
+* this gets supported (may need some extra modification to work)
+*
 */
-TEST(mongoContextProvidersUpdateRequest, pattern1AttrMulti)
+TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrMulti)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en("E[1-2]", "T", "true");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A1");
+    ContextElement ce;
+    ce.entityId.fill("E[1-2]", "T", "true");
+    ContextAttribute ca("A1", "TA1", "new_val");
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -1024,7 +1187,7 @@ TEST(mongoContextProvidersUpdateRequest, pattern1AttrMulti)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1051,21 +1214,28 @@ TEST(mongoContextProvidersUpdateRequest, pattern1AttrMulti)
 * Result:    (E1. E2) - (A1, A2) - http://cr1.com
 *            E1      - A1        - http://cr2.com
 *            E2      - A2        - http://cr3.com
+*
+* isPattern=true is not currently supported in updateContext, so this test it disabled: enable it once
+* this gets supported (may need some extra modification to work)
 */
-TEST(mongoContextProvidersUpdateRequest, patternNAttr)
+TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNAttr)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en("E[1-2]", "T", "true");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A1");
-    req.attributeList.push_back("A2");
+    ContextElement ce;
+    ce.entityId.fill("E[1-2]", "T", "true");
+    ContextAttribute ca1("A1", "TA1", "new_val");
+    ContextAttribute ca2("A2", "TA2", "new_val");
+    ce.contextAttributeVector.push_back(&ca1);
+    ce.contextAttributeVector.push_back(&ca2);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -1074,7 +1244,7 @@ TEST(mongoContextProvidersUpdateRequest, patternNAttr)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1099,19 +1269,26 @@ TEST(mongoContextProvidersUpdateRequest, patternNAttr)
 *
 * Discover:  R.* - none
 * Result:    none
+*
+* isPattern=true is not currently supported in updateContext, so this test it disabled: enable it once
+* this gets supported (may need some extra modification to work)
 */
-TEST(mongoContextProvidersUpdateRequest, patternFail)
+TEST(DISABLED_mongoContextProvidersUpdateRequest, patternFail)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en("R.*", "T", "true");
-    req.entityIdVector.push_back(&en);
+    /* Note that although is a bit weird having a updateContext without attributes to update,
+     * it is legal from the point of view of OMA spec */
+    ContextElement ce;
+    ce.entityId.fill("R.*", "T", "true");
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -1120,7 +1297,7 @@ TEST(mongoContextProvidersUpdateRequest, patternFail)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1151,20 +1328,25 @@ TEST(mongoContextProvidersUpdateRequest, patternFail)
 * Note that this case checks matching of no-type in the discover for both the case in
 * which the returned CR has type (cr1, cr3, cr4) and the case in which it has no type (cr5).
 *
+* isPattern=true is not currently supported in updateContext, so this test it disabled: enable it once
+* this gets supported (may need some extra modification to work)
 */
-TEST(mongoContextProvidersUpdateRequest, patternNoType)
+TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNoType)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en("E[2-3]", "", "true");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A2");
+    ContextElement ce;
+    ce.entityId.fill("E[2-3]", "", "true");
+    ContextAttribute ca("A2", "TA2", "new_val");
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -1173,7 +1355,7 @@ TEST(mongoContextProvidersUpdateRequest, patternNoType)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1200,21 +1382,29 @@ TEST(mongoContextProvidersUpdateRequest, patternNoType)
 * Result:    (E1, E2, E3) - (A1, A2, A3) - http://cr1.com
 *            E1           - (A1 ,A4) - http://cr2.com
 *            E2           - (A2, A3) - http://cr3.com
+*
+* isPattern=true is not currently supported in updateContext, so this test it disabled: enable it once
+* this gets supported (may need some extra modification to work)
+*
 */
-TEST(mongoContextProvidersUpdateRequest, mixPatternAndNotPattern)
+TEST(DISABLED_mongoContextProvidersUpdateRequest, mixPatternAndNotPattern)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
 
     /* Prepare database */
     prepareDatabasePatternTrue();
 
     /* Forge the request (from "inside" to "outside") */
-    EntityId en1("E[2-3]", "T", "true");
-    EntityId en2("E1", "T");
-    req.entityIdVector.push_back(&en1);
-    req.entityIdVector.push_back(&en2);
+    /* Note that although is a bit weird having a updateContext without attributes to update,
+     * it is legal from the point of view of OMA spec */
+    ContextElement ce1, ce2;
+    ce1.entityId.fill("E[2-3]", "T", "true");
+    ce2.entityId.fill("E1", "T", "false");
+    req.contextElementVector.push_back(&ce1);
+    req.contextElementVector.push_back(&ce2);
+    req.updateActionType.set("UPDATE");
 
     /* Prepare mock */
     TimerMock* timerMock = new TimerMock();
@@ -1223,7 +1413,7 @@ TEST(mongoContextProvidersUpdateRequest, mixPatternAndNotPattern)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1241,4 +1431,3 @@ TEST(mongoContextProvidersUpdateRequest, mixPatternAndNotPattern)
     delete timerMock;
 
 }
-#endif
