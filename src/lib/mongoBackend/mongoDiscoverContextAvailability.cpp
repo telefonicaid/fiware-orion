@@ -195,11 +195,11 @@ static HttpStatusCode associationsDiscoverContextAvailability
     // association between the given source entity <sourceEntityId> and the given target entity <targetEntityId>"
     //
     // In Orion this association of entities is NOT supported at the moment.
-    if (requestP->attributeList.size() == 0)
-    {
-      responseP->errorCode.fill(SccContextElementNotFound, "Attribute list may not be empty");
-      LM_RE(SccOk, (responseP->errorCode.details.c_str()));
-    }
+//    if (requestP->attributeList.size() == 0)
+//    {
+//      responseP->errorCode.fill(SccContextElementNotFound, "Attribute list may not be empty");
+//      LM_RE(SccOk, (responseP->errorCode.details.c_str()));
+//    }
 
     MetadataVector mdV;
     std::string err;
@@ -393,7 +393,18 @@ HttpStatusCode mongoDiscoverContextAvailability
     std::string scopeType  = requestP->restriction.scopeVector.get(0)->type;
     std::string scopeValue = requestP->restriction.scopeVector.get(0)->value;
 
-    if (scopeType == SCOPE_TYPE_ASSOC) {
+    if (scopeType == SCOPE_TYPE_ASSOC && requestP->attributeList.size() == 0) {
+      HttpStatusCode hsCode = conventionalDiscoverContextAvailability(requestP, responseP, tenant, offset, limit, details);
+      if (hsCode != SccOk)
+      {
+        ++noOfDiscoveryErrors;
+      }
+
+      reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request");
+      return hsCode;
+    }
+    else if (scopeType == SCOPE_TYPE_ASSOC)
+    {
       HttpStatusCode ms = associationsDiscoverContextAvailability(requestP, responseP, scopeValue, tenant, offset, limit, details);
       reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request (association)");
       return ms;
