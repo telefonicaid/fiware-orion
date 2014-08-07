@@ -493,6 +493,8 @@ TEST(mongoQueryContextRequest, paginationDetails)
     QueryContextRequest   req;
     QueryContextResponse  res;
 
+    utInit();
+
     /* Prepare database */
     prepareDatabaseForPagination();
 
@@ -586,6 +588,8 @@ TEST(mongoQueryContextRequest, paginationDetails)
 
     /* Release connection */
     mongoDisconnect();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -598,6 +602,8 @@ TEST(mongoQueryContextRequest, paginationAll)
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabaseForPagination();
@@ -693,6 +699,8 @@ TEST(mongoQueryContextRequest, paginationAll)
 
     /* Release connection */
     mongoDisconnect();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -705,6 +713,8 @@ TEST(mongoQueryContextRequest, paginationOnlyFirst)
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabaseForPagination();
@@ -740,6 +750,8 @@ TEST(mongoQueryContextRequest, paginationOnlyFirst)
 
     /* Release connection */
     mongoDisconnect();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -752,6 +764,8 @@ TEST(mongoQueryContextRequest, paginationOnlySecond)
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabaseForPagination();
@@ -788,6 +802,8 @@ TEST(mongoQueryContextRequest, paginationOnlySecond)
 
     /* Release connection */
     mongoDisconnect();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -800,6 +816,8 @@ TEST(mongoQueryContextRequest, paginationRange)
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabaseForPagination();
@@ -860,6 +878,8 @@ TEST(mongoQueryContextRequest, paginationRange)
 
     /* Release connection */
     mongoDisconnect();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -872,6 +892,8 @@ TEST(mongoQueryContextRequest, paginationNonExisting)
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabaseForPagination();
@@ -897,6 +919,8 @@ TEST(mongoQueryContextRequest, paginationNonExisting)
 
     /* Release connection */
     mongoDisconnect();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -905,10 +929,12 @@ TEST(mongoQueryContextRequest, paginationNonExisting)
 *
 */
 TEST(mongoQueryContextRequest, paginationNonExistingOverlap)
-{
+{       
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabaseForPagination();
@@ -945,6 +971,8 @@ TEST(mongoQueryContextRequest, paginationNonExistingOverlap)
 
     /* Release connection */
     mongoDisconnect();
+
+    utExit();
 }
 
 /* ****************************************************************************
@@ -957,6 +985,8 @@ TEST(mongoQueryContextRequest, paginationNonExistingDetails)
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
+
+    utInit();
 
     /* Prepare database */
     prepareDatabaseForPagination();
@@ -982,6 +1012,8 @@ TEST(mongoQueryContextRequest, paginationNonExistingDetails)
 
     /* Release connection */
     mongoDisconnect();
+
+    utExit();
 }
 
 /* ****************************************************************************
