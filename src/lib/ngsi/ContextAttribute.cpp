@@ -56,24 +56,24 @@ ContextAttribute::ContextAttribute()
 */
 ContextAttribute::ContextAttribute(ContextAttribute* caP)
 {
-   name                  = caP->name;
-   type                  = caP->type;
-   value                 = caP->value;
-   compoundValueP        = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
-   typeFromXmlAttribute  = "";
+  name                  = caP->name;
+  type                  = caP->type;
+  value                 = caP->value;
+  compoundValueP        = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
+  typeFromXmlAttribute  = "";
 
-   LM_T(LmtClone, ("Creating a ContextAttribute: compoundValueP at %p for attribute '%s' at %p",
-                   compoundValueP,
-                   name.c_str(),
-                   this));
+  LM_T(LmtClone, ("Creating a ContextAttribute: compoundValueP at %p for attribute '%s' at %p",
+                  compoundValueP,
+                  name.c_str(),
+                  this));
 
-   // Cloning metadata
-   for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); ++mIx)
-   {
-      LM_T(LmtClone, ("Copying metadata %d", mIx));
-      Metadata* mP = new Metadata(caP->metadataVector.get(mIx));
-      metadataVector.push_back(mP);
-   }
+  // Cloning metadata
+  for (unsigned int mIx = 0; mIx < caP->metadataVector.size(); ++mIx)
+  {
+    LM_T(LmtClone, ("Copying metadata %d", mIx));
+    Metadata* mP = new Metadata(caP->metadataVector.get(mIx));
+    metadataVector.push_back(mP);
+  }
 }
 
 
@@ -84,19 +84,28 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
 */
 ContextAttribute::ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value)
 {
-   LM_T(LmtClone, ("Creating a ContextAttribute '%s':'%s':'%s', setting its compound to NULL", _name.c_str(), _type.c_str(), _value.c_str()));
-   name                  = _name;
-   type                  = _type;
-   value                 = _value;
-   compoundValueP        = NULL;
-   typeFromXmlAttribute  = "";
+  LM_T(LmtClone, ("Creating a ContextAttribute '%s':'%s':'%s', setting its compound to NULL",
+                  _name.c_str(), _type.c_str(), _value.c_str()));
+
+  name                  = _name;
+  type                  = _type;
+  value                 = _value;
+  compoundValueP        = NULL;
+  typeFromXmlAttribute  = "";
 }
+
+
 
 /* ****************************************************************************
 *
 * ContextAttribute::ContextAttribute -
 */
-ContextAttribute::ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP)
+ContextAttribute::ContextAttribute
+(
+  const std::string&         _name,
+  const std::string&         _type,
+  orion::CompoundValueNode*  _compoundValueP
+)
 {
   LM_T(LmtClone, ("Creating a ContextAttribute, maintaing a pointer to compound value (at %p)", _compoundValueP));
 
@@ -106,19 +115,26 @@ ContextAttribute::ContextAttribute(const std::string& _name, const std::string& 
   typeFromXmlAttribute  = "";
 }
 
+
+
 /* ****************************************************************************
 *
 * ContextAttribute::getId() -
 */
-std::string ContextAttribute::getId()
+std::string ContextAttribute::getId(void)
 {
-  for (unsigned int ix = 0; ix < metadataVector.size(); ++ix) {
-      if (metadataVector.get(ix)->name == NGSI_MD_ID) {
-          return metadataVector.get(ix)->value;
-      }
+  for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
+  {
+    if (metadataVector.get(ix)->name == NGSI_MD_ID)
+    {
+      return metadataVector.get(ix)->value;
+    }
   }
+
   return "";
 }
+
+
 
 /* ****************************************************************************
 *
@@ -126,11 +142,14 @@ std::string ContextAttribute::getId()
 */
 std::string ContextAttribute::getLocation()
 {
-  for (unsigned int ix = 0; ix < metadataVector.size(); ++ix) {
-      if (metadataVector.get(ix)->name == NGSI_MD_LOCATION) {
-          return metadataVector.get(ix)->value;
-      }
+  for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
+  {
+    if (metadataVector.get(ix)->name == NGSI_MD_LOCATION)
+    {
+      return metadataVector.get(ix)->value;
+    }
   }
+
   return "";
 }
 
@@ -150,13 +169,18 @@ std::string ContextAttribute::renderAsJsonObject(ConnectionInfo* ciP, const std:
   out += valueTag(indent + "  ", "type",         type,  ciP->outFormat, true);
 
   if (compoundValueP == NULL)
-    out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"), value, ciP->outFormat, commaAfterContextValue);
+  {
+    out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"), 
+                    value, ciP->outFormat, commaAfterContextValue);
+  }
   else
   {
     bool isCompoundVector = false;
 
     if ((compoundValueP != NULL) && (compoundValueP->type == orion::CompoundValueNode::Vector))
+    {
       isCompoundVector = true;    
+    }
 
     out += startTag(indent + "  ", "contextValue", "value", ciP->outFormat, isCompoundVector, true, isCompoundVector);
     out += compoundValueP->render(ciP->outFormat, indent + "    ");
@@ -200,13 +224,18 @@ std::string ContextAttribute::render(ConnectionInfo* ciP, const std::string& ind
   out += valueTag(indent + "  ", "type",         type,  ciP->outFormat, true);
 
   if (compoundValueP == NULL)
-    out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"), value, ciP->outFormat, commaAfterContextValue);
+  {
+    out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
+                    value, ciP->outFormat, commaAfterContextValue);
+  }
   else
   {
     bool isCompoundVector = false;
 
     if ((compoundValueP != NULL) && (compoundValueP->type == orion::CompoundValueNode::Vector))
+    {
       isCompoundVector = true;    
+    }
 
     out += startTag(indent + "  ", "contextValue", "value", ciP->outFormat, isCompoundVector, true, isCompoundVector);
     out += compoundValueP->render(ciP->outFormat, indent + "    ");
@@ -228,7 +257,9 @@ std::string ContextAttribute::render(ConnectionInfo* ciP, const std::string& ind
 std::string ContextAttribute::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
 {
   if (name == "")
+  {
     return "missing attribute name";
+  }
 
   if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0))
   {
@@ -253,9 +284,13 @@ void ContextAttribute::present(const std::string& indent, int ix)
   PRINTF("%s  Type:       %s\n", indent.c_str(), type.c_str());
 
   if (compoundValueP == NULL)
+  {
     PRINTF("%s  Value:      %s\n", indent.c_str(), value.c_str());
+  }
   else
+  {
     compoundValueP->show(indent + "  ");
+  }
 
   metadataVector.present("Attribute", indent + "  ");
 }
