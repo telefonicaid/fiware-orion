@@ -58,10 +58,18 @@ std::string Association::render(Format format, const std::string& indent, bool c
   bool         attributeAssociationListRendered = attributeAssociationList.size() != 0;
   std::string  tag                              = "association";
 
-  out += startTag(indent, tag, format, false);
-  out += entityAssociation.render(format, indent + "  ", attributeAssociationListRendered);
-  out += attributeAssociationList.render(format, indent + "  ", false);
-  out += endTag(indent, tag, format);
+  if (format == JSON)
+  {
+    out += startTag(indent, tag, format, false);
+    out += entityAssociation.render(format, indent + "  ", attributeAssociationListRendered);
+    out += attributeAssociationList.render(format, indent + "  ", false);
+    out += endTag(indent, tag, format);
+  }
+  else
+  {
+    out += entityAssociation.render(format, indent + "  ", attributeAssociationListRendered);
+    out += attributeAssociationList.render(format, indent + "  ", false);
+  }
 
   return out;
 }

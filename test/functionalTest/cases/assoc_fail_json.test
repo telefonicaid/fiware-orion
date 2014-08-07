@@ -267,6 +267,7 @@ orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
     ]
   }
 }'
+# ********************************************************************************
 echo "++++++ Query an association with no attribute list"
 
 orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{

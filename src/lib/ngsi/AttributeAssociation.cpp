@@ -40,11 +40,16 @@ std::string AttributeAssociation::render(Format format, const std::string& inden
 {
   std::string  out                     = "";
   std::string  tag                     = "attributeAssociation";
+  std::string  srcXmlTag               = "sourceAttribute";
+  std::string  tgtXmlTag               = "targetAttribute";
+  std::string  srcJsonTag              = "source";
+  std::string  tgtJsonTag              = "target";
+
   bool         targetAttributeRendered = target != "";
 
   out += startTag(indent, tag, format, false);
-  out += valueTag(indent + "  ", "source", source, format, targetAttributeRendered);
-  out += valueTag(indent + "  ", "target", target, format, false);
+  out += valueTag(indent + "  ", (format == XML? srcXmlTag : srcJsonTag), source, format, targetAttributeRendered);
+  out += valueTag(indent + "  ", (format == XML? tgtXmlTag : tgtJsonTag), target, format, false);
   out += endTag(indent, tag, format, comma);
 
   return out;

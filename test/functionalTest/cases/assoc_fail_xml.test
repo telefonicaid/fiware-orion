@@ -40,6 +40,9 @@ orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
         <entityId type="House" isPattern="false">
           <id>House2</id>
         </entityId>
+        <entityId type="House" isPattern="false">
+          <id>House3</id>
+        </entityId>
       </entityIdList>
       <contextRegistrationAttributeList>
         <contextRegistrationAttribute>
@@ -66,6 +69,9 @@ orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
         </entityId>
         <entityId type="TemperatureSensor" isPattern="false">
           <id>Sensor2</id>
+        </entityId>
+        <entityId type="TemperatureSensor" isPattern="false">
+          <id>Sensor3</id>
         </entityId>
       </entityIdList>
       <contextRegistrationAttributeList>
@@ -109,7 +115,7 @@ orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
           </value>
         </contextMetadata>
         <contextMetadata>
-          <name>association1</name>
+          <name>association2</name>
           <type>Association</type>
           <value>
             <entityAssociation>
@@ -136,7 +142,29 @@ orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
   <registrationId></registrationId>
 </registerContextRequest>'
 # ********************************************************************************
-echo "++++++ Query an association"
+echo "++++++ Query an non existing association for an existing entity"
+
+orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1.0"?>
+<discoverContextAvailabilityRequest>
+  <entityIdList>
+    <entityId type="House" isPattern="false">
+      <id>House3</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>temperature</attribute>
+  </attributeList>
+  <restriction>
+    <scope>
+      <operationScope>
+        <scopeType>IncludeAssociations</scopeType>
+        <scopeValue>SOURCES</scopeValue>
+      </operationScope>     
+    </scope>
+  </restriction>
+</discoverContextAvailabilityRequest>'
+# ********************************************************************************
+echo "++++++ Query association OK"
 
 orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1.0"?>
 <discoverContextAvailabilityRequest>
@@ -201,6 +229,45 @@ orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1
     </scope>
   </restriction>
 </discoverContextAvailabilityRequest>'
+# ********************************************************************************
+echo "++++++ Query an association with empty attribute list"
+
+orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1.0"?>
+<discoverContextAvailabilityRequest>
+  <entityIdList>
+    <entityId type="House" isPattern="false">
+      <id>House9</id>
+    </entityId>
+  </entityIdList>
+  <attributeList></attributeList>
+  <restriction>
+    <scope>
+      <operationScope>
+        <scopeType>IncludeAssociations</scopeType>
+        <scopeValue>SOURCES</scopeValue>
+      </operationScope>
+    </scope>
+  </restriction>
+</discoverContextAvailabilityRequest>'
+# ********************************************************************************
+echo "++++++ Query an association with no attribute list"
+
+orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1.0"?>
+<discoverContextAvailabilityRequest>
+  <entityIdList>
+    <entityId type="House" isPattern="false">
+      <id>House9</id>
+    </entityId>
+  </entityIdList>
+  <restriction>
+    <scope>
+      <operationScope>
+        <scopeType>IncludeAssociations</scopeType>
+        <scopeValue>SOURCES</scopeValue>
+      </operationScope>
+    </scope>
+  </restriction>
+</discoverContextAvailabilityRequest>'
 
 --REGEXPECT--
 ++++++ Register new entities - HOUSES
@@ -236,7 +303,21 @@ Date: REGEX(.*)
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
-++++++ Query an association
+++++++ Query an non existing association for an existing entity
+HTTP/1.1 200 OK
+Content-Length: 273
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<discoverContextAvailabilityResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Could not query association with combination of entity/attribute</details>
+  </errorCode>
+</discoverContextAvailabilityResponse>
+++++++ Query association OK
 HTTP/1.1 200 OK
 Content-Length: 1870
 Content-Type: application/xml
@@ -293,35 +374,59 @@ Date: REGEX(.*)
 </discoverContextAvailabilityResponse>
 ++++++ Query an association for a non existing entity
 HTTP/1.1 200 OK
-Content-Length: 368
+Content-Length: 273
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
-  <contextRegistrationResponseList>
-    <contextRegistrationResponse>
-      <contextRegistration>
-        <providingApplication>http://www.fi-ware.eu/NGSI/association</providingApplication>
-      </contextRegistration>
-    </contextRegistrationResponse>
-  </contextRegistrationResponseList>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Could not query association with combination of entity/attribute</details>
+  </errorCode>
 </discoverContextAvailabilityResponse>
 ++++++ Query an association for a non existing attribute
 HTTP/1.1 200 OK
-Content-Length: 368
+Content-Length: 273
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <discoverContextAvailabilityResponse>
-  <contextRegistrationResponseList>
-    <contextRegistrationResponse>
-      <contextRegistration>
-        <providingApplication>http://www.fi-ware.eu/NGSI/association</providingApplication>
-      </contextRegistration>
-    </contextRegistrationResponse>
-  </contextRegistrationResponseList>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Could not query association with combination of entity/attribute</details>
+  </errorCode>
+</discoverContextAvailabilityResponse>
+++++++ Query an association with empty attribute list
+HTTP/1.1 200 OK
+Content-Length: 240
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<discoverContextAvailabilityResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Attribute list may not be empty</details>
+  </errorCode>
+</discoverContextAvailabilityResponse>
+++++++ Query an association with no attribute list
+HTTP/1.1 200 OK
+Content-Length: 240
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<discoverContextAvailabilityResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Attribute list may not be empty</details>
+  </errorCode>
 </discoverContextAvailabilityResponse>
 --TEARDOWN--
 brokerStop CB
