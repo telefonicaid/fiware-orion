@@ -1710,8 +1710,41 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     if (docs == 0) {      
 
         if (strcasecmp(action.c_str(), "append") != 0) {
-            /* Only APPEND can create entities, thus error is returned in UPDATE or DELETE cases */
-            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
+            /* Only APPEND can create entities, in the case of UPDATE or DELETE we look for a context
+             * provider or (if there is no context provider) return a not found error */
+            ContextRegistrationResponseVector crrV;
+            EntityIdVector                    enV;
+            AttributeList                     attrL;
+            std::string err;
+            long long fakeCount;  // we don't use it, but we need it to match the registrationQuery() signature
+
+            enV.push_back(enP);
+            for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
+                attrL.push_back(ceP->contextAttributeVector.get(ix)->name);
+            }
+
+            // By the time being we use limit=1. That's ensures that as much as one providing application is returned. In the future,
+            // we would consider leave this limit open and define an algorithm to pick the right one, and ordered list, etc.
+            if (registrationsQuery(enV, attrL, &crrV, &err, tenant, 0, 1, false, &fakeCount))
+            {
+                if (crrV.size() > 0)
+                {
+                    // Suitable CProvider has been found: creating response and returning
+                    std::string prApp = crrV.get(0)->contextRegistration.providingApplication.get();
+                    LM_T(LmtCtxProviders, ("context provide found: %s", prApp.c_str()));
+                    buildGeneralErrorReponse(ceP, NULL, responseP, SccFound, prApp);
+                }
+                else
+                {
+                    buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
+                }
+            }
+            else
+            {
+                LM_E(("Database Error (%s)", err.c_str()));
+                buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
+            }
+
         }
         else {            
 
