@@ -78,11 +78,12 @@ sudo make install  # installation puts .h files in /usr/local/include and librar
 sudo ldconfig      # just in case... it doesn't hurt :)
 ```
 
-* Get the code (alternatively you can download it using a zipped version or a different URL pattern):
+* Get the code (alternatively you can download it using a zipped version or a different URL pattern, e.g `git clone git@github.com:telefonicaid/fiware-orion.git`):
 
 ```
 sudo yum install git
 git clone https://github.com/telefonicaid/fiware-orion
+```
 
 * Build the source:
 
