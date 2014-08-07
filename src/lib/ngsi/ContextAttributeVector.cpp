@@ -28,6 +28,7 @@
 #include <vector>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
 #include "common/tag.h"
@@ -96,19 +97,36 @@ std::string ContextAttributeVector::render(ConnectionInfo* ciP, RequestType requ
   // NOTE:
   // If the URI parameter 'attributesFormat' is set to 'object', then the attribute vector
   // is to be rendered as objects for JSON, and not as a vector.
+  // Also, if we have more than one attribute with the same name (possible if different metaID),
+  // only one of them should be included in the vector. Any one of them.
+  // So, step 1 is to purge the context attribute vector from 'copies'.
   //
   if ((ciP->uriParam["attributesFormat"] == "object") && (ciP->outFormat == JSON))
   {
     std::vector<std::string> added;
 
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
+    // 1. Remove attributes with attribute names already used.
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       if (addedLookup(added, vec[ix]->name) == "")
       {
-        out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1);
         added.push_back(vec[ix]->name);
+        LM_T(LmtJsonAttributes, ("Keeping attribute '%s'", vec[ix]->name.c_str()));
       }
+      else
+      {
+        LM_T(LmtJsonAttributes, ("Removing attribute '%s'", vec[ix]->name.c_str()));
+        vec[ix]->release();
+        delete vec[ix];
+        vec.erase(vec.begin() + ix);
+      }
+    }
+
+    // 2. Now it's time to render
+    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
+    for (unsigned int ix = 0; ix < vec.size(); ++ix)
+    {
+      out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1);
     }
     out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
   }
@@ -116,7 +134,9 @@ std::string ContextAttributeVector::render(ConnectionInfo* ciP, RequestType requ
   {
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
+    {
       out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1);
+    }
     out += endTag(indent, xmlTag, ciP->outFormat, comma, true);
   }
 
