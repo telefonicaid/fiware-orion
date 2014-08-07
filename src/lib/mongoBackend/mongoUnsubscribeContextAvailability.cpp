@@ -44,7 +44,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability(UnsubscribeContextAvailabilit
 
   LM_T(LmtMongo, ("Unsubscribe Context Availability"));
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* No matter if success or failure, the subscriptionId in the response is always the one
    * in the request */

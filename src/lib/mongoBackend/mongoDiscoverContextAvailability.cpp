@@ -56,7 +56,7 @@ static bool associationsQuery
   bool                  details
 )
 {
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* Note that SCOPE_VALUE_ASSOC_SOURCE means that the argument is a target (so we use ASSOC_TARGET_ENT and
      * ASSOC_ATTRS_TARGET in the query), while SCOPE_VALUE_ASSOC_TARGET means that the argument is a source (so we

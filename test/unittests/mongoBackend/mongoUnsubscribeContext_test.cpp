@@ -68,7 +68,7 @@ static void prepareDatabase(void) {
     /* Set database */
     setupDatabase();
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
                         "expiration" << 10000000 <<
@@ -144,7 +144,7 @@ TEST(mongoUnsubscribeContext, subscriptionNotFound)
     EXPECT_EQ("subscriptionId: '51307b66f481db11bf869999'", res.statusCode.details);
 
     /* Check database (untouched) */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     ASSERT_EQ(2, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
 
     /* Release connection */
@@ -191,7 +191,7 @@ TEST(mongoUnsubscribeContext, unsubscribe)
     EXPECT_EQ(0, res.statusCode.details.size());
 
     /* Check database (one document, but not the deleted one) */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().str());
@@ -256,7 +256,7 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
     // Without this sleep, this tests fails around 10% of the times (in Ubuntu 13.04)
     usleep(1000);
     mongoConnect("localhost");
-    DBClientConnection*  connection = getMongoConnection();
+    DBClientBase*  connection = getMongoConnection();
     int                  count      = connection->count(SUBSCRIBECONTEXT_COLL, BSONObj());
 
     ASSERT_EQ(2, count);
@@ -326,7 +326,7 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
     // Sleeping a little to "give mongod time to process its input".
     usleep(1000);
     mongoConnect("localhost");
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     ASSERT_EQ(2, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
 
     /* Release mocks */

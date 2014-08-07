@@ -65,7 +65,7 @@ static void prepareDatabase(void) {
   /* Set database */
   setupDatabase();
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   connection->ensureIndex("unittest.entities", BSON("location.coords" << "2dsphere" ));
 

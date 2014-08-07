@@ -48,7 +48,7 @@ static bool processAssociations(MetadataVector mdV, std::string* err, std::strin
 
     // FIXME: first version of associations doesn't support association update
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     for (unsigned int ix = 0; ix < mdV.size(); ++ix) {
 
@@ -124,7 +124,7 @@ static bool processAssociations(MetadataVector mdV, std::string* err, std::strin
 */
 static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* For each one of the subscriptions in the map, send notification */
     bool ret = true;
@@ -183,7 +183,7 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
 */
 static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     BSONArrayBuilder entitiesNoPatternA;
     std::vector<std::string> idJsV;
@@ -348,7 +348,7 @@ static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONOb
 HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, RegisterContextResponse* responseP, OID* id, std::string tenant)
 {
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* If expiration is not present, then use a default one */
     if (requestP->duration.isEmpty()) {

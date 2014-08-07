@@ -1,2 +1,3 @@
-o ADD: support for associations in JSON (Issue #334).
-o FIX: Associations now return error messages when appropiate (Issue #334).
+- Add: support for associations in JSON (Issue #334).
+- Fix: Associations now return error messages when appropiate (Issue #334).
+- Add: support for MongoDB replica sets (using the new -rplSet CLI parameter) (Issue #493)

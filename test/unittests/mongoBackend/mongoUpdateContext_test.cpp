@@ -150,7 +150,7 @@ static void prepareDatabase(void) {
   /* Set database */
   setupDatabase();
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* We create the following entities:
    *
@@ -237,7 +237,7 @@ static void prepareDatabaseMd(void) {
     setupDatabase();
 
     /* Add an entity with custom metadata */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj en = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
                        "attrs" << BSON_ARRAY(
                           BSON("name" << "A1" << "type" << "TA1" << "value" << "val1" <<
@@ -266,7 +266,7 @@ static void prepareDatabaseWithAttributeIds(void) {
 
     /* Add some entities with metadata ID */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj en = BSON("_id" << BSON("id" << "E10" << "type" << "T10") <<
                        "attrs" << BSON_ARRAY(
                           BSON("name" << "A1" << "type" << "TA1" << "value" << "val11" << "id" << "ID1") <<
@@ -293,7 +293,7 @@ static void prepareDatabaseWithServicePaths(void) {
 
 
     /* Create entities with service path */
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
     BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1" << "servicePath" << "/home/kz/01") <<
                        "attrs" << BSON_ARRAY(
                           BSON("name" << "A1" << "type" << "TA1" << "value" << "kz01")
@@ -388,7 +388,7 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -555,7 +555,7 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -749,7 +749,7 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -943,7 +943,7 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -1127,7 +1127,7 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -1301,7 +1301,7 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -1475,7 +1475,7 @@ TEST(mongoUpdateContextRequest, update1EntNAttrSameName)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -1671,7 +1671,7 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -1838,7 +1838,7 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -2010,7 +2010,7 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -2208,7 +2208,7 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -2416,7 +2416,7 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -2615,7 +2615,7 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -2798,7 +2798,7 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -3005,7 +3005,7 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -3186,7 +3186,7 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -3326,7 +3326,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -3488,7 +3488,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -3662,7 +3662,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType0Attr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -3788,7 +3788,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -3971,7 +3971,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -4146,7 +4146,7 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -4310,7 +4310,7 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -4497,7 +4497,7 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -4640,7 +4640,7 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -4807,7 +4807,7 @@ TEST(mongoUpdateContextRequest, createEntity)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -4993,7 +4993,7 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -5186,7 +5186,7 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -5352,7 +5352,7 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -5519,7 +5519,7 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -5686,7 +5686,7 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -5852,7 +5852,7 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -6036,7 +6036,7 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -6217,7 +6217,7 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -6389,7 +6389,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -6611,7 +6611,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -6827,7 +6827,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -7055,7 +7055,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -7283,7 +7283,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -7494,7 +7494,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -7710,7 +7710,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -7926,7 +7926,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -8135,7 +8135,7 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -8227,7 +8227,7 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -8319,7 +8319,7 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -8411,7 +8411,7 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -8505,7 +8505,7 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -8604,7 +8604,7 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -8703,7 +8703,7 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -8797,7 +8797,7 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -8889,7 +8889,7 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -8982,7 +8982,7 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -9074,7 +9074,7 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -9175,7 +9175,7 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -9512,7 +9512,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_3levels)
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
    * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* entities collection */
   BSONObj ent;
@@ -9612,7 +9612,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_2levels)
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
    * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* entities collection */
   BSONObj ent;
@@ -9699,7 +9699,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_3levels)
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
    * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* entities collection */
   BSONObj ent;
@@ -9805,7 +9805,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_2levels)
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
    * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* entities collection */
   BSONObj ent;
@@ -9904,7 +9904,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_2levels)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -10006,7 +10006,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_3levels)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -10111,7 +10111,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_2levels)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -10169,7 +10169,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_3levels)
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
      * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
     BSONObj ent;
@@ -10233,7 +10233,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
    * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
 
-  DBClientConnection* connection = getMongoConnection();
+  DBClientBase* connection = getMongoConnection();
 
   /* entities collection */
   BSONObj ent;

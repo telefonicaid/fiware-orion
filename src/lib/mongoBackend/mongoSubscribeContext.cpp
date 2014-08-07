@@ -54,7 +54,7 @@ HttpStatusCode mongoSubscribeContext
 
     reqSemTake(__FUNCTION__, "ngsi10 subscribe request");
 
-    DBClientConnection* connection = getMongoConnection();
+    DBClientBase* connection = getMongoConnection();
 
     /* If expiration is not present, then use a default one */
     if (requestP->duration.isEmpty()) {

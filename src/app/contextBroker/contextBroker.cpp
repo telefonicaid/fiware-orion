@@ -163,6 +163,7 @@ bool            fg;
 char            bindAddress[MAX_LEN_IP];
 int             port;
 char            dbHost[64];
+char            rplSet[64];
 char            dbName[64];
 char            user[64];
 char            pwd[64];
@@ -193,6 +194,7 @@ PaArgument paArgs[] =
   { "-pidpath",      pidPath,       "PID_PATH",        PaString, PaOpt, PIDPATH,        PaNL,   PaNL,  "pid file path"                             },
 
   { "-dbhost",       dbHost,        "DB_HOST",         PaString, PaOpt, _i "localhost", PaNL,   PaNL,  "database host"                             },
+  { "-rplSet",       rplSet,        "RPL_SET",         PaString, PaOpt, _i "",          PaNL,   PaNL,  "replicat set"                              },
   { "-dbuser",       user,          "DB_USER",         PaString, PaOpt, _i "",          PaNL,   PaNL,  "database user"                             },
   { "-dbpwd",        pwd,           "DB_PASSWORD",     PaString, PaOpt, _i "",          PaNL,   PaNL,  "database password"                         },
   { "-db",           dbName,        "DB",              PaString, PaOpt, _i "orion",     PaNL,   PaNL,  "database name"                             },
@@ -1045,11 +1047,11 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
 *
 * mongoInit - 
 */
-static void mongoInit(const char* dbHost, std::string dbName, const char* user, const char* pwd)
+static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd)
 {
    std::string multitenant = mtenant;
 
-   if (!mongoConnect(dbHost, dbName.c_str(), user, pwd, multitenant != "off"))
+   if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, multitenant != "off"))
     LM_X(1, ("Fatal Error (MongoDB error)"));
 
   if (user[0] != 0) 
@@ -1261,7 +1263,7 @@ int main(int argC, char* argV[])
 
   pidFile();
   orionInit(orionExit, ORION_VERSION);
-  mongoInit(dbHost, dbName, user, pwd);
+  mongoInit(dbHost, rplSet, dbName, user, pwd);
   contextBrokerInit(ngsi9Only, dbName, multitenant != "off");
   curl_global_init(CURL_GLOBAL_NOTHING);
 
