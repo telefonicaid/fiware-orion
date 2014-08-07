@@ -190,17 +190,6 @@ static HttpStatusCode associationsDiscoverContextAvailability
         return SccOk;
     }
 
-    // Note that in http://forge.fi-ware.org/plugins/mediawiki/wiki/fiware/index.php/NGSI_association it states:
-    // "In case an Association instance contains no AttributeAssociationList field, it represents the entity
-    // association between the given source entity <sourceEntityId> and the given target entity <targetEntityId>"
-    //
-    // In Orion this association of entities is NOT supported at the moment.
-//    if (requestP->attributeList.size() == 0)
-//    {
-//      responseP->errorCode.fill(SccContextElementNotFound, "Attribute list may not be empty");
-//      LM_RE(SccOk, (responseP->errorCode.details.c_str()));
-//    }
-
     MetadataVector mdV;
     std::string err;
     if (!associationsQuery(&requestP->entityIdVector, &requestP->attributeList, scope, &mdV, &err, tenant, offset, limit, details))

@@ -37,16 +37,6 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
           "type": "House",
           "isPattern": "false",
           "id": "house1"
-        },
-        {
-          "type": "House",
-          "isPattern": "false",
-          "id": "house2"
-        },
-        {
-          "type": "House",
-          "isPattern": "false",
-          "id": "house3"
         }
       ],
       "attributes": [
@@ -72,21 +62,15 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
           "type": "TemperatureSensor",
           "isPattern": "false",
           "id": "sensor1"
-        },
-        {
-          "type": "TemperatureSensor",
-          "isPattern": "false",
-          "id": "sensor2"
-        },
-        {
-          "type": "TemperatureSensor",
-          "isPattern": "false",
-          "id": "sensor3"
         }
       ],
       "attributes": [
         {
           "name": "measurement",
+          "isDomain": "false"
+        },
+        {
+          "name": "height",
           "isDomain": "false"
         }
       ],
@@ -124,28 +108,6 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
               }
             ]
           }
-        },
-        {
-          "name": "association2",
-          "type": "Association",
-          "value": {
-            "source": {
-              "type": "TemperatureSensor",
-              "isPattern": "false",
-              "id": "sensor2"
-            },
-            "target": {
-              "type": "House",
-              "isPattern": "false",
-              "id": "house2"
-            },
-            "associations": [
-              {
-                "source": "measurement",
-                "target": "temperature"
-              }
-            ]
-          }
         }
       ],
       "providingApplication": "http://192.168.100.1:70/application"
@@ -155,30 +117,7 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
   "registrationId": ""
 }'
 # ********************************************************************************
-echo "++++++ Query an non existing association for an existing entity"
-
-orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
-  "entities": [
-    {
-      "type": "House",
-      "isPattern": "false",
-      "id": "house3"
-    }
-  ],
-  "attributes": [
-    "temperature"
-  ],
-  "restriction": {
-    "scopes": [
-      {
-        "type" : "IncludeAssociations",
-        "value" : "SOURCES"
-      }
-    ]
-  }
-}'
-# ********************************************************************************
-echo "++++++ Query association OK"
+echo "++++++ Query an association with empty attribute list"
 
 orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
   "entities": [
@@ -188,9 +127,7 @@ orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
       "id": "house1"
     }
   ],
-  "attributes": [
-    "temperature"
-  ],
+  "attributes": [ ],
   "restriction": {
     "scopes": [
       {
@@ -201,30 +138,7 @@ orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
   }
 }'
 # ********************************************************************************
-echo "++++++ Query an association for a non existing entity"
-
-orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
-  "entities": [
-    {
-      "type": "House",
-      "isPattern": "false",
-      "id": "house9"
-    }
-  ],
-  "attributes": [
-    "temperature"
-  ],
-  "restriction": {
-    "scopes": [
-      {
-        "type" : "IncludeAssociations",
-        "value" : "SOURCES"
-      }
-    ]
-  }
-}'
-# ********************************************************************************
-echo "++++++ Query an association for a non existing attribute"
+echo "++++++ Query an association with no attribute list"
 
 orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
   "entities": [
@@ -233,9 +147,6 @@ orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
       "isPattern": "false",
       "id": "house1"
     }
-  ],
-  "attributes": [
-    "foobar"
   ],
   "restriction": {
     "scopes": [
@@ -278,22 +189,9 @@ Date: REGEX(.*)
     "duration": "PT1H",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
-++++++ Query an non existing association for an existing entity
+++++++ Query an association with empty attribute list
 HTTP/1.1 200 OK
-Content-Length: 178
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "errorCode": {
-        "code": "404", 
-        "details": "Could not query association with combination of entity/attribute", 
-        "reasonPhrase": "No context element found"
-    }
-}
-++++++ Query association OK
-HTTP/1.1 200 OK
-Content-Length: 1344
+Content-Length: 464
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -303,79 +201,51 @@ Date: REGEX(.*)
             "contextRegistration": {
                 "attributes": [
                     {
-                        "isDomain": "false",
-                        "name": "measurement",
+                        "isDomain": "false", 
+                        "name": "temperature", 
                         "type": ""
                     }
-                ],
+                ], 
                 "entities": [
                     {
-                        "id": "sensor1",
-                        "isPattern": "false",
-                        "type": "TemperatureSensor"
+                        "id": "house1", 
+                        "isPattern": "false", 
+                        "type": "House"
                     }
-                ],
+                ], 
                 "providingApplication": "http://myHomeGateway22.org"
-            }
-        },
-        {
-            "contextRegistration": {
-                "metadatas": [
-                    {
-                        "name": "association1",
-                        "type": "Association",
-                        "value": {
-                            "attributeAssociations": [
-                                {
-                                    "source": "measurement",
-                                    "target": "temperature"
-                                }
-                            ],
-                            "entities": {
-                                "source": {
-                                    "id": "sensor1",
-                                    "isPattern": "false",
-                                    "type": "TemperatureSensor"
-                                },
-                                "target": {
-                                    "id": "house1",
-                                    "isPattern": "false",
-                                    "type": "House"
-                                }
-                            }
-                        }
-                    }
-                ],
-                "providingApplication": "http://www.fi-ware.eu/NGSI/association"
             }
         }
     ]
 }
-++++++ Query an association for a non existing entity
+++++++ Query an association with no attribute list
 HTTP/1.1 200 OK
-Content-Length: 178
+Content-Length: 464
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "errorCode": {
-        "code": "404", 
-        "details": "Could not query association with combination of entity/attribute", 
-        "reasonPhrase": "No context element found"
-    }
-}
-++++++ Query an association for a non existing attribute
-HTTP/1.1 200 OK
-Content-Length: 178
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "errorCode": {
-        "code": "404", 
-        "details": "Could not query association with combination of entity/attribute", 
-        "reasonPhrase": "No context element found"
-    }
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "temperature", 
+                        "type": ""
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "house1", 
+                        "isPattern": "false", 
+                        "type": "House"
+                    }
+                ], 
+                "providingApplication": "http://myHomeGateway22.org"
+            }
+        }
+    ]
 }
 --TEARDOWN--
 brokerStop CB

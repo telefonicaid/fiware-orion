@@ -37,12 +37,6 @@ orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
         <entityId type="House" isPattern="false">
           <id>House1</id>
         </entityId>
-        <entityId type="House" isPattern="false">
-          <id>House2</id>
-        </entityId>
-        <entityId type="House" isPattern="false">
-          <id>House3</id>
-        </entityId>
       </entityIdList>
       <contextRegistrationAttributeList>
         <contextRegistrationAttribute>
@@ -66,12 +60,6 @@ orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
       <entityIdList>
         <entityId type="TemperatureSensor" isPattern="false">
           <id>Sensor1</id>
-        </entityId>
-        <entityId type="TemperatureSensor" isPattern="false">
-          <id>Sensor2</id>
-        </entityId>
-        <entityId type="TemperatureSensor" isPattern="false">
-          <id>Sensor3</id>
         </entityId>
       </entityIdList>
       <contextRegistrationAttributeList>
@@ -113,27 +101,7 @@ orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
               </attributeAssociation>
             </attributeAssociationList>
           </value>
-        </contextMetadata>
-        <contextMetadata>
-          <name>association2</name>
-          <type>Association</type>
-          <value>
-            <entityAssociation>
-              <sourceEntityId type="TemperatureSensor" isPattern="false">
-                <id>Sensor2</id>
-              </sourceEntityId>
-              <targetEntityId type="House" isPattern="false">
-                <id>House2</id>
-              </targetEntityId>
-            </entityAssociation>
-            <attributeAssociationList>
-              <attributeAssociation>
-                <sourceAttribute>measurement</sourceAttribute>
-                <targetAttribute>temperature</targetAttribute>
-              </attributeAssociation>
-            </attributeAssociationList>
-          </value>
-        </contextMetadata>      
+        </contextMetadata>    
       </registrationMetadata>
       <providingApplication>http://www.fi-ware.eu/NGSI/association</providingApplication>
     </contextRegistration>
@@ -142,29 +110,7 @@ orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
   <registrationId></registrationId>
 </registerContextRequest>'
 # ********************************************************************************
-echo "++++++ Query an non existing association for an existing entity"
-
-orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1.0"?>
-<discoverContextAvailabilityRequest>
-  <entityIdList>
-    <entityId type="House" isPattern="false">
-      <id>House3</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>temperature</attribute>
-  </attributeList>
-  <restriction>
-    <scope>
-      <operationScope>
-        <scopeType>IncludeAssociations</scopeType>
-        <scopeValue>SOURCES</scopeValue>
-      </operationScope>     
-    </scope>
-  </restriction>
-</discoverContextAvailabilityRequest>'
-# ********************************************************************************
-echo "++++++ Query association OK"
+echo "++++++ Query an association with empty attribute list"
 
 orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1.0"?>
 <discoverContextAvailabilityRequest>
@@ -173,31 +119,7 @@ orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1
       <id>House1</id>
     </entityId>
   </entityIdList>
-  <attributeList>
-    <attribute>temperature</attribute>
-  </attributeList>
-  <restriction>
-    <scope>
-      <operationScope>
-        <scopeType>IncludeAssociations</scopeType>
-        <scopeValue>SOURCES</scopeValue>
-      </operationScope>     
-    </scope>
-  </restriction>
-</discoverContextAvailabilityRequest>'
-# ********************************************************************************
-echo "++++++ Query an association for a non existing entity"
-
-orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1.0"?>
-<discoverContextAvailabilityRequest>
-  <entityIdList>
-    <entityId type="House" isPattern="false">
-      <id>House9</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>temperature</attribute>
-  </attributeList>
+  <attributeList></attributeList>
   <restriction>
     <scope>
       <operationScope>
@@ -208,7 +130,7 @@ orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1
   </restriction>
 </discoverContextAvailabilityRequest>'
 # ********************************************************************************
-echo "++++++ Query an association for a non existing attribute"
+echo "++++++ Query an association with no attribute list"
 
 orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1.0"?>
 <discoverContextAvailabilityRequest>
@@ -217,9 +139,6 @@ orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1
       <id>House1</id>
     </entityId>
   </entityIdList>
-  <attributeList>
-    <attribute>notAnAttribute</attribute>
-  </attributeList>
   <restriction>
     <scope>
       <operationScope>
@@ -264,23 +183,9 @@ Date: REGEX(.*)
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
-++++++ Query an non existing association for an existing entity
+++++++ Query an association with empty attribute list
 HTTP/1.1 200 OK
-Content-Length: 273
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<discoverContextAvailabilityResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Could not query association with combination of entity/attribute</details>
-  </errorCode>
-</discoverContextAvailabilityResponse>
-++++++ Query association OK
-HTTP/1.1 200 OK
-Content-Length: 1870
+Content-Length: 777
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -290,13 +195,13 @@ Date: REGEX(.*)
     <contextRegistrationResponse>
       <contextRegistration>
         <entityIdList>
-          <entityId type="TemperatureSensor" isPattern="false">
-            <id>Sensor1</id>
+          <entityId type="House" isPattern="false">
+            <id>House1</id>
           </entityId>
         </entityIdList>
         <contextRegistrationAttributeList>
           <contextRegistrationAttribute>
-            <name>measurement</name>
+            <name>temperature</name>
             <type/>
             <isDomain>false</isDomain>
           </contextRegistrationAttribute>
@@ -304,62 +209,35 @@ Date: REGEX(.*)
         <providingApplication>http://myHomeGateway22.org</providingApplication>
       </contextRegistration>
     </contextRegistrationResponse>
+  </contextRegistrationResponseList>
+</discoverContextAvailabilityResponse>
+++++++ Query an association with no attribute list
+HTTP/1.1 200 OK
+Content-Length: 777
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<discoverContextAvailabilityResponse>
+  <contextRegistrationResponseList>
     <contextRegistrationResponse>
       <contextRegistration>
-        <registrationMetadata>
-          <contextMetadata>
-            <name>association1</name>
-            <type>Association</type>
-            <value>
-              <entityAssociation>
-                <sourceEntityId type="TemperatureSensor" isPattern="false">
-                  <id>Sensor1</id>
-                </sourceEntityId>
-                <targetEntityId type="House" isPattern="false">
-                  <id>House1</id>
-                </targetEntityId>
-              </entityAssociation>
-              <attributeAssociationList>
-                <attributeAssociation>
-                  <sourceAttribute>measurement</sourceAttribute>
-                  <targetAttribute>temperature</targetAttribute>
-                </attributeAssociation>
-              </attributeAssociationList>
-            </value>
-          </contextMetadata>
-        </registrationMetadata>
-        <providingApplication>http://www.fi-ware.eu/NGSI/association</providingApplication>
+        <entityIdList>
+          <entityId type="House" isPattern="false">
+            <id>House1</id>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
+          <contextRegistrationAttribute>
+            <name>temperature</name>
+            <type/>
+            <isDomain>false</isDomain>
+          </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://myHomeGateway22.org</providingApplication>
       </contextRegistration>
     </contextRegistrationResponse>
   </contextRegistrationResponseList>
-</discoverContextAvailabilityResponse>
-++++++ Query an association for a non existing entity
-HTTP/1.1 200 OK
-Content-Length: 273
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<discoverContextAvailabilityResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Could not query association with combination of entity/attribute</details>
-  </errorCode>
-</discoverContextAvailabilityResponse>
-++++++ Query an association for a non existing attribute
-HTTP/1.1 200 OK
-Content-Length: 273
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<discoverContextAvailabilityResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Could not query association with combination of entity/attribute</details>
-  </errorCode>
 </discoverContextAvailabilityResponse>
 --TEARDOWN--
 brokerStop CB
