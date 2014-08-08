@@ -1,1 +1,2 @@
 - Add: support for MongoDB replica sets (using the new -rplSet CLI parameter) (Issue #493)
+- Fix: each send is now considered a separate transaction (Issue #478)
