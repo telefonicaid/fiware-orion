@@ -70,19 +70,17 @@ size_t writeMemoryCallback(void* contents, size_t size, size_t nmemb, void* user
 */
 std::string sendHttpRequest(const char* host, unsigned short port, CoapPDU* request)
 {
-  char*         url                      = NULL;
   int           recvURILen               = 0;
   CURL*         curl                     = curl_easy_init();
-  MemoryStruct* httpResponse             = NULL;
+  MemoryStruct  httpResponse;
   CURLcode      res;
   char          uriBuffer[COAP_URI_BUFFER_SIZE];
 
   if (curl)
   {
     // Allocate to hold HTTP response
-    httpResponse = new MemoryStruct;
-    httpResponse->memory = (char*) malloc(1); // will grow as needed
-    httpResponse->size = 0; // no data at this point
+    httpResponse.memory = (char*) malloc(1); // will grow as needed
+    httpResponse.size = 0; // no data at this point
 
     // --- Set HTTP verb
     std::string httpVerb = "";
@@ -118,9 +116,9 @@ std::string sendHttpRequest(const char* host, unsigned short port, CoapPDU* requ
 
     for (int i = 0; i < numOptions ; i++)
     {
-      u_int8_t*    buffer  = new u_int8_t[options[i].optionValueLength + 1];
-      u_int16_t    opt     = options[i].optionNumber;
-      std::string  string  = "";
+      u_int16_t     opt     = options[i].optionNumber;
+      std::string   string  = "";
+      u_int8_t      buffer[options[i].optionValueLength + 1];
 
       memcpy(buffer, options[i].optionValuePointer, options[i].optionValueLength);
 
@@ -173,8 +171,6 @@ std::string sendHttpRequest(const char* host, unsigned short port, CoapPDU* requ
         LM_T(LmtCoap, ("Got unknown option"));
         break;
       }
-
-      delete buffer;
     }
 
 
@@ -197,8 +193,8 @@ std::string sendHttpRequest(const char* host, unsigned short port, CoapPDU* requ
 
     // --- Prepare URL
     request->getURI(uriBuffer, COAP_URI_BUFFER_SIZE, &recvURILen);
-    url = new char[strlen(host) + recvURILen + 1];
-    strcpy(url, host);
+    char url[strlen(host) + recvURILen + 1];
+    strncpy(url, host, strlen(host));
     if (recvURILen > 0)
       strncat(url, uriBuffer, recvURILen);
     url[strlen(host) + recvURILen] = '\0';
@@ -211,7 +207,7 @@ std::string sendHttpRequest(const char* host, unsigned short port, CoapPDU* requ
     curl_easy_setopt(curl, CURLOPT_HEADER, 1); // Activate include the header in the body output
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); // Put headers in place
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) httpResponse); // Custom data for response handling
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) &httpResponse); // Custom data for response handling
 
 
     // --- Do HTTP Request
@@ -223,7 +219,6 @@ std::string sendHttpRequest(const char* host, unsigned short port, CoapPDU* requ
       // --- Cleanup curl environment
       curl_slist_free_all(headers);
       curl_easy_cleanup(curl);
-      delete url;
 
       return "";
     }
@@ -231,11 +226,11 @@ std::string sendHttpRequest(const char* host, unsigned short port, CoapPDU* requ
     // --- Cleanup curl environment
     curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
-    delete url;
   }
 
   std::string ret;
-  ret.assign(httpResponse->memory, httpResponse->size);
+  ret.assign(httpResponse.memory, httpResponse.size);
+  free(httpResponse.memory);
   return ret;
 }
 
