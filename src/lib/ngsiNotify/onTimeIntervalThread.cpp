@@ -60,13 +60,14 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
     int current = getCurrentTime();
 
     /* Send notification (only if subscription is not expired and there is actual data)*/
-    if (current < csi.expiration) {
-
+    if (current < csi.expiration)
+    {
         /* Throttling check (only if throttling is used and at least one notification has been sent) */
-        if (csi.throttling < 0 || csi.lastNotification < 0 || csi.lastNotification + csi.throttling <  current) {
-
+        if (csi.throttling < 0 || csi.lastNotification < 0 || csi.lastNotification + csi.throttling <  current)
+        {
             /* Query database for data */
             NotifyContextRequest ncr;
+
             // FIXME P7: mongoGetContextElementResponses ALWAYS returns SccOk !!!
             if (mongoGetContextElementResponses(csi.entityIdVector, csi.attributeList, &(ncr.contextElementResponseVector), &err, tenant) != SccOk)
             {
@@ -78,9 +79,6 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
 
             if (ncr.contextElementResponseVector.size() > 0)
             {
-                // New transactionId for each notification
-                LM_TRANSACTION_START_URL(csi.url.c_str());  // OnTimeInterval Notification Starts
-
                 /* Complete NotifyContextRequest */
                 // FIXME: implement a proper originator string
                 ncr.originator.set("localhost");
@@ -95,16 +93,15 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
 
                 ncr.contextElementResponseVector.release();
                 csi.release();
-
-                LM_TRANSACTION_END();   // OnTimeInterval Notification ends here
             }
             else
             {
-                LM_T(LmtNotifier, ("notification not sent due to empty context elements response vector)"));
+              LM_T(LmtNotifier, ("notification not sent due to empty context elements response vector)"));
             }
         }
-        else {
-            LM_T(LmtNotifier, ("notification not sent due to throttling (current time: %d)", current));
+        else
+        {
+          LM_T(LmtNotifier, ("notification not sent due to throttling (current time: %d)", current));
         }
     }
 

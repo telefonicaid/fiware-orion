@@ -148,46 +148,55 @@ std::string sendHttpSocket
 
   ++callNo;
 
+  LM_TRANSACTION_START("to", ip.c_str(), port, resource.c_str());
+
   // Preconditions check
   if (port == 0)
   {
     LM_E(("Runtime Error (port is ZERO)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if (ip.empty())
   {
     LM_E(("Runtime Error (ip is empty)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if (verb.empty())
   {
     LM_E(("Runtime Error (verb is empty)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if (resource.empty())
   {
     LM_E(("Runtime Error (resource is empty)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if ((content_type.empty()) && (!content.empty()))
   {
     LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if ((!content_type.empty()) && (content.empty()))
   {
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
   if ((curl = curl_easy_init()) == NULL)
   {
     LM_E(("Runtime Error (could not init libcurl)"));
+    LM_TRANSACTION_END();
     return "error";
   }
 
@@ -298,6 +307,7 @@ std::string sendHttpSocket
     free(httpResponse->memory);
     delete httpResponse;
 
+    LM_TRANSACTION_END();
     return "error";
   }
 
@@ -334,7 +344,7 @@ std::string sendHttpSocket
   else
   {
     // The Response is here
-    LM_I(("Notification Successfully Sent"));
+    LM_I(("Notification Successfully Sent to %s", url.c_str()));
     result.assign(httpResponse->memory, httpResponse->size);
   }
 
@@ -345,6 +355,7 @@ std::string sendHttpSocket
   free(httpResponse->memory);
   delete httpResponse;
 
+  LM_TRANSACTION_END();
   return result;
 }
 
@@ -360,6 +371,8 @@ int socketHttpConnect(const std::string& host, unsigned short port)
   struct addrinfo     hints;
   struct addrinfo*    peer;
   char                port_str[10];
+
+  LM_TRANSACTION_START("to", ip.c_str(), port, resource.c_str());
 
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_socktype = SOCK_STREAM;
@@ -386,12 +399,14 @@ int socketHttpConnect(const std::string& host, unsigned short port)
   if (getaddrinfo(host.c_str(), port_str, &hints, &peer) != 0)
   {
     LM_W(("Notification failure for %s:%d (getaddrinfo: %s)", host.c_str(), port, strerror(errno)));
+    LM_TRANSACTION_END();
     return -1;
   }
 
   if ((fd = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol)) == -1)
   {
     LM_W(("Notification failure for %s:%d (socket: %s)", host.c_str(), port, strerror(errno)));
+    LM_TRANSACTION_END();
     return -1;
   }
 
@@ -400,10 +415,12 @@ int socketHttpConnect(const std::string& host, unsigned short port)
     freeaddrinfo(peer);
     close(fd);
     LM_W(("Notification failure for %s:%d (connect: %s)", host.c_str(), port, strerror(errno)));
+    LM_TRANSACTION_END();
     return -1;
   }
 
   freeaddrinfo(peer);
+  LM_TRANSACTION_END();
   return fd;
 }
 
@@ -641,7 +658,7 @@ std::string sendHttpSocket
       else
       {
           memcpy(response, buffer, nb);
-          LM_I(("Notification Successfully Sent"));
+          LM_I(("Notification Successfully Sent to %s:%d%s", ip.c_str(), port, resource.c_str()));
           LM_T(LmtClientInputPayload, ("Received from HTTP server:\n%s", response));
       }
 
@@ -651,7 +668,7 @@ std::string sendHttpSocket
   else
   {
      LM_T(LmtClientInputPayload, ("not waiting for response"));
-     LM_I(("Notification Successfully Sent"));
+     LM_I(("Notification Successfully Sent to %s:%d%s", ip.c_str(), port, resource.c_str()));
      result = "";
   }
 

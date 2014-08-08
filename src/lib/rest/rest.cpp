@@ -626,7 +626,7 @@ static int connectionTreat
     //
     // Transaction starts here
     //
-    LM_TRANSACTION_START(ip, port, url);  // Incoming REST request starts
+    LM_TRANSACTION_START("from", ip, port, url);  // Incoming REST request starts
 
 
 
