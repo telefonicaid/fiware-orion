@@ -109,9 +109,6 @@ using ::testing::Return;
 *
 */
 
-#define NO_CODE 0
-
-
 /* ****************************************************************************
 *
 * prepareDatabase -
@@ -259,7 +256,7 @@ static void prepareDatabasePatternTrue(void) {
    *
    * (*) same name but different types. This is included to check that type is taken into account,
    *     so Reg3 is not returned never (except patternNoType). You can try to change types in Reg3
-   *     to make them equat to the ones in Reg1 and Reg2 and check that some tests are failing.
+   *     to make them equal to the ones in Reg1 and Reg2 and check that some tests are failing.
    * (**)same name but without type
    */
 
@@ -402,7 +399,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_Attr0_noPattern)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -476,7 +473,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_Attr0_noPattern_JSON)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -551,7 +548,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_AttrN_noPattern)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -628,7 +625,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, EntN_Attr0_noPattern)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -709,7 +706,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, EntN_AttrN_noPattern)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -791,7 +788,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_Attr0_pattern)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -881,7 +878,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrsAll)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -971,7 +968,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrsAll_JSON)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1058,7 +1055,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrOneSingle)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1155,7 +1152,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrOneMulti)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1247,7 +1244,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrsSubset)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1345,7 +1342,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternSeveralCREs)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1440,7 +1437,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternSeveralRegistrations)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1546,7 +1543,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiEntity)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1644,7 +1641,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiAttr)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1750,7 +1747,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiEntityAttrs)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1865,7 +1862,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternNoType)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1967,7 +1964,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern0Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2052,7 +2049,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern1AttrSingle)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2145,7 +2142,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern1AttrMulti)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2246,7 +2243,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, patternNAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2357,7 +2354,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, patternNoType)
     EXPECT_EQ(SccOk, ms);
     EXPECT_TRUE(res.duration.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2465,7 +2462,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, mixPatternAndNotPattern)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2547,7 +2544,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, updateDurationAndEntN_AttrN_noP
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT5H", res.duration.get());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2640,7 +2637,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, updateDurationAndNoPatternAttrs
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("PT5H", res.duration.get());
     EXPECT_EQ("51307b66f481db11bf860010", res.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 

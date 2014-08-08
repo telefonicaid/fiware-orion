@@ -39,7 +39,11 @@
 *
 * Tests
 *
-* These test are based on the ones in the mongoDiscoverContextAvailability_test.cpp file
+* These test are based on the ones in the mongoDiscoverContextAvailability_test.cpp file.
+* In other words, the test in this file are queryContext operations that involve a
+* query on the registration collection equal to the one in the test with the same name
+* in mongoDiscoverContextAvailability_test.cpp. Some test in mongoDiscoverContextAvailability_test.cpp
+* are not used here (e.g. the ones related with pagination).
 *
 * With isPattern=false:
 *
@@ -70,12 +74,10 @@
 * - mixPatternAndNotPattern
 *
 * Note these tests are not "canonical" unit tests. Canon says that in this case we should have
-* mocked MongoDB. Actually, we think is very much powerfull to check that everything is ok at
+* mocked MongoDB. Actually, we think is very much powerful to check that everything is ok at
 * MongoDB layer.
 *
 */
-
-#define NO_CODE 0
 
 /* ****************************************************************************
 *
@@ -84,7 +86,8 @@
 * This function is called before every test, to populate some information in the
 * registrations collection.
 */
-static void prepareDatabase(void) {
+static void prepareDatabase(void)
+{
 
   /* Set database */
   setupDatabase();
@@ -101,7 +104,7 @@ static void prepareDatabase(void) {
    *
    * (*) same name but different types. This is included to check that type is taken into account,
    *     so Reg3 is not returned never (except noPatternNoType). You can try to change types in Reg3
-   *     to make them equat to the ones in Reg1 and Reg2 and check that some tests are failing.
+   *     to make them equal to the ones in Reg1 and Reg2 and check that some tests are failing.
    * (**)same name but without type
    */
 
@@ -194,7 +197,8 @@ static void prepareDatabase(void) {
 * This is a variant of populateDatabase function in which all entities have the same type,
 * to ease test for isPattern=true cases
 */
-static void prepareDatabasePatternTrue(void) {
+static void prepareDatabasePatternTrue(void)
+{
 
   /* Set database */
   setupDatabase();
@@ -211,7 +215,7 @@ static void prepareDatabasePatternTrue(void) {
    *
    * (*) same name but different types. This is included to check that type is taken into account,
    *     so Reg3 is not returned never (except patternNoType). You can try to change types in Reg3
-   *     to make them equat to the ones in Reg1 and Reg2 and check that some tests are failing.
+   *     to make them equal to the ones in Reg1 and Reg2 and check that some tests are failing.
    * (**)same name but without type
    */
 
@@ -347,41 +351,35 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
 */
 TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabase();
+  /* Prepare database */
+  utInit();
+  prepareDatabase();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E1", "T1");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A4");
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E1", "T1");
+  req.entityIdVector.push_back(&en);
+  req.attributeList.push_back("A4");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccFound, res.errorCode.code);
+  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("http://cr2.com", res.errorCode.details);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr2.com", res.errorCode.details);
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }
 
@@ -398,43 +396,35 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
 */
 TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabase();
+  /* Prepare database */
+  utInit();
+  prepareDatabase();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E1", "T1");
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E1", "T1");
+  req.entityIdVector.push_back(&en);
+  req.attributeList.push_back("A1");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A1");
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  EXPECT_EQ(SccFound, res.errorCode.code);
+  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+  /* Release connection */
+  mongoDisconnect();
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
-
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
-
+  utExit();
 
 }
 
@@ -448,42 +438,36 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
 */
 TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabase();
+  /* Prepare database */
+  utInit();
+  prepareDatabase();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E3", "T3");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A1");
-    req.attributeList.push_back("A2");
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E3", "T3");
+  req.entityIdVector.push_back(&en);
+  req.attributeList.push_back("A1");
+  req.attributeList.push_back("A2");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccFound, res.errorCode.code);
+  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }
 
@@ -497,40 +481,34 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
 */
 TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabase();
+  /* Prepare database */
+  utInit();
+  prepareDatabase();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E1", "T1");
-    req.entityIdVector.push_back(&en);
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E1", "T1");
+  req.entityIdVector.push_back(&en);
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccFound, res.errorCode.code);
+  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }
 
@@ -544,40 +522,34 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
 */
 TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabase();
+  /* Prepare database */
+  utInit();
+  prepareDatabase();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E2", "T2");
-    req.entityIdVector.push_back(&en);
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E2", "T2");
+  req.entityIdVector.push_back(&en);
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccFound, res.errorCode.code);
+  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }
 
@@ -590,39 +562,33 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
 */
 TEST(mongoContextProvidersQueryRequest, noPatternNoEntity)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabase();
+  /* Prepare database */
+  utInit();
+  prepareDatabase();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E4", "T4");
-    req.entityIdVector.push_back(&en);
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E4", "T4");
+  req.entityIdVector.push_back(&en);
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
+  EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
+  EXPECT_EQ(0, res.errorCode.details.size());
+  EXPECT_EQ(0, res.contextElementResponseVector.size());
 
-    EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
-    EXPECT_EQ(0, res.errorCode.details.size());
-    EXPECT_EQ(0, res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }
 
@@ -636,41 +602,35 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoEntity)
 */
 TEST(mongoContextProvidersQueryRequest, noPatternNoAttribute)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabase();
+  /* Prepare database */
+  utInit();
+  prepareDatabase();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E1", "T1");
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E1", "T1");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  req.entityIdVector.push_back(&en);
+  req.attributeList.push_back("A5");
 
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A5");
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
+  EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
+  EXPECT_EQ(0, res.errorCode.details.size());
+  EXPECT_EQ(0,res.contextElementResponseVector.size());
 
-    EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
-    EXPECT_EQ(0, res.errorCode.details.size());
-    EXPECT_EQ(0,res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }
 
@@ -685,42 +645,36 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoAttribute)
 */
 TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabase();
+  /* Prepare database */
+  utInit();
+  prepareDatabase();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en1("E1", "T1");
-    EntityId en2("E2", "T2");
-    req.entityIdVector.push_back(&en1);
-    req.entityIdVector.push_back(&en2);
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en1("E1", "T1");
+  EntityId en2("E2", "T2");
+  req.entityIdVector.push_back(&en1);
+  req.entityIdVector.push_back(&en2);
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccFound, res.errorCode.code);
+  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }
 
@@ -734,43 +688,37 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
 */
 TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabase();
+  /* Prepare database */
+  utInit();
+  prepareDatabase();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E1", "T1");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A3");
-    req.attributeList.push_back("A4");
-    req.attributeList.push_back("A5");
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E1", "T1");
+  req.entityIdVector.push_back(&en);
+  req.attributeList.push_back("A3");
+  req.attributeList.push_back("A4");
+  req.attributeList.push_back("A5");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccFound, res.errorCode.code);
+  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }
 
@@ -785,45 +733,39 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
 */
 TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabase();
+  /* Prepare database */
+  utInit();
+  prepareDatabase();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en1("E1", "T1");
-    EntityId en2("E2", "T2");
-    req.entityIdVector.push_back(&en1);
-    req.entityIdVector.push_back(&en2);
-    req.attributeList.push_back("A3");
-    req.attributeList.push_back("A4");
-    req.attributeList.push_back("A5");
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en1("E1", "T1");
+  EntityId en2("E2", "T2");
+  req.entityIdVector.push_back(&en1);
+  req.entityIdVector.push_back(&en2);
+  req.attributeList.push_back("A3");
+  req.attributeList.push_back("A4");
+  req.attributeList.push_back("A5");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccFound, res.errorCode.code);
+  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }
 
@@ -843,41 +785,35 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
 */
 TEST(mongoContextProvidersQueryRequest, noPatternNoType)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabase();
+  /* Prepare database */
+  utInit();
+  prepareDatabase();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E1", "", "false");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A1");
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E1", "", "false");
+  req.entityIdVector.push_back(&en);
+  req.attributeList.push_back("A1");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccFound, res.errorCode.code);
+  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }
 
@@ -895,40 +831,34 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
 */
 TEST(mongoContextProvidersQueryRequest, pattern0Attr)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabasePatternTrue();
+  /* Prepare database */
+  utInit();
+  prepareDatabasePatternTrue();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E[2-3]", "T", "true");
-    req.entityIdVector.push_back(&en);
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E[2-3]", "T", "true");
+  req.entityIdVector.push_back(&en);
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccFound, res.errorCode.code);
+  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }
 
@@ -941,41 +871,35 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
 */
 TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabasePatternTrue();
+  /* Prepare database */
+  utInit();
+  prepareDatabasePatternTrue();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E[1-3]", "T", "true");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A4");
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E[1-3]", "T", "true");
+  req.entityIdVector.push_back(&en);
+  req.attributeList.push_back("A4");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccFound, res.errorCode.code);
+  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("http://cr2.com", res.errorCode.details);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr2.com", res.errorCode.details);
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }
 
@@ -989,41 +913,35 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
 */
 TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabasePatternTrue();
+  /* Prepare database */
+  utInit();
+  prepareDatabasePatternTrue();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E[1-2]", "T", "true");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A1");
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E[1-2]", "T", "true");
+  req.entityIdVector.push_back(&en);
+  req.attributeList.push_back("A1");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccFound, res.errorCode.code);
+  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }
 
@@ -1038,42 +956,36 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
 */
 TEST(mongoContextProvidersQueryRequest, patternNAttr)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabasePatternTrue();
+  /* Prepare database */
+  utInit();
+  prepareDatabasePatternTrue();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E[1-2]", "T", "true");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A1");
-    req.attributeList.push_back("A2");
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E[1-2]", "T", "true");
+  req.entityIdVector.push_back(&en);
+  req.attributeList.push_back("A1");
+  req.attributeList.push_back("A2");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccFound, res.errorCode.code);
+  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }
 
@@ -1086,39 +998,33 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
 */
 TEST(mongoContextProvidersQueryRequest, patternFail)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabasePatternTrue();
+  /* Prepare database */
+  utInit();
+  prepareDatabasePatternTrue();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("R.*", "T", "true");
-    req.entityIdVector.push_back(&en);
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("R.*", "T", "true");
+  req.entityIdVector.push_back(&en);
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
+  EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
+  EXPECT_EQ(0, res.errorCode.details.size());
+  EXPECT_EQ(0,res.contextElementResponseVector.size());
 
-    EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-    EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
-    EXPECT_EQ(0, res.errorCode.details.size());
-    EXPECT_EQ(0,res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }
 
@@ -1138,41 +1044,35 @@ TEST(mongoContextProvidersQueryRequest, patternFail)
 */
 TEST(mongoContextProvidersQueryRequest, patternNoType)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabasePatternTrue();
+  /* Prepare database */
+  utInit();
+  prepareDatabasePatternTrue();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E[2-3]", "", "true");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A2");
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E[2-3]", "", "true");
+  req.entityIdVector.push_back(&en);
+  req.attributeList.push_back("A2");
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccFound, res.errorCode.code);
+  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }
 
@@ -1187,41 +1087,35 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
 */
 TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
 {
-    HttpStatusCode        ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
 
-    /* Prepare database */
-    prepareDatabasePatternTrue();
+  /* Prepare database */
+  utInit();
+  prepareDatabasePatternTrue();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en1("E[2-3]", "T", "true");
-    EntityId en2("E1", "T");
-    req.entityIdVector.push_back(&en1);
-    req.entityIdVector.push_back(&en2);
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en1("E[2-3]", "T", "true");
+  EntityId en2("E1", "T");
+  req.entityIdVector.push_back(&en1);
+  req.entityIdVector.push_back(&en2);
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccFound, res.errorCode.code);
+  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
-    EXPECT_EQ(SccFound, res.errorCode.code);
-    EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("http://cr1.com", res.errorCode.details);
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-    ASSERT_EQ(0, res.contextElementResponseVector.size());
+  /* Release connection */
+  mongoDisconnect();
 
-    /* Release connection */
-    mongoDisconnect();
-
-    /* Delete mock */
-    delete timerMock;
+  utExit();
 
 }

@@ -112,12 +112,10 @@
 * - mongoDbQueryFail
 *
 * Note these tests are not "canonical" unit tests. Canon says that in this case we should have
-* mocked MongoDB. Actually, we think is very much powerfull to check that everything is ok at
+* mocked MongoDB. Actually, we think is very much powerful to check that everything is ok at
 * MongoDB layer.
 *
 */
-
-#define NO_CODE 0
 
 /* ****************************************************************************
 *
@@ -620,7 +618,7 @@ TEST(mongoQueryContextRequest, paginationAll)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -731,7 +729,7 @@ TEST(mongoQueryContextRequest, paginationOnlyFirst)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -783,7 +781,7 @@ TEST(mongoQueryContextRequest, paginationOnlySecond)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -835,7 +833,7 @@ TEST(mongoQueryContextRequest, paginationRange)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -929,7 +927,7 @@ TEST(mongoQueryContextRequest, paginationNonExisting)
 *
 */
 TEST(mongoQueryContextRequest, paginationNonExistingOverlap)
-{       
+{
     HttpStatusCode         ms;
     QueryContextRequest   req;
     QueryContextResponse  res;
@@ -952,7 +950,7 @@ TEST(mongoQueryContextRequest, paginationNonExistingOverlap)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -1043,7 +1041,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_2levels)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -1115,7 +1113,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1level)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -1224,7 +1222,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_0levels)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -1272,7 +1270,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1levelbis)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -1333,7 +1331,7 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
 
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -1403,7 +1401,7 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
 
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -1451,7 +1449,7 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
 
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -1500,7 +1498,7 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
 
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -1547,7 +1545,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_2levels)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -1631,7 +1629,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1level)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -1752,7 +1750,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_0levels)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -1800,7 +1798,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1levelbis)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -1896,7 +1894,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternTypeOk)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -1944,7 +1942,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternNoType)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -2070,7 +2068,7 @@ TEST(mongoQueryContextRequest, query1Ent0Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -2124,7 +2122,7 @@ TEST(mongoQueryContextRequest, query1Ent1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -2172,7 +2170,7 @@ TEST(mongoQueryContextRequest, query1Ent1AttrSameName)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -2231,7 +2229,7 @@ TEST(mongoQueryContextRequest, queryNEnt0Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -2302,7 +2300,7 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrSingle)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -2356,7 +2354,7 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrMulti)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -2424,7 +2422,7 @@ TEST(mongoQueryContextRequest, queryNEntNAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -2604,7 +2602,7 @@ TEST(mongoQueryContextRequest, query1EntWA1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -2654,7 +2652,7 @@ TEST(mongoQueryContextRequest, queryNEntWA0Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -2719,7 +2717,7 @@ TEST(mongoQueryContextRequest, queryNEntWA1Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -2773,7 +2771,7 @@ TEST(mongoQueryContextRequest, queryNoType)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -2846,7 +2844,7 @@ TEST(mongoQueryContextRequest, queryIdMetadata)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -2907,7 +2905,7 @@ TEST(mongoQueryContextRequest, queryCustomMetadata)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -2977,7 +2975,7 @@ TEST(mongoQueryContextRequest, queryPattern0Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -3043,7 +3041,7 @@ TEST(mongoQueryContextRequest, queryPattern1AttrSingle)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -3092,7 +3090,7 @@ TEST(mongoQueryContextRequest, queryPattern1AttrMulti)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -3154,7 +3152,7 @@ TEST(mongoQueryContextRequest, queryPatternNAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -3255,7 +3253,7 @@ TEST(mongoQueryContextRequest, queryMixPatternAndNotPattern)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -3339,7 +3337,7 @@ TEST(mongoQueryContextRequest, queryNoTypePattern)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -3433,7 +3431,7 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
@@ -3521,7 +3519,7 @@ TEST(mongoQueryContextRequest, queryCustomMetadataPattern)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ("", res.errorCode.reasonPhrase);
     EXPECT_EQ("", res.errorCode.details);
 
