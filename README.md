@@ -115,11 +115,11 @@ sudo cp nethelper.h /usr/local/include
 sudo cp libcantcoap.a /usr/local/lib
 ```
 
-* Get the code (alternatively you can download it using a zipped version or a different URL pattern):
+* Get the code (alternatively you can download it using a zipped version or a different URL pattern, e.g `git clone git@github.com:telefonicaid/fiware-orion.git`):
 
 ```
 sudo yum install git
-git clone git@github.com:telefonicaid/fiware-orion.git
+git clone https://github.com/telefonicaid/fiware-orion
 ```
 
 * Build the source:
