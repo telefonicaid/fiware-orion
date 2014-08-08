@@ -369,9 +369,7 @@ static std::string sourceEntityId(const std::string& path, const std::string& va
 {
   LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
 
-  reqDataP->rcr.registrationMetadataP->association.entityAssociation.source.id        = "";
-  reqDataP->rcr.registrationMetadataP->association.entityAssociation.source.type      = "";
-  reqDataP->rcr.registrationMetadataP->association.entityAssociation.source.isPattern = "false";
+  reqDataP->rcr.registrationMetadataP->association.entityAssociation.source.fill("", "", "false");
 
   return "OK";
 }
@@ -439,9 +437,7 @@ static std::string targetEntityId(const std::string& path, const std::string& va
 {
   LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
 
-  reqDataP->rcr.registrationMetadataP->association.entityAssociation.target.id        = "";
-  reqDataP->rcr.registrationMetadataP->association.entityAssociation.target.type      = "";
-  reqDataP->rcr.registrationMetadataP->association.entityAssociation.target.isPattern = "false";
+  reqDataP->rcr.registrationMetadataP->association.entityAssociation.target.fill("", "", "false");
 
   return "OK";
 }

@@ -354,18 +354,7 @@ HttpStatusCode mongoDiscoverContextAvailability
     std::string scopeType  = requestP->restriction.scopeVector.get(0)->type;
     std::string scopeValue = requestP->restriction.scopeVector.get(0)->value;
 
-    if (scopeType == SCOPE_TYPE_ASSOC && requestP->attributeList.size() == 0)
-    {
-      HttpStatusCode hsCode = conventionalDiscoverContextAvailability(requestP, responseP, tenant, offset, limit, details);
-      if (hsCode != SccOk)
-      {
-        ++noOfDiscoveryErrors;
-      }
-
-      reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request");
-      return hsCode;
-    }
-    else if (scopeType == SCOPE_TYPE_ASSOC)
+    if (scopeType == SCOPE_TYPE_ASSOC)
     {
       HttpStatusCode ms = associationsDiscoverContextAvailability(requestP, responseP, scopeValue, tenant, offset, limit, details);
       reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request (association)");
