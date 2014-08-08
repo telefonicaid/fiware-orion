@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Associations Fail Tests JSON
+Associations empty attribute list JSON
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -36,12 +36,16 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
         {
           "type": "House",
           "isPattern": "false",
-          "id": "house1"
+          "id": "house3"
         }
       ],
       "attributes": [
         {
           "name": "temperature",
+          "isDomain": "false"
+        },
+        {
+          "name": "humidity",
           "isDomain": "false"
         }
       ],
@@ -61,7 +65,7 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
         {
           "type": "TemperatureSensor",
           "isPattern": "false",
-          "id": "sensor1"
+          "id": "sensor3"
         }
       ],
       "attributes": [
@@ -70,7 +74,7 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
           "isDomain": "false"
         },
         {
-          "name": "height",
+          "name": "humidity",
           "isDomain": "false"
         }
       ],
@@ -81,7 +85,7 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
   "registrationId": ""
 }'
 # ********************************************************************************
-echo "++++++ Create two associations"
+echo "++++++ Create associations"
 
 orionCurl --json --url "/NGSI9/registerContext" --payload '{
   "contextRegistrations": [
@@ -92,12 +96,12 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
           "type": "Association",
           "value": {
             "source": {
-              "id": "sensor1",
+              "id": "sensor3",
               "type": "TemperatureSensor",
               "isPattern": "false"
             },
             "target": {
-              "id": "house1",
+              "id": "house3",
               "type": "House",
               "isPattern": "false"
             },
@@ -105,6 +109,10 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
               {
                 "source": "measurement",
                 "target": "temperature"
+              },
+              {
+                "source": "humidity",
+                "target": "humidity"
               }
             ]
           }
@@ -117,35 +125,14 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
   "registrationId": ""
 }'
 # ********************************************************************************
-echo "++++++ Query an association with empty attribute list"
+echo "++++++ Query an association with empty attribute list, one entity"
 
 orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
   "entities": [
     {
       "type": "House",
       "isPattern": "false",
-      "id": "house1"
-    }
-  ],
-  "attributes": [ ],
-  "restriction": {
-    "scopes": [
-      {
-        "type" : "IncludeAssociations",
-        "value" : "SOURCES"
-      }
-    ]
-  }
-}'
-# ********************************************************************************
-echo "++++++ Query an association with no attribute list"
-
-orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
-  "entities": [
-    {
-      "type": "House",
-      "isPattern": "false",
-      "id": "house1"
+      "id": "house3"
     }
   ],
   "restriction": {
@@ -179,7 +166,7 @@ Date: REGEX(.*)
     "duration": "PT1H",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
-++++++ Create two associations
+++++++ Create associations
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/json
@@ -189,9 +176,9 @@ Date: REGEX(.*)
     "duration": "PT1H",
     "registrationId": "REGEX([0-9a-f]{24})"
 }
-++++++ Query an association with empty attribute list
+++++++ Query an association with empty attribute list, one entity
 HTTP/1.1 200 OK
-Content-Length: 464
+Content-Length: 1578
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -202,47 +189,58 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "isDomain": "false", 
-                        "name": "temperature", 
+                        "name": "measurement", 
+                        "type": ""
+                    }, 
+                    {
+                        "isDomain": "false", 
+                        "name": "humidity", 
                         "type": ""
                     }
                 ], 
                 "entities": [
                     {
-                        "id": "house1", 
+                        "id": "sensor3", 
                         "isPattern": "false", 
-                        "type": "House"
+                        "type": "TemperatureSensor"
                     }
                 ], 
                 "providingApplication": "http://myHomeGateway22.org"
             }
-        }
-    ]
-}
-++++++ Query an association with no attribute list
-HTTP/1.1 200 OK
-Content-Length: 464
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextRegistrationResponses": [
+        }, 
         {
             "contextRegistration": {
-                "attributes": [
+                "metadatas": [
                     {
-                        "isDomain": "false", 
-                        "name": "temperature", 
-                        "type": ""
+                        "name": "association1", 
+                        "type": "Association", 
+                        "value": {
+                            "attributeAssociations": [
+                                {
+                                    "source": "measurement", 
+                                    "target": "temperature"
+                                }, 
+                                {
+                                    "source": "humidity", 
+                                    "target": "humidity"
+                                }
+                            ], 
+                            "entities": {
+                                "source": {
+                                    "id": "sensor3", 
+                                    "isPattern": "false", 
+                                    "type": "TemperatureSensor"
+                                }, 
+                                "target": {
+                                    "id": "house3", 
+                                    "isPattern": "false", 
+                                    "type": "House"
+                                }
+                            }
+                        }
                     }
                 ], 
-                "entities": [
-                    {
-                        "id": "house1", 
-                        "isPattern": "false", 
-                        "type": "House"
-                    }
-                ], 
-                "providingApplication": "http://myHomeGateway22.org"
+                "providingApplication": "http://www.fi-ware.eu/NGSI/association"
             }
         }
     ]

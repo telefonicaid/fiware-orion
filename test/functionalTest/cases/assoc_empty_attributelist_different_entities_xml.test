@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Associations empty attribute list XML
+Associations empty attribute list different entities XML
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -36,6 +36,12 @@ orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
       <entityIdList>
         <entityId type="House" isPattern="false">
           <id>House1</id>
+        </entityId>
+        <entityId type="House" isPattern="false">
+          <id>House2</id>
+        </entityId>
+        <entityId type="House" isPattern="false">
+          <id>House3</id>
         </entityId>
       </entityIdList>
       <contextRegistrationAttributeList>
@@ -64,6 +70,12 @@ orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
       <entityIdList>
         <entityId type="TemperatureSensor" isPattern="false">
           <id>Sensor1</id>
+        </entityId>
+        <entityId type="TemperatureSensor" isPattern="false">
+          <id>Sensor2</id>
+        </entityId>
+        <entityId type="TemperatureSensor" isPattern="false">
+          <id>Sensor3</id>
         </entityId>
       </entityIdList>
       <contextRegistrationAttributeList>
@@ -107,6 +119,22 @@ orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
                 <sourceAttribute>measurement</sourceAttribute>
                 <targetAttribute>temperature</targetAttribute>
               </attributeAssociation>
+            </attributeAssociationList>
+          </value>
+        </contextMetadata>    
+        <contextMetadata>
+          <name>association2</name>
+          <type>Association</type>
+          <value>
+            <entityAssociation>
+              <sourceEntityId type="TemperatureSensor" isPattern="false">
+                <id>Sensor2</id>
+              </sourceEntityId>
+              <targetEntityId type="House" isPattern="false">
+                <id>House1</id>
+              </targetEntityId>
+            </entityAssociation>
+            <attributeAssociationList>
               <attributeAssociation>
                 <sourceAttribute>humidity</sourceAttribute>
                 <targetAttribute>humidity</targetAttribute>
@@ -122,7 +150,27 @@ orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
   <registrationId></registrationId>
 </registerContextRequest>'
 # ********************************************************************************
-echo "++++++ Query an association with empty attribute list, one entity"
+echo "++++++ Query an association with empty attribute list, two entities"
+
+orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1.0"?>
+<discoverContextAvailabilityRequest>
+  <entityIdList>
+    <entityId type="House" isPattern="false">
+      <id>House1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList></attributeList>
+  <restriction>
+    <scope>
+      <operationScope>
+        <scopeType>IncludeAssociations</scopeType>
+        <scopeValue>SOURCES</scopeValue>
+      </operationScope>
+    </scope>
+  </restriction>
+</discoverContextAvailabilityRequest>'
+# ********************************************************************************
+echo "++++++ Query an association with no attribute list, two entities"
 
 orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1.0"?>
 <discoverContextAvailabilityRequest>
@@ -175,9 +223,9 @@ Date: REGEX(.*)
   <duration>PT1H</duration>
   <registrationId>REGEX([0-9a-f]{24})</registrationId>
 </registerContextResponse>
-++++++ Query an association with empty attribute list, one entity
+++++++ Query an association with empty attribute list, two entities
 HTTP/1.1 200 OK
-Content-Length: 2255
+Content-Length: 3300
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -197,6 +245,18 @@ Date: REGEX(.*)
             <type/>
             <isDomain>false</isDomain>
           </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://myHomeGateway22.org</providingApplication>
+      </contextRegistration>
+    </contextRegistrationResponse>
+    <contextRegistrationResponse>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="TemperatureSensor" isPattern="false">
+            <id>Sensor2</id>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
           <contextRegistrationAttribute>
             <name>humidity</name>
             <type/>
@@ -226,6 +286,114 @@ Date: REGEX(.*)
                   <sourceAttribute>measurement</sourceAttribute>
                   <targetAttribute>temperature</targetAttribute>
                 </attributeAssociation>
+              </attributeAssociationList>
+            </value>
+          </contextMetadata>
+          <contextMetadata>
+            <name>association2</name>
+            <type>Association</type>
+            <value>
+              <entityAssociation>
+                <sourceEntityId type="TemperatureSensor" isPattern="false">
+                  <id>Sensor2</id>
+                </sourceEntityId>
+                <targetEntityId type="House" isPattern="false">
+                  <id>House1</id>
+                </targetEntityId>
+              </entityAssociation>
+              <attributeAssociationList>
+                <attributeAssociation>
+                  <sourceAttribute>humidity</sourceAttribute>
+                  <targetAttribute>humidity</targetAttribute>
+                </attributeAssociation>
+              </attributeAssociationList>
+            </value>
+          </contextMetadata>
+        </registrationMetadata>
+        <providingApplication>http://www.fi-ware.eu/NGSI/association</providingApplication>
+      </contextRegistration>
+    </contextRegistrationResponse>
+  </contextRegistrationResponseList>
+</discoverContextAvailabilityResponse>
+++++++ Query an association with no attribute list, two entities
+HTTP/1.1 200 OK
+Content-Length: 3300
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<discoverContextAvailabilityResponse>
+  <contextRegistrationResponseList>
+    <contextRegistrationResponse>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="TemperatureSensor" isPattern="false">
+            <id>Sensor1</id>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
+          <contextRegistrationAttribute>
+            <name>measurement</name>
+            <type/>
+            <isDomain>false</isDomain>
+          </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://myHomeGateway22.org</providingApplication>
+      </contextRegistration>
+    </contextRegistrationResponse>
+    <contextRegistrationResponse>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="TemperatureSensor" isPattern="false">
+            <id>Sensor2</id>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
+          <contextRegistrationAttribute>
+            <name>humidity</name>
+            <type/>
+            <isDomain>false</isDomain>
+          </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://myHomeGateway22.org</providingApplication>
+      </contextRegistration>
+    </contextRegistrationResponse>
+    <contextRegistrationResponse>
+      <contextRegistration>
+        <registrationMetadata>
+          <contextMetadata>
+            <name>association1</name>
+            <type>Association</type>
+            <value>
+              <entityAssociation>
+                <sourceEntityId type="TemperatureSensor" isPattern="false">
+                  <id>Sensor1</id>
+                </sourceEntityId>
+                <targetEntityId type="House" isPattern="false">
+                  <id>House1</id>
+                </targetEntityId>
+              </entityAssociation>
+              <attributeAssociationList>
+                <attributeAssociation>
+                  <sourceAttribute>measurement</sourceAttribute>
+                  <targetAttribute>temperature</targetAttribute>
+                </attributeAssociation>
+              </attributeAssociationList>
+            </value>
+          </contextMetadata>
+          <contextMetadata>
+            <name>association2</name>
+            <type>Association</type>
+            <value>
+              <entityAssociation>
+                <sourceEntityId type="TemperatureSensor" isPattern="false">
+                  <id>Sensor2</id>
+                </sourceEntityId>
+                <targetEntityId type="House" isPattern="false">
+                  <id>House1</id>
+                </targetEntityId>
+              </entityAssociation>
+              <attributeAssociationList>
                 <attributeAssociation>
                   <sourceAttribute>humidity</sourceAttribute>
                   <targetAttribute>humidity</targetAttribute>
