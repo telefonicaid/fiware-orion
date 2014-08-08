@@ -335,7 +335,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
 
   ASSERT_EQ(0,res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -376,7 +378,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -421,7 +425,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -464,7 +470,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -505,7 +513,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -546,7 +556,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -585,7 +597,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoEntity)
   EXPECT_EQ(0, res.errorCode.details.size());
   EXPECT_EQ(0, res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -627,7 +641,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoAttribute)
   EXPECT_EQ(0, res.errorCode.details.size());
   EXPECT_EQ(0,res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -671,7 +687,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -715,7 +733,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -762,7 +782,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -810,7 +832,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -855,7 +879,9 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -896,7 +922,9 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -938,7 +966,9 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -982,7 +1012,9 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -1021,7 +1053,9 @@ TEST(mongoContextProvidersQueryRequest, patternFail)
   EXPECT_EQ(0, res.errorCode.details.size());
   EXPECT_EQ(0,res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -1069,7 +1103,9 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
@@ -1113,7 +1149,9 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
-  /* Release connection */
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
   mongoDisconnect();
 
   utExit();
