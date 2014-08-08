@@ -89,7 +89,12 @@ static bool associationsQuery
     else {  // SCOPE_VALUE_ASSOC_TARGET
         attrField = ASSOC_ATTRS "." ASSOC_ATTRS_SOURCE;
     }
-    queryB.append(attrField, BSON("$in" << attrArray.arr()));
+
+    // If there are no attributes specified we want them all
+    if (attrArray.arrSize() != 0)
+    {
+      queryB.append(attrField, BSON("$in" << attrArray.arr()));
+    }
 
     /* Do the query in MongoDB */
     auto_ptr<DBClientCursor> cursor;
@@ -145,13 +150,9 @@ static bool associationsQuery
         std::string tgtEnType = STR_FIELD(r.getField(ASSOC_TARGET_ENT).embeddedObject(), ASSOC_ENT_TYPE);
 
         Metadata* md = new Metadata(name, "Association");
-        md->association.entityAssociation.source.id        = srcEnId;
-        md->association.entityAssociation.source.type      = srcEnType;
-        md->association.entityAssociation.source.isPattern = "false";
-        md->association.entityAssociation.target.id        = tgtEnId;
-        md->association.entityAssociation.target.type      = tgtEnType;
-        md->association.entityAssociation.target.isPattern = "false";
-
+        md->association.entityAssociation.source.fill(srcEnId, srcEnType, "false");
+        md->association.entityAssociation.source.fill(tgtEnId, tgtEnType, "false");
+        
         std::vector<BSONElement> attrs = r.getField(ASSOC_ATTRS).Array();
         for (unsigned int ix = 0; ix < attrs.size(); ++ix) {
             std::string srcAttr = STR_FIELD(attrs[ix].embeddedObject(), ASSOC_ATTRS_SOURCE);
