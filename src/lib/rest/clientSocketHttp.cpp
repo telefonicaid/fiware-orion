@@ -668,7 +668,7 @@ std::string sendHttpSocket
   else
   {
      LM_T(LmtClientInputPayload, ("not waiting for response"));
-     LM_I(("Notification Successfully Sent to %s:%d", ip.c_str(), port, resource.c_str()));
+     LM_I(("Notification Successfully Sent to %s:%d%s", ip.c_str(), port, resource.c_str()));
      result = "";
   }
 
