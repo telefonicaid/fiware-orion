@@ -38,6 +38,8 @@
 #include <time.h>
 #include <stdint.h>             /* int64, ...                                */
 
+#include "common/globals.h"     /* transactionIdSet                          */
+
 
 
 /******************************************************************************
@@ -1747,11 +1749,11 @@ do                                                        \
 *
 * LM_TRANSACTION_START -
 */
-#define LM_TRANSACTION_START(ip, port, path)                    \
-do                                                              \
-{                                                               \
-  transactionIdSet();                                           \
-  LM_I(("Starting transaction from %s:%d%s", ip, port, path));  \
+#define LM_TRANSACTION_START(keyword, ip, port, path)                  \
+do                                                                     \
+{                                                                      \
+  transactionIdSet();                                                  \
+  LM_I(("Starting transaction %s %s:%d%s", keyword, ip, port, path));  \
 } while (0)
 
 

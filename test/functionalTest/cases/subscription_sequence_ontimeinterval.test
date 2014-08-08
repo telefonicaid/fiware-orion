@@ -80,7 +80,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "$payload"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
-# Interval from 0 to 5: we recieve some three notifications (t=0, t=2, t=4)
+# Interval from 0 to 5: we receive some three notifications (t=0, t=2, t=4)
 sleep 5
 
 echo "2: ++++++++++++++++++++"
@@ -100,7 +100,7 @@ payload='<?xml version="1.0"?>
 </updateContextSubscriptionRequest>'
 orionCurl --url "$url" --payload "$payload"
 
-#Interval from 5 to 14: we will recieve three notifications (t=5, t=9, t=13)
+# Interval from 5 to 14: we will receive three notifications (t=5, t=9, t=13)
 sleep 9
 
 echo "3: ++++++++++++++++++++"
@@ -370,6 +370,3 @@ TIMES: REGEX((0, 2, 4, 5, 9, 13, 14, 24, 34, 35, 37, 39, 53, 65, 67, 69|0, 2, 4,
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
-
-mv /tmp/contextBroker.log /tmp/contextBroker.log.oti
-
