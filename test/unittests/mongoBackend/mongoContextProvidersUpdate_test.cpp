@@ -323,7 +323,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsAll)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  /* Note that although is a bit weird having a updateContext without attributes to update,
+  /* Note that although it is a bit weird having an updateContext without attributes to update,
    * it is legal from the point of view of OMA spec */
   ContextElement ce;
   ce.entityId.fill("E3", "T3", "false");
@@ -535,7 +535,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternSeveralCREs)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  /* Note that although is a bit weird having a updateContext without attributes to update,
+  /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
   ContextElement ce;
   ce.entityId.fill("E1", "T1", "false");
@@ -587,7 +587,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternSeveralRegistrations)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  /* Note that although is a bit weird having a updateContext without attributes to update,
+  /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
   ContextElement ce;
   ce.entityId.fill("E2", "T2", "false");
@@ -638,7 +638,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoEntity)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  /* Note that although is a bit weird having a updateContext without attributes to update,
+  /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
   ContextElement ce;
   ce.entityId.fill("E4", "T4", "false");
@@ -743,7 +743,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  /* Note that although is a bit weird having a updateContext without attributes to update,
+  /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
   ContextElement ce1, ce2;
   ce1.entityId.fill("E1", "T1", "false");
@@ -1003,7 +1003,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern0Attr)
   prepareDatabasePatternTrue();
 
   /* Forge the request (from "inside" to "outside") */
-  /* Note that although is a bit weird having a updateContext without attributes to update,
+  /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
   ContextElement ce;
   ce.entityId.fill("E[2-3]", "T", "true");
@@ -1197,7 +1197,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternFail)
   prepareDatabasePatternTrue();
 
   /* Forge the request (from "inside" to "outside") */
-  /* Note that although is a bit weird having a updateContext without attributes to update,
+  /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
   ContextElement ce;
   ce.entityId.fill("R.*", "T", "true");
@@ -1299,7 +1299,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, mixPatternAndNotPattern)
   prepareDatabasePatternTrue();
 
   /* Forge the request (from "inside" to "outside") */
-  /* Note that although is a bit weird having a updateContext without attributes to update,
+  /* Note that although it is a bit weird having an updateContext without attributes to update,
      * it is legal from the point of view of OMA spec */
   ContextElement ce1, ce2;
   ce1.entityId.fill("E[2-3]", "T", "true");
