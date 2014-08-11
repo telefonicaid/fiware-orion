@@ -66,7 +66,7 @@ echo
 echo
 
 
-echo "4. Update E1/A1 using conv op PUT /ngsi10/contextEntities/E1/attributes (fails as A1 has no type, right?)"
+echo "4. Update E1/A1 using conv op PUT /ngsi10/contextEntities/E1/attributes"
 url="/ngsi10/contextEntities/E1"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
@@ -74,49 +74,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <contextAttributeList>
     <contextAttribute>
       <name>A1</name>
-      <type>degree</type>
-      <contextValue>99</contextValue>
-    </contextAttribute>
-  </contextAttributeList>
-</updateContextElementRequest>'
-orionCurl --url "$url" --payload "$payload" --urlParams attributesFormat=object --out json -X PUT
-echo
-echo
-
-echo "5. Conventional update, giving a type to E1/A1"
-url="/ngsi10/updateContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="T" isPattern="false">
-        <id>E1</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A1</name>
-          <type>T1</type>
-          <contextValue>98</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --out json
-echo
-echo
-
-
-echo "6. Update E1/A1 using conv op PUT /ngsi10/contextEntities/E1/attributes (works now as A1 has a type)"
-url="/ngsi10/contextEntities/E1"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextElementRequest>
-  <attributeDomainName></attributeDomainName>
-  <contextAttributeList>
-    <contextAttribute>
-      <name>A1</name>
-      <type>degree</type>
+      <type>Attr</type>
       <contextValue>99</contextValue>
     </contextAttribute>
   </contextAttributeList>
@@ -126,14 +84,14 @@ echo
 echo
 
 
-echo "7. query E1/A1 using conv op GET /ngsi10/contextEntities/E1/attributes/A1 (with attributesFormat=object)"
+echo "5. query E1/A1 using conv op GET /ngsi10/contextEntities/E1/attributes/A1 (with attributesFormat=object)"
 url="/ngsi10/contextEntities/E1/attributes/A1"
 orionCurl --url "$url" --urlParams attributesFormat=object --out json
 echo
 echo
 
 
-echo "8. query E1/A1 using conv op GET /ngsi10/contextEntities/E1/attributes/A1 (without attributesFormat=object)"
+echo "6. query E1/A1 using conv op GET /ngsi10/contextEntities/E1/attributes/A1 (without attributesFormat=object)"
 url="/ngsi10/contextEntities/E1/attributes/A1"
 orionCurl --url "$url" --out json
 echo
@@ -216,41 +174,20 @@ Date: REGEX(.*)
 }
 
 
-4. Update E1/A1 using conv op PUT /ngsi10/contextEntities/E1/attributes (fails as A1 has no type, right?)
+4. Update E1/A1 using conv op PUT /ngsi10/contextEntities/E1/attributes
 HTTP/1.1 200 OK
-Content-Length: 187
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "errorCode": {
-        "code": "472", 
-        "details": "action: UPDATE - entity: (E1, ) - offending attribute: A1", 
-        "reasonPhrase": "request parameter is invalid/not allowed"
-    }
-}
-
-
-5. Conventional update, giving a type to E1/A1
-HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 239
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "contextResponses": [
         {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A1", 
-                        "type": "T1", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "T"
+            "attributes": {
+                "A1": {
+                    "type": "Attr", 
+                    "value": ""
+                }
             }, 
             "statusCode": {
                 "code": "200", 
@@ -261,20 +198,9 @@ Date: REGEX(.*)
 }
 
 
-6. Update E1/A1 using conv op PUT /ngsi10/contextEntities/E1/attributes (works now as A1 has a type)
+5. query E1/A1 using conv op GET /ngsi10/contextEntities/E1/attributes/A1 (with attributesFormat=object)
 HTTP/1.1 200 OK
-Content-Length: 187
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    WHY does this not work?
-}
-
-
-7. query E1/A1 using conv op GET /ngsi10/contextEntities/E1/attributes/A1 (with attributesFormat=object)
-HTTP/1.1 200 OK
-Content-Length: 159
+Content-Length: 160
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -292,9 +218,9 @@ Date: REGEX(.*)
 }
 
 
-8. query E1/A1 using conv op GET /ngsi10/contextEntities/E1/attributes/A1 (without attributesFormat=object)
+6. query E1/A1 using conv op GET /ngsi10/contextEntities/E1/attributes/A1 (without attributesFormat=object)
 HTTP/1.1 200 OK
-Content-Length: 173
+Content-Length: 174
 Content-Type: application/json
 Date: REGEX(.*)
 
