@@ -1707,13 +1707,48 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
      * Actually, the 'slash-escaped' ServicePath (variable: 'path') is sent to the function createEntity
      * which sets the ServicePath for the entity.
      */
-    if (docs == 0) {      
+    if (docs == 0)
+    {
+      if (strcasecmp(action.c_str(), "append") != 0)
+      {
+        /* Only APPEND can create entities, in the case of UPDATE or DELETE we look for a context
+         * provider or (if there is no context provider) return a not found error */
+        ContextRegistrationResponseVector crrV;
+        EntityIdVector                    enV;
+        AttributeList                     attrL;
+        std::string err;
 
-        if (strcasecmp(action.c_str(), "append") != 0) {
-            /* Only APPEND can create entities, thus error is returned in UPDATE or DELETE cases */
-            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
+        enV.push_back(enP);
+        for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+        {
+          attrL.push_back(ceP->contextAttributeVector.get(ix)->name);
         }
-        else {            
+
+        // For now, we use limit=1. That's ensures that as much as one providing application is returned. In the future,
+        // we would consider leave this limit open and define an algorithm to pick the right one, and ordered list, etc.
+        if (registrationsQuery(enV, attrL, &crrV, &err, tenant, 0, 1, false))
+        {
+          if (crrV.size() > 0)
+          {
+            // Suitable CProvider has been found: creating response and returning
+            std::string prApp = crrV[0]->contextRegistration.providingApplication.get();
+            LM_T(LmtCtxProviders, ("context provide found: %s", prApp.c_str()));
+            buildGeneralErrorReponse(ceP, NULL, responseP, SccFound, prApp);
+          }
+          else
+          {
+            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
+          }
+        }
+        else
+        {
+          LM_E(("Database Error (%s)", err.c_str()));
+          buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
+        }
+
+      }
+      else
+      {
 
             /* Creating the part of the response that doesn't depend on success or failure */
             ContextElementResponse* cerP = new ContextElementResponse();
