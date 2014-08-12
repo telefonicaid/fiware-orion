@@ -27,8 +27,6 @@
 # 3. Append entity E2 with two attributes with identical names 'A3', but different meta IDs
 # 4. Normal Query for the entity E2 for attribute A3 - both attributes are returned
 # 5. JsonAttributeObjectQuery Query for the entity E2 for attribute A3 - only one attribute is returned
-# 6. Append entity E3 with two attributes with identical names 'A4', types 'test' and WITHOUT meta IDs
-# 7. JsonAttributeObjectQuery Query for the entity E3 for attribute A4 - only one attribute is returned
 #
 #
 
@@ -147,54 +145,6 @@ echo
 echo
 
 echo "5. JsonAttributeObjectQuery Query for the entity E2 for attribute A3 - only one attribute is returned"
-url="/NGSI10/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="Test" isPattern="false">
-      <id>E2</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>A3</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"  --out json --urlParams attributesFormat=object
-echo
-echo
-
-
-echo "6. Append entity E3 with two attributes with identical names 'A4', types 'test' and WITHOUT meta IDs"
-url="/NGSI10/updateContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="Test" isPattern="false">
-        <id>E3</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A4</name>
-          <type>test</type>
-          <contextValue>1</contextValue>
-        </contextAttribute>
-        <contextAttribute>
-          <name>A4</name>
-          <type>test</type>
-          <contextValue>2</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --out json
-echo
-echo
-
-
-echo "7. JsonAttributeObjectQuery Query for the entity E3 for attribute A4 - only one attribute is returned"
 url="/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
@@ -380,77 +330,6 @@ Date: REGEX(.*)
 
 
 5. JsonAttributeObjectQuery Query for the entity E2 for attribute A3 - only one attribute is returned
-HTTP/1.1 200 OK
-Content-Length: 538
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": {
-                    "A3": {
-                        "metadatas": [
-                            {
-                                "name": "ID", 
-                                "type": "string", 
-                                "value": "A3-1"
-                            }
-                        ], 
-                        "type": "test", 
-                        "value": "1"
-                    }
-                }, 
-                "id": "E2", 
-                "isPattern": "false", 
-                "type": "Test"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-
-
-6. Append entity E3 with two attributes with identical names 'A4', types 'test' and WITHOUT meta IDs
-HTTP/1.1 200 OK
-Content-Length: 489
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A4", 
-                        "type": "test", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "A4", 
-                        "type": "test", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E3", 
-                "isPattern": "false", 
-                "type": "Test"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-
-
-7. JsonAttributeObjectQuery Query for the entity E3 for attribute A4 - only one attribute is returned
 HTTP/1.1 200 OK
 Content-Length: 538
 Content-Type: application/json
