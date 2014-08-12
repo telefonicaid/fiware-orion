@@ -1,0 +1,312 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# fermin at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+#
+# Uncached/Cached query
+#
+# 1. Start a contextBroker (working as broker)
+# 2. Start another contextBroker (working as contextProvider)
+# 3. Register an entity/attribute E1/A1 in broker1, with broker2 as providing application
+# 4. Query broker1 for E1/A1 (will go to broker2, but broker2 doesn't know about E1/A1)
+# 5. Update/APPEND E1/A1(=CP1) in broker2
+# 6. Query broker1 for E1/A1 (will go to broker2 and it will work)
+# 7. Update/APPEND E1/A1(=CB) in broker1
+# 8. Query broker1 for E1/A1 (will NOT go to broker2, but broker1's local info is returned)
+#
+
+--NAME--
+Query Redirect Operation
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+brokerStart CP1
+
+--SHELL--
+echo "1. contextBroker running"
+echo "2. contextProvider1 running"
+
+echo "3. Register an entity/attribute E1/A1 in broker, with contextProvider1 as providing application"
+url="/ngsi9/registerContext"
+payload='<?xml version="1.0"?>
+  <registerContextRequest>
+    <contextRegistrationList>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="E" isPattern="false">
+            <id>E1</id>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
+          <contextRegistrationAttribute>
+            <name>A1</name>
+            <type>T1</type>
+            <isDomain>false</isDomain>
+          </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://localhost:'$CP1_PORT'/</providingApplication>
+      </contextRegistration>
+    </contextRegistrationList>
+    <registrationId></registrationId>
+  </registerContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "4. Query broker1 for E1/A1 (will go to broker2, but broker2 doesn't know about E1/A1)"
+url="/ngsi10/queryContext"
+payload='<?xml version="1.0"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="E" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A1</attribute>
+  </attributeList>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "5. Update/APPEND E1/A1(=CP1) in broker2"
+url="/ngsi10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="E" isPattern="false">
+        <id>E1</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A1</name>
+          <type>T1</type>
+          <contextValue>CP1</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "6. Query broker1 for E1/A1 (will go to broker2 and it will work)"
+url="/ngsi10/queryContext"
+payload='<?xml version="1.0"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="E" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A1</attribute>
+  </attributeList>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "7. Update/APPEND E1/A1(=CB) in broker1"
+url="/ngsi10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="E" isPattern="false">
+        <id>E1</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A1</name>
+          <type>T1</type>
+          <contextValue>CB</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "8. Query broker1 for E1/A1 (will NOT go to broker2, but broker1's local info is returned"
+url="/ngsi10/queryContext"
+payload='<?xml version="1.0"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="E" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A1</attribute>
+  </attributeList>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+--REGEXPECT--
+1. contextBroker running
+2. contextProvider1 running
+3. Register an entity/attribute E1/A1 in broker, with contextProvider1 as providing application
+HTTP/1.1 200 OK
+Content-Length: 142
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<registerContextResponse>
+  <duration>PT24H</duration>
+  <registrationId>REGEX([0-9a-f]{24})</registrationId>
+</registerContextResponse>
+
+
+4. Query broker1 for E1/A1 (will go to broker2, but broker2 doesn't know about E1/A1)
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+</queryContextResponse>
+
+
+5. Update/APPEND E1/A1(=CP1) in broker2
+HTTP/1.1 200 OK
+Content-Length: 616
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="E" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>T1</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+6. Query broker1 for E1/A1 (will go to broker2 and it will work)
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+</queryContextResponse>
+
+
+7. Update/APPEND E1/A1(=CB) in broker1
+HTTP/1.1 200 OK
+Content-Length: 616
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="E" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>T1</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+8. Query broker1 for E1/A1 (will NOT go to broker2, but broker1's local info is returned
+HTTP/1.1 200 OK
+Content-Length: 616
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="E" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>T1</type>
+            <contextValue>CB</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
