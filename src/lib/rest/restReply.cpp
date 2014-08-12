@@ -191,7 +191,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, const std::str
    else if (tag == "queryContextResponse")
    {
       QueryContextResponse qcr(errorCode);
-      reply =  qcr.render(QueryContext, format, indent);
+      reply =  qcr.render(ciP, QueryContext, indent);
    }
    else if (tag == "subscribeContextResponse")
    {
@@ -211,7 +211,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, const std::str
    else if (tag == "updateContextResponse")
    {
       UpdateContextResponse ucr(errorCode);
-      reply = ucr.render(UpdateContext, format, indent);
+      reply = ucr.render(ciP, UpdateContext, indent);
    }
    else if (tag == "notifyContextResponse")
    {

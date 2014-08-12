@@ -42,7 +42,7 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
   std::string            answer;
 
   ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, &upcr, ciP->tenant, ciP->servicePathV);
-  answer = upcr.render(UpdateContext, ciP->outFormat, "");
+  answer = upcr.render(ciP, UpdateContext, "");
 
   return answer;
 }

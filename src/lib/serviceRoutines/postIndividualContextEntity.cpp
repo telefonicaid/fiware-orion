@@ -49,7 +49,7 @@ std::string postIndividualContextEntity(ConnectionInfo* ciP, int components, std
   LM_T(LmtConvenience, ("CONVENIENCE: got a 'POST' request for entityId '%s'", entityId.c_str()));
 
   ciP->httpStatusCode = mapPostIndividualContextEntity(entityId, &parseDataP->acer.res, &response, ciP);
-  answer = response.render(IndividualContextEntity, ciP->outFormat, "");
+  answer = response.render(ciP, IndividualContextEntity, "");
   response.release();
 
   return answer;

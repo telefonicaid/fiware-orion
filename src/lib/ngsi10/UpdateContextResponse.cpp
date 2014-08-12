@@ -34,7 +34,7 @@
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextResponse.h"
-
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -46,6 +46,8 @@ UpdateContextResponse::UpdateContextResponse()
 {
   errorCode.tagSet("errorCode");
 }
+
+
 
 /* ****************************************************************************
 *
@@ -59,6 +61,7 @@ UpdateContextResponse::~UpdateContextResponse()
 }
 
 
+
 /* ****************************************************************************
 *
 * UpdateContextResponse::UpdateContextResponse - 
@@ -66,7 +69,6 @@ UpdateContextResponse::~UpdateContextResponse()
 UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
 {
   errorCode = _errorCode;
-
   errorCode.tagSet("errorCode");
 }
 
@@ -76,29 +78,29 @@ UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
 *
 * UpdateContextResponse::render - 
 */
-std::string UpdateContextResponse::render(RequestType requestType, Format format, const std::string& indent)
+std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "updateContextResponse";
 
-  out += startTag(indent, tag, format, false);
+  out += startTag(indent, tag, ciP->outFormat, false);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(format, indent + "  ");
+    out += errorCode.render(ciP->outFormat, indent + "  ");
   }
   else
   {
     if (contextElementResponseVector.size() == 0)
     {
       errorCode.fill(SccContextElementNotFound);
-      out += errorCode.render(format, indent + "  ");
+      out += errorCode.render(ciP->outFormat, indent + "  ");
     }
     else
-      out += contextElementResponseVector.render(UpdateContext, format, indent + "  ");
+      out += contextElementResponseVector.render(ciP, UpdateContext, indent + "  ");
   }
   
-  out += endTag(indent, tag, format);
+  out += endTag(indent, tag, ciP->outFormat);
 
   return out;
 }

@@ -33,6 +33,7 @@
 #include "ngsi/StatusCode.h"
 #include "convenience/ContextAttributeResponse.h"
 #include "ngsi/Request.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -40,15 +41,15 @@
 *
 * render - 
 */
-std::string ContextAttributeResponse::render(RequestType request, Format format, std::string indent)
+std::string ContextAttributeResponse::render(ConnectionInfo* ciP, RequestType request, std::string indent)
 {
   std::string tag = "contextAttributeResponse";
   std::string out = "";
 
-  out += startTag(indent, tag, format, false);
-  out += contextAttributeVector.render(request, format, indent + "  ", true);
-  out += statusCode.render(format, indent + "  ");
-  out += endTag(indent, tag, format);
+  out += startTag(indent, tag, ciP->outFormat, false);
+  out += contextAttributeVector.render(ciP, request, indent + "  ", true);
+  out += statusCode.render(ciP->outFormat, indent + "  ");
+  out += endTag(indent, tag, ciP->outFormat);
 
   return out;
 }
@@ -59,7 +60,14 @@ std::string ContextAttributeResponse::render(RequestType request, Format format,
 *
 * check - 
 */
-std::string ContextAttributeResponse::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ContextAttributeResponse::check
+(
+  ConnectionInfo*  ciP,
+  RequestType      requestType,
+  std::string      indent,
+  std::string      predetectedError,
+  int              counter
+)
 {
    std::string  res;
 
@@ -67,7 +75,7 @@ std::string ContextAttributeResponse::check(RequestType requestType, Format form
    {
      statusCode.fill(SccBadRequest, predetectedError);
    }
-   else if ((res = contextAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+   else if ((res = contextAttributeVector.check(requestType, ciP->outFormat, indent, predetectedError, counter)) != "OK")
    {
      LM_W(("Bad Input (contextAttributeVector: '%s')", res.c_str()));
      statusCode.fill(SccBadRequest, res);
@@ -82,7 +90,7 @@ std::string ContextAttributeResponse::check(RequestType requestType, Format form
    else 
      return "OK";
 
-   return render(requestType, format, indent);
+   return render(ciP, requestType, indent);
 }
 
 

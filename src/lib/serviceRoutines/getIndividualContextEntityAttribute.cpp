@@ -50,7 +50,7 @@ std::string getIndividualContextEntityAttribute(ConnectionInfo* ciP, int compone
   LM_T(LmtConvenience, ("CONVENIENCE: got 'GET' request with %d components", components));
 
   ciP->httpStatusCode = mapGetIndividualContextEntityAttribute(entityId, attributeName, &response, ciP);
-  answer = response.render(IndividualContextEntityAttribute, ciP->outFormat, "");
+  answer = response.render(ciP, IndividualContextEntityAttribute, "");
   response.release();
 
   return answer;
