@@ -23,14 +23,15 @@
 #
 # Uncached/Cached query
 #
-# 1. Start a contextBroker (working as broker)
-# 2. Start another contextBroker (working as contextProvider)
-# 3. Register an entity/attribute E1/A1 in broker1, with broker2 as providing application
-# 4. Query broker1 for E1/A1 (will go to broker2, but broker2 doesn't know about E1/A1)
-# 5. Update/APPEND E1/A1(=CP1) in broker2
-# 6. Query broker1 for E1/A1 (will go to broker2 and it will work)
-# 7. Update/APPEND E1/A1(=CB) in broker1
-# 8. Query broker1 for E1/A1 (will NOT go to broker2, but broker1's local info is returned)
+# 01. Start the contextBroker 'broker'
+# 02. Start contextProvider 'CP' (contextBroker functioning as contextProvider)
+# 03. Query broker for E1/A1 (nothing found)
+# 04. Register an entity/attribute E1/A1 in broker, with CP as providing application
+# 05. Query broker for E1/A1 (will go to CP, but CP doesn't know about E1/A1)
+# 06. Update/APPEND E1/A1(=CP) in CP
+# 07. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)
+# 08. Update/APPEND E1/A1(=broker) in broker
+# 09. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=broker))
 #
 
 --NAME--
@@ -40,11 +41,33 @@ dbInit CB
 brokerStart CB
 brokerStart CP1
 
---SHELL--
-echo "1. contextBroker running"
-echo "2. contextProvider1 running"
 
-echo "3. Register an entity/attribute E1/A1 in broker, with contextProvider1 as providing application"
+--SHELL--
+echo "01. contextBroker running"
+echo "02. contextProvider running (contextBroker functioning as contextProvider)"
+echo
+echo
+
+
+echo "03. Query broker for E1/A1 (nothing found)"
+url="/ngsi10/queryContext"
+payload='<?xml version="1.0"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="E" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A1</attribute>
+  </attributeList>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "04. Register an entity/attribute E1/A1 in broker, with CP as providing application"
 url="/ngsi9/registerContext"
 payload='<?xml version="1.0"?>
   <registerContextRequest>
@@ -72,7 +95,7 @@ echo
 echo
 
 
-echo "4. Query broker1 for E1/A1 (will go to broker2, but broker2 doesn't know about E1/A1)"
+echo "05. Query broker for E1/A1 (will go to CP, but CP doesn't know about E1/A1)"
 url="/ngsi10/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -90,7 +113,7 @@ echo
 echo
 
 
-echo "5. Update/APPEND E1/A1(=CP1) in broker2"
+echo "06. Update/APPEND E1/A1(=CP) in CP"
 url="/ngsi10/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
@@ -115,7 +138,7 @@ echo
 echo
 
 
-echo "6. Query broker1 for E1/A1 (will go to broker2 and it will work)"
+echo "07. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)"
 url="/ngsi10/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -133,7 +156,7 @@ echo
 echo
 
 
-echo "7. Update/APPEND E1/A1(=CB) in broker1"
+echo "08. Update/APPEND E1/A1(=broker) in broker"
 url="/ngsi10/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
@@ -158,7 +181,7 @@ echo
 echo
 
 
-echo "8. Query broker1 for E1/A1 (will NOT go to broker2, but broker1's local info is returned"
+echo "09. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=broker))"
 url="/ngsi10/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -177,9 +200,26 @@ echo
 
 
 --REGEXPECT--
-1. contextBroker running
-2. contextProvider1 running
-3. Register an entity/attribute E1/A1 in broker, with contextProvider1 as providing application
+01. contextBroker running
+02. contextProvider running (contextBroker functioning as contextProvider)
+
+
+03. Query broker for E1/A1 (nothing found)
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
+</queryContextResponse>
+
+
+04. Register an entity/attribute E1/A1 in broker, with CP as providing application
 HTTP/1.1 200 OK
 Content-Length: 142
 Content-Type: application/xml
@@ -192,18 +232,23 @@ Date: REGEX(.*)
 </registerContextResponse>
 
 
-4. Query broker1 for E1/A1 (will go to broker2, but broker2 doesn't know about E1/A1)
+05. Query broker for E1/A1 (will go to CP, but CP doesn't know about E1/A1)
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 182
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <queryContextResponse>
+  <errorCode>
+    <code>302</code>
+    <reasonPhrase>Found</reasonPhrase>
+    <details>http://localhost:9801/</details>
+  </errorCode>
 </queryContextResponse>
 
 
-5. Update/APPEND E1/A1(=CP1) in broker2
+06. Update/APPEND E1/A1(=CP) in CP
 HTTP/1.1 200 OK
 Content-Length: 616
 Content-Type: application/xml
@@ -234,18 +279,23 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-6. Query broker1 for E1/A1 (will go to broker2 and it will work)
+07. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 182
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <queryContextResponse>
+  <errorCode>
+    <code>302</code>
+    <reasonPhrase>Found</reasonPhrase>
+    <details>http://localhost:9801/</details>
+  </errorCode>
 </queryContextResponse>
 
 
-7. Update/APPEND E1/A1(=CB) in broker1
+08. Update/APPEND E1/A1(=broker) in broker
 HTTP/1.1 200 OK
 Content-Length: 616
 Content-Type: application/xml
@@ -276,7 +326,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-8. Query broker1 for E1/A1 (will NOT go to broker2, but broker1's local info is returned
+09. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=broker))
 HTTP/1.1 200 OK
 Content-Length: 616
 Content-Type: application/xml
