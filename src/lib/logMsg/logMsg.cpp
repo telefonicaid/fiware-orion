@@ -1913,6 +1913,8 @@ LmStatus lmFdRegister
 
       sz = strlen(startMsg);
 
+      lseek(fd, 0, SEEK_END);
+
       if (write(fd, startMsg, sz) != sz)
       {
         return LmsWrite;
@@ -2201,7 +2203,10 @@ LmStatus lmOut
     }
     else
     {
-      int nb = write(fds[i].fd, line, sz);
+      int nb;
+
+      lseek(fds[i].fd, 0, SEEK_END);
+      nb = write(fds[i].fd, line, sz);
 
       if (nb == -1)
       {
