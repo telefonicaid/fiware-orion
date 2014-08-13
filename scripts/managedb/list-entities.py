@@ -60,7 +60,7 @@ if (range != "hour" and range != "day" and range != "week" and range != "month" 
 # Optional argument: filter
 query = {}
 if len(argv) == 4:
-    query['_id.id'] = {'$regex': argv[2]}
+    query['_id.id'] = {'$regex': argv[3]}
 
 client = MongoClient('localhost', 27017)
 col = client[db]['entities']

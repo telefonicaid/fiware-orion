@@ -48,6 +48,25 @@ function harnessExit()
 
 # ------------------------------------------------------------------------------
 #
+# vMsg - verbose output
+#
+# Remember that if the '--verbose' flag is used, the verboser messages pollute
+# the total answer and the harness test will fail.
+#
+# Verbose mode is only meant to troubleshoot harness tests that fail.
+#
+function vMsg()
+{
+  if [ "$_verbose" == "on" ]
+  then
+    echo $*
+  fi
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
 # dbInit - 
 #
 function dbInit()
@@ -440,6 +459,8 @@ function dbInsertEntity()
 #   --httpTenant  <tenant>         (tenant in HTTP header)
 #   --urlTenant   <tenant>         (tenant in URL)
 #   --servicePath <path>           (Service Path in HTTP header)
+#   --urlParams   <params>         (URI parameters 'in' URL-string)
+#   --verbose                      
 #
 # Any parameters are sent as is to 'curl'
 # 
@@ -459,7 +480,10 @@ function orionCurl()
   _httpTenant=""
   _servicePath=""
   _urlTenant=""
+  _urlParams=''
   _xtra=''
+  _verbose='off'
+  _debug='off'
 
   while [ "$#" != 0 ]
   do
@@ -474,11 +498,21 @@ function orionCurl()
     elif [ "$1" == "--httpTenant" ]; then      _httpTenant="$2"; shift;
     elif [ "$1" == "--servicePath" ]; then     _servicePath="$2"; shift;
     elif [ "$1" == "--urlTenant" ]; then       _urlTenant="$2"; shift;
+    elif [ "$1" == "--urlParams" ]; then       _urlParams=$2; shift;
+    elif [ "$1" == "--verbose" ]; then         _verbose=on;
+    elif [ "$1" == "--debug" ]; then           _debug=on;
     else                                       _xtra="$_xtra $1"; shift;
     fi
 
     shift
   done
+
+
+
+  vMsg urlParams: $_urlParams
+  vMsg URL: $_URL
+
+
 
   #
   # Sanity check of parameters
@@ -532,6 +566,13 @@ function orionCurl()
     _URL=$_host:$_port$_url
   fi
   
+  if [ "$_urlParams" != "" ]
+  then
+    _URL=$_URL'?'$_urlParams
+  fi
+
+  vMsg URL: $_URL
+
   _BUILTINS='-s -S --dump-header /tmp/httpHeaders.out'
 
 #   echo '==============================================================================================================================================================='
@@ -544,15 +585,19 @@ function orionCurl()
   then
      if [ "$_servicePath" != "" ]
      then
+       vMsg _URL1: $_URL
        _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "service-path: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
      else
+       vMsg _URL2: $_URL
        _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
      fi
   else
      if [ "$_servicePath" != "" ]
      then
+       vMsg _URL3: $_URL
        _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "service-path: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
      else
+       vMsg _URL4: $_URL
        _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
      fi
   fi
@@ -569,11 +614,14 @@ function orionCurl()
   then
     if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == "" ]
     then
+      vMsg Running xmllint tool for $_response
       echo $_response | xmllint --format -
     elif [ "$_outFormat" == application/json ]
     then
+      vMsg Running python tool for $_response
       echo $_response | python -mjson.tool
     else
+      vMsg Running xmllint tool for $_response
       echo $_response | xmllint --format -
     fi
   fi
@@ -747,6 +795,7 @@ function coapCurl()
       echo $_response | xmllint --format -
     elif [ "$_outFormat" == application/json ]
     then
+      vMsg "JSON check for:" $_response
       echo $_response | python -mjson.tool
     else
       echo $_response | xmllint --format -
@@ -769,3 +818,4 @@ export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd
 export -f coapCurl
+export -f vMsg

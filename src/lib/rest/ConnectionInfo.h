@@ -38,7 +38,8 @@
 #include "rest/mhd.h"
 #include "rest/Verb.h"
 #include "rest/HttpHeaders.h"
-#include "ngsi/ParseData.h"
+
+struct ParseData;
 
 
 
@@ -56,6 +57,28 @@ public:
     payloadSize            = 0;
     inFormat               = XML;
     outFormat              = XML;
+    httpStatusCode         = SccOk;
+    callNo                 = 1;
+    inCompoundValue        = false;
+    compoundValueRoot      = NULL;
+    compoundValueP         = NULL;
+    parseDataP             = NULL;
+    verb                   = NOVERB;
+    tenant                 = "";
+    servicePath            = "";
+    ip                     = "";
+    port                   = 0;
+
+    memset(payloadWord, 0, sizeof(payloadWord));
+  }
+
+  ConnectionInfo(Format _outFormat)
+  {
+    connection             = NULL;
+    payload                = NULL;
+    payloadSize            = 0;
+    inFormat               = XML;
+    outFormat              = _outFormat;
     httpStatusCode         = SccOk;
     callNo                 = 1;
     inCompoundValue        = false;
