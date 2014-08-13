@@ -330,7 +330,7 @@ std::string sendHttpSocket
   curl_easy_setopt(curl, CURLOPT_HEADER, 1); // Activate include the header in the body output
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); // Put headers in place
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
-  curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) httpResponse); // Custom data for response handling
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) httpResponse); // Custom data for response handling
 
   // Synchronous HTTP request
   LM_T(LmtClientOutputPayload, ("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));

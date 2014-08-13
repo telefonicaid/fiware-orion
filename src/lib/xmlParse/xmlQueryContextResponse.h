@@ -1,9 +1,9 @@
-#ifndef XML_REQUEST_H
-#define XML_REQUEST_H
+#ifndef XML_QUERY_CONTEXT_RESPONSE_H
+#define XML_QUERY_CONTEXT_RESPONSE_H
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -27,7 +27,6 @@
 */
 #include <string>
 
-#include "ngsi/Request.h"
 #include "ngsi/ParseData.h"
 #include "xmlParse/XmlNode.h"
 
@@ -35,35 +34,40 @@
 
 /* ****************************************************************************
 *
-* XmlRequest - 
+* qcrsParseVector - 
 */
-typedef struct XmlRequest
-{
-  RequestType     type;
-  std::string     method;
-  std::string     keyword;
-  XmlNode*        parseVector;
-  RequestInit     init;
-  RequestRelease  release;
-  RequestPresent  present;
-  RequestCheck    check;
-} XmlRequest;
+extern XmlNode qcrsParseVector[];
 
 
 
 /* ****************************************************************************
 *
-* xmlTreat - 
+* qcrsInit - 
 */
-extern std::string xmlTreat
-(
-  const char*      content,
-  ConnectionInfo*  ciP,
-  ParseData*       reqData,
-  RequestType      requestType,
-  std::string      payloadWord,
-  XmlRequest**     reqP,
-  std::string*     errorMsgP = NULL
-);
+extern void qcrsInit(ParseData* reqData);
+
+
+
+/* ****************************************************************************
+*
+* qcrsRelease - 
+*/
+extern void qcrsRelease(ParseData* reqData);
+
+
+
+/* ****************************************************************************
+*
+* qcrsCheck - 
+*/
+extern std::string qcrsCheck(ParseData* reqData, ConnectionInfo* ciP);
+
+
+
+/* ****************************************************************************
+*
+* qcrsPresent - 
+*/
+extern void qcrsPresent(ParseData* reqData);
 
 #endif

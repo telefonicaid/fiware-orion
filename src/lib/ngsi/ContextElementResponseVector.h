@@ -47,6 +47,7 @@ typedef struct ContextElementResponseVector
   unsigned int             size(void);
   ContextElementResponse*  get(unsigned int ix);
   void                     release();
+  void                     fill(struct ContextElementResponseVector* cervP);
 
   ContextElementResponse*  operator[](unsigned int ix)       { if (ix < vec.size()) return vec[ix]; else return NULL; }
 } ContextElementResponseVector;

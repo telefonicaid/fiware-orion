@@ -57,10 +57,19 @@ function dbInit()
 
   if [ "$role" == "CB" ]
   then
-    echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
+    echo 'db.dropDatabase()' | mongo ${CB_DATABASE_NAME} --quiet
   elif [ "$role" == "CM" ]
   then
-    echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE2_NAME} --quiet
+    echo 'db.dropDatabase()' | mongo ${CM_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP1" ]
+  then
+    echo 'db.dropDatabase()' | mongo ${CP1_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP2" ]
+  then
+    echo 'db.dropDatabase()' | mongo ${CP2_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP3" ]
+  then
+    echo 'db.dropDatabase()' | mongo ${CP3_DATABASE_NAME} --quiet
   else
     echo 'db.dropDatabase()' | mongo $db --quiet
   fi

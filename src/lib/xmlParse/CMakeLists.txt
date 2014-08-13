@@ -29,6 +29,7 @@ SET (SOURCES
     xmlNotifyContextAvailabilityRequest.cpp
 
     xmlQueryContextRequest.cpp
+    xmlQueryContextResponse.cpp
     xmlSubscribeContextRequest.cpp
     xmlUnsubscribeContextRequest.cpp
     xmlUpdateContextRequest.cpp
@@ -55,6 +56,7 @@ SET (HEADERS
     xmlNotifyContextAvailabilityRequest.h
 
     xmlQueryContextRequest.h
+    xmlQueryContextResponse.h
     xmlSubscribeContextRequest.h
     xmlUnsubscribeContextRequest.h
     xmlUpdateContextRequest.h

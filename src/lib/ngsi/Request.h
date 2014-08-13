@@ -48,6 +48,7 @@ typedef enum RequestType
   NotifyContextAvailability,
 
   QueryContext = 11,
+  RtQueryContextResponse,
   SubscribeContext,
   UpdateContextSubscription,
   UnsubscribeContext,

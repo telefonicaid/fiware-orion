@@ -103,6 +103,9 @@ int noOfRtSubscribeError                                 = -1;
 /* ****************************************************************************
 *
 * statisticsUpdate - 
+*
+* FIXME P6: No statistics for received QueryResponses (Response from Provider Application
+*           after forwarding a query)
 */
 void statisticsUpdate(RequestType request, Format inFormat)
 {
@@ -127,6 +130,7 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case NotifyContextAvailability:                        ++noOfAvailabilityNotificationsReceived; break;
 
   case QueryContext:                                     ++noOfQueries; break;
+  case RtQueryContextResponse:                           break;
   case SubscribeContext:                                 ++noOfSubscriptions; break;
   case UpdateContextSubscription:                        ++noOfSubscriptionUpdates; break;
   case UnsubscribeContext:                               ++noOfUnsubscriptions; break;

@@ -42,6 +42,7 @@ const char* requestType(RequestType rt)
   case UnsubscribeContextAvailability:              return "UnsubscribeContextAvailabilityRequest";
   case NotifyContextAvailability:                   return "NotifyContextAvailabilityRequest";
   case QueryContext:                                return "QueryContextRequest";
+  case RtQueryContextResponse:                      return "QueryContextResponse";
   case SubscribeContext:                            return "SubscribeContextRequest";
   case UpdateContextSubscription:                   return "UpdateContextSubscriptionRequest";
   case UnsubscribeContext:                          return "UnsubscribeContextRequest";

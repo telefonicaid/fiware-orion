@@ -129,3 +129,14 @@ void AttributeDomainName::release(void)
 {
    /* This method is included for the sake of homogeneity */
 }
+
+
+
+/* ****************************************************************************
+*
+* clone - 
+*/
+void AttributeDomainName::clone(const AttributeDomainName& adn)
+{
+  string = adn.string;
+}

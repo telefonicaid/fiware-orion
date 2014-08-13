@@ -48,6 +48,7 @@ typedef struct AttributeDomainName
   void          present(const std::string& indent);
   const char*   c_str();
   void          release(void);
+  void          clone(const AttributeDomainName& adn);
 } AttributeDomainName;
 
 #endif

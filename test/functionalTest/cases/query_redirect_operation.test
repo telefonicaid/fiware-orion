@@ -29,17 +29,19 @@
 # 04. Register an entity/attribute E1/A1 in broker, with CP as providing application
 # 05. Query broker for E1/A1 (will go to CP, but CP doesn't know about E1/A1)
 # 06. Update/APPEND E1/A1(=CP) in CP
-# 07. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)
-# 08. Update/APPEND E1/A1(=broker) in broker
-# 09. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=broker))
+# 07. Query CP for E1/A1
+# 08. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)
+# 09. Update/APPEND E1/A1(=broker) in broker
+# 10. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=broker))
 #
 
 --NAME--
 Query Redirect Operation
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
-brokerStart CP1
+dbInit CP1
+brokerStart CB 0
+brokerStart CP1 0
 
 
 --SHELL--
@@ -126,7 +128,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
         <contextAttribute>
           <name>A1</name>
           <type>T1</type>
-          <contextValue>CP1</contextValue>
+          <contextValue>CP</contextValue>
         </contextAttribute>
       </contextAttributeList>
     </contextElement>
@@ -138,7 +140,25 @@ echo
 echo
 
 
-echo "07. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)"
+echo "07. Query CP for E1/A1"
+url="/ngsi10/queryContext"
+payload='<?xml version="1.0"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="E" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A1</attribute>
+  </attributeList>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "08. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)"
 url="/ngsi10/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -156,7 +176,7 @@ echo
 echo
 
 
-echo "08. Update/APPEND E1/A1(=broker) in broker"
+echo "09. Update/APPEND E1/A1(=broker) in broker"
 url="/ngsi10/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
@@ -181,7 +201,7 @@ echo
 echo
 
 
-echo "09. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=broker))"
+echo "10. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=broker))"
 url="/ngsi10/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -234,16 +254,15 @@ Date: REGEX(.*)
 
 05. Query broker for E1/A1 (will go to CP, but CP doesn't know about E1/A1)
 HTTP/1.1 200 OK
-Content-Length: 182
+Content-Length: 155
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
-    <code>302</code>
-    <reasonPhrase>Found</reasonPhrase>
-    <details>http://localhost:9801/</details>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
   </errorCode>
 </queryContextResponse>
 
@@ -279,23 +298,69 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-07. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)
+07. Query CP for E1/A1
 HTTP/1.1 200 OK
-Content-Length: 182
+Content-Length: 616
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <queryContextResponse>
-  <errorCode>
-    <code>302</code>
-    <reasonPhrase>Found</reasonPhrase>
-    <details>http://localhost:9801/</details>
-  </errorCode>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="E" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>T1</type>
+            <contextValue>CP</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
 </queryContextResponse>
 
 
-08. Update/APPEND E1/A1(=broker) in broker
+08. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)
+HTTP/1.1 200 OK
+Content-Length: 616
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="E" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>T1</type>
+            <contextValue>CP</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+09. Update/APPEND E1/A1(=broker) in broker
 HTTP/1.1 200 OK
 Content-Length: 616
 Content-Type: application/xml
@@ -326,7 +391,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-09. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=broker))
+10. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=broker))
 HTTP/1.1 200 OK
 Content-Length: 616
 Content-Type: application/xml
