@@ -45,6 +45,7 @@
 #include "xmlParse/xmlUnsubscribeContextRequest.h"
 #include "xmlParse/xmlUpdateContextSubscriptionRequest.h"
 #include "xmlParse/xmlUpdateContextRequest.h"
+#include "xmlParse/xmlUpdateContextResponse.h"
 #include "xmlParse/xmlRegisterProviderRequest.h"
 #include "xmlParse/xmlUpdateContextElementRequest.h"
 #include "xmlParse/xmlAppendContextElementRequest.h"
@@ -133,6 +134,7 @@ static XmlRequest xmlRequest[] =
   // Responses
   { RegisterResponse,                      "POST", "registerContextResponse",                      rcrsParseVector,  rcrsInit,  rcrsRelease,  rcrsPresent,  rcrsCheck  },
   { RtQueryContextResponse,                "POST", "queryContextResponse",                         qcrsParseVector,  qcrsInit,  qcrsRelease,  qcrsPresent,  qcrsCheck  },
+  { RtUpdateContextResponse,               "POST", "updateContextResponse",                        upcrsParseVector, upcrsInit, upcrsRelease, upcrsPresent, upcrsCheck },
 
   // Without payload
   { LogRequest,                            "*", "", NULL, NULL, NULL, NULL, NULL },
@@ -169,10 +171,19 @@ static XmlRequest* xmlRequestGet(RequestType request, std::string method)
 *
 * xmlTreat -
 */
-std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* parseDataP, RequestType request, std::string payloadWord, XmlRequest** reqPP, std::string* errorMsgP)
+std::string xmlTreat
+(
+  const char*      content,
+  ConnectionInfo*  ciP,
+  ParseData*       parseDataP,
+  RequestType      request,
+  std::string      payloadWord,
+  XmlRequest**     reqPP,
+  std::string*     errorMsgP
+)
 {
-  xml_document<> doc;
-  char*          xmlPayload = (char*) content;
+  xml_document<>  doc;
+  char*           xmlPayload = (char*) content;
 
   try
   {

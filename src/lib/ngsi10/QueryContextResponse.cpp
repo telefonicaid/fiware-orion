@@ -44,6 +44,7 @@ QueryContextResponse::QueryContextResponse()
 }
 
 
+
 /* ****************************************************************************
 *
 * QueryContextResponse::QueryContextResponse - 
@@ -52,7 +53,10 @@ QueryContextResponse::QueryContextResponse(StatusCode& _errorCode)
 {
   errorCode.fill(&_errorCode);
   errorCode.tagSet("errorCode");
+  LM_T(LmtDestructor, ("destroyed"));
 }
+
+
 
 /* ****************************************************************************
 *
@@ -60,9 +64,12 @@ QueryContextResponse::QueryContextResponse(StatusCode& _errorCode)
 */
 QueryContextResponse::~QueryContextResponse()
 {
+  errorCode.release();
   contextElementResponseVector.release();
   LM_T(LmtDestructor,("destroyed"));
 }
+
+
 
 /* ****************************************************************************
 *

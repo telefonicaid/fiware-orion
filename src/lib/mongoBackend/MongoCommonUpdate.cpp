@@ -1724,8 +1724,10 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
           attrL.push_back(ceP->contextAttributeVector.get(ix)->name);
         }
 
+        //
         // For now, we use limit=1. That's ensures that as much as one providing application is returned. In the future,
         // we would consider leave this limit open and define an algorithm to pick the right one, and ordered list, etc.
+        //
         if (registrationsQuery(enV, attrL, &crrV, &err, tenant, 0, 1, false))
         {
           if (crrV.size() > 0)
@@ -1749,38 +1751,46 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
       }
       else
       {
+        /* Creating the part of the response that doesn't depend on success or failure */
+        ContextElementResponse* cerP = new ContextElementResponse();
 
-            /* Creating the part of the response that doesn't depend on success or failure */
-            ContextElementResponse* cerP = new ContextElementResponse();
-            cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
-            for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
-                ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
-                ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);                
-                setResponseMetadata(caP, ca);
-                cerP->contextElement.contextAttributeVector.push_back(ca);
-            }
+        cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
 
-            std::string errReason, errDetail;
-            if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant, servicePathV)) {
-               cerP->statusCode.fill(SccInvalidParameter, errDetail);
-            }
-            else {
-               cerP->statusCode.fill(SccOk);
-
-                /* Successful creation: send potential notifications */
-                std::map<string, BSONObj*> subsToNotify;
-                for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
-                    std::string err;
-                    if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err, tenant))
-                    {
-                      cerP->statusCode.fill(SccReceiverInternalError, err);
-                      responseP->contextElementResponseVector.push_back(cerP);
-                      return;
-                    }
-                }
-                processSubscriptions(enP, &subsToNotify, &errReason, tenant);
-            }
-            responseP->contextElementResponseVector.push_back(cerP);
+        for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+        {
+          ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
+          ContextAttribute* ca  = new ContextAttribute(caP->name, caP->type);                
+          setResponseMetadata(caP, ca);
+          cerP->contextElement.contextAttributeVector.push_back(ca);
         }
+
+        std::string errReason, errDetail;
+        if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant, servicePathV))
+        {
+          cerP->statusCode.fill(SccInvalidParameter, errDetail);
+        }
+        else
+        {
+          cerP->statusCode.fill(SccOk);
+          
+          /* Successful creation: send potential notifications */
+          std::map<string, BSONObj*> subsToNotify;
+          for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+          {
+            std::string err;
+
+            if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err, tenant))
+            {
+              cerP->statusCode.fill(SccReceiverInternalError, err);
+              responseP->contextElementResponseVector.push_back(cerP);
+              return;
+            }
+          }
+
+          processSubscriptions(enP, &subsToNotify, &errReason, tenant);
+        }
+
+        responseP->contextElementResponseVector.push_back(cerP);
+      }
     }
 }

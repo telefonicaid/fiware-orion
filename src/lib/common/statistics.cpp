@@ -130,12 +130,13 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case NotifyContextAvailability:                        ++noOfAvailabilityNotificationsReceived; break;
 
   case QueryContext:                                     ++noOfQueries; break;
-  case RtQueryContextResponse:                           break;
   case SubscribeContext:                                 ++noOfSubscriptions; break;
   case UpdateContextSubscription:                        ++noOfSubscriptionUpdates; break;
   case UnsubscribeContext:                               ++noOfUnsubscriptions; break;
   case NotifyContext:                                    ++noOfNotificationsReceived; break;
   case UpdateContext:                                    ++noOfUpdates; break;
+  case RtQueryContextResponse:                           break;
+  case RtUpdateContextResponse:                          break;
 
   case ContextEntitiesByEntityId:                        ++noOfContextEntitiesByEntityId; break;
   case ContextEntityAttributes:                          ++noOfContextEntityAttributes; break;

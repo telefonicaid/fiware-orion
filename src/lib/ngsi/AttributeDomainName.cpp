@@ -134,9 +134,9 @@ void AttributeDomainName::release(void)
 
 /* ****************************************************************************
 *
-* clone - 
+* fill - 
 */
-void AttributeDomainName::clone(const AttributeDomainName& adn)
+void AttributeDomainName::fill(const AttributeDomainName& adn)
 {
   string = adn.string;
 }

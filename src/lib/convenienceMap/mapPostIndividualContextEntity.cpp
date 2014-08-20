@@ -52,7 +52,7 @@ HttpStatusCode mapPostIndividualContextEntity(const std::string& entityId, Appen
 
   ceP->entityId.fill(entityId, "", "false");
   ceP->attributeDomainName    = request->attributeDomainName;
-  ceP->contextAttributeVector.fill(request->contextAttributeVector); // Here I get a pointer to the metadata that is freed twice ...
+  ceP->contextAttributeVector.fill((ContextAttributeVector*) &request->contextAttributeVector);
   
   ucRequest.contextElementVector.push_back(ceP);
   ucRequest.updateActionType.set("Append");

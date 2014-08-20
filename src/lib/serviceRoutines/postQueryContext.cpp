@@ -53,13 +53,15 @@ static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
 */
 std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
+  static int callNo = 0;
+
+  ++callNo;
+
+
   QueryContextResponse  qcr;
   std::string           answer;
    
   ciP->httpStatusCode = mongoQueryContext(&parseDataP->qcr.res, &qcr, ciP->tenant, ciP->servicePathV, ciP->uriParam);
-
-  LM_M(("kz. IN postQueryContext. mongoQueryContext response: %d", ciP->httpStatusCode));
-  LM_M(("kz. IN postQueryContext. errorCode.code:             %d", qcr.errorCode.code));
 
   // If no redirectioning is necessary, just return the result
   if (qcr.errorCode.code != SccFound)
@@ -75,8 +77,6 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
   int             port;
   std::string     prefix;
 
-  LM_M(("kz. Got a FOUND"));
-
   //
   // A has been found on some context provider.
   // We need to forward the query request to the context provider, indicated in qcr.errorCode.details.
@@ -86,7 +86,7 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
   // 3. Render an XML-string of the request we want to forward
   // 4. Send the request to the providing application (and await the response)
   // 5. Parse the XML response and fill in a binary QueryContextResponse
-  // 6. Replace the ContextElementResponse that was "Found" with the info in the QueryContextResponse
+  // 6. Render QueryContextResponse from the providing application 
   //
 
 
@@ -106,7 +106,6 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
     answer = qcrs.render(QueryContext, ciP->outFormat, "");
     return answer;
   }
-  LM_M(("kz. Providing App: %s POST %s:%d%s/ngsi/queryContext", protocol.c_str(), ip.c_str(), port, prefix.c_str()));
 
 
   //
@@ -129,7 +128,6 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
     answer = qcrs.render(QueryContext, ciP->outFormat, "");
     return answer;
   }
-  LM_M(("kz. payload to send to providing application:\n%s", cleanPayload));
 
 
   //
@@ -138,11 +136,10 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
   //
   std::string     out;
   std::string     verb         = "POST";
-  std::string     resource     = prefix + "/ngsi10/queryContext";
+  std::string     resource     = prefix + "/queryContext";
   std::string     tenant       = ciP->tenant;
 
   out = sendHttpSocket(ip, port, protocol, verb, tenant, resource, "application/xml", payload, false, true);
-  LM_M(("kz. sendHttpSocket returned:\n%s", out.c_str()));
 
   if ((out == "error") || (out == ""))
   {
@@ -150,19 +147,21 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
 
     qcrs.errorCode.fill(SccReceiverInternalError, "error forwarding query to providing application,");
     answer = qcrs.render(QueryContext, ciP->outFormat, "");
+    LM_E(("Runtime Error (error forwarding 'Query' to providing application)"));
     return answer;
   }
 
 
+  //
+  // 5. Parse the XML response and fill in a binary QueryContextResponse
+  //
   ParseData    parseData;
   std::string  s;
   std::string  errorMsg;
 
   cleanPayload = xmlPayloadClean(out.c_str(), "<queryContextResponse>");
-  LM_M(("kz. payload received from providing application:\n%s", cleanPayload));
 
   s = xmlTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL, &errorMsg);
-  LM_M(("kz. xmlTreat returned:\n%s", s.c_str()));
   if (s != "OK")
   {
     QueryContextResponse qcrs;
@@ -172,18 +171,29 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
     answer = qcrs.render(QueryContext, ciP->outFormat, "");
     return answer;
   }
-  LM_M(("------------------------ XML Treat OK (kz) -----------------------------"));
 
+
+  //
+  // 6. Render QueryContextResponse from the providing application 
+  //
   char portV[16];
   snprintf(portV, sizeof(portV), "%d", port);
 
   // Fill in the response from the redirection into the response to the originator of this request
   QueryContextResponse* qcrsP = &parseData.qcrs.res;
 
-  LM_M(("kz. Got %d Context Element Responses", qcrsP->contextElementResponseVector.size()));
-  LM_M(("kz. Got errorCode %d (%s), details '%s'", qcrsP->errorCode.code, qcrsP->errorCode.reasonPhrase.c_str(), qcrsP->errorCode.details.c_str()));
+  //
+  // Returning 'redirected to' in StatusCode::details
+  //
+  if (((qcrsP->errorCode.code != SccOk) && (qcrsP->errorCode.code != SccNone)) && (qcrsP->errorCode.details == ""))
+  {
+    qcrsP->errorCode.details = "Redirected to context provider " + ip + ":" + portV + prefix;
+  }
+  else if ((qcrsP->contextElementResponseVector.size() > 0) && (qcrsP->contextElementResponseVector[0]->statusCode.details == ""))
+  {
+    qcrsP->contextElementResponseVector[0]->statusCode.details = "Redirected to context provider " + ip + ":" + portV + prefix;
+  }
 
   answer = qcrsP->render(QueryContext, ciP->outFormat, "");
   return answer;
 }
-

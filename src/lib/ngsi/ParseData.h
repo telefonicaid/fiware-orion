@@ -46,6 +46,7 @@
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UpdateContextRequest.h"
+#include "ngsi10/UpdateContextResponse.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "convenience/RegisterProviderRequest.h"
@@ -239,6 +240,21 @@ typedef struct UpdateContextData
 
 /* ****************************************************************************
 *
+* UpdateContextResponseData - 
+*/
+typedef struct UpdateContextResponseData
+{
+  UpdateContextResponse    res;
+  ContextElementResponse*  cerP;
+  ContextAttribute*        attributeP;
+  Metadata*                metadataP;
+  Metadata*                domainMetadataP;
+} UpdateContextResponseData;
+
+
+
+/* ****************************************************************************
+*
 * UpdateContextSubscriptionData - 
 */
 typedef struct UpdateContextSubscriptionData
@@ -336,7 +352,7 @@ typedef struct ParseData
 
   RegisterContextResponseData                 rcrs;
   QueryContextResponseData                    qcrs;
-  
+  UpdateContextResponseData                   upcrs;
 } ParseData;
 
 #endif

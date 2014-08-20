@@ -21,55 +21,38 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 #
-# Uncached/Cached query
+# Uncached/Cached update/DELETE
 #
 # 01. Start the contextBroker 'broker'
 # 02. Start contextProvider 'CP' (contextBroker functioning as contextProvider)
-# 03. Query broker for E1/A1 (nothing found)
-# 04. Register an entity/attribute E1/A1 in broker, with CP as providing application
-# 05. Query broker for E1/A1 (will go to CP, but CP doesn't know about E1/A1)
-# 06. Update/APPEND E1/A1(=CP) in CP
-# 07. Query CP for E1/A1
-# 08. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)
-# 09. Update/APPEND E1/A1(=broker) in broker
-# 10. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=broker))
+#
+# 03. Register an entity/attribute E1/A1 in broker, with CP as providing application
+# 04. Update/APPEND E1/A1(=CP) in CP
+# 05. Query broker for E1/A1 (will go to CP and E1/A1(=CP) is found)
+# 06. Update/DELETE E1/A1 in broker (will go to CP and CP's E1/A1(=CP-2) will be removed)
+# 07. Query broker for E1/A1 (will go to CP but but nothing is found)
 #
 
 --NAME--
-Query Redirect Operation
+Update Redirect/DELETE
 --SHELL-INIT--
+
+rm -f /tmp/orionCurlURL
+
 dbInit CB
 dbInit CP1
-brokerStart CB 0
-brokerStart CP1 0
 
+brokerStart CB
+brokerStart CP1
 
 --SHELL--
 echo "01. contextBroker running"
-echo "02. contextProvider running (contextBroker functioning as contextProvider)"
+echo "02. contextProvider1 running (contextBroker functioning as contextProvider)"
 echo
 echo
 
 
-echo "03. Query broker for E1/A1 (nothing found)"
-url="/ngsi10/queryContext"
-payload='<?xml version="1.0"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="E" isPattern="false">
-      <id>E1</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>A1</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo
-echo
-
-
-echo "04. Register an entity/attribute E1/A1 in broker, with CP as providing application"
+echo "03. Register an entity/attribute E1/A1 in broker, with CP as providing application"
 url="/ngsi9/registerContext"
 payload='<?xml version="1.0"?>
   <registerContextRequest>
@@ -97,25 +80,7 @@ echo
 echo
 
 
-echo "05. Query broker for E1/A1 (will go to CP, but CP doesn't know about E1/A1)"
-url="/ngsi10/queryContext"
-payload='<?xml version="1.0"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="E" isPattern="false">
-      <id>E1</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>A1</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo
-echo
-
-
-echo "06. Update/APPEND E1/A1(=CP) in CP"
+echo "04. Update/APPEND E1/A1(=CP) in CP"
 url="/ngsi10/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
@@ -140,25 +105,7 @@ echo
 echo
 
 
-echo "07. Query CP for E1/A1"
-url="/ngsi10/queryContext"
-payload='<?xml version="1.0"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="E" isPattern="false">
-      <id>E1</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>A1</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload" --port $CP1_PORT
-echo
-echo
-
-
-echo "08. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)"
+echo "05. Query broker for E1/A1 (will go to CP and E1/A1(=CP) is found)"
 url="/ngsi10/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -176,7 +123,7 @@ echo
 echo
 
 
-echo "09. Update/APPEND E1/A1(=broker) in broker"
+echo "06. Update/DELETE E1/A1 in broker (will go to CP and CP's E1/A1(=CP-2) will be removed)"
 url="/ngsi10/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
@@ -189,19 +136,19 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
         <contextAttribute>
           <name>A1</name>
           <type>T1</type>
-          <contextValue>CB</contextValue>
+          <contextValue>broker</contextValue>
         </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>APPEND</updateAction>
+  <updateAction>DELETE</updateAction>
 </updateContextRequest>'
 orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
 
-echo "10. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=broker))"
+echo "07. Query broker for E1/A1 (will go to CP but but nothing is found)"
 url="/ngsi10/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -221,25 +168,10 @@ echo
 
 --REGEXPECT--
 01. contextBroker running
-02. contextProvider running (contextBroker functioning as contextProvider)
+02. contextProvider1 running (contextBroker functioning as contextProvider)
 
 
-03. Query broker for E1/A1 (nothing found)
-HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-  </errorCode>
-</queryContextResponse>
-
-
-04. Register an entity/attribute E1/A1 in broker, with CP as providing application
+03. Register an entity/attribute E1/A1 in broker, with CP as providing application
 HTTP/1.1 200 OK
 Content-Length: 142
 Content-Type: application/xml
@@ -252,23 +184,7 @@ Date: REGEX(.*)
 </registerContextResponse>
 
 
-05. Query broker for E1/A1 (will go to CP, but CP doesn't know about E1/A1)
-HTTP/1.1 200 OK
-Content-Length: 231
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Redirected to context provider localhost:9801/ngsi10</details>
-  </errorCode>
-</queryContextResponse>
-
-
-06. Update/APPEND E1/A1(=CP) in CP
+04. Update/APPEND E1/A1(=CP) in CP
 HTTP/1.1 200 OK
 Content-Length: 616
 Content-Type: application/xml
@@ -299,38 +215,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-07. Query CP for E1/A1
-HTTP/1.1 200 OK
-Content-Length: 616
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="E" isPattern="false">
-          <id>E1</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A1</name>
-            <type>T1</type>
-            <contextValue>CP</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
-
-
-08. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)
+05. Query broker for E1/A1 (will go to CP and E1/A1(=CP) is found)
 HTTP/1.1 200 OK
 Content-Length: 696
 Content-Type: application/xml
@@ -362,9 +247,9 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
-09. Update/APPEND E1/A1(=broker) in broker
+06. Update/DELETE E1/A1 in broker (will go to CP and CP's E1/A1(=CP-2) will be removed)
 HTTP/1.1 200 OK
-Content-Length: 616
+Content-Length: 696
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -387,40 +272,26 @@ Date: REGEX(.*)
       <statusCode>
         <code>200</code>
         <reasonPhrase>OK</reasonPhrase>
+        <details>Redirected to context provider localhost:9801/ngsi10</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
 
 
-10. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=broker))
+07. Query broker for E1/A1 (will go to CP but but nothing is found)
 HTTP/1.1 200 OK
-Content-Length: 616
+Content-Length: 231
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="E" isPattern="false">
-          <id>E1</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A1</name>
-            <type>T1</type>
-            <contextValue>CB</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Redirected to context provider localhost:9801/ngsi10</details>
+  </errorCode>
 </queryContextResponse>
 
 

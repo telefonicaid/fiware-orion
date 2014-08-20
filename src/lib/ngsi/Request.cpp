@@ -48,6 +48,7 @@ const char* requestType(RequestType rt)
   case UnsubscribeContext:                          return "UnsubscribeContextRequest";
   case NotifyContext:                               return "NotifyContextRequest";
   case UpdateContext:                               return "UpdateContextRequest";
+  case RtUpdateContextResponse:                     return "UpdateContextResponse";
 
   case ContextEntitiesByEntityId:                   return "ContextEntitiesByEntityId";
   case ContextEntityAttributes:                     return "ContextEntityAttributes";

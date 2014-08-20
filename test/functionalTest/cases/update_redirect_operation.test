@@ -23,26 +23,33 @@
 #
 # Uncached/Cached update
 #
+#
 # 01. Start the contextBroker 'broker'
 # 02. Start contextProvider 'CP' (contextBroker functioning as contextProvider)
-# 03. Register an entity/attribute E1/A1 in broker, with CP as providing application
-# 04. Update/APPEND E1/A1(=CP) in CP
-# 05. Query broker for E1/A1 (will go to CP and A1=CP is found)
-# 06. Update/UPDATE E1/A1(=CP-2) in broker (is forwarded to CP)
-# 07. Query CP for E1/A1 (A1=CP-2 is found)
-# 08. Update/APPEND E1/A1(=broker) in broker
-# 09. Query broker for E1/A1 (stays local and A1=broker is found)
-# 10. Update/DELETE E1/A1 in broker (its local E1/A1 is removed)
-# 11. Query broker for E1/A1 (will go to CP and A1=CP-2 is found)
-# 12. Update/DELETE E1/A1 in broker (will go to CP and CP's E1/A1 will be removed)
-# 13. Query broker for E1/A1 (doesn't exist)
 #
-
+# 03. Register an entity/attribute E1/A1 in broker, with CP as providing application
+# 04. Update/UPDATE E1/A1(=BAD) broker (is forwarded to CP but nothing is found/updated)
+# 05. Query broker for E1/A1 (is forwarded to CP but nothing is found)
+# 06. Update/APPEND E1/A1(=CP) in CP
+# 07. Query CP for E1/A1 (OK - E1/A1(=CP) is found)
+# 08. Query broker for E1/A1 (is forwarded to CP and E1/A1(=CP) is found)
+# 09. Update/UPDATE E1/A1(=CP-2) broker (is forwarded to CP and now it is updated)
+# 10. Query CP for E1/A1 (OK - E1/A1(=CP-2) is found)
+# 11. Query broker for E1/A1 (is forwarded to CP and E1/A1(=CP-2) is found)
+# 12. Update/APPEND E1/A1(=broker) in broker
+# 13. Query broker for E1/A1 (stays local and A1(=broker) is found)
+# 14. Update/DELETE E1/A1 in broker (its local E1/A1(=broker) is removed)
+# 15. Query broker for E1/A1 (will go to CP and E1/A1(=CP-2) is found)
 
 --NAME--
-Update Redirect Operation
+Update Redirect
 --SHELL-INIT--
+
+rm -f /tmp/orionCurlURL
+
 dbInit CB
+dbInit CP1
+
 brokerStart CB
 brokerStart CP1
 
@@ -71,7 +78,7 @@ payload='<?xml version="1.0"?>
             <isDomain>false</isDomain>
           </contextRegistrationAttribute>
         </contextRegistrationAttributeList>
-        <providingApplication>http://localhost:'$CP1_PORT'/</providingApplication>
+        <providingApplication>http://localhost:'$CP1_PORT'/ngsi10</providingApplication>
       </contextRegistration>
     </contextRegistrationList>
     <registrationId></registrationId>
@@ -80,8 +87,50 @@ orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
+echo "04. Update/UPDATE E1/A1(=BAD) in broker (is forwarded to CP and nothing is found/updated)"
+url="/ngsi10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="E" isPattern="false">
+        <id>E1</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A1</name>
+          <type>T1</type>
+          <contextValue>BAD</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>UPDATE</updateAction>
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
 
-echo "04. Update/APPEND E1/A1(=CP) in CP"
+
+echo "05. Query broker for E1/A1 (is forwarded to CP but nothing is found)"
+url="/ngsi10/queryContext"
+payload='<?xml version="1.0"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="E" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A1</attribute>
+  </attributeList>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "06. Update/APPEND E1/A1(=CP) in CP"
 url="/ngsi10/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
@@ -106,7 +155,25 @@ echo
 echo
 
 
-echo "05. Query broker for E1/A1 (will go to CP and A1=CP is found)"
+echo "07. Query CP for E1/A1 (OK - E1/A1(=CP) is found)"
+url="/ngsi10/queryContext"
+payload='<?xml version="1.0"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="E" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A1</attribute>
+  </attributeList>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload" --port $CP1_PORT
+echo
+echo
+
+
+echo "08. Query broker for E1/A1 (is forwarded to CP and E1/A1(=CP) is found)"
 url="/ngsi10/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -123,7 +190,8 @@ orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
-echo "06. Update/UPDATE E1/A1(=CP-2) in broker (is forwarded to CP)"
+
+echo "09. Update/UPDATE E1/A1(=CP-2) broker (is forwarded to CP and now it is updated)"
 url="/ngsi10/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
@@ -148,7 +216,7 @@ echo
 echo
 
 
-echo "07. Query CP for E1/A1 (A1=CP-2 is found)"
+echo "10. Query CP for E1/A1 (OK - E1/A1(=CP-2) is found)"
 url="/ngsi10/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -166,7 +234,25 @@ echo
 echo
 
 
-echo "08. Update/APPEND E1/A1(=broker) in broker"
+echo "11. Query broker for E1/A1 (is forwarded to CP and E1/A1(=CP-2) is found)"
+url="/ngsi10/queryContext"
+payload='<?xml version="1.0"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="E" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A1</attribute>
+  </attributeList>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "12. Update/APPEND E1/A1(=broker) in broker"
 url="/ngsi10/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
@@ -191,7 +277,7 @@ echo
 echo
 
 
-echo "09. Query broker for E1/A1 (stays local and A1=broker is found)"
+echo "13. Query broker for E1/A1 (stays local and A1(=broker) is found)"
 url="/ngsi10/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -209,7 +295,7 @@ echo
 echo
 
 
-echo "10. Update/DELETE E1/A1 in broker (its local E1/A1 is removed)"
+echo "14. Update/DELETE E1/A1 in broker (its local E1/A1(=broker) is removed)"
 url="/ngsi10/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
@@ -222,7 +308,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
         <contextAttribute>
           <name>A1</name>
           <type>T1</type>
-          <contextValue></contextValue>
+          <contextValue>broker</contextValue>
         </contextAttribute>
       </contextAttributeList>
     </contextElement>
@@ -234,50 +320,7 @@ echo
 echo
 
 
-echo "11. Query broker for E1/A1 (will go to CP and A1=CP-2 is found)"
-url="/ngsi10/queryContext"
-payload='<?xml version="1.0"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="E" isPattern="false">
-      <id>E1</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>A1</attribute>
-  </attributeList>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo
-echo
-
-
-echo "12. Update/DELETE E1/A1 in broker (will go to CP and CP's E1/A1 will be removed)"
-url="/ngsi10/updateContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="E" isPattern="false">
-        <id>E1</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A1</name>
-          <type>T1</type>
-          <contextValue></contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>DELETE</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo
-echo
-
-
-echo "13. Query broker for E1/A1 (doesn't exist)"
+echo "15. Query broker for E1/A1 (will go to CP and E1/A1(=CP-2) is found)"
 url="/ngsi10/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -313,7 +356,48 @@ Date: REGEX(.*)
 </registerContextResponse>
 
 
-04. Update/APPEND E1/A1(=CP) in CP
+04. Update/UPDATE E1/A1(=BAD) in broker (is forwarded to CP and nothing is found/updated)
+HTTP/1.1 200 OK
+Content-Length: 448
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="E" isPattern="false">
+          <id>E1</id>
+        </entityId>
+      </contextElement>
+      <statusCode>
+        <code>404</code>
+        <reasonPhrase>No context element found</reasonPhrase>
+        <details>E1</details>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+05. Query broker for E1/A1 (is forwarded to CP but nothing is found)
+HTTP/1.1 200 OK
+Content-Length: 231
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Redirected to context provider localhost:9801/ngsi10</details>
+  </errorCode>
+</queryContextResponse>
+
+
+06. Update/APPEND E1/A1(=CP) in CP
 HTTP/1.1 200 OK
 Content-Length: 616
 Content-Type: application/xml
@@ -344,25 +428,72 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-05. Query broker for E1/A1 (will go to CP and A1=CP is found)
+07. Query CP for E1/A1 (OK - E1/A1(=CP) is found)
 HTTP/1.1 200 OK
-Content-Length: 182
+Content-Length: 616
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <queryContextResponse>
-  <errorCode>
-    <code>302</code>
-    <reasonPhrase>Found</reasonPhrase>
-    <details>http://localhost:9801/</details>
-  </errorCode>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="E" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>T1</type>
+            <contextValue>CP</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
 </queryContextResponse>
 
 
-06. Update/UPDATE E1/A1(=CP-2) in broker (is forwarded to CP)
+08. Query broker for E1/A1 (is forwarded to CP and E1/A1(=CP) is found)
 HTTP/1.1 200 OK
-Content-Length: 449
+Content-Length: 696
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="E" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>T1</type>
+            <contextValue>CP</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+        <details>Redirected to context provider localhost:9801/ngsi10</details>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+09. Update/UPDATE E1/A1(=CP-2) broker (is forwarded to CP and now it is updated)
+HTTP/1.1 200 OK
+Content-Length: 696
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -374,20 +505,27 @@ Date: REGEX(.*)
         <entityId type="E" isPattern="false">
           <id>E1</id>
         </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>T1</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
       </contextElement>
       <statusCode>
-        <code>302</code>
-        <reasonPhrase>Found</reasonPhrase>
-        <details>http://localhost:9801/</details>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+        <details>Redirected to context provider localhost:9801/ngsi10</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
 
 
-07. Query CP for E1/A1 (A1=CP-2 is found)
+10. Query CP for E1/A1 (OK - E1/A1(=CP-2) is found)
 HTTP/1.1 200 OK
-Content-Length: 616
+Content-Length: 618
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -416,7 +554,39 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
-08. Update/APPEND E1/A1(=broker) in broker
+11. Query broker for E1/A1 (is forwarded to CP and E1/A1(=CP-2) is found)
+HTTP/1.1 200 OK
+Content-Length: 698
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="E" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>T1</type>
+            <contextValue>CP-2</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+        <details>Redirected to context provider localhost:9801/ngsi10</details>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+12. Update/APPEND E1/A1(=broker) in broker
 HTTP/1.1 200 OK
 Content-Length: 616
 Content-Type: application/xml
@@ -447,7 +617,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-09. Query broker for E1/A1 (stays local and A1=broker is found)
+13. Query broker for E1/A1 (stays local and A1(=broker) is found)
 HTTP/1.1 200 OK
 Content-Length: 620
 Content-Type: application/xml
@@ -478,7 +648,7 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
-10. Update/DELETE E1/A1 in broker (its local E1/A1 is removed)
+14. Update/DELETE E1/A1 in broker (its local E1/A1(=broker) is removed)
 HTTP/1.1 200 OK
 Content-Length: 616
 Content-Type: application/xml
@@ -509,30 +679,14 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-11. Query broker for E1/A1 (will go to CP and A1=CP-2 is found)
+15. Query broker for E1/A1 (will go to CP and E1/A1(=CP-2) is found)
 HTTP/1.1 200 OK
-Content-Length: 182
+Content-Length: 698
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <queryContextResponse>
-  <errorCode>
-    <code>302</code>
-    <reasonPhrase>Found</reasonPhrase>
-    <details>http://localhost:9801/</details>
-  </errorCode>
-</queryContextResponse>
-
-
-12. Update/DELETE E1/A1 in broker (will go to CP and CP's E1/A1 will be removed)
-HTTP/1.1 200 OK
-Content-Length: 740
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<updateContextResponse>
   <contextResponseList>
     <contextElementResponse>
       <contextElement>
@@ -543,33 +697,17 @@ Date: REGEX(.*)
           <contextAttribute>
             <name>A1</name>
             <type>T1</type>
-            <contextValue/>
+            <contextValue>CP-2</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
       <statusCode>
-        <code>472</code>
-        <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-        <details>action: DELETE - entity: (E1, E) - offending attribute: A1</details>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+        <details>Redirected to context provider localhost:9801/ngsi10</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
-</updateContextResponse>
-
-
-13. Query broker for E1/A1 (doesn't exist)
-HTTP/1.1 200 OK
-Content-Length: 182
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <errorCode>
-    <code>302</code>
-    <reasonPhrase>Found</reasonPhrase>
-    <details>http://localhost:9801/</details>
-  </errorCode>
 </queryContextResponse>
 
 

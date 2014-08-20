@@ -60,8 +60,8 @@ export BROKER2_PORT=${BROKER2_PORT:-9998}
 export CM_PORT=$BROKER2_PORT
 export COAP_PORT=${COAP_PORT:-5683}
 export CP1_PORT=${CP1_PORT:-9801}
-export CP2_PORT=${CP1_PORT:-9802}
-export CP3_PORT=${CP1_PORT:-9803}
+export CP2_PORT=${CP2_PORT:-9802}
+export CP3_PORT=${CP3_PORT:-9803}
 export LISTENER_PORT=${LISTENER_PORT:-9997}
 export LISTENER2_PORT=${LISTENER2_PORT:-9977}
 
@@ -106,8 +106,8 @@ export CB_PID_FILE=$BROKER_PID_FILE
 export BROKER_PID2_FILE=${BROKER_PID2_FILE:-/tmp/orion_${BROKER2_PORT}.pid}
 export CM_PID_FILE=$BROKER_PID2_FILE
 export CP1_PID_FILE=${CP1_PID_FILE:-/tmp/orion_${CP1_PORT}.pid}
-export CP2_PID_FILE=${CP1_PID_FILE:-/tmp/orion_${CP2_PORT}.pid}
-export CP3_PID_FILE=${CP1_PID_FILE:-/tmp/orion_${CP3_PORT}.pid}
+export CP2_PID_FILE=${CP2_PID_FILE:-/tmp/orion_${CP2_PORT}.pid}
+export CP3_PID_FILE=${CP3_PID_FILE:-/tmp/orion_${CP3_PORT}.pid}
 
 
 
