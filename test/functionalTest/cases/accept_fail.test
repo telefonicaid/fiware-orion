@@ -124,19 +124,19 @@ orionCurl --url "$url" --payload "${payload}" --in "application/json" --out "app
 
 echo "8: ++++++++++++++++++++"
 
-# This test that Accept preference is correctly taken into account (JSON preferred to XML)
-# FIXME P6: Once issue #317 is fixed - move this test to use curlIt
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json, application/xml' -d @-) <<EOF
-{
-	"entities": [
-		{
-			"type": "Room",
-			"isPattern": "false",
-			"id": "OfficeRoom"
-		}
-	]
-}
-EOF
+# This test that Accept preference is correctly taken into account (XML preferred to JSON)
+url="/NGSI10/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "${payload}" --in "application/json" --out "application/json, application/xml"
+
 echo "9: ++++++++++++++++++++"
 
 # This test that Accept preference is correctly taken into account (XML preferred to JSON)
@@ -285,6 +285,12 @@ Date: REGEX(.*)
     }
 }
 8: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
     <code>404</code>
