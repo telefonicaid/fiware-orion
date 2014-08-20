@@ -22,6 +22,9 @@ test/functionalTest/cases/*.stderr
 test/functionalTest/cases/*/*.stderr
 test/functionalTest/cases/*.teardown
 test/functionalTest/cases/*/*.teardown
+test/functionalTest/cases/*.contextBroker.log
+test/functionalTest/cases/*/*.contextBroker.log
+
 core*
 test/valgrind/*.out
 src/lib/common/compileInfo.h
