@@ -276,7 +276,7 @@ void xmlParse
 */
 int nullTreat(xml_node<>* node, ParseData* parseDataP)
 {
-  LM_T(LmtNullNode, ("Node '%s' is recognized but need no action", node->name()));
+  LM_T(LmtNullNode, ("Node '%s' is recognized but no action is needed", node->name()));
   return 0;
 }
 

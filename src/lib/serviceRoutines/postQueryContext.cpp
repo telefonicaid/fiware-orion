@@ -53,11 +53,6 @@ static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
 */
 std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
-  static int callNo = 0;
-
-  ++callNo;
-
-
   QueryContextResponse  qcr;
   std::string           answer;
    

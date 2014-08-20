@@ -53,10 +53,6 @@ static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
 */
 std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
 {
-  static int callNo = 0;
-
-  ++callNo;
-
   UpdateContextResponse  upcr;
   std::string            answer;
 

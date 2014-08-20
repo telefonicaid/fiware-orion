@@ -153,9 +153,8 @@ void Metadata::release(void)
 */
 void Metadata::fill(const struct Metadata& md)
 {
-  name  = md.name;
-  type  = md.type;
-  value = md.value;
-
-  // FIXME P5: Do we want associations to work 100% ?
+  name        = md.name;
+  type        = md.type;
+  value       = md.value;
+  association = md.association;
 }
