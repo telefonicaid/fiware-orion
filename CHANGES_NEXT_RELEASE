@@ -1,4 +1,3 @@
 - Add: context providers basic functionality (Issue #499)
 - Add: support for MongoDB replica sets (using the new -rplSet CLI parameter) (Issue #493)
 - Fix: each send is now considered a separate transaction (Issue #478)
-- Add: part I for Context Providers implementecd (Issue #499)
