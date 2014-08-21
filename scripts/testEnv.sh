@@ -49,7 +49,7 @@ export MAXIMUM_WAIT=${MAXIMUM_WAIT:-30}
 # o CP3_PORT       - port where the third contextProvider listens for connections
 #
 # o LISTENER_PORT  - port where listening (test) applications listen for connections
-# o LISTENER2_PORT - port where a second listening (test) application listen for connections
+# o LISTENER2_PORT - port where a second listening (test) application listens for connections
 #
 export CB_PORT=${CB_PORT:-9999}
 export CM_PORT=${CM_PORT:-9998}
