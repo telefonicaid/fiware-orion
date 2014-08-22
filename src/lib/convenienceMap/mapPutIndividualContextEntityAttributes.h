@@ -1,5 +1,5 @@
-#ifndef MAP_PUT_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTES_H
-#define MAP_PUT_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTES_H
+#ifndef SRC_LIB_CONVENIENCEMAP_MAPPUTINDIVIDUALCONTEXTENTITYATTRIBUTES_H_
+#define SRC_LIB_CONVENIENCEMAP_MAPPUTINDIVIDUALCONTEXTENTITYATTRIBUTES_H_
 
 /*
 *
@@ -25,11 +25,13 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/UpdateContextElementResponse.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpStatusCode.h" 
+#include "rest/HttpStatusCode.h"
 
 
 /* ****************************************************************************
@@ -44,4 +46,4 @@ extern HttpStatusCode mapPutIndividualContextEntityAttributes
   ConnectionInfo*                ciP
 );
 
-#endif
+#endif  // SRC_LIB_CONVENIENCEMAP_MAPPUTINDIVIDUALCONTEXTENTITYATTRIBUTES_H_

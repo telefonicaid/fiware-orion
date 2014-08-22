@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 
 #include "convenience/UpdateContextElementRequest.h"
@@ -32,8 +34,8 @@
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
-#include "rest/ConnectionInfo.h" 
-#include "rest/HttpStatusCode.h" 
+#include "rest/ConnectionInfo.h"
+#include "rest/HttpStatusCode.h"
 
 
 
@@ -41,7 +43,13 @@
 *
 * mapPutIndividualContextEntity - 
 */
-HttpStatusCode mapPutIndividualContextEntity(const std::string& entityId, UpdateContextElementRequest* ucerP, UpdateContextElementResponse* response, ConnectionInfo* ciP)
+HttpStatusCode mapPutIndividualContextEntity
+(
+  const std::string&             entityId,
+  UpdateContextElementRequest*   ucerP,
+  UpdateContextElementResponse*  response,
+  ConnectionInfo*                ciP
+)
 {
   HttpStatusCode          ms;
   UpdateContextRequest    ucRequest;
@@ -51,7 +59,7 @@ HttpStatusCode mapPutIndividualContextEntity(const std::string& entityId, Update
   ce.entityId.fill(entityId, "", "false");
   ce.attributeDomainName    = ucerP->attributeDomainName;
   ce.contextAttributeVector = ucerP->contextAttributeVector;
-  
+
   ucRequest.contextElementVector.push_back(&ce);
   ucRequest.updateActionType.set("Update");
 
@@ -63,7 +71,7 @@ HttpStatusCode mapPutIndividualContextEntity(const std::string& entityId, Update
   for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
   {
     ContextAttribute* caP = new ContextAttribute(ceP->contextAttributeVector.get(ix));
-    carP->contextAttributeVector.push_back(caP);    
+    carP->contextAttributeVector.push_back(caP);
   }
   carP->statusCode.fill(&ucResponse.contextElementResponseVector.get(0)->statusCode);
 

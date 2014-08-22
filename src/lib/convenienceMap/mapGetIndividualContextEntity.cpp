@@ -22,6 +22,9 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+
 #include "logMsg/logMsg.h"
 
 #include "convenienceMap/mapGetIndividualContextEntity.h"
@@ -40,32 +43,42 @@
 *
 * mapGetIndividualContextEntity - 
 */
-HttpStatusCode mapGetIndividualContextEntity(const std::string& entityId, ContextElementResponse* response, ConnectionInfo* ciP)
+HttpStatusCode mapGetIndividualContextEntity
+(
+  const std::string&       entityId,
+  ContextElementResponse*  response,
+  ConnectionInfo*          ciP
+)
 {
-   HttpStatusCode        ms;
-   QueryContextRequest   qcRequest;
-   QueryContextResponse  qcResponse;
-   EntityId              entity(entityId, "", "false");
+  HttpStatusCode        ms;
+  QueryContextRequest   qcRequest;
+  QueryContextResponse  qcResponse;
+  EntityId              entity(entityId, "", "false");
 
-   // Here I fill in the 'query' entityId for the response
-   response->contextElement.entityId.fill(entityId, "", "false");
+  // Here I fill in the 'query' entityId for the response
+  response->contextElement.entityId.fill(entityId, "", "false");
 
-   qcRequest.entityIdVector.push_back(&entity);
-   ms = mongoQueryContext(&qcRequest, &qcResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+  qcRequest.entityIdVector.push_back(&entity);
+  ms = mongoQueryContext(&qcRequest, &qcResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
-   if ((ms != SccOk) || (qcResponse.contextElementResponseVector.size() == 0))
-   {
-     // Here I fill in statusCode for the response
-     response->statusCode.fill(SccContextElementNotFound, std::string("Entity id: '") + entityId + "'");
-     LM_W(("Bad Input (entityId '%s' not found)", entityId.c_str()));
-     return ms;
-   }
+  if ((ms != SccOk) || (qcResponse.contextElementResponseVector.size() == 0))
+  {
+    // Here I fill in statusCode for the response
+    response->statusCode.fill(SccContextElementNotFound, std::string("Entity id: '") + entityId + "'");
+    LM_W(("Bad Input (entityId '%s' not found)", entityId.c_str()));
+    return ms;
+  }
 
-   std::vector<ContextAttribute*> attrV = qcResponse.contextElementResponseVector.get(0)->contextElement.contextAttributeVector.vec;
-   for (unsigned int ix = 0; ix < attrV.size() ; ++ix) {
-       ContextAttribute* ca = new ContextAttribute(attrV[ix]);
-       response->contextElement.contextAttributeVector.push_back(ca);
-   }
-   response->statusCode.fill(&qcResponse.contextElementResponseVector.get(0)->statusCode);
-   return ms;
+  ContextElementResponse*         cerP  = qcResponse.contextElementResponseVector[0];
+  std::vector<ContextAttribute*>  attrV = cerP->contextElement.contextAttributeVector.vec;
+
+  for (unsigned int ix = 0; ix < attrV.size() ; ++ix)
+  {
+    ContextAttribute* ca = new ContextAttribute(attrV[ix]);
+    response->contextElement.contextAttributeVector.push_back(ca);
+  }
+
+  response->statusCode.fill(&qcResponse.contextElementResponseVector.get(0)->statusCode);
+
+  return ms;
 }

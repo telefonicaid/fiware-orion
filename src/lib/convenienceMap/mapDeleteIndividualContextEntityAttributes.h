@@ -1,5 +1,5 @@
-#ifndef MAP_DELETE_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTES_H
-#define MAP_DELETE_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTES_H
+#ifndef SRC_LIB_CONVENIENCEMAP_MAPDELETEINDIVIDUALCONTEXTENTITYATTRIBUTES_H_
+#define SRC_LIB_CONVENIENCEMAP_MAPDELETEINDIVIDUALCONTEXTENTITYATTRIBUTES_H_
 
 /*
 *
@@ -25,6 +25,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "mongoBackend/MongoGlobal.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
@@ -36,6 +38,11 @@
 *
 * mapDeleteIndividualContextEntityAttributes - 
 */
-extern HttpStatusCode mapDeleteIndividualContextEntityAttributes(const std::string& entityId, StatusCode* response, ConnectionInfo* ciP);
+extern HttpStatusCode mapDeleteIndividualContextEntityAttributes
+(
+  const std::string&  entityId,
+  StatusCode*         response,
+  ConnectionInfo*     ciP
+);
 
-#endif
+#endif  // SRC_LIB_CONVENIENCEMAP_MAPDELETEINDIVIDUALCONTEXTENTITYATTRIBUTES_H_
