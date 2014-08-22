@@ -1,5 +1,5 @@
-#ifndef CONTEXT_ID_VECTOR_H
-#define CONTEXT_ID_VECTOR_H
+#ifndef SRC_LIB_CONVENIENCE_CONTEXTATTRIBUTERESPONSEVECTOR_H_
+#define SRC_LIB_CONVENIENCE_CONTEXTATTRIBUTERESPONSEVECTOR_H_
 
 /*
 *
@@ -40,13 +40,14 @@ typedef struct ContextAttributeResponseVector
 {
   std::vector<ContextAttributeResponse*>  vec;
 
-  std::string                render(RequestType requestType, Format format, std::string indent);
-  std::string                check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
-  void                       present(std::string indent);
-  void                       push_back(ContextAttributeResponse* item);
-  unsigned int               size(void);
+  std::string   render(RequestType requestType, Format format, std::string indent);
+  std::string   check(RequestType requestType, Format format, std::string indent, std::string preError, int counter);
+  void          present(std::string indent);
+  void          push_back(ContextAttributeResponse* item);
+  unsigned int  size(void);
+  void          release();
+
   ContextAttributeResponse*  get(int ix);
-  void                       release();
 } ContextAttributeResponseVector;
 
-#endif
+#endif  // SRC_LIB_CONVENIENCE_CONTEXTATTRIBUTERESPONSEVECTOR_H_

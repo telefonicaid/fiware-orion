@@ -1,5 +1,5 @@
-#ifndef CONVENIENCE_H
-#define CONVENIENCE_H
+#ifndef SRC_LIB_CONVENIENCE_CONVENIENCE_H_
+#define SRC_LIB_CONVENIENCE_CONVENIENCE_H_
 
 /*
 *
@@ -26,6 +26,7 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
 #include "rest/ConnectionInfo.h"
 #include "rest/Verb.h"
@@ -38,13 +39,22 @@
 *
 * Convenience - 
 */
-typedef void (*ConvenienceTreat)(ConnectionInfo* ciP, Verb verb, int components, std::vector<std::string> compV, ParseData* reqDataP, std::string* responseData);
+typedef void (*ConvenienceTreat)
+(
+  ConnectionInfo*           ciP,
+  Verb                      verb,
+  int                       components,
+  std::vector<std::string>  compV,
+  ParseData*                reqDataP,
+  std::string*              responseData
+);
+
 typedef struct Convenience
 {
-   Verb              verb;
-   int               components;
-   std::string       compV[6];
-   ConvenienceTreat  treat;
+  Verb              verb;
+  int               components;
+  std::string       compV[6];
+  ConvenienceTreat  treat;
 } Convenience;
 
 
@@ -55,13 +65,13 @@ typedef struct Convenience
 */
 extern void convenienceTreat
 (
-   ConnectionInfo*           ciP,
-   std::string               protocol,
-   Verb                      verb,
-   int                       components,
-   std::vector<std::string>  compV,
-   ParseData*                reqDataP,
-   std::string*              responseData
+  ConnectionInfo*           ciP,
+  std::string               protocol,
+  Verb                      verb,
+  int                       components,
+  std::vector<std::string>  compV,
+  ParseData*                reqDataP,
+  std::string*              responseData
 );
 
-#endif
+#endif  // SRC_LIB_CONVENIENCE_CONVENIENCE_H_
