@@ -2489,7 +2489,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, sourceAssociationsFails)
   prepareDatabase();
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en("E2", "T2");
+  EntityId en("E2", "T3");
   req.entityIdVector.push_back(&en);
   req.attributeList.push_back("A1");
   Scope sc(SCOPE_TYPE_ASSOC, "SOURCES");
