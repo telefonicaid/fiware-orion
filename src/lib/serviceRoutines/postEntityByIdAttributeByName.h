@@ -1,5 +1,5 @@
-#ifndef POST_ENTITY_BY_ID_ATTRIBUTE_BY_NAME_H
-#define POST_ENTITY_BY_ID_ATTRIBUTE_BY_NAME_H
+#ifndef SRC_LIB_SERVICEROUTINES_POSTENTITYBYIDATTRIBUTEBYNAME_H_
+#define SRC_LIB_SERVICEROUTINES_POSTENTITYBYIDATTRIBUTEBYNAME_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * postEntityByIdAttributeByName - 
 */
-extern std::string postEntityByIdAttributeByName(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string postEntityByIdAttributeByName
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_POSTENTITYBYIDATTRIBUTEBYNAME_H_

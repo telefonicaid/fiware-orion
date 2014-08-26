@@ -1,5 +1,5 @@
-#ifndef PUT_ATTRIBUTE_VALUE_INSTANCE_H
-#define PUT_ATTRIBUTE_VALUE_INSTANCE_H
+#ifndef SRC_LIB_SERVICEROUTINES_PUTATTRIBUTEVALUEINSTANCE_H_
+#define SRC_LIB_SERVICEROUTINES_PUTATTRIBUTEVALUEINSTANCE_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * putAttributeValueInstance - 
 */
-extern std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string putAttributeValueInstance
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_PUTATTRIBUTEVALUEINSTANCE_H_

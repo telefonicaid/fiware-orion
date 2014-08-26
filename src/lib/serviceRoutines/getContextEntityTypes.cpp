@@ -37,9 +37,15 @@
 
 /* ****************************************************************************
 *
-* getContextEntityTypes - 
+* getContextEntityTypes -
 */
-std::string getContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string getContextEntityTypes
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   std::string                          typeName     = compV[2];
   std::string                          answer;
@@ -49,6 +55,6 @@ std::string getContextEntityTypes(ConnectionInfo* ciP, int components, std::vect
   ciP->httpStatusCode = mapGetContextEntityTypes(typeName, &response, ciP);
   answer = response.render(DiscoverContextAvailability, ciP->outFormat, "");
   response.release();
-  
+
   return answer;
 }

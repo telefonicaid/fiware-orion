@@ -1,5 +1,5 @@
-#ifndef GET_CONTEXT_ENTITIES_BY_ENTITYID_H
-#define GET_CONTEXT_ENTITIES_BY_ENTITYID_H
+#ifndef SRC_LIB_SERVICEROUTINES_GETCONTEXTENTITIESBYENTITYID_H_
+#define SRC_LIB_SERVICEROUTINES_GETCONTEXTENTITIESBYENTITYID_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * getContextEntitiesByEntityId - 
 */
-extern std::string getContextEntitiesByEntityId(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string getContextEntitiesByEntityId
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_GETCONTEXTENTITIESBYENTITYID_H_

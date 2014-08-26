@@ -36,7 +36,13 @@
 *
 * postUpdateContextAvailabilitySubscription - 
 */
-std::string postUpdateContextAvailabilitySubscription(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string postUpdateContextAvailabilitySubscription
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   UpdateContextAvailabilitySubscriptionResponse  ucas;
   std::string                                    answer;
@@ -47,7 +53,11 @@ std::string postUpdateContextAvailabilitySubscription(ConnectionInfo* ciP, int c
   // used to do the subscription, so we are passing ciP->inFomat. This is just an heuristic, the client could want
   // for example to use XML in the subscription message but wants notifications in JSON. We need a more
   // flexible approach, to be implemented
-  ciP->httpStatusCode = mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res, &ucas, ciP->inFormat, ciP->tenant);
+  ciP->httpStatusCode = mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res,
+                                                                   &ucas,
+                                                                   ciP->inFormat,
+                                                                   ciP->tenant);
+
   answer = ucas.render(UpdateContextAvailabilitySubscription, ciP->outFormat, "", 0);
 
   return answer;

@@ -1,5 +1,5 @@
-#ifndef PUT_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTE_H
-#define PUT_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTE_H
+#ifndef SRC_LIB_SERVICEROUTINES_PUTINDIVIDUALCONTEXTENTITYATTRIBUTE_H_
+#define SRC_LIB_SERVICEROUTINES_PUTINDIVIDUALCONTEXTENTITYATTRIBUTE_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * putIndividualContextEntityAttribute -
 */
-extern std::string putIndividualContextEntityAttribute(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string putIndividualContextEntityAttribute
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_PUTINDIVIDUALCONTEXTENTITYATTRIBUTE_H_

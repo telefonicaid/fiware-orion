@@ -1,5 +1,5 @@
-#ifndef GET_NGSI10_CONTEXT_ENTITY_TYPES_ATTRIBUTE_H
-#define GET_NGSI10_CONTEXT_ENTITY_TYPES_ATTRIBUTE_H
+#ifndef SRC_LIB_SERVICEROUTINES_GETNGSI10CONTEXTENTITYTYPESATTRIBUTE_H_
+#define SRC_LIB_SERVICEROUTINES_GETNGSI10CONTEXTENTITYTYPESATTRIBUTE_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * getNgsi10ContextEntityTypesAttribute - 
 */
-extern std::string getNgsi10ContextEntityTypesAttribute(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string getNgsi10ContextEntityTypesAttribute
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_GETNGSI10CONTEXTENTITYTYPESATTRIBUTE_H_

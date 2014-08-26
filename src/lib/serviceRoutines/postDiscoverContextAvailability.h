@@ -1,5 +1,5 @@
-#ifndef POST_DISCOVER_CONTEXT_AVAILABILITY_H
-#define POST_DISCOVER_CONTEXT_AVAILABILITY_H
+#ifndef SRC_LIB_SERVICEROUTINES_POSTDISCOVERCONTEXTAVAILABILITY_H_
+#define SRC_LIB_SERVICEROUTINES_POSTDISCOVERCONTEXTAVAILABILITY_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * postDiscoverContextAvailability - 
 */
-extern std::string postDiscoverContextAvailability(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string postDiscoverContextAvailability
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_POSTDISCOVERCONTEXTAVAILABILITY_H_

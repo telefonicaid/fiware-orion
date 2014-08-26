@@ -1,5 +1,5 @@
-#ifndef BAD_VERB_GET_POST_ONLY_H
-#define BAD_VERB_GET_POST_ONLY_H
+#ifndef SRC_LIB_SERVICEROUTINES_BADVERBGETPOSTONLY_H_
+#define SRC_LIB_SERVICEROUTINES_BADVERBGETPOSTONLY_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * badVerbGetPostOnly - 
 */
-extern std::string badVerbGetPostOnly(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string badVerbGetPostOnly
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_BADVERBGETPOSTONLY_H_

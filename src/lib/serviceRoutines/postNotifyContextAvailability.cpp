@@ -39,9 +39,15 @@
 
 /* ****************************************************************************
 *
-* postNotifyContextAvailability - 
+* postNotifyContextAvailability -
 */
-std::string postNotifyContextAvailability(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string postNotifyContextAvailability
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   NotifyContextAvailabilityResponse  ncar;
 

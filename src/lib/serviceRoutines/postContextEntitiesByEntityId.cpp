@@ -42,7 +42,13 @@
 *
 * POST /ngsi9/contextEntities/{entityId}
 */
-std::string postContextEntitiesByEntityId(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string postContextEntitiesByEntityId
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   std::string  entityId = compV[2];
 

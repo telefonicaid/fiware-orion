@@ -1,5 +1,5 @@
-#ifndef VERSION_TREAT_H
-#define VERSION_TREAT_H
+#ifndef SRC_LIB_SERVICEROUTINES_VERSIONTREAT_H_
+#define SRC_LIB_SERVICEROUTINES_VERSIONTREAT_H_
 
 /*
 *
@@ -53,6 +53,12 @@ extern char* versionGet();
 *
 * versionTreat - 
 */
-extern std::string versionTreat(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string versionTreat
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_VERSIONTREAT_H_

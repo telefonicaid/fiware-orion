@@ -1,5 +1,5 @@
-#ifndef PUT_AVAILABILITY_SUBSCRIPTION_CONV_OP_H
-#define PUT_AVAILABILITY_SUBSCRIPTION_CONV_OP_H
+#ifndef SRC_LIB_SERVICEROUTINES_PUTAVAILABILITYSUBSCRIPTIONCONVOP_H_
+#define SRC_LIB_SERVICEROUTINES_PUTAVAILABILITYSUBSCRIPTIONCONVOP_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * putAvailabilitySubscriptionConvOp - 
 */
-extern std::string putAvailabilitySubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string putAvailabilitySubscriptionConvOp
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_PUTAVAILABILITYSUBSCRIPTIONCONVOP_H_
