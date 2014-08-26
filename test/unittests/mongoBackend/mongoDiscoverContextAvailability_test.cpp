@@ -201,7 +201,7 @@ static void prepareDatabase(void) {
               "contextRegistration" << BSON_ARRAY(cr5)
               );
 
-  /* This associations relates E1.A4 (in cr2) -> E2.A1 (in cr1) */
+  /* This association relates E1.A4 (in cr2) -> E2.A1 (in cr1) */
   BSONObj assoc = BSON(
               "_id" << "assoc1" <<
               "srcEnt" << BSON("id" << "E1" << "type" << "T1") <<
