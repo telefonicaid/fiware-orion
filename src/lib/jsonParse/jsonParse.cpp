@@ -22,10 +22,7 @@
 *
 * Author: Ken Zangelin
 */
-#include <set>
-#include <string>
 #include <stdint.h>
-#include <exception>
 
 //
 // http://www.boost.org/doc/libs/1_31_0/libs/spirit/doc/grammar.html:
@@ -39,6 +36,10 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
+
+#include <set>
+#include <string>
+#include <exception>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -55,9 +56,10 @@
 using boost::property_tree::ptree;
 
 
+
 /* ****************************************************************************
 *
-* compoundRootV - 
+* compoundRootV -
 *
 */
 static const char* compoundRootV[] =
@@ -70,7 +72,7 @@ static const char* compoundRootV[] =
 
 /* ****************************************************************************
 *
-* isCompoundPath - 
+* isCompoundPath -
 *
 * This function examines a path to see whether we are inside a compound value or not.
 * Also, it returned the root of the compound (found in 'compoundValueRootV') and also
@@ -80,29 +82,40 @@ static const char* compoundRootV[] =
 */
 static bool isCompoundPath(const char* path)
 {
-   unsigned int len;
+  unsigned int len;
 
-   for (unsigned int ix = 0; ix < sizeof(compoundRootV) / sizeof(compoundRootV[0]); ++ix)
-   {
-      len = strlen(compoundRootV[ix]);
+  for (unsigned int ix = 0; ix < sizeof(compoundRootV) / sizeof(compoundRootV[0]); ++ix)
+  {
+    len = strlen(compoundRootV[ix]);
 
-      if (strlen(path) < len)
-         continue;
+    if (strlen(path) < len)
+    {
+      continue;
+    }
 
-      if (strncmp(compoundRootV[ix], path, len) == 0)
-         return true;
-   }
+    if (strncmp(compoundRootV[ix], path, len) == 0)
+    {
+      return true;
+    }
+  }
 
-   return false;
+  return false;
 }
 
 
 
 /* ****************************************************************************
 *
-* treat - 
+* treat -
 */
-static bool treat(ConnectionInfo* ciP, const std::string& path, const std::string& value, JsonNode* parseVector, ParseData* parseDataP)
+static bool treat
+(
+  ConnectionInfo*     ciP,
+  const std::string&  path,
+  const std::string&  value,
+  JsonNode*           parseVector,
+  ParseData*          parseDataP
+)
 {
   LM_T(LmtTreat, ("Treating path '%s', value '%s'", path.c_str(), value.c_str()));
 
@@ -113,6 +126,7 @@ static bool treat(ConnectionInfo* ciP, const std::string& path, const std::strin
       LM_T(LmtTreat, ("calling treat function for '%s': '%s'", path.c_str(), value.c_str()));
       std::string res = parseVector[ix].treat(path, value, parseDataP);
       LM_T(LmtTreat, ("called treat function for '%s'. result: '%s'", path.c_str(), res.c_str()));
+
       return true;
     }
   }
@@ -136,9 +150,11 @@ static std::string getArrayElementName(const std::string& arrayName)
   // that is present in every case
   elementName = elementName.substr(0, elementName.length() - 1);
 
-  // Is the singular is formed changing 'ie' for 'y' ??
-  if(elementName.length() > 2 && elementName.substr(elementName.length() - 2).compare("ie") == 0)
+  // Is the singular form changing 'ie' for 'y' ??
+  if (elementName.length() > 2 && elementName.substr(elementName.length() - 2).compare("ie") == 0)
+  {
     elementName.replace(elementName.length() - 2, 2, "y");
+  }
 
   return elementName;
 }
@@ -147,7 +163,7 @@ static std::string getArrayElementName(const std::string& arrayName)
 
 /* ****************************************************************************
 *
-* nodeType - 
+* nodeType -
 */
 std::string nodeType(const std::string& nodeName, const std::string& value, orion::CompoundValueNode::Type* typeP)
 {
@@ -166,7 +182,7 @@ std::string nodeType(const std::string& nodeName, const std::string& value, orio
     *typeP = orion::CompoundValueNode::String;
     return "String";
   }
-  
+
   if (isVector)
   {
      *typeP = orion::CompoundValueNode::Vector;
@@ -181,9 +197,15 @@ std::string nodeType(const std::string& nodeName, const std::string& value, orio
 
 /* ****************************************************************************
 *
-* eatCompound - 
+* eatCompound -
 */
-void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, boost::property_tree::ptree::value_type& v, const std::string& indent)
+void eatCompound
+(
+  ConnectionInfo*                           ciP,
+  orion::CompoundValueNode*                 containerP,
+  boost::property_tree::ptree::value_type&  v,
+  const std::string&                        indent
+)
 {
   std::string                  nodeName     = v.first.data();
   std::string                  nodeValue    = v.second.data();
@@ -198,17 +220,20 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, boos
   }
   else
   {
-    if ((nodeName != "") && (nodeValue != "")) // Named String
+    if ((nodeName != "") && (nodeValue != ""))  // Named String
     {
       containerP->add(orion::CompoundValueNode::String, nodeName, nodeValue);
-      LM_T(LmtCompoundValue, ("Added string '%s' (value: '%s') under '%s'", nodeName.c_str(), nodeValue.c_str(), containerP->cpath()));
+      LM_T(LmtCompoundValue, ("Added string '%s' (value: '%s') under '%s'",
+                              nodeName.c_str(),
+                              nodeValue.c_str(),
+                              containerP->cpath()));
     }
-    else if ((nodeName == "") && (nodeValue == "") && (noOfChildren == 0)) // Unnamed String with EMPTY VALUE
+    else if ((nodeName == "") && (nodeValue == "") && (noOfChildren == 0))  // Unnamed String with EMPTY VALUE
     {
       LM_T(LmtCompoundValue, ("'Bad' input - looks like a container but it is an EMPTY STRING - no name, no value"));
       containerP->add(orion::CompoundValueNode::String, "item", "");
     }
-    else if ((nodeName != "") && (nodeValue == "")) // Named Container
+    else if ((nodeName != "") && (nodeValue == ""))  // Named Container
     {
       LM_T(LmtCompoundValue, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
       containerP = containerP->add(orion::CompoundValueNode::Object, nodeName);
@@ -219,12 +244,13 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, boos
       containerP->type = orion::CompoundValueNode::Vector;
       containerP = containerP->add(orion::CompoundValueNode::Object, "item");
     }
-    else if ((nodeName == "") && (nodeValue != "")) // Name-Less String + its container is a vector
+    else if ((nodeName == "") && (nodeValue != ""))  // Name-Less String + its container is a vector
     {
       containerP->type = orion::CompoundValueNode::Vector;
       LM_T(LmtCompoundValue, ("Set '%s' to be a vector", containerP->cpath()));
       containerP->add(orion::CompoundValueNode::String, "item", nodeValue);
-      LM_T(LmtCompoundValue, ("Added a name-less string (value: '%s') under '%s'", nodeValue.c_str(), containerP->cpath()));
+      LM_T(LmtCompoundValue, ("Added a name-less string (value: '%s') under '%s'",
+                              nodeValue.c_str(), containerP->cpath()));
     }
     else
       LM_T(LmtCompoundValue, ("IMPOSSIBLE !!!"));
@@ -241,15 +267,15 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, boos
 
 /* ****************************************************************************
 *
-* jsonParse - 
+* jsonParse -
 */
 static std::string jsonParse
 (
-   ConnectionInfo*                           ciP,
-   boost::property_tree::ptree::value_type&  v,
-   const std::string&                        _path,
-   JsonNode*                                 parseVector,
-   ParseData*                                parseDataP
+  ConnectionInfo*                           ciP,
+  boost::property_tree::ptree::value_type&  v,
+  const std::string&                        _path,
+  JsonNode*                                 parseVector,
+  ParseData*                                parseDataP
 )
 {
   std::string                     nodeName         = v.first.data();
@@ -265,13 +291,19 @@ static std::string jsonParse
     // This detects whether we are trying to use an object within an object instead of an one-item array.
     // We don't allow the first case, hence the exception thrown.
     // However, this restriction is not valid inside Compound Values.
-     if ((nodeName != arrayElementName) || (ciP->inCompoundValue == true))
+    if ((nodeName != arrayElementName) || (ciP->inCompoundValue == true))
+    {
       path = path + "/" + nodeName;
+    }
     else
+    {
       throw std::logic_error("The object '" + path + "' may not have a child named '" + nodeName + "'");
+    }
   }
   else
+  {
     path = path + "/" + arrayElementName;
+  }
 
   treated = treat(ciP, path, nodeValue, parseVector, parseDataP);
 
@@ -287,7 +319,9 @@ static std::string jsonParse
     compoundValueEnd(ciP, parseDataP);
 
     if (ciP->httpStatusCode != SccOk)
+    {
       return ciP->answer;
+    }
 
     return "OK";
   }
@@ -295,13 +329,18 @@ static std::string jsonParse
   {
     ciP->httpStatusCode = SccBadRequest;
     if (ciP->answer == "")
+    {
       ciP->answer = std::string("JSON Parse Error (unknown field: '") + path.c_str() + "')";
+    }
+
     LM_W(("Bad Input (%s)", ciP->answer.c_str()));
     return ciP->answer;
   }
 
   if (noOfChildren == 0)
+  {
     return "OK";
+  }
 
   subtree = (boost::property_tree::ptree) v.second;
   BOOST_FOREACH(boost::property_tree::ptree::value_type &v2, subtree)
@@ -319,9 +358,16 @@ static std::string jsonParse
 
 /* ****************************************************************************
 *
-* jsonParse - 
+* jsonParse -
 */
-std::string jsonParse(ConnectionInfo* ciP, const char* content, const std::string& requestType, JsonNode* parseVector, ParseData* parseDataP)
+std::string jsonParse
+(
+  ConnectionInfo*     ciP,
+  const char*         content,
+  const std::string&  requestType,
+  JsonNode*           parseVector,
+  ParseData*          parseDataP
+)
 {
   std::stringstream  ss;
   ptree              tree;

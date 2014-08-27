@@ -37,6 +37,8 @@
 
 using namespace orion;
 
+
+
 /* ****************************************************************************
 *
 * duration - 
@@ -51,7 +53,9 @@ static std::string duration(const std::string& path, const std::string& value, P
 
   // The failure is postponed until the 'check' step to not miss the subscriptionId
   if ((s = parseDataP->ucsr.res.duration.check(UpdateContextSubscription, JSON, "", "", 0)) != "OK")
+  {
     LM_W(("Bad Input (error parsing duration '%s': %s)", parseDataP->ucsr.res.duration.get().c_str(), s.c_str()));
+  }
 
   return "OK";
 }
@@ -142,7 +146,7 @@ static std::string scopeValue(const std::string& path, const std::string& value,
     LM_T(LmtParse, ("Got a scopeValue: '%s' for scopeType '%s'", value.c_str(), parseDataP->ucsr.scopeP->type.c_str()));
   }
 
-   return "OK";
+  return "OK";
 }
 
 
@@ -394,36 +398,36 @@ static std::string throttling(const std::string& path, const std::string& value,
 */
 JsonNode jsonUcsrParseVector[] =
 {
-  { "/duration",                                               duration                   },
-  { "/restriction",                                            restriction                },
-  { "/restriction/attributeExpression",                        attributeExpression        },
-  { "/restriction/scopes",                                     jsonNullTreat              },
-  { "/restriction/scopes/scope",                               scope,                     },
-  { "/restriction/scopes/scope/type",                          scopeType                  },
-  { "/restriction/scopes/scope/value",                         scopeValue                 },
+  { "/duration",                                                           duration                   },
+  { "/restriction",                                                        restriction                },
+  { "/restriction/attributeExpression",                                    attributeExpression        },
+  { "/restriction/scopes",                                                 jsonNullTreat              },
+  { "/restriction/scopes/scope",                                           scope,                     },
+  { "/restriction/scopes/scope/type",                                      scopeType                  },
+  { "/restriction/scopes/scope/value",                                     scopeValue                 },
 
-  { "/restriction/scopes/scope/value/circle",                              circle                  },
-  { "/restriction/scopes/scope/value/circle/centerLatitude",               circleCenterLatitude    },
-  { "/restriction/scopes/scope/value/circle/centerLongitude",              circleCenterLongitude   },
-  { "/restriction/scopes/scope/value/circle/radius",                       circleRadius            },
-  { "/restriction/scopes/scope/value/circle/inverted",                     circleInverted          },
+  { "/restriction/scopes/scope/value/circle",                              circle                     },
+  { "/restriction/scopes/scope/value/circle/centerLatitude",               circleCenterLatitude       },
+  { "/restriction/scopes/scope/value/circle/centerLongitude",              circleCenterLongitude      },
+  { "/restriction/scopes/scope/value/circle/radius",                       circleRadius               },
+  { "/restriction/scopes/scope/value/circle/inverted",                     circleInverted             },
 
-  { "/restriction/scopes/scope/value/polygon",                             polygon                 },
-  { "/restriction/scopes/scope/value/polygon/inverted",                    polygonInverted         },
-  { "/restriction/scopes/scope/value/polygon/vertices",                    polygonVertexList       },
-  { "/restriction/scopes/scope/value/polygon/vertices/vertice",            polygonVertex           },
-  { "/restriction/scopes/scope/value/polygon/vertices/vertice/latitude",   polygonVertexLatitude   },
-  { "/restriction/scopes/scope/value/polygon/vertices/vertice/longitude",  polygonVertexLongitude  },
-  { "/restriction/scopes/scope/value/polygon/inverted",                    polygonInverted         },
+  { "/restriction/scopes/scope/value/polygon",                             polygon                    },
+  { "/restriction/scopes/scope/value/polygon/inverted",                    polygonInverted            },
+  { "/restriction/scopes/scope/value/polygon/vertices",                    polygonVertexList          },
+  { "/restriction/scopes/scope/value/polygon/vertices/vertice",            polygonVertex              },
+  { "/restriction/scopes/scope/value/polygon/vertices/vertice/latitude",   polygonVertexLatitude      },
+  { "/restriction/scopes/scope/value/polygon/vertices/vertice/longitude",  polygonVertexLongitude     },
+  { "/restriction/scopes/scope/value/polygon/inverted",                    polygonInverted            },
 
-  { "/subscriptionId",                                         subscriptionId             },
-  { "/notifyConditions",                                       jsonNullTreat              },
-  { "/notifyConditions/notifyCondition",                       notifyCondition            },
-  { "/notifyConditions/notifyCondition/type",                  notifyConditionType        },
-  { "/notifyConditions/notifyCondition/condValues",            jsonNullTreat              },
-  { "/notifyConditions/notifyCondition/condValues/condValue",  notifyConditionCondValue   },
-  { "/notifyConditions/notifyCondition/restriction",           notifyConditionRestriction },
-  { "/throttling",                                             throttling                 },
+  { "/subscriptionId",                                                     subscriptionId             },
+  { "/notifyConditions",                                                   jsonNullTreat              },
+  { "/notifyConditions/notifyCondition",                                   notifyCondition            },
+  { "/notifyConditions/notifyCondition/type",                              notifyConditionType        },
+  { "/notifyConditions/notifyCondition/condValues",                        jsonNullTreat              },
+  { "/notifyConditions/notifyCondition/condValues/condValue",              notifyConditionCondValue   },
+  { "/notifyConditions/notifyCondition/restriction",                       notifyConditionRestriction },
+  { "/throttling",                                                         throttling                 },
 
   { "LAST", NULL }
 };
@@ -438,10 +442,10 @@ void jsonUcsrInit(ParseData* parseDataP)
 {
   jsonUcsrRelease(parseDataP);
 
-  parseDataP->ucsr.notifyConditionP       = NULL;
-  parseDataP->ucsr.scopeP                 = NULL;  
-  parseDataP->ucsr.res.restrictions       = 0;
-  parseDataP->errorString                = "";
+  parseDataP->ucsr.notifyConditionP  = NULL;
+  parseDataP->ucsr.scopeP            = NULL;
+  parseDataP->ucsr.res.restrictions  = 0;
+  parseDataP->errorString            = "";
 }
 
 
@@ -463,9 +467,9 @@ void jsonUcsrRelease(ParseData* parseDataP)
 */
 std::string jsonUcsrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
-   std::string s;
-   s = parseDataP->ucsr.res.check(UpdateContextSubscription, ciP->outFormat, "", parseDataP->errorString, 0);
-   return s;
+  std::string s;
+  s = parseDataP->ucsr.res.check(UpdateContextSubscription, ciP->outFormat, "", parseDataP->errorString, 0);
+  return s;
 }
 
 
@@ -479,7 +483,9 @@ void jsonUcsrPresent(ParseData* parseDataP)
   printf("jsonUcsrPresent\n");
 
   if (!lmTraceIsSet(LmtDump))
+  {
     return;
+  }
 
   parseDataP->ucsr.res.present("");
 }

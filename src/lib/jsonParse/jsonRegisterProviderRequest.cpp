@@ -45,11 +45,11 @@
 */
 static std::string contextMetadata(const std::string& path, const std::string& value, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a metadata"));
-   reqData->rpr.metadataP = new Metadata();
-   reqData->rpr.res.metadataVector.push_back(reqData->rpr.metadataP);
-   return "OK";
- }
+  LM_T(LmtParse, ("Got a metadata"));
+  reqData->rpr.metadataP = new Metadata();
+  reqData->rpr.res.metadataVector.push_back(reqData->rpr.metadataP);
+  return "OK";
+}
 
 
 
@@ -60,9 +60,9 @@ static std::string contextMetadata(const std::string& path, const std::string& v
 */
 static std::string contextMetadataName(const std::string& path, const std::string& value, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a metadata name '%s'", value.c_str()));
-   reqData->rpr.metadataP->name = value;
-   return "OK";
+  LM_T(LmtParse, ("Got a metadata name '%s'", value.c_str()));
+  reqData->rpr.metadataP->name = value;
+  return "OK";
 }
 
 
@@ -73,9 +73,9 @@ static std::string contextMetadataName(const std::string& path, const std::strin
 */
 static std::string contextMetadataType(const std::string& path, const std::string& value, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a metadata type '%s'", value.c_str()));
-   reqData->rpr.metadataP->type = value;
-   return "OK";
+  LM_T(LmtParse, ("Got a metadata type '%s'", value.c_str()));
+  reqData->rpr.metadataP->type = value;
+  return "OK";
 }
 
 
@@ -87,9 +87,9 @@ static std::string contextMetadataType(const std::string& path, const std::strin
 */
 static std::string contextMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
-   reqData->rpr.metadataP->value = value;
-   return "OK";
+  LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
+  reqData->rpr.metadataP->value = value;
+  return "OK";
 }
 
 
@@ -100,9 +100,9 @@ static std::string contextMetadataValue(const std::string& path, const std::stri
 */
 static std::string duration(const std::string& path, const std::string& value, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a duration '%s'", value.c_str()));
-   reqData->rpr.res.duration.set(value);
-   return "OK";
+  LM_T(LmtParse, ("Got a duration '%s'", value.c_str()));
+  reqData->rpr.res.duration.set(value);
+  return "OK";
 }
 
 
@@ -113,9 +113,9 @@ static std::string duration(const std::string& path, const std::string& value, P
 */
 static std::string providingApplication(const std::string& path, const std::string& value, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a providingApplication '%s'", value.c_str()));
-   reqData->rpr.res.providingApplication.set(value);
-   return "OK";
+  LM_T(LmtParse, ("Got a providingApplication '%s'", value.c_str()));
+  reqData->rpr.res.providingApplication.set(value);
+  return "OK";
 }
 
 
@@ -126,9 +126,9 @@ static std::string providingApplication(const std::string& path, const std::stri
 */
 static std::string registrationId(const std::string& path, const std::string& value, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a registrationId '%s'", value.c_str()));
-   reqData->rpr.res.registrationId.set(value);
-   return "OK";
+  LM_T(LmtParse, ("Got a registrationId '%s'", value.c_str()));
+  reqData->rpr.res.registrationId.set(value);
+  return "OK";
 }
 
 
@@ -138,17 +138,17 @@ static std::string registrationId(const std::string& path, const std::string& va
 */
 JsonNode jsonRprParseVector[] =
 {
-   { "/metadatas",                                               jsonNullTreat         },
-   { "/metadatas/metadata",                                      contextMetadata       },
-   { "/metadatas/metadata/name",                                 contextMetadataName   },
-   { "/metadatas/metadata/type",                                 contextMetadataType   },
-   { "/metadatas/metadata/value",                                contextMetadataValue  },
+  { "/metadatas",                       jsonNullTreat         },
+  { "/metadatas/metadata",              contextMetadata       },
+  { "/metadatas/metadata/name",         contextMetadataName   },
+  { "/metadatas/metadata/type",         contextMetadataType   },
+  { "/metadatas/metadata/value",        contextMetadataValue  },
 
-   { "/duration",                        duration              },
-   { "/providingApplication",            providingApplication  },
-   { "/registrationId",                  registrationId        },
+  { "/duration",                        duration              },
+  { "/providingApplication",            providingApplication  },
+  { "/registrationId",                  registrationId        },
 
-   { "LAST", NULL }
+  { "LAST", NULL }
 };
 
 
@@ -159,11 +159,11 @@ JsonNode jsonRprParseVector[] =
 */
 void jsonRprInit(ParseData* reqData)
 {
-   reqData->rpr.res.registrationId.set("");
-   reqData->rpr.res.providingApplication.set("");
-   reqData->rpr.res.duration.set("");
+  reqData->rpr.res.registrationId.set("");
+  reqData->rpr.res.providingApplication.set("");
+  reqData->rpr.res.duration.set("");
 
-   reqData->rpr.metadataP = NULL;
+  reqData->rpr.metadataP = NULL;
 }
 
 
@@ -174,7 +174,7 @@ void jsonRprInit(ParseData* reqData)
 */
 void jsonRprRelease(ParseData* reqData)
 {
-   reqData->rpr.res.release();
+  reqData->rpr.res.release();
 }
 
 
@@ -194,5 +194,5 @@ std::string jsonRprCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void jsonRprPresent(ParseData* reqData)
 {
-   reqData->rpr.res.present("");
+  reqData->rpr.res.present("");
 }

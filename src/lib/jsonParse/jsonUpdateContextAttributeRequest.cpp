@@ -130,7 +130,7 @@ JsonNode jsonUpcarParseVector[] =
   { "/metadatas/metadata/name",  contextMetadataName  },
   { "/metadatas/metadata/type",  contextMetadataType  },
   { "/metadatas/metadata/value", contextMetadataValue },
-  
+
   { "LAST", NULL }
 };
 
@@ -175,7 +175,9 @@ std::string jsonUpcarCheck(ParseData* reqData, ConnectionInfo* ciP)
 void jsonUpcarPresent(ParseData* reqData)
 {
   if (!lmTraceIsSet(LmtDump))
+  {
     return;
+  }
 
   PRINTF("\n\n");
   reqData->upcar.res.present("");

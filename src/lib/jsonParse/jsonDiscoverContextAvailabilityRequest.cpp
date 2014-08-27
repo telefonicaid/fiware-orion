@@ -66,10 +66,10 @@ static std::string entityId(const std::string& path, const std::string& value, P
 */
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->dcar.entityIdP->id = value;
-   LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->dcar.entityIdP->id.c_str()));
+  reqDataP->dcar.entityIdP->id = value;
+  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->dcar.entityIdP->id.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
@@ -80,10 +80,10 @@ static std::string entityIdId(const std::string& path, const std::string& value,
 */
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->dcar.entityIdP->type = value;
-   LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->dcar.entityIdP->type.c_str()));
+  reqDataP->dcar.entityIdP->type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->dcar.entityIdP->type.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
@@ -99,7 +99,9 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
   reqDataP->dcar.entityIdP->isPattern = value;
 
   if (!isTrue(value) && !isFalse(value))
+  {
     return "invalid isPattern (boolean) value for entity: '" + value + "'";
+  }
 
   return "OK";
 }
@@ -173,7 +175,7 @@ static std::string attributeExpression(const std::string& path, const std::strin
 static std::string operationScope(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an operationScope"));
-  
+
   reqDataP->dcar.scopeP = new Scope();
   reqDataP->dcar.res.restriction.scopeVector.push_back(reqDataP->dcar.scopeP);
   reqDataP->dcar.scopeP->type  = "";
@@ -190,9 +192,9 @@ static std::string operationScope(const std::string& path, const std::string& va
 */
 static std::string scopeType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->dcar.scopeP->type = value;
-   LM_T(LmtParse, ("Set scope 'type' to '%s' for a scope", reqDataP->dcar.scopeP->type.c_str()));
-   return "OK";
+  reqDataP->dcar.scopeP->type = value;
+  LM_T(LmtParse, ("Set scope 'type' to '%s' for a scope", reqDataP->dcar.scopeP->type.c_str()));
+  return "OK";
 }
 
 
@@ -203,10 +205,10 @@ static std::string scopeType(const std::string& path, const std::string& value, 
 */
 static std::string scopeValue(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->dcar.scopeP->value = value;
-   LM_T(LmtParse, ("Set scope 'value' to '%s' for a scope", reqDataP->dcar.scopeP->value.c_str()));
+  reqDataP->dcar.scopeP->value = value;
+  LM_T(LmtParse, ("Set scope 'value' to '%s' for a scope", reqDataP->dcar.scopeP->value.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
@@ -246,7 +248,11 @@ void jsonDcarRelease(ParseData* reqDataP)
 */
 std::string jsonDcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-   return reqDataP->dcar.res.check(DiscoverContextAvailability, ciP->outFormat, "", reqDataP->errorString, reqDataP->dcar.res.restrictions);
+  return reqDataP->dcar.res.check(DiscoverContextAvailability,
+                                  ciP->outFormat,
+                                  "",
+                                  reqDataP->errorString,
+                                  reqDataP->dcar.res.restrictions);
 }
 
 
@@ -259,7 +265,9 @@ std::string jsonDcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 void jsonDcarPresent(ParseData* reqDataP)
 {
   if (!lmTraceIsSet(LmtDump))
+  {
     return;
+  }
 
   PRINTF("\n\n");
   reqDataP->dcar.res.present("");
