@@ -151,7 +151,7 @@ static bool associationsQuery
 
         Metadata* md = new Metadata(name, "Association");
         md->association.entityAssociation.source.fill(srcEnId, srcEnType, "false");
-        md->association.entityAssociation.source.fill(tgtEnId, tgtEnType, "false");
+        md->association.entityAssociation.target.fill(tgtEnId, tgtEnType, "false");
         
         std::vector<BSONElement> attrs = r.getField(ASSOC_ATTRS).Array();
         for (unsigned int ix = 0; ix < attrs.size(); ++ix) {
