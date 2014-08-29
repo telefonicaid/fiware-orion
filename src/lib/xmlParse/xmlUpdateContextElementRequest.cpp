@@ -25,8 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -41,143 +39,155 @@
 
 /* ****************************************************************************
 *
-* attributeDomainName - 
+* attributeDomainName -
 */
 static int attributeDomainName(xml_node<>* node, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got an attributeDomainName"));
-   reqData->ucer.res.attributeDomainName.set(node->value());
-   return 0;
+  LM_T(LmtParse, ("Got an attributeDomainName"));
+  reqData->ucer.res.attributeDomainName.set(node->value());
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* contextAttribute - 
+* contextAttribute -
 */
 static int contextAttribute(xml_node<>* node, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got an attribute"));
-   reqData->ucer.attributeP = new ContextAttribute();
-   reqData->ucer.res.contextAttributeVector.push_back(reqData->ucer.attributeP);
-   return 0;
+  LM_T(LmtParse, ("Got an attribute"));
+
+  reqData->ucer.attributeP = new ContextAttribute();
+  reqData->ucer.res.contextAttributeVector.push_back(reqData->ucer.attributeP);
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* contextAttributeName - 
+* contextAttributeName -
 */
 static int contextAttributeName(xml_node<>* node, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got an attribute name: %s", node->value()));
-   reqData->ucer.attributeP->name = node->value();
-   return 0;
+  LM_T(LmtParse, ("Got an attribute name: %s", node->value()));
+  reqData->ucer.attributeP->name = node->value();
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* contextAttributeType - 
+* contextAttributeType -
 */
 static int contextAttributeType(xml_node<>* node, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got an attribute type: %s", node->value()));
-   reqData->ucer.attributeP->type = node->value();
-   return 0;
+  LM_T(LmtParse, ("Got an attribute type: %s", node->value()));
+  reqData->ucer.attributeP->type = node->value();
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* contextAttributeValue - 
+* contextAttributeValue -
 */
 static int contextAttributeValue(xml_node<>* node, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got an attribute value: %s", node->value()));
-   reqData->ucer.attributeP->value = node->value();
-   return 0;
+  LM_T(LmtParse, ("Got an attribute value: %s", node->value()));
+  reqData->ucer.attributeP->value = node->value();
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* contextMetadata - 
+* contextMetadata -
 */
 static int contextMetadata(xml_node<>* node, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a metadata"));
-   reqData->ucer.metadataP = new Metadata();
-   reqData->ucer.attributeP->metadataVector.push_back(reqData->ucer.metadataP);
-   return 0;
+  LM_T(LmtParse, ("Got a metadata"));
+
+  reqData->ucer.metadataP = new Metadata();
+  reqData->ucer.attributeP->metadataVector.push_back(reqData->ucer.metadataP);
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* contextMetadataName - 
+* contextMetadataName -
 */
 static int contextMetadataName(xml_node<>* node, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a metadata name '%s'", node->value()));
-   reqData->ucer.metadataP->name = node->value();
-   return 0;
+  LM_T(LmtParse, ("Got a metadata name '%s'", node->value()));
+  reqData->ucer.metadataP->name = node->value();
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* contextMetadataType - 
+* contextMetadataType -
 */
 static int contextMetadataType(xml_node<>* node, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a metadata type '%s'", node->value()));
-   reqData->ucer.metadataP->type = node->value();
-   return 0;
+  LM_T(LmtParse, ("Got a metadata type '%s'", node->value()));
+  reqData->ucer.metadataP->type = node->value();
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* contextMetadataValue - 
+* contextMetadataValue -
 */
 static int contextMetadataValue(xml_node<>* node, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a metadata value '%s'", node->value()));
-   reqData->ucer.metadataP->value = node->value();
-   return 0;
+  LM_T(LmtParse, ("Got a metadata value '%s'", node->value()));
+  reqData->ucer.metadataP->value = node->value();
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* ucerParseVector - 
+* ucerParseVector -
 */
+#define UCER "/updateContextElementRequest"
 XmlNode ucerParseVector[] =
 {
-  { "/updateContextElementRequest",                          nullTreat             },
-  { "/updateContextElementRequest/attributeDomainName",      attributeDomainName   },
+  { "/updateContextElementRequest",                                                nullTreat             },
+  { UCER "/attributeDomainName",                                                   attributeDomainName   },
 
-  { "/updateContextElementRequest/contextAttributeList",                                   nullTreat              },
-  { "/updateContextElementRequest/contextAttributeList/contextAttribute",                  contextAttribute       },
-  { "/updateContextElementRequest/contextAttributeList/contextAttribute/name",             contextAttributeName   },
-  { "/updateContextElementRequest/contextAttributeList/contextAttribute/type",             contextAttributeType   },
-  { "/updateContextElementRequest/contextAttributeList/contextAttribute/contextValue",     contextAttributeValue  },
+  { UCER "/contextAttributeList",                                                  nullTreat             },
+  { UCER "/contextAttributeList/contextAttribute",                                 contextAttribute      },
+  { UCER "/contextAttributeList/contextAttribute/name",                            contextAttributeName  },
+  { UCER "/contextAttributeList/contextAttribute/type",                            contextAttributeType  },
+  { UCER "/contextAttributeList/contextAttribute/contextValue",                    contextAttributeValue },
 
-  { "/updateContextElementRequest/contextAttributeList/contextAttribute/metadata",                        nullTreat             },
-  { "/updateContextElementRequest/contextAttributeList/contextAttribute/metadata/contextMetadata",        contextMetadata       },
-  { "/updateContextElementRequest/contextAttributeList/contextAttribute/metadata/contextMetadata/name",   contextMetadataName   },
-  { "/updateContextElementRequest/contextAttributeList/contextAttribute/metadata/contextMetadata/type",   contextMetadataType   },
-  { "/updateContextElementRequest/contextAttributeList/contextAttribute/metadata/contextMetadata/value",  contextMetadataValue  },
+  { UCER "/contextAttributeList/contextAttribute/metadata",                        nullTreat             },
+  { UCER "/contextAttributeList/contextAttribute/metadata/contextMetadata",        contextMetadata       },
+  { UCER "/contextAttributeList/contextAttribute/metadata/contextMetadata/name",   contextMetadataName   },
+  { UCER "/contextAttributeList/contextAttribute/metadata/contextMetadata/type",   contextMetadataType   },
+  { UCER "/contextAttributeList/contextAttribute/metadata/contextMetadata/value",  contextMetadataValue  },
 
   { "LAST", NULL }
 };
@@ -186,7 +196,7 @@ XmlNode ucerParseVector[] =
 
 /* ****************************************************************************
 *
-* ucerInit - 
+* ucerInit -
 */
 void ucerInit(ParseData* reqData)
 {
@@ -200,7 +210,7 @@ void ucerInit(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* ucerRelease - 
+* ucerRelease -
 */
 void ucerRelease(ParseData* reqData)
 {
@@ -211,7 +221,7 @@ void ucerRelease(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* ucerCheck - 
+* ucerCheck -
 */
 std::string ucerCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
@@ -222,7 +232,7 @@ std::string ucerCheck(ParseData* reqData, ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* ucerPresent - 
+* ucerPresent -
 */
 void ucerPresent(ParseData* reqData)
 {

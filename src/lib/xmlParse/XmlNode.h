@@ -1,5 +1,5 @@
-#ifndef XML_NODE_H
-#define XML_NODE_H
+#ifndef SRC_LIB_XMLPARSE_XMLNODE_H_
+#define SRC_LIB_XMLPARSE_XMLNODE_H_
 
 /*
 *
@@ -60,8 +60,8 @@ typedef int (*XmlNodeTreat)(xml_node<>* node, ParseData* reqData);
 */
 typedef struct XmlNode
 {
-   std::string   path;
-   XmlNodeTreat  treat;
+  std::string   path;
+  XmlNodeTreat  treat;
 } XmlNode;
 
-#endif
+#endif  // SRC_LIB_XMLPARSE_XMLNODE_H_

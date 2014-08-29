@@ -25,8 +25,6 @@
 #include <stdio.h>
 #include <string>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -37,13 +35,11 @@
 #include "xmlParse/xmlParse.h"
 #include "xmlParse/xmlUpdateContextSubscriptionRequest.h"
 
-using namespace orion;
-
 
 
 /* ****************************************************************************
 *
-* restriction - 
+* restriction -
 */
 static int restriction(xml_node<>* node, ParseData* reqData)
 {
@@ -57,7 +53,7 @@ static int restriction(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* attributeExpression - 
+* attributeExpression -
 */
 static int attributeExpression(xml_node<>* node, ParseData* reqData)
 {
@@ -71,7 +67,7 @@ static int attributeExpression(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* operationScope - 
+* operationScope -
 */
 static int operationScope(xml_node<>* node, ParseData* reqData)
 {
@@ -88,7 +84,7 @@ static int operationScope(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* scopeType - 
+* scopeType -
 */
 static int scopeType(xml_node<>* node, ParseData* reqData)
 {
@@ -101,7 +97,7 @@ static int scopeType(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* scopeValue - 
+* scopeValue -
 */
 static int scopeValue(xml_node<>* node, ParseData* reqData)
 {
@@ -128,7 +124,7 @@ static int scopeValue(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* circle - 
+* circle -
 */
 static int circle(xml_node<>* node, ParseData* reqData)
 {
@@ -141,7 +137,7 @@ static int circle(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* circleCenterLatitude - 
+* circleCenterLatitude -
 */
 static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
 {
@@ -155,7 +151,7 @@ static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* circleCenterLongitude - 
+* circleCenterLongitude -
 */
 static int circleCenterLongitude(xml_node<>* node, ParseData* reqData)
 {
@@ -168,7 +164,7 @@ static int circleCenterLongitude(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* circleRadius - 
+* circleRadius -
 */
 static int circleRadius(xml_node<>* node, ParseData* reqData)
 {
@@ -181,7 +177,7 @@ static int circleRadius(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* circleInverted - 
+* circleInverted -
 */
 static int circleInverted(xml_node<>* node, ParseData* parseDataP)
 {
@@ -202,7 +198,7 @@ static int circleInverted(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* polygon - 
+* polygon -
 */
 static int polygon(xml_node<>* node, ParseData* reqData)
 {
@@ -215,7 +211,7 @@ static int polygon(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* polygonInverted - 
+* polygonInverted -
 */
 static int polygonInverted(xml_node<>* node, ParseData* parseDataP)
 {
@@ -235,7 +231,7 @@ static int polygonInverted(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* polygonVertexList - 
+* polygonVertexList -
 */
 static int polygonVertexList(xml_node<>* node, ParseData* reqData)
 {
@@ -247,7 +243,7 @@ static int polygonVertexList(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* polygonVertex - 
+* polygonVertex -
 */
 static int polygonVertex(xml_node<>* node, ParseData* reqData)
 {
@@ -262,7 +258,7 @@ static int polygonVertex(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* polygonVertexLatitude - 
+* polygonVertexLatitude -
 */
 static int polygonVertexLatitude(xml_node<>* node, ParseData* reqData)
 {
@@ -275,7 +271,7 @@ static int polygonVertexLatitude(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* polygonVertexLongitude - 
+* polygonVertexLongitude -
 */
 static int polygonVertexLongitude(xml_node<>* node, ParseData* reqData)
 {
@@ -288,7 +284,7 @@ static int polygonVertexLongitude(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* duration - 
+* duration -
 */
 static int duration(xml_node<>* node, ParseData* reqData)
 {
@@ -301,7 +297,7 @@ static int duration(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* notifyCondition - 
+* notifyCondition -
 */
 static int notifyCondition(xml_node<>* node, ParseData* reqData)
 {
@@ -315,7 +311,7 @@ static int notifyCondition(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* notifyConditionType - 
+* notifyConditionType -
 */
 static int notifyConditionType(xml_node<>* node, ParseData* reqData)
 {
@@ -328,7 +324,7 @@ static int notifyConditionType(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* condValue - 
+* condValue -
 */
 static int condValue(xml_node<>* node, ParseData* reqData)
 {
@@ -341,7 +337,7 @@ static int condValue(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* subscriptionId - 
+* subscriptionId -
 */
 static int subscriptionId(xml_node<>* node, ParseData* reqData)
 {
@@ -354,7 +350,7 @@ static int subscriptionId(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* throttling - 
+* throttling -
 */
 static int throttling(xml_node<>* node, ParseData* reqData)
 {
@@ -367,7 +363,7 @@ static int throttling(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* ucsrInit - 
+* ucsrInit -
 */
 void ucsrInit(ParseData* reqData)
 {
@@ -380,7 +376,7 @@ void ucsrInit(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* ucsrRelease - 
+* ucsrRelease -
 */
 void ucsrRelease(ParseData* reqData)
 {
@@ -391,7 +387,7 @@ void ucsrRelease(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* ucsrCheck - 
+* ucsrCheck -
 */
 std::string ucsrCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
@@ -402,7 +398,7 @@ std::string ucsrCheck(ParseData* reqData, ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* ucsrPresent - 
+* ucsrPresent -
 */
 void ucsrPresent(ParseData* reqData)
 {
@@ -417,43 +413,56 @@ void ucsrPresent(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* scrParseVector - 
+* scrParseVector -
 */
-XmlNode ucsrParseVector[] = 
+#define UCS   "/updateContextSubscriptionRequest"
+#define RS    "/restriction"
+#define SC    "/scope"
+#define OSC   "/operationScope"
+#define SVAL  "/scopeValue"
+#define CRC   "/circle"
+#define POL   "/polygon"
+#define VXL   "/vertexList"
+#define VX    "/vertex"
+#define NCL   "/notifyConditions"
+#define NC    "/notifyCondition"
+#define CVL   "/condValueList"
+
+XmlNode ucsrParseVector[] =
 {
-  { "/updateContextSubscriptionRequest", nullTreat },
+  { "/updateContextSubscriptionRequest",         nullTreat                   },
 
-  { "/updateContextSubscriptionRequest/duration", duration   },
-  
-  { "/updateContextSubscriptionRequest/restriction",                                  restriction          },
-  { "/updateContextSubscriptionRequest/restriction/attributeExpression",              attributeExpression  },
-  { "/updateContextSubscriptionRequest/restriction/scope",                            nullTreat            },
-  { "/updateContextSubscriptionRequest/restriction/scope/operationScope",             operationScope       },
-  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeType",   scopeType            },
-  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue",  scopeValue           },
+  { UCS "/duration",                             duration                    },
 
-  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/circle",                              circle                  },
-  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/centerLatitude",               circleCenterLatitude    },
-  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/centerLongitude",              circleCenterLongitude   },
-  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/radius",                       circleRadius            },
-  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/circle/inverted",                     circleInverted          },
+  { UCS "/restriction",                          restriction                 },
+  { UCS RS "/attributeExpression",               attributeExpression         },
+  { UCS RS "/scope",                             nullTreat                   },
+  { UCS RS SC "/operationScope",                 operationScope              },
+  { UCS RS SC OSC "/scopeType",                  scopeType                   },
+  { UCS RS SC OSC "/scopeValue",                 scopeValue                  },
 
-  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/polygon",                             polygon                 },
-  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/polygon/inverted",                    polygonInverted         },
-  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList",                  polygonVertexList       },
-  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex",           polygonVertex           },
-  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex/latitude",  polygonVertexLatitude   },
-  { "/updateContextSubscriptionRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex/longitude", polygonVertexLongitude  },
+  { UCS RS SC OSC SVAL "/circle",                circle                      },
+  { UCS RS SC OSC SVAL CRC "/centerLatitude",    circleCenterLatitude        },
+  { UCS RS SC OSC SVAL CRC "/centerLongitude",   circleCenterLongitude       },
+  { UCS RS SC OSC SVAL CRC "/radius",            circleRadius                },
+  { UCS RS SC OSC SVAL CRC "/inverted",          circleInverted              },
 
-  { "/updateContextSubscriptionRequest/subscriptionId", subscriptionId   },
-  
-  { "/updateContextSubscriptionRequest/notifyConditions",                                          nullTreat           },
-  { "/updateContextSubscriptionRequest/notifyConditions/notifyCondition",                          notifyCondition     },
-  { "/updateContextSubscriptionRequest/notifyConditions/notifyCondition/type",                     notifyConditionType },
-  { "/updateContextSubscriptionRequest/notifyConditions/notifyCondition/condValueList",            nullTreat           },
-  { "/updateContextSubscriptionRequest/notifyConditions/notifyCondition/condValueList/condValue",  condValue           },
+  { UCS RS SC OSC SVAL "/polygon",               polygon                     },
+  { UCS RS SC OSC SVAL POL "/inverted",          polygonInverted             },
+  { UCS RS SC OSC SVAL POL "/vertexList",        polygonVertexList           },
+  { UCS RS SC OSC SVAL POL VXL "/vertex",        polygonVertex               },
+  { UCS RS SC OSC SVAL POL VXL VX "/latitude",   polygonVertexLatitude       },
+  { UCS RS SC OSC SVAL POL VXL VX "/longitude",  polygonVertexLongitude      },
 
-  { "/updateContextSubscriptionRequest/throttling", throttling },
+  { UCS "/subscriptionId",                       subscriptionId              },
+
+  { UCS "/notifyConditions",                     nullTreat                   },
+  { UCS NCL "/notifyCondition",                  notifyCondition             },
+  { UCS NCL NC "/type",                          notifyConditionType         },
+  { UCS NCL NC "/condValueList",                 nullTreat                   },
+  { UCS NCL NC CVL "/condValue",                 condValue                   },
+
+  { UCS "/throttling",                           throttling                  },
 
   { "LAST", NULL }
 };

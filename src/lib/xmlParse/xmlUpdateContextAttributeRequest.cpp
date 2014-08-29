@@ -25,8 +25,6 @@
 #include <stdio.h>
 #include <string>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -40,7 +38,7 @@
 
 /* ****************************************************************************
 *
-* upcarInit - 
+* upcarInit -
 */
 void upcarInit(ParseData* reqData)
 {
@@ -50,7 +48,7 @@ void upcarInit(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* upcarRelease - 
+* upcarRelease -
 */
 void upcarRelease(ParseData* reqData)
 {
@@ -61,7 +59,7 @@ void upcarRelease(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* upcarCheck - 
+* upcarCheck -
 */
 std::string upcarCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
@@ -72,7 +70,7 @@ std::string upcarCheck(ParseData* reqData, ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* upcarPresent - 
+* upcarPresent -
 */
 void upcarPresent(ParseData* reqData)
 {
@@ -87,7 +85,7 @@ void upcarPresent(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* attributeType - 
+* attributeType -
 */
 static int attributeType(xml_node<>* node, ParseData* reqData)
 {
@@ -100,7 +98,7 @@ static int attributeType(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* attributeValue - 
+* attributeValue -
 */
 static int attributeValue(xml_node<>* node, ParseData* reqData)
 {
@@ -113,7 +111,7 @@ static int attributeValue(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* contextMetadata - 
+* contextMetadata -
 */
 static int contextMetadata(xml_node<>* node, ParseData* reqData)
 {
@@ -127,7 +125,7 @@ static int contextMetadata(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* contextMetadataName - 
+* contextMetadataName -
 */
 static int contextMetadataName(xml_node<>* node, ParseData* reqData)
 {
@@ -140,7 +138,7 @@ static int contextMetadataName(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* contextMetadataType - 
+* contextMetadataType -
 */
 static int contextMetadataType(xml_node<>* node, ParseData* reqData)
 {
@@ -153,7 +151,7 @@ static int contextMetadataType(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* contextMetadataValue - 
+* contextMetadataValue -
 */
 static int contextMetadataValue(xml_node<>* node, ParseData* reqData)
 {
@@ -166,18 +164,18 @@ static int contextMetadataValue(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* upcarParseVector - 
+* upcarParseVector -
 */
-XmlNode upcarParseVector[] = 
+XmlNode upcarParseVector[] =
 {
-  { "/updateContextAttributeRequest",                                nullTreat            },
-  { "/updateContextAttributeRequest/type",                           attributeType        },
-  { "/updateContextAttributeRequest/contextValue",                   attributeValue       },
-  { "/updateContextAttributeRequest/metadata",                       nullTreat            },
-  { "/updateContextAttributeRequest/metadata/contextMetadata",       contextMetadata      },
-  { "/updateContextAttributeRequest/metadata/contextMetadata/name",  contextMetadataName  },
-  { "/updateContextAttributeRequest/metadata/contextMetadata/type",  contextMetadataType  },
-  { "/updateContextAttributeRequest/metadata/contextMetadata/value", contextMetadataValue },
-  
+  { "/updateContextAttributeRequest",                                 nullTreat             },
+  { "/updateContextAttributeRequest/type",                            attributeType         },
+  { "/updateContextAttributeRequest/contextValue",                    attributeValue        },
+  { "/updateContextAttributeRequest/metadata",                        nullTreat             },
+  { "/updateContextAttributeRequest/metadata/contextMetadata",        contextMetadata       },
+  { "/updateContextAttributeRequest/metadata/contextMetadata/name",   contextMetadataName   },
+  { "/updateContextAttributeRequest/metadata/contextMetadata/type",   contextMetadataType   },
+  { "/updateContextAttributeRequest/metadata/contextMetadata/value",  contextMetadataValue  },
+
   { "LAST", NULL }
 };

@@ -24,8 +24,6 @@
 */
 #include <string>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -40,23 +38,23 @@
 
 /* ****************************************************************************
 *
-* ncrInit - 
+* ncrInit -
 */
 void ncrInit(ParseData* parseDataP)
 {
-   ncrRelease(parseDataP);
+  ncrRelease(parseDataP);
 
-   parseDataP->ncr.cerP                 = NULL;
-   parseDataP->ncr.attributeP           = NULL;
-   parseDataP->ncr.attributeMetadataP   = NULL;
-   parseDataP->ncr.domainMetadataP      = NULL;
+  parseDataP->ncr.cerP                 = NULL;
+  parseDataP->ncr.attributeP           = NULL;
+  parseDataP->ncr.attributeMetadataP   = NULL;
+  parseDataP->ncr.domainMetadataP      = NULL;
 }
 
 
 
 /* ****************************************************************************
 *
-* ncrRelease - 
+* ncrRelease -
 */
 void ncrRelease(ParseData* parseDataP)
 {
@@ -67,7 +65,7 @@ void ncrRelease(ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* ncrCheck - 
+* ncrCheck -
 */
 std::string ncrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
@@ -78,12 +76,14 @@ std::string ncrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* ncrPresent - 
+* ncrPresent -
 */
 void ncrPresent(ParseData* parseDataP)
 {
   if (!lmTraceIsSet(LmtDump))
+  {
     return;
+  }
 
   PRINTF("\n\n");
   parseDataP->ncr.res.subscriptionId.present("");
@@ -93,13 +93,13 @@ void ncrPresent(ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* subscriptionId - 
+* subscriptionId -
 */
 static int subscriptionId(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a subscriptionId: '%s'", node->value()));
-
   parseDataP->ncr.res.subscriptionId.set(node->value());
+
   return 0;
 }
 
@@ -107,13 +107,13 @@ static int subscriptionId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* originator - 
+* originator -
 */
 static int originator(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an originator: '%s'", node->value()));
-
   parseDataP->ncr.res.originator.set(node->value());
+
   return 0;
 }
 
@@ -121,7 +121,7 @@ static int originator(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* entityId - 
+* entityId -
 */
 static int entityId(xml_node<>* node, ParseData* parseDataP)
 {
@@ -130,7 +130,9 @@ static int entityId(xml_node<>* node, ParseData* parseDataP)
   std::string es = entityIdParse(RegisterContext, node, &parseDataP->ncr.cerP->contextElement.entityId);
 
   if (es != "OK")
+  {
     parseDataP->errorString = es;
+  }
 
   return 0;
 }
@@ -139,12 +141,11 @@ static int entityId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* entityIdId - 
+* entityIdId -
 */
 static int entityIdId(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId:id: '%s'", node->value()));
-
   parseDataP->ncr.cerP->contextElement.entityId.id = node->value();
 
   return 0;
@@ -154,12 +155,11 @@ static int entityIdId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* attributeDomainName - 
+* attributeDomainName -
 */
 static int attributeDomainName(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeDomainName: '%s'", node->value()));
-
   parseDataP->ncr.cerP->contextElement.attributeDomainName.set(node->value());
 
   return 0;
@@ -169,12 +169,13 @@ static int attributeDomainName(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextElementResponse - 
+* contextElementResponse -
 */
 static int contextElementResponse(xml_node<>* node, ParseData* parseDataP)
 {
   parseDataP->ncr.cerP = new ContextElementResponse();
   parseDataP->ncr.res.contextElementResponseVector.push_back(parseDataP->ncr.cerP);
+
   return 0;
 }
 
@@ -182,13 +183,15 @@ static int contextElementResponse(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextAttribute - 
+* contextAttribute -
 */
 static int contextAttribute(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Creating an attribute"));
+
   parseDataP->ncr.attributeP = new ContextAttribute();
   parseDataP->ncr.cerP->contextElement.contextAttributeVector.push_back(parseDataP->ncr.attributeP);
+
   return 0;
 }
 
@@ -196,12 +199,13 @@ static int contextAttribute(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextAttributeName - 
+* contextAttributeName -
 */
 static int contextAttributeName(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute name: '%s'", node->value()));
   parseDataP->ncr.attributeP->name = node->value();
+
   return 0;
 }
 
@@ -209,12 +213,13 @@ static int contextAttributeName(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextAttributeType - 
+* contextAttributeType -
 */
 static int contextAttributeType(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute type: '%s'", node->value()));
   parseDataP->ncr.attributeP->type = node->value();
+
   return 0;
 }
 
@@ -222,12 +227,13 @@ static int contextAttributeType(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextAttributeContextValue - 
+* contextAttributeContextValue -
 */
 static int contextAttributeContextValue(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute value: '%s'", node->value()));
   parseDataP->ncr.attributeP->value = node->value();
+
   return 0;
 }
 
@@ -235,13 +241,15 @@ static int contextAttributeContextValue(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextMetadata - 
+* contextMetadata -
 */
 static int contextMetadata(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata"));
+
   reqData->ncr.attributeMetadataP = new Metadata();
   reqData->ncr.attributeP->metadataVector.push_back(reqData->ncr.attributeMetadataP);
+
   return 0;
 }
 
@@ -249,12 +257,13 @@ static int contextMetadata(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* contextMetadataName - 
+* contextMetadataName -
 */
 static int contextMetadataName(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata name '%s'", node->value()));
   reqData->ncr.attributeMetadataP->name = node->value();
+
   return 0;
 }
 
@@ -262,12 +271,13 @@ static int contextMetadataName(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* contextMetadataType - 
+* contextMetadataType -
 */
 static int contextMetadataType(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata type '%s'", node->value()));
   reqData->ncr.attributeMetadataP->type = node->value();
+
   return 0;
 }
 
@@ -275,12 +285,13 @@ static int contextMetadataType(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* contextMetadataValue - 
+* contextMetadataValue -
 */
 static int contextMetadataValue(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata value '%s'", node->value()));
   reqData->ncr.attributeMetadataP->value = node->value();
+
   return 0;
 }
 
@@ -288,12 +299,13 @@ static int contextMetadataValue(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* statusCodeCode - 
+* statusCodeCode -
 */
 static int statusCodeCode(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a statusCode code: '%s'", node->value()));
   parseDataP->ncr.cerP->statusCode.code = (HttpStatusCode) atoi(node->value());
+
   return 0;
 }
 
@@ -301,12 +313,13 @@ static int statusCodeCode(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* statusCodeReasonPhrase - 
+* statusCodeReasonPhrase -
 */
 static int statusCodeReasonPhrase(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a statusCode reasonPhrase: '%s'", node->value()));
-  parseDataP->ncr.cerP->statusCode.reasonPhrase = node->value(); // OK - parsing step
+  parseDataP->ncr.cerP->statusCode.reasonPhrase = node->value();  // OK - parsing step
+
   return 0;
 }
 
@@ -314,57 +327,67 @@ static int statusCodeReasonPhrase(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* statusCodeDetails - 
+* statusCodeDetails -
 */
 static int statusCodeDetails(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a statusCode details: '%s'", node->value()));
   parseDataP->ncr.cerP->statusCode.details = node->value();
+
   return 0;
 }
 
 
-
 /* ****************************************************************************
 *
-* ncrParseVector - 
+* ncrParseVector -
 */
-XmlNode ncrParseVector[] = 
+#define NCR "/notifyContextRequest"
+#define CRL "/contextResponseList"
+#define CR  "/contextElementResponse"
+#define CE  "/contextElement"
+#define CAL "/contextAttributeList"
+#define CA  "/contextAttribute"
+#define MDL "/metadata"
+#define MD  "/contextMetadata"
+#define DMD "/domainMetadata"
+#define ST  "/statusCode"
+
+XmlNode ncrParseVector[] =
 {
-  { "/notifyContextRequest",                         nullTreat          },
-  { "/notifyContextRequest/subscriptionId",          subscriptionId     },
-  { "/notifyContextRequest/originator",              originator         },
-  { "/notifyContextRequest/contextResponseList",     nullTreat          },
+  { NCR,                                  nullTreat                    },
+  { NCR "/subscriptionId",                subscriptionId               },
+  { NCR "/originator",                    originator                   },
+  { NCR "/contextResponseList",           nullTreat                    },
 
-  { "/notifyContextRequest/contextResponseList/contextElementResponse",                             contextElementResponse  },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement",              nullTreat               },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/entityId",     entityId                },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/entityId/id",  entityIdId              },
+  { NCR CRL CR,                           contextElementResponse       },
+  { NCR CRL CR CE,                        nullTreat                    },
+  { NCR CRL CR CE "/entityId",            entityId                     },
+  { NCR CRL CR CE "/entityId/id",         entityIdId                   },
+  { NCR CRL CR CE "/attributeDomainName", attributeDomainName          },
 
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/attributeDomainName",    attributeDomainName   },
+  { NCR CRL CR CE CAL,                    nullTreat                    },
+  { NCR CRL CR CE CAL CA,                 contextAttribute             },
+  { NCR CRL CR CE CAL CA "/name",         contextAttributeName         },
+  { NCR CRL CR CE CAL CA "/type",         contextAttributeType         },
+  { NCR CRL CR CE CAL CA "/contextValue", contextAttributeContextValue },
 
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList",                               nullTreat },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute",              contextAttribute },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/name",         contextAttributeName },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/type",         contextAttributeType },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/contextValue", contextAttributeContextValue },
+  { NCR CRL CR CE CAL CA MDL,             nullTreat                    },
+  { NCR CRL CR CE CAL CA MDL MD,          contextMetadata              },
+  { NCR CRL CR CE CAL CA MDL MD "/name",  contextMetadataName          },
+  { NCR CRL CR CE CAL CA MDL MD "/type",  contextMetadataType          },
+  { NCR CRL CR CE CAL CA MDL MD "/value", contextMetadataValue         },
 
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata",                       nullTreat            },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata",       contextMetadata      },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/name",  contextMetadataName  },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/type",  contextMetadataType  },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/value", contextMetadataValue },
+  { NCR CRL CR CE "/domainMetadata",      nullTreat                    },
+  { NCR CRL CR CE DMD "/contextMetadata", nullTreat                    },
+  { NCR CRL CR CE DMD MD "/name",         nullTreat                    },
+  { NCR CRL CR CE DMD MD "/type",         nullTreat                    },
+  { NCR CRL CR CE DMD MD "/value",        nullTreat                    },
 
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/domainMetadata",                       nullTreat },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/domainMetadata/contextMetadata",       nullTreat },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/domainMetadata/contextMetadata/name",  nullTreat },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/domainMetadata/contextMetadata/type",  nullTreat },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/contextElement/domainMetadata/contextMetadata/value", nullTreat },
+  { NCR CRL CR "/statusCode",             nullTreat                    },
+  { NCR CRL CR ST "/code",                statusCodeCode               },
+  { NCR CRL CR ST "/reasonPhrase",        statusCodeReasonPhrase       },
+  { NCR CRL CR ST "/details",             statusCodeDetails            },
 
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/statusCode",                nullTreat              },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/statusCode/code",           statusCodeCode         },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/statusCode/reasonPhrase",   statusCodeReasonPhrase },
-  { "/notifyContextRequest/contextResponseList/contextElementResponse/statusCode/details",        statusCodeDetails      },
-  
   { "LAST", NULL }
 };

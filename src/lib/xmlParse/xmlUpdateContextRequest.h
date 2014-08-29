@@ -1,5 +1,5 @@
-#ifndef XML_UPDATE_CONTEXT_REQUEST_H
-#define XML_UPDATE_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_XMLPARSE_XMLUPDATECONTEXTREQUEST_H_
+#define SRC_LIB_XMLPARSE_XMLUPDATECONTEXTREQUEST_H_
 
 /*
 *
@@ -70,4 +70,4 @@ extern std::string upcrCheck(ParseData* reqData, ConnectionInfo* ciP);
 */
 extern void upcrPresent(ParseData* reqData);
 
-#endif
+#endif  // SRC_LIB_XMLPARSE_XMLUPDATECONTEXTREQUEST_H_

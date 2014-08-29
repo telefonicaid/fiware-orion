@@ -1,5 +1,5 @@
-#ifndef XML_UNSUBSCRIBE_CONTEXT_REQUEST_H
-#define XML_UNSUBSCRIBE_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_XMLPARSE_XMLUNSUBSCRIBECONTEXTREQUEST_H_
+#define SRC_LIB_XMLPARSE_XMLUNSUBSCRIBECONTEXTREQUEST_H_
 
 /*
 *
@@ -70,4 +70,4 @@ extern std::string uncrCheck(ParseData* reqData, ConnectionInfo* ciP);
 */
 extern void uncrPresent(ParseData* reqData);
 
-#endif
+#endif  // SRC_LIB_XMLPARSE_XMLUNSUBSCRIBECONTEXTREQUEST_H_
