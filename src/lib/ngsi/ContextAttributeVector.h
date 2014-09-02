@@ -49,7 +49,7 @@ typedef struct ContextAttributeVector
   unsigned int       size(void);
   ContextAttribute*  get(unsigned int ix);
   void               release(void);
-  void               fill(ContextAttributeVector& caV);
+  void               fill(ContextAttributeVector* caV);
 
   ContextAttribute*  operator[](unsigned int ix)       { if (ix < vec.size()) return vec[ix]; else return NULL; }
 } ContextAttributeVector;

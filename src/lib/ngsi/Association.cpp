@@ -34,9 +34,16 @@
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
-std::string Association::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string Association::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   std::string res;
 
@@ -50,11 +57,11 @@ std::string Association::check(RequestType requestType, Format format, const std
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 std::string Association::render(Format format, const std::string& indent, bool comma)
 {
-  std::string  out                              = ""; 
+  std::string  out                              = "";
   bool         attributeAssociationListRendered = attributeAssociationList.size() != 0;
 
   out += entityAssociation.render(format, indent + "  ", attributeAssociationListRendered);

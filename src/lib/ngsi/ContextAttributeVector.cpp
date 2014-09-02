@@ -80,7 +80,14 @@ std::string ContextAttributeVector::render(RequestType request, Format format, c
 *
 * ContextAttributeVector::check - 
 */
-std::string ContextAttributeVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ContextAttributeVector::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -101,10 +108,12 @@ std::string ContextAttributeVector::check(RequestType requestType, Format format
 */
 void ContextAttributeVector::present(const std::string& indent)
 {
-   PRINTF("%lu ContextAttributes", (unsigned long) vec.size());
+  PRINTF("%lu ContextAttributes", (uint64_t) vec.size());
 
-   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-      vec[ix]->present(indent, ix);
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    vec[ix]->present(indent, ix);
+  }
 }
 
 
@@ -146,17 +155,17 @@ unsigned int ContextAttributeVector::size(void)
 
 /* ****************************************************************************
 *
-* ContextAttributeVector::release - 
+* ContextAttributeVector::release -
 */
 void ContextAttributeVector::release(void)
-{ 
+{
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     vec[ix]->release();
     delete vec[ix];
   }
 
- vec.clear();
+  vec.clear();
 }
 
 
@@ -165,11 +174,11 @@ void ContextAttributeVector::release(void)
 *
 * ContextAttributeVector::fill - 
 */
-void ContextAttributeVector::fill(ContextAttributeVector& caV)
+void ContextAttributeVector::fill(ContextAttributeVector* caV)
 {
-  for (unsigned int ix = 0; ix < caV.size(); ++ix)
+  for (unsigned int ix = 0; ix < caV->size(); ++ix)
   {
-    ContextAttribute* caP = new ContextAttribute(caV.get(ix));
+    ContextAttribute* caP = new ContextAttribute(caV->get(ix));
 
     push_back(caP);
   }

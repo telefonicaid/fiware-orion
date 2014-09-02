@@ -73,14 +73,23 @@ std::string AttributeAssociationList::render(Format format, const std::string& i
 *
 * check - 
 */
-std::string AttributeAssociationList::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string AttributeAssociationList::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, 0)) != "OK")
+    {
       return res;
+    }
   }
 
   return "OK";
@@ -94,10 +103,12 @@ std::string AttributeAssociationList::check(RequestType requestType, Format form
 */
 void AttributeAssociationList::present(const std::string& indent)
 {
-  PRINTF("%lu Attribute Associations", (unsigned long) vec.size());
+  PRINTF("%lu Attribute Associations", (uint64_t) vec.size());
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
     vec[ix]->present(indent, ix);
+  }
 }
 
 
@@ -130,8 +141,10 @@ unsigned int AttributeAssociationList::size(void)
 */
 void AttributeAssociationList::release(void)
 {
-  for (unsigned int ix = 0; ix < vec.size(); ++ix) {
-      delete vec[ix];
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    delete vec[ix];
   }
+
   vec.clear();
 }

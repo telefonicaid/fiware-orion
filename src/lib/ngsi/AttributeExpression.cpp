@@ -37,7 +37,14 @@
 *
 * AttributeExpression::check - 
 */
-std::string AttributeExpression::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string AttributeExpression::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   return "OK";
 }
@@ -51,7 +58,9 @@ std::string AttributeExpression::check(RequestType requestType, Format format, c
 bool AttributeExpression::isEmpty(void)
 {
   if (string == "")
+  {
     return true;
+  }
 
   return false;
 }
@@ -87,9 +96,13 @@ std::string AttributeExpression::get(void)
 void AttributeExpression::present(const std::string& indent)
 {
   if (string != "")
+  {
     PRINTF("%sAttributeExpression: %s\n", indent.c_str(), string.c_str());
+  }
   else
+  {
     PRINTF("%sNo AttributeExpression\n", indent.c_str());
+  }
 }
 
 
@@ -101,9 +114,11 @@ void AttributeExpression::present(const std::string& indent)
 std::string AttributeExpression::render(Format format, const std::string& indent, bool comma)
 {
   if (string == "")
+  {
     return "";
-  else
-    return valueTag(indent, "attributeExpression", string, format, comma);
+  }
+
+  return valueTag(indent, "attributeExpression", string, format, comma);
 }
 
 
@@ -114,7 +129,7 @@ std::string AttributeExpression::render(Format format, const std::string& indent
 */
 const char* AttributeExpression::c_str(void)
 {
-   return string.c_str();
+  return string.c_str();
 }
 
 
@@ -125,5 +140,5 @@ const char* AttributeExpression::c_str(void)
 */
 void AttributeExpression::release(void)
 {
-   /* This method is included for the sake of homogeneity */
+  /* This method is included for the sake of homogeneity */
 }
