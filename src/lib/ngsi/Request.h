@@ -85,7 +85,13 @@ typedef enum RequestType
   RegisterResponse,
   RtSubscribeResponse,
   RtSubscribeError,
-  InvalidRequest,
+
+  EntityTypes,
+  AttributesForEntityType,
+  RtEntityTypesResponse,
+  RtAttributesForEntityTypeResponse,
+
+  InvalidRequest
 } RequestType;
 
 

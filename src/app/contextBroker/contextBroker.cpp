@@ -84,15 +84,21 @@
 #include "common/Timer.h"
 #include "common/compileInfo.h"
 
+#include "utility/EntityTypesResponse.h"
+
 #include "serviceRoutines/logTraceTreat.h"
 
 #include "ngsi/ParseData.h"
 #include "ngsiNotify/onTimeIntervalThread.h"
 
+#include "serviceRoutines/getEntityTypes.h"
+#include "serviceRoutines/getAttributesForEntityType.h"
+
 #include "serviceRoutines/versionTreat.h"
 #include "serviceRoutines/statisticsTreat.h"
 #include "serviceRoutines/exitTreat.h"
 #include "serviceRoutines/leakTreat.h"
+
 #include "serviceRoutines/postDiscoverContextAvailability.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutines/postRegisterContext.h"
@@ -239,6 +245,7 @@ PaArgument paArgs[] =
 */
 
 
+
 /* ****************************************************************************
 *
 * restServiceMTenant - services for BROKER (ngsi9/10) and tenants 
@@ -248,6 +255,12 @@ PaArgument paArgs[] =
 */
 RestService restServiceMTenant[] =
 {
+  // Entity Type listings
+  { "GET",    EntityTypes,                                 2, { "info", "contextEntityTypes"                                  }, "",                                             getEntityTypes                            },
+  { "GET",    AttributesForEntityType,                     4, { "info", "contextEntityTypes", "*", "attr"                     }, "",                                             getAttributesForEntityType                },
+  { "GET",    EntityTypes,                                 3, { "*", "info", "contextEntityTypes"                             }, "",                                             getEntityTypes                            },
+  { "GET",    AttributesForEntityType,                     5, { "*", "info", "contextEntityTypes", "*", "attr"                }, "",                                             getAttributesForEntityType                },
+
   // NGSI-9 Requests
   { "POST",   RegisterContext,                             2, { "ngsi9",  "registerContext"                                   }, "registerContextRequest",                       postRegisterContext                       },
   { "*",      RegisterContext,                             2, { "ngsi9",  "registerContext"                                   }, "registerContextRequest",                       badVerbPostOnly                           },
@@ -504,6 +517,10 @@ RestService restServiceMTenant[] =
 */
 RestService restServiceV[] =
 {
+  // Entity Type listings
+  { "GET",    EntityTypes,                                 2, { "info", "contextEntityTypes"                                  }, "",                                             getEntityTypes                            },
+  { "GET",    AttributesForEntityType,                     4, { "info", "contextEntityTypes", "*", "attr"                     }, "",                                             getAttributesForEntityType                },
+
   // NGSI-9 Requests
   { "POST",   RegisterContext,                             2, { "ngsi9",  "registerContext"                                   }, "registerContextRequest",                       postRegisterContext                       },
   { "*",      RegisterContext,                             2, { "ngsi9",  "registerContext"                                   }, "registerContextRequest",                       badVerbPostOnly                           },

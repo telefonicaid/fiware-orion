@@ -1,5 +1,5 @@
-#ifndef URI_PARAM_NAMES_H
-#define URI_PARAM_NAMES_H
+#ifndef SRC_LIB_SERVICEROUTINES_GETATTRIBUTESFORENTITYTYPESH_
+#define SRC_LIB_SERVICEROUTINES_GETATTRIBUTESFORENTITYTYPESH_
 
 /*
 *
@@ -25,33 +25,24 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* Names of the URI parameters
+* getAttributesForEntityType - 
 */
-#define URI_PARAM_NOTIFY_FORMAT       "notifyFormat"
-#define URI_PARAM_PAGINATION_OFFSET   "offset"
-#define URI_PARAM_PAGINATION_LIMIT    "limit"
-#define URI_PARAM_PAGINATION_DETAILS  "details"
-#define URI_PARAM_ENTITY_TYPE         "entityType"
+extern std::string getAttributesForEntityType
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-
-
-/* ****************************************************************************
-*
-* Values for URI parameters
-*/
-#define DEFAULT_PAGINATION_OFFSET       "0"
-#define DEFAULT_PAGINATION_OFFSET_INT   0
-
-#define DEFAULT_PAGINATION_LIMIT        "20"
-#define DEFAULT_PAGINATION_LIMIT_INT    20
-#define MAX_PAGINATION_LIMIT            "1000"
-
-#define DEFAULT_PARAM_NOTIFY_FORMAT     ""
-#define DEFAULT_PAGINATION_DETAILS      "off"
-
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_GETATTRIBUTESFORENTITYTYPESH_
