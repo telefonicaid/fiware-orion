@@ -38,7 +38,14 @@
 *
 * Originator::check -
 */
-std::string Originator::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string Originator::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   return "OK";
 }
@@ -51,7 +58,7 @@ std::string Originator::check(RequestType requestType, Format format, const std:
 */
 bool Originator::isEmpty(void)
 {
-   return (string == "")? true : false;
+  return (string == "")? true : false;
 }
 
 
@@ -85,9 +92,13 @@ std::string Originator::get(void)
 void Originator::present(const std::string& indent)
 {
   if (string != "")
+  {
     PRINTF("%sOriginator: %s\n", indent.c_str(), string.c_str());
+  }
   else
+  {
     PRINTF("%sNo Originator", indent.c_str());
+  }
 }
 
 
@@ -99,7 +110,9 @@ void Originator::present(const std::string& indent)
 std::string Originator::render(Format format, const std::string& indent, bool comma)
 {
   if (string == "")
+  {
     return "";
+  }
 
   return valueTag(indent, "originator", string, format, comma);
 }
@@ -112,5 +125,5 @@ std::string Originator::render(Format format, const std::string& indent, bool co
 */
 const char* Originator::c_str(void)
 {
-   return string.c_str();
+  return string.c_str();
 }

@@ -36,21 +36,31 @@
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::render - 
+* ContextElementResponseVector::render -
 */
-std::string ContextElementResponseVector::render(RequestType requestType, Format format, const std::string& indent, bool comma)
+std::string ContextElementResponseVector::render
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  bool                comma
+)
 {
   std::string xmlTag   = "contextResponseList";
   std::string jsonTag  = "contextResponses";
   std::string out      = "";
 
   if (vec.size() == 0)
+  {
     return "";
+  }
 
   out += startTag(indent, xmlTag, jsonTag, format, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
     out += vec[ix]->render(requestType, format, indent + "  ", ix < (vec.size() - 1));
+  }
 
   out += endTag(indent, xmlTag, format, comma, true);
 
@@ -61,16 +71,25 @@ std::string ContextElementResponseVector::render(RequestType requestType, Format
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::check - 
+* ContextElementResponseVector::check -
 */
-std::string ContextElementResponseVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ContextElementResponseVector::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  for (uint64_t ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    {
       return res;
+    }
   }
 
   return "OK";
@@ -80,21 +99,23 @@ std::string ContextElementResponseVector::check(RequestType requestType, Format 
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::present - 
+* ContextElementResponseVector::present -
 */
 void ContextElementResponseVector::present(const std::string& indent)
 {
-   PRINTF("%lu ContextElementResponses", (unsigned long) vec.size());
+  PRINTF("%lu ContextElementResponses", (uint64_t) vec.size());
 
-   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-      vec[ix]->present(indent, ix);
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    vec[ix]->present(indent, ix);
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::push_back - 
+* ContextElementResponseVector::push_back -
 */
 void ContextElementResponseVector::push_back(ContextElementResponse* item)
 {
@@ -105,12 +126,15 @@ void ContextElementResponseVector::push_back(ContextElementResponse* item)
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::get - 
+* ContextElementResponseVector::get -
 */
 ContextElementResponse* ContextElementResponseVector::get(unsigned int ix)
 {
   if (ix < vec.size())
+  {
     return vec[ix];
+  }
+
   return NULL;
 }
 
@@ -118,7 +142,7 @@ ContextElementResponse* ContextElementResponseVector::get(unsigned int ix)
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::size - 
+* ContextElementResponseVector::size -
 */
 unsigned int ContextElementResponseVector::size(void)
 {
@@ -129,7 +153,7 @@ unsigned int ContextElementResponseVector::size(void)
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector::release - 
+* ContextElementResponseVector::release -
 */
 void ContextElementResponseVector::release(void)
 {

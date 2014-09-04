@@ -36,14 +36,23 @@
 
 /* ****************************************************************************
 *
-* Reference::check - 
+* Reference::check -
 */
-std::string Reference::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string Reference::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   if (string == "")
   {
     if ((requestType == SubscribeContextAvailability) || (requestType == SubscribeContext))
-       return "Empty Reference";
+    {
+      return "Empty Reference";
+    }
   }
 
   return "OK";
@@ -53,18 +62,18 @@ std::string Reference::check(RequestType requestType, Format format, const std::
 
 /* ****************************************************************************
 *
-* Reference::isEmpty - 
+* Reference::isEmpty -
 */
 bool Reference::isEmpty(void)
 {
-   return (string == "")? true : false;
+  return (string == "")? true : false;
 }
 
 
 
 /* ****************************************************************************
 *
-* Reference::set - 
+* Reference::set -
 */
 void Reference::set(const std::string& value)
 {
@@ -75,7 +84,7 @@ void Reference::set(const std::string& value)
 
 /* ****************************************************************************
 *
-* Reference::get - 
+* Reference::get -
 */
 std::string Reference::get(void)
 {
@@ -86,26 +95,32 @@ std::string Reference::get(void)
 
 /* ****************************************************************************
 *
-* Reference::present - 
+* Reference::present -
 */
 void Reference::present(const std::string& indent)
 {
   if (string != "")
+  {
     PRINTF("%sReference: %s\n", indent.c_str(), string.c_str());
+  }
   else
+  {
     PRINTF("%sNo Reference\n", indent.c_str());
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* Reference::render - 
+* Reference::render -
 */
 std::string Reference::render(Format format, const std::string& indent, bool comma)
 {
   if (string == "")
+  {
     return "";
+  }
 
   return valueTag(indent, "reference", string, format, comma);
 }
@@ -114,9 +129,9 @@ std::string Reference::render(Format format, const std::string& indent, bool com
 
 /* ****************************************************************************
 *
-* Reference::c_str - 
+* Reference::c_str -
 */
 const char* Reference::c_str(void)
 {
-   return string.c_str();
+  return string.c_str();
 }

@@ -1,5 +1,5 @@
-#ifndef RESTRICTION_STRING_H
-#define RESTRICTION_STRING_H
+#ifndef SRC_LIB_NGSI_RESTRICTIONSTRING_H_
+#define SRC_LIB_NGSI_RESTRICTIONSTRING_H_
 
 /*
 *
@@ -44,9 +44,14 @@ typedef struct RestrictionString
   std::string   get(void);
   bool          isEmpty(void);
   std::string   render(Format format, const std::string& indent, bool comma);
-  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(const std::string& indent);
   const char*   c_str();
+
+  std::string   check(RequestType         requestType,
+                      Format              format,
+                      const std::string&  indent,
+                      const std::string&  predetectedError,
+                      int                 counter);
 } RestrictionString;
 
-#endif
+#endif  // SRC_LIB_NGSI_RESTRICTIONSTRING_H_

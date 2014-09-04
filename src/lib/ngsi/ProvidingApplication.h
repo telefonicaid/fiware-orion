@@ -1,5 +1,5 @@
-#ifndef PROVIDING_APPLICATION_H
-#define PROVIDING_APPLICATION_H
+#ifndef SRC_LIB_NGSI_PROVIDINGAPPLICATION_H_
+#define SRC_LIB_NGSI_PROVIDINGAPPLICATION_H_
 
 /*
 *
@@ -44,10 +44,15 @@ typedef struct ProvidingApplication
   std::string   get(void);
   bool          isEmpty(void);
   std::string   render(Format format, const std::string& indent, bool comma);
-  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(const std::string& indent);
   const char*   c_str(void);
   void          release(void);
+
+  std::string   check(RequestType         requestType,
+                      Format              format,
+                      const std::string&  indent,
+                      const std::string&  predetectedError,
+                      int                 counter);
 } ProvidingApplication;
 
-#endif
+#endif  // SRC_LIB_NGSI_PROVIDINGAPPLICATION_H_

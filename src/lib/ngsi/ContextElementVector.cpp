@@ -36,7 +36,7 @@
 
 /* ****************************************************************************
 *
-* ContextElementVector::push_back - 
+* ContextElementVector::push_back -
 */
 void ContextElementVector::push_back(ContextElement* item)
 {
@@ -47,7 +47,7 @@ void ContextElementVector::push_back(ContextElement* item)
 
 /* ****************************************************************************
 *
-* ContextElementVector::render - 
+* ContextElementVector::render -
 */
 std::string ContextElementVector::render(RequestType requestType, Format format, const std::string& indent, bool comma)
 {
@@ -56,12 +56,16 @@ std::string ContextElementVector::render(RequestType requestType, Format format,
   std::string  jsonTag = "contextElements";
 
   if (vec.size() == 0)
+  {
     return "";
+  }
 
   out += startTag(indent, xmlTag, jsonTag, format, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
     out += vec[ix]->render(requestType, format, indent + "  ", ix != vec.size() - 1);
+  }
 
   out += endTag(indent, xmlTag, format, comma);
 
@@ -72,21 +76,23 @@ std::string ContextElementVector::render(RequestType requestType, Format format,
 
 /* ****************************************************************************
 *
-* ContextElementVector::present - 
+* ContextElementVector::present -
 */
 void ContextElementVector::present(const std::string& indent)
 {
-   PRINTF("%lu ContextElements", (unsigned long) vec.size());
+  PRINTF("%lu ContextElements", (uint64_t) vec.size());
 
-   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-      vec[ix]->present(indent, ix);
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    vec[ix]->present(indent, ix);
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* ContextElementVector::release - 
+* ContextElementVector::release -
 */
 void ContextElementVector::release(void)
 {
@@ -103,7 +109,7 @@ void ContextElementVector::release(void)
 
 /* ****************************************************************************
 *
-* ContextElementVector::get - 
+* ContextElementVector::get -
 */
 ContextElement* ContextElementVector::get(int ix)
 {
@@ -114,7 +120,7 @@ ContextElement* ContextElementVector::get(int ix)
 
 /* ****************************************************************************
 *
-* ContextElementVector::size - 
+* ContextElementVector::size -
 */
 unsigned int ContextElementVector::size(void)
 {
@@ -125,14 +131,23 @@ unsigned int ContextElementVector::size(void)
 
 /* ****************************************************************************
 *
-* ContextElementVector::check - 
+* ContextElementVector::check -
 */
-std::string ContextElementVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ContextElementVector::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   if (requestType == UpdateContext)
   {
     if (vec.size() == 0)
+    {
       return "No context elements";
+    }
   }
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
@@ -140,7 +155,9 @@ std::string ContextElementVector::check(RequestType requestType, Format format, 
     std::string res;
 
     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    {
       return res;
+    }
   }
 
   return "OK";

@@ -35,7 +35,7 @@
 
 /* ****************************************************************************
 *
-* push_back - 
+* push_back -
 */
 void AttributeAssociationList::push_back(AttributeAssociation* aaP)
 {
@@ -46,7 +46,7 @@ void AttributeAssociationList::push_back(AttributeAssociation* aaP)
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 std::string AttributeAssociationList::render(Format format, const std::string& indent, bool comma)
 {
@@ -71,7 +71,7 @@ std::string AttributeAssociationList::render(Format format, const std::string& i
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
 std::string AttributeAssociationList::check
 (
@@ -99,7 +99,7 @@ std::string AttributeAssociationList::check
 
 /* ****************************************************************************
 *
-* present - 
+* present -
 */
 void AttributeAssociationList::present(const std::string& indent)
 {
@@ -115,7 +115,7 @@ void AttributeAssociationList::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* AttributeAssociationList::get - 
+* AttributeAssociationList::get -
 */
 AttributeAssociation* AttributeAssociationList::get(int ix)
 {
@@ -126,7 +126,7 @@ AttributeAssociation* AttributeAssociationList::get(int ix)
 
 /* ****************************************************************************
 *
-* AttributeAssociationList::size - 
+* AttributeAssociationList::size -
 */
 unsigned int AttributeAssociationList::size(void)
 {
@@ -137,7 +137,7 @@ unsigned int AttributeAssociationList::size(void)
 
 /* ****************************************************************************
 *
-* AttributeAssociationList::release - 
+* AttributeAssociationList::release -
 */
 void AttributeAssociationList::release(void)
 {

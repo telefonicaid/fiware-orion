@@ -1,5 +1,5 @@
-#ifndef REGISTRATION_ID_H
-#define REGISTRATION_ID_H
+#ifndef SRC_LIB_NGSI_REGISTRATIONID_H_
+#define SRC_LIB_NGSI_REGISTRATIONID_H_
 
 /*
 *
@@ -44,9 +44,14 @@ typedef struct RegistrationId
   std::string   get(void);
   bool          isEmpty(void);
   std::string   render(RequestType requestType, Format format, const std::string& indent, bool comma = false);
-  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(const std::string& indent);
   void          release(void);
+
+  std::string   check(RequestType         requestType,
+                      Format              format,
+                      const std::string&  indent,
+                      const std::string&  predetectedError,
+                      int                 counter);
 } RegistrationId;
 
-#endif
+#endif  // SRC_LIB_NGSI_REGISTRATIONID_H_

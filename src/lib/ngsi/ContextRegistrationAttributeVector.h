@@ -1,5 +1,5 @@
-#ifndef CONTEXT_REGISTRATION_ATTRIBUTE_VECTOR_H
-#define CONTEXT_REGISTRATION_ATTRIBUTE_VECTOR_H
+#ifndef SRC_LIB_NGSI_CONTEXTREGISTRATIONATTRIBUTEVECTOR_H_
+#define SRC_LIB_NGSI_CONTEXTREGISTRATIONATTRIBUTEVECTOR_H_
 
 /*
 *
@@ -34,19 +34,24 @@
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector - 
+* ContextRegistrationAttributeVector -
 */
 typedef struct ContextRegistrationAttributeVector
 {
   std::vector<ContextRegistrationAttribute*>  vec;
 
   std::string                      render(Format format, const std::string& indent, bool comma = false);
-  std::string                      check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void                             present(const std::string& indent);
   void                             push_back(ContextRegistrationAttribute* item);
   unsigned int                     size(void);
   ContextRegistrationAttribute*    get(int ix);
   void                             release();
+
+  std::string                      check(RequestType         requestType,
+                                         Format              format,
+                                         const std::string&  indent,
+                                         const std::string&  predetectedError,
+                                         int                 counter);
 } ContextRegistrationAttributeVector;
 
-#endif
+#endif  // SRC_LIB_NGSI_CONTEXTREGISTRATIONATTRIBUTEVECTOR_H_

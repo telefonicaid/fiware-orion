@@ -1,5 +1,5 @@
-#ifndef SCOPE_VECTOR_H
-#define SCOPE_VECTOR_H
+#ifndef SRC_LIB_NGSI_SCOPEVECTOR_H_
+#define SRC_LIB_NGSI_SCOPEVECTOR_H_
 
 /*
 *
@@ -41,12 +41,17 @@ typedef struct ScopeVector
   std::vector<Scope*>  vec;
 
   std::string  render(Format format, const std::string& indent, bool comma);
-  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void         present(const std::string& indent);
   void         push_back(Scope* item);
   unsigned int size(void);
   Scope*       get(int ix);
   void         release();
+
+  std::string  check(RequestType         requestType,
+                     Format              format,
+                     const std::string&  indent,
+                     const std::string&  predetectedError,
+                     int                 counter);
 } ScopeVector;
 
-#endif
+#endif  // SRC_LIB_NGSI_SCOPEVECTOR_H_

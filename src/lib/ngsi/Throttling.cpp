@@ -32,6 +32,8 @@
 #include "ngsi/Request.h"
 #include "ngsi/Throttling.h"
 
+
+
 /* ****************************************************************************
 *
 * Throttling::Throttling
@@ -41,34 +43,48 @@
 */
 Throttling::Throttling()
 {
-    seconds = 0;
+  seconds = 0;
 }
+
+
 
 /* ****************************************************************************
 *
 * Throttling::parse -
 */
-long long Throttling::parse(void)
+int64_t Throttling::parse(void)
 {
-    seconds = parse8601(string);
-    return seconds;
+  seconds = parse8601(string);
+  return seconds;
 }
+
 
 
 /* ****************************************************************************
 *
-* Throttling::check - 
+* Throttling::check -
 */
-std::string Throttling::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string Throttling::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
-   // FIXME - make Throttling and Duration inherit from same class
-   //         that implements the 'parse' method
+  // FIXME - make Throttling and Duration inherit from same class
+  //         that implements the 'parse' method
 
   if (string == "")
+  {
     return "OK";
-  
+  }
+
   if (parse() == -1)
-     return "syntax error in throttling string";
+  {
+    return "syntax error in throttling string";
+  }
 
   return "OK";
 }
@@ -77,18 +93,18 @@ std::string Throttling::check(RequestType requestType, Format format, const std:
 
 /* ****************************************************************************
 *
-* Throttling::isEmpty - 
+* Throttling::isEmpty -
 */
 bool Throttling::isEmpty(void)
 {
-   return (string == "")? true : false;
+  return (string == "")? true : false;
 }
 
 
 
 /* ****************************************************************************
 *
-* Throttling::set - 
+* Throttling::set -
 */
 void Throttling::set(const std::string& value)
 {
@@ -99,7 +115,7 @@ void Throttling::set(const std::string& value)
 
 /* ****************************************************************************
 *
-* Throttling::get - 
+* Throttling::get -
 */
 std::string Throttling::get(void)
 {
@@ -110,26 +126,32 @@ std::string Throttling::get(void)
 
 /* ****************************************************************************
 *
-* Throttling::present - 
+* Throttling::present -
 */
 void Throttling::present(const std::string& indent)
 {
   if (string != "")
+  {
     PRINTF("%sThrottling: %s\n", indent.c_str(), string.c_str());
+  }
   else
+  {
     PRINTF("%sNo Throttling\n", indent.c_str());
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* Throttling::render - 
+* Throttling::render -
 */
 std::string Throttling::render(Format format, const std::string& indent, bool comma)
 {
   if (string == "")
+  {
     return "";
+  }
 
   return valueTag(indent, "throttling", string, format, comma);
 }

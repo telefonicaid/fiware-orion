@@ -1,5 +1,5 @@
-#ifndef ATTRIBUTE_LIST_H
-#define ATTRIBUTE_LIST_H
+#ifndef SRC_LIB_NGSI_ATTRIBUTELIST_H_
+#define SRC_LIB_NGSI_ATTRIBUTELIST_H_
 
 /*
 *
@@ -36,19 +36,24 @@
 
 /* ****************************************************************************
 *
-* AttributeList - 
+* AttributeList -
 */
 typedef struct AttributeList
 {
   std::vector<std::string>  attributeV;
 
   std::string  render(Format format, const std::string& indent, bool comma = false);
-  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void         present(const std::string& indent);
   void         release(void);
   void         push_back(const std::string& attributeName);
   unsigned int size(void);
   std::string  get(int ix);
+
+  std::string  check(RequestType         requestType,
+                     Format              format,
+                     const std::string&  indent,
+                     const std::string&  predetectedError,
+                     int                 counter);
 } AttributeList;
 
-#endif
+#endif  // SRC_LIB_NGSI_ATTRIBUTELIST_H_

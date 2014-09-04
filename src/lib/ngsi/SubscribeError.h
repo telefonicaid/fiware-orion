@@ -1,5 +1,5 @@
-#ifndef SUBSCRIBE_ERROR_H
-#define SUBSCRIBE_ERROR_H
+#ifndef SRC_LIB_NGSI_SUBSCRIBEERROR_H_
+#define SRC_LIB_NGSI_SUBSCRIBEERROR_H_
 
 /*
 *
@@ -45,7 +45,12 @@ typedef struct SubscribeError
 
   SubscribeError();
   std::string render(RequestType requestType, Format format, const std::string& indent, bool comma = false);
-  std::string check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+
+  std::string check(RequestType         requestType,
+                    Format              format,
+                    const std::string&  indent,
+                    const std::string&  predetectedError,
+                    int                 counter);
 } SubscribeError;
 
-#endif
+#endif  // SRC_LIB_NGSI_SUBSCRIBEERROR_H_

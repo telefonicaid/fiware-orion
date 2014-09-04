@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* SubscribeError::SubscribeError - 
+* SubscribeError::SubscribeError -
 */
 SubscribeError::SubscribeError()
 {
@@ -45,7 +45,7 @@ SubscribeError::SubscribeError()
 
 /* ****************************************************************************
 *
-* SubscribeError::render - 
+* SubscribeError::render -
 */
 std::string SubscribeError::render(RequestType requestType, Format format, const std::string& indent, bool comma)
 {
@@ -59,15 +59,21 @@ std::string SubscribeError::render(RequestType requestType, Format format, const
   if (requestType == UpdateContextSubscription)
   {
     //
-    // NOTE: the subscriptionId must have come from the request. 
+    // NOTE: the subscriptionId must have come from the request.
     //       If the field is empty, we are in unit tests and I here set it to all zeroes
     //
     if (subscriptionId.get() == "")
+    {
       subscriptionId.set("000000000000000000000000");
+    }
     out += subscriptionId.render(requestType, format, indent + "  ", true);
   }
-  else if ((requestType == SubscribeContext) && (subscriptionId.get() != "000000000000000000000000") && (subscriptionId.get() != ""))
+  else if ((requestType          == SubscribeContext)           &&
+           (subscriptionId.get() != "000000000000000000000000") &&
+           (subscriptionId.get() != ""))
+  {
     out += subscriptionId.render(requestType, format, indent + "  ", true);
+  }
 
   out += errorCode.render(format, indent + "  ");
 
@@ -80,9 +86,16 @@ std::string SubscribeError::render(RequestType requestType, Format format, const
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
-std::string SubscribeError::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string SubscribeError::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
-   return "OK";
+  return "OK";
 }

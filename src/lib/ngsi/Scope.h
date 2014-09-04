@@ -1,5 +1,5 @@
-#ifndef SCOPE_H
-#define SCOPE_H
+#ifndef SRC_LIB_NGSI_SCOPE_H_
+#define SRC_LIB_NGSI_SCOPE_H_
 
 /*
 *
@@ -34,6 +34,7 @@
 using namespace orion;
 
 
+
 /* ****************************************************************************
 *
 * Defined scopes so far
@@ -42,6 +43,8 @@ using namespace orion;
 #define SCOPE_VALUE_ASSOC_SOURCE   "SOURCES"
 #define SCOPE_VALUE_ASSOC_TARGET   "TARGETS"
 #define SCOPE_VALUE_ASSOC_ALL      "ALL"
+
+
 
 /* ****************************************************************************
 *
@@ -60,9 +63,14 @@ typedef struct Scope
   Scope(const std::string& _type, const std::string& _value);
 
   std::string render(Format format, const std::string& indent, bool notLastInVector);
-  std::string check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void        present(const std::string& indent, int ix);
   void        release(void);
+
+  std::string check(RequestType         requestType,
+                    Format              format,
+                    const std::string&  indent,
+                    const std::string&  predetectedError,
+                    int                 counter);
 } Scope;
 
-#endif
+#endif  // SRC_LIB_NGSI_SCOPE_H_

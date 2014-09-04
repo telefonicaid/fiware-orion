@@ -1,5 +1,5 @@
-#ifndef CONTEXT_ELEMENT_VECTOR_H
-#define CONTEXT_ELEMENT_VECTOR_H
+#ifndef SRC_LIB_NGSI_CONTEXTELEMENTVECTOR_H_
+#define SRC_LIB_NGSI_CONTEXTELEMENTVECTOR_H_
 
 /*
 *
@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* ContextElementVector - 
+* ContextElementVector -
 */
 typedef struct ContextElementVector
 {
@@ -44,9 +44,14 @@ typedef struct ContextElementVector
   unsigned int     size(void);
   ContextElement*  get(int ix);
   std::string      render(RequestType requestType, Format format, const std::string& indent, bool comma);
-  std::string      check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void             present(const std::string& indent);
   void             release(void);
+
+  std::string      check(RequestType         requestType,
+                         Format              format,
+                         const std::string&  indent,
+                         const std::string&  predetectedError,
+                         int                 counter);
 } ContextElementVector;
 
-#endif
+#endif  // SRC_LIB_NGSI_CONTEXTELEMENTVECTOR_H_

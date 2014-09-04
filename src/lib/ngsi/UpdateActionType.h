@@ -1,5 +1,5 @@
-#ifndef UPDATE_ACTION_TYPE_H
-#define UPDATE_ACTION_TYPE_H
+#ifndef SRC_LIB_NGSI_UPDATEACTIONTYPE_H_
+#define SRC_LIB_NGSI_UPDATEACTIONTYPE_H_
 
 /*
 *
@@ -44,9 +44,14 @@ typedef struct UpdateActionType
   std::string   get(void);
   bool          isEmpty(void);
   std::string   render(Format format, const std::string& indent, bool comma = false);
-  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(const std::string& indent);
   const char*   c_str(void);
+
+  std::string   check(RequestType         requestType,
+                      Format              format,
+                      const std::string&  indent,
+                      const std::string&  predetectedError,
+                      int                 counter);
 } UpdateActionType;
 
-#endif
+#endif  // SRC_LIB_NGSI_UPDATEACTIONTYPE_H_

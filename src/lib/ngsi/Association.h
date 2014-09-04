@@ -1,5 +1,5 @@
-#ifndef ASSOCIATION
-#define ASSOCIATION
+#ifndef SRC_LIB_NGSI_ASSOCIATION_H_
+#define SRC_LIB_NGSI_ASSOCIATION_H_
 
 /*
 *
@@ -25,6 +25,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "ngsi/EntityAssociation.h"
 #include "ngsi/AttributeAssociationList.h"
 
@@ -40,9 +42,15 @@ typedef struct Association
   AttributeAssociationList  attributeAssociationList;
 
   std::string  render(Format format, const std::string& indent, bool comma);
-  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+
+  std::string  check(RequestType         requestType,
+                     Format              format,
+                     const std::string&  indent,
+                     const std::string&  predetectedError,
+                     int                 counter);
+
   void         present(const std::string& metadataType, int ix, const std::string& indent);
   void         release(void);
 } Association;
 
-#endif
+#endif  // SRC_LIB_NGSI_ASSOCIATION_H_

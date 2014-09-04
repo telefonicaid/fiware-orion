@@ -1,5 +1,5 @@
-#ifndef METADATA_VECTOR_H
-#define METADATA_VECTOR_H
+#ifndef SRC_LIB_NGSI_METADATAVECTOR_H_
+#define SRC_LIB_NGSI_METADATAVECTOR_H_
 
 /*
 *
@@ -40,19 +40,25 @@ typedef struct MetadataVector
 {
   std::vector<Metadata*>  vec;
 
-  std::string  tag;        // Help variable for the 'render' method
+  std::string             tag;        // Help variable for the 'render' method
 
   MetadataVector(const std::string& _tag = "registrationMetadata");
 
-  void         tagSet(const std::string& tagName);
-  std::string  render(Format format, const std::string& indent, bool comma = false);
-  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
-  void         present(const std::string& metadataType, const std::string& indent);
-  void         push_back(Metadata* item);
-  unsigned int size(void);
-  Metadata*    get(int ix);
-  void         release();
-  void         fill(MetadataVector& mV);
+  void          tagSet(const std::string& tagName);
+  std::string   render(Format format, const std::string& indent, bool comma = false);
+
+  std::string   check(RequestType requestType,
+                      Format format,
+                      const std::string& indent,
+                      const std::string& predetectedError,
+                      int counter);
+
+  void          present(const std::string& metadataType, const std::string& indent);
+  void          push_back(Metadata* item);
+  unsigned int  size(void);
+  Metadata*     get(int ix);
+  void          release();
+  void          fill(MetadataVector* mV);
 } MetadataVector;
 
-#endif
+#endif  // SRC_LIB_NGSI_METADATAVECTOR_H_

@@ -46,7 +46,7 @@ ContextRegistration::ContextRegistration()
 
 /* ****************************************************************************
 *
-* ContextRegistration::render - 
+* ContextRegistration::render -
 */
 std::string ContextRegistration::render(Format format, const std::string& indent, bool comma, bool isInVector)
 {
@@ -73,19 +73,43 @@ std::string ContextRegistration::render(Format format, const std::string& indent
 
 /* ****************************************************************************
 *
-* ContextRegistration::check - 
+* ContextRegistration::check -
 */
-std::string ContextRegistration::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ContextRegistration::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   std::string res;
 
-  if ((res = entityIdVector.check(requestType, format, indent, predetectedError, counter)) != "OK")                      return res;
-  if ((res = contextRegistrationAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")  return res;
-  if ((res = registrationMetadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")          return res;
-  if ((res = providingApplication.check(requestType, format, indent, predetectedError, counter)) != "OK")                return res;
+  if ((res = entityIdVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    return res;
+  }
+
+  if ((res = contextRegistrationAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    return res;
+  }
+
+  if ((res = registrationMetadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    return res;
+  }
+
+  if ((res = providingApplication.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    return res;
+  }
 
   if ((entityIdVectorPresent == true) && (entityIdVector.size() == 0))
+  {
     return "Empty entityIdVector";
+  }
 
   return "OK";
 }
@@ -94,15 +118,19 @@ std::string ContextRegistration::check(RequestType requestType, Format format, c
 
 /* ****************************************************************************
 *
-* ContextRegistration::present - 
+* ContextRegistration::present -
 */
 void ContextRegistration::present(const std::string& indent, int ix)
 {
   if (ix != -1)
+  {
     PRINTF("%sContext Registration %d:\n", indent.c_str(), ix);
+  }
   else
+  {
     PRINTF("%scontext registration:\n", indent.c_str());
-      
+  }
+
   entityIdVector.present(indent + "  ");
   contextRegistrationAttributeVector.present(indent + "  ");
   registrationMetadataVector.present("Registration", indent + "  ");
@@ -113,7 +141,7 @@ void ContextRegistration::present(const std::string& indent, int ix)
 
 /* ****************************************************************************
 *
-* ContextRegistration::release - 
+* ContextRegistration::release -
 */
 void ContextRegistration::release(void)
 {
