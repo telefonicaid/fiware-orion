@@ -96,7 +96,7 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
     //  SccBadRequest should have been returned before, when it was registered!
 
-    qcrs.errorCode.fill(SccContextElementNotFound, "error parsing providing application");
+    qcrs.errorCode.fill(SccContextElementNotFound, "");
     answer = qcrs.render(QueryContext, ciP->outFormat, "");
     return answer;
   }
@@ -118,7 +118,8 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
   {
     QueryContextResponse qcrs;
 
-    qcrs.errorCode.fill(SccContextElementNotFound, "error rendering forward-request");
+    LM_E(("Runtime Error (error rendering forward-request)"));
+    qcrs.errorCode.fill(SccContextElementNotFound, "");
     answer = qcrs.render(QueryContext, ciP->outFormat, "");
     return answer;
   }
@@ -139,7 +140,7 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
   {
     QueryContextResponse qcrs;
 
-    qcrs.errorCode.fill(SccContextElementNotFound, "error forwarding query to providing application,");
+    qcrs.errorCode.fill(SccContextElementNotFound, "");
     answer = qcrs.render(QueryContext, ciP->outFormat, "");
     LM_E(("Runtime Error (error forwarding 'Query' to providing application)"));
     return answer;
@@ -160,7 +161,7 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
   {
     QueryContextResponse qcrs;
 
-    qcrs.errorCode.fill(SccContextElementNotFound, std::string("treating reply from prov app: ") + errorMsg);
+    qcrs.errorCode.fill(SccContextElementNotFound, "");
     LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
     answer = qcrs.render(QueryContext, ciP->outFormat, "");
     return answer;
