@@ -34,10 +34,15 @@
 # 09. Update/APPEND E1/A1(=CP1) in CP1
 # 10. Update/APPEND E1/A2(=CP2) in CP2
 # 11. Update/APPEND E1/A3(=CP3) in CP3
-# 12. Update all three attributes, one attribute in each ContextElement and let's see what happens ...
-# 13. Query broker for E1/A1
-# 14. Query broker for E1/A2
-# 15. Query broker for E1/A3
+# 12. Query broker for E1/A1
+# 13. Query broker for E1/A2
+# 14. Query broker for E1/A3
+# 15. Update/UPDATE E1/A1(=CP1-2) in CB
+# 16. Update/UPDATE E1/A2(=CP2-2) in CB
+# 17. Update/UPDATE E1/A3(=CP3-2) in CB
+# 18. Query broker for E1/A1
+# 19. Query broker for E1/A2
+# 20. Query broker for E1/A3
 #
 
 --NAME--
@@ -173,7 +178,7 @@ payload='<?xml version="1.0"?>
         </entityIdList>
         <contextRegistrationAttributeList>
           <contextRegistrationAttribute>
-            <name>A1</name>
+            <name>A3</name>
             <type>T1</type>
             <isDomain>false</isDomain>
           </contextRegistrationAttribute>
@@ -263,7 +268,61 @@ echo
 echo
 
 
-echo "12. Update all three attributes, one attribute in each ContextElement and let's see what happens ..."
+echo "12. Query broker for E1/A1"
+url="/ngsi10/queryContext"
+payload='<?xml version="1.0"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="E" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A1</attribute>
+  </attributeList>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "13. Query broker for E1/A2"
+url="/ngsi10/queryContext"
+payload='<?xml version="1.0"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="E" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A2</attribute>
+  </attributeList>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "14. Query broker for E1/A3"
+url="/ngsi10/queryContext"
+payload='<?xml version="1.0"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="E" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A3</attribute>
+  </attributeList>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "15. Update/UPDATE E1/A1(=CP1-2) in CB"
 url="/ngsi10/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
@@ -276,10 +335,23 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
         <contextAttribute>
           <name>A1</name>
           <type>T1</type>
-          <contextValue>CP1</contextValue>
+          <contextValue>CP1-2</contextValue>
         </contextAttribute>
       </contextAttributeList>
     </contextElement>
+  </contextElementList>
+  <updateAction>UPDATE</updateAction>
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "16. Update/UPDATE E1/A2(=CP2-2) in CB"
+url="/ngsi10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
     <contextElement>
       <entityId type="E" isPattern="false">
         <id>E1</id>
@@ -288,10 +360,23 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
         <contextAttribute>
           <name>A2</name>
           <type>T1</type>
-          <contextValue>CP2</contextValue>
+          <contextValue>CP2-2</contextValue>
         </contextAttribute>
       </contextAttributeList>
     </contextElement>
+  </contextElementList>
+  <updateAction>UPDATE</updateAction>
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "17. Update/UPDATE E1/A3(=CP3-2) in CB"
+url="/ngsi10/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
     <contextElement>
       <entityId type="E" isPattern="false">
         <id>E1</id>
@@ -300,19 +385,19 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
         <contextAttribute>
           <name>A3</name>
           <type>T1</type>
-          <contextValue>CP3</contextValue>
+          <contextValue>CP3-2</contextValue>
         </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
-  <updateAction>APPEND</updateAction>
+  <updateAction>UPDATE</updateAction>
 </updateContextRequest>'
 orionCurl --url "$url" --payload "$payload"
 echo
 echo
 
 
-echo "13. Query broker for E1"
+echo "18. Query broker for E1/A1"
 url="/ngsi10/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -321,6 +406,45 @@ payload='<?xml version="1.0"?>
       <id>E1</id>
     </entityId>
   </entityIdList>
+  <attributeList>
+    <attribute>A1</attribute>
+  </attributeList>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "19. Query broker for E1/A2"
+url="/ngsi10/queryContext"
+payload='<?xml version="1.0"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="E" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A2</attribute>
+  </attributeList>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload"
+echo
+echo
+
+
+echo "20. Query broker for E1/A3"
+url="/ngsi10/queryContext"
+payload='<?xml version="1.0"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="E" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A3</attribute>
+  </attributeList>
 </queryContextRequest>'
 orionCurl --url "$url" --payload "$payload"
 echo
@@ -481,9 +605,105 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-12. Update all three attributes, one attribute in each ContextElement and let's see what happens ...
+12. Query broker for E1/A1
 HTTP/1.1 200 OK
-Content-Length: 1652
+Content-Length: 697
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="E" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>T1</type>
+            <contextValue>CP1</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+        <details>Redirected to context provider localhost:REGEX(\d*)/ngsi10</details>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+13. Query broker for E1/A2
+HTTP/1.1 200 OK
+Content-Length: 697
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="E" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A2</name>
+            <type>T1</type>
+            <contextValue>CP2</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+        <details>Redirected to context provider localhost:REGEX(\d*)/ngsi10</details>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+14. Query broker for E1/A3
+HTTP/1.1 200 OK
+Content-Length: 697
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="E" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A3</name>
+            <type>T1</type>
+            <contextValue>CP3</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+        <details>Redirected to context provider localhost:REGEX(\d*)/ngsi10</details>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+15. Update/UPDATE E1/A1(=CP1-2) in CB
+HTTP/1.1 200 OK
+Content-Length: 696
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -506,8 +726,22 @@ Date: REGEX(.*)
       <statusCode>
         <code>200</code>
         <reasonPhrase>OK</reasonPhrase>
+        <details>Redirected to context provider localhost:REGEX(\d*)/ngsi10</details>
       </statusCode>
     </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+16. Update/UPDATE E1/A2(=CP2-2) in CB
+HTTP/1.1 200 OK
+Content-Length: 696
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
     <contextElementResponse>
       <contextElement>
         <entityId type="E" isPattern="false">
@@ -524,8 +758,22 @@ Date: REGEX(.*)
       <statusCode>
         <code>200</code>
         <reasonPhrase>OK</reasonPhrase>
+        <details>Redirected to context provider localhost:REGEX(\d*)/ngsi10</details>
       </statusCode>
     </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+17. Update/UPDATE E1/A3(=CP3-2) in CB
+HTTP/1.1 200 OK
+Content-Length: 696
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
     <contextElementResponse>
       <contextElement>
         <entityId type="E" isPattern="false">
@@ -542,15 +790,16 @@ Date: REGEX(.*)
       <statusCode>
         <code>200</code>
         <reasonPhrase>OK</reasonPhrase>
+        <details>Redirected to context provider localhost:REGEX(\d*)/ngsi10</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
 
 
-13. Query broker for E1
+18. Query broker for E1/A1
 HTTP/1.1 200 OK
-Content-Length: 937
+Content-Length: 699
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -566,23 +815,78 @@ Date: REGEX(.*)
           <contextAttribute>
             <name>A1</name>
             <type>T1</type>
-            <contextValue>CP1</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>A2</name>
-            <type>T1</type>
-            <contextValue>CP2</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>A3</name>
-            <type>T1</type>
-            <contextValue>CP3</contextValue>
+            <contextValue>CP1-2</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
       <statusCode>
         <code>200</code>
         <reasonPhrase>OK</reasonPhrase>
+        <details>Redirected to context provider localhost:REGEX(\d*)/ngsi10</details>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+19. Query broker for E1/A2
+HTTP/1.1 200 OK
+Content-Length: 699
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="E" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A2</name>
+            <type>T1</type>
+            <contextValue>CP2-2</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+        <details>Redirected to context provider localhost:REGEX(\d*)/ngsi10</details>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+20. Query broker for E1/A3
+HTTP/1.1 200 OK
+Content-Length: 699
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="E" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A3</name>
+            <type>T1</type>
+            <contextValue>CP3-2</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+        <details>Redirected to context provider localhost:REGEX(\d*)/ngsi10</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>

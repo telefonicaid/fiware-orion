@@ -141,13 +141,3 @@ void ContextElementResponseVector::release(void)
 
   vec.clear();
 }
-
-
-
-void ContextElementResponseVector::fill(struct ContextElementResponseVector* cervP)
-{
-  for (unsigned int ix = 0; ix < cervP->size(); ++ix)
-  {
-    
-  }
-}

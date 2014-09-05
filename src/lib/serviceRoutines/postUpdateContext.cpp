@@ -62,16 +62,27 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
   // Checking for SccFound in the ContextElementResponseVector
   // Any 'Founds' must be forwarded to their respective providing applications
   //
-  // FIXME P9: What do we do if upcr.errorCode contains an error?
-  //           Right now, that only happens if there is more than one servicePath, but ...
+
   //
+  // If upcr.errorCode contains an error after mongoUpdateContext, we return a 404 Not Found.
+  // Right now, this only happens if there is more than one servicePath, but in the future this may grow
+  //
+  if ((upcr.errorCode.code != SccOk) && (upcr.errorCode.code != SccNone))
+  {
+    upcr.errorCode.fill(SccContextElementNotFound, "");
+    answer = upcr.render(UpdateContext, ciP->outFormat, "");
+    return answer;
+  }
+
   for (unsigned int ix = 0; ix < upcr.contextElementResponseVector.size(); ++ix)
   {
     ContextElementResponse* cerP = upcr.contextElementResponseVector[ix];
 
     // If the statusCode.code is not SccFound, we leave the ContextElementResponse exactly the way it is
     if (cerP->statusCode.code != SccFound)
+    {
       continue;
+    }
 
     //
     // If the statusCode.code IS SccFound, it means we can find the contextElement elsewhere.
@@ -82,6 +93,7 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     // 4. Forward the query to the providing application
     // 5. Parse the XML response and fill in a binary ContextElementResponse
     // 6. Replace the ContextElementResponse that was "Found" with the info in the UpdateContextResponse
+    //
 
 
     //
