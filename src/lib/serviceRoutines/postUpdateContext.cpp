@@ -124,25 +124,9 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     ContextElement*        ceP  = new ContextElement();
 
     ucrP->updateActionType      = parseDataP->upcr.res.updateActionType;
-
-    //
-    // FIXME P9: Instead of taking the contextElement from 'upcr', which is the output from mongoUpdateContext,
-    //           I take it from 'parseDataP->upcr.res', which is the input to mongoUpdateContext, and the
-    //           input from the original sender.
-    //           I tried with 'upcr', but there is no contextAttributeVector there, so I can't use it.
-    //           The problem with using 'parseDataP->upcr.res' is that I use only parseDataP->upcr.res.contextElementVector[0],
-    //           while there may be more than one contextElement in the request and I don't know to which the response of 
-    //           mongoUpdateContext corresponds.
-    //           Assuming there is only ONE contextElement all should be OK.
-    //
-    //           HOWEVER, we should take a close look at this during the PR review.
-    //
-    //           What I would like to do here:
-    //           ceP->fill(upcr.contextElementResponseVector[ix]->contextElement);
-    //
-    ceP->fill(upcr.contextElementResponseVector[ix]->contextElement); // ceP->fill(parseDataP->upcr.res.contextElementVector[0]);
-
     ucrP->contextElementVector.push_back(ceP);
+    ceP->fill(upcr.contextElementResponseVector[ix]->contextElement);
+
 
 
     //
@@ -150,7 +134,7 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     //
     std::string payloadIn = ucrP->render(UpdateContext, XML, "");
 
-    LM_T(LmtForwardPayload, ("payloadIn:\n%s", payloadIn.c_str()));
+    LM_T(LmtCtxProviders, ("payloadIn:\n%s", payloadIn.c_str()));
 
     //
     // 4. Forward the query to the providing application
@@ -202,8 +186,9 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     //
     // 6. Replace the ContextElementResponse that was "Found" with the info in the UpdateContextResponse
     //
-    cerP->contextElement.fill(provUpcrsP->contextElementResponseVector[0]->contextElement);
-    cerP->statusCode.fill(&provUpcrsP->contextElementResponseVector[0]->statusCode);
+    cerP->contextElement.release();
+    cerP->contextElement.fill(provUpcrsP->contextElementResponseVector[ix]->contextElement);
+    cerP->statusCode.fill(&provUpcrsP->contextElementResponseVector[ix]->statusCode);
 
     if (cerP->statusCode.details == "")
     {
