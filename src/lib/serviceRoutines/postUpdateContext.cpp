@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 #include "common/string.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ParseData.h"
@@ -138,7 +140,8 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     //           What I would like to do here:
     //           ceP->fill(upcr.contextElementResponseVector[ix]->contextElement);
     //
-    ceP->fill(parseDataP->upcr.res.contextElementVector[0]);
+    ceP->fill(upcr.contextElementResponseVector[ix]->contextElement); // ceP->fill(parseDataP->upcr.res.contextElementVector[0]);
+
     ucrP->contextElementVector.push_back(ceP);
 
 
@@ -147,6 +150,7 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     //
     std::string payloadIn = ucrP->render(UpdateContext, XML, "");
 
+    LM_T(LmtForwardPayload, ("payloadIn:\n%s", payloadIn.c_str()));
 
     //
     // 4. Forward the query to the providing application
