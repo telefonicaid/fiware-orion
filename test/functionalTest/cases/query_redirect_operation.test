@@ -23,7 +23,7 @@
 #
 # Uncached/Cached query
 #
-# 01. Start the contextBroker 'broker'
+# 01. Start the contextBroker 'CB'
 # 02. Start contextProvider 'CP' (contextBroker functioning as contextProvider)
 # 03. Query broker for E1/A1 (nothing found)
 # 04. Register an entity/attribute E1/A1 in broker, with CP as providing application
@@ -201,7 +201,7 @@ echo
 echo
 
 
-echo "10. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=broker))"
+echo "10. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=CB))"
 url="/ngsi10/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -263,7 +263,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>Redirected to context provider localhost:9801/ngsi10</details>
+    <details>Redirected to context provider localhost:REGEX(\d+)/ngsi10</details>
   </errorCode>
 </queryContextResponse>
 
@@ -355,7 +355,7 @@ Date: REGEX(.*)
       <statusCode>
         <code>200</code>
         <reasonPhrase>OK</reasonPhrase>
-        <details>Redirected to context provider localhost:9801/ngsi10</details>
+        <details>Redirected to context provider localhost:REGEX(\d+)/ngsi10</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -393,7 +393,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-10. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=broker))
+10. Query broker for E1/A1 (will NOT go to CP, but broker's local info is returned (A1=CB))
 HTTP/1.1 200 OK
 Content-Length: 616
 Content-Type: application/xml

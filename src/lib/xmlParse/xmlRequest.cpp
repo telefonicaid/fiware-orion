@@ -196,7 +196,7 @@ std::string xmlTreat
 
     if (errorMsgP)
     {
-      *errorMsgP = std::string("XML parse error 1");
+      *errorMsgP = std::string("XML parse error exception: ") + e.what();
     }
 
     return errorReply;
@@ -208,7 +208,7 @@ std::string xmlTreat
 
     if (errorMsgP)
     {
-      *errorMsgP = std::string("XML parse error 2");
+      *errorMsgP = std::string("XML parse generic exception");
     }
 
     return errorReply;
@@ -225,7 +225,7 @@ std::string xmlTreat
     LM_W(("Bad Input (XML parse error)"));
     if (errorMsgP)
     {
-      *errorMsgP = std::string("XML parse error 3");
+      *errorMsgP = std::string("XML parse error: invalid XML input");
     }
 
     return errorReply;
@@ -240,7 +240,7 @@ std::string xmlTreat
     LM_W(("Bad Input (no request treating object found for RequestType %d (%s), method %s)", request, requestType(request), ciP->method.c_str()));
     if (errorMsgP)
     {
-      *errorMsgP = std::string("XML parse error 4");
+      *errorMsgP = std::string("Unable to treat ") + requestType(request) + " requests";
     }
 
     return errorReply;
@@ -280,7 +280,7 @@ std::string xmlTreat
 
       if (errorMsgP)
       {
-        *errorMsgP = std::string("XML parse error 5");
+        *errorMsgP = std::string("Bad Input (invalid payload, expecting '") + payloadWord + "', got '" + payloadStart + "')" ;
       }
 
       return errorReply;
