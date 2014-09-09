@@ -240,7 +240,7 @@ Date: REGEX(.*)
       <statusCode>
         <code>200</code>
         <reasonPhrase>OK</reasonPhrase>
-        <details>Redirected to context provider localhost:9801/ngsi10</details>
+        <details>Redirected to context provider localhost:REGEX(\d+)/ngsi10</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -272,7 +272,7 @@ Date: REGEX(.*)
       <statusCode>
         <code>200</code>
         <reasonPhrase>OK</reasonPhrase>
-        <details>Redirected to context provider localhost:9801/ngsi10</details>
+        <details>Redirected to context provider localhost:REGEX(\d+)/ngsi10</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -290,7 +290,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>Redirected to context provider localhost:9801/ngsi10</details>
+    <details>Redirected to context provider localhost:REGEX(\d+)/ngsi10</details>
   </errorCode>
 </queryContextResponse>
 

@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 #include "common/string.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ParseData.h"
@@ -62,16 +64,27 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
   // Checking for SccFound in the ContextElementResponseVector
   // Any 'Founds' must be forwarded to their respective providing applications
   //
-  // FIXME P9: What do we do if upcr.errorCode contains an error?
-  //           Right now, that only happens if there is more than one servicePath, but ...
+
   //
+  // If upcr.errorCode contains an error after mongoUpdateContext, we return a 404 Not Found.
+  // Right now, this only happens if there is more than one servicePath, but in the future this may grow
+  //
+  if ((upcr.errorCode.code != SccOk) && (upcr.errorCode.code != SccNone))
+  {
+    upcr.errorCode.fill(SccContextElementNotFound, "");
+    answer = upcr.render(UpdateContext, ciP->outFormat, "");
+    return answer;
+  }
+
   for (unsigned int ix = 0; ix < upcr.contextElementResponseVector.size(); ++ix)
   {
     ContextElementResponse* cerP = upcr.contextElementResponseVector[ix];
 
     // If the statusCode.code is not SccFound, we leave the ContextElementResponse exactly the way it is
     if (cerP->statusCode.code != SccFound)
+    {
       continue;
+    }
 
     //
     // If the statusCode.code IS SccFound, it means we can find the contextElement elsewhere.
@@ -82,6 +95,7 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     // 4. Forward the query to the providing application
     // 5. Parse the XML response and fill in a binary ContextElementResponse
     // 6. Replace the ContextElementResponse that was "Found" with the info in the UpdateContextResponse
+    //
 
 
     //
@@ -110,24 +124,9 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     ContextElement*        ceP  = new ContextElement();
 
     ucrP->updateActionType      = parseDataP->upcr.res.updateActionType;
-
-    //
-    // FIXME P9: Instead of taking the contextElement from 'upcr', which is the output from mongoUpdateContext,
-    //           I take it from 'parseDataP->upcr.res', which is the input to mongoUpdateContext, and the
-    //           input from the original sender.
-    //           I tried with 'upcr', but there is no contextAttributeVector there, so I can't use it.
-    //           The problem with using 'parseDataP->upcr.res' is that I use only parseDataP->upcr.res.contextElementVector[0],
-    //           while there may be more than one contextElement in the request and I don't know to which the response of 
-    //           mongoUpdateContext corresponds.
-    //           Assuming there is only ONE contextElement all should be OK.
-    //
-    //           HOWEVER, we should take a close look at this during the PR review.
-    //
-    //           What I would like to do here:
-    //           ceP->fill(upcr.contextElementResponseVector[ix]->contextElement);
-    //
-    ceP->fill(parseDataP->upcr.res.contextElementVector[0]);
     ucrP->contextElementVector.push_back(ceP);
+    ceP->fill(upcr.contextElementResponseVector[ix]->contextElement);
+
 
 
     //
@@ -135,6 +134,7 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     //
     std::string payloadIn = ucrP->render(UpdateContext, XML, "");
 
+    LM_T(LmtCtxProviders, ("payloadIn:\n%s", payloadIn.c_str()));
 
     //
     // 4. Forward the query to the providing application
@@ -154,7 +154,7 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     if ((out == "error") || (out == ""))
     {
       std::string details = "error forwardingupdateContext to " + ip + ":" + portV + resource + ": " + out;
-      cerP->statusCode.fill(SccReceiverInternalError, details);
+      cerP->statusCode.fill(SccContextElementNotFound, "");
       LM_E(("Runtime Error (error forwarding 'Update' to providing application)"));
       continue;
     }
@@ -177,7 +177,7 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     {
       std::string details = "error forwarding 'Update' to providing application " + ip + portV + resource + ": " + "error parsing XML";
       
-      cerP->statusCode.fill(SccReceiverInternalError, details);
+      cerP->statusCode.fill(SccContextElementNotFound, "");
       LM_E(("Runtime Error (%s)", details.c_str()));
       continue;
     }
@@ -186,8 +186,9 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     //
     // 6. Replace the ContextElementResponse that was "Found" with the info in the UpdateContextResponse
     //
-    cerP->contextElement.fill(provUpcrsP->contextElementResponseVector[0]->contextElement);
-    cerP->statusCode.fill(&provUpcrsP->contextElementResponseVector[0]->statusCode);
+    cerP->contextElement.release();
+    cerP->contextElement.fill(provUpcrsP->contextElementResponseVector[ix]->contextElement);
+    cerP->statusCode.fill(&provUpcrsP->contextElementResponseVector[ix]->statusCode);
 
     if (cerP->statusCode.details == "")
     {
