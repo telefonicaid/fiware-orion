@@ -154,7 +154,7 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     if ((out == "error") || (out == ""))
     {
       std::string details = "error forwardingupdateContext to " + ip + ":" + portV + resource + ": " + out;
-      cerP->statusCode.fill(SccReceiverInternalError, details);
+      cerP->statusCode.fill(SccContextElementNotFound, "");
       LM_E(("Runtime Error (error forwarding 'Update' to providing application)"));
       continue;
     }
@@ -177,7 +177,7 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     {
       std::string details = "error forwarding 'Update' to providing application " + ip + portV + resource + ": " + "error parsing XML";
       
-      cerP->statusCode.fill(SccReceiverInternalError, details);
+      cerP->statusCode.fill(SccContextElementNotFound, "");
       LM_E(("Runtime Error (%s)", details.c_str()));
       continue;
     }
