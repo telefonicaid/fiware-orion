@@ -24,8 +24,8 @@
 URL-Tenant subscribe and update
 --SHELL-INIT--
 dbInit CB
-dbInit ${BROKER_DATABASE_NAME}-t_01
-dbInit ${BROKER_DATABASE_NAME}-t_02
+dbInit ${CB_DATABASE_NAME}-t_01
+dbInit ${CB_DATABASE_NAME}-t_02
 brokerStart CB 0-255 IPV4 -multiservice url
 accumulatorStart localhost $LISTENER_PORT
 accumulatorStart localhost $LISTENER2_PORT

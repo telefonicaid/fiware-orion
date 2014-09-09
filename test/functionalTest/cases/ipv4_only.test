@@ -31,7 +31,7 @@ accumulatorStart :: ${LISTENER2_PORT}
 
 --SHELL--
 echo "1: ++++++++++++++++++++"
-curl -g [::1]:${BROKER_PORT}/version --max-time 10 > /dev/null 2>&1
+curl -g [::1]:${CB_PORT}/version --max-time 10 > /dev/null 2>&1
 echo exit code: $?
 
 echo "2: ++++++++++++++++++++"

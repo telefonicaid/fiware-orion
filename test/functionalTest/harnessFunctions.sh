@@ -237,11 +237,11 @@ function brokerStop
 
   if [ "$role" == "CB" ]
   then
-    pidFile=$BROKER_PID_FILE
+    pidFile=$CB_PID_FILE
     port=$CB_PORT
   elif [ "$role" == "CM" ]
   then
-    pidFile=$BROKER_PID2_FILE
+    pidFile=$CM_PID_FILE
     port=$CM_PORT
   elif [ "$role" == "CP1" ]
   then

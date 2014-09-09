@@ -39,11 +39,8 @@ export MAXIMUM_WAIT=${MAXIMUM_WAIT:-30}
 #
 # Ports
 #
-# o BROKER_PORT    - port where the main contextBroker listens for connections
-# o CB_PORT        - better name for BROKER_PORT
-#
-# o BROKER2_PORT   - port where the configManager listens for connections
-# o CM_PORT        - better name for BROKER2_PORT
+# o CB_PORT        - port where the main contextBroker listens for connections
+# o CM_PORT        - port where the configManager listens for connections
 #
 # o COAP_PORT      - port where proxyCoap listens for connections
 #
@@ -52,12 +49,10 @@ export MAXIMUM_WAIT=${MAXIMUM_WAIT:-30}
 # o CP3_PORT       - port where the third contextProvider listens for connections
 #
 # o LISTENER_PORT  - port where listening (test) applications listen for connections
-# o LISTENER2_PORT - port where a second listening (test) application listen for connections
+# o LISTENER2_PORT - port where a second listening (test) application listens for connections
 #
-export BROKER_PORT=${BROKER_PORT:-9999}
-export CB_PORT=$BROKER_PORT
-export BROKER2_PORT=${BROKER2_PORT:-9998}
-export CM_PORT=$BROKER2_PORT
+export CB_PORT=${CB_PORT:-9999}
+export CM_PORT=${CM_PORT:-9998}
 export COAP_PORT=${COAP_PORT:-5683}
 export CP1_PORT=${CP1_PORT:-9801}
 export CP2_PORT=${CP2_PORT:-9802}
@@ -71,15 +66,13 @@ export LISTENER2_PORT=${LISTENER2_PORT:-9977}
 #
 # Log directories
 #
-# o BROKER_LOG_DIR    - directory where the 'main' broker keeps its log file
-# o CB_LOG_DIR        - better name for BROKER_LOG_DIR
+# o CB_LOG_DIR        - directory where the 'main' broker keeps its log file
 # o CM_LOG_DIR        - directory where the configManager keeps its log file
 # o CP1_LOG_DIR       - directory where contextProvider1 keeps its log file
 # o CP2_LOG_DIR       - directory where contextProvider2 keeps its log file
 # o CP3_LOG_DIR       - directory where contextProvider3 keeps its log file
 #
-export BROKER_LOG_DIR=${BROKER_LOG_DIR:-/var/log/contextBroker}
-export CB_LOG_DIR=$BROKER_LOG_DIR
+export CB_LOG_DIR=${CB_LOG_DIR:-/var/log/contextBroker}
 export CM_LOG_DIR=${CM_LOG_DIR:-/tmp/configManager}
 export CP1_LOG_DIR=${CP1_LOG_DIR:-/tmp/orion/logs/contextProvider1}
 export CP2_LOG_DIR=${CP2_LOG_DIR:-/tmp/orion/logs/contextProvider2}
@@ -91,20 +84,15 @@ export CP3_LOG_DIR=${CP3_LOG_DIR:-/tmp/orion/logs/contextProvider3}
 #
 # PID files
 #
-# o BROKER_PID_FILE   - path to pid file for the main broker
-# o CB_PID_FILE       - better name main broker
-#
-# o BROKER_PID2_FILE  - path to pid file for config manager
-# o CM_PID_FILE       - better name for config manager 
+# o CB_PID_FILE       - path to pid file for the main broker
+# o CM_PID_FILE       - path to pid file for config manager
 #
 # o CP1_PID_FILE      - path to pid file for the first context provider
 # o CP2_PID_FILE      - path to pid file for the second context provider
 # o CP3_PID_FILE      - path to pid file for the third context provider
 #
-export BROKER_PID_FILE=${BROKER_PID_FILE:-/tmp/orion_${BROKER_PORT}.pid}
-export CB_PID_FILE=$BROKER_PID_FILE
-export BROKER_PID2_FILE=${BROKER_PID2_FILE:-/tmp/orion_${BROKER2_PORT}.pid}
-export CM_PID_FILE=$BROKER_PID2_FILE
+export CB_PID_FILE=${CB_PID_FILE:-/tmp/orion_${CB_PORT}.pid}
+export CM_PID_FILE=${CM_PID_FILE:-/tmp/orion_${CM_PORT}.pid}
 export CP1_PID_FILE=${CP1_PID_FILE:-/tmp/orion_${CP1_PORT}.pid}
 export CP2_PID_FILE=${CP2_PID_FILE:-/tmp/orion_${CP2_PORT}.pid}
 export CP3_PID_FILE=${CP3_PID_FILE:-/tmp/orion_${CP3_PORT}.pid}
@@ -115,9 +103,9 @@ export CP3_PID_FILE=${CP3_PID_FILE:-/tmp/orion_${CP3_PORT}.pid}
 #
 # Database configuration for all instances of contextBroker
 #
-export BROKER_DATABASE_HOST=${BROKER_DATABASE_HOST:-localhost}
-export BROKER_DATABASE_USER=${BROKER_DATABASE_USER:-orion}
-export BROKER_DATABASE_PASSWORD=${BROKER_DATABASE_PASSWORD:-orion}
+export ORION_DATABASE_HOST=${ORION_DATABASE_HOST:-localhost}
+export ORION_DATABASE_USER=${ORION_DATABASE_USER:-orion}
+export ORION_DATABASE_PASSWORD=${ORION_DATABASE_PASSWORD:-orion}
 
 
 
@@ -125,20 +113,15 @@ export BROKER_DATABASE_PASSWORD=${BROKER_DATABASE_PASSWORD:-orion}
 #
 # Name of the database for the instances of the broker doing harness tests
 #
-# o BROKER_DATABASE_NAME   - database for main broker
-# o CB_DATABASE_NAME       - better name for main broker database
-#
-# o BROKER_DATABASE2_NAME  - database for config manager
-# o CM_DATABASE_NAME       - better name for config manager database
+# o CB_DATABASE_NAME       - database for main broker
+# o CM_DATABASE_NAME       - database for config manager
 #
 # o CP1_DATABASE_NAME      - database for first context provider
 # o CP2_DATABASE_NAME      - database for second context provider
 # o CP3_DATABASE_NAME      - database for third context provider
 #
-export BROKER_DATABASE_NAME=${BROKER_DATABASE_NAME:-testharness}
-export CB_DATABASE_NAME=$BROKER_DATABASE_NAME
-export BROKER_DATABASE2_NAME=${BROKER_DATABASE2_NAME:-testharness2}
-export CM_DATABASE_NAME=$BROKER_DATABASE2_NAME
+export CB_DATABASE_NAME=${CB_DATABASE_NAME:-testharness}
+export CM_DATABASE_NAME=${CM_DATABASE_NAME:-testharness_cm}
 export CP1_DATABASE_NAME=${CP1_DATABASE_NAME:-testharness_cp1}
 export CP2_DATABASE_NAME=${CP2_DATABASE_NAME:-testharness_cp2}
 export CP3_DATABASE_NAME=${CP3_DATABASE_NAME:-testharness_cp3}
