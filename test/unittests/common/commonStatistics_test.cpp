@@ -49,6 +49,9 @@ TEST(commonStatistics, statisticsUpdate)
   noOfSubscriptionUpdates                    = 0;
   noOfUnsubscriptions                        = 0;
   noOfNotificationsReceived                  = 0;
+  noOfQueryContextResponses                  = 0;
+  noOfUpdateContextResponses                 = 0;
+
   noOfContextEntitiesByEntityId              = 0;
   noOfContextEntityAttributes                = 0;
   noOfEntityByIdAttributeByName              = 0;
@@ -91,6 +94,9 @@ TEST(commonStatistics, statisticsUpdate)
   statisticsUpdate(UnsubscribeContext, JSON);
   statisticsUpdate(NotifyContext, XML);
   statisticsUpdate(UpdateContext, JSON);
+  statisticsUpdate(RtQueryContextResponse, JSON);
+  statisticsUpdate(RtUpdateContextResponse, XML);
+
   statisticsUpdate(ContextEntitiesByEntityId, XML);
   statisticsUpdate(ContextEntityAttributes, JSON);
   statisticsUpdate(EntityByIdAttributeByName, XML);
@@ -131,6 +137,9 @@ TEST(commonStatistics, statisticsUpdate)
   EXPECT_EQ(1, noOfSubscriptionUpdates);
   EXPECT_EQ(1, noOfUnsubscriptions);
   EXPECT_EQ(1, noOfNotificationsReceived);
+  EXPECT_EQ(1, noOfQueryContextResponses);
+  EXPECT_EQ(1, noOfUpdateContextResponses);
+  
   EXPECT_EQ(1, noOfContextEntitiesByEntityId);
   EXPECT_EQ(1, noOfContextEntityAttributes);
   EXPECT_EQ(1, noOfEntityByIdAttributeByName);
@@ -158,6 +167,6 @@ TEST(commonStatistics, statisticsUpdate)
   EXPECT_EQ(1, noOfRtSubscribeResponse);
   EXPECT_EQ(1, noOfRtSubscribeError);
 
-  EXPECT_EQ(19, noOfXmlRequests);
-  EXPECT_EQ(20, noOfJsonRequests);
+  EXPECT_EQ(20, noOfXmlRequests);
+  EXPECT_EQ(21, noOfJsonRequests);
 }
