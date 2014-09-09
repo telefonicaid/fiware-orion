@@ -57,10 +57,19 @@ function dbInit()
 
   if [ "$role" == "CB" ]
   then
-    echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
+    echo 'db.dropDatabase()' | mongo ${CB_DATABASE_NAME} --quiet
   elif [ "$role" == "CM" ]
   then
-    echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE2_NAME} --quiet
+    echo 'db.dropDatabase()' | mongo ${CM_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP1" ]
+  then
+    echo 'db.dropDatabase()' | mongo ${CP1_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP2" ]
+  then
+    echo 'db.dropDatabase()' | mongo ${CP2_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP3" ]
+  then
+    echo 'db.dropDatabase()' | mongo ${CP3_DATABASE_NAME} --quiet
   else
     echo 'db.dropDatabase()' | mongo $db --quiet
   fi
@@ -94,13 +103,28 @@ function localBrokerStart()
 
   if [ "$role" == "CB" ]
   then
-    port=$BROKER_PORT
-    CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME} -t $traceLevels $IPvOption $extraParams"
+    port=$CB_PORT
+    CB_START_CMD="contextBroker -harakiri -port $CB_PORT  -pidpath $CB_PID_FILE  -db $CB_DATABASE_NAME  -t $traceLevels $IPvOption $extraParams"
   elif [ "$role" == "CM" ]
   then
-    mkdir -p /tmp/configManager
+    mkdir -p $CM_LOG_DIR
     port=$CM_PORT
-    CB_START_CMD="contextBroker -harakiri -port ${CM_PORT}     -pidpath ${BROKER_PID2_FILE} -db ${BROKER_DATABASE2_NAME} -t $traceLevels -fwdPort ${BROKER_PORT} -logDir /tmp/configManager -ngsi9 $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port $CM_PORT  -pidpath $CM_PID_FILE  -db $CM_DATABASE_NAME  -t $traceLevels $IPvOption -logDir $CM_LOG_DIR -fwdPort $CB_PORT -ngsi9 $extraParams"
+  elif [ "$role" == "CP1" ]
+  then
+    mkdir -p $CP1_LOG_DIR
+    port=$CP1_PORT
+    CB_START_CMD="contextBroker -harakiri -port $CP1_PORT -pidpath $CP1_PID_FILE -db $CP1_DATABASE_NAME -t $traceLevels $IPvOption -logDir $CP1_LOG_DIR $extraParams"
+  elif [ "$role" == "CP2" ]
+  then
+    mkdir -p $CP2_LOG_DIR
+    port=$CP2_PORT
+    CB_START_CMD="contextBroker -harakiri -port $CP2_PORT -pidpath $CP2_PID_FILE -db $CP2_DATABASE_NAME -t $traceLevels $IPvOption -logDir $CP2_LOG_DIR $extraParams"
+  elif [ "$role" == "CP3" ]
+  then
+    mkdir -p $CP3_LOG_DIR
+    port=$CP3_PORT
+    CB_START_CMD="contextBroker -harakiri -port $CP3_PORT -pidpath $CP3_PID_FILE -db $CP3_DATABASE_NAME -t $traceLevels $IPvOption -logDir $CP3_LOG_DIR $extraParams"
   fi
 
   if [ "$VALGRIND" == "" ]; then
@@ -133,9 +157,19 @@ function localBrokerStop
 
   if [ "$role" == "CB" ]
   then
-    port=$BROKER_PORT
-  else
-    port=CM_PORT
+    port=$CB_PORT
+  elif [ "$role" == "CM" ]
+  then
+    port=$CM_PORT
+  elif [ "$role" == "CP1" ]
+  then
+    port=$CP1_PORT
+  elif [ "$role" == "CP2" ]
+  then
+    port=$CP2_PORT
+  elif [ "$role" == "CP3" ]
+  then
+    port=$CP3_PORT
   fi
 
   # Test to see if we have a broker running on $port if so kill it!
@@ -204,11 +238,23 @@ function brokerStop
   if [ "$role" == "CB" ]
   then
     pidFile=$BROKER_PID_FILE
-    port=$BROKER_PORT
+    port=$CB_PORT
   elif [ "$role" == "CM" ]
   then
     pidFile=$BROKER_PID2_FILE
     port=$CM_PORT
+  elif [ "$role" == "CP1" ]
+  then
+    pidFile=$CP1_PID_FILE
+    port=$CP1_PORT
+  elif [ "$role" == "CP2" ]
+  then
+    pidFile=$CP2_PID_FILE
+    port=$CP2_PORT
+  elif [ "$role" == "CP3" ]
+  then
+    pidFile=$CP3_PID_FILE
+    port=$CP3_PORT
   fi
 
   if [ "$VALGRIND" == "" ]; then
@@ -234,10 +280,10 @@ function proxyCoapStart()
 {
   extraParams=$*
 
-  proxyCoap $extraParams -cbPort $BROKER_PORT
+  proxyCoap $extraParams -cbPort $CB_PORT
 
   # Test to see whether we have a proxy running. If not raise an error
-  running_proxyCoap=$(ps -fe | grep ' proxyCoap' | grep "cbPort $BROKER_PORT" | wc -l)
+  running_proxyCoap=$(ps -fe | grep ' proxyCoap' | grep "cbPort $CB_PORT" | wc -l)
   if [ "$running_proxyCoap" == "" ]
   then
     echo "Unable to start proxyCoap"
@@ -431,7 +477,7 @@ function dbInsertEntity()
 # Options:
 #   -X            <HTTP method>    (default: according to curl. GET if no payload, POST if with payload)
 #   --host        <host>           (default: localhost)
-#   --port        <port>           (default: $BROKER_PORT)
+#   --port        <port>           (default: $CB_PORT)
 #   --url         <URL>            (default: empty string)
 #   --payload     <payload>        (default: NO PAYLOAD. Possible values: [filename | "${string}"])
 #   --in          (input payload)  (default: xml => application/xml, If 'json': application/json)
@@ -450,7 +496,7 @@ function orionCurl()
   #
   _method=""
   _host="localhost"
-  _port=$BROKER_PORT
+  _port=$CB_PORT
   _url=""
   _payload=""
   _inFormat=application/xml

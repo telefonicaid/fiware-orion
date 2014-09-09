@@ -957,21 +957,40 @@ static bool processSubscriptions(const EntityId* enP, map<string, BSONObj*>* sub
     return true;
 }
 
+
+
 /* ****************************************************************************
 *
-* buildGeneralErrorReponse -
+* buildGeneralErrorResponse -
 *
 */
-static void buildGeneralErrorReponse(ContextElement* ceP, ContextAttribute* ca, UpdateContextResponse* responseP, HttpStatusCode code, std::string details = "") {
+static void buildGeneralErrorResponse
+(
+  ContextElement*         ceP,
+  ContextAttribute*       caP,
+  UpdateContextResponse*  responseP,
+  HttpStatusCode          code,
+  std::string             details = "",
+  ContextAttributeVector* cavP    = NULL
+)
+{
+  ContextElementResponse* cerP = new ContextElementResponse();
+  cerP->contextElement.entityId = ceP->entityId;
 
-    ContextElementResponse* cerP = new ContextElementResponse();
-    cerP->contextElement.entityId = ceP->entityId;
-    if (ca != NULL) {
-        cerP->contextElement.contextAttributeVector.push_back(ca);
-    }
-    cerP->statusCode.fill(code, details);
-    responseP->contextElementResponseVector.push_back(cerP);
+  if (caP != NULL)
+  {
+    cerP->contextElement.contextAttributeVector.push_back(caP);
+  }
+  else if (cavP != NULL)
+  {
+    cerP->contextElement.contextAttributeVector.fill(cavP);
+  }
+
+  cerP->statusCode.fill(code, details);
+  responseP->contextElementResponseVector.push_back(cerP);
 }
+
+
 
 /* ****************************************************************************
 *
@@ -1427,7 +1446,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
     /* Not supporting isPattern = true currently */
     if (isTrue(enP->isPattern)) {
-        buildGeneralErrorReponse(ceP, NULL, responseP, SccNotImplemented);
+        buildGeneralErrorResponse(ceP, NULL, responseP, SccNotImplemented);
         return;
     }
 
@@ -1439,7 +1458,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                 ContextAttribute* aP = ceP->contextAttributeVector.get(ix);
                 ContextAttribute* ca = new ContextAttribute(aP);
 
-                buildGeneralErrorReponse(ceP, ca, responseP, SccInvalidParameter,                                   
+                buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidParameter,                                   
                                    std::string("action: ") + action +
                                       " - entity: (" + enP->toString(true) + ")" +
                                       " - offending attribute: " + aP->toString() +
@@ -1501,7 +1520,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     catch (const DBException &e)
     {
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo db exception)");
-        buildGeneralErrorReponse(ceP, NULL, responseP, SccReceiverInternalError,                           
+        buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError,                           
                            std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                               " - query(): " + query.toString() +
                               " - exception: " + e.what());
@@ -1511,7 +1530,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     catch (...)
     {
         mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo generic exception)");
-        buildGeneralErrorReponse(ceP, NULL, responseP, SccReceiverInternalError,                           
+        buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError,                           
                            std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                               " - query(): " + query.toString() +
                               " - exception: " + "generic");
@@ -1713,10 +1732,10 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
       {
         /* Only APPEND can create entities, in the case of UPDATE or DELETE we look for a context
          * provider or (if there is no context provider) return a not found error */
-        ContextRegistrationResponseVector crrV;
-        EntityIdVector                    enV;
-        AttributeList                     attrL;
-        std::string err;
+        ContextRegistrationResponseVector  crrV;
+        EntityIdVector                     enV;
+        AttributeList                      attrL;
+        std::string                        err;
 
         enV.push_back(enP);
         for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
@@ -1724,8 +1743,10 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
           attrL.push_back(ceP->contextAttributeVector.get(ix)->name);
         }
 
-        // For now, we use limit=1. That's ensures that as much as one providing application is returned. In the future,
-        // we would consider leave this limit open and define an algorithm to pick the right one, and ordered list, etc.
+        //
+        // For now, we use limit=1. That ensures that maximum one providing application is returned. In the future,
+        // we will consider leaving this limit open and define an algorithm to pick the right one, and ordered list, etc.
+        //
         if (registrationsQuery(enV, attrL, &crrV, &err, tenant, 0, 1, false))
         {
           if (crrV.size() > 0)
@@ -1733,54 +1754,62 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             // Suitable CProvider has been found: creating response and returning
             std::string prApp = crrV[0]->contextRegistration.providingApplication.get();
             LM_T(LmtCtxProviders, ("context provide found: %s", prApp.c_str()));
-            buildGeneralErrorReponse(ceP, NULL, responseP, SccFound, prApp);
+            buildGeneralErrorResponse(ceP, NULL, responseP, SccFound, prApp, &ceP->contextAttributeVector);
           }
           else
           {
-            buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
+            buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
           }
         }
         else
         {
           LM_E(("Database Error (%s)", err.c_str()));
-          buildGeneralErrorReponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
+          buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
         }
 
       }
       else
       {
+        /* Creating the part of the response that doesn't depend on success or failure */
+        ContextElementResponse* cerP = new ContextElementResponse();
 
-            /* Creating the part of the response that doesn't depend on success or failure */
-            ContextElementResponse* cerP = new ContextElementResponse();
-            cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
-            for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
-                ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
-                ContextAttribute* ca = new ContextAttribute(caP->name, caP->type);                
-                setResponseMetadata(caP, ca);
-                cerP->contextElement.contextAttributeVector.push_back(ca);
-            }
+        cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
 
-            std::string errReason, errDetail;
-            if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant, servicePathV)) {
-               cerP->statusCode.fill(SccInvalidParameter, errDetail);
-            }
-            else {
-               cerP->statusCode.fill(SccOk);
-
-                /* Successful creation: send potential notifications */
-                std::map<string, BSONObj*> subsToNotify;
-                for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
-                    std::string err;
-                    if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err, tenant))
-                    {
-                      cerP->statusCode.fill(SccReceiverInternalError, err);
-                      responseP->contextElementResponseVector.push_back(cerP);
-                      return;
-                    }
-                }
-                processSubscriptions(enP, &subsToNotify, &errReason, tenant);
-            }
-            responseP->contextElementResponseVector.push_back(cerP);
+        for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+        {
+          ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
+          ContextAttribute* ca  = new ContextAttribute(caP->name, caP->type);                
+          setResponseMetadata(caP, ca);
+          cerP->contextElement.contextAttributeVector.push_back(ca);
         }
+
+        std::string errReason, errDetail;
+        if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant, servicePathV))
+        {
+          cerP->statusCode.fill(SccInvalidParameter, errDetail);
+        }
+        else
+        {
+          cerP->statusCode.fill(SccOk);
+          
+          /* Successful creation: send potential notifications */
+          std::map<string, BSONObj*> subsToNotify;
+          for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+          {
+            std::string err;
+
+            if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err, tenant))
+            {
+              cerP->statusCode.fill(SccReceiverInternalError, err);
+              responseP->contextElementResponseVector.push_back(cerP);
+              return;
+            }
+          }
+
+          processSubscriptions(enP, &subsToNotify, &errReason, tenant);
+        }
+
+        responseP->contextElementResponseVector.push_back(cerP);
+      }
     }
 }

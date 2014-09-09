@@ -1,9 +1,9 @@
-#ifndef UPDATE_CONTEXT_RESPONSE_H
-#define UPDATE_CONTEXT_RESPONSE_H
+#ifndef XML_QUERY_CONTEXT_RESPONSE_H
+#define XML_QUERY_CONTEXT_RESPONSE_H
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -26,31 +26,48 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <vector>
 
-#include "ngsi/ContextElementResponseVector.h"
-#include "common/Format.h"
-#include "ngsi/StatusCode.h"
+#include "ngsi/ParseData.h"
+#include "xmlParse/XmlNode.h"
 
 
 
 /* ****************************************************************************
 *
-* UpdateContextResponse - 
+* qcrsParseVector - 
 */
-typedef struct UpdateContextResponse
-{
-  ContextElementResponseVector  contextElementResponseVector;  // Optional
-  StatusCode                    errorCode;                     // Optional
+extern XmlNode qcrsParseVector[];
 
-  UpdateContextResponse();
-  UpdateContextResponse(StatusCode& _errorCode);
-  ~UpdateContextResponse();
 
-  std::string   render(RequestType requestType, Format format, const std::string& indent);  
-  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
-  void          present(const std::string& indent);
-  void          release(void);
-} UpdateContextResponse;
+
+/* ****************************************************************************
+*
+* qcrsInit - 
+*/
+extern void qcrsInit(ParseData* reqData);
+
+
+
+/* ****************************************************************************
+*
+* qcrsRelease - 
+*/
+extern void qcrsRelease(ParseData* reqData);
+
+
+
+/* ****************************************************************************
+*
+* qcrsCheck - 
+*/
+extern std::string qcrsCheck(ParseData* reqData, ConnectionInfo* ciP);
+
+
+
+/* ****************************************************************************
+*
+* qcrsPresent - 
+*/
+extern void qcrsPresent(ParseData* reqData);
 
 #endif

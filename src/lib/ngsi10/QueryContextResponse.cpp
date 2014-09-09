@@ -44,6 +44,7 @@ QueryContextResponse::QueryContextResponse()
 }
 
 
+
 /* ****************************************************************************
 *
 * QueryContextResponse::QueryContextResponse - 
@@ -52,7 +53,10 @@ QueryContextResponse::QueryContextResponse(StatusCode& _errorCode)
 {
   errorCode.fill(&_errorCode);
   errorCode.tagSet("errorCode");
+  LM_T(LmtDestructor, ("destroyed"));
 }
+
+
 
 /* ****************************************************************************
 *
@@ -60,9 +64,12 @@ QueryContextResponse::QueryContextResponse(StatusCode& _errorCode)
 */
 QueryContextResponse::~QueryContextResponse()
 {
+  errorCode.release();
   contextElementResponseVector.release();
   LM_T(LmtDestructor,("destroyed"));
 }
+
+
 
 /* ****************************************************************************
 *
@@ -115,4 +122,53 @@ std::string QueryContextResponse::render(RequestType requestType, Format format,
   out += endTag(indent, tag, format);
 
   return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* QueryContextResponse::check -
+*/
+std::string QueryContextResponse::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+{
+  std::string           res;
+
+  if (predetectedError != "")
+  {
+    errorCode.fill(SccBadRequest, predetectedError);
+  }
+  else if (contextElementResponseVector.check(QueryContext, format, indent, predetectedError, 0) != "OK")
+  {
+    LM_W(("Bad Input (%s)", res.c_str()));
+    errorCode.fill(SccBadRequest, res);
+  }
+  else
+    return "OK";
+
+  return render(QueryContext, format, indent);
+}
+
+
+
+/* ****************************************************************************
+*
+* QueryContextResponse::present -
+*/
+void QueryContextResponse::present(const std::string& indent)
+{
+  contextElementResponseVector.present(indent + "  ");
+  errorCode.present(indent + "  ");
+}
+
+
+
+/* ****************************************************************************
+*
+* QueryContextResponse::release -
+*/
+void QueryContextResponse::release(void)
+{
+  contextElementResponseVector.release();
+  errorCode.release();
 }

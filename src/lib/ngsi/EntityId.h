@@ -53,6 +53,7 @@ public:
   std::string  render(Format format, const std::string& indent, bool comma = false, bool isInVector = false, const std::string& assocTag = "");
   std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void         fill(const std::string& _id, const std::string& _type, const std::string& _isPattern);
+  void         fill(const struct EntityId* eidP);
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  toString(bool useIsPattern = false, const std::string& delimiter = ", ");

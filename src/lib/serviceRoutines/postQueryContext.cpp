@@ -25,11 +25,25 @@
 #include <string>
 #include <vector>
 
+#include "common/string.h"
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/clientSocketHttp.h"
 #include "serviceRoutines/postQueryContext.h"
+#include "xmlParse/xmlRequest.h"
+
+
+
+/* ****************************************************************************
+*
+* xmlPayloadClean - 
+*/
+static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
+{
+  return (char*) strstr(payload, payloadWord);
+}
 
 
 
@@ -43,8 +57,138 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
   std::string           answer;
    
   ciP->httpStatusCode = mongoQueryContext(&parseDataP->qcr.res, &qcr, ciP->tenant, ciP->servicePathV, ciP->uriParam);
-  answer = qcr.render(QueryContext, ciP->outFormat, "");
 
+  // If no redirectioning is necessary, just return the result
+  if (qcr.errorCode.code != SccFound)
+  {
+    answer = qcr.render(QueryContext, ciP->outFormat, "");
+    return answer;
+  }
+
+
+
+  std::string     ip;
+  std::string     protocol;
+  int             port;
+  std::string     prefix;
+
+  //
+  // A has been found on some context provider.
+  // We need to forward the query request to the context provider, indicated in qcr.errorCode.details.
+  //
+  // 1. Parse the providing application to extract IP, port and URI-path
+  // 2. The exact same QueryContextRequest will be used for the query-forwarding
+  // 3. Render an XML-string of the request we want to forward
+  // 4. Send the request to the providing application (and await the response)
+  // 5. Parse the XML response and fill in a binary QueryContextResponse
+  // 6. Render QueryContextResponse from the providing application 
+  //
+
+
+  //
+  // 1. Parse the providing application to extract IP, port and URI-path
+  //
+  if (parseUrl(qcr.errorCode.details, ip, port, prefix, protocol) == false)
+  {
+    QueryContextResponse qcrs;
+
+    LM_W(("Bad Input (invalid proving application '%s')", qcr.errorCode.details.c_str()));
+    //  Somehow, if we accepted this providing application, it is the brokers fault ...
+    //  SccBadRequest should have been returned before, when it was registered!
+
+    qcrs.errorCode.fill(SccContextElementNotFound, "");
+    answer = qcrs.render(QueryContext, ciP->outFormat, "");
+    return answer;
+  }
+
+
+  //
+  // 2. The exact same QueryContextRequest will be used for the query-forwarding
+  //
+  QueryContextRequest* qcReqP = &parseDataP->qcr.res;
+
+
+  //
+  // 3. Render an XML-string of the request we want to forward
+  //
+  std::string payload = qcReqP->render(QueryContext, XML, "");
+  char*       cleanPayload;
+
+  if ((cleanPayload = xmlPayloadClean(payload.c_str(), "<queryContextRequest>")) == NULL)
+  {
+    QueryContextResponse qcrs;
+
+    LM_E(("Runtime Error (error rendering forward-request)"));
+    qcrs.errorCode.fill(SccContextElementNotFound, "");
+    answer = qcrs.render(QueryContext, ciP->outFormat, "");
+    return answer;
+  }
+
+
+  //
+  // 4. Send the request to the providing application (and await the reply)
+  // FIXME P7: Should Rush be used?
+  //
+  std::string     out;
+  std::string     verb         = "POST";
+  std::string     resource     = prefix + "/queryContext";
+  std::string     tenant       = ciP->tenant;
+
+  out = sendHttpSocket(ip, port, protocol, verb, tenant, resource, "application/xml", payload, false, true);
+
+  if ((out == "error") || (out == ""))
+  {
+    QueryContextResponse qcrs;
+
+    qcrs.errorCode.fill(SccContextElementNotFound, "");
+    answer = qcrs.render(QueryContext, ciP->outFormat, "");
+    LM_E(("Runtime Error (error forwarding 'Query' to providing application)"));
+    return answer;
+  }
+
+
+  //
+  // 5. Parse the XML response and fill in a binary QueryContextResponse
+  //
+  ParseData    parseData;
+  std::string  s;
+  std::string  errorMsg;
+
+  cleanPayload = xmlPayloadClean(out.c_str(), "<queryContextResponse>");
+
+  s = xmlTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL, &errorMsg);
+  if (s != "OK")
+  {
+    QueryContextResponse qcrs;
+
+    qcrs.errorCode.fill(SccContextElementNotFound, "");
+    LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
+    answer = qcrs.render(QueryContext, ciP->outFormat, "");
+    return answer;
+  }
+
+
+  //
+  // 6. Render QueryContextResponse from the providing application 
+  //
+  char portV[16];
+  snprintf(portV, sizeof(portV), "%d", port);
+
+  // Fill in the response from the redirection into the response to the originator of this request
+  QueryContextResponse* qcrsP = &parseData.qcrs.res;
+
+  //
+  // Returning 'redirected to' in StatusCode::details
+  //
+  if (((qcrsP->errorCode.code != SccOk) && (qcrsP->errorCode.code != SccNone)) && (qcrsP->errorCode.details == ""))
+  {
+    qcrsP->errorCode.details = "Redirected to context provider " + ip + ":" + portV + prefix;
+  }
+  else if ((qcrsP->contextElementResponseVector.size() > 0) && (qcrsP->contextElementResponseVector[0]->statusCode.details == ""))
+  {
+    qcrsP->contextElementResponseVector[0]->statusCode.details = "Redirected to context provider " + ip + ":" + portV + prefix;
+  }
+
+  answer = qcrsP->render(QueryContext, ciP->outFormat, "");
   return answer;
 }
-
