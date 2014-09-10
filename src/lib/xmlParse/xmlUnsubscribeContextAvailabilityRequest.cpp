@@ -38,7 +38,7 @@
 
 /* ****************************************************************************
 *
-* subscriptionId - 
+* subscriptionId -
 */
 static int subscriptionId(xml_node<>* node, ParseData* reqData)
 {
@@ -51,7 +51,7 @@ static int subscriptionId(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* ucarInit - 
+* ucarInit -
 */
 void ucarInit(ParseData* reqData)
 {
@@ -61,7 +61,7 @@ void ucarInit(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* ucarRelease - 
+* ucarRelease -
 */
 void ucarRelease(ParseData* reqData)
 {
@@ -72,7 +72,7 @@ void ucarRelease(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* ucarCheck - 
+* ucarCheck -
 */
 std::string ucarCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
@@ -83,7 +83,7 @@ std::string ucarCheck(ParseData* reqData, ConnectionInfo* ciP)
 #define PRINTF printf
 /* ****************************************************************************
 *
-* ucarPresent - 
+* ucarPresent -
 */
 void ucarPresent(ParseData* reqData)
 {
@@ -98,12 +98,12 @@ void ucarPresent(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* ucarParseVector - 
+* ucarParseVector -
 */
-XmlNode ucarParseVector[] = 
+XmlNode ucarParseVector[] =
 {
   { "/unsubscribeContextAvailabilityRequest",                nullTreat      },
   { "/unsubscribeContextAvailabilityRequest/subscriptionId", subscriptionId },
-  
+
   { "LAST", NULL }
 };

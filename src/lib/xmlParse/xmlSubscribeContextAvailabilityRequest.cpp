@@ -25,8 +25,6 @@
 #include <stdio.h>
 #include <string>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -45,7 +43,7 @@
 
 /* ****************************************************************************
 *
-* entityId - 
+* entityId -
 */
 static int entityId(xml_node<>* node, ParseData* reqDataP)
 {
@@ -57,8 +55,10 @@ static int entityId(xml_node<>* node, ParseData* reqDataP)
   std::string es = entityIdParse(SubscribeContextAvailability, node, reqDataP->scar.entityIdP);
 
   if (es != "OK")
+  {
     reqDataP->errorString = es;
-  
+  }
+
   return 0;
 }
 
@@ -66,12 +66,11 @@ static int entityId(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* entityIdId - 
+* entityIdId -
 */
 static int entityIdId(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an entityId:id: '%s'", node->value()));
-
   reqDataP->scar.entityIdP->id = node->value();
 
   return 0;
@@ -81,7 +80,7 @@ static int entityIdId(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* reference - 
+* reference -
 */
 static int reference(xml_node<>* node, ParseData* reqDataP)
 {
@@ -89,8 +88,8 @@ static int reference(xml_node<>* node, ParseData* reqDataP)
   char*        stripped = wsStrip((char*) ref.c_str());
 
   LM_T(LmtParse, ("Got a reference: '%s'", stripped));
-
   reqDataP->scar.res.reference.set(stripped);
+
   return 0;
 }
 
@@ -98,7 +97,7 @@ static int reference(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* attribute - 
+* attribute -
 */
 static int attribute(xml_node<>* node, ParseData* reqDataP)
 {
@@ -112,7 +111,7 @@ static int attribute(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* restriction - 
+* restriction -
 */
 static int restriction(xml_node<>* node, ParseData* reqDataP)
 {
@@ -126,12 +125,13 @@ static int restriction(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* attributeExpression - 
+* attributeExpression -
 */
 static int attributeExpression(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an attributeExpression: '%s'", node->value()));
   reqDataP->scar.res.restriction.attributeExpression.set(node->value());
+
   return 0;
 }
 
@@ -139,7 +139,7 @@ static int attributeExpression(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* operationScope - 
+* operationScope -
 */
 static int operationScope(xml_node<>* node, ParseData* reqDataP)
 {
@@ -156,12 +156,13 @@ static int operationScope(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* scopeType - 
+* scopeType -
 */
 static int scopeType(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a scopeType: '%s'", node->value()));
   reqDataP->scar.scopeP->type = node->value();
+
   return 0;
 }
 
@@ -169,12 +170,13 @@ static int scopeType(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* scopeValue - 
+* scopeValue -
 */
 static int scopeValue(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a scopeValue: '%s'", node->value()));
   reqDataP->scar.scopeP->value = node->value();
+
   return 0;
 }
 
@@ -182,7 +184,7 @@ static int scopeValue(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* duration - 
+* duration -
 */
 static int duration(xml_node<>* node, ParseData* reqDataP)
 {
@@ -195,7 +197,7 @@ static int duration(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* scarInit - 
+* scarInit -
 */
 void scarInit(ParseData* reqDataP)
 {
@@ -213,7 +215,7 @@ void scarInit(ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* scarRelease - 
+* scarRelease -
 */
 void scarRelease(ParseData* reqDataP)
 {
@@ -224,7 +226,7 @@ void scarRelease(ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* scarCheck - 
+* scarCheck -
 */
 std::string scarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
@@ -235,12 +237,14 @@ std::string scarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* scarPresent - 
+* scarPresent -
 */
 void scarPresent(ParseData* reqDataP)
 {
   if (!lmTraceIsSet(LmtDump))
+  {
     return;
+  }
 
   reqDataP->scar.res.present("");
 }
@@ -249,9 +253,9 @@ void scarPresent(ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* scarParseVector - 
+* scarParseVector -
 */
-XmlNode scarParseVector[] = 
+XmlNode scarParseVector[] =
 {
   { "/subscribeContextAvailabilityRequest",                                             nullTreat            },
 

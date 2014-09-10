@@ -25,8 +25,6 @@
 #include <stdio.h>
 #include <string>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -86,7 +84,7 @@ static int errorCodeCode(xml_node<>* node, ParseData* reqData)
 static int errorCodeReasonPhrase(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got an errorCode reason phrase: '%s'", node->value()));
-  reqData->rcrs.res.errorCode.reasonPhrase = node->value(); // OK - parsing step
+  reqData->rcrs.res.errorCode.reasonPhrase = node->value();  // OK - parsing step
   return 0;
 }
 
@@ -109,7 +107,7 @@ static int errorCodeDetails(xml_node<>* node, ParseData* reqData)
 *
 * registerContextResponseParseVector - 
 */
-XmlNode rcrsParseVector[] = 
+XmlNode rcrsParseVector[] =
 {
   { "/registerContextResponse",                         nullTreat              },
   { "/registerContextResponse/duration",                duration               },

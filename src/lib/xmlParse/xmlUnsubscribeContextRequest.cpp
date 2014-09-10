@@ -24,8 +24,6 @@
 */
 #include <string>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -39,7 +37,7 @@
 
 /* ****************************************************************************
 *
-* subscriptionId - 
+* subscriptionId -
 */
 static int subscriptionId(xml_node<>* node, ParseData* reqData)
 {
@@ -52,7 +50,7 @@ static int subscriptionId(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* uncrInit - 
+* uncrInit -
 */
 void uncrInit(ParseData* reqData)
 {
@@ -62,7 +60,7 @@ void uncrInit(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* uncrRelease - 
+* uncrRelease -
 */
 void uncrRelease(ParseData* reqData)
 {
@@ -73,7 +71,7 @@ void uncrRelease(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* uncrCheck - 
+* uncrCheck -
 */
 std::string uncrCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
@@ -85,7 +83,7 @@ std::string uncrCheck(ParseData* reqData, ConnectionInfo* ciP)
 #define PRINTF printf
 /* ****************************************************************************
 *
-* uncrPresent - 
+* uncrPresent -
 */
 void uncrPresent(ParseData* reqData)
 {
@@ -100,12 +98,12 @@ void uncrPresent(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* uncrParseVector - 
+* uncrParseVector -
 */
-XmlNode uncrParseVector[] = 
+XmlNode uncrParseVector[] =
 {
-  { "/unsubscribeContextRequest",                                   nullTreat },
-  { "/unsubscribeContextRequest/subscriptionId", subscriptionId },
-  
+  { "/unsubscribeContextRequest",                 nullTreat       },
+  { "/unsubscribeContextRequest/subscriptionId",  subscriptionId  },
+
   { "LAST", NULL }
 };

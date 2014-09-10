@@ -24,8 +24,6 @@
 */
 #include <string>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -37,12 +35,13 @@
 #include "ngsi10/UpdateContextRequest.h"
 #include "xmlParse/xmlParse.h"
 #include "xmlParse/xmlUpdateContextRequest.h"
+#include "xmlParse/XmlNode.h"
 
 
 
 /* ****************************************************************************
 *
-* contextElement - 
+* contextElement -
 */
 static int contextElement(xml_node<>* node, ParseData* reqData)
 {
@@ -60,7 +59,7 @@ static int contextElement(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* entityId - 
+* entityId -
 */
 static int entityId(xml_node<>* node, ParseData* reqData)
 {
@@ -81,7 +80,7 @@ static int entityId(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* entityIdId - 
+* entityIdId -
 */
 static int entityIdId(xml_node<>* node, ParseData* reqData)
 {
@@ -96,7 +95,7 @@ static int entityIdId(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* contextAttribute - 
+* contextAttribute -
 */
 static int contextAttribute(xml_node<>* node, ParseData* reqData)
 {
@@ -110,7 +109,7 @@ static int contextAttribute(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* contextAttributeName - 
+* contextAttributeName -
 */
 static int contextAttributeName(xml_node<>* node, ParseData* reqData)
 {
@@ -123,7 +122,7 @@ static int contextAttributeName(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* contextAttributeType - 
+* contextAttributeType -
 */
 static int contextAttributeType(xml_node<>* node, ParseData* reqData)
 {
@@ -136,7 +135,7 @@ static int contextAttributeType(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* contextAttributeValue - 
+* contextAttributeValue -
 */
 static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
 {
@@ -145,7 +144,7 @@ static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
   LM_T(LmtCompoundValue, ("Set parseDataP->lastContextAttribute (type: '%s') to: %p",
                           parseDataP->lastContextAttribute->typeFromXmlAttribute.c_str(),
                           parseDataP->lastContextAttribute));
-  
+
   LM_T(LmtParse, ("Got an attribute value: '%s'", node->value()));
   parseDataP->upcr.attributeP->value = node->value();
 
@@ -159,7 +158,7 @@ static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextMetadata - 
+* contextMetadata -
 */
 static int contextMetadata(xml_node<>* node, ParseData* reqData)
 {
@@ -173,7 +172,7 @@ static int contextMetadata(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* contextMetadataName - 
+* contextMetadataName -
 */
 static int contextMetadataName(xml_node<>* node, ParseData* reqData)
 {
@@ -186,7 +185,7 @@ static int contextMetadataName(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* contextMetadataType - 
+* contextMetadataType -
 */
 static int contextMetadataType(xml_node<>* node, ParseData* reqData)
 {
@@ -199,7 +198,7 @@ static int contextMetadataType(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* contextMetadataValue - 
+* contextMetadataValue -
 */
 static int contextMetadataValue(xml_node<>* node, ParseData* reqData)
 {
@@ -212,7 +211,7 @@ static int contextMetadataValue(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* domainMetadata - 
+* domainMetadata -
 */
 static int domainMetadata(xml_node<>* node, ParseData* reqData)
 {
@@ -226,7 +225,7 @@ static int domainMetadata(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* domainMetadataName - 
+* domainMetadataName -
 */
 static int domainMetadataName(xml_node<>* node, ParseData* reqData)
 {
@@ -239,7 +238,7 @@ static int domainMetadataName(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* domainMetadataType - 
+* domainMetadataType -
 */
 static int domainMetadataType(xml_node<>* node, ParseData* reqData)
 {
@@ -252,7 +251,7 @@ static int domainMetadataType(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* domainMetadataValue - 
+* domainMetadataValue -
 */
 static int domainMetadataValue(xml_node<>* node, ParseData* reqData)
 {
@@ -265,7 +264,7 @@ static int domainMetadataValue(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* updateAction - 
+* updateAction -
 */
 static int updateAction(xml_node<>* node, ParseData* reqData)
 {
@@ -278,7 +277,7 @@ static int updateAction(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* upcrInit - 
+* upcrInit -
 */
 void upcrInit(ParseData* reqData)
 {
@@ -296,11 +295,11 @@ void upcrInit(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* upcrRelease - 
+* upcrRelease -
 */
 void upcrRelease(ParseData* reqData)
 {
-   reqData->upcr.res.release();
+  reqData->upcr.res.release();
 }
 
 
@@ -308,7 +307,7 @@ void upcrRelease(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* upcrCheck - 
+* upcrCheck -
 */
 std::string upcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
@@ -319,7 +318,7 @@ std::string upcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* upcrPresent - 
+* upcrPresent -
 */
 void upcrPresent(ParseData* reqData)
 {
@@ -330,37 +329,46 @@ void upcrPresent(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* upcrParseVector - 
+* upcrParseVector -
 */
+#define UCR   "/updateContextRequest"
+#define CEL   "/contextElementList"
+#define CE    "/contextElement"
+#define CAL   "/contextAttributeList"
+#define CA    "/contextAttribute"
+#define MDL   "/metadata"
+#define MD    "/contextMetadata"
+#define DMDL  "/domainMetadata"
+
 XmlNode upcrParseVector[] =
 {
-  { "/updateContextRequest", nullTreat },
-  { "/updateContextRequest/contextElementList", nullTreat },
+  { "/updateContextRequest",                   nullTreat                 },
+  { UCR "/contextElementList",                 nullTreat                 },
 
-  { "/updateContextRequest/contextElementList/contextElement", contextElement },
+  { UCR CEL "/contextElement",                 contextElement            },
 
-  { "/updateContextRequest/contextElementList/contextElement/entityId",           entityId          },
-  { "/updateContextRequest/contextElementList/contextElement/entityId/id",        entityIdId        },
-  
-  { "/updateContextRequest/contextElementList/contextElement/contextAttributeList",                               nullTreat              },
-  { "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute",              contextAttribute       },
-  { "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/name",         contextAttributeName   },
-  { "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/type",         contextAttributeType   },
-  { "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue", contextAttributeValue  },
-  
-  { "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/metadata",                       nullTreat                 },
-  { "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata",       contextMetadata           },
-  { "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/name",  contextMetadataName       },
-  { "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/type",  contextMetadataType       },
-  { "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/value", contextMetadataValue      },
-  
-  { "/updateContextRequest/contextElementList/contextElement/domainMetadata",                       nullTreat            },
-  { "/updateContextRequest/contextElementList/contextElement/domainMetadata/contextMetadata",       domainMetadata       },
-  { "/updateContextRequest/contextElementList/contextElement/domainMetadata/contextMetadata/name",  domainMetadataName   },
-  { "/updateContextRequest/contextElementList/contextElement/domainMetadata/contextMetadata/type",  domainMetadataType   },
-  { "/updateContextRequest/contextElementList/contextElement/domainMetadata/contextMetadata/value", domainMetadataValue  },
-  
-  { "/updateContextRequest/updateAction", updateAction },
+  { UCR CEL CE "/entityId",                    entityId                  },
+  { UCR CEL CE "/entityId/id",                 entityIdId                },
+
+  { UCR CEL CE "/contextAttributeList",        nullTreat                 },
+  { UCR CEL CE CAL "/contextAttribute",        contextAttribute          },
+  { UCR CEL CE CAL CA "/name",                 contextAttributeName      },
+  { UCR CEL CE CAL CA "/type",                 contextAttributeType      },
+  { UCR CEL CE CAL CA "/contextValue",         contextAttributeValue     },
+
+  { UCR CEL CE CAL CA "/metadata",             nullTreat                 },
+  { UCR CEL CE CAL CA MDL "/contextMetadata",  contextMetadata           },
+  { UCR CEL CE CAL CA MDL MD "/name",          contextMetadataName       },
+  { UCR CEL CE CAL CA MDL MD "/type",          contextMetadataType       },
+  { UCR CEL CE CAL CA MDL MD "/value",         contextMetadataValue      },
+
+  { UCR CEL CE "/domainMetadata",              nullTreat                 },
+  { UCR CEL CE DMDL "/contextMetadata",        domainMetadata            },
+  { UCR CEL CE DMDL MD "/name",                domainMetadataName        },
+  { UCR CEL CE DMDL MD "/type",                domainMetadataType        },
+  { UCR CEL CE DMDL MD "/value",               domainMetadataValue       },
+
+  { UCR "/updateAction",                       updateAction              },
 
   { "LAST", NULL }
 };

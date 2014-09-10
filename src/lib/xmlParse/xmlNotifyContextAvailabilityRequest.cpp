@@ -24,8 +24,6 @@
 */
 #include <string>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -44,13 +42,13 @@
 */
 void ncarInit(ParseData* parseDataP)
 {
-   ncarRelease(parseDataP);
+  ncarRelease(parseDataP);
 
-   parseDataP->ncar.crrP                = NULL;
-   parseDataP->ncar.entityIdP           = NULL;
-   parseDataP->ncar.craP                = NULL;
-   parseDataP->ncar.attributeMetadataP  = NULL;
-   parseDataP->ncar.regMetadataP        = NULL;
+  parseDataP->ncar.crrP                = NULL;
+  parseDataP->ncar.entityIdP           = NULL;
+  parseDataP->ncar.craP                = NULL;
+  parseDataP->ncar.attributeMetadataP  = NULL;
+  parseDataP->ncar.regMetadataP        = NULL;
 }
 
 
@@ -84,7 +82,9 @@ std::string ncarCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 void ncarPresent(ParseData* parseDataP)
 {
   if (!lmTraceIsSet(LmtDump))
+  {
     return;
+  }
 
   PRINTF("\n\n");
   parseDataP->ncar.res.present("");
@@ -101,6 +101,7 @@ static int subscriptionId(xml_node<>* node, ParseData* parseDataP)
   LM_T(LmtParse, ("Got a subscriptionId: '%s'", node->value()));
 
   parseDataP->ncar.res.subscriptionId.set(node->value());
+
   return 0;
 }
 
@@ -136,7 +137,9 @@ static int entityId(xml_node<>* node, ParseData* parseDataP)
   std::string es = entityIdParse(NotifyContextAvailability, node, parseDataP->ncar.entityIdP);
 
   if (es != "OK")
+  {
     parseDataP->errorString = es;
+  }
 
   return 0;
 }
@@ -150,8 +153,8 @@ static int entityId(xml_node<>* node, ParseData* parseDataP)
 static int entityIdId(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityIdId: '%s'", node->value()));
-
   parseDataP->ncar.entityIdP->id = node->value();
+
   return 0;
 }
 
@@ -167,6 +170,7 @@ static int contextRegistrationAttribute(xml_node<>* node, ParseData* parseDataP)
 
   parseDataP->ncar.craP = new ContextRegistrationAttribute();
   parseDataP->ncar.crrP->contextRegistration.contextRegistrationAttributeVector.push_back(parseDataP->ncar.craP);
+
   return 0;
 }
 
@@ -179,8 +183,8 @@ static int contextRegistrationAttribute(xml_node<>* node, ParseData* parseDataP)
 static int contextRegistrationAttributeName(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a contextRegistrationAttributeName: '%s'", node->value()));
-
   parseDataP->ncar.craP->name = node->value();
+
   return 0;
 }
 
@@ -193,8 +197,8 @@ static int contextRegistrationAttributeName(xml_node<>* node, ParseData* parseDa
 static int contextRegistrationAttributeType(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a contextRegistrationAttributeType: '%s'", node->value()));
-
   parseDataP->ncar.craP->type = node->value();
+
   return 0;
 }
 
@@ -207,8 +211,8 @@ static int contextRegistrationAttributeType(xml_node<>* node, ParseData* parseDa
 static int contextRegistrationAttributeIsDomain(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a contextRegistrationAttributeIsDomain: '%s'", node->value()));
-
   parseDataP->ncar.craP->isDomain = node->value();
+
   return 0;
 }
 
@@ -238,6 +242,7 @@ static int attributeMetadataName(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeMetadataName: '%s'", node->value()));
   parseDataP->ncar.attributeMetadataP->name = node->value();
+
   return 0;
 }
 
@@ -251,6 +256,7 @@ static int attributeMetadataType(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeMetadataType: '%s'", node->value()));
   parseDataP->ncar.attributeMetadataP->type = node->value();
+
   return 0;
 }
 
@@ -264,6 +270,7 @@ static int attributeMetadataValue(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeMetadataValue: '%s'", node->value()));
   parseDataP->ncar.attributeMetadataP->value = node->value();
+
   return 0;
 }
 
@@ -278,7 +285,7 @@ static int registrationMetadata(xml_node<>* node, ParseData* parseDataP)
   LM_T(LmtParse, ("Got a registrationMetadata: '%s'", node->value()));
   parseDataP->ncar.regMetadataP = new Metadata();
   parseDataP->ncar.crrP->contextRegistration.registrationMetadataVector.push_back(parseDataP->ncar.regMetadataP);
-  
+
   return 0;
 }
 
@@ -292,6 +299,7 @@ static int registrationMetadataName(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a registrationMetadataName: '%s'", node->value()));
   parseDataP->ncar.regMetadataP->name = node->value();
+
   return 0;
 }
 
@@ -305,6 +313,7 @@ static int registrationMetadataType(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a registrationMetadataType: '%s'", node->value()));
   parseDataP->ncar.regMetadataP->type = node->value();
+
   return 0;
 }
 
@@ -318,6 +327,7 @@ static int registrationMetadataValue(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a registrationMetadataValue: '%s'", node->value()));
   parseDataP->ncar.regMetadataP->value = node->value();
+
   return 0;
 }
 
@@ -330,49 +340,49 @@ static int registrationMetadataValue(xml_node<>* node, ParseData* parseDataP)
 static int providingApplication(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a providingApplication: '%s'", node->value()));
-
   parseDataP->ncar.crrP->contextRegistration.providingApplication.set(node->value());
+
   return 0;
 }
 
 
-
+#define CRR "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse"
+#define CRA CRR "/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute"
 /* ****************************************************************************
 *
 * ncarParseVector - 
 */
-XmlNode ncarParseVector[] = 
+XmlNode ncarParseVector[] =
 {
-  { "/notifyContextAvailabilityRequest",                                     nullTreat          },
-  { "/notifyContextAvailabilityRequest/subscriptionId",                      subscriptionId     },
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList",     nullTreat          },
+  { "/notifyContextAvailabilityRequest",                                    nullTreat                             },
+  { "/notifyContextAvailabilityRequest/subscriptionId",                     subscriptionId                        },
+  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList",    nullTreat                             },
 
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse",                             contextRegistrationResponse  },
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration",         nullTreat                    },
+  { CRR,                                                                    contextRegistrationResponse           },
+  { CRR "/contextRegistration",                                             nullTreat                             },
+  { CRR "/contextRegistration/entityIdList",                                nullTreat                             },
+  { CRR "/contextRegistration/entityIdList/entityId",                       entityId                              },
+  { CRR "/contextRegistration/entityIdList/entityId/id",                    entityIdId                            },
 
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/entityIdList",              nullTreat               },
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/entityIdList/entityId",     entityId                },
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/entityIdList/entityId/id",  entityIdId              },
+  { CRR "/contextRegistration/contextRegistrationAttributeList",            nullTreat                             },
+  { CRA,                                                                    contextRegistrationAttribute          },
+  { CRA "/name",                                                            contextRegistrationAttributeName      },
+  { CRA "/type",                                                            contextRegistrationAttributeType      },
+  { CRA "/isDomain",                                                        contextRegistrationAttributeIsDomain  },
 
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/contextRegistrationAttributeList",                                       nullTreat },
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute",          contextRegistrationAttribute },
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute/name",     contextRegistrationAttributeName },
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute/type",     contextRegistrationAttributeType },
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute/isDomain", contextRegistrationAttributeIsDomain },
+  { CRA "/metadata",                                                        nullTreat                             },
+  { CRA "/metadata/contextMetadata",                                        attributeMetadata                     },
+  { CRA "/metadata/contextMetadata/name",                                   attributeMetadataName                 },
+  { CRA "/metadata/contextMetadata/type",                                   attributeMetadataType                 },
+  { CRA "/metadata/contextMetadata/value",                                  attributeMetadataValue                },
 
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute/metadata",                       nullTreat              },
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute/metadata/contextMetadata",       attributeMetadata      },
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute/metadata/contextMetadata/name",  attributeMetadataName  },
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute/metadata/contextMetadata/type",  attributeMetadataType  },
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute/metadata/contextMetadata/value", attributeMetadataValue },
+  { CRR "/contextRegistration/registrationMetadata",                        nullTreat                             },
+  { CRR "/contextRegistration/registrationMetadata/contextMetadata",        registrationMetadata                  },
+  { CRR "/contextRegistration/registrationMetadata/contextMetadata/name",   registrationMetadataName              },
+  { CRR "/contextRegistration/registrationMetadata/contextMetadata/type",   registrationMetadataType              },
+  { CRR "/contextRegistration/registrationMetadata/contextMetadata/value",  registrationMetadataValue             },
 
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/registrationMetadata",                           nullTreat                             },
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/registrationMetadata/contextMetadata",           registrationMetadata                  },
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/registrationMetadata/contextMetadata/name",      registrationMetadataName              },
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/registrationMetadata/contextMetadata/type",      registrationMetadataType              },
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/registrationMetadata/contextMetadata/value",     registrationMetadataValue             },
-
-  { "/notifyContextAvailabilityRequest/contextRegistrationResponseList/contextRegistrationResponse/contextRegistration/providingApplication", providingApplication },
+  { CRR "/contextRegistration/providingApplication",                        providingApplication                  },
 
   { "LAST", NULL }
 };

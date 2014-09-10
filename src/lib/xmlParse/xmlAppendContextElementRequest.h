@@ -1,5 +1,5 @@
-#ifndef XML_APPEND_CONTEXT_ELEMENT_REQUEST_H
-#define XML_APPEND_CONTEXT_ELEMENT_REQUEST_H
+#ifndef SRC_LIB_XMLPARSE_XMLAPPENDCONTEXTELEMENTREQUEST_H_
+#define SRC_LIB_XMLPARSE_XMLAPPENDCONTEXTELEMENTREQUEST_H_
 
 /*
 *
@@ -70,4 +70,4 @@ extern std::string acerCheck(ParseData* reqData, ConnectionInfo* ciP);
 */
 extern void acerPresent(ParseData* reqData);
 
-#endif
+#endif  // SRC_LIB_XMLPARSE_XMLAPPENDCONTEXTELEMENTREQUEST_H_

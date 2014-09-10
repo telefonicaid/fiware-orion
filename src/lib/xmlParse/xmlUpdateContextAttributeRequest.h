@@ -1,5 +1,5 @@
-#ifndef XML_UPDATE_CONTEXT_ATTRIBUTE_REQUEST_H
-#define XML_UPDATE_CONTEXT_ATTRIBUTE_REQUEST_H
+#ifndef SRC_LIB_XMLPARSE_XMLUPDATECONTEXTATTRIBUTEREQUEST_H_
+#define SRC_LIB_XMLPARSE_XMLUPDATECONTEXTATTRIBUTEREQUEST_H_
 
 /*
 *
@@ -70,4 +70,4 @@ extern std::string upcarCheck(ParseData* reqData, ConnectionInfo* ciP);
 */
 extern void upcarPresent(ParseData* reqData);
 
-#endif
+#endif  // SRC_LIB_XMLPARSE_XMLUPDATECONTEXTATTRIBUTEREQUEST_H_

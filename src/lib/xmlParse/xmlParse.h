@@ -1,5 +1,5 @@
-#ifndef XML_PARSE_H
-#define XML_PARSE_H
+#ifndef SRC_LIB_XMLPARSE_XMLPARSE_H_
+#define SRC_LIB_XMLPARSE_XMLPARSE_H_
 
 /*
 *
@@ -27,8 +27,6 @@
 */
 #include <string>
 
-#include "XmlNode.h"
-
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "xmlParse/XmlNode.h"
@@ -39,7 +37,16 @@
 *
 * xmlParse - 
 */
-extern void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, const std::string& indentation, const std::string& fatherPath, XmlNode* treatV, ParseData* reqData);
+extern void xmlParse
+(
+  ConnectionInfo*     ciP,
+  xml_node<>*         father,
+  xml_node<>*         node,
+  const std::string&  indentation,
+  const std::string&  fatherPath,
+  XmlNode*            treatV,
+  ParseData*          reqData
+);
 
 
 
@@ -67,4 +74,4 @@ extern std::string entityIdParse(RequestType request, xml_node<>* node, EntityId
 */
 extern std::string xmlTypeAttributeGet(xml_node<>* node);
 
-#endif
+#endif  // SRC_LIB_XMLPARSE_XMLPARSE_H_
