@@ -275,7 +275,7 @@ void jsonAcerRelease(ParseData* reqData)
 */
 std::string jsonAcerCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->acer.res.check(AppendContextElement, ciP->outFormat, "", reqData->errorString, 0);
+  return reqData->acer.res.check(ciP, AppendContextElement, "", reqData->errorString, 0);
 }
 
 

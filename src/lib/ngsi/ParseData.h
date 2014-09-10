@@ -32,6 +32,7 @@
 #include "ngsi/AttributeAssociation.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextRegistrationAttribute.h"
+#include "ngsi/ContextElementResponse.h"
 #include "ngsi/Metadata.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
@@ -42,8 +43,10 @@
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/QueryContextRequest.h"
+#include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UpdateContextRequest.h"
+#include "ngsi10/UpdateContextResponse.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "convenience/RegisterProviderRequest.h"
@@ -105,6 +108,21 @@ typedef struct QueryContextData
    Scope*               scopeP;
    orion::Point*        vertexP;
 } QueryContextData;
+
+
+
+/* ****************************************************************************
+*
+* QueryContextResponseData - 
+*/
+typedef struct QueryContextResponseData
+{
+  QueryContextResponse     res;
+  ContextElementResponse*  cerP;
+  ContextAttribute*        attributeP;
+  Metadata*                metadataP;
+  Metadata*                domainMetadataP;
+} QueryContextResponseData;
 
 
 
@@ -222,6 +240,21 @@ typedef struct UpdateContextData
 
 /* ****************************************************************************
 *
+* UpdateContextResponseData - 
+*/
+typedef struct UpdateContextResponseData
+{
+  UpdateContextResponse    res;
+  ContextElementResponse*  cerP;
+  ContextAttribute*        attributeP;
+  Metadata*                metadataP;
+  Metadata*                domainMetadataP;
+} UpdateContextResponseData;
+
+
+
+/* ****************************************************************************
+*
 * UpdateContextSubscriptionData - 
 */
 typedef struct UpdateContextSubscriptionData
@@ -318,6 +351,8 @@ typedef struct ParseData
   UpdateContextAttributeData                  upcar;
 
   RegisterContextResponseData                 rcrs;
+  QueryContextResponseData                    qcrs;
+  UpdateContextResponseData                   upcrs;
 } ParseData;
 
 #endif

@@ -55,6 +55,15 @@ typedef struct XmlRequest
 *
 * xmlTreat - 
 */
-extern std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* reqData, RequestType requestType, std::string payloadWord, XmlRequest** reqP);
+extern std::string xmlTreat
+(
+  const char*      content,
+  ConnectionInfo*  ciP,
+  ParseData*       reqData,
+  RequestType      requestType,
+  std::string      payloadWord,
+  XmlRequest**     reqP,
+  std::string*     errorMsgP = NULL
+);
 
 #endif

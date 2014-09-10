@@ -83,7 +83,7 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   ContextElement*                 ceP           = new ContextElement();
 
   // Copy the metadata vector of the input payload
-  attributeP->metadataVector.fill(upcarP->metadataVector);
+  attributeP->metadataVector.fill((MetadataVector*) &upcarP->metadataVector);
 
   // If no "ID" metadata was in the payload, add it
   if (idFound == false)

@@ -81,7 +81,9 @@ std::string statisticsTreat(ConnectionInfo* ciP, int components, std::vector<std
      noOfUnsubscriptionErrors                 = -1;
      noOfNotificationsReceived                = -1;
      noOfNotificationsSent                    = -1;
-     
+     noOfQueryContextResponses                = -1;
+     noOfUpdateContextResponses               = -1;
+
      noOfContextEntitiesByEntityId            = -1;
      noOfContextEntityAttributes              = -1;
      noOfEntityByIdAttributeByName            = -1;
@@ -134,6 +136,9 @@ std::string statisticsTreat(ConnectionInfo* ciP, int components, std::vector<std
   if (noOfSubscriptionUpdates != -1)                         out += valueTag(indent2, "subscriptionUpdates",                        noOfSubscriptionUpdates + 1,                         ciP->outFormat, true);
   if (noOfUnsubscriptions != -1)                             out += valueTag(indent2, "unsubscriptions",                            noOfUnsubscriptions + 1,                             ciP->outFormat, true);
   if (noOfNotificationsReceived != -1)                       out += valueTag(indent2, "notificationsReceived",                      noOfNotificationsReceived + 1,                       ciP->outFormat, true);
+
+  if (noOfQueryContextResponses != -1)                       out += valueTag(indent2, "queryResponsesReceived",                     noOfQueryContextResponses + 1,                       ciP->outFormat, true);
+  if (noOfUpdateContextResponses != -1)                      out += valueTag(indent2, "updateResponsesReceived",                    noOfUpdateContextResponses + 1,                       ciP->outFormat, true);
 
   if (noOfContextEntitiesByEntityId != -1)                   out += valueTag(indent2, "contextEntitiesByEntityId",                  noOfContextEntitiesByEntityId + 1,                   ciP->outFormat, true);
   if (noOfContextEntityAttributes != -1)                     out += valueTag(indent2, "contextEntityAttributes",                    noOfContextEntityAttributes + 1,                     ciP->outFormat, true);

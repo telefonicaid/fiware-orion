@@ -39,7 +39,17 @@
 *
 * xmlParse - 
 */
-extern void xmlParse(ConnectionInfo* ciP, xml_node<>* father, xml_node<>* node, const std::string& indentation, const std::string& fatherPath, XmlNode* treatV, ParseData* reqData);
+extern void xmlParse
+(
+  ConnectionInfo*     ciP,
+  xml_node<>*         father,
+  xml_node<>*         node,
+  const std::string&  indentation,
+  const std::string&  fatherPath,
+  XmlNode*            treatV,
+  ParseData*          reqData,
+  std::string*        errorMsgP = NULL
+);
 
 
 

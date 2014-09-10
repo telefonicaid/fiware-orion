@@ -147,9 +147,6 @@
 *
 */
 
-#define NO_CODE 0
-
-
 /* ****************************************************************************
 *
 * prepareDatabase -
@@ -349,7 +346,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T1_C0)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -442,7 +439,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T1_C0_JSON)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -535,7 +532,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T1_C0)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -633,7 +630,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_TN_C0)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -734,7 +731,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_TN_C0)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -830,7 +827,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -925,7 +922,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1022,7 +1019,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T0_CN)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1121,7 +1118,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T0_CNbis)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1220,7 +1217,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T0_CN)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1323,7 +1320,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T0_CNbis)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1429,7 +1426,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_TN_CN)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1542,7 +1539,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_TN_CNbis)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1654,7 +1651,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_TN_CN)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1771,7 +1768,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_TN_CNbis)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1875,7 +1872,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_T1_C0)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1977,7 +1974,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_T1_C0)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2082,7 +2079,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_TN_C0)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2189,7 +2186,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_TN_C0)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2291,7 +2288,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2392,7 +2389,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2495,7 +2492,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_T0_CN)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2600,7 +2597,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_T0_CNbis)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2704,7 +2701,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_T0_CN)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2813,7 +2810,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_T0_CNbis)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2925,7 +2922,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_TN_CN)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3044,7 +3041,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_TN_CNbis)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3162,7 +3159,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_TN_CN)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3285,7 +3282,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_TN_CNbis)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3392,7 +3389,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T1_C0_throttling)
     EXPECT_EQ("PT4S", res.subscribeResponse.throttling.get());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3486,7 +3483,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T1_C0_throttling)
     EXPECT_EQ("PT4S", res.subscribeResponse.throttling.get());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3582,7 +3579,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_T1_C0_throttling)
     EXPECT_EQ("PT4S", res.subscribeResponse.throttling.get());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3685,7 +3682,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_T1_C0_throttling)
     EXPECT_EQ("PT4S", res.subscribeResponse.throttling.get());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3796,7 +3793,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3904,7 +3901,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_C1_JSON)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4015,7 +4012,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4124,7 +4121,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_C1_disjoint)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4249,7 +4246,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4374,7 +4371,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_T0_C1_disjoint)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4490,7 +4487,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4606,7 +4603,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_T0_C1_disjoint)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4736,7 +4733,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4866,7 +4863,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_T0_C1_disjoint)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4978,7 +4975,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_CN)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5094,7 +5091,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_CN_partial)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5209,7 +5206,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_CNbis)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5319,7 +5316,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CN_disjoint)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5437,7 +5434,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CN_partial)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5555,7 +5552,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CN_partial_disjoint)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5671,7 +5668,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CNbis)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5791,7 +5788,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_TN_CN)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5918,7 +5915,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_TN_CNbis)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -6042,7 +6039,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_TN_CN)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -6171,7 +6168,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_TN_CNbis)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -6297,7 +6294,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -6416,7 +6413,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -6541,7 +6538,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_T0_CN)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -6668,7 +6665,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_T0_CNbis)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -6790,7 +6787,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_T0_CN)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -6915,7 +6912,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_T0_CNbis)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -7047,7 +7044,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_TN_CN)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -7186,7 +7183,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_TN_CNbis)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -7320,7 +7317,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_TN_CN)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -7459,7 +7456,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_TN_CNbis)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -7564,7 +7561,7 @@ TEST(mongoSubscribeContext, defaultDuration)
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_FALSE(res.subscribeResponse.subscriptionId.isEmpty());
     std::string id = res.subscribeResponse.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 

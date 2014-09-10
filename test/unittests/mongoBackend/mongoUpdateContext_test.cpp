@@ -133,7 +133,7 @@
 * - servicePathEntityVectorNotAllowed
 *
 * Note these tests are not "canonical" unit tests. Canon says that in this case we should have
-* mocked MongoDB. Actually, we think is very much powerfull to check that everything is ok at
+* mocked MongoDB. Actually, we think is very much powerful to check that everything is ok at
 * MongoDB layer.
 *
 */

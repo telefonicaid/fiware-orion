@@ -32,6 +32,7 @@
 #include "ngsi/ContextAttributeVector.h"
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/UpdateContextElementResponse.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -39,15 +40,15 @@
 *
 * render - 
 */
-std::string UpdateContextElementRequest::render(RequestType requestType, Format format, std::string indent)
+std::string UpdateContextElementRequest::render(ConnectionInfo* ciP, RequestType requestType, std::string indent)
 {
   std::string tag = "updateContextElementRequest";
   std::string out = "";
 
-  out += startTag(indent, tag, format, false);
-  out += attributeDomainName.render(format, indent + "  ", true);
-  out += contextAttributeVector.render(requestType, format, indent + "  ");
-  out += endTag(indent, tag, format);
+  out += startTag(indent, tag, ciP->outFormat, false);
+  out += attributeDomainName.render(ciP->outFormat, indent + "  ", true);
+  out += contextAttributeVector.render(ciP, requestType, indent + "  ");
+  out += endTag(indent, tag, ciP->outFormat);
 
   return out;
 }
@@ -70,21 +71,22 @@ std::string UpdateContextElementRequest::render(RequestType requestType, Format 
 */
 std::string UpdateContextElementRequest::check
 (
-  RequestType  requestType,
-  Format       format,
-  std::string  indent,
-  std::string  preError,      // Predetected Error, normally during parsing
-  int          counter
+  ConnectionInfo*  ciP,
+  RequestType      requestType,
+  std::string      indent,
+  std::string      predetectedError,     // Predetected Error, normally during parsing
+  int              counter
 )
 {
   UpdateContextElementResponse  response;
   std::string                   res;
+  Format                        fmt = ciP->outFormat;
 
-  if (preError != "")
+  if (predetectedError != "")
   {
-    response.errorCode.fill(SccBadRequest, preError);
+    response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(UpdateContextElement, format, indent, preError, counter)) != "OK")
+  else if ((res = contextAttributeVector.check(UpdateContextElement, fmt, indent, predetectedError, counter)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }
@@ -93,7 +95,7 @@ std::string UpdateContextElementRequest::check
     return "OK";
   }
 
-  return response.render(requestType, format, indent);
+  return response.render(ciP, requestType, indent);
 }
 
 
