@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 
 #include "convenienceMap/mapDeleteIndividualContextEntityAttributes.h"
@@ -39,7 +41,12 @@
 *
 * mapDeleteIndividualContextEntityAttributes - 
 */
-HttpStatusCode mapDeleteIndividualContextEntityAttributes(const std::string& entityId, StatusCode* response, ConnectionInfo* ciP)
+HttpStatusCode mapDeleteIndividualContextEntityAttributes
+(
+  const std::string&  entityId,
+  StatusCode*         response,
+  ConnectionInfo*     ciP
+)
 {
   HttpStatusCode         ms;
 
@@ -48,7 +55,7 @@ HttpStatusCode mapDeleteIndividualContextEntityAttributes(const std::string& ent
   ContextElement*        ceP = new ContextElement();
 
   ceP->entityId.fill(entityId, "", "false");
-  
+
   ucRequest.contextElementVector.push_back(ceP);
   ucRequest.updateActionType.set("Delete");
 

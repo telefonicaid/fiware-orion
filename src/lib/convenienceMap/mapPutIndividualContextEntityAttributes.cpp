@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 
 #include "convenience/UpdateContextElementRequest.h"
@@ -41,7 +43,13 @@
 *
 * mapPutIndividualContextEntityAttributes - 
 */
-HttpStatusCode mapPutIndividualContextEntityAttributes(const std::string& entityId, UpdateContextElementRequest* ucerP, UpdateContextElementResponse* response, ConnectionInfo* ciP)
+HttpStatusCode mapPutIndividualContextEntityAttributes
+(
+  const std::string&             entityId,
+  UpdateContextElementRequest*   ucerP,
+  UpdateContextElementResponse*  response,
+  ConnectionInfo*                ciP
+)
 {
   HttpStatusCode          ms;
   UpdateContextRequest    ucRequest;
@@ -51,7 +59,7 @@ HttpStatusCode mapPutIndividualContextEntityAttributes(const std::string& entity
   ce.entityId.fill(entityId, "", "false");
   ce.attributeDomainName    = ucerP->attributeDomainName;
   ce.contextAttributeVector = ucerP->contextAttributeVector;
-  
+
   ucRequest.contextElementVector.push_back(&ce);
   ucRequest.updateActionType.set("Update");
 
@@ -66,7 +74,7 @@ HttpStatusCode mapPutIndividualContextEntityAttributes(const std::string& entity
     carP->contextAttributeVector.push_back(caP);
   }
 
-  response->contextAttributeResponseVector.push_back(carP);  
+  response->contextAttributeResponseVector.push_back(carP);
   response->errorCode.fill(&ucResponse.errorCode);
   carP->statusCode.fill(&ucResponse.contextElementResponseVector.get(0)->statusCode);
 

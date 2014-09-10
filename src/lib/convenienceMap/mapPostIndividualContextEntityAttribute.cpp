@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "mongoBackend/MongoGlobal.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/AppendContextElementResponse.h"
@@ -38,23 +40,30 @@
 *
 * mapPostIndividualContextEntityAttribute - 
 */
-HttpStatusCode mapPostIndividualContextEntityAttribute(const std::string& entityId, const std::string& attributeName, UpdateContextAttributeRequest* request, StatusCode* response, ConnectionInfo* ciP)
+HttpStatusCode mapPostIndividualContextEntityAttribute
+(
+  const std::string&              entityId,
+  const std::string&              attributeName,
+  UpdateContextAttributeRequest*  request,
+  StatusCode*                     response,
+  ConnectionInfo*                 ciP
+)
 {
-   HttpStatusCode         ms;
-   UpdateContextRequest   ucRequest;
-   UpdateContextResponse  ucResponse;
-   ContextElement         ce;
-   ContextAttribute       attribute(attributeName, "", "");
+  HttpStatusCode         ms;
+  UpdateContextRequest   ucRequest;
+  UpdateContextResponse  ucResponse;
+  ContextElement         ce;
+  ContextAttribute       attribute(attributeName, "", "");
 
-   ce.entityId.fill(entityId, "", "false");
-   ce.contextAttributeVector.push_back(&attribute);
+  ce.entityId.fill(entityId, "", "false");
+  ce.contextAttributeVector.push_back(&attribute);
 
-   ucRequest.contextElementVector.push_back(&ce);
-   ucRequest.updateActionType.set("Append");
+  ucRequest.contextElementVector.push_back(&ce);
+  ucRequest.updateActionType.set("Append");
 
-   ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
 
-   response->fill(SccOk);
-   
-   return ms;
+  response->fill(SccOk);
+
+  return ms;
 }

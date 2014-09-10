@@ -1,5 +1,5 @@
-#ifndef MAP_PUT_INDIVIDUAL_CONTEXT_ENTITY_H
-#define MAP_PUT_INDIVIDUAL_CONTEXT_ENTITY_H
+#ifndef SRC_LIB_CONVENIENCEMAP_MAPPUTINDIVIDUALCONTEXTENTITY_H_
+#define SRC_LIB_CONVENIENCEMAP_MAPPUTINDIVIDUALCONTEXTENTITY_H_
 
 /*
 *
@@ -25,6 +25,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/UpdateContextElementResponse.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -37,6 +39,12 @@
 *
 * mapPutIndividualContextEntity - 
 */
-extern HttpStatusCode mapPutIndividualContextEntity(const std::string& entityId, UpdateContextElementRequest* ucerP, UpdateContextElementResponse* response, ConnectionInfo* ciP);
+extern HttpStatusCode mapPutIndividualContextEntity
+(
+  const std::string&             entityId,
+  UpdateContextElementRequest*   ucerP,
+  UpdateContextElementResponse*  response,
+  ConnectionInfo*                ciP
+);
 
-#endif
+#endif  // SRC_LIB_CONVENIENCEMAP_MAPPUTINDIVIDUALCONTEXTENTITY_H_

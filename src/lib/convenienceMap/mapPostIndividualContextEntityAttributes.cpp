@@ -22,10 +22,11 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "mongoBackend/MongoGlobal.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/AppendContextElementResponse.h"
 #include "convenienceMap/mapPostIndividualContextEntityAttributes.h"
@@ -41,9 +42,15 @@
 
 /* ****************************************************************************
 *
-* mapPostIndividualContextEntityAttributes - 
+* mapPostIndividualContextEntityAttributes -
 */
-HttpStatusCode mapPostIndividualContextEntityAttributes(const std::string& entityId, AppendContextElementRequest* request, AppendContextElementResponse* response, ConnectionInfo* ciP)
+HttpStatusCode mapPostIndividualContextEntityAttributes
+(
+  const std::string&             entityId,
+  AppendContextElementRequest*   request,
+  AppendContextElementResponse*  response,
+  ConnectionInfo*                ciP
+)
 {
   HttpStatusCode         ms;
 
@@ -54,7 +61,7 @@ HttpStatusCode mapPostIndividualContextEntityAttributes(const std::string& entit
   ce.entityId.fill(entityId, "", "false");
   ce.attributeDomainName    = request->attributeDomainName;
   ce.contextAttributeVector = request->contextAttributeVector;
-  
+
   ucRequest.contextElementVector.push_back(&ce);
   ucRequest.updateActionType.set("Append");
 
@@ -66,10 +73,11 @@ HttpStatusCode mapPostIndividualContextEntityAttributes(const std::string& entit
   // Copying contextAttributeVector from ucContextElementResponse
   for (unsigned caIx = 0; caIx < ucContextElementResponse->contextElement.contextAttributeVector.size(); ++caIx)
   {
-     LM_T(LmtClone, ("Copying ContextAttribute %d", caIx));
-     ContextAttribute* caP = new ContextAttribute(ucContextElementResponse->contextElement.contextAttributeVector.get(caIx));
-     
-     car->contextAttributeVector.push_back(caP);     
+    LM_T(LmtClone, ("Copying ContextAttribute %d", caIx));
+    ContextAttribute* attribute = ucContextElementResponse->contextElement.contextAttributeVector[caIx];
+    ContextAttribute* caP = new ContextAttribute(attribute);
+
+    car->contextAttributeVector.push_back(caP);
   }
   car->statusCode.fill(&ucContextElementResponse->statusCode);
 
