@@ -115,10 +115,14 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
   if (!isTrue(value) && !isFalse(value))
+  {
     return "invalid isPattern (boolean) value for entity: '" + value + "'";
+  }
 
   if (isTrue(value))
+  {
     return "isPattern set to true for a registration";
+  }
 
   reqDataP->rcr.entityIdP->isPattern = value;
 
@@ -179,7 +183,9 @@ static std::string craType(const std::string& path, const std::string& value, Pa
 static std::string craIsDomain(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   if (!isTrue(value) && !isFalse(value))
+  {
     return "invalid isDomain (boolean) value for context registration attribute: '" + value + "'";
+  }
 
   reqDataP->rcr.attributeP->isDomain = value;
   LM_T(LmtParse, ("Set 'isDomain' to '%s' for a contextRegistrationAttribute", reqDataP->rcr.attributeP->isDomain.c_str()));
@@ -357,6 +363,183 @@ static std::string registrationId(const std::string& path, const std::string& va
 
 /* ****************************************************************************
 *
+* sourceEntityId -
+*/
+static std::string sourceEntityId(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+  LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
+
+  reqDataP->rcr.registrationMetadataP->association.entityAssociation.source.fill("", "", "false");
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* sourceEntityIdId -
+*/
+static std::string sourceEntityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+  reqDataP->rcr.registrationMetadataP->association.entityAssociation.source.id = value;
+  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", value.c_str()));
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* sourceEntityIdType -
+*/
+static std::string sourceEntityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+   reqDataP->rcr.registrationMetadataP->association.entityAssociation.source.type = value;
+   LM_T(LmtParse, ("Set 'type' to '%s' for an entity", value.c_str()));
+
+   return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* sourceEntityIdIsPattern -
+*/
+static std::string sourceEntityIdIsPattern(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
+
+  if (!isTrue(value) && !isFalse(value))
+  {
+    return "invalid isPattern (boolean) value for entity: '" + value + "'";
+  }
+
+  if (isTrue(value))
+  {
+    return "isPattern set to true for a registration";
+  }
+
+  reqDataP->rcr.registrationMetadataP->association.entityAssociation.source.isPattern = value;
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* targetEntityId -
+*/
+static std::string targetEntityId(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+  LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
+
+  reqDataP->rcr.registrationMetadataP->association.entityAssociation.target.fill("", "", "false");
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* targetEntityIdId -
+*/
+static std::string targetEntityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+  reqDataP->rcr.registrationMetadataP->association.entityAssociation.target.id = value;
+  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", value.c_str()));
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* targetEntityIdType -
+*/
+static std::string targetEntityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+   reqDataP->rcr.registrationMetadataP->association.entityAssociation.target.type = value;
+   LM_T(LmtParse, ("Set 'type' to '%s' for an entity", value.c_str()));
+
+   return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* targetEntityIdIsPattern -
+*/
+static std::string targetEntityIdIsPattern(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
+
+  if (!isTrue(value) && !isFalse(value))
+  {
+    return "invalid isPattern (boolean) value for entity: '" + value + "'";
+  }
+
+  if (isTrue(value))
+  {
+    return "isPattern set to true for a registration";
+  }
+
+  reqDataP->rcr.registrationMetadataP->association.entityAssociation.target.isPattern = value;
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* attributeAssociation -
+*/
+static std::string attributeAssociation(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+   LM_T(LmtParse, ("got an attribute association"));
+   reqDataP->rcr.attributeAssociationP = new AttributeAssociation();
+
+   reqDataP->rcr.registrationMetadataP->association.attributeAssociationList.push_back(reqDataP->rcr.attributeAssociationP);
+   return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* sourceAttribute -
+*/
+static std::string sourceAttribute(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+   LM_T(LmtParse, ("got a source attribute association"));
+   reqDataP->rcr.attributeAssociationP->source = value;
+   return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* targetAttribute -
+*/
+static std::string targetAttribute(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+   LM_T(LmtParse, ("got a target attribute association"));
+   reqDataP->rcr.attributeAssociationP->target = value;
+   return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
 * jsonRcrParseVector -
 */
 JsonNode jsonRcrParseVector[] =
@@ -386,6 +569,20 @@ JsonNode jsonRcrParseVector[] =
   { "/contextRegistrations/contextRegistration/metadatas/metadata/name",                           regMetadataName  },
   { "/contextRegistrations/contextRegistration/metadatas/metadata/type",                           regMetadataType  },
   { "/contextRegistrations/contextRegistration/metadatas/metadata/value",                          regMetadataValue },
+
+  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/source",                       sourceEntityId          },
+  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/source/id",                    sourceEntityIdId        },
+  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/source/type",                  sourceEntityIdType      },
+  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/source/isPattern",             sourceEntityIdIsPattern },
+  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/target",                       targetEntityId          },
+  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/target/id",                    targetEntityIdId        },
+  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/target/type",                  targetEntityIdType      },
+  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/target/isPattern",             targetEntityIdIsPattern },
+
+  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/associations",                    jsonNullTreat        },
+  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/associations/association",        attributeAssociation },
+  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/associations/association/source", sourceAttribute      },
+  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/associations/association/target", targetAttribute      },
 
   { "/contextRegistrations/contextRegistration/providingApplication",                providingApplication },
   { "/duration",                                                                     duration             },
@@ -441,7 +638,9 @@ std::string jsonRcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 void jsonRcrPresent(ParseData* reqDataP)
 {
   if (!lmTraceIsSet(LmtDump))
+  {
     return;
+  }
 
   PRINTF("\n\n");
 

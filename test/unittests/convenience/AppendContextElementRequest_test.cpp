@@ -29,6 +29,7 @@
 #include "convenience/AppendContextElementRequest.h"
 #include "ngsi/ContextElement.h"
 #include "ngsi/Metadata.h"
+#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
@@ -45,13 +46,14 @@ TEST(AppendContextElementRequest, render_xml)
    ContextAttribute             ca("caName", "caType", "121");
    Metadata                     md("mdName", "mdType", "122");
    const char*                  outfile = "ngsi10.appendContextElementRequest.adn.valid.xml";
+   ConnectionInfo               ci;
 
    utInit();
 
    acer.attributeDomainName.set("ADN");
    acer.contextAttributeVector.push_back(&ca);
    
-   out = acer.render(UpdateContext, XML, "");
+   out = acer.render(&ci, UpdateContext, "");
 
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
@@ -72,13 +74,15 @@ TEST(AppendContextElementRequest, render_json)
    ContextAttribute             ca("caName", "caType", "121");
    Metadata                     md("mdName", "mdType", "122");
    const char*                  outfile = "ngsi10.appendContextElementRequest.adn.valid.json";
+   ConnectionInfo               ci;
 
    utInit();
 
    acer.attributeDomainName.set("ADN");
    acer.contextAttributeVector.push_back(&ca);
    
-   out = acer.render(UpdateContext, JSON, "");
+   ci.outFormat = JSON;
+   out = acer.render(&ci, UpdateContext, "");
 
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
@@ -101,6 +105,7 @@ TEST(AppendContextElementRequest, check_xml)
    const char*                  outfile1 = "ngsi10.appendContextElementResponse.predetectedError.valid.xml";
    const char*                  outfile2 = "ngsi10.appendContextElementResponse.missingAttributeName.invalid.xml";
    const char*                  outfile3 = "ngsi10.appendContextElementResponse.missingMetadataName.invalid.xml";
+   ConnectionInfo               ci;
 
    utInit();
 
@@ -109,13 +114,13 @@ TEST(AppendContextElementRequest, check_xml)
    acer.domainMetadataVector.push_back(&md);
 
    // 1. ok
-   out = acer.check(AppendContextElement, XML, "", "", 0);
+   out = acer.check(&ci, AppendContextElement, "", "", 0);
    EXPECT_STREQ("OK", out.c_str());
 
 
    // 2. Predetected error 
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-   out = acer.check(AppendContextElement, XML, "", "Error is predetected", 0);
+   out = acer.check(&ci, AppendContextElement, "", "Error is predetected", 0);
    EXPECT_STREQ(expectedBuf, out.c_str());
    
 
@@ -123,7 +128,7 @@ TEST(AppendContextElementRequest, check_xml)
    ContextAttribute  ca2("", "caType", "121");
 
    acer.contextAttributeVector.push_back(&ca2);
-   out = acer.check(AppendContextElement, XML, "", "", 0);
+   out = acer.check(&ci, AppendContextElement, "", "", 0);
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";   
    EXPECT_STREQ(expectedBuf, out.c_str());
    ca2.name = "ca2Name";
@@ -133,7 +138,7 @@ TEST(AppendContextElementRequest, check_xml)
    Metadata  md2("", "mdType", "122");
 
    acer.domainMetadataVector.push_back(&md2);
-   out = acer.check(AppendContextElement, XML, "", "", 0);
+   out = acer.check(&ci, AppendContextElement, "", "", 0);
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";   
    EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -159,6 +164,7 @@ TEST(AppendContextElementRequest, check_json)
    const char*                  outfile1 = "ngsi10.appendContextElementResponse.predetectedError.valid.json";
    const char*                  outfile2 = "ngsi10.appendContextElementResponse.missingAttributeName.valid.json";
    const char*                  outfile3 = "ngsi10.appendContextElementResponse.missingMetadataName.valid.json";
+   ConnectionInfo               ci;
 
    utInit();
 
@@ -167,13 +173,14 @@ TEST(AppendContextElementRequest, check_json)
    acer.domainMetadataVector.push_back(&md);
 
    // 1. ok
-   out = acer.check(AppendContextElement, JSON, "", "", 0);
+   ci.outFormat = JSON;
+   out = acer.check(&ci, AppendContextElement, "", "", 0);
    EXPECT_STREQ("OK", out.c_str());
 
 
    // 2. Predetected error 
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-   out = acer.check(AppendContextElement, JSON, "", "Error is predetected", 0);
+   out = acer.check(&ci, AppendContextElement, "", "Error is predetected", 0);
    EXPECT_STREQ(expectedBuf, out.c_str());
    
 
@@ -181,7 +188,7 @@ TEST(AppendContextElementRequest, check_json)
    ContextAttribute  ca2("", "caType", "121");
 
    acer.contextAttributeVector.push_back(&ca2);
-   out = acer.check(AppendContextElement, JSON, "", "", 0);
+   out = acer.check(&ci, AppendContextElement, "", "", 0);
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";   
    EXPECT_STREQ(expectedBuf, out.c_str());
    ca2.name = "ca2Name";
@@ -191,7 +198,7 @@ TEST(AppendContextElementRequest, check_json)
    Metadata  md2("", "mdType", "122");
 
    acer.domainMetadataVector.push_back(&md2);
-   out = acer.check(AppendContextElement, JSON, "", "", 0);
+   out = acer.check(&ci, AppendContextElement, "", "", 0);
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";   
    EXPECT_STREQ(expectedBuf, out.c_str());
 

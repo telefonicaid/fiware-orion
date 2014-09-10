@@ -72,7 +72,7 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
   if ((upcr.errorCode.code != SccOk) && (upcr.errorCode.code != SccNone))
   {
     upcr.errorCode.fill(SccContextElementNotFound, "");
-    answer = upcr.render(UpdateContext, ciP->outFormat, "");
+    answer = upcr.render(ciP, UpdateContext, "");
     return answer;
   }
 
@@ -132,7 +132,7 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     //
     // 3. Render an XML-string of the request we want to forward
     //
-    std::string payloadIn = ucrP->render(UpdateContext, XML, "");
+    std::string payloadIn = ucrP->render(ciP, UpdateContext, "");
 
     LM_T(LmtCtxProviders, ("payloadIn:\n%s", payloadIn.c_str()));
 
@@ -196,6 +196,6 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     }
   }
 
-  answer = upcr.render(UpdateContext, ciP->outFormat, "");
+  answer = upcr.render(ciP, UpdateContext, "");
   return answer;
 }

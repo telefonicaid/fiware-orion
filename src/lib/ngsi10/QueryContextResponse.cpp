@@ -31,6 +31,7 @@
 #include "rest/HttpStatusCode.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/QueryContextResponse.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -75,51 +76,32 @@ QueryContextResponse::~QueryContextResponse()
 *
 * QueryContextResponse::render - 
 */
-std::string QueryContextResponse::render(RequestType requestType, Format format, const std::string& indent)
+std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "queryContextResponse";
 
-  out += startTag(indent, tag, format, false);
+  out += startTag(indent, tag, ciP->outFormat, false);
 
   if (contextElementResponseVector.size() > 0)
   {
     bool commaNeeded = (errorCode.code != SccNone);
-    out += contextElementResponseVector.render(QueryContext, format, indent + "  ", commaNeeded);
+    out += contextElementResponseVector.render(ciP, QueryContext, indent + "  ", commaNeeded);
   }
 
   if (errorCode.code != SccNone)
   {
-    out += errorCode.render(format, indent + "  ");
+    out += errorCode.render(ciP->outFormat, indent + "  ");
   }
 
   /* Safety check: neither errorCode nor CER vector was filled by mongoBackend */
   if (errorCode.code == SccNone && contextElementResponseVector.size() == 0)
   {
       errorCode.fill(SccReceiverInternalError, "Both the error-code structure and the response vector were empty");
-      out += errorCode.render(format, indent + "  ");
+      out += errorCode.render(ciP->outFormat, indent + "  ");
   }
 
-#if 0
-  // I needed to adjust rednder function for details=on to work. Ken, please review that this code can be safely removed, after the
-  // above re-factoring
-  if ((errorCode.code == SccNone) || (errorCode.code == SccOk))
-  {
-    if (contextElementResponseVector.size() == 0)
-    {
-      errorCode.fill(SccContextElementNotFound);
-      out += errorCode.render(format, indent + "  ");
-    }
-    else 
-    {
-      out += contextElementResponseVector.render(QueryContext, format, indent + "  ");
-    }
-  }
-  else
-     out += errorCode.render(format, indent + "  ");
-#endif
-
-  out += endTag(indent, tag, format);
+  out += endTag(indent, tag, ciP->outFormat);
 
   return out;
 }
@@ -130,7 +112,7 @@ std::string QueryContextResponse::render(RequestType requestType, Format format,
 *
 * QueryContextResponse::check -
 */
-std::string QueryContextResponse::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string QueryContextResponse::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string           res;
 
@@ -138,7 +120,7 @@ std::string QueryContextResponse::check(RequestType requestType, Format format, 
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (contextElementResponseVector.check(QueryContext, format, indent, predetectedError, 0) != "OK")
+  else if (contextElementResponseVector.check(QueryContext, ciP->outFormat, indent, predetectedError, 0) != "OK")
   {
     LM_W(("Bad Input (%s)", res.c_str()));
     errorCode.fill(SccBadRequest, res);
@@ -146,7 +128,7 @@ std::string QueryContextResponse::check(RequestType requestType, Format format, 
   else
     return "OK";
 
-  return render(QueryContext, format, indent);
+  return render(ciP, QueryContext, indent);
 }
 
 
@@ -171,4 +153,5 @@ void QueryContextResponse::release(void)
 {
   contextElementResponseVector.release();
   errorCode.release();
+  errorCode.tagSet("errorCode");
 }

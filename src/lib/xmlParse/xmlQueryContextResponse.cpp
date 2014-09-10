@@ -347,7 +347,7 @@ void qcrsRelease(ParseData* parseDataP)
 */
 std::string qcrsCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
-  return parseDataP->qcrs.res.check(QueryContext, ciP->outFormat, "", parseDataP->errorString, 0);
+  return parseDataP->qcrs.res.check(ciP, QueryContext, "", parseDataP->errorString, 0);
 }
 
 
