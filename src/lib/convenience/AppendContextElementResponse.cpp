@@ -91,7 +91,7 @@ std::string AppendContextElementResponse::check
 
   if (predetectedError != "")
   {
-    errorCode.fill(SccBadRequest, predetectedError); 
+    errorCode.fill(SccBadRequest, predetectedError);
   }
   else if ((res = contextResponseVector.check(ciP, requestType, indent, "", counter)) != "OK")
   {

@@ -36,7 +36,7 @@
 
 /* ****************************************************************************
 *
-* UpdateContextElementResponse::UpdateContextElementResponse - 
+* UpdateContextElementResponse::UpdateContextElementResponse -
 */
 UpdateContextElementResponse::UpdateContextElementResponse()
 {
@@ -47,9 +47,14 @@ UpdateContextElementResponse::UpdateContextElementResponse()
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
-std::string UpdateContextElementResponse::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
+std::string UpdateContextElementResponse::render
+(
+  ConnectionInfo*     ciP,
+  RequestType         requestType,
+  const std::string&  indent
+)
 {
   std::string tag = "updateContextElementResponse";
   std::string out = "";
@@ -74,7 +79,7 @@ std::string UpdateContextElementResponse::render(ConnectionInfo* ciP, RequestTyp
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
 std::string UpdateContextElementResponse::check
 (
@@ -86,7 +91,7 @@ std::string UpdateContextElementResponse::check
 )
 {
   std::string res;
-  
+
   if (predetectedError != "")
   {
     errorCode.fill(SccBadRequest, predetectedError);
@@ -107,7 +112,7 @@ std::string UpdateContextElementResponse::check
 
 /* ****************************************************************************
 *
-* UpdateContextElementResponse::release - 
+* UpdateContextElementResponse::release -
 */
 void UpdateContextElementResponse::release(void)
 {

@@ -81,7 +81,7 @@ std::string ContextAttributeResponse::check
     statusCode.fill(SccBadRequest, res);
 
     //
-    // If this ContextAttributeResponse is part of an IndividualContextEntity, the complete rendered 
+    // If this ContextAttributeResponse is part of an IndividualContextEntity, the complete rendered
     // response is not desired, just the string returned from the check method
     //
     if (requestType == IndividualContextEntity)
@@ -89,7 +89,7 @@ std::string ContextAttributeResponse::check
       return res;
     }
   }
-  else 
+  else
   {
     return "OK";
   }

@@ -90,16 +90,17 @@ std::string AppendContextElementRequest::check
 {
   AppendContextElementResponse  response;
   std::string                   res;
+  Format                        fmt = ciP->outFormat;
 
   if (predetectedError != "")
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(AppendContextElement, ciP->outFormat, indent, predetectedError, counter)) != "OK")
+  else if ((res = contextAttributeVector.check(AppendContextElement, fmt, indent, predetectedError, counter)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }
-  else if ((res = domainMetadataVector.check(AppendContextElement, ciP->outFormat, indent, predetectedError, counter)) != "OK")
+  else if ((res = domainMetadataVector.check(AppendContextElement, fmt, indent, predetectedError, counter)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }
@@ -108,7 +109,7 @@ std::string AppendContextElementRequest::check
     return "OK";
   }
 
-   return response.render(ciP, requestType, indent);
+  return response.render(ciP, requestType, indent);
 }
 
 

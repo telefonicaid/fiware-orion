@@ -51,10 +51,14 @@ typedef struct UpdateContextElementResponse
 
   UpdateContextElementResponse();
 
-  std::string render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
-  std::string check(ConnectionInfo* ciP,  RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
-  void        present();
-  void        release();
+  std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
+  void         present();
+  void         release();
+  std::string  check(ConnectionInfo*     ciP,
+                     RequestType         requestType,
+                     const std::string&  indent,
+                     const std::string&  predetectedError,
+                     int                 counter);
 } UpdateContextElementResponse;
 
 #endif  // SRC_LIB_CONVENIENCE_UPDATECONTEXTELEMENTRESPONSE_H_
