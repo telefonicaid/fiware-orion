@@ -1,5 +1,5 @@
-#ifndef REGISTER_PROVIDER_REQUEST_H
-#define REGISTER_PROVIDER_REQUEST_H
+#ifndef SRC_LIB_CONVENIENCE_REGISTERPROVIDERREQUEST_H_
+#define SRC_LIB_CONVENIENCE_REGISTERPROVIDERREQUEST_H_
 
 /*
 *
@@ -50,9 +50,9 @@ typedef struct RegisterProviderRequest
   RegisterProviderRequest();
 
   std::string  render(Format format, std::string indent);
-  std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
+  std::string  check(RequestType requestType, Format format, std::string indent, std::string preError, int counter);
   void         present(std::string indent);
   void         release();
 } RegisterProviderRequest;
 
-#endif
+#endif  // SRC_LIB_CONVENIENCE_REGISTERPROVIDERREQUEST_H_

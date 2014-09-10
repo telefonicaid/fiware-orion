@@ -79,27 +79,37 @@ std::string AppendContextElementRequest::render(ConnectionInfo* ciP, RequestType
 *   }
 *
 */
-std::string AppendContextElementRequest::check(ConnectionInfo* ciP, RequestType requestType, std::string indent, std::string predetectedError, int counter)
+std::string AppendContextElementRequest::check
+(
+  ConnectionInfo*  ciP,
+  RequestType      requestType,
+  std::string      indent,
+  std::string      predetectedError,     // Predetected Error, normally during parsing
+  int              counter
+)
 {
-   AppendContextElementResponse  response;
-   std::string                   res;
+  AppendContextElementResponse  response;
+  std::string                   res;
+  Format                        fmt = ciP->outFormat;
 
-   if (predetectedError != "")
-   {
-     response.errorCode.fill(SccBadRequest, predetectedError);
-   }
-   else if ((res = contextAttributeVector.check(AppendContextElement, ciP->outFormat, indent, predetectedError, counter)) != "OK")
-   {
-     response.errorCode.fill(SccBadRequest, res);
-   }
-   else if ((res = domainMetadataVector.check(AppendContextElement, ciP->outFormat, indent, predetectedError, counter)) != "OK")
-   {
-     response.errorCode.fill(SccBadRequest, res);
-   }
-   else
-     return "OK";
-   
-   return response.render(ciP, requestType, indent);
+  if (predetectedError != "")
+  {
+    response.errorCode.fill(SccBadRequest, predetectedError);
+  }
+  else if ((res = contextAttributeVector.check(AppendContextElement, fmt, indent, predetectedError, counter)) != "OK")
+  {
+    response.errorCode.fill(SccBadRequest, res);
+  }
+  else if ((res = domainMetadataVector.check(AppendContextElement, fmt, indent, predetectedError, counter)) != "OK")
+  {
+    response.errorCode.fill(SccBadRequest, res);
+  }
+  else
+  {
+    return "OK";
+  }
+
+  return response.render(ciP, requestType, indent);
 }
 
 

@@ -1,5 +1,5 @@
-#ifndef UPDATE_CONTEXT_ELEMENT_REQUEST_H
-#define UPDATE_CONTEXT_ELEMENT_REQUEST_H
+#ifndef SRC_LIB_CONVENIENCE_UPDATECONTEXTELEMENTREQUEST_H_
+#define SRC_LIB_CONVENIENCE_UPDATECONTEXTELEMENTREQUEST_H_
 
 /*
 *
@@ -45,10 +45,14 @@ typedef struct UpdateContextElementRequest
   ContextAttributeVector     contextAttributeVector;     // Optional
   MetadataVector             domainMetadataVector;       // Optional
 
-  std::string render(ConnectionInfo* ciP, RequestType requestType, std::string indent);
-  std::string check(ConnectionInfo* ciP,  RequestType requestType, std::string indent, std::string predetectedError, int counter);
-  void        present(std::string indent);
-  void        release(void);
+  std::string  render(ConnectionInfo* ciP, RequestType requestType, std::string indent);
+  void         present(std::string indent);
+  void         release(void);
+  std::string  check(ConnectionInfo*  ciP,
+                     RequestType      requestType,
+                     std::string      indent,
+                     std::string      predetectedError,
+                     int              counter);
 } UpdateContextElementRequest;
 
-#endif
+#endif  // SRC_LIB_CONVENIENCE_UPDATECONTEXTELEMENTREQUEST_H_

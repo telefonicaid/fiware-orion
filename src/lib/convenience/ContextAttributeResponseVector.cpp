@@ -65,14 +65,23 @@ std::string ContextAttributeResponseVector::render(ConnectionInfo* ciP, RequestT
 *
 * ContextAttributeResponseVector::check - 
 */
-std::string ContextAttributeResponseVector::check(ConnectionInfo* ciP, RequestType request, std::string indent, std::string predetectedError, int counter)
+std::string ContextAttributeResponseVector::check
+(
+  ConnectionInfo*  ciP,
+  RequestType      request,
+  std::string      indent,
+  std::string      predetectedError,
+  int              counter
+)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     std::string res;
+    std::string res;
 
-     if ((res = vec[ix]->check(ciP, request, indent, predetectedError, counter)) != "OK")
-       return res;
+    if ((res = vec[ix]->check(ciP, request, indent, predetectedError, counter)) != "OK")
+    {
+      return res;
+    }
   }
 
   return "OK";
@@ -86,10 +95,12 @@ std::string ContextAttributeResponseVector::check(ConnectionInfo* ciP, RequestTy
 */
 void ContextAttributeResponseVector::present(std::string indent)
 {
-   PRINTF("%lu ContextAttributeResponses", (unsigned long) vec.size());
+  PRINTF("%lu ContextAttributeResponses", (uint64_t) vec.size());
 
-   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-      vec[ix]->present(indent + "  ");
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    vec[ix]->present(indent + "  ");
+  }
 }
 
 
