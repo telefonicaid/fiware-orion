@@ -1,5 +1,5 @@
-#ifndef UPDATE_CONTEXT_ATTRIBUTE_REQUEST_H
-#define UPDATE_CONTEXT_ATTRIBUTE_REQUEST_H
+#ifndef SRC_LIB_CONVENIENCE_UPDATECONTEXTATTRIBUTEREQUEST_H_
+#define SRC_LIB_CONVENIENCE_UPDATECONTEXTATTRIBUTEREQUEST_H_
 
 /*
 *
@@ -42,12 +42,12 @@ typedef struct UpdateContextAttributeRequest
   std::string                type;                // Optional
   std::string                contextValue;        // Mandatory
   MetadataVector             metadataVector;      // Optional
-  
+
   UpdateContextAttributeRequest();
   std::string  render(Format format, std::string indent);
-  std::string  check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
+  std::string  check(RequestType requestType, Format format, std::string indent, std::string preError, int counter);
   void         present(std::string indent);
   void         release();
 } UpdateContextAttributeRequest;
 
-#endif
+#endif  // SRC_LIB_CONVENIENCE_UPDATECONTEXTATTRIBUTEREQUEST_H_

@@ -68,23 +68,32 @@ std::string UpdateContextElementRequest::render(RequestType requestType, Format 
 *   }
 *
 */
-std::string UpdateContextElementRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string UpdateContextElementRequest::check
+(
+  RequestType  requestType,
+  Format       format,
+  std::string  indent,
+  std::string  preError,      // Predetected Error, normally during parsing
+  int          counter
+)
 {
-   UpdateContextElementResponse  response;
-   std::string                   res;
+  UpdateContextElementResponse  response;
+  std::string                   res;
 
-   if (predetectedError != "")
-   {
-     response.errorCode.fill(SccBadRequest, predetectedError);
-   }
-   else if ((res = contextAttributeVector.check(UpdateContextElement, format, indent, predetectedError, counter)) != "OK")
-   {
-     response.errorCode.fill(SccBadRequest, res);
-   }
-   else
-     return "OK";
-   
-   return response.render(requestType, format, indent);
+  if (preError != "")
+  {
+    response.errorCode.fill(SccBadRequest, preError);
+  }
+  else if ((res = contextAttributeVector.check(UpdateContextElement, format, indent, preError, counter)) != "OK")
+  {
+    response.errorCode.fill(SccBadRequest, res);
+  }
+  else
+  {
+    return "OK";
+  }
+
+  return response.render(requestType, format, indent);
 }
 
 

@@ -58,14 +58,17 @@ std::string AppendContextElementResponse::render(RequestType requestType, Format
   out += startTag(indent, tag, format, false);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
+  {
     out += errorCode.render(format, indent + "  ");
+  }
   else
+  {
     out += contextResponseVector.render(requestType, format, indent + "  ");
+  }
 
   out += endTag(indent, tag, format);
 
   return out;
-
 }
 
 
@@ -74,16 +77,29 @@ std::string AppendContextElementResponse::render(RequestType requestType, Format
 *
 * AppendContextElementResponse::check - 
 */
-std::string AppendContextElementResponse::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string AppendContextElementResponse::check
+(
+  RequestType  requestType,
+  Format       format,
+  std::string  indent,
+  std::string  predetectedError,
+  int          counter
+)
 {
   std::string res;
-  
+
   if (predetectedError != "")
-    errorCode.fill(SccBadRequest, predetectedError); 
+  {
+    errorCode.fill(SccBadRequest, predetectedError);
+  }
   else if ((res = contextResponseVector.check(requestType, format, indent, "", counter)) != "OK")
+  {
     errorCode.fill(SccBadRequest, res);
+  }
   else
+  {
     return "OK";
+  }
 
   return render(requestType, format, indent);
 }

@@ -50,19 +50,23 @@ UpdateContextElementResponse::UpdateContextElementResponse()
 */
 std::string UpdateContextElementResponse::render(RequestType requestType, Format format, const std::string& indent)
 {
-   std::string tag = "updateContextElementResponse";
-   std::string out = "";
+  std::string tag = "updateContextElementResponse";
+  std::string out = "";
 
-   out += startTag(indent, tag, format, false);
+  out += startTag(indent, tag, format, false);
 
-   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
-     out += errorCode.render(format, indent + "  ");
-   else
-     out += contextAttributeResponseVector.render(requestType, format, indent + "  ");
+  if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
+  {
+    out += errorCode.render(format, indent + "  ");
+  }
+  else
+  {
+    out += contextAttributeResponseVector.render(requestType, format, indent + "  ");
+  }
 
-   out += endTag(indent, tag, format);
+  out += endTag(indent, tag, format);
 
-   return out;
+  return out;
 }
 
 
@@ -71,16 +75,29 @@ std::string UpdateContextElementResponse::render(RequestType requestType, Format
 *
 * check - 
 */
-std::string UpdateContextElementResponse::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextElementResponse::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  preError,           // Predetected Error, normally during parsing
+  int                 counter
+)
 {
   std::string res;
-  
-  if (predetectedError != "")
-    errorCode.fill(SccBadRequest, predetectedError);
+
+  if (preError != "")
+  {
+    errorCode.fill(SccBadRequest, preError);
+  }
   else if ((res = contextAttributeResponseVector.check(requestType, format, indent, "", counter)) != "OK")
+  {
     errorCode.fill(SccBadRequest, res);
+  }
   else
+  {
     return "OK";
+  }
 
   return render(requestType, format, indent);
 }

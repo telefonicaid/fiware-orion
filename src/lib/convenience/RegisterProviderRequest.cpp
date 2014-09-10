@@ -65,8 +65,8 @@ std::string RegisterProviderRequest::render(Format format, std::string indent)
   bool         registrationIdRendered         = registrationId.get() != "";
   bool         commaAfterRegistrationId       = false;    // Last element
   bool         commaAfterProvidingApplication = registrationIdRendered;
-  bool         commaAfterDuration             = registrationIdRendered || providingApplicationRendered;
-  bool         commaAfterMetadataVector       = registrationIdRendered || providingApplicationRendered || durationRendered;
+  bool         commaAfterDuration             = commaAfterProvidingApplication || providingApplicationRendered;
+  bool         commaAfterMetadataVector       = commaAfterDuration || durationRendered;
 
   out += startTag(indent, xmlTag, "", format, false, false);
   out += metadataVector.render(format,       indent + "  ", commaAfterMetadataVector);
@@ -75,7 +75,7 @@ std::string RegisterProviderRequest::render(Format format, std::string indent)
   out += registrationId.render(RegisterContext, format,       indent + "  ", commaAfterRegistrationId);
   out += endTag(indent, xmlTag, format, false);
 
-  return out;   
+  return out;
 }
 
 
@@ -84,27 +84,37 @@ std::string RegisterProviderRequest::render(Format format, std::string indent)
 *
 * RegisterProviderRequest::check - 
 */
-std::string RegisterProviderRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string RegisterProviderRequest::check
+(
+  RequestType  requestType,
+  Format       format,
+  std::string  indent,
+  std::string  predetectedError,
+  int          counter
+)
 {
-   DiscoverContextAvailabilityResponse  response;
-   std::string                          res;
+  DiscoverContextAvailabilityResponse  response;
+  std::string                          res;
 
-   if (predetectedError != "")
-   {
-     response.errorCode.fill(SccBadRequest, predetectedError);
-   }
-   else if (((res = metadataVector.check(requestType, format, indent, "", counter))  != "OK") ||
-            ((res = duration.check(requestType, format, indent, "", 0))              != "OK") ||
-            ((res = providingApplication.check(requestType, format, indent, "", 0))  != "OK") ||
-            ((res = registrationId.check(requestType, format, indent, "", 0))        != "OK"))
-   {
-     response.errorCode.fill(SccBadRequest, res);
-   }
-   else
-      return "OK";
+  if (predetectedError != "")
+  {
+    response.errorCode.fill(SccBadRequest, predetectedError);
+  }
+  else if (((res = metadataVector.check(requestType, format, indent, "", counter))  != "OK") ||
+           ((res = duration.check(requestType, format, indent, "", 0))              != "OK") ||
+           ((res = providingApplication.check(requestType, format, indent, "", 0))  != "OK") ||
+           ((res = registrationId.check(requestType, format, indent, "", 0))        != "OK"))
+  {
+    response.errorCode.fill(SccBadRequest, res);
+  }
+  else
+  {
+    return "OK";
+  }
 
-   LM_W(("Bad Input (RegisterProviderRequest Error: %s)", res.c_str()));
-   return response.render(DiscoverContextAvailability, format, indent);
+  LM_W(("Bad Input (RegisterProviderRequest Error: %s)", res.c_str()));
+
+  return response.render(DiscoverContextAvailability, format, indent);
 }
 
 
@@ -115,12 +125,12 @@ std::string RegisterProviderRequest::check(RequestType requestType, Format forma
 */
 void RegisterProviderRequest::present(std::string indent)
 {
-   PRINTF("%sRegisterProviderRequest:\n", indent.c_str());
-   metadataVector.present("Registration", indent + "  ");
-   duration.present(indent + "  ");
-   providingApplication.present(indent + "  ");
-   registrationId.present(indent + "  ");
-   PRINTF("\n");
+  PRINTF("%sRegisterProviderRequest:\n", indent.c_str());
+  metadataVector.present("Registration", indent + "  ");
+  duration.present(indent + "  ");
+  providingApplication.present(indent + "  ");
+  registrationId.present(indent + "  ");
+  PRINTF("\n");
 }
 
 
@@ -131,5 +141,5 @@ void RegisterProviderRequest::present(std::string indent)
 */
 void RegisterProviderRequest::release(void)
 {
-   metadataVector.release();
+  metadataVector.release();
 }

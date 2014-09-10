@@ -1,5 +1,5 @@
-#ifndef APPEND_CONTEXT_ELEMENT_REQUEST_H
-#define APPEND_CONTEXT_ELEMENT_REQUEST_H
+#ifndef SRC_LIB_CONVENIENCE_APPENDCONTEXTELEMENTREQUEST_H_
+#define SRC_LIB_CONVENIENCE_APPENDCONTEXTELEMENTREQUEST_H_
 
 /*
 *
@@ -43,14 +43,14 @@ typedef struct AppendContextElementRequest
 {
   AttributeDomainName        attributeDomainName;        // Optional
   ContextAttributeVector     contextAttributeVector;     // Optional
-  MetadataVector             domainMetadataVector;       // Optional  
+  MetadataVector             domainMetadataVector;       // Optional
 
   AppendContextElementRequest();
 
   std::string render(RequestType requestType, Format format, std::string indent);
-  std::string check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
+  std::string check(RequestType requestType, Format format, std::string indent, std::string preError, int counter);
   void        present(std::string indent);
   void        release();
 } AppendContextElementRequest;
 
-#endif
+#endif  // SRC_LIB_CONVENIENCE_APPENDCONTEXTELEMENTREQUEST_H_

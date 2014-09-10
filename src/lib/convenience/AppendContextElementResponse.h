@@ -1,5 +1,5 @@
-#ifndef APPEND_CONTEXT_ELEMENT_RESPONSE_H
-#define APPEND_CONTEXT_ELEMENT_RESPONSE_H
+#ifndef SRC_LIB_CONVENIENCE_APPENDCONTEXTELEMENTRESPONSE_H_
+#define SRC_LIB_CONVENIENCE_APPENDCONTEXTELEMENTRESPONSE_H_
 
 /*
 *
@@ -51,9 +51,9 @@ typedef struct AppendContextElementResponse
   AppendContextElementResponse();
 
   std::string render(RequestType requestType, Format format, std::string indent);
-  std::string check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter);
+  std::string check(RequestType requestType, Format format, std::string indent, std::string preError, int counter);
   void        present(void);
   void        release(void);
 } AppendContextElementResponse;
 
-#endif
+#endif  // SRC_LIB_CONVENIENCE_APPENDCONTEXTELEMENTRESPONSE_H_

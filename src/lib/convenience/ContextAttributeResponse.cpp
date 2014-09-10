@@ -59,30 +59,41 @@ std::string ContextAttributeResponse::render(RequestType request, Format format,
 *
 * check - 
 */
-std::string ContextAttributeResponse::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string ContextAttributeResponse::check
+(
+  RequestType  requestType,
+  Format       format,
+  std::string  indent,
+  std::string  predetectedError,
+  int          counter
+)
 {
-   std::string  res;
+  std::string  res;
 
-   if (predetectedError != "")
-   {
-     statusCode.fill(SccBadRequest, predetectedError);
-   }
-   else if ((res = contextAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
-   {
-     LM_W(("Bad Input (contextAttributeVector: '%s')", res.c_str()));
-     statusCode.fill(SccBadRequest, res);
+  if (predetectedError != "")
+  {
+    statusCode.fill(SccBadRequest, predetectedError);
+  }
+  else if ((res = contextAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    LM_W(("Bad Input (contextAttributeVector: '%s')", res.c_str()));
+    statusCode.fill(SccBadRequest, res);
 
-     //
-     // If this ContextAttributeResponse is part of an IndividualContextEntity, the complete rendered 
-     // response is not desired, just the string returned from the check method
-     //
-     if (requestType == IndividualContextEntity)
-       return res;
-   }
-   else 
-     return "OK";
+    //
+    // If this ContextAttributeResponse is part of an IndividualContextEntity, the complete rendered
+    // response is not desired, just the string returned from the check method
+    //
+    if (requestType == IndividualContextEntity)
+    {
+      return res;
+    }
+  }
+  else
+  {
+    return "OK";
+  }
 
-   return render(requestType, format, indent);
+  return render(requestType, format, indent);
 }
 
 
@@ -105,5 +116,5 @@ void ContextAttributeResponse::present(std::string indent)
 */
 void ContextAttributeResponse::release(void)
 {
-   contextAttributeVector.release();
+  contextAttributeVector.release();
 }
