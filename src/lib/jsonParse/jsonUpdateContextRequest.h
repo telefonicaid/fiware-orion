@@ -1,5 +1,5 @@
-#ifndef JSON_UPDATE_CONTEXT_REQUEST_H
-#define JSON_UPDATE_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_JSONPARSE_JSONUPDATECONTEXTREQUEST_H_
+#define SRC_LIB_JSONPARSE_JSONUPDATECONTEXTREQUEST_H_
 
 /*
 *
@@ -71,4 +71,4 @@ extern std::string jsonUpcrCheck(ParseData* reqDataP, ConnectionInfo* ciP);
 */
 extern void jsonUpcrPresent(ParseData* reqDataP);
 
-#endif
+#endif  // SRC_LIB_JSONPARSE_JSONUPDATECONTEXTREQUEST_H_

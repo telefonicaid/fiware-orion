@@ -29,11 +29,10 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "ngsi/EntityId.h"
-#include "ngsi9/SubscribeContextAvailabilityRequest.h"
-#include "parse/nullTreat.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonSubscribeContextAvailabilityRequest.h"
+#include "ngsi/EntityId.h"
+#include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "parse/nullTreat.h"
 
 
@@ -67,10 +66,10 @@ static std::string entityId(const std::string& path, const std::string& value, P
 */
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->scar.entityIdP->id = value;
-   LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->scar.entityIdP->id.c_str()));
+  reqDataP->scar.entityIdP->id = value;
+  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->scar.entityIdP->id.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
@@ -81,10 +80,10 @@ static std::string entityIdId(const std::string& path, const std::string& value,
 */
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->scar.entityIdP->type = value;
-   LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->scar.entityIdP->type.c_str()));
+  reqDataP->scar.entityIdP->type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->scar.entityIdP->type.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
@@ -98,7 +97,9 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
   LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
 
   if (!isTrue(value) && !isFalse(value))
+  {
     return "invalid isPattern (boolean) value for entity: '" + value + "'";
+  }
 
   reqDataP->scar.entityIdP->isPattern = value;
 
@@ -293,9 +294,9 @@ void jsonScarRelease(ParseData* reqDataP)
 */
 std::string jsonScarCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-   std::string s;
-   s = reqData->scar.res.check(SubscribeContextAvailability, ciP->outFormat, "", reqData->errorString, 0);
-   return s;
+  std::string s;
+  s = reqData->scar.res.check(SubscribeContextAvailability, ciP->outFormat, "", reqData->errorString, 0);
+  return s;
 }
 
 
@@ -309,7 +310,9 @@ void jsonScarPresent(ParseData* reqDataP)
   printf("jsonScarPresent\n");
 
   if (!lmTraceIsSet(LmtDump))
+  {
     return;
+  }
 
   reqDataP->scar.res.present("");
 }

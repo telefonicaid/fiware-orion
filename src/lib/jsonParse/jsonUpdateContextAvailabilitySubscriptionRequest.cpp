@@ -29,11 +29,10 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "ngsi/EntityId.h"
-#include "ngsi9/SubscribeContextAvailabilityRequest.h"
-#include "parse/nullTreat.h"
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonUpdateContextAvailabilitySubscriptionRequest.h"
+#include "ngsi/EntityId.h"
+#include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "parse/nullTreat.h"
 
 
@@ -67,10 +66,10 @@ static std::string entityId(const std::string& path, const std::string& value, P
 */
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->ucas.entityIdP->id = value;
-   LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->ucas.entityIdP->id.c_str()));
+  reqDataP->ucas.entityIdP->id = value;
+  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->ucas.entityIdP->id.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
@@ -81,10 +80,10 @@ static std::string entityIdId(const std::string& path, const std::string& value,
 */
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->ucas.entityIdP->type = value;
-   LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->ucas.entityIdP->type.c_str()));
+  reqDataP->ucas.entityIdP->type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->ucas.entityIdP->type.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
@@ -292,9 +291,9 @@ void jsonUcasRelease(ParseData* reqDataP)
 */
 std::string jsonUcasCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-   std::string s;
-   s = reqData->ucas.res.check(SubscribeContextAvailability, ciP->outFormat, "", reqData->errorString, 0);
-   return s;
+  std::string s;
+  s = reqData->ucas.res.check(SubscribeContextAvailability, ciP->outFormat, "", reqData->errorString, 0);
+  return s;
 }
 
 
@@ -305,10 +304,11 @@ std::string jsonUcasCheck(ParseData* reqData, ConnectionInfo* ciP)
 */
 void jsonUcasPresent(ParseData* reqDataP)
 {
-  printf("jsonUcasPresent\n");
-
   if (!lmTraceIsSet(LmtDump))
+  {
     return;
+  }
 
+  printf("jsonUcasPresent\n");
   reqDataP->ucas.res.present("");
 }
