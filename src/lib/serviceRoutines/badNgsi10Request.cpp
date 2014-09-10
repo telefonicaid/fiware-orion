@@ -39,12 +39,23 @@
 *
 * badNgsi10Request - 
 */
-std::string badNgsi10Request(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string badNgsi10Request
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   std::string answer;
 
   LM_W(("Bad Input (service '%s' not found)", ciP->url.c_str()));
-  answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("ngsi10 service '") + ciP->url +"' not found");
+  answer = restErrorReplyGet(ciP,
+                             ciP->outFormat,
+                             "",
+                             ciP->payloadWord,
+                             SccBadRequest,
+                             std::string("ngsi10 service '") + ciP->url + "' not found");
 
   return answer;
 }

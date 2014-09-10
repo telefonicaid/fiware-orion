@@ -1,5 +1,5 @@
-#ifndef GET_CONTEXT_ENTITIY_ATTRIBUTES_H
-#define GET_CONTEXT_ENTITIY_ATTRIBUTES_H
+#ifndef SRC_LIB_SERVICEROUTINES_GETCONTEXTENTITYATTRIBUTES_H_
+#define SRC_LIB_SERVICEROUTINES_GETCONTEXTENTITYATTRIBUTES_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * getContextEntityAttributes - 
 */
-extern std::string getContextEntityAttributes(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string getContextEntityAttributes
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_GETCONTEXTENTITYATTRIBUTES_H_

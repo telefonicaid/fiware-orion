@@ -37,7 +37,13 @@
 *
 * postUpdateContextSubscription - 
 */
-std::string postUpdateContextSubscription(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string postUpdateContextSubscription
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   UpdateContextSubscriptionResponse  ucsr;
   std::string                        answer;
@@ -50,5 +56,6 @@ std::string postUpdateContextSubscription(ConnectionInfo* ciP, int components, s
   // flexible approach, to be implemented
   ciP->httpStatusCode = mongoUpdateContextSubscription(&parseDataP->ucsr.res, &ucsr, ciP->inFormat, ciP->tenant);
   answer = ucsr.render(UpdateContextSubscription, ciP->outFormat, "");
+
   return answer;
 }

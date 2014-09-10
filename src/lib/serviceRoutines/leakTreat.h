@@ -1,5 +1,5 @@
-#ifndef LEAK_TREAT_H
-#define LEAK_TREAT_H
+#ifndef SRC_LIB_SERVICEROUTINES_LEAKTREAT_H_
+#define SRC_LIB_SERVICEROUTINES_LEAKTREAT_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * leakTreat - 
 */
-extern std::string leakTreat(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string leakTreat
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_LEAKTREAT_H_

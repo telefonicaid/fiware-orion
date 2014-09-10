@@ -1,5 +1,5 @@
-#ifndef DELETE_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTE_H
-#define DELETE_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTE_H
+#ifndef SRC_LIB_SERVICEROUTINES_DELETEINDIVIDUALCONTEXTENTITYATTRIBUTE_H_
+#define SRC_LIB_SERVICEROUTINES_DELETEINDIVIDUALCONTEXTENTITYATTRIBUTE_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * deleteIndividualContextEntityAttribute - 
 */
-extern std::string deleteIndividualContextEntityAttribute(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string deleteIndividualContextEntityAttribute
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_DELETEINDIVIDUALCONTEXTENTITYATTRIBUTE_H_

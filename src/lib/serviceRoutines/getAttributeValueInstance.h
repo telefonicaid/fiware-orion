@@ -1,5 +1,5 @@
-#ifndef GET_ATTRIBUTE_VALUE_INSTANCE_H
-#define GET_ATTRIBUTE_VALUE_INSTANCE_H
+#ifndef SRC_LIB_SERVICEROUTINES_GETATTRIBUTEVALUEINSTANCE_H_
+#define SRC_LIB_SERVICEROUTINES_GETATTRIBUTEVALUEINSTANCE_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * getAttributeValueInstance - 
 */
-extern std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string getAttributeValueInstance
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_GETATTRIBUTEVALUEINSTANCE_H_

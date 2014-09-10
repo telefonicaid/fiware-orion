@@ -1,5 +1,5 @@
-#ifndef STATISTICS_TREAT_H
-#define STATISTICS_TREAT_H
+#ifndef SRC_LIB_SERVICEROUTINES_STATISTICSTREAT_H_
+#define SRC_LIB_SERVICEROUTINES_STATISTICSTREAT_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * statisticsTreat - 
 */
-extern std::string statisticsTreat(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string statisticsTreat
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_STATISTICSTREAT_H_

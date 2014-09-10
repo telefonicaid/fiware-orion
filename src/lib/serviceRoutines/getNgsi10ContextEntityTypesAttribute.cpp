@@ -41,15 +41,24 @@
 *
 * GET /ngsi10/contextEntityTypes/{typeName}/attributes/{attributeName}
 */
-std::string getNgsi10ContextEntityTypesAttribute(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string getNgsi10ContextEntityTypesAttribute
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   std::string typeName      = compV[2];
   std::string attributeName = compV[4];
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a  'GET' request for entity type '%s', attribute name '%s'", typeName.c_str(), attributeName.c_str()));
+  LM_T(LmtConvenience,
+       ("CONVENIENCE: got a  'GET' request for entity type '%s', attribute name '%s'",
+        typeName.c_str(), attributeName.c_str()));
+
   parseDataP->qcr.res.fill(".*", typeName, attributeName);
   std::string answer = postQueryContext(ciP, components, compV, parseDataP);
   parseDataP->qcr.res.release();
-  
+
   return answer;
 }

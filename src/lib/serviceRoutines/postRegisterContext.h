@@ -1,5 +1,5 @@
-#ifndef POST_REGISTER_CONTEXT_H
-#define POST_REGISTER_CONTEXT_H
+#ifndef SRC_LIB_SERVICEROUTINES_POSTREGISTERCONTEXT_H_
+#define SRC_LIB_SERVICEROUTINES_POSTREGISTERCONTEXT_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * postRegisterContext - 
 */
-extern std::string postRegisterContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string postRegisterContext
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_POSTREGISTERCONTEXT_H_

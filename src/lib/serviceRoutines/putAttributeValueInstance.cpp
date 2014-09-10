@@ -44,7 +44,13 @@
 *
 * Payload: UpdateContextAttributeRequest
 */
-std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string putAttributeValueInstance
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   UpdateContextRequest            request;
   UpdateContextResponse           response;
@@ -69,12 +75,18 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
       {
         std::string out;
 
-        out = restErrorReplyGet(ciP, ciP->outFormat, "", "StatusCode", SccBadRequest,
-                                std::string("unmatching metadata ID value URI/payload: '") + valueId + "' vs '" + mP->value + "'");
+        out = restErrorReplyGet(ciP,
+                                ciP->outFormat,
+                                "", "StatusCode",
+                                SccBadRequest,
+                                std::string("unmatching metadata ID value URI/payload: '") +
+                                  valueId + "' vs '" + mP->value + "'");
         return out;
       }
       else
+      {
         idFound = true;
+      }
     }
   }
 
@@ -101,23 +113,35 @@ std::string putAttributeValueInstance(ConnectionInfo* ciP, int components, std::
 
   response.errorCode.code = SccNone;
   ciP->httpStatusCode = mongoUpdateContext(&request, &response, ciP->tenant, ciP->servicePathV);
-  
+
   StatusCode statusCode;
   if (response.contextElementResponseVector.size() == 0)
-    statusCode.fill(SccContextElementNotFound, std::string("Entity-Attribute pair: '") + entityId + "-" + attributeName + "'");
+  {
+    statusCode.fill(SccContextElementNotFound,
+                    std::string("Entity-Attribute pair: '") + entityId + "-" + attributeName + "'");
+  }
   else if (response.contextElementResponseVector.size() == 1)
   {
     ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
 
     if (response.errorCode.code != SccNone)
+    {
       statusCode.fill(&response.errorCode);
+    }
     else if (cerP->statusCode.code != SccNone)
+    {
       statusCode.fill(&cerP->statusCode);
+    }
     else
+    {
       statusCode.fill(SccOk);
+    }
   }
   else
-    statusCode.fill(SccReceiverInternalError, "More than one response from putAttributeValueInstance::mongoUpdateContext");
+  {
+    statusCode.fill(SccReceiverInternalError,
+                    "More than one response from putAttributeValueInstance::mongoUpdateContext");
+  }
 
   request.release();
   return statusCode.render(ciP->outFormat, "", false, false);

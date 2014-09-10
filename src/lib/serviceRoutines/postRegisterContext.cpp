@@ -46,23 +46,30 @@
 * NOTE
 *   Used by registerContextForward
 */
-static std::string fordwardRegisterContext(char* host, int port, const std::string& tenant, const std::string& payload) {
+static std::string fordwardRegisterContext
+(
+  char*               host,
+  int                 port,
+  const std::string&  tenant,
+  const std::string&  payload
+)
+{
+  LM_T(LmtCm, ("forwarding registerContext to: host='%s', port=%d", fwdHost, fwdPort));
+  LM_T(LmtCm, ("payload (content-type: application/xml): '%s'", payload.c_str()));
+  std::string response = sendHttpSocket(fwdHost,
+                                        fwdPort,
+                                        "http:",
+                                        "POST",
+                                        tenant,
+                                        "ngsi9/registerContext",
+                                        // FIXME P3: unhardwire content type
+                                        std::string("application/xml"),
+                                        payload,
+                                        true);
 
-    LM_T(LmtCm, ("forwarding registerContext to: host='%s', port=%d", fwdHost, fwdPort));
-    LM_T(LmtCm, ("payload (content-type: application/xml): '%s'", payload.c_str()));
-    std::string response = sendHttpSocket(fwdHost,
-                                          fwdPort,
-                                          "http:",
-                                          "POST",
-                                          tenant,
-                                          "ngsi9/registerContext",
-                                          //FIXME P3: unhardwire content type
-                                          std::string("application/xml"),
-                                          payload,
-                                          true);
-    LM_T(LmtCm, ("response to forward registerContext: '%s'", response.c_str()));
+  LM_T(LmtCm, ("response to forward registerContext: '%s'", response.c_str()));
 
-    return response;
+  return response;
 }
 
 
@@ -74,7 +81,12 @@ static std::string fordwardRegisterContext(char* host, int port, const std::stri
 * NOTE
 *   Used by postRegisterContext
 */
-static void registerContextForward(ConnectionInfo* ciP, ParseData* parseDataP, RegisterContextResponse* rcrP)
+static void registerContextForward
+(
+  ConnectionInfo*           ciP,
+  ParseData*                parseDataP,
+  RegisterContextResponse*  rcrP
+)
 {
   /* Forward registerContext */
   if (parseDataP->rcr.res.registrationId.isEmpty())
@@ -97,22 +109,27 @@ static void registerContextForward(ConnectionInfo* ciP, ParseData* parseDataP, R
 
     if (payloadStart == NULL)
     {
-      LM_E(("Runtime Error (<registerContextResponse> not found in fordwardRegisterContext response '%s')", response.c_str()));
+      LM_E(("Runtime Error (<registerContextResponse> not found in fordwardRegisterContext response '%s')",
+            response.c_str()));
       return;
     }
 
     std::string  s = xmlTreat(payloadStart, ciP, &responseData, RegisterResponse, "", &reqP);
     if (s != "OK")
+    {
       LM_W(("Bad Input (error parsing registerContextResponse: %s)", s.c_str()));
+    }
     else
     {
       std::string fwdRegId = responseData.rcrs.res.registrationId.get();
       LM_T(LmtCm, ("forward regId is: '%s'", fwdRegId.c_str()));
       mongoSetFwdRegId(rcrP->registrationId.get(), fwdRegId, ciP->tenant);
     }
-      
+
     if (reqP != NULL)
+    {
       reqP->release(&responseData);
+    }
   }
   else
   {
@@ -131,9 +148,15 @@ static void registerContextForward(ConnectionInfo* ciP, ParseData* parseDataP, R
 
 /* ****************************************************************************
 *
-* postRegisterContext - 
+* postRegisterContext -
 */
-std::string postRegisterContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string postRegisterContext
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   RegisterContextResponse  rcr;
 
@@ -142,7 +165,9 @@ std::string postRegisterContext(ConnectionInfo* ciP, int components, std::vector
     registerContextForward(ciP, parseDataP, &rcr);
   }
   else
+  {
     ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->tenant);
+  }
 
   std::string answer = rcr.render(RegisterContext, ciP->outFormat, "");
 

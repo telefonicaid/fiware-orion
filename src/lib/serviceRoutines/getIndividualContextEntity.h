@@ -1,5 +1,5 @@
-#ifndef GET_INDIVIDUAL_CONTEXT_ENTITY_H
-#define GET_INDIVIDUAL_CONTEXT_ENTITY_H
+#ifndef SRC_LIB_SERVICEROUTINES_GETINDIVIDUALCONTEXTENTITY_H_
+#define SRC_LIB_SERVICEROUTINES_GETINDIVIDUALCONTEXTENTITY_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * getIndividualContextEntity - 
 */
-extern std::string getIndividualContextEntity(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string getIndividualContextEntity
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_GETINDIVIDUALCONTEXTENTITY_H_

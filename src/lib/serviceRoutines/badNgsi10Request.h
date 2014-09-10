@@ -1,5 +1,5 @@
-#ifndef BAD_NGSI10_REQUEST_H
-#define BAD_NGSI10_REQUEST_H
+#ifndef SRC_LIB_SERVICEROUTINES_BADNGSI10REQUEST_H_
+#define SRC_LIB_SERVICEROUTINES_BADNGSI10REQUEST_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * badNgsi10Request - 
 */
-extern std::string badNgsi10Request(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string badNgsi10Request
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_BADNGSI10REQUEST_H_

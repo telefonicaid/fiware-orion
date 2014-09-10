@@ -1,5 +1,5 @@
-#ifndef POST_UPDATE_CONTEXT_H
-#define POST_UPDATE_CONTEXT_H
+#ifndef SRC_LIB_SERVICEROUTINES_POSTUPDATECONTEXT_H_
+#define SRC_LIB_SERVICEROUTINES_POSTUPDATECONTEXT_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * postUpdateContext - 
 */
-extern std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string postUpdateContext
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_POSTUPDATECONTEXT_H_

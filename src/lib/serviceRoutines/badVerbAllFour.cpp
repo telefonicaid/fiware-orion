@@ -39,7 +39,13 @@
 *
 * badVerbAllFour - 
 */
-std::string badVerbAllFour(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string badVerbAllFour
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   ciP->httpHeader.push_back("Allow");
   ciP->httpHeaderValue.push_back("POST, GET, PUT, DELETE");

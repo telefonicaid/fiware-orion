@@ -38,15 +38,21 @@
 
 /* ****************************************************************************
 *
-* postContextEntityTypeAttribute - 
+* postContextEntityTypeAttribute -
 *
 * POST /ngsi9/contextEntityTypes/{typeName}/attributes/{attributeName}
 */
-std::string postContextEntityTypeAttribute(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string postContextEntityTypeAttribute
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   std::string  entityIdType   = compV[2];
-  std::string  attributeName  = compV[4];  
-  
+  std::string  attributeName  = compV[4];
+
   // Transform RegisterProviderRequest into RegisterContextRequest
   parseDataP->rcr.res.fill(parseDataP->rpr.res, "", entityIdType, attributeName);
 
