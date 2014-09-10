@@ -31,6 +31,7 @@
 #include "common/Format.h"
 #include "convenience/ContextAttributeResponseVector.h"
 #include "ngsi/StatusCode.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -50,8 +51,8 @@ typedef struct UpdateContextElementResponse
 
   UpdateContextElementResponse();
 
-  std::string render(RequestType requestType, Format format, const std::string& indent);
-  std::string check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
+  std::string check(ConnectionInfo* ciP,  RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void        present();
   void        release();
 } UpdateContextElementResponse;

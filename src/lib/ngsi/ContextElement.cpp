@@ -30,6 +30,7 @@
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/ContextElement.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -37,7 +38,7 @@
 *
 * ContextElement::render - 
 */
-std::string ContextElement::render(RequestType requestType, Format format, const std::string& indent, bool comma)
+std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma)
 {
   std::string  out                              = "";
   std::string  xmlTag                           = "contextElement";
@@ -51,14 +52,14 @@ std::string ContextElement::render(RequestType requestType, Format format, const
   bool         commaAfterAttributeDomainName    = domainMetadataVectorRendered || contextAttributeVectorRendered;
   bool         commaAfterEntityId               = domainMetadataVectorRendered || contextAttributeVectorRendered || attributeDomainNameRendered;
 
-  out += startTag(indent, xmlTag, jsonTag, format, false, true);
+  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
 
-  out += entityId.render(format,               indent + "  ", commaAfterEntityId, false);
-  out += attributeDomainName.render(format,    indent + "  ", commaAfterAttributeDomainName);
-  out += contextAttributeVector.render(requestType, format, indent + "  ", commaAfterContextAttributeVector);
-  out += domainMetadataVector.render(format,   indent + "  ", commaAfterDomainMetadataVector);
+  out += entityId.render(ciP->outFormat, indent + "  ", commaAfterEntityId, false);
+  out += attributeDomainName.render(ciP->outFormat, indent + "  ", commaAfterAttributeDomainName);
+  out += contextAttributeVector.render(ciP, requestType, indent + "  ", commaAfterContextAttributeVector);
+  out += domainMetadataVector.render(ciP->outFormat, indent + "  ", commaAfterDomainMetadataVector);
 
-  out += endTag(indent, xmlTag, format, comma, false);
+  out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
 
   return out;
 }

@@ -43,14 +43,14 @@ orionCurl --url "$url" --payload "${payload}" --out " "
 
 echo "1: ++++++++++++++++++++"
 
-# This test fails due to error in payload parsing
+# Fails due to error in payload parsing
 url="/NGSI10/queryContext"
 payload='no meaningful payload (failing tests)'
 orionCurl --url "$url" --payload "${payload}"
 
 echo "2: ++++++++++++++++++++"
 
-# This test that explicit "Accept: application/xml" is ok
+# Explicit "Accept: application/xml" is ok
 url="/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
@@ -65,7 +65,7 @@ orionCurl --url "$url" --payload "${payload}" --out "application/xml"
 
 echo "3: ++++++++++++++++++++"
 
-# This test uses a list in Accept which a valid type is found is ok
+# Uses a list in Accept which a valid type is found is ok
 url="/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
@@ -80,7 +80,7 @@ orionCurl --url "$url" --payload "${payload}" --out "text/plain, application/xml
 
 echo "4: ++++++++++++++++++++"
 
-# This test uses a list in Accept which a valid type is found is ok (with extra encoding after ";")
+# Uses a list in Accept which a valid type is found is ok (with extra encoding after ";")
 url="/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
@@ -95,21 +95,21 @@ orionCurl --url "$url" --payload "${payload}" --out "text/plain, application/xml
 
 echo "5: ++++++++++++++++++++"
 
-# This test uses a list in Accept with no valid type
+# Uses a list in Accept with no valid type
 url="/NGSI10/queryContext"
 payload='no meaningful payload (failing tests)'
 orionCurl --url "$url" --payload "${payload}" --out "text/plain, image/jpeg"
 
 echo "6: ++++++++++++++++++++"
 
-# This test uses a list in Accept with no valid type (with extra encoding after ";")
+# List in Accept with no valid type (with extra encoding after ";")
 url="/NGSI10/queryContext"
 payload='no meaningful payload (failing tests)'
 orionCurl --url "$url" --payload "${payload}" --out "text/plain, image/jpeg; charset=UTF-8"
 
 echo "7: ++++++++++++++++++++"
 
-# This test verifies that explicit "Accept: application/json" is ok
+# Verifies that explicit "Accept: application/json" is ok
 url="/NGSI10/queryContext"
 payload='{
 	"entities": [
@@ -123,23 +123,22 @@ payload='{
 orionCurl --url "$url" --payload "${payload}" --in "application/json" --out "application/json"
 
 echo "8: ++++++++++++++++++++"
+# Accept preference is correctly taken into account (XML preferred to JSON), order is JSON, XML
+url="/NGSI10/queryContext"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ]
+}'
+orionCurl --url "$url" --payload "${payload}" --in "application/json" --out "application/json, application/xml"
 
-# This test that Accept preference is correctly taken into account (JSON preferred to XML)
-# FIXME P6: Once issue #317 is fixed - move this test to use curlIt
-(curl localhost:${CB_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json, application/xml' -d @-) <<EOF
-{
-	"entities": [
-		{
-			"type": "Room",
-			"isPattern": "false",
-			"id": "OfficeRoom"
-		}
-	]
-}
-EOF
+
 echo "9: ++++++++++++++++++++"
-
-# This test that Accept preference is correctly taken into account (XML preferred to JSON)
+# Accept preference is correctly taken into account (XML preferred to JSON), order is XML, JSON
 url="/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
@@ -285,6 +284,12 @@ Date: REGEX(.*)
     }
 }
 8: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
 <queryContextResponse>
   <errorCode>
     <code>404</code>

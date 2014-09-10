@@ -34,7 +34,7 @@
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextResponse.h"
-
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -69,6 +69,7 @@ UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
 UpdateContextResponse::~UpdateContextResponse()
 {
   errorCode.release();
+//  errorCode.tagSet("errorCode");
   contextElementResponseVector.release();
   LM_T(LmtDestructor, ("destroyed"));
 }
@@ -79,29 +80,29 @@ UpdateContextResponse::~UpdateContextResponse()
 *
 * UpdateContextResponse::render - 
 */
-std::string UpdateContextResponse::render(RequestType requestType, Format format, const std::string& indent)
+std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "updateContextResponse";
 
-  out += startTag(indent, tag, format, false);
+  out += startTag(indent, tag, ciP->outFormat, false);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(format, indent + "  ");
+    out += errorCode.render(ciP->outFormat, indent + "  ");
   }
   else
   {
     if (contextElementResponseVector.size() == 0)
     {
       errorCode.fill(SccContextElementNotFound);
-      out += errorCode.render(format, indent + "  ");
+      out += errorCode.render(ciP->outFormat, indent + "  ");
     }
     else
-      out += contextElementResponseVector.render(UpdateContext, format, indent + "  ");
+      out += contextElementResponseVector.render(ciP, UpdateContext, indent + "  ");
   }
   
-  out += endTag(indent, tag, format);
+  out += endTag(indent, tag, ciP->outFormat);
 
   return out;
 }
@@ -114,8 +115,8 @@ std::string UpdateContextResponse::render(RequestType requestType, Format format
 */
 std::string UpdateContextResponse::check
 (
+  ConnectionInfo*     ciP,
   RequestType         requestType,
-  Format              format,
   const std::string&  indent,
   const std::string&  predetectedError,
   int                 counter
@@ -127,7 +128,7 @@ std::string UpdateContextResponse::check
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (contextElementResponseVector.check(UpdateContext, format, indent, predetectedError, 0) != "OK")
+  else if (contextElementResponseVector.check(UpdateContext, ciP->outFormat, indent, predetectedError, 0) != "OK")
   {
     LM_W(("Bad Input (%s)", res.c_str()));
     errorCode.fill(SccBadRequest, res);
@@ -135,7 +136,7 @@ std::string UpdateContextResponse::check
   else
     return "OK";
 
-  return render(UpdateContext, format, indent);
+  return render(ciP, UpdateContext, indent);
 }
 
 

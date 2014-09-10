@@ -347,7 +347,7 @@ void upcrsRelease(ParseData* parseDataP)
 */
 std::string upcrsCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
-  return parseDataP->upcrs.res.check(UpdateContext, ciP->outFormat, "", parseDataP->errorString, 0);
+  return parseDataP->upcrs.res.check(ciP, UpdateContext, "", parseDataP->errorString, 0);
 }
 
 

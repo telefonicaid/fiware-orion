@@ -61,7 +61,7 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
   // If no redirectioning is necessary, just return the result
   if (qcr.errorCode.code != SccFound)
   {
-    answer = qcr.render(QueryContext, ciP->outFormat, "");
+    answer = qcr.render(ciP, QueryContext, "");
     return answer;
   }
 
@@ -73,7 +73,7 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
   std::string     prefix;
 
   //
-  // A has been found on some context provider.
+  // An entity/attribute has been found on some context provider.
   // We need to forward the query request to the context provider, indicated in qcr.errorCode.details.
   //
   // 1. Parse the providing application to extract IP, port and URI-path
@@ -97,7 +97,7 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
     //  SccBadRequest should have been returned before, when it was registered!
 
     qcrs.errorCode.fill(SccContextElementNotFound, "");
-    answer = qcrs.render(QueryContext, ciP->outFormat, "");
+    answer = qcrs.render(ciP, QueryContext, "");
     return answer;
   }
 
@@ -120,7 +120,7 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
 
     LM_E(("Runtime Error (error rendering forward-request)"));
     qcrs.errorCode.fill(SccContextElementNotFound, "");
-    answer = qcrs.render(QueryContext, ciP->outFormat, "");
+    answer = qcrs.render(ciP, QueryContext, "");
     return answer;
   }
 
@@ -141,7 +141,7 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
     QueryContextResponse qcrs;
 
     qcrs.errorCode.fill(SccContextElementNotFound, "");
-    answer = qcrs.render(QueryContext, ciP->outFormat, "");
+    answer = qcrs.render(ciP, QueryContext, "");
     LM_E(("Runtime Error (error forwarding 'Query' to providing application)"));
     return answer;
   }
@@ -163,7 +163,7 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
 
     qcrs.errorCode.fill(SccContextElementNotFound, "");
     LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
-    answer = qcrs.render(QueryContext, ciP->outFormat, "");
+    answer = qcrs.render(ciP, QueryContext, "");
     return answer;
   }
 
@@ -189,6 +189,6 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
     qcrsP->contextElementResponseVector[0]->statusCode.details = "Redirected to context provider " + ip + ":" + portV + prefix;
   }
 
-  answer = qcrsP->render(QueryContext, ciP->outFormat, "");
+  answer = qcrsP->render(ciP, QueryContext, "");
   return answer;
 }

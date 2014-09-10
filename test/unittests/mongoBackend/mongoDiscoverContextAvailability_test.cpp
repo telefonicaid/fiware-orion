@@ -199,7 +199,7 @@ static void prepareDatabase(void) {
               "contextRegistration" << BSON_ARRAY(cr5)
               );
 
-  /* This associations relates E1.A4 (in cr2) -> E2.A1 (in cr1) */
+  /* This association relates E1.A4 (in cr2) -> E2.A1 (in cr1) */
   BSONObj assoc = BSON(
               "_id" << "assoc1" <<
               "srcEnt" << BSON("id" << "E1" << "type" << "T1") <<
@@ -2405,6 +2405,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, sourceAssociations)
   /* Prepare database */
   prepareDatabase();
 
+  /* This associations relates E1.A4 (in cr2) -> E2.A1 (in cr1) */
+
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E2", "T2");
   req.entityIdVector.push_back(&en);
@@ -2461,6 +2463,54 @@ TEST(mongoDiscoverContextAvailabilityRequest, sourceAssociations)
   EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
+
+  /* Release connection */
+  mongoDisconnect();
+
+  /* Delete mock */
+  delete timerMock;
+
+}
+
+/* ****************************************************************************
+*
+* sourceAssociationsFails -
+*
+*/
+TEST(mongoDiscoverContextAvailabilityRequest, sourceAssociationsFails)
+{
+  HttpStatusCode                       ms;
+  DiscoverContextAvailabilityRequest   req;
+  DiscoverContextAvailabilityResponse  res;
+
+  /* Prepare database */
+  prepareDatabase();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E2", "T3");
+  req.entityIdVector.push_back(&en);
+  req.attributeList.push_back("A1");
+  Scope sc(SCOPE_TYPE_ASSOC, "SOURCES");
+  req.restriction.scopeVector.push_back(&sc);
+
+  /* Prepare mock */
+  TimerMock* timerMock = new TimerMock();
+  ON_CALL(*timerMock, getCurrentTime())
+          .WillByDefault(Return(1360232700));
+  setTimer(timerMock);
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(404, res.errorCode.code);
+  EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("Could not query association with combination of entity/attribute", res.errorCode.details);
+
+  ASSERT_EQ(0, res.responseVector.size());
+
 
   /* Release connection */
   mongoDisconnect();

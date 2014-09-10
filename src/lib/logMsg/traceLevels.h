@@ -74,6 +74,7 @@ typedef enum TraceLevels
   LmtCompoundValueContainer,
   LmtCompoundValueStep,
   LmtCompoundValueShow = 55,
+  LmtJsonAttributes,
 
   /* RestService and Service (60-79) */
   LmtService     = 60,

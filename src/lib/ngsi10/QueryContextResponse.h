@@ -32,6 +32,7 @@
 #include "ngsi/ContextElementResponseVector.h"
 #include "common/Format.h"
 #include "ngsi/StatusCode.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -52,8 +53,8 @@ typedef struct QueryContextResponse
   QueryContextResponse(StatusCode& _errorCode);
   ~QueryContextResponse();
 
-  std::string   render(RequestType requestType, Format format, const std::string& indent);  
-  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string   render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);  
+  std::string   check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(const std::string& indent);
   void          release(void);  
 } QueryContextResponse;
