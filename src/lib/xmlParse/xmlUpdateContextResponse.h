@@ -1,9 +1,9 @@
-#ifndef UPDATE_CONTEXT_RESPONSE_H
-#define UPDATE_CONTEXT_RESPONSE_H
+#ifndef XML_UPDATE_CONTEXT_RESPONSE_H
+#define XML_UPDATE_CONTEXT_RESPONSE_H
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -26,32 +26,48 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <vector>
 
-#include "ngsi/ContextElementResponseVector.h"
-#include "common/Format.h"
-#include "ngsi/StatusCode.h"
-#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
+#include "xmlParse/XmlNode.h"
 
 
 
 /* ****************************************************************************
 *
-* UpdateContextResponse - 
+* upcrsParseVector - 
 */
-typedef struct UpdateContextResponse
-{
-  ContextElementResponseVector  contextElementResponseVector;  // Optional
-  StatusCode                    errorCode;                     // Optional
+extern XmlNode upcrsParseVector[];
 
-  UpdateContextResponse();
-  UpdateContextResponse(StatusCode& _errorCode);
-  ~UpdateContextResponse();
 
-  std::string   render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);  
-  std::string   check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
-  void          present(const std::string& indent);
-  void          release(void);
-} UpdateContextResponse;
+
+/* ****************************************************************************
+*
+* upcrsInit - 
+*/
+extern void upcrsInit(ParseData* reqData);
+
+
+
+/* ****************************************************************************
+*
+* upcrsRelease - 
+*/
+extern void upcrsRelease(ParseData* reqData);
+
+
+
+/* ****************************************************************************
+*
+* upcrsCheck - 
+*/
+extern std::string upcrsCheck(ParseData* reqData, ConnectionInfo* ciP);
+
+
+
+/* ****************************************************************************
+*
+* upcrsPresent - 
+*/
+extern void upcrsPresent(ParseData* reqData);
 
 #endif

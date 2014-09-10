@@ -52,6 +52,8 @@ typedef struct ContextElement
   std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void         present(const std::string& indent, int ix);
   void         release(void);
+  void         fill(const struct ContextElement& ce);
+  void         fill(ContextElement* ceP);
 } ContextElement;
 
 #endif

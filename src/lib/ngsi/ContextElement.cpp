@@ -114,3 +114,31 @@ void ContextElement::present(const std::string& indent, int ix)
   contextAttributeVector.present(indent + "  ");
   domainMetadataVector.present("Domain", indent + "  ");
 }
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::fill - 
+*/
+void ContextElement::fill(const struct ContextElement& ce)
+{
+  entityId.fill(&ce.entityId);
+  attributeDomainName.fill(ce.attributeDomainName);
+  contextAttributeVector.fill((ContextAttributeVector*) &ce.contextAttributeVector);
+  domainMetadataVector.fill((MetadataVector*) &ce.domainMetadataVector);
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::fill - 
+*/
+void ContextElement::fill(ContextElement* ceP)
+{
+  entityId.fill(&ceP->entityId);
+  attributeDomainName.fill(ceP->attributeDomainName);
+  contextAttributeVector.fill((ContextAttributeVector*) &ceP->contextAttributeVector);
+  domainMetadataVector.fill((MetadataVector*) &ceP->domainMetadataVector);
+}

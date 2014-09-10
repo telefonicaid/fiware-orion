@@ -129,3 +129,14 @@ void AttributeDomainName::release(void)
 {
    /* This method is included for the sake of homogeneity */
 }
+
+
+
+/* ****************************************************************************
+*
+* fill - 
+*/
+void AttributeDomainName::fill(const AttributeDomainName& adn)
+{
+  string = adn.string;
+}

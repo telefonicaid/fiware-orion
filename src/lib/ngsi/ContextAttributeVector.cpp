@@ -234,11 +234,11 @@ void ContextAttributeVector::release(void)
 *
 * ContextAttributeVector::fill - 
 */
-void ContextAttributeVector::fill(ContextAttributeVector& caV)
+void ContextAttributeVector::fill(ContextAttributeVector* cavP)
 {
-  for (unsigned int ix = 0; ix < caV.size(); ++ix)
+  for (unsigned int ix = 0; ix < cavP->size(); ++ix)
   {
-    ContextAttribute* caP = new ContextAttribute(caV.get(ix));
+    ContextAttribute* caP = new ContextAttribute(cavP->get(ix));
 
     push_back(caP);
   }

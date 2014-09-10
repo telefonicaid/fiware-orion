@@ -164,11 +164,11 @@ void MetadataVector::release(void)
 *
 * MetadataVector::fill - 
 */
-void MetadataVector::fill(MetadataVector& mV)
+void MetadataVector::fill(struct MetadataVector* mvP)
 {
-  for (unsigned int ix = 0; ix < mV.size(); ++ix)
+  for (unsigned int ix = 0; ix < mvP->size(); ++ix)
   {
-    Metadata* mP = new Metadata(mV.get(ix));
+    Metadata* mP = new Metadata(mvP->get(ix));
 
     push_back(mP);
   }
