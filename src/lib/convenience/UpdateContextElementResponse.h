@@ -1,5 +1,5 @@
-#ifndef UPDATE_CONTEXT_ELEMENT_RESPONSE_H
-#define UPDATE_CONTEXT_ELEMENT_RESPONSE_H
+#ifndef SRC_LIB_CONVENIENCE_UPDATECONTEXTELEMENTRESPONSE_H_
+#define SRC_LIB_CONVENIENCE_UPDATECONTEXTELEMENTRESPONSE_H_
 
 /*
 *
@@ -46,8 +46,8 @@
 */
 typedef struct UpdateContextElementResponse
 {
-  ContextAttributeResponseVector   contextAttributeResponseVector; // Optional, but mandatory if success
-  StatusCode                       errorCode;                      // Optional, but mandatory if failure
+  ContextAttributeResponseVector   contextAttributeResponseVector;  // Optional, but mandatory if success
+  StatusCode                       errorCode;                       // Optional, but mandatory if failure
 
   UpdateContextElementResponse();
 
@@ -57,4 +57,4 @@ typedef struct UpdateContextElementResponse
   void        release();
 } UpdateContextElementResponse;
 
-#endif
+#endif  // SRC_LIB_CONVENIENCE_UPDATECONTEXTELEMENTRESPONSE_H_

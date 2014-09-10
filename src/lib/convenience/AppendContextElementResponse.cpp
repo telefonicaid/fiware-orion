@@ -59,14 +59,17 @@ std::string AppendContextElementResponse::render(ConnectionInfo* ciP, RequestTyp
   out += startTag(indent, tag, ciP->outFormat, false);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
+  {
     out += errorCode.render(ciP->outFormat, indent + "  ");
+  }
   else
+  {
     out += contextResponseVector.render(ciP, requestType, indent + "  ");
+  }
 
   out += endTag(indent, tag, ciP->outFormat);
 
   return out;
-
 }
 
 
@@ -75,16 +78,29 @@ std::string AppendContextElementResponse::render(ConnectionInfo* ciP, RequestTyp
 *
 * AppendContextElementResponse::check - 
 */
-std::string AppendContextElementResponse::check(ConnectionInfo* ciP, RequestType requestType, std::string indent, std::string predetectedError, int counter)
+std::string AppendContextElementResponse::check
+(
+  ConnectionInfo*  ciP,
+  RequestType      requestType,
+  std::string      indent,
+  std::string      predetectedError,
+  int              counter
+)
 {
   std::string res;
-  
+
   if (predetectedError != "")
+  {
     errorCode.fill(SccBadRequest, predetectedError); 
+  }
   else if ((res = contextResponseVector.check(ciP, requestType, indent, "", counter)) != "OK")
+  {
     errorCode.fill(SccBadRequest, res);
+  }
   else
+  {
     return "OK";
+  }
 
   return render(ciP, requestType, indent);
 }

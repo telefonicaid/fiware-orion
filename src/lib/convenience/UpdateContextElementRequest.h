@@ -1,5 +1,5 @@
-#ifndef UPDATE_CONTEXT_ELEMENT_REQUEST_H
-#define UPDATE_CONTEXT_ELEMENT_REQUEST_H
+#ifndef SRC_LIB_CONVENIENCE_UPDATECONTEXTELEMENTREQUEST_H_
+#define SRC_LIB_CONVENIENCE_UPDATECONTEXTELEMENTREQUEST_H_
 
 /*
 *
@@ -51,4 +51,4 @@ typedef struct UpdateContextElementRequest
   void        release(void);
 } UpdateContextElementRequest;
 
-#endif
+#endif  // SRC_LIB_CONVENIENCE_UPDATECONTEXTELEMENTREQUEST_H_

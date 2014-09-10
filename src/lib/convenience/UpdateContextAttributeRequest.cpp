@@ -72,13 +72,22 @@ std::string UpdateContextAttributeRequest::render(Format format, std::string ind
 *
 * check - 
 */
-std::string UpdateContextAttributeRequest::check(RequestType requestType, Format format, std::string indent, std::string predetectedError, int counter)
+std::string UpdateContextAttributeRequest::check
+(
+  RequestType  requestType,
+  Format       format,
+  std::string  indent,
+  std::string  predetectedError,
+  int          counter
+)
 {
   StatusCode       response;
   std::string      res;
 
   if (format == (Format) 0)
-     format = XML;
+  {
+    format = XML;
+  }
 
   if (predetectedError != "")
   {
@@ -93,8 +102,10 @@ std::string UpdateContextAttributeRequest::check(RequestType requestType, Format
     response.fill(SccBadRequest, res);
   }
   else
+  {
     return "OK";
-   
+  }
+
   return response.render(format, indent);
 }
 
@@ -119,5 +130,5 @@ void UpdateContextAttributeRequest::present(std::string indent)
 */
 void UpdateContextAttributeRequest::release(void)
 {
-   metadataVector.release();
+  metadataVector.release();
 }

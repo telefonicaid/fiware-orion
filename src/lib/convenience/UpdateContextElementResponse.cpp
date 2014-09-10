@@ -51,19 +51,23 @@ UpdateContextElementResponse::UpdateContextElementResponse()
 */
 std::string UpdateContextElementResponse::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
 {
-   std::string tag = "updateContextElementResponse";
-   std::string out = "";
+  std::string tag = "updateContextElementResponse";
+  std::string out = "";
 
-   out += startTag(indent, tag, ciP->outFormat, false);
+  out += startTag(indent, tag, ciP->outFormat, false);
 
-   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
-     out += errorCode.render(ciP->outFormat, indent + "  ");
-   else
-     out += contextAttributeResponseVector.render(ciP, requestType, indent + "  ");
+  if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
+  {
+    out += errorCode.render(ciP->outFormat, indent + "  ");
+  }
+  else
+  {
+    out += contextAttributeResponseVector.render(ciP, requestType, indent + "  ");
+  }
 
-   out += endTag(indent, tag, ciP->outFormat);
+  out += endTag(indent, tag, ciP->outFormat);
 
-   return out;
+  return out;
 }
 
 
@@ -72,7 +76,14 @@ std::string UpdateContextElementResponse::render(ConnectionInfo* ciP, RequestTyp
 *
 * check - 
 */
-std::string UpdateContextElementResponse::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextElementResponse::check
+(
+  ConnectionInfo*     ciP,
+  RequestType         requestType,
+  const std::string&  indent,
+  const std::string&  predetectedError,  // Predetected Error, normally during parsing
+  int                 counter
+)
 {
   std::string res;
   
