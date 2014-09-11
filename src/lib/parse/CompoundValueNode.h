@@ -1,5 +1,5 @@
-#ifndef ORION_COMPOUND_VALUE
-#define ORION_COMPOUND_VALUE
+#ifndef SRC_LIB_PARSE_COMPOUNDVALUENODE_H_
+#define SRC_LIB_PARSE_COMPOUNDVALUENODE_H_
 
 /*
 *
@@ -34,7 +34,6 @@
 
 namespace orion
 {
-
 /* ****************************************************************************
 *
 * CompoundValueNode - 
@@ -77,61 +76,71 @@ namespace orion
 */
 class CompoundValueNode
 {
-public:
-   enum Type
-   {
-      Unknown,
-      String,
-      Object,
-      Vector
-   };
+ public:
+  enum Type
+  {
+    Unknown,
+    String,
+    Object,
+    Vector
+  };
 
-   // Tree fields
-   std::string                        name;
-   Type                               type;
-   std::string                        value;
-   std::vector<CompoundValueNode*>    childV;
+  // Tree fields
+  std::string                        name;
+  Type                               type;
+  std::string                        value;
+  std::vector<CompoundValueNode*>    childV;
 
 
-   // Auxiliar fields for creation of the tree
-   CompoundValueNode*                 container;
-   CompoundValueNode*                 rootP;
-   std::string                        error;
+  // Auxiliar fields for creation of the tree
+  CompoundValueNode*                 container;
+  CompoundValueNode*                 rootP;
+  std::string                        error;
 
-   // Needed for JSON rendering
-   int                                siblingNo;
+  // Needed for JSON rendering
+  int                                siblingNo;
 
-   // Fields that may not be necessary
-   // FIXME P4: when finally sure, remove the unnecessary fields
-   std::string                        path;
-   int                                level;
+  // Fields that may not be necessary
+  // FIXME P4: when finally sure, remove the unnecessary fields
+  std::string                        path;
+  int                                level;
 
-   // Constructors/Destructors   
-   CompoundValueNode();
-   CompoundValueNode(Type _type);
-   CompoundValueNode(CompoundValueNode* _container, const std::string& _path, const std::string& _name, const std::string& _value, int _siblingNo, Type _type, int _level = -1);
-   ~CompoundValueNode();
+  // Constructors/Destructors
+  CompoundValueNode();
+  explicit CompoundValueNode(Type _type);
 
-   CompoundValueNode*  clone(void);
-   CompoundValueNode*  add(CompoundValueNode* node);
-   CompoundValueNode*  add(const Type _type, const std::string& _name, const std::string& _value = "");
-   void                check(void);
-   std::string         finish(void);
-   std::string         render(Format format, const std::string& indent);
+  CompoundValueNode
+  (
+    CompoundValueNode*  _container,
+    const std::string&  _path,
+    const std::string&  _name,
+    const std::string&  _value,
+    int                 _siblingNo,
+    Type                _type,
+    int                 _level = -1);
 
-   static const char*  typeName(const Type _type);
-   void                shortShow(const std::string& indent);
-   void                show(const std::string& indent);
+  ~CompoundValueNode();
 
-   bool                isVector(void)   { return (type == Vector); }
-   bool                isObject(void)   { return (type == Object); }
-   bool                isString(void)   { return (type == String); }
+  CompoundValueNode*  clone(void);
+  CompoundValueNode*  add(CompoundValueNode* node);
+  CompoundValueNode*  add(const Type _type, const std::string& _name, const std::string& _value = "");
+  void                check(void);
+  std::string         finish(void);
+  std::string         render(Format format, const std::string& indent);
 
-   const char*         cname(void)  { return name.c_str();  };
-   const char*         cvalue(void) { return value.c_str(); };
-   const char*         cpath(void)  { return path.c_str();  };
+  static const char*  typeName(const Type _type);
+  void                shortShow(const std::string& indent);
+  void                show(const std::string& indent);
+
+  bool                isVector(void);
+  bool                isObject(void);
+  bool                isString(void);
+
+  const char*         cname(void);
+  const char*         cvalue(void);
+  const char*         cpath(void);
 };
 
-} // namespace orion
+}  // namespace orion
 
-#endif
+#endif  // SRC_LIB_PARSE_COMPOUNDVALUENODE_H_

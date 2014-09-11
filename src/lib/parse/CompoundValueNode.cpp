@@ -37,14 +37,12 @@
 
 namespace orion
 {
-
-
 /* ****************************************************************************
 *
-* CompoundValueNode - constructor for toplevel 'node' 
+* CompoundValueNode - constructor for toplevel 'node'
 */
 CompoundValueNode::CompoundValueNode()
-{  
+{
   rootP      = NULL;
   type       = Unknown;
   container  = NULL;
@@ -60,7 +58,7 @@ CompoundValueNode::CompoundValueNode()
 
 /* ****************************************************************************
 *
-* CompoundValueNode - constructor for toplevel 'node' 
+* CompoundValueNode - constructor for toplevel 'node'
 */
 CompoundValueNode::CompoundValueNode(Type _type)
 {
@@ -81,7 +79,16 @@ CompoundValueNode::CompoundValueNode(Type _type)
 *
 * CompoundValueNode - constructor for all nodes except toplevel
 */
-CompoundValueNode::CompoundValueNode(CompoundValueNode* _container, const std::string& _path, const std::string& _name, const std::string& _value, int _siblingNo, Type _type, int _level)
+CompoundValueNode::CompoundValueNode
+(
+  CompoundValueNode*  _container,
+  const std::string&  _path,
+  const std::string&  _name,
+  const std::string&  _value,
+  int                 _siblingNo,
+  Type                _type,
+  int                 _level
+)
 {
   container = _container;
   rootP     = container->rootP;
@@ -92,7 +99,11 @@ CompoundValueNode::CompoundValueNode(CompoundValueNode* _container, const std::s
   siblingNo = _siblingNo;
   type      = _type;
 
-  LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s", name.c_str(), level, siblingNo, typeName(type)));
+  LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s",
+                          name.c_str(),
+                          level,
+                          siblingNo,
+                          typeName(type)));
 }
 
 
@@ -105,7 +116,7 @@ CompoundValueNode::~CompoundValueNode()
 {
   LM_T(LmtCompoundValue, ("Destroying node '%s', path '%s'", name.c_str(), path.c_str()));
 
-  for (unsigned long ix = 0; ix < childV.size(); ++ix)
+  for (uint64_t ix = 0; ix < childV.size(); ++ix)
     delete childV[ix];
 
   childV.clear();
@@ -115,7 +126,7 @@ CompoundValueNode::~CompoundValueNode()
 
 /* ****************************************************************************
 *
-* typeName - 
+* typeName -
 */
 const char* CompoundValueNode::typeName(const Type _type)
 {
@@ -134,7 +145,7 @@ const char* CompoundValueNode::typeName(const Type _type)
 
 /* ****************************************************************************
 *
-* finish - 
+* finish -
 */
 std::string CompoundValueNode::finish(void)
 {
@@ -145,7 +156,7 @@ std::string CompoundValueNode::finish(void)
   if (lmTraceIsSet(LmtCompoundValueShow))
     show("");
 
-  check(); // sets 'error' for toplevel node
+  check();  // sets 'error' for toplevel node
 
   return error;
 }
@@ -154,7 +165,7 @@ std::string CompoundValueNode::finish(void)
 
 /* ****************************************************************************
 *
-* add - 
+* add -
 */
 CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
 {
@@ -164,9 +175,15 @@ CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
   node->rootP     = rootP;
 
   if (node->type == String)
-     LM_T(LmtCompoundValueAdd, ("Adding String '%s', with value '%s' under '%s' (%s)", node->name.c_str(), node->value.c_str(), node->container->path.c_str(), node->container->name.c_str()));
+    LM_T(LmtCompoundValueAdd, ("Adding String '%s', with value '%s' under '%s' (%s)",
+                               node->name.c_str(),
+                               node->value.c_str(),
+                               node->container->path.c_str(),
+                                node->container->name.c_str()));
   else
-     LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s' (%s)", typeName(node->type), node->name.c_str(), node->container->path.c_str(), node->container->name.c_str()));
+    LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s' (%s)", typeName(node->type), node->name.c_str(),
+                               node->container->path.c_str(),
+                               node->container->name.c_str()));
 
   childV.push_back(node);
   return node;
@@ -176,16 +193,25 @@ CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
 
 /* ****************************************************************************
 *
-* add - 
+* add -
 */
-CompoundValueNode* CompoundValueNode::add(const Type _type, const std::string& _name, const std::string& _value)
+CompoundValueNode* CompoundValueNode::add
+(
+  const Type          _type,
+  const std::string&  _name,
+  const std::string&  _value
+)
 {
   std::string newPath = path;
 
   if (newPath == "/")
-     newPath += _name;
+  {
+    newPath += _name;
+  }
   else
-     newPath += "/" + _name;
+  {
+    newPath += "/" + _name;
+  }
 
   CompoundValueNode* node = new CompoundValueNode(this, newPath, _name, _value, childV.size(), _type, level + 1);
 
@@ -196,39 +222,54 @@ CompoundValueNode* CompoundValueNode::add(const Type _type, const std::string& _
 
 /* ****************************************************************************
 *
-* shortShow - 
+* shortShow -
 */
 void CompoundValueNode::shortShow(const std::string& indent)
 {
   if ((rootP == this) && (type == Vector))
+  {
     LM_F(("%s%s (toplevel vector)", indent.c_str(), name.c_str()));
+  }
   else if (rootP == this)
+  {
     LM_F(("%s%s (toplevel object)", indent.c_str(), name.c_str()));
+  }
   else if (type == Vector)
+  {
     LM_F(("%s%s (vector)", indent.c_str(), name.c_str()));
+  }
   else if (type == Object)
+  {
     LM_F(("%s%s (object)", indent.c_str(), name.c_str()));
+  }
   else
+  {
     LM_F(("%s%s (%s)", indent.c_str(), name.c_str(), value.c_str()));
+  }
 
-  for (unsigned long ix = 0; ix < childV.size(); ++ix)
+  for (uint64_t ix = 0; ix < childV.size(); ++ix)
+  {
     childV[ix]->shortShow(indent + "  ");
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* show - 
+* show -
 */
 void CompoundValueNode::show(const std::string& indent)
 {
-
   if (name != "")
+  {
     LM_F(("%sname:      %s", indent.c_str(), name.c_str()));
+  }
 
   if (value != "")
+  {
     LM_F(("%svalue:     %s", indent.c_str(), value.c_str()));
+  }
 
   LM_F(("%scontainer: %s", indent.c_str(), container->name.c_str()));
   LM_F(("%slevel:     %d", indent.c_str(), level));
@@ -241,17 +282,21 @@ void CompoundValueNode::show(const std::string& indent)
   {
     std::string childrenString;
 
-    for (unsigned long ix = 0; ix < childV.size(); ++ix)
+    for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
       childrenString += childV[ix]->name;
       if (ix != childV.size() - 1)
+      {
         childrenString += ", ";
+      }
     }
 
     LM_F(("%s%lu children (%s)", indent.c_str(), childV.size(), childrenString.c_str()));
 
-    for (unsigned long ix = 0; ix < childV.size(); ++ix)
+    for (uint64_t ix = 0; ix < childV.size(); ++ix)
+    {
       childV[ix]->show(indent + "  ");
+    }
   }
 
   LM_F((""));
@@ -261,7 +306,7 @@ void CompoundValueNode::show(const std::string& indent)
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 *
 * A vector must have all its children with the same name.
 * An object cannot have two children with the same name.
@@ -273,13 +318,17 @@ void CompoundValueNode::check(void)
   if (type == Vector)
   {
     if (childV.size() == 0)
+    {
       return;
+    }
 
-    for (unsigned long ix = 1; ix < childV.size(); ++ix)
+    for (uint64_t ix = 1; ix < childV.size(); ++ix)
     {
       if (childV[ix]->name != childV[0]->name)
       {
-        rootP->error = std::string("bad tag-name of vector item: '") + childV[ix]->name + "' (should be '" + childV[0]->name + "')";
+        rootP->error =
+          std::string("bad tag-name of vector item: '") + childV[ix]->name + "' (should be '" + childV[0]->name + "')";
+
         LM_W(("Bad Input (%s)", rootP->error.c_str()));
         return;
       }
@@ -288,16 +337,19 @@ void CompoundValueNode::check(void)
   else if (type == Object)
   {
     if (childV.size() == 0)
-      return;
-
-    for (unsigned long ix = 0; ix < childV.size() - 1; ++ix)
     {
-      for (unsigned long ix2 = ix + 1; ix2 < childV.size(); ++ix2)
+      return;
+    }
+
+    for (uint64_t ix = 0; ix < childV.size() - 1; ++ix)
+    {
+      for (uint64_t ix2 = ix + 1; ix2 < childV.size(); ++ix2)
       {
         if (childV[ix]->name == childV[ix2]->name)
         {
           rootP->error = std::string("duplicated tag-name: '") + childV[ix]->name + "' in '" + path + "'";
           LM_W(("Bad Input (%s)", rootP->error.c_str()));
+
           return;
         }
       }
@@ -310,15 +362,17 @@ void CompoundValueNode::check(void)
   }
 
   // 'recursively' call the check method for all children
-  for (unsigned long ix = 0; ix < childV.size(); ++ix)
+  for (uint64_t ix = 0; ix < childV.size(); ++ix)
+  {
     childV[ix]->check();
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 std::string CompoundValueNode::render(Format format, const std::string& indent)
 {
@@ -335,22 +389,30 @@ std::string CompoundValueNode::render(Format format, const std::string& indent)
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
     out += startTag(indent, tagName, tagName, format, true, container->type == Object, true);
-    for (unsigned long ix = 0; ix < childV.size(); ++ix)
+    for (uint64_t ix = 0; ix < childV.size(); ++ix)
+    {
       out += childV[ix]->render(format, indent + "  ");
+    }
+
     out += endTag(indent, tagName, format, jsonComma, true, true);
   }
   else if ((type == Vector) && (container == this))
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s) and my container is TOPLEVEL", name.c_str()));
-    for (unsigned long ix = 0; ix < childV.size(); ++ix)
+    for (uint64_t ix = 0; ix < childV.size(); ++ix)
+    {
       out += childV[ix]->render(format, indent);
+    }
   }
   else if ((type == Object) && (container->type == Vector))
   {
     LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is a Vector", name.c_str()));
     out += startTag(indent, "item", "", format, false, false);
-    for (unsigned long ix = 0; ix < childV.size(); ++ix)
+    for (uint64_t ix = 0; ix < childV.size(); ++ix)
+    {
       out += childV[ix]->render(format, indent + "  ");
+    }
+
     out += endTag(indent, "item", format, jsonComma, false, true);
   }
   else if (type == Object)
@@ -360,16 +422,20 @@ std::string CompoundValueNode::render(Format format, const std::string& indent)
       LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is NOT a Vector", name.c_str()));
       out += startTag(indent, tagName, tagName, format, false, true);
 
-      for (unsigned long ix = 0; ix < childV.size(); ++ix)
+      for (uint64_t ix = 0; ix < childV.size(); ++ix)
+      {
         out += childV[ix]->render(format, indent + "  ");
+      }
 
       out += endTag(indent, tagName, format, jsonComma, false, true);
     }
     else
     {
       LM_T(LmtCompoundValueRender, ("I am the TREE ROOT (%s)", name.c_str()));
-      for (unsigned long ix = 0; ix < childV.size(); ++ix)
+      for (uint64_t ix = 0; ix < childV.size(); ++ix)
+      {
         out += childV[ix]->render(format, indent);
+      }
     }
   }
 
@@ -377,15 +443,17 @@ std::string CompoundValueNode::render(Format format, const std::string& indent)
 }
 
 
+
 /* ****************************************************************************
 *
-* clone - 
+* clone -
 */
 CompoundValueNode* CompoundValueNode::clone(void)
 {
   LM_T(LmtCompoundValue, ("cloning '%s'", name.c_str()));
 
-  CompoundValueNode* me = (rootP == this)? new CompoundValueNode(type) : new CompoundValueNode(container, path, name, value, siblingNo, type, level);
+  CompoundValueNode* me = (rootP == this)? new CompoundValueNode(type) :
+    new CompoundValueNode(container, path, name, value, siblingNo, type, level);
 
   for (unsigned int ix = 0; ix < childV.size(); ++ix)
   {
@@ -396,4 +464,69 @@ CompoundValueNode* CompoundValueNode::clone(void)
   return me;
 }
 
+
+
+/* ****************************************************************************
+*
+* isVector -
+*/
+bool CompoundValueNode::isVector(void)
+{
+  return (type == Vector);
+}
+
+
+
+/* ****************************************************************************
+*
+* isObject -
+*/
+bool CompoundValueNode::isObject(void)
+{
+  return (type == Object);
+}
+
+
+
+/* ****************************************************************************
+*
+* isString -
+*/
+bool CompoundValueNode::isString(void)
+{
+  return (type == String);
+}
+
+
+
+/* ****************************************************************************
+*
+* cname -
+*/
+const char* CompoundValueNode::cname(void)
+{
+  return name.c_str();
+}
+
+
+
+/* ****************************************************************************
+*
+* cvalue -
+*/
+const char* CompoundValueNode::cvalue(void)
+{
+  return value.c_str();
+}
+
+
+
+/* ****************************************************************************
+*
+* cpath -
+*/
+const char* CompoundValueNode::cpath(void)
+{
+  return path.c_str();
+}
 }
