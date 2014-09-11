@@ -152,15 +152,15 @@ orionCurl --url "$url" --payload "${payload}"
 echo "7: ++++++++++++++++++++"
 
 # Check that everything is ok at database layer
-mongoCmd ${BROKER_DATABASE_NAME} 'db.registrations.count()'
-mongoCmd ${BROKER_DATABASE2_NAME} 'db.registrations.count()'
+mongoCmd ${CB_DATABASE_NAME} 'db.registrations.count()'
+mongoCmd ${CM_DATABASE_NAME} 'db.registrations.count()'
 
-RESULT=$(mongoCmd ${BROKER_DATABASE_NAME} 'db.registrations.find({}, {_id: 1})')
+RESULT=$(mongoCmd ${CB_DATABASE_NAME} 'db.registrations.find({}, {_id: 1})')
 # The next line is based in processing the following pattern:
 #   { "_id" : ObjectId("5213a9a1db818a34990755c3") }
 ID1=$(echo $RESULT | awk '{print $4}' | awk -F '"' '{print $2}')
 
-RESULT=$(mongoCmd ${BROKER_DATABASE2_NAME} 'db.registrations.find({}, {fwdRegId: 1, _id: 0})')
+RESULT=$(mongoCmd ${CM_DATABASE_NAME} 'db.registrations.find({}, {fwdRegId: 1, _id: 0})')
 # The next line is based in processing the following pattern:
 #   { "fwdRegId" : "5213a9a1db818a34990755c3" }
 ID2=$(echo $RESULT | awk '{print $4}' | awk -F '"' '{print $2}')

@@ -215,7 +215,7 @@ void ucerRelease(ParseData* reqData)
 */
 std::string ucerCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->ucer.res.check(UpdateContextElement, ciP->outFormat, "", reqData->errorString, 0);
+  return reqData->ucer.res.check(ciP, UpdateContextElement, "", reqData->errorString, 0);
 }
 
 

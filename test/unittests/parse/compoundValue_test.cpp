@@ -738,7 +738,7 @@ TEST(compoundValue, updateTwoStructs)
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
-  rendered = caP->render(XML, "");
+  rendered = caP->render(&ci, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
@@ -887,7 +887,8 @@ TEST(compoundValue, updateTwoStructsJson)
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
-  rendered = caP->render(JSON, "");
+  ci.outFormat = JSON;
+  rendered = caP->render(&ci, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
@@ -1032,7 +1033,7 @@ TEST(compoundValue, sixLevels)
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
-  rendered = caP->render(XML, "");
+  rendered = caP->render(&ci, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
@@ -1343,7 +1344,8 @@ TEST(compoundValue, sixLevelsJson)
   EXPECT_TRUE(caP != NULL);
   EXPECT_TRUE(caP->compoundValueP != NULL);
 
-  rendered = caP->render(JSON, "");
+  ci.outFormat = JSON;
+  rendered = caP->render(&ci, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
@@ -1862,7 +1864,7 @@ TEST(compoundValue, tenCompounds)
   EXPECT_STREQ("OK", result.c_str());
 
   upcrP = &reqData.upcr.res;
-  rendered = upcrP->render(UpdateContext, XML, "");
+  rendered = upcrP->render(&ci, UpdateContext, "");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), renderedFile)) << "Error getting test data from '" << renderedFile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());

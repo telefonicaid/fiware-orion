@@ -29,6 +29,7 @@
 #include "common/Format.h"
 #include "common/tag.h"
 #include "ngsi/ContextElementResponse.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -36,16 +37,16 @@
 *
 * ContextElementResponse::render - 
 */
-std::string ContextElementResponse::render(RequestType requestType, Format format, const std::string& indent, bool comma)
+std::string ContextElementResponse::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma)
 {
   std::string xmlTag   = "contextElementResponse";
   std::string jsonTag  = "contextElement";
   std::string out      = "";
 
-  out += startTag(indent, xmlTag, jsonTag, format, false, false);
-  out += contextElement.render(requestType, format, indent + "  ", true);
-  out += statusCode.render(format, indent + "  ", false);
-  out += endTag(indent, xmlTag, format, comma, false);
+  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+  out += contextElement.render(ciP, requestType, indent + "  ", true);
+  out += statusCode.render(ciP->outFormat, indent + "  ", false);
+  out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
 
   return out;
 }

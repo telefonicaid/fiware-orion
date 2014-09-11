@@ -88,6 +88,27 @@ HttpStatusCode mongoQueryContext
     }
     else if (responseP->contextElementResponseVector.size() == 0)
     {
+      // Check a pontential Context Provider in the registrations collection
+      ContextRegistrationResponseVector crrV;
+      std::string err;      
+      // For now, we use limit=1. That's ensures that as much as one providing application is returned. In the future,
+      // we would consider leave this limit open and define an algorithm to pick the right one, and ordered list, etc.
+      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, 0, 1, false))
+      {
+        if (crrV.size() > 0)
+        {
+          // Suitable CProvider has been found: creating response and returning
+          std::string prApp = crrV[0]->contextRegistration.providingApplication.get();
+          LM_T(LmtCtxProviders, ("context provide found: %s", prApp.c_str()));
+          responseP->errorCode.fill(SccFound, prApp);
+          return SccOk;
+        }
+      }
+      else
+      {
+        LM_E(("Database Error (%s)", err.c_str()));
+      }
+
       //
       // If the query has an empty response, we have to fill in the status code part in the response.
       //

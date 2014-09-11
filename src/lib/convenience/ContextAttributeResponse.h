@@ -31,6 +31,7 @@
 #include "common/Format.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/StatusCode.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -43,10 +44,14 @@ typedef struct ContextAttributeResponse
   ContextAttributeVector     contextAttributeVector;     // Mandatory
   StatusCode                 statusCode;                 // Mandatory
 
-  std::string render(RequestType requestType, Format format, std::string indent);
-  std::string check(RequestType requestType, Format format, std::string indent, std::string preError, int counter);
+  std::string render(ConnectionInfo* ciP, RequestType requestType, std::string indent);
   void        present(std::string indent);
   void        release(void);
+  std::string check(ConnectionInfo*  ciP,
+                    RequestType      requestType,
+                    std::string      indent,
+                    std::string      predetectedError,
+                    int              counter);
 } ContextAttributeResponse;
 
 #endif  // SRC_LIB_CONVENIENCE_CONTEXTATTRIBUTERESPONSE_H_

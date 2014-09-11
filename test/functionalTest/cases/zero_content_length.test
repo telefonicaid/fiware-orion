@@ -31,7 +31,7 @@ brokerStart CB
 # is executed in less than one minute
 
 url=/ngsi9/registerContext
-curl localhost:${BROKER_PORT}/ngsi9/registerContext --header "Content-Length: 0" -X POST 2> /dev/null | xmllint --format -
+curl localhost:${CB_PORT}/ngsi9/registerContext --header "Content-Length: 0" -X POST 2> /dev/null | xmllint --format -
 --REGEXPECT--
 <?xml version="1.0"?>
 <registerContextResponse>

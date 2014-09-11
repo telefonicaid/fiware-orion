@@ -95,6 +95,8 @@ std::string statisticsTreat
     noOfUnsubscriptionErrors                        = -1;
     noOfNotificationsReceived                       = -1;
     noOfNotificationsSent                           = -1;
+    noOfQueryContextResponses                       = -1;
+    noOfUpdateContextResponses                      = -1;
 
     noOfContextEntitiesByEntityId                   = -1;
     noOfContextEntityAttributes                     = -1;
@@ -208,6 +210,16 @@ std::string statisticsTreat
     out += TAG_ADD("notificationsReceived", noOfNotificationsReceived);
   }
 
+
+  if (noOfQueryContextResponses != -1)
+  {
+    out += TAG_ADD("queryResponsesReceived", noOfQueryContextResponses);
+  }
+
+  if (noOfUpdateContextResponses != -1)
+  {
+    out += TAG_ADD("updateResponsesReceived", noOfUpdateContextResponses);
+  }
 
   if (noOfContextEntitiesByEntityId != -1)
   {

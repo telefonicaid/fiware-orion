@@ -385,7 +385,7 @@ void jsonUpcrRelease(ParseData* reqDataP)
 */
 std::string jsonUpcrCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->upcr.res.check(UpdateContext, ciP->outFormat, "", reqData->errorString, 0);
+  return reqData->upcr.res.check(ciP, UpdateContext, "", reqData->errorString, 0);
 }
 
 
