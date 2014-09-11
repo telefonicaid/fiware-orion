@@ -60,7 +60,7 @@ HttpStatusCode mapPostIndividualContextEntity
   ceP->entityId.fill(entityId, "", "false");
   ceP->attributeDomainName    = request->attributeDomainName;
   ceP->contextAttributeVector.fill((ContextAttributeVector*) &request->contextAttributeVector);
-  
+
   ucRequest.contextElementVector.push_back(ceP);
   ucRequest.updateActionType.set("Append");
 
