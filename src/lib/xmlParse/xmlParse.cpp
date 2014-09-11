@@ -275,7 +275,7 @@ void xmlParse
     }
 
     LM_W(("Bad Input (%s)", ciP->answer.c_str()));
-    
+
     if (errorMsgP)
     {
       *errorMsgP = std::string("Bad Input: ") + ciP->answer;

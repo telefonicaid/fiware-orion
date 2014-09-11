@@ -24,8 +24,6 @@
 */
 #include <string>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -46,7 +44,7 @@ using namespace orion;
 
 /* ****************************************************************************
 *
-* contextElementResponse - 
+* contextElementResponse -
 */
 static int contextElementResponse(xml_node<>* node, ParseData* parseDataP)
 {
@@ -60,14 +58,14 @@ static int contextElementResponse(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* entityId - 
+* entityId -
 */
 static int entityId(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId"));
 
   std::string es = entityIdParse(UpdateContext, node, &parseDataP->upcrs.cerP->contextElement.entityId);
-  
+
   if (es != "OK")
     parseDataP->errorString = es;
 
@@ -78,7 +76,7 @@ static int entityId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* entityIdId - 
+* entityIdId -
 */
 static int entityIdId(xml_node<>* node, ParseData* parseDataP)
 {
@@ -93,7 +91,7 @@ static int entityIdId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextAttribute - 
+* contextAttribute -
 */
 static int contextAttribute(xml_node<>* node, ParseData* parseDataP)
 {
@@ -107,7 +105,7 @@ static int contextAttribute(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextAttributeName - 
+* contextAttributeName -
 */
 static int contextAttributeName(xml_node<>* node, ParseData* parseDataP)
 {
@@ -120,7 +118,7 @@ static int contextAttributeName(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextAttributeType - 
+* contextAttributeType -
 */
 static int contextAttributeType(xml_node<>* node, ParseData* parseDataP)
 {
@@ -133,7 +131,7 @@ static int contextAttributeType(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextAttributeValue - 
+* contextAttributeValue -
 */
 static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
 {
@@ -148,7 +146,7 @@ static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextMetadata - 
+* contextMetadata -
 */
 static int contextMetadata(xml_node<>* node, ParseData* parseDataP)
 {
@@ -162,7 +160,7 @@ static int contextMetadata(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextMetadataName - 
+* contextMetadataName -
 */
 static int contextMetadataName(xml_node<>* node, ParseData* parseDataP)
 {
@@ -175,7 +173,7 @@ static int contextMetadataName(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextMetadataType - 
+* contextMetadataType -
 */
 static int contextMetadataType(xml_node<>* node, ParseData* parseDataP)
 {
@@ -188,7 +186,7 @@ static int contextMetadataType(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextMetadataValue - 
+* contextMetadataValue -
 */
 static int contextMetadataValue(xml_node<>* node, ParseData* parseDataP)
 {
@@ -201,7 +199,7 @@ static int contextMetadataValue(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* statusCodeCode - 
+* statusCodeCode -
 */
 static int statusCodeCode(xml_node<>* node, ParseData* parseDataP)
 {
@@ -214,12 +212,12 @@ static int statusCodeCode(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* statusCodeReasonPhrase - 
+* statusCodeReasonPhrase -
 */
 static int statusCodeReasonPhrase(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a statusCode reasonPhrase: '%s'", node->value()));
-  parseDataP->upcrs.cerP->statusCode.reasonPhrase = node->value(); // OK - parsing step
+  parseDataP->upcrs.cerP->statusCode.reasonPhrase = node->value();  // OK - parsing step
   return 0;
 }
 
@@ -227,7 +225,7 @@ static int statusCodeReasonPhrase(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* statusCodeDetails - 
+* statusCodeDetails -
 */
 static int statusCodeDetails(xml_node<>* node, ParseData* parseDataP)
 {
@@ -240,7 +238,7 @@ static int statusCodeDetails(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* errorCodeCode - 
+* errorCodeCode -
 */
 static int errorCodeCode(xml_node<>* node, ParseData* parseDataP)
 {
@@ -253,12 +251,12 @@ static int errorCodeCode(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* errorCodeReasonPhrase - 
+* errorCodeReasonPhrase -
 */
 static int errorCodeReasonPhrase(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an errorCode reasonPhrase: '%s'", node->value()));
-  parseDataP->upcrs.res.errorCode.reasonPhrase = node->value(); // OK - parsing step
+  parseDataP->upcrs.res.errorCode.reasonPhrase = node->value();  // OK - parsing step
   return 0;
 }
 
@@ -266,7 +264,7 @@ static int errorCodeReasonPhrase(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* errorCodeDetails - 
+* errorCodeDetails -
 */
 static int errorCodeDetails(xml_node<>* node, ParseData* parseDataP)
 {
@@ -277,41 +275,48 @@ static int errorCodeDetails(xml_node<>* node, ParseData* parseDataP)
 
 
 
+#define UCR  "/updateContextResponse"
+#define CR_L "/contextResponseList"
+#define CER  "/contextElementResponse"
+#define CE   "/contextElement"
+#define CA_L "/contextAttributeList"
+#define CA   "/contextAttribute"
 /* ****************************************************************************
 *
-* upcrsParseVector - 
+* upcrsParseVector -
 */
-XmlNode upcrsParseVector[] = 
+XmlNode upcrsParseVector[] =
 {
-  { "/updateContextResponse",                                             nullTreat             },
+  { "/updateContextResponse",                                   nullTreat               },
 
-  { "/updateContextResponse/contextResponseList",                                                    nullTreat               },
-  { "/updateContextResponse/contextResponseList/contextElementResponse",                             contextElementResponse  },
-  { "/updateContextResponse/contextResponseList/contextElementResponse/contextElement",              nullTreat               },
-  { "/updateContextResponse/contextResponseList/contextElementResponse/contextElement/entityId",     entityId                },
-  { "/updateContextResponse/contextResponseList/contextElementResponse/contextElement/entityId/id",  entityIdId              },
+  { UCR "/contextResponseList",                                 nullTreat               },
+  { UCR CR_L "/contextElementResponse",                         contextElementResponse  },
+  { UCR CR_L CER "/contextElement",                             nullTreat               },
+  { UCR CR_L CER CE "/entityId",                                entityId                },
+  { UCR CR_L CER CE "/entityId/id",                             entityIdId              },
 
-  { "/updateContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList",                                nullTreat              },
-  { "/updateContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute",               contextAttribute       },
-  { "/updateContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/name",          contextAttributeName   },
-  { "/updateContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/type",          contextAttributeType   },
-  { "/updateContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/contextValue",  contextAttributeValue  },
+  { UCR CR_L CER CE "/contextAttributeList",                    nullTreat               },
+  { UCR CR_L CER CE CA_L "/contextAttribute",                   contextAttribute        },
+  { UCR CR_L CER CE CA_L CA "/name",                            contextAttributeName    },
+  { UCR CR_L CER CE CA_L CA "/type",                            contextAttributeType    },
+  { UCR CR_L CER CE CA_L CA "/contextValue",                    contextAttributeValue   },
 
-  { "/updateContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata",                        nullTreat             },
-  { "/updateContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata",        contextMetadata       },
-  { "/updateContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/name",   contextMetadataName   },
-  { "/updateContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/type",   contextMetadataType   },
-  { "/updateContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/value",  contextMetadataValue  },
+  { UCR CR_L CER CE CA_L CA "/metadata",                        nullTreat               },
+  { UCR CR_L CER CE CA_L CA "/metadata/contextMetadata",        contextMetadata         },
+  { UCR CR_L CER CE CA_L CA "/metadata/contextMetadata/name",   contextMetadataName     },
+  { UCR CR_L CER CE CA_L CA "/metadata/contextMetadata/type",   contextMetadataType     },
+  { UCR CR_L CER CE CA_L CA "/metadata/contextMetadata/value",  contextMetadataValue    },
 
-  { "/updateContextResponse/contextResponseList/contextElementResponse/statusCode",               nullTreat                  },
-  { "/updateContextResponse/contextResponseList/contextElementResponse/statusCode/code",          statusCodeCode             },
-  { "/updateContextResponse/contextResponseList/contextElementResponse/statusCode/reasonPhrase",  statusCodeReasonPhrase     },
-  { "/updateContextResponse/contextResponseList/contextElementResponse/statusCode/details",       statusCodeDetails          },
+  { UCR CR_L CER "/statusCode",                                 nullTreat               },
+  { UCR CR_L CER "/statusCode/code",                            statusCodeCode          },
+  { UCR CR_L CER "/statusCode/reasonPhrase",                    statusCodeReasonPhrase  },
+  { UCR CR_L CER "/statusCode/details",                         statusCodeDetails       },
 
-  { "/updateContextResponse/errorCode",                                   nullTreat             },
-  { "/updateContextResponse/errorCode/code",                              errorCodeCode         },
-  { "/updateContextResponse/errorCode/reasonPhrase",                      errorCodeReasonPhrase },
-  { "/updateContextResponse/errorCode/details",                           errorCodeDetails      },
+  { UCR "/errorCode",                                           nullTreat               },
+  { UCR "/errorCode/code",                                      errorCodeCode           },
+  { UCR "/errorCode/reasonPhrase",                              errorCodeReasonPhrase   },
+  { UCR "/errorCode/details",                                   errorCodeDetails        },
+
   { "LAST", NULL }
 };
 
@@ -319,7 +324,7 @@ XmlNode upcrsParseVector[] =
 
 /* ****************************************************************************
 *
-* upcrsInit - 
+* upcrsInit -
 */
 void upcrsInit(ParseData* parseDataP)
 {
@@ -332,7 +337,7 @@ void upcrsInit(ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* upcrsRelease - 
+* upcrsRelease -
 */
 void upcrsRelease(ParseData* parseDataP)
 {
@@ -343,7 +348,7 @@ void upcrsRelease(ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* upcrsCheck - 
+* upcrsCheck -
 */
 std::string upcrsCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
@@ -354,7 +359,7 @@ std::string upcrsCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 #define PRINTF printf
 /* ****************************************************************************
 *
-* upcrsPresent - 
+* upcrsPresent -
 */
 void upcrsPresent(ParseData* parseDataP)
 {

@@ -257,7 +257,9 @@ std::string xmlTreat
           requestType(request),
           ciP->method.c_str()));
 
-    LM_W(("Bad Input (no request treating object found for RequestType %d (%s), method %s)", request, requestType(request), ciP->method.c_str()));
+    LM_W(("Bad Input (no request treating object found for RequestType %d (%s), method %s)",
+          request, requestType(request), ciP->method.c_str()));
+
     if (errorMsgP)
     {
       *errorMsgP = std::string("Unable to treat ") + requestType(request) + " requests";
@@ -307,7 +309,8 @@ std::string xmlTreat
 
       if (errorMsgP)
       {
-        *errorMsgP = std::string("Bad Input (invalid payload, expecting '") + payloadWord + "', got '" + payloadStart + "')" ;
+        *errorMsgP = std::string("Bad Input (invalid payload, expecting '") +
+          payloadWord + "', got '" + payloadStart + "')";
       }
 
       return errorReply;
